@@ -38,7 +38,7 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                     width="174"
                   />
                 </div>
-                <p className="max-w- text-black text-xs leading-6 pb-3 dark:text-gray-200 font-semibold">
+                <p className="max-w-xs text-nearblue-600 text-xs leading-6 pb-3 dark:text-neargray-10 font-medium">
                   {t('footer.description')}
                 </p>
 
@@ -100,10 +100,10 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
               </div>
               <div className="hidden lg:!block"></div>
               <div className="hidden lg:!block">
-                <div className="text-green-500 dark:text-green-250 font-semibold text-xl mb-3">
+                <div className="text-green-500 dark:text-green-250 font-medium text-xs mb-3">
                   &nbsp;
                 </div>
-                <ul className="text-black opacity-80 footer-links text-sm leading-6 dark:text-gray-200">
+                <ul className="text-nearblue-600 opacity-80 footer-links text-xs font-medium leading-6 dark:text-neargray-10">
                   <li>
                     <Link href="/">&nbsp;</Link>
                   </li>
@@ -113,7 +113,7 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 <div className="text-green-500 dark:text-green-250 font-semibold text-base mb-3">
                   Tools
                 </div>
-                <ul className="text-black opacity-80 footer-links text-xs font-semibold leading-6 dark:text-gray-200">
+                <ul className="text-nearblue-600 opacity-80 footer-links text-xs font-medium leading-6 dark:text-neargray-10">
                   <li>
                     <Link href="/advertise">{t('footer.links.advertise')}</Link>
                   </li>
@@ -136,7 +136,7 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 <div className="text-green-500 dark:text-green-250 font-semibold text-base mb-3">
                   {t('footer.links.explore')}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-xs font-semibold leading-6 dark:text-gray-200 ">
+                <ul className="text-nearblue-600 opacity-80 footer-links text-xs font-medium leading-6 dark:text-neargray-10 ">
                   <li>
                     <Link href="/blocks">{t('footer.links.latestBlocks')}</Link>
                   </li>
@@ -157,7 +157,7 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                 <div className="text-green-500 dark:text-green-250 font-semibold text-base mb-3">
                   {t('footer.links.company')}
                 </div>
-                <ul className="text-black opacity-80 footer-links text-xs font-semibold leading-6 dark:text-gray-200">
+                <ul className="text-nearblue-600 opacity-80 footer-links text-xs font-medium leading-6 dark:text-neargray-10">
                   <li>
                     <Link href="/about">{t('footer.links.about')}</Link>
                   </li>

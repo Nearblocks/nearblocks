@@ -63,7 +63,9 @@ const Keys = ({ role }: { role?: string }) => {
         <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
           <div className="px-5 pt-2 pb-4 items-center sm:flex flex-nowrap justify-between">
             <div>
-              <p className="text-black dark:text-neargray-10">API Keys</p>
+              <p className="text-nearblue-600 dark:text-neargray-10">
+                API Keys
+              </p>
               <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
                 For developers interested in building applications using our API
                 Service, please create an API-Key Token usable for all API
@@ -144,10 +146,10 @@ const Keys = ({ role }: { role?: string }) => {
                                 <Plan />
                               </span>
                             </div>
-                            <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+                            <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                               API Keys Empty
                             </h3>
-                            <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-10">
+                            <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-10">
                               No API Key Found
                             </p>
                           </div>
@@ -158,7 +160,7 @@ const Keys = ({ role }: { role?: string }) => {
 
                   {keys?.data.map((key: ApiKey) => (
                     <tr className="hover:bg-blue-900/5" key={key.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
                           className={'left-1/2 max-w-[200px]'}
                           position="top"
@@ -178,11 +180,11 @@ const Keys = ({ role }: { role?: string }) => {
                             <CopyIcon className="fill-current -z-50 text-green-500 dark:text-green-250 group-hover:text-white h-3 w-3" />
                           </button>
                         </div>
-                        <p className="text-[10px] text-gray-600 dark:text-neargray-100">
+                        <p className="text-[10px] text-gray-600 dark:text-neargray-10">
                           Added on {dayjs(key.created_at).format('YYYY-MM-DD')}
                         </p>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 align-top">
                         {key.usage}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap flex  items-center text-xs text-gray-600 dark:text-neargray-10 align-top">

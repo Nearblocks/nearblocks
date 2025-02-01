@@ -67,10 +67,12 @@ const Delete = () => {
     <>
       <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit my-4">
         <div className="border-b px-5 py-5 dark:border-black-200">
-          <p className="text-black dark:text-neargray-10 ">Delete Account</p>
+          <p className="text-nearblue-600 dark:text-neargray-10 ">
+            Delete Account
+          </p>
         </div>
         <div className="border-b items-center justify-between dark:border-black-200">
-          <p className="text-sm text-black dark:text-neargray-10  mt-2 px-6 pt-4 font-semibold">
+          <p className="text-sm text-nearblue-600 dark:text-neargray-10  mt-2 px-6 pt-4 font-semibold">
             Are you sure you want to permanently delete your user account?
             Recovery is not possible upon delete confirmation
           </p>
@@ -113,7 +115,7 @@ const Delete = () => {
                       <div className="flex flex-col items-start">
                         <div className="relative w-full">
                           <input
-                            className="border w-full text-black-300 dark:text-white px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
+                            className="border w-full text-nearblue-600 dark:text-neargray-10 px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
                             name="password"
                             onChange={formik.handleChange}
                             placeholder="Password"

@@ -45,7 +45,7 @@ const Buttons = ({ address }: Props) => {
 
   return (
     <>
-      <span className="inline-flex space-x-2 h-7">
+      <span className="inline-flex mr-1.5 h-7">
         <Tooltip
           className="whitespace-nowrap ml-20 mt-3 max-w-[200px]"
           position={'bottom'}

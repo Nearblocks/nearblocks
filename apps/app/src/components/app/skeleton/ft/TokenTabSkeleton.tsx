@@ -39,14 +39,14 @@ const TokenTabSkeleton = forwardRef(
     ];
     return (
       <>
-        <div className="flex items-center justify-between flex-wrap pt-8">
-          <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
-            {!error ? <Skeleton className="h-7" /> : ''}
+        <div className="flex items-center justify-between flex-wrap">
+          <div className="w-80 max-w-xs py-4 bg-neargray-25 dark:bg-black-300">
+            {!error ? <Skeleton className="h-6 flex mt-2" /> : ''}
           </div>
         </div>
         <div>
           {!error ? (
-            <div className="pt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
+            <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
               <div className="w-full">
                 <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
                   <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">

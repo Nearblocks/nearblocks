@@ -111,15 +111,15 @@ const OverviewActions = ({
 
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap pt-4">
+      <div className="flex items-center justify-between flex-wrap">
         {!token ? (
-          <div className="w-80 max-w-xs px-3 py-5">
+          <div className="w-80 max-w-xs px-2 py-4">
             <Skeleton className="h-7" />
           </div>
         ) : (
           <div className="flex items-center w-full py-4 px-2">
-            <h1 className="break-all text-xl text-gray-700 dark:text-neargray-10 leading-8 py-4 pr-2">
-              <span className="inline-flex align-middle h-7 w-7">
+            <h1 className="break-all font-bold dark:text-neargray-10 text-nearblue-600 text-lg pr-2">
+              <span className="inline-flex align-middle h-7 w-7 -ml-1">
                 <TokenImage
                   alt={token?.name}
                   className="w-7 h-7"
@@ -357,7 +357,7 @@ const OverviewActions = ({
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        className="text-green-500 dark:text-green-250 font-semibold"
+                        className="text-green-500 dark:text-green-250 font-medium"
                         href={`/address/${token?.contract}`}
                       >
                         {token?.contract}
@@ -381,7 +381,7 @@ const OverviewActions = ({
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
                     Official Site:
                   </div>
-                  <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words font-semibold">
+                  <div className="w-full md:w-3/4 text-green-500 dark:text-green-250 break-words font-medium">
                     {!token ? (
                       <div className="w-32">
                         <Skeleton className="h-4" />

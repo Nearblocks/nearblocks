@@ -46,16 +46,16 @@ export default async function NFTTokentxns(props: {
   );
   return (
     <section>
-      <div className="h-72">
-        <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-neargray-10 font-medium">
+      <div>
+        <div className="container-xxl mx-auto p-5">
+          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
             {t ? t('nfts.heading') : 'Non-Fungible Token Transfers'}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48 ">
+      <div className="container-xxl mx-auto px-4">
         <div className="relative block lg:flex lg:space-x-2">
-          <div className="w-full ">
+          <div className="w-full">
             <ErrorBoundary fallback={errorBoundaryFallback}>
               <Suspense fallback={<NFTTxnsSkeleton />}>
                 <TransfersList searchParams={searchParams} />

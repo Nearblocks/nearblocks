@@ -7,10 +7,10 @@ import '../../public/common.css';
 export const Content = ({ reset }: any) => {
   return (
     <>
-      <div className="text-center text-black dark:text-neargray-10 mt-4">
+      <div className="text-center text-nearblue-600 dark:text-neargray-10 mt-4">
         Sorry, we encountered an unexpected error. Please try again later.
       </div>
-      <div className="text-center text-black dark:text-neargray-10 mt-2">
+      <div className="text-center text-nearblue-600 dark:text-neargray-10 mt-2">
         If you think this is a problem,{' '}
         <Link
           className="text-green-100 hover:text-green-200 underline"
@@ -49,7 +49,7 @@ export default function GlobalError({
         <section className="flex flex-col items-center justify-center relative h-full bg-white dark:bg-nearblack">
           <div className="errorContainer h-screen flex flex-col items-center justify-center w-full">
             <div className="px-3 errorContent absolute flex flex-col justify-between">
-              <div className="text-center text-black dark:text-neargray-10 text-3xl pt-28 font-semibold">
+              <div className="text-center text-nearblue-600 dark:text-neargray-10 text-3xl pt-28 font-semibold">
                 Server Error
               </div>
               <Content reset={reset} />

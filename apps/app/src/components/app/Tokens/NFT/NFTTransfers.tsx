@@ -41,7 +41,8 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
       ),
       header: <span></span>,
       key: '',
-      tdClassName: 'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600',
+      tdClassName:
+        'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
       cell: (row: TransactionInfo) => (

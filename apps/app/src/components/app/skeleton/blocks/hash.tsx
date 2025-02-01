@@ -9,8 +9,8 @@ export default function HashLoading() {
   return (
     <>
       <div className="md:flex items-center justify-between">
-        <div className="w-80 max-w-xs px-3 py-5">
-          <Skeleton className="h-7" />
+        <div className="w-40 max-w-xs pr-2 py-6">
+          <Skeleton className="h-5" />
         </div>
       </div>
       <div className="bg-white text-sm text-nearblue-600 dark:text-neargray-10 dark:bg-black-600 dark:divide-black-200 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">

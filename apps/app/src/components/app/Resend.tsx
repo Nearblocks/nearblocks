@@ -68,12 +68,12 @@ const Resend = ({ type }: Props) => {
               </h1>
             )}
             <div className="py-2">
-              <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+              <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                 Email Address
               </p>
               <input
                 autoComplete="off"
-                className="border text-black-300 dark:text-white dark:border-black-200 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
+                className="border text-nearblue-600 dark:text-neargray-10 dark:border-black-200 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
                 name="email"
                 onChange={formik.handleChange}
                 placeholder="Enter your email address here"

@@ -83,7 +83,7 @@ const UpdatePassword = () => {
   return (
     <form className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit my-4">
       <div className="border-b px-5 py-5 dark:border-black-200">
-        <p className="text-black dark:text-neargray-10">Password</p>
+        <p className="text-nearblue-600 dark:text-neargray-10">Password</p>
       </div>
       <div className="gap-1 ">
         <p className="text-sm text-gray-600 dark:text-neargray-10 px-6 py-4 ">

@@ -102,7 +102,7 @@ const AddKeys = ({ mutate, selected }: Props) => {
           </p>
           <input
             autoComplete="off"
-            className="w-full border text-black-300 dark:text-white bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-xs py-2 px-2"
+            className="w-full border text-nearblue-600 dark:text-neargray-10 bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-xs py-2 px-2"
             name="name"
             onChange={formik.handleChange}
             value={formik.values.name}

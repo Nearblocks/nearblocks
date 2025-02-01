@@ -27,7 +27,7 @@ const PlanListing = ({ userRole }: { userRole?: string }) => {
                 <div className="bg-white dark:bg-black-600 dark:text-neargray-10 border dark:border-black-200 soft-shadow rounded-lg pb-1">
                   <div className={`flex flex-col lg:flex-row pt-4`}>
                     <div className="flex flex-col">
-                      <h1 className="leading-7 px-6 text-base text-black dark:text-neargray-10">
+                      <h1 className="leading-7 px-6 text-base text-nearblue-600 dark:text-neargray-10">
                         Campaign Plans
                       </h1>
                       <p className="leading-7 px-6 text-sm mb-4 text-gray-600 dark:text-neargray-10">
@@ -36,7 +36,7 @@ const PlanListing = ({ userRole }: { userRole?: string }) => {
                     </div>
                   </div>
                   <div className="overflow-x-auto ">
-                    <table className="min-w-full divide-y dark:divide-black-200  border-t dark:border-black-200 text-black">
+                    <table className="min-w-full divide-y dark:divide-black-200  border-t dark:border-black-200 text-nearblue-600 dark:text-neargray-10">
                       <thead className="bg-gray-100 dark:bg-black-300 dark:text-neargray-10">
                         <tr>
                           <th
@@ -87,10 +87,10 @@ const PlanListing = ({ userRole }: { userRole?: string }) => {
                                       <Plan />
                                     </span>
                                   </div>
-                                  <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+                                  <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                                     Plans Empty
                                   </h3>
-                                  <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-10">
+                                  <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-10">
                                     No Plans Found
                                   </p>
                                 </div>

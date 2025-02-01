@@ -59,14 +59,14 @@ export default async function TokensLayout(props: {
 
   return (
     <section>
-      <div className="h-24">
-        <div className="container-xxl mx-auto px-5">
-          <h1 className="pt-8 sm:!text-2xl text-xl text-gray-700 dark:text-neargray-10 font-semibold">
+      <div>
+        <div className="container-xxl mx-auto p-5">
+          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
             {t ? t('heading') : 'Latest Multichain Transactions'}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5">
+      <div className="container-xxl mx-auto px-4">
         <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full ">
             <ErrorBoundary fallback={<MultiChainSkeleton error />}>

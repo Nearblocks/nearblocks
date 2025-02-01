@@ -188,7 +188,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
             </h1>
             <span className="py-2 text-center">
               {/* Login to your account */}
-              <p className="text-gray-600 text-sm  font-medium dark:text-white my-1">
+              <p className="text-gray-600 text-sm  font-medium dark:text-neargray-10 my-1">
                 Don&apos;t have an account?{' '}
                 <span className="text-green-500 dark:text-green-250">
                   <Link href="/register">
@@ -219,12 +219,12 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
             )}
 
             <div className="py-2">
-              <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+              <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                 Username or Email
               </p>
               <input
                 autoComplete="off"
-                className="px-3 h-12 w-full bg-white text-black-300 dark:text-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
+                className="px-3 h-12 w-full bg-white text-nearblue-600 dark:text-neargray-10 dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
                 name="usernameOrEmail"
                 onChange={formik.handleChange}
                 onKeyDown={(e) => {
@@ -245,11 +245,11 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
             </div>
             <div className="py-2">
               <div className="flex justify-between items-center">
-                <p className="py-2 text-sm text-black-600 font-medium dark:text-neargray-100">
+                <p className="py-2 text-sm text-nearblue-600 font-medium dark:text-neargray-10">
                   Password
                 </p>
                 <Link href="/lostpassword">
-                  <span className="py-2 text-sm font-medium text-gray-600 dark:text-white hover:text-green-500 dark:hover:text-green-250">
+                  <span className="py-2 text-sm font-medium text-gray-600 dark:text-neargray-10 hover:text-green-500 dark:hover:text-green-250">
                     Forgot your password?
                   </span>
                 </Link>
@@ -257,7 +257,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
               <div className="relative w-full">
                 <input
                   autoComplete="off"
-                  className="px-3 h-12 w-full bg-white text-black-300 dark:text-white dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
+                  className="px-3 h-12 w-full bg-white text-nearblue-600 dark:text-neargray-10 dark:bg-black-600 dark:border-black-200 border border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 text-base"
                   name="password"
                   onChange={formik.handleChange}
                   onKeyDown={(e) => {
@@ -286,7 +286,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
               )}
             </div>
             <div className="py-2">
-              <p className="text-sm font-medium text-gray-600 dark:text-white flex">
+              <p className="text-sm font-medium text-gray-600 dark:text-neargray-10 flex">
                 <span className="flex">
                   <input
                     className="mr-2"

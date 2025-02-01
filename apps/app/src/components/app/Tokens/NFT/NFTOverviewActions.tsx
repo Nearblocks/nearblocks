@@ -57,13 +57,13 @@ const NFTOverviewActions = ({
 
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap pt-4">
+      <div className="flex items-center justify-between flex-wrap">
         {!token ? (
-          <div className="w-80 max-w-xs px-3 py-5">
+          <div className="w-80 max-w-xs py-4 px-1">
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all space-x-2 text-xl text-nearblue-600 dark:text-neargray-10 leading-8 py-4 px-2">
+          <h1 className="break-all space-x-2 text-lg font-bold dark:text-neargray-10 text-nearblue-600 leading-8 py-5 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 alt={token?.name}
@@ -196,7 +196,7 @@ const NFTOverviewActions = ({
                   ) : (
                     <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
                       <Link
-                        className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                        className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
                         href={`/address/${token?.contract}`}
                       >
                         {token?.contract}

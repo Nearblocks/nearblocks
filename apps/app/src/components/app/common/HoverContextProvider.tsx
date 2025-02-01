@@ -93,8 +93,8 @@ export function AddressOrTxnsLink({
       <Link
         href={linkHref}
         className={`
-          text-green-500 dark:text-green-250 text-center
-          font-semibold
+          text-green-500 dark:text-green-250 
+          font-medium
           ${!txnHash && !noHover && 'p-0.5 px-1 border rounded-md'}
           ${className}
           ${

@@ -120,7 +120,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         <div className="flex flex-wrap p-4">
           <div className="w-full">
             <div className="flex items-center pb-3">
-              <FaCode className="mr-2 text-black-600 dark:text-neargray-10" />
+              <FaCode className="mr-2 text-nearblue-600 dark:text-neargray-10" />
               <span className="font-bold">
                 {verifierData
                   ? 'Contract Source Code'

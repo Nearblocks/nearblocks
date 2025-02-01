@@ -57,17 +57,17 @@ export default async function TransactionList(props: {
 
   return (
     <>
-      <div className="h-72">
+      <div>
         <div className="container-xxl mx-auto px-5">
           <h1
-            className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-neargray-25 font-medium"
+            className="py-5 text-lg font-bold dark:text-neargray-10 text-nearblue-600"
             suppressHydrationWarning={true}
           >
             {t('txnsHeading') || 'Latest Near Protocol Transactions'}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48">
+      <div className="container-xxl mx-auto px-4">
         <div className="relative block lg:flex lg:space-x-2">
           <div className=" w-full">
             <ErrorBoundary fallback={errorBoundaryFallback}>

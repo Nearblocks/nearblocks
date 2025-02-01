@@ -72,7 +72,7 @@ const Invoice = ({ role }: { role?: string }) => {
       <UserLayout role={role} title="Invoices">
         <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit">
           <div className="px-5 pt-2 pb-4">
-            <p className="text-black dark:text-neargray-10">Invoices</p>
+            <p className="text-nearblue-600 dark:text-neargray-10">Invoices</p>
             <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
               List all invoices
             </p>
@@ -173,10 +173,10 @@ const Invoice = ({ role }: { role?: string }) => {
                             <Plan />
                           </span>
                         </div>
-                        <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+                        <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                           Invoices Empty
                         </h3>
-                        <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-10">
+                        <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-10">
                           No Invoice Found
                         </p>
                       </td>
@@ -185,7 +185,7 @@ const Invoice = ({ role }: { role?: string }) => {
 
                   {invoices?.map((invoice: Invoice) => (
                     <tr className="hover:bg-blue-900/5" key={invoice.id}>
-                      <td className="px-6 py-4 text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top">
                         {invoice.number}
                         {role === 'publisher' && (
                           <Tooltip
@@ -208,26 +208,26 @@ const Invoice = ({ role }: { role?: string }) => {
                           </p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top">
                         ${centsToDollar(invoice?.subtotal)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top">
                         ${centsToDollar(invoice?.total)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top">
                         {dayjs
                           .unix(invoice?.lines?.data[0].period?.start)
                           .format('MMMM D, YYYY')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top">
                         {dayjs
                           .unix(invoice?.lines?.data[0].period?.end)
                           .format('MMMM D, YYYY')}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top ml-3">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top ml-3">
                         {invoice?.status}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:bg-black-600 dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:bg-black-600 dark:text-neargray-10 align-top">
                         <a href={invoice.invoice_pdf}>
                           <div className="flex items-center border border-green-500 dark:border-green-250 rounded-md px-2 hover:bg-neargreen/5 dark:hover:bg-black-200">
                             <FaDownload className="text-green-500 dark:text-green-250 " />{' '}

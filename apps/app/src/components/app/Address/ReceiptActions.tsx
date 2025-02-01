@@ -515,7 +515,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             </button>
           </Tooltip>
           <button className="px-2" onClick={onOrder} type="button">
-            <div className="text-nearblue-600 font-semibold">
+            <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
               <SortIcon order={order as string} />
             </div>
           </button>

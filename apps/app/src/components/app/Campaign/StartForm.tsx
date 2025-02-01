@@ -109,14 +109,14 @@ const StartForm = ({
       <div className="w-full bg-white dark:bg-black-600 rounded-xl soft-shadow h-fit my-4">
         {/* <div className="pl-8 pb-3 border-b dark:border-black-200"> */}
         <div className="border-b px-5 py-5 dark:border-black-200">
-          <p className="text-black dark:text-neargray-10">
+          <p className="text-nearblue-600 dark:text-neargray-10">
             {!campaignData || campaignData?.data?.is_active == 0
               ? 'Start Campaign'
               : 'Stop Campaign'}
           </p>
         </div>
         <div className="border-b items-center justify-between dark:border-black-200">
-          <p className="text-sm text-black dark:text-neargray-10 mt-2 px-6 pt-4 font-semibold">
+          <p className="text-sm text-nearblue-600 dark:text-neargray-10 mt-2 px-6 pt-4 font-semibold">
             {!campaignData || campaignData?.data?.is_active == 0
               ? 'Your campaign will start once approved by an administrator'
               : 'Are you sure you want to permanently stop this campaign?'}

@@ -388,7 +388,7 @@ const Header = ({
                           className={`block w-full hover:text-green-500 dark:text-green-250 hover:no-underline py-2 px-4 text-gray-500 ${
                             networkId === 'mainnet'
                               ? 'text-green-500 dark:text-green-250'
-                              : 'text-black-600 dark:text-neargray-10'
+                              : 'text-nearblue-600 dark:text-neargray-10'
                           }`}
                           href="https://nearblocks.io"
                         >
@@ -400,7 +400,7 @@ const Header = ({
                           className={`block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline ${
                             networkId === 'testnet'
                               ? 'text-green-500 dark:text-green-250'
-                              : 'text-black-600 dark:text-neargray-10'
+                              : 'text-nearblue-600 dark:text-neargray-10'
                           }`}
                           href="https://testnet.nearblocks.io"
                         >
@@ -502,7 +502,7 @@ const Header = ({
                                 )}
                               >
                                 <div
-                                  className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 text-sm font-medium dark:text-neargray-10 text-black-600"
+                                  className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 text-sm font-medium dark:text-neargray-10 text-nearblue-600"
                                   onClick={(e: any) => onClick(e)}
                                 >
                                   {t(menu.title) || menu.fallbackText}
@@ -524,7 +524,7 @@ const Header = ({
                                     href={submenu?.link}
                                   >
                                     <div
-                                      className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-xs dark:text-neargray-10 text-black-600"
+                                      className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-xs dark:text-neargray-10 text-nearblue-600"
                                       onClick={() => setOpen(false)}
                                     >
                                       {submenu?.title
@@ -545,7 +545,7 @@ const Header = ({
                                 (item) => item.link,
                               )}
                             >
-                              <div className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-25 text-black-600">
+                              <div className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                                 {menu.fallbackText}
                                 <ArrowDown className="fill-current w-4 h-4 ml-2 transition-transform duration-200 group-hover:rotate-180" />
                               </div>
@@ -563,7 +563,7 @@ const Header = ({
                                     exact={true}
                                     href={submenu?.link}
                                   >
-                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-25 text-black-600">
+                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-10 text-nearblue-600">
                                       {submenu.fallbackText}
                                     </div>
                                   </ActiveLink>
@@ -578,7 +578,7 @@ const Header = ({
                           exact={true}
                           href={menu.link || ''}
                         >
-                          <div className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-25 text-black-600">
+                          <div className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                             {t(menu.title) || menu.fallbackText}
                           </div>
                         </ActiveLink>
@@ -590,7 +590,7 @@ const Header = ({
                       <Collapse
                         trigger={({ onClick, show }) => (
                           <a
-                            className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600"
+                            className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600"
                             href="#"
                             onClick={onClick}
                           >
@@ -607,7 +607,7 @@ const Header = ({
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink
-                                className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-medium text-xs dark:text-neargray-10 text-black-600"
+                                className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-medium text-xs dark:text-neargray-10 text-nearblue-600"
                                 href={pathname}
                                 locale={language.locale}
                               >
@@ -619,7 +619,7 @@ const Header = ({
                       </Collapse>
                       <span className="group hidden md:flex h-full w-full relative">
                         <a
-                          className="hidden md:flex h-full items-center justify-between w-full py-2 px-4 font-medium text-sm dark:text-neargray-10 text-black-600 
+                          className="hidden md:flex h-full items-center justify-between w-full py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600 
   hover:text-green-500 dark:hover:text-green-250"
                           href="#"
                         >
@@ -634,7 +634,7 @@ const Header = ({
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink
-                                className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-normal dark:text-neargray-10 text-black-600"
+                                className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-normal dark:text-neargray-10 text-nearblue-600"
                                 href={pathname}
                                 locale={language.locale}
                               >
@@ -662,7 +662,7 @@ const Header = ({
                     <UserMenu profile={profile} user={user} />
                   </li>
                 </ul>
-                <ul className="md:flex justify-end dark:text-neargray-10 text-black-600 pb-2 md:pb-0">
+                <ul className="md:flex justify-end dark:text-neargray-10 text-nearblue-600 pb-2 md:pb-0">
                   <li>
                     <>
                       <Collapse
@@ -695,7 +695,7 @@ const Header = ({
                                 ${
                                   networkId === 'mainnet'
                                     ? 'text-green-500 dark:text-green-250'
-                                    : 'text-black-600 dark:text-neargray-10'
+                                    : 'text-nearblue-600 dark:text-neargray-10'
                                 }`}
                               href="https://nearblocks.io"
                             >
@@ -708,7 +708,7 @@ const Header = ({
                                 ${
                                   networkId === 'testnet'
                                     ? 'text-green-500 dark:text-green-250'
-                                    : 'text-black-600 dark:text-neargray-10'
+                                    : 'text-nearblue-600 dark:text-neargray-10'
                                 }`}
                               href="https://testnet.nearblocks.io"
                             >

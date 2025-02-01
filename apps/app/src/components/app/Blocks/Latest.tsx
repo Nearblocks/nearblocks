@@ -96,7 +96,7 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                       <div className="overflow-hidden pl-2">
                         <div className="text-green-500 dark:text-green-250 text-sm font-medium ">
                           <Link
-                            className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                            className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
                             href={`/blocks/${block?.block_hash}`}
                           >
                             {block?.block_height
@@ -121,7 +121,7 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                         {t ? t('homePage.blockMiner') : 'Author'}&nbsp;
                       </span>
                       <Link
-                        className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
+                        className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                         href={`/address/${block?.author_account_id}`}
                       >
                         <span>{block?.author_account_id}</span>
@@ -156,14 +156,14 @@ const LatestBlocks = ({ blocks, error }: Props) => {
         </PerfectScrollbar>
       </div>
       {error && blocks?.length === 0 && (
-        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
+        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Skeleton className="h-10" />
         </div>
       )}
       {blocks && blocks?.length > 0 && (
-        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
+        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Link href="/blocks">
-            <span className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-semibold dark:font-semibold dark:hover:text-green-250 text-white dark:text-sm text-sm py-2 rounded w-full focus:outline-none hover:no-underline cursor-pointer">
+            <span className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-medium dark:hover:text-green-250 text-white dark:text-sm text-sm py-2 rounded w-full focus:outline-none hover:no-underline cursor-pointer">
               View all blocks
             </span>
           </Link>

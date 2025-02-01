@@ -54,14 +54,14 @@ export default async function Blocks(props: {
 
   return (
     <>
-      <div className=" h-72">
+      <div>
         <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl dark:text-white text-lg font-medium">
+          <h1 className="py-5 dark:text-neargray-10 text-nearblue-600 text-lg font-bold">
             {t('blockHeading') || 'Latest Near Protocol Blocks'}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48">
+      <div className="container-xxl mx-auto px-4">
         <div className="relative block lg:flex lg:space-x-2">
           <div className="w-full">
             <ErrorBoundary fallback={errorBoundaryFallback}>

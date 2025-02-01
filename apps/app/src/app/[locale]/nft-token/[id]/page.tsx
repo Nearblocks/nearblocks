@@ -31,7 +31,7 @@ export default async function TokenIndex(props: {
   );
 
   return (
-    <div className="relative container-xxl mx-auto px-5">
+    <div className="relative container-xxl mx-auto px-4">
       <section>
         <Suspense
           fallback={

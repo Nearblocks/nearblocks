@@ -74,7 +74,7 @@ module.exports = {
           DEFAULT: '#0d494a',
         },
         nearblue: {
-          600: '#000000', // Black color
+          600: '#403d50',
           700: '#9CA3AF',
           DEFAULT: '#F1F9FF',
         },

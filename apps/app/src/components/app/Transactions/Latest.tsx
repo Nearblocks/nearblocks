@@ -97,7 +97,7 @@ const LatestTransactions = ({ error, txns }: Props) => {
                       <div className="overflow-hidden pl-2">
                         <div className="text-green-500 dark:text-green-250 text-sm">
                           <Link
-                            className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
+                            className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                             href={`/txns/${txn?.transaction_hash}`}
                           >
                             {shortenHex(txn?.transaction_hash ?? '')}
@@ -119,7 +119,7 @@ const LatestTransactions = ({ error, txns }: Props) => {
                       <div className="whitespace-nowrap truncate dark:text-white">
                         {t ? t('homePage.txnFrom') : 'From'}{' '}
                         <Link
-                          className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
+                          className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                           href={`/address/${txn?.signer_account_id}`}
                         >
                           {shortenAddress(txn?.signer_account_id ?? '')}
@@ -128,7 +128,7 @@ const LatestTransactions = ({ error, txns }: Props) => {
                       <div className="whitespace-nowrap truncate dark:text-white">
                         {t ? t('homePage.txnTo') : 'To'}{' '}
                         <Link
-                          className="text-green-500 dark:text-green-250 font-semibold hover:no-underline"
+                          className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
                           href={`/address/${txn?.receiver_account_id}`}
                         >
                           {shortenAddress(txn?.receiver_account_id ?? '')}
@@ -157,14 +157,14 @@ const LatestTransactions = ({ error, txns }: Props) => {
         </PerfectScrollbar>
       </div>
       {error && txns.length === 0 && (
-        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
+        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Skeleton className="h-10" />
         </div>
       )}
       {txns && txns?.length > 0 && (
-        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600">
+        <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Link
-            className="block text-center dark:text-white  border border-green-900/10 font-semibold dark:font-semibold bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white text-sm dark:text-sm py-2 rounded w-full focus:outline-none hover:no-underline"
+            className="block text-center dark:text-white  border border-green-900/10 font-medium bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white text-sm dark:text-sm py-2 rounded w-full focus:outline-none hover:no-underline"
             href="/txns"
           >
             View all transactions

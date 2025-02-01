@@ -33,9 +33,9 @@ const NFTTokenTabSkeletion = forwardRef(
     return (
       <div className={`w-full z-50 ${className}`} ref={ref}>
         {!error && (
-          <div className="flex items-center justify-between flex-wrap pt-4">
-            <div className="w-80 max-w-xs px-3 py-5 bg-neargray-25 dark:bg-black-300">
-              <Skeleton className="h-6" />
+          <div className="flex items-center justify-between flex-wrap">
+            <div className="w-80 max-w-xs py-4 px-1 bg-neargray-25 dark:bg-black-300">
+              <Skeleton className="h-6 flex mt-2" />
             </div>{' '}
           </div>
         )}

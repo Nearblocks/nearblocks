@@ -105,16 +105,16 @@ export const Register = () => {
               <h1 className="text-2xl text-green-500 dark:text-green-250 py-2 font-semibold">
                 Register a new account
               </h1>
-              <p className="text-gray-600 text-sm  font-medium dark:text-white  py-2">
+              <p className="text-gray-600 text-sm  font-medium dark:text-neargray-10  py-2">
                 Fill out the form to get started.
               </p>
               <div className="py-2">
-                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                   Username
                 </p>
                 <input
                   autoComplete="off"
-                  className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue rounded-md h-12 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
+                  className="border text-nearblue-600 dark:text-neargray-10 dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue rounded-md h-12 dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
                   name="username"
                   onChange={formik.handleChange}
                   value={formik.values.username}
@@ -126,11 +126,11 @@ export const Register = () => {
                 )}
               </div>
               <div className="py-2">
-                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                   Email Address
                 </p>
                 <input
-                  className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
+                  className="border text-nearblue-600 dark:text-neargray-10 dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
                   name="email"
                   onChange={formik.handleChange}
                   value={formik.values.email}
@@ -140,12 +140,12 @@ export const Register = () => {
                 )}
               </div>
               <div className="py-2">
-                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                   Confirm Email Address
                 </p>
                 <input
                   autoComplete="off"
-                  className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
+                  className="border text-nearblue-600 dark:text-neargray-10 dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
                   name="confirm_email"
                   onChange={formik.handleChange}
                   onPaste={(e) => {
@@ -163,12 +163,12 @@ export const Register = () => {
               </div>
               <div className="py-2 flex">
                 <div className="w-full mr-1">
-                  <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                  <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                     Password
                   </p>
                   <div className="relative w-full">
                     <input
-                      className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
+                      className="border text-nearblue-600 dark:text-neargray-10 dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
                       name="password"
                       onChange={formik.handleChange}
                       type={showPasswords.password1 ? 'text' : 'password'}
@@ -192,12 +192,12 @@ export const Register = () => {
                   )}
                 </div>
                 <div className="w-full ml-2">
-                  <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                  <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                     Confirm Password
                   </p>
                   <div className="relative w-full">
                     <input
-                      className="border text-black-300 dark:text-white dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
+                      className="border text-nearblue-600 dark:text-neargray-10 dark:border-black-200 dark:bg-black-300 px-3 w-full focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded-md h-12"
                       name="confirm_password"
                       onChange={formik.handleChange}
                       onPaste={(e) => {
@@ -227,7 +227,7 @@ export const Register = () => {
                 </div>
               </div>
               <div className="py-2">
-                <p className="text-sm font-medium text-gray-600 dark:text-white flex">
+                <p className="text-sm font-medium text-gray-600 dark:text-neargray-10 flex">
                   <span className="flex">
                     <input
                       checked={formik.values.terms_conditions}
@@ -274,7 +274,7 @@ export const Register = () => {
                 </button>
               </div>
               <div className="py-2">
-                <p className="text-gray-600 text-sm  font-medium dark:text-white my-1">
+                <p className="text-gray-600 text-sm  font-medium dark:text-neargray-10 my-1">
                   <span>Already have an account?</span>{' '}
                   <span className="text-green-500 dark:text-green-250 ">
                     <Link href="/login">
@@ -293,17 +293,17 @@ export const Register = () => {
                 Your account registration has been submitted and is pending
                 email verification
               </div>
-              <p className="text-sm text-black-600 dark:text-neargray-100 my-6">
+              <p className="text-sm text-nearblue-600 dark:text-neargray-10 my-6">
                 We have sent an email to {formik.values?.email} with a link to
                 activate your account. To complete the sign-up process, please
                 click on the confirmation link in the email.
               </p>
-              <p className="text-sm text-black-600 dark:text-neargray-100 my-6">
+              <p className="text-sm text-nearblue-600 dark:text-neargray-10 my-6">
                 If you do not receive a confirmation email, please check your
                 spam folder and ensure your spam filters allow emails from
                 contact@ {removeProtocol(appUrl)}.
               </p>
-              <p className="text-sm text-black-600 dark:text-neargray-100 my-6">
+              <p className="text-sm text-nearblue-600 dark:text-neargray-10 my-6">
                 If you dont get confirmation link, please{' '}
                 <a
                   className="text-green-500 dark:text-green-250 font-medium cursor-pointer"

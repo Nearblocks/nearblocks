@@ -113,7 +113,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
             </div>
           )}
           <div className="border-b dark:border-black-200 px-5 py-5">
-            <p className="text-black dark:text-neargray-10">
+            <p className="text-nearblue-600 dark:text-neargray-10">
               Current API Plans
             </p>
           </div>
@@ -124,7 +124,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-1 items-center px-6 py-4  border-b dark:border-black-200">
               <p className="text-gray-600 dark:text-neargray-10 text-xs flex items-center mb-2">
-                <Avatar className="text-gray-600 dark:text-neargray-100" />{' '}
+                <Avatar className="text-gray-600 dark:text-neargray-10" />{' '}
                 <span className="ml-2">My API plan</span>
               </p>
               {loading || error ? (
@@ -132,7 +132,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
                   <Skeleton className="flex w-20 h-4" />
                 </div>
               ) : (
-                <p className="text-sm text-black dark:text-neargray-10 font-medium">
+                <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
                   {data?.user?.plan?.title} API Plan
                 </p>
               )}
@@ -140,7 +140,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-1 items-center px-6 py-4  border-b dark:border-black-200">
             <p className="text-gray-600 dark:text-neargray-10 text-xs flex items-center mb-2">
-              <CircleTimer className="text-gray-600 dark:text-neargray-100" />{' '}
+              <CircleTimer className="text-gray-600 dark:text-neargray-10" />{' '}
               <span className="ml-2">API calls per minute</span>
             </p>
             {loading || error ? (
@@ -148,14 +148,14 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
                 <Skeleton className="flex w-20 h-4" />
               </div>
             ) : (
-              <p className="text-sm text-black dark:text-neargray-10 font-medium">
+              <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
                 {localFormat(data?.user?.plan?.limit_per_minute)} Calls
               </p>
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-1 items-center px-6 py-4">
             <p className="text-gray-600 dark:text-neargray-10 text-xs flex items-center mb-2">
-              <Refresh className="text-gray-600 dark:text-neargray-100" />{' '}
+              <Refresh className="text-gray-600 dark:text-neargray-10" />{' '}
               <span className="ml-2">Monthly Quota</span>
             </p>
             {loading || error ? (
@@ -177,7 +177,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
                     {localFormat(rateLimit.limit)}
                   </p>
                   {data?.data?.subscription[0]?.end_date && (
-                    <p className="text-xs text-black dark:text-neargray-10">
+                    <p className="text-xs text-nearblue-600 dark:text-neargray-10">
                       Renewal on &nbsp;
                       {dayjs(data?.data?.subscription[0]?.end_date).format(
                         'DD/MM/YYYY',

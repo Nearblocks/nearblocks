@@ -452,7 +452,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       cell: (row: TransactionInfo) => (
         <span>
           <Link
-            className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+            className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
             href={`/blocks/${row?.included_in_block_hash}`}
           >
             {row?.block?.block_height

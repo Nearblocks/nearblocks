@@ -421,7 +421,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                   <td className="py-2 pl-4">
                     {block && (
                       <Link
-                        className="text-green-500 dark:text-green-250 font-semibold"
+                        className="text-green-500 dark:text-green-250 font-medium"
                         href={`/blocks/${receipt?.outcome?.blockHash}`}
                       >
                         {!loading &&
@@ -446,7 +446,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                   <td className="pl-4">
                     <div className="flex items-center">
                       <Link
-                        className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                        className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
                         href={`/address/${receipt?.predecessorId}`}
                       >
                         {receipt?.predecessorId}
@@ -491,7 +491,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                   </td>
                   <td className="py-2 pl-4">
                     <Link
-                      className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                      className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
                       href={`/address/${receipt?.receiverId}`}
                     >
                       {receipt?.receiverId}

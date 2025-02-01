@@ -26,7 +26,7 @@ const APISubscription = ({ role }: { role?: string }) => {
         <SubscriptionStats type="api" />
         <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
           <div className="px-5 pt-2 pb-4">
-            <p className="text-black dark:text-neargray-10">
+            <p className="text-nearblue-600 dark:text-neargray-10">
               API Subscriptions
             </p>
             <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
@@ -129,10 +129,10 @@ const APISubscription = ({ role }: { role?: string }) => {
                                   <Plan />
                                 </span>
                               </div>
-                              <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+                              <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                                 API Keys Empty
                               </h3>
-                              <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-10">
+                              <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-10">
                                 No API Key Found
                               </p>
                             </div>
@@ -153,7 +153,7 @@ const APISubscription = ({ role }: { role?: string }) => {
                           : 0;
                       return (
                         <tr className="hover:bg-blue-900/5" key={key.id}>
-                          <td className="px-6 py-4 text-xs text-black pt-6 dark:text-neargray-10 align-middle max-w-52 text-ellipsis">
+                          <td className="px-6 py-4 text-xs text-nearblue-600 pt-6 dark:text-neargray-10 align-middle max-w-52 text-ellipsis">
                             <Tooltip
                               className={'left-25 mb-3 max-w-[200px]'}
                               position="top"
@@ -170,33 +170,33 @@ const APISubscription = ({ role }: { role?: string }) => {
                             </div>
                           </td>
                           {key?.subscription_type === 'monthly' ? (
-                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
+                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
                               <span>
                                 ${dollarFormat(key?.price / 100)}
                                 /mo
                               </span>
                             </td>
                           ) : (
-                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
+                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
                               <span>
                                 ${dollarFormat(key?.price / 100)}
                                 /yr
                               </span>
                             </td>
                           )}
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
                             {dayjs(key.start_date).format('YYYY-MM-DD')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
                             {dayjs(key.end_date).format('YYYY-MM-DD')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-black dark:text-neargray-10 align-middle">
+                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
                             {key.status}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap flex items-center text-xs text-gray-600 dark:text-neargray-10 align-top">
                             <div className="flex flex-col items-center px-2 hover:bg-neargreen/5 dark:hover:bg-black-200">
                               <>
-                                <p className="text-sm font-bold text-black dark:text-neargray-10">
+                                <p className="text-sm font-semibold text-nearblue-600 dark:text-neargray-10">
                                   {localFormat(key?.remainingDaily)}
                                 </p>
                                 <div>
@@ -225,7 +225,7 @@ const APISubscription = ({ role }: { role?: string }) => {
                           <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-neargray-10 align-top">
                             <div className="flex flex-col items-center px-2 hover:bg-neargreen/5 dark:hover:bg-black-200">
                               <>
-                                <p className="text-sm font-bold text-black dark:text-neargray-10">
+                                <p className="text-sm font-semibold text-nearblue-600 dark:text-neargray-10">
                                   {localFormat(key?.remainingMonthly)}
                                 </p>
                                 <div>

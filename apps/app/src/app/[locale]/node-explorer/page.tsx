@@ -8,14 +8,14 @@ export default async function NodeExplorer(props: any) {
   const searchParams = await props.searchParams;
   return (
     <>
-      <div className="h-72">
-        <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl font-medium dark:text-neargray-10">
+      <div>
+        <div className="container-xxl mx-auto p-5">
+          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
             NEAR Protocol Validator Explorer
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48">
+      <div className="container-xxl mx-auto px-4">
         <div className="relative">
           <ErrorBoundary fallback={<ExplorerIndex error reset />}>
             <Suspense fallback={<ExplorerIndex />}>

@@ -101,12 +101,12 @@ const Reset = ({ code, email }: Props) => {
             </p>
             <div className="py-2 flex">
               <div className="w-full mr-1">
-                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                   Password
                 </p>
                 <div className="relative w-full">
                   <input
-                    className="border text-black-300 dark:text-white px-3 w-full h-12 bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
+                    className="border text-nearblue-600 dark:text-neargray-10 px-3 w-full h-12 bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
                     name="password"
                     onChange={formik.handleChange}
                     type={showPasswords.password1 ? 'text' : 'password'}
@@ -130,12 +130,12 @@ const Reset = ({ code, email }: Props) => {
                 )}
               </div>
               <div className="w-full ml-2">
-                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                   Confirm Password
                 </p>
                 <div className="relative w-full">
                   <input
-                    className="border text-black-300 dark:text-white px-3 w-full h-12 bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
+                    className="border text-nearblue-600 dark:text-neargray-10 px-3 w-full h-12 bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800"
                     name="confirm_password"
                     onChange={formik.handleChange}
                     type={showPasswords.password2 ? 'text' : 'password'}
