@@ -2,7 +2,7 @@
 import classNames from 'classnames';
 import { isEmpty } from 'lodash';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
@@ -35,7 +35,7 @@ export type RpcProvider = {
   url: string;
 };
 
-const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
+const TxnsTabActions = ({ hash, price, stats, tab, txn }: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
@@ -275,6 +275,19 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
       },
     );
 
+  const contract = useMemo(() => {
+    const containsDelegateOrFunctionCall =
+      Array.isArray(rpcTxn?.transaction?.actions) &&
+      rpcTxn?.transaction?.actions.some(
+        (action: any) =>
+          action &&
+          typeof action === 'object' &&
+          ('Delegate' in action || 'FunctionCall' in action),
+      );
+
+    return containsDelegateOrFunctionCall;
+  }, [rpcTxn]);
+
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
@@ -324,7 +337,7 @@ const TxnsTabActions = ({ hash, isContract, price, stats, tab, txn }: any) => {
                 {tab === 'overview' && (
                   <Details
                     hash={hash}
-                    isContract={isContract}
+                    isContract={contract}
                     loading={false}
                     price={price ? String(price) : ''}
                     rpcTxn={rpcTxn}

@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { truncateString } from '@/utils/app/libs';
 import { CopyButton } from './CopyButton';
 import { usePathname } from '@/i18n/routing';
+import { shortenText } from '@/utils/libs';
 
 type AddressHoverContextType = {
   hoveredAddress: string | null;
@@ -78,7 +79,7 @@ export function AddressOrTxnsLink({
     ? name
     : txnHash
     ? truncateString(txnHash, 17, '...')
-    : currentAddress && truncateString(currentAddress, 17, '...');
+    : currentAddress && shortenText(currentAddress);
   const linkHref = href
     ? href
     : txnHash
@@ -88,11 +89,11 @@ export function AddressOrTxnsLink({
   const textToCopy = txnHash ? txnHash : currentAddress;
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center">
       <Link
         href={linkHref}
         className={`
-          text-green-500 dark:text-green-250 
+          text-green-500 dark:text-green-250 text-center
           font-semibold
           ${!txnHash && !noHover && 'p-0.5 px-1 border rounded-md'}
           ${className}

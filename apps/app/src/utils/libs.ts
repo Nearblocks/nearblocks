@@ -19,6 +19,14 @@ export function shortenAddress(address: string) {
   return `${string.substr(0, 10)}...${string.substr(-7)}`;
 }
 
+export function shortenText(text: string) {
+  const string = String(text);
+
+  if (string.length <= 20) return string;
+
+  return `${string.substr(0, 6)}...${string.substr(-4)}`;
+}
+
 export function isAction(type: string) {
   const actions = [
     'DEPLOY_CONTRACT',
@@ -149,7 +157,7 @@ export function formatCustomDate(inputDate: string) {
 export function localFormat(number: string) {
   const bigNumber = Big(number);
   const formattedNumber = bigNumber
-    .toFixed(5)
+    .toFixed(6)
     .replace(/(\d)(?=(\d{3})+\.)/g, '$1,'); // Add commas before the decimal point
   return formattedNumber.replace(/\.?0*$/, ''); // Remove trailing zeros and the dot
 }
@@ -504,7 +512,7 @@ export function tokenAmount(
   if (amount === undefined || amount === null) return 'N/A';
 
   const decimalNumber = Number(decimal);
-  if (isNaN(decimalNumber)) throw new Error('Invalid decimal value');
+  if (isNaN(decimalNumber)) return '0';
 
   const near = Big(amount).div(Big(10).pow(decimalNumber));
 
@@ -633,3 +641,38 @@ export const parseLink = (link: string) => {
     return null;
   }
 };
+
+export function isValidJson(value: string): boolean {
+  try {
+    const parsed = JSON.parse(value);
+
+    return parsed && typeof parsed === 'object';
+  } catch (e) {
+    return false;
+  }
+}
+
+export function parseNestedJSON(obj: any): any {
+  if (typeof obj !== 'object' || obj === null) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => parseNestedJSON(item));
+  }
+
+  const result: any = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      try {
+        result[key] = JSON.parse(atob(obj[key]));
+      } catch {
+        result[key] = obj[key];
+      }
+    } else if (typeof obj[key] === 'object') {
+      result[key] = parseNestedJSON(obj[key]);
+    } else {
+      result[key] = obj[key];
+    }
+  }
+
+  return result;
+}

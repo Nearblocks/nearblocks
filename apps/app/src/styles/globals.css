@@ -277,3 +277,25 @@ a {
     max-width: 1400px;
   }
 }
+
+
+.mostly-customized-scrollbar {
+  display: block;
+  overflow: auto;
+}
+
+.invisible-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color:#f4f6f7; 
+  border-radius: 12px;
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1cfcf;
+  border-radius: 12px;
+}

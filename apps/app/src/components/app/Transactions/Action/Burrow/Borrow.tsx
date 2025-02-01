@@ -14,7 +14,7 @@ const Borrow = (props: DepositPropsInfo) => {
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (
-    <div className="action flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-all py-0.5">
       {props?.receiptId && params?.hash ? (
         <Link href={`/txns/${params?.hash}?tab=execution#${props?.receiptId}`}>
           <FaRight className="inline-flex text-gray-400 text-xs" />

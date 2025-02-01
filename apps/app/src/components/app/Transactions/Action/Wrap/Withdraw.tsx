@@ -12,7 +12,7 @@ const Withdraw = (props: EventPropsInfo) => {
   if (log?.length !== 3) return null;
 
   return (
-    <div className="action flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-all py-0.5">
       {props?.event?.receiptId && params?.hash ? (
         <Link
           href={`/txns/${params?.hash}?tab=execution#${props?.event?.receiptId}`}
