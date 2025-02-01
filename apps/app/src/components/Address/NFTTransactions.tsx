@@ -168,18 +168,18 @@ const NFTTransactions = ({
     {
       header: (
         <Menu>
-          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 uppercase tracking-wider focus:outline-none">
+          <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
             {t ? t('txns:type') : 'METHOD'}{' '}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
-          <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+          <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
             <form onSubmit={onFilter} className="flex flex-col">
               <input
                 name="event"
                 value={form.event}
                 onChange={onChange}
                 placeholder="Search by method"
-                className="border rounded h-8 mb-2 px-2 text-gray-500 text-xs"
+                className="border  dark:border-black-200 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
               />
               <div className="flex">
                 <button
@@ -193,7 +193,7 @@ const NFTTransactions = ({
                   name="event"
                   type="button"
                   onClick={onClear}
-                  className="flex-1 rounded bg-gray-300 text-xs h-7"
+                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                 >
                   {t ? t('txns:filter.clear') : 'Clear'}
                 </button>

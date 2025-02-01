@@ -233,7 +233,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             {t ? t('txns:type') : 'METHOD'}{' '}
             <Filter className="h-4 w-4 fill-current ml-2" />
           </MenuButton>
-          <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+          <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
             <form onSubmit={onFilter} className="flex flex-col">
               <input
                 name="type"
@@ -245,7 +245,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               <div className="flex">
                 <button
                   type="submit"
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 !text-white dark:text-black text-xs mr-2"
                 >
                   <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                   {t ? t('txns:filter.filter') : 'Filter'}
@@ -321,7 +321,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               {t ? t('txns:from') : 'FROM'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+            <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="from"
@@ -346,7 +346,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     name="from"
                     type="button"
                     onClick={onClear}
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                   >
                     {t ? t('txns:filter.clear') : 'Clear'}
                   </button>
