@@ -2,6 +2,7 @@ import type { NextPage } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
 import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
+import { supportedNetworks } from './app/config';
 
 export type NextPageWithLayout<T = any> = NextPage<T> & {
   getLayout?: (page: ReactElement<any>) => ReactNode;
@@ -518,6 +519,8 @@ export type AccountContractInfo = {
 
 export type EventPropsInfo = {
   event: TransactionLog;
+  actionsLog?: any;
+  allActionLog?: any;
 };
 
 export type DepositPropsInfo = {
@@ -746,9 +749,11 @@ export type TransActionProps = {
 };
 
 export type TokenInfoProps = {
-  amount: string;
   contract: string;
+  amount: string;
   decimals?: any;
+  transferAmount?: string;
+  isShowText?: boolean;
 };
 
 export type ValidatorFullData = {
@@ -1816,6 +1821,7 @@ export type Account = {
   storage_usage: number;
 };
 
+export type NetworkType = keyof typeof supportedNetworks;
 export type UserToken = {
   exp: number;
   iat: number;

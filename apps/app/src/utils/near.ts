@@ -9,6 +9,7 @@ import {
   FailedToFindReceipt,
   InvalidTxError,
   NestedReceiptWithOutcome,
+  NetworkType,
   NonDelegateAction,
   NonDelegateActionView,
   Obj,
@@ -25,6 +26,8 @@ import {
   TransactionLog,
   TxExecutionError,
 } from '@/utils/types';
+import { intentsAddressList, supportedNetworks } from './app/config';
+import { isValidJson } from './libs';
 
 export function localFormat(number: string) {
   const bigNumber = Big(number);
@@ -128,12 +131,12 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
 
   const outcomes = txn?.receipts_outcome || [];
 
-  for (let i = 0; i < outcomes?.length; i++) {
+  for (let i = 1; i < outcomes.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
 
-    if (logs?.length > 0) {
-      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
+    if (logs.length > 0) {
+      const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
         contract: outcome?.outcome?.executor_id || '',
         logs: log,
         receiptId: outcome.id,
@@ -144,7 +147,28 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
   return txLogs;
 }
 
-export function mapRpcActionToAction(action: ActionType | string) {
+export function txnActionLogs(txn: RPCTransactionInfo): TransactionLog[] {
+  let txLogs: TransactionLog[] = [];
+
+  const outcomes = txn?.receipts_outcome || [];
+
+  for (let i = 0; i < outcomes.length; i++) {
+    const outcome = outcomes[i];
+    let logs = outcome?.outcome?.logs || [];
+
+    if (logs.length > 0) {
+      const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
+        contract: outcome?.outcome?.executor_id || '',
+        logs: log,
+        receiptId: outcome.id,
+      }));
+      txLogs = [...txLogs, ...mappedLogs];
+    }
+  }
+  return txLogs;
+}
+
+export function mapRpcActionToAction(action: string | ActionType) {
   if (action === 'CreateAccount') {
     return {
       action_kind: 'CreateAccount',
@@ -168,7 +192,7 @@ export function txnActions(txn: RPCTransactionInfo) {
   const txActions = [];
   const receipts = txn?.receipts || [];
 
-  for (let i = 0; i < receipts?.length; i++) {
+  for (let i = 1; i < receipts.length; i++) {
     const receipt = receipts[i];
     const from = receipt?.predecessor_id;
     const to = receipt?.receiver_id;
@@ -179,20 +203,148 @@ export function txnActions(txn: RPCTransactionInfo) {
     if (Array.isArray(receipt?.receipt)) {
       const actions = receipt.receipt;
 
-      for (let j = 0; j < actions?.length; j++) {
+      for (let j = 0; j < actions.length; j++) {
         const action = actions[j];
 
-        txActions.push({ from, receiptId, to, ...action });
+        txActions.push({ from, to, receiptId, ...action });
       }
     } else {
       const actions = receipt?.receipt?.Action?.actions || [];
 
-      for (let j = 0; j < actions?.length; j++) {
+      for (let j = 0; j < actions.length; j++) {
         const action = mapRpcActionToAction(actions[j]);
 
-        txActions.push({ from, receiptId, to, ...action });
+        txActions.push({ from, to, receiptId, ...action });
       }
     }
+  }
+
+  return txActions;
+}
+
+export function txnAllActions(txn: RPCTransactionInfo) {
+  const txActions = [];
+  const receipts = txn?.receipts || [];
+
+  for (let i = 0; i < receipts.length; i++) {
+    const receipt = receipts[i];
+    const from = receipt?.predecessor_id;
+    const to = receipt?.receiver_id;
+    const receiptId = receipt?.receipt_id;
+
+    if (from === 'system') continue;
+
+    if (Array.isArray(receipt?.receipt)) {
+      const actions = receipt.receipt;
+
+      for (let j = 0; j < actions.length; j++) {
+        const action = actions[j];
+
+        txActions.push({ from, to, receiptId, ...action });
+      }
+    } else {
+      const actions = receipt?.receipt?.Action?.actions || [];
+
+      for (let j = 0; j < actions.length; j++) {
+        const action = mapRpcActionToAction(actions[j]);
+
+        txActions.push({ from, to, receiptId, ...action });
+      }
+    }
+  }
+
+  return txActions;
+}
+
+function parseNestedJSON(obj: any): any {
+  if (typeof obj !== 'object' || obj === null) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => parseNestedJSON(item));
+  }
+
+  const result: any = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      try {
+        result[key] = JSON.parse(obj[key]);
+      } catch {
+        result[key] = obj[key];
+      }
+    } else if (typeof obj[key] === 'object') {
+      result[key] = parseNestedJSON(obj[key]);
+    } else {
+      result[key] = obj[key];
+    }
+  }
+
+  return result;
+}
+
+function displayArgs(args: any) {
+  if (!args || typeof args === 'undefined') return 'The arguments are empty';
+
+  let decoded;
+  try {
+    decoded = Buffer.from(args, 'base64');
+  } catch (e) {
+    return '';
+  }
+
+  let pretty = '';
+  const decodedStr = decoded.toString();
+
+  if (isValidJson(decodedStr)) {
+    try {
+      const parsed = JSON.parse(decodedStr);
+
+      const parsedWithNestedJSON = parseNestedJSON(parsed);
+
+      pretty = JSON.stringify(parsedWithNestedJSON, null, 2);
+    } catch (err) {
+      return '';
+    }
+  }
+  return pretty;
+}
+
+export function mainActions(rpcTxn: any) {
+  const txActions = [];
+  const transaction = rpcTxn?.transaction.actions || [];
+  const receipt = rpcTxn?.transaction_outcome?.outcome?.receipt_ids[0];
+  const from = rpcTxn?.transaction?.signer_id;
+  const to = rpcTxn?.transaction?.receiver_id;
+  const logs = rpcTxn?.receipts_outcome[0]?.outcome?.logs?.map((log: any) => ({
+    logs: log,
+    contract: to,
+    receiptId: receipt,
+  }));
+
+  const actionsLog = rpcTxn?.transaction?.actions.map((log: any) => {
+    const actionInfo: any = mapRpcActionToAction(log);
+
+    return {
+      ...actionInfo,
+      args: {
+        deposit: actionInfo?.args.deposit,
+        gas: actionInfo?.args.gas,
+        method_name: actionInfo?.args?.method_name,
+        args: displayArgs(actionInfo.args.args),
+      },
+    };
+  });
+
+  for (let i = 0; i < transaction.length; i++) {
+    const action = mapRpcActionToAction(transaction[i]);
+
+    txActions?.push({
+      to,
+      from,
+      receiptId: receipt,
+      logs,
+      actionsLog,
+      ...action,
+    });
   }
 
   return txActions;
@@ -921,3 +1073,43 @@ export const txnFee = (
     .map((receipt) => receipt?.outcome?.tokens_burnt)
     ?.reduce((acc, fee) => Big(acc)?.add(fee)?.toString(), txnTokensBurnt);
 };
+
+export function parseEventLogs(event: TransactionLog): {} | any {
+  let parsedEvent: {} | any = {};
+
+  try {
+    if (event?.logs?.startsWith('EVENT_JSON:')) {
+      parsedEvent = JSON.parse(event?.logs?.replace('EVENT_JSON:', ''));
+    }
+  } catch (error) {
+    console.error('Failed to parse event logs:', error);
+  }
+
+  return parsedEvent;
+}
+
+export const networkFullNames: any = supportedNetworks;
+
+export function getNetworkDetails(input: string): string {
+  const matchedKey = Object.keys(intentsAddressList).find(
+    (key) => intentsAddressList[key] === input,
+  );
+
+  if (!matchedKey) {
+    return '';
+  }
+
+  const network = matchedKey.includes('-')
+    ? matchedKey.split('-')[0]
+    : matchedKey;
+
+  if (isExplorerNetwork(network)) {
+    return networkFullNames[network];
+  }
+
+  return '';
+}
+
+function isExplorerNetwork(value: string): value is NetworkType {
+  return Object.keys(networkFullNames).includes(value);
+}

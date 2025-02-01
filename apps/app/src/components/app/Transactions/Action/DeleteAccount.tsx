@@ -10,7 +10,7 @@ const DeleteAccount = (props: ActionPropsInfo) => {
   const params = useParams();
 
   return (
-    <div className="action flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-all">
       {props?.action?.receiptId && params?.hash ? (
         <Link
           href={`/txns/${params?.hash}?tab=execution#${props?.action?.receiptId}`}

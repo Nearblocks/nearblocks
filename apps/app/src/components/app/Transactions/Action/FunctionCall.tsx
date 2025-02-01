@@ -11,7 +11,7 @@ const FunctionCall = (props: ActionPropsInfo) => {
   const params = useParams();
 
   return (
-    <div className="action flex flex-wrap items-center break-all leading-7">
+    <div className="action flex flex-wrap items-center break-">
       {props?.action?.receiptId && params?.hash ? (
         <Link
           href={`/txns/${params?.hash}?tab=execution#${props?.action?.receiptId}`}
@@ -29,7 +29,7 @@ const FunctionCall = (props: ActionPropsInfo) => {
             position="bottom"
             tooltip={props.action.args.method_name}
           >
-            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-1 max-w-[240px] inline-flex truncate">
+            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-0.5 max-w-[240px] inline-flex truncate">
               <span className="block truncate">
                 {props.action.args.method_name}
               </span>
