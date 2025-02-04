@@ -19,11 +19,11 @@ const ErrorMessage = ({ icons, message, mutedText, reset }: Props) => {
         </span>
       </div>
 
-      <h3 className="font-bold text-lg text-black dark:text-neargray-10">
+      <h3 className="font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
         {message}
       </h3>
 
-      <p className="mb-0 py-1 font-bold break-words px-2">{mutedText}</p>
+      <p className="mb-0 py-1 font-semibold break-words px-2">{mutedText}</p>
 
       {reset && (
         <button

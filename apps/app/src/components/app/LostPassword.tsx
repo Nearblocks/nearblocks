@@ -93,7 +93,7 @@ const LostPassword = () => {
               )}
 
               <div className="py-2">
-                <p className="py-2 text-sm font-medium text-black-600 dark:text-neargray-100">
+                <p className="py-2 text-sm font-medium text-nearblue-600 dark:text-neargray-10">
                   Email Address
                 </p>
                 <input

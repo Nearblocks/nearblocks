@@ -187,7 +187,7 @@ const ApiActions = ({
             NEARBLOCKS API
           </p>
           <div className="w-full sm:block flex sm:!justify-start justify-center ">
-            <h1 className="mb-4 pt-4 text-3xl text-black dark:text-neargray-10 lg:w-1/2 md:w-3/4 sm:w-1/3 w-3/4">
+            <h1 className="mb-4 pt-4 text-3xl text-nearblue-600 dark:text-neargray-10 lg:w-1/2 md:w-3/4 sm:w-1/3 w-3/4">
               Build Precise & Reliable Apps with NearBlocks APIs
             </h1>
           </div>
@@ -225,11 +225,11 @@ const ApiActions = ({
             Data from the leading Near Protocol Block Explorer catered to your
             project&apos;s needs.
           </p>
-          <div className="my-4 flex justify-center items-center font-thin">
+          <div className="my-4 flex justify-center items-center font-medium">
             <p
               className={`${
-                !interval ? 'text-black dark:text-neargray-10' : 'text-gray-500'
-              } text-sm mx-2 font-medium`}
+                !interval ? 'opacity-100' : 'opacity-50'
+              } text-sm mx-2 font-medium text-nearblue-600 dark:text-neargray-10`}
             >
               Monthly{' '}
             </p>
@@ -241,8 +241,8 @@ const ApiActions = ({
             </span>
             <p
               className={`${
-                interval ? 'text-black dark:text-neargray-10' : 'text-gray-400'
-              } text-sm font-medium`}
+                interval ? 'opacity-100' : 'opacity-50'
+              } text-sm font-medium text-nearblue-600 dark:text-neargray-10`}
             >
               Annually{' '}
               <span className="text-green-400 dark:text-green-250">
@@ -448,14 +448,15 @@ const ApiActions = ({
           <div className="flex items-center md:w-1/3 justify-end max-sm:px-4">
             <Link href="/contact?subject=apis" type="button">
               <span className="bg-white text-green-500 text-nowrap d-block py-2 px-6 rounded-lg flex items-center dark:bg-green-250 dark:text-neargray-10">
-                Contact Us <Arrow className="text-black-600" />
+                Contact Us{' '}
+                <Arrow className="text-nearblue-600 dark:text-neargray-10" />
               </span>
             </Link>
           </div>
         </div>
         <div className="py-10 lg:px-32 px-5 dark:text-neargray-10">
           <div className="flex justify-center">
-            <h2 className="text-center px-5 border-t py-10 text-2xl font-medium text-black dark:text-neargray-10">
+            <h2 className="text-center px-5 border-t py-10 text-2xl font-medium text-nearblue-600 dark:text-neargray-10">
               Frequently Asked Questions
             </h2>
           </div>
@@ -517,7 +518,7 @@ const ApiActions = ({
           </div>
         </div>
         <div className="flex sm:!flex-row flex-col items-center  justify-center my-5">
-          <p className="text-xl text-black dark:text-neargray-10 text-center mx-4 my-6">
+          <p className="text-xl text-nearblue-600 dark:text-neargray-10 text-center mx-4 my-6">
             Detailed documentation to get started.{' '}
           </p>
           <Link href={docsUrl}>
@@ -529,7 +530,7 @@ const ApiActions = ({
 
         <div className="bg-white flex justify-center my-4 dark:bg-black-200 dark:text-neargray-10">
           <form className="my-10 md:w-1/2 w-full mx-4" onSubmit={submitForm}>
-            <h2 className="text-2xl text-center py-2 font-medium text-black dark:text-neargray-10">
+            <h2 className="text-2xl text-center py-2 font-medium text-nearblue-600 dark:text-neargray-10">
               Contact us for any inquiries
             </h2>
 

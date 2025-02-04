@@ -138,7 +138,7 @@ const BannerAdForm = ({
       <form>
         <div className="rounded-xl border dark:border-black-200 bg-white dark:bg-black-600 soft-shadow">
           <div className="px-5 py-5 border-b dark:border-black-200">
-            <p className="text-base text-black dark:text-neargray-10">
+            <p className="text-base text-nearblue-600 dark:text-neargray-10">
               Campaign Information
             </p>
           </div>
@@ -156,7 +156,7 @@ const BannerAdForm = ({
                     <Skeleton className="flex w-36 h-4" />
                   </div>
                 ) : (
-                  <p className="text-sm text-black dark:text-neargray-10 font-bold">
+                  <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-semibold">
                     {campaignData?.data?.title}
                   </p>
                 )}
@@ -173,7 +173,7 @@ const BannerAdForm = ({
                       <Skeleton className="flex w-36 h-4" />
                     </div>
                   ) : (
-                    <p className="text-sm text-black dark:text-neargray-10 font-bold">
+                    <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-semibold">
                       {`${campaignData?.data?.start_date.slice(0, 19)} (UTC)`}
                     </p>
                   )}
@@ -227,7 +227,7 @@ const BannerAdForm = ({
                 </div>
               ) : (
                 <div className="flex flex-col items-start col-span-2">
-                  <div className="h-[70px] border w-full relative text-black dark:text-neargray-10 px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800">
+                  <div className="h-[70px] border w-full relative text-nearblue-600 dark:text-neargray-10 px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800">
                     <label className="w-full h-full flex items-center justify-center hover:cursor-pointer overflow-hidden">
                       <input
                         accept=".png, .jpg, .jpeg, .gif, .webp, .svg"
@@ -284,7 +284,7 @@ const BannerAdForm = ({
                 </div>
               ) : (
                 <div className="flex flex-col items-start col-span-2">
-                  <div className="h-[70px] border w-full relative text-black dark:text-neargray-10 px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800">
+                  <div className="h-[70px] border w-full relative text-nearblue-600 dark:text-neargray-10 px-3 py-2 text-sm bg-white dark:bg-black-600 dark:border-black-200 border-{#E5E7EB} rounded-md focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800">
                     <label className="w-full h-full flex items-center justify-center hover:cursor-pointer overflow-hidden">
                       <input
                         accept=".png, .jpg, .jpeg, .gif, .webp, .svg"

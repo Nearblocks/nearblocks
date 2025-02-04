@@ -505,7 +505,7 @@ const Chart = (props: Props) => {
                 key={index}
               >
                 <Link
-                  className="block leading-7 p-3 text-sm text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200 truncate font-semibold"
+                  className="block leading-7 p-3 text-sm text-nearblue-600 dark:text-neargray-10 border-b dark:border-black-200 truncate font-medium"
                   href={chart?.link}
                 >
                   <h2>{chart?.text}</h2>

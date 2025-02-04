@@ -55,7 +55,7 @@ const BannerActions = ({ bannerInfo }: BannerActionsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bannerInfo, isMobile, isTablet]);
   const adLabel = (
-    <div className="absolute border text-nearblue-600 dark:!text-white dark:border dark:border-nearblue-650/[0.25] bg-white dark:bg-black-200 text-[8px] h-4 p-0.5 inline-flex items-center rounded-md -top-1.5 right-1.5 px-1">
+    <div className="absolute border text-nearblue-600 dark:text-neargray-10 dark:border dark:border-nearblue-650/[0.25] bg-white dark:bg-black-200 text-[8px] h-4 p-0.5 inline-flex items-center rounded-md -top-1.5 right-1.5 px-1">
       Ad
     </div>
   );

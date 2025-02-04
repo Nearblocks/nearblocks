@@ -133,7 +133,7 @@ const ReceiptRow = (props: Props) => {
         }
         id={`${receipt?.receipt_id}`}
       >
-        <div className="flex flex-wrap px-4 pt-4 pb-2">
+        <div className="flex flex-wrap px-4 py-2.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-48 left-25 max-w-[200px]'}
@@ -147,7 +147,7 @@ const ReceiptRow = (props: Props) => {
           </div>
           {!receipt || loading ? (
             <div className="w-full md:w-3/4">
-              <Loader wrapperClassName="flex w-80 max-w-xs" />
+              <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold word-break">
@@ -155,8 +155,8 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-start p-4 py-2 md:h-9">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+        <div className="flex flex-wrap items-start px-4 py-2.5">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
               tooltip={t('txnDetails.status.tooltip')}
@@ -181,8 +181,8 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap px-4 py-2">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+        <div className="flex flex-wrap px-4 py-2.5">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
               tooltip={t('txnDetails.block.tooltip')}
@@ -216,8 +216,8 @@ const ReceiptRow = (props: Props) => {
           )}
         </div>
         <div>
-          <div className="flex flex-wrap px-4 py-2">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+          <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-[1.625rem]">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
                 tooltip={t('txnDetails.receipts.from.tooltip')}
@@ -243,8 +243,8 @@ const ReceiptRow = (props: Props) => {
               ''
             )}
           </div>
-          <div className="flex flex-wrap px-4 py-2">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+          <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-[1.625rem]">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
                 tooltip={t('txnDetails.receipts.to.tooltip')}
@@ -268,8 +268,8 @@ const ReceiptRow = (props: Props) => {
             )}
           </div>
         </div>
-        <div className="flex flex-wrap px-4 py-2 md:h-9">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+        <div className="flex flex-wrap px-4 py-2.5">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
               tooltip={t('txnDetails.receipts.burnt.tooltip')}
@@ -304,7 +304,7 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2">
+        <div className="flex items-start flex-wrap px-4 py-2.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -336,7 +336,7 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2">
+        <div className="flex items-start flex-wrap px-4 py-2.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -365,7 +365,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2">
+        <div className="flex items-start flex-wrap px-4 py-2.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -387,7 +387,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2">
+        <div className="flex items-start flex-wrap px-4 py-2.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}

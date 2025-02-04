@@ -29,7 +29,7 @@ const SubscriptionStats = ({ type }: Props) => {
                 </h2>
                 {!loading && data ? (
                   <>
-                    <p className="text-3xl text-black font-bold dark:text-neargray-10">
+                    <p className="text-3xl text-nearblue-600 font-semibold dark:text-neargray-10">
                       {localFormat(data?.active)}
                     </p>
                   </>
@@ -48,7 +48,7 @@ const SubscriptionStats = ({ type }: Props) => {
                 </h2>
                 {!loading && data ? (
                   <>
-                    <p className=" text-3xl font-bold text-black dark:text-neargray-10">
+                    <p className=" text-3xl font-semibold text-nearblue-600 dark:text-neargray-10">
                       {localFormat(data?.incomplete)}
                     </p>
                   </>
@@ -67,7 +67,7 @@ const SubscriptionStats = ({ type }: Props) => {
                 </h2>
                 {!loading && data ? (
                   <>
-                    <p className=" text-3xl font-bold text-black dark:text-neargray-10">
+                    <p className=" text-3xl font-semibold text-nearblue-600 dark:text-neargray-10">
                       {localFormat(data?.cancelled)}
                     </p>
                   </>

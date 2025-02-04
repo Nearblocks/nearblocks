@@ -24,7 +24,7 @@ const UserMenu = ({ profile, user }: Props) => {
               {user ? (
                 <div className="flex justify-between">
                   <div className="flex items-center">
-                    <span className="truncate max-w-[110px] font-medium text-sm dark:text-white text-black-600">
+                    <span className="truncate max-w-[110px] font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                       {user}
                     </span>
                   </div>
@@ -37,7 +37,7 @@ const UserMenu = ({ profile, user }: Props) => {
               ) : (
                 <div>
                   <Link
-                    className="w-full flex items-center font-medium text-sm dark:text-white text-black-600"
+                    className="w-full flex items-center font-medium text-sm dark:text-neargray-10 text-nearblue-600"
                     href={`/login`}
                   >
                     <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
@@ -54,7 +54,7 @@ const UserMenu = ({ profile, user }: Props) => {
             {profile.map((menu: any) => (
               <li key={menu.id}>
                 <ActiveLink href={menu.link}>
-                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 font-medium text-sm dark:text-white text-black-600 py-2 px-4">
+                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 font-medium text-sm dark:text-neargray-10 text-nearblue-600 py-2 px-4">
                     {menu.title}
                   </div>
                 </ActiveLink>
@@ -79,7 +79,7 @@ const UserMenu = ({ profile, user }: Props) => {
           {user ? (
             <>
               <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-              <span className="truncate max-w-[110px] font-medium text-sm dark:text-white text-black-600">
+              <span className="truncate max-w-[110px] font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                 {user}
               </span>
               <ArrowDown className="fill-current w-4 h-4 ml-2" />
@@ -88,7 +88,7 @@ const UserMenu = ({ profile, user }: Props) => {
             <div className="flex items-center">
               <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
               <Link
-                className="flex font-medium text-sm dark:text-white text-black-600"
+                className="flex font-medium text-sm dark:text-neargray-10 text-nearblue-600"
                 href={`/login`}
               >
                 Sign In
@@ -101,7 +101,7 @@ const UserMenu = ({ profile, user }: Props) => {
             {profile.map((menu: any) => (
               <li key={menu.id}>
                 <ActiveLink href={menu.link}>
-                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-white text-black-600">
+                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                     {menu.title}
                   </div>
                 </ActiveLink>

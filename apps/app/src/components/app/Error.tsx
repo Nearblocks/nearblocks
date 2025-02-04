@@ -5,11 +5,11 @@ import { Link } from '@/i18n/routing';
 export const Content = () => {
   return (
     <>
-      <div className="text-center text-black dark:text-neargray-10 mt-4">
+      <div className="text-center text-nearblue-600 dark:text-neargray-10 mt-4">
         The requested URL was not found on this server.
       </div>
 
-      <div className="text-center text-black dark:text-neargray-10 mt-2">
+      <div className="text-center text-nearblue-600 dark:text-neargray-10 mt-2">
         If you think this is a problem,{' '}
         <Link
           className="text-green-100 hover:text-green-200 underline"
@@ -39,7 +39,7 @@ const Error = () => {
         </Head>
         <div className="errorContainer flex flex-col items-center justify-center">
           <div className="px-3  errorContent absolute flex flex-col justify-center">
-            <div className="text-center text-black dark:text-neargray-10 text-3xl pt-20 font-semibold">
+            <div className="text-center text-nearblue-600 dark:text-neargray-10 text-3xl pt-20 font-semibold">
               Page not found
             </div>
             {<Content />}

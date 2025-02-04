@@ -35,7 +35,7 @@ const Keys = ({ role }: { role?: string }) => {
       <UserLayout role={role} title="API Keys">
         <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4">
           <div className="px-5 pt-2 pb-4">
-            <p className="text-black dark:text-neargray-10">API Keys</p>
+            <p className="text-nearblue-600 dark:text-neargray-10">API Keys</p>
             <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
               {role === 'publisher'
                 ? `List all api keys`
@@ -116,10 +116,10 @@ const Keys = ({ role }: { role?: string }) => {
                                 <Plan />
                               </span>
                             </div>
-                            <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+                            <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                               API Keys Empty
                             </h3>
-                            <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-10">
+                            <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-10">
                               No API Key Found
                             </p>
                           </div>
@@ -130,7 +130,7 @@ const Keys = ({ role }: { role?: string }) => {
 
                   {keys?.data.map((key: ApiKey) => (
                     <tr className="hover:bg-blue-900/5" key={key.id}>
-                      <td className="px-6 py-4  text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
+                      <td className="px-6 py-4  text-xs text-nearblue-600 dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
                           className={'left-1/2 mb-3 max-w-[200px] '}
                           position="top"
@@ -141,7 +141,7 @@ const Keys = ({ role }: { role?: string }) => {
                           </span>
                         </Tooltip>
                       </td>
-                      <td className="px-6 py-4  text-xs text-black dark:text-neargray-10 align-top max-w-52 text-ellipsis">
+                      <td className="px-6 py-4  text-xs text-nearblue-600 dark:text-neargray-10 align-top max-w-52 text-ellipsis">
                         <Tooltip
                           className={'left-1/2 max-w-[200px]'}
                           position="top"
@@ -156,11 +156,11 @@ const Keys = ({ role }: { role?: string }) => {
                         <div className="flex">
                           <p className="mr-2">{shortenAddress(key?.token)}</p>
                         </div>
-                        <p className="text-[10px] text-gray-600 dark:text-neargray-100">
+                        <p className="text-[10px] text-gray-600 dark:text-neargray-10">
                           Added on {dayjs(key.created_at).format('YYYY-MM-DD')}
                         </p>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 align-top">
                         {key.usage}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap flex  items-center text-xs text-gray-600 dark:text-neargray-10 align-top">

@@ -184,7 +184,7 @@ const MultiChainTxns = ({
               {row?.transaction_hash && (
                 <div className="flex items-center mr-1">
                   <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                    <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                    <Near className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
                   </div>
                 </div>
               )}
@@ -217,7 +217,7 @@ const MultiChainTxns = ({
               {row?.account_id && (
                 <div className="flex items-center mr-1">
                   <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                    <Near className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                    <Near className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
                   </div>
                 </div>
               )}
@@ -304,7 +304,7 @@ const MultiChainTxns = ({
                       <Bitcoin className="w-4 h-4 text-orange-400" />
                     )}
                     {row?.chain === chain.ethereum && (
-                      <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                      <Ethereum className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
                     )}
                   </div>
                   <span className="ml-2">-</span>
@@ -336,7 +336,7 @@ const MultiChainTxns = ({
                       <Bitcoin className="w-4 h-4 text-orange-400" />
                     )}
                     {row?.chain === 'ETHEREUM' && (
-                      <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                      <Ethereum className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
                     )}
                   </div>
                 </div>
@@ -447,7 +447,7 @@ const MultiChainTxns = ({
             </button>
           </Tooltip>
           <button className="px-2" onClick={onOrder} type="button">
-            <div className="text-nearblue-600 font-semibold">
+            <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
               <SortIcon order={currentParams.order as string} />
             </div>
           </button>

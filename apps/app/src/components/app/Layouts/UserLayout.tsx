@@ -152,7 +152,7 @@ const UserLayout = ({ children, role, title }: UserLayoutProps) => {
                       <Skeleton className="w-28 h-4" />
                     </div>
                   ) : (
-                    <p className="text-black dark:text-neargray-100">
+                    <p className="text-nearblue-600 dark:text-neargray-10">
                       {userDetails?.username}
                     </p>
                   )}
@@ -179,7 +179,7 @@ const UserLayout = ({ children, role, title }: UserLayoutProps) => {
                 }`}
               >
                 <div className="px-4 py-2">
-                  <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
+                  <p className="text-nearblue-600 dark:text-neargray-10 uppercase text-xs py-2">
                     Account
                   </p>
 
@@ -198,7 +198,7 @@ const UserLayout = ({ children, role, title }: UserLayoutProps) => {
 
                 {role == 'advertiser' && (
                   <div className="px-4 py-2">
-                    <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
+                    <p className="text-nearblue-600 dark:text-neargray-10 uppercase text-xs py-2">
                       API
                     </p>
                     <MenuItem
@@ -232,7 +232,7 @@ const UserLayout = ({ children, role, title }: UserLayoutProps) => {
                 )}
                 {role == 'publisher' && (
                   <div className="px-4 py-2">
-                    <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
+                    <p className="text-nearblue-600 dark:text-neargray-10 uppercase text-xs py-2">
                       API
                     </p>
                     <MenuItem
@@ -254,7 +254,7 @@ const UserLayout = ({ children, role, title }: UserLayoutProps) => {
                 )}
 
                 <div className="px-4 py-2">
-                  <p className="text-nearblue-600 dark:!text-neargray-100 uppercase text-xs py-2">
+                  <p className="text-nearblue-600 dark:text-neargray-10 uppercase text-xs py-2">
                     Advertise
                   </p>
                   <MenuItem

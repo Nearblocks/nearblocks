@@ -57,16 +57,15 @@ export default async function Contact(props: {
 
   return (
     <>
-      <div className="h-72"></div>
-      <div className="container-xxl mx-auto px-5 md:px-14 flex flex-col items-start py-16 mt-[-350px]">
-        <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-white">
+      <div className="container-xxl mx-auto px-5 pb-8 md:px-14 flex flex-col items-start">
+        <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600 py-5">
           {`Contact NearBlocks`}
         </h1>
-        <div className="text-neargray-600 dark:text-neargray-10 pt-4 pb-8 gap-6 w-full soft-shadow rounded-lg bg-white dark:bg-black-600 lg:mt-8 mt-4">
-          <p className="text-lg px-10 text-neargray-600 dark:text-neargray-10 pb-4 font-medium sm:mt-0 mt-8 mb-4 border-b dark:border-slate-800">
+        <div className="dark:text-neargray-10 pt-4 pb-5 gap-6 w-full soft-shadow rounded-lg bg-white dark:bg-black-600">
+          <p className="text-base px-5 dark:text-neargray-10 pb-4 font-semibold sm:mt-0 mt-8 mb-4 border-b dark:border-slate-800">
             {t(`contact.form.heading`)}
           </p>
-          <div className="flex flex-col mx-auto px-10 ">
+          <div className="flex flex-col mx-auto px-5 ">
             <div className="col-span-5 text-green dark:text-neargreen-200 soft-shadow bg-nearblue dark:bg-gray-950 border rounded-lg p-4">
               <p className="text-sm font-bold">{t(`contact.info.heading`)}</p>
               <div className="my-4 flex flex-col gap-4">

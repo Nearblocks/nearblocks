@@ -52,21 +52,23 @@ export default async function AddressLayout(props: {
 
   return (
     <>
-      <div className="relative container-xxl mx-auto px-5 mb-10">
-        <div className="flex items-center justify-between flex-wrap pt-3">
+      <div className="relative container-xxl mx-auto px-4">
+        <div className="flex items-center justify-between flex-wrap">
           <div className="flex md:flex-wrap w-full border-b mb-5 dark:border-black-200">
-            <div className="sm:flex flex-1 justify-between md:items-center dark:text-neargray-10 w-full ">
-              <h1 className="py-2 break-all space-x-2 text-xl text-gray-700 dark:text-white leading-8 px-2 font-medium">
+            <div className="sm:flex flex-1 py-2 justify-between md:items-center dark:text-neargray-10 w-full ">
+              <h1 className="break-all text-lg py-2 px-1 dark:text-neargray-10 text-nearblue-600 font-bold">
                 Near Account:&nbsp;
                 {id && (
-                  <span className="text-green-500 dark:text-green-250">
+                  <span className="text-green-500 dark:text-green-250 mx-0.5">
                     @<span className="font-semibold">{id}</span>
                   </span>
                 )}
-                <Buttons address={id as string} />
+                <span className="ml-1">
+                  <Buttons address={id as string} />
+                </span>
               </h1>
               <div>
-                <ul className="flex relative md:pt-2 sm:pb-2 pb-1 items-center text-gray-500 text-xs">
+                <ul className="flex relative md:pt-2 sm:pb-2 items-center text-gray-500 text-xs">
                   <span className="ml-2">
                     <RpcMenu />
                   </span>

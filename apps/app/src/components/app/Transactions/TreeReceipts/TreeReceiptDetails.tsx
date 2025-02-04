@@ -73,7 +73,7 @@ const TreeReceiptDetails = (props: Props) => {
                           tooltip={receipt.predecessor_id}
                         >
                           <Link
-                            className="text-green-500 dark:text-green-250 font-semibold block truncate"
+                            className="text-green-500 dark:text-green-250 font-medium block truncate"
                             href={`/address/${receipt?.predecessor_id}`}
                           >
                             {receipt.predecessor_id}
@@ -90,7 +90,7 @@ const TreeReceiptDetails = (props: Props) => {
                           tooltip={receipt.receiver_id}
                         >
                           <Link
-                            className="text-green-500 dark:text-green-250 font-semibold block truncate"
+                            className="text-green-500 dark:text-green-250 font-medium block truncate"
                             href={`/address/${receipt?.receiver_id}`}
                           >
                             {receipt.receiver_id}

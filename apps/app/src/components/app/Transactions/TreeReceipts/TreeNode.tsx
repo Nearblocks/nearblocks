@@ -65,7 +65,7 @@ const TreeNode = ({ node, path }: { node: any; path: string }) => {
                 </span>
                 <span className="ml-1 text-green-500 dark:text-green-250">
                   {`"${key}": `}
-                  <span className="text-green-500 dark:text-green-250 font-semibold">{` { `}</span>
+                  <span className="text-green-500 dark:text-green-250 font-medium">{` { `}</span>
                 </span>
               </span>
               {isExpanded ? (

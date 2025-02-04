@@ -62,25 +62,23 @@ export default async function TxnVolumeChart(props: {
   const data = await getRequest('charts');
   return (
     <section>
-      <div className="h-72">
-        <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-white font-medium">
+      <div>
+        <div className="container-xxl mx-auto p-5">
+          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
             {t('txnVolumeCharts.heading')}
           </h1>
         </div>
       </div>
-      <div className="container-xxl mx-auto px-5 -mt-48">
-        <div className="container-xxl mx-auto px-5 -mt-36">
-          <div className="relative">
-            <Suspense fallback={<ChartDetails chartTypes="txn-volume" />}>
-              <Chart
-                chartsData={data}
-                chartTypes={'txn-volume'}
-                poweredBy={false}
-                theme={theme}
-              />
-            </Suspense>
-          </div>
+      <div className="container-xxl mx-auto px-4">
+        <div className="relative">
+          <Suspense fallback={<ChartDetails chartTypes="txn-volume" />}>
+            <Chart
+              chartsData={data}
+              chartTypes={'txn-volume'}
+              poweredBy={false}
+              theme={theme}
+            />
+          </Suspense>
         </div>
       </div>
       <div className="py-8"></div>

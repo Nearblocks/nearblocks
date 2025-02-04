@@ -22,14 +22,14 @@ const PreviewAd = ({ campaignData }: Props) => {
           <div className="text-white pt-3">
             <div className="relative">
               <div className="text-sm">
-                <p className="text-black dark:text-neargray-10 ">
+                <p className="text-nearblue-600 dark:text-neargray-10 ">
                   <b>Sponsored: </b>{' '}
                   <img
                     alt="Icon"
                     className="ad-icon inline"
                     src={campaignData?.icon}
                   />{' '}
-                  <b className="text-black dark:text-neargray-10 ">
+                  <b className="text-nearblue-600 dark:text-neargray-10 ">
                     {campaignData?.site_name}
                   </b>
                   :{campaignData?.text}{' '}

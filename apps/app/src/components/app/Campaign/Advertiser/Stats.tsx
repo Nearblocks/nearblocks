@@ -29,7 +29,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
       {!isTextHide ? (
         <div className="flex flex-wrap md:!flex-nowrap gap-4">
           <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 border soft-shadow rounded-xl px-8">
-            <h1 className="text-xl mt-8 text-black dark:text-neargray-10">
+            <h1 className="text-xl mt-8 text-nearblue-600 dark:text-neargray-10">
               Total Impressions
               {!isTextHide ? (
                 <p className="text-sm">[current Month]</p>
@@ -38,7 +38,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
               )}
             </h1>
             {!loading ? (
-              <div className="mt-4 mb-8 text-3xl text-gray-500 dark:text-neargray-10">
+              <div className="mt-4 mb-8 text-3xl text-nearblue-600 dark:text-neargray-10">
                 {campaignId ? (
                   !campaignDataLoading ? (
                     localFormat(campaignStats?.totalImpression)
@@ -54,7 +54,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
             )}
           </div>
           <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 border soft-shadow rounded-xl px-8">
-            <h1 className="text-xl mt-8 text-black dark:text-neargray-10">
+            <h1 className="text-xl mt-8 text-nearblue-600 dark:text-neargray-10">
               Total Clicks{' '}
               {!isTextHide ? (
                 <p className="text-sm">[current Month]</p>
@@ -63,7 +63,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
               )}
             </h1>
             {!loading ? (
-              <div className="mt-4 mb-8 text-3xl text-gray-500 dark:text-neargray-10">
+              <div className="mt-4 mb-8 text-3xl text-nearblue-600 dark:text-neargray-10">
                 {campaignId ? (
                   !campaignDataLoading ? (
                     localFormat(campaignStats?.totalClicks)
@@ -79,14 +79,14 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
             )}
           </div>
           <div className="w-full bg-white dark:bg-black-600 border soft-shadow rounded-xl px-8">
-            <h1 className="text-xl mt-8 text-black dark:text-neargray-10">
+            <h1 className="text-xl mt-8 text-nearblue-600 dark:text-neargray-10">
               Active Subscription{' '}
             </h1>
             {!loading ? (
               <div
                 className={`${
                   !isTextHide ? 'mt-8' : 'mt-4'
-                } mb-8 text-3xl text-gray-500 dark:text-neargray-10`}
+                } mb-8 text-3xl text-nearblue-600 dark:text-neargray-10`}
               >
                 {campaignId ? (
                   !campaignDataLoading ? (
@@ -118,7 +118,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
       ) : (
         <div className="flex flex-wrap md:!flex-nowrap gap-4">
           <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 border soft-shadow rounded-xl px-8">
-            <h1 className="text-xl mt-8 text-black dark:text-neargray-10">
+            <h1 className="text-xl mt-8 text-nearblue-600 dark:text-neargray-10">
               Total Impressions{' '}
               {!isTextHide ? (
                 <p className="text-sm">[current Month]</p>
@@ -127,7 +127,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
               )}
             </h1>
             {!loading ? (
-              <div className="mt-4 mb-8 text-3xl text-gray-500 dark:text-neargray-10">
+              <div className="mt-4 mb-8 text-3xl text-nearblue-600 dark:text-neargray-10">
                 {campaignId ? (
                   !campaignOverAllDataLoading ? (
                     localFormat(campaignOverAllStats?.totalImpression)
@@ -143,7 +143,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
             )}
           </div>
           <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 border soft-shadow rounded-xl px-8">
-            <h1 className="text-xl mt-8 text-black dark:text-neargray-10">
+            <h1 className="text-xl mt-8 text-nearblue-600 dark:text-neargray-10">
               Total Clicks{' '}
               {!isTextHide ? (
                 <p className="text-sm">[current Month]</p>
@@ -152,7 +152,7 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
               )}
             </h1>
             {!loading ? (
-              <div className="mt-4 mb-8 text-3xl text-gray-500 dark:text-neargray-10">
+              <div className="mt-4 mb-8 text-3xl text-nearblue-600 dark:text-neargray-10">
                 {campaignId ? (
                   !campaignOverAllDataLoading ? (
                     localFormat(campaignOverAllStats?.totalClicks)
@@ -168,14 +168,14 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
             )}
           </div>
           <div className="w-full bg-white dark:bg-black-600 border soft-shadow rounded-xl px-8">
-            <h1 className="text-xl mt-8 text-black dark:text-neargray-10">
+            <h1 className="text-xl mt-8 text-nearblue-600 dark:text-neargray-10">
               Active Subscription{' '}
             </h1>
             {!loading ? (
               <div
                 className={`${
                   !isTextHide ? 'mt-8' : 'mt-4'
-                } mb-8 text-3xl text-gray-500 dark:text-neargray-10`}
+                } mb-8 text-3xl text-nearblue-600 dark:text-neargray-10`}
               >
                 {campaignId ? (
                   !campaignOverAllDataLoading ? (

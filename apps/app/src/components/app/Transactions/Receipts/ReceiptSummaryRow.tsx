@@ -100,7 +100,7 @@ const ReceiptSummaryRow = (props: Props) => {
               {receipt?.predecessor_id ? (
                 <div className="word-break">
                   <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-semibold"
+                    className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
                     href={`/address/${receipt?.predecessor_id}`}
                   >
                     {receipt?.predecessor_id}
@@ -119,7 +119,7 @@ const ReceiptSummaryRow = (props: Props) => {
               {receipt?.receiver_id ? (
                 <div className="word-break">
                   <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-semibold"
+                    className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
                     href={`/address/${receipt?.receiver_id}`}
                   >
                     {receipt?.receiver_id}

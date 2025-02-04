@@ -42,13 +42,13 @@ export function CopyButton({ textToCopy }: CopyButtonProps) {
     >
       {isCopied ? (
         <>
-          <Tick className="fill-current text-green-500 dark:text-green-250 h-4 w-4" />
+          <Tick className="fill-current text-green-500 dark:text-green-250 h-4 w-4 -mt-0.5" />
           <span className="absolute bg-black/90 text-white text-xs px-3 py-2 -left-full -top-9 rounded-lg z-20 whitespace-nowrap">
             Copied!
           </span>
         </>
       ) : (
-        <CopyIcon className="fill-current text-gray-500 dark:text-gray-250 group-hover:text-green-500 dark:group-hover:text-green-250 h-4 w-4" />
+        <CopyIcon className="fill-current text-gray-500 dark:text-gray-250 group-hover:text-green-500 dark:group-hover:text-green-250 h-4 w-4 -mt-0.5" />
       )}
     </button>
   );

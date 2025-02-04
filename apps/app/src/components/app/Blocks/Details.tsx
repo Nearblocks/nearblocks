@@ -119,16 +119,18 @@ export default function Details(props: Props) {
     <>
       <div className="md:flex items-center justify-between">
         {isLoading ? (
-          <div className="w-80 max-w-xs px-3 py-5">
-            <Skeleton className="h-7" />
+          <div className="w-40 max-w-xs pr-2 py-6">
+            <Skeleton className="h-5" />
           </div>
         ) : (
-          <h1 className="text-xl text-nearblue-600 dark:text-neargray-10 px-2 py-5">
+          <h1 className="text-lg text-nearblue-600 dark:text-neargray-10 pr-2 py-5">
             {block ? (
               t ? (
                 <>
-                  {t('block.heading.0') || 'Block'}
-                  <span className="font-semibold pl-1" key={1}>
+                  <span className="font-bold">
+                    {t('block.heading.0') || 'Block'}
+                  </span>
+                  <span className="pl-1 font-semibold" key={1}>
                     {t('block.heading.1', {
                       block: block?.block_height
                         ? localFormat(block?.block_height.toString())
@@ -143,8 +145,8 @@ export default function Details(props: Props) {
                 </>
               ) : (
                 <>
-                  Block
-                  <span className="font-semibold" key={1}>
+                  <span className="font-bold">Block</span>
+                  <span className="pl-1 font-semibold" key={1}>
                     #
                     {block?.block_height
                       ? localFormat(block?.block_height.toString())

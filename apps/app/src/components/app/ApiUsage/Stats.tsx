@@ -61,9 +61,9 @@ const ApiUsageStats = ({ keyId }: Props) => {
               !keyDataLoading && keyData ? (
                 <>
                   <p className="text-gray-500 dark:text-neargray-10 text-sm">
-                    {`[${keyData?.key?.token}]`}
+                    {keyData?.key?.token && `[${keyData?.key?.token}]`}
                   </p>
-                  <p className="text-3xl text-black dark:text-neargray-10 font-bold mt-3">
+                  <p className="text-3xl text-nearblue-600 dark:text-neargray-10 font-medium mt-3">
                     {localFormat((keyData?.consumed).toString())}
                   </p>
                 </>
@@ -74,7 +74,7 @@ const ApiUsageStats = ({ keyId }: Props) => {
               )
             ) : !loading ? (
               <>
-                <p className="text-3xl text-black dark:text-neargray-10 font-bold">
+                <p className="text-3xl text-nearblue-600 dark:text-neargray-10 font-medium">
                   {localFormat(data?.consumed)}
                 </p>
                 <div className="text-gray-500  dark:text-neargray-10 text-sm mt-2">
@@ -97,7 +97,7 @@ const ApiUsageStats = ({ keyId }: Props) => {
             </h2>
             {!loading && data ? (
               <>
-                <p className=" text-3xl font-bold text-black dark:text-neargray-10">
+                <p className=" text-3xl font-medium text-nearblue-600 dark:text-neargray-10">
                   {localFormat(data?.remainingDaily)}
                 </p>
                 <div>
@@ -139,7 +139,7 @@ const ApiUsageStats = ({ keyId }: Props) => {
             </h2>
             {!loading && data ? (
               <>
-                <p className=" text-3xl font-bold text-black dark:text-neargray-10">
+                <p className=" text-3xl font-medium text-nearblue-600 dark:text-neargray-10">
                   {localFormat(data?.remainingMonthly)}
                 </p>
                 <div>

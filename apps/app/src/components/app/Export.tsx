@@ -114,7 +114,7 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
 
   return (
     <div className="bg-neargray-25 dark:bg-black-300 py-16 flex flex-col items-center text-center">
-      <h2 className="text-black dark:text-white text-2xl font-medium">
+      <h2 className="text-nearblue-600 dark:text-neargray-10 text-2xl font-medium">
         Download Data ({exportInfo.tittle})
       </h2>
       <div className="text-sm text-neargray-600 dark:text-neargray-10 py-2 max-w-lg md:mx-12 mx-4">

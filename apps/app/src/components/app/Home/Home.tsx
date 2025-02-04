@@ -137,7 +137,7 @@ export default async function Home({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="h-full w-full">
               <div className=" bg-white soft-shadow dark:bg-black-600  rounded-xl overflow-hidden md:mb-10">
-                <h2 className="border-b p-3 dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-bold">
+                <h2 className="border-b p-3 dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                   {t('homePage.latestBlocks')}
                 </h2>
                 <ErrorBoundary
@@ -155,7 +155,7 @@ export default async function Home({
             </div>
             <div className="h-full  w-full">
               <div className=" bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden mb-6 md:mb-10">
-                <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-extrabold">
+                <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
                   {t('homePage.latestTxns')}
                 </h2>
                 <ErrorBoundary

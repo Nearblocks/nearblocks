@@ -101,7 +101,7 @@ const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
   return (
     <div className="w-full bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl  soft-shadow h-fit mb-4">
       <div className="border-b px-5 py-5 dark:border-black-200">
-        <p className="text-black dark:text-neargray-10">User Settings</p>
+        <p className="text-nearblue-600 dark:text-neargray-10">User Settings</p>
       </div>
       <div className="gap-1 items-center">
         <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2 px-6 py-4">
@@ -116,7 +116,7 @@ const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
               <Skeleton className="flex w-20 h-4" />
             </div>
           ) : user?.username ? (
-            <p className="text-sm text-black dark:text-neargray-10 font-bold">
+            <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-semibold">
               {user?.username}
             </p>
           ) : (
@@ -166,7 +166,7 @@ const UpdateEmail = ({ loading, mutate, user }: UpdateEmailProps) => {
             <Skeleton className="flex w-20 h-4" />
           </div>
         ) : (
-          <p className="text-sm text-black dark:text-neargray-10 flex col-span-2">
+          <p className="text-sm text-nearblue-600 dark:text-neargray-10 flex col-span-2">
             {user?.last_login_at ? (
               <>
                 <Clock className="my-auto mr-1" />

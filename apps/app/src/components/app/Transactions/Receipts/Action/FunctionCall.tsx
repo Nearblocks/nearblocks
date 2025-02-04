@@ -85,7 +85,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
     <div className="py-1">
       <FaCode className="inline-flex text-yellow-500 mr-1" />
       {t ? t('txnDetails.actions.functionCall.0') : 'Called method'}
-      <span className="font-bold ml-1">{args?.method_name}</span>
+      <span className="font-bold mx-1">{args?.method_name}</span>
       {t ? t('txnDetails.actions.functionCall.1') : 'in contract'}
       <Link
         href={`/address/${receiver}`}

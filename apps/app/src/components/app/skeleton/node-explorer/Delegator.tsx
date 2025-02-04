@@ -103,19 +103,19 @@ const DelegatorSkeleton = forwardRef(
                   <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
                     <tr>
                       <th
-                        className="pl-7 py-2 w-[37.2rem] whitespace-nowrap align-middle text-left text-xs font-semibold text-nearblue-600  uppercase tracking-wider"
+                        className="pl-7 py-2 w-[37.2rem] whitespace-nowrap align-middle text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10  uppercase tracking-wider"
                         scope="col"
                       >
                         Account
                       </th>
                       <th
-                        className="pl-9 py-2 text-left text-xs font-semibold text-nearblue-600 align-middle uppercase tracking-wider whitespace-nowrap w-40"
+                        className="pl-9 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 align-middle uppercase tracking-wider whitespace-nowrap w-40"
                         scope="col"
                       >
                         Staked Balance
                       </th>
                       <th
-                        className="px-6 py-2 text-left text-xs align-middle font-semibold text-nearblue-600  uppercase tracking-wider whitespace-nowrap w-40"
+                        className="px-6 py-2 text-left text-xs align-middle font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap w-40"
                         scope="col"
                       >
                         Unstaked Balance

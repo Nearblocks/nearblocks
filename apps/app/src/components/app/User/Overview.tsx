@@ -22,7 +22,7 @@ const Overview = ({ role }: { role?: string }) => {
     <UserLayout role={role} title="Account Overview">
       <div className="w-full bg-white dark:bg-black-600 rounded-xl soft-shadow h-fit">
         <div className="border-b px-5 py-5 dark:border-black-200">
-          <p className="text-black dark:text-neargray-100">
+          <p className="text-nearblue-600 dark:text-neargray-10">
             Personal Information
           </p>
         </div>
@@ -40,7 +40,7 @@ const Overview = ({ role }: { role?: string }) => {
                 <Skeleton className="flex w-20 h-4" />
               </div>
             ) : (
-              <p className="text-sm text-black dark:text-neargray-100 font-bold">
+              <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-semibold">
                 {user?.username}
               </p>
             )}
@@ -56,7 +56,7 @@ const Overview = ({ role }: { role?: string }) => {
             </div>
           ) : (
             <>
-              <p className="text-sm text-black dark:text-neargray-100 font-bold">
+              <p className="text-sm text-nearblue-600 dark:text-neargray-10 font-semibold">
                 {user?.email}
               </p>
               <div className="flex justify-end">
@@ -79,7 +79,7 @@ const Overview = ({ role }: { role?: string }) => {
               <Skeleton className="flex w-20 h-4" />
             </div>
           ) : (
-            <p className="text-sm text-black dark:text-neargray-100 flex col-span-2">
+            <p className="text-sm text-nearblue-600 dark:text-neargray-10 flex col-span-2">
               {user?.last_login_at ? (
                 <>
                   <Clock className="my-auto mr-1" />

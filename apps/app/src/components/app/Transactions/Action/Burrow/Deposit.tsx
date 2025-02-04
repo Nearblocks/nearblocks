@@ -31,12 +31,12 @@ const Deposit = (props: DepositPropsInfo) => {
           currentAddress={log?.account_id}
         />
       </span>
-      <span className="font-bold text-gray px-1 flex items-center">
+      <span className="font-bold text-gray pr-1 flex items-center">
         On{' '}
         <AddressOrTxnsLink
           className="h-6 flex items-center ml-1"
           name="Burrow"
-          currentAddress={log?.account_id}
+          currentAddress={'contract.main.burrow.near'}
         />
       </span>
     </div>

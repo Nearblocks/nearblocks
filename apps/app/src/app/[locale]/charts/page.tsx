@@ -17,20 +17,18 @@ export default async function ChartIndex(props: {
 
   return (
     <>
-      <div className="h-72">
-        <div className="container-xxl mx-auto px-5">
-          <h1 className="mb-4 pt-8 sm:!text-2xl text-xl dark:text-white font-medium">
+      <div>
+        <div className="container-xxl mx-auto p-5">
+          <h1 className="text-lg dark:text-neargray-10 text-nearblue-600 font-bold">
             {t('charts.heading')}
           </h1>
         </div>
       </div>
-      <div className="mx-auto px-3 -mt-48">
-        <div className="container-xxl mx-auto px-5 -mt-36">
-          <div className="relative">
-            <Suspense fallback={<ChartSkeletion />}>
-              <Chart poweredBy={false} theme={theme} />
-            </Suspense>
-          </div>
+      <div className="container-xxl mx-auto px-4">
+        <div>
+          <Suspense fallback={<ChartSkeletion />}>
+            <Chart poweredBy={false} theme={theme} />
+          </Suspense>
         </div>
       </div>
       <div className="py-8"></div>

@@ -253,10 +253,10 @@ const ApiUsageChart = ({ keyId, role }: Props) => {
                   <Plan />
                 </span>
               </div>
-              <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+              <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                 API Key Usage
               </h3>
-              <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-50">
+              <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-50">
                 No API key usage over time
               </p>
             </div>

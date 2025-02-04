@@ -97,11 +97,11 @@ const CampaignPlans = ({ userRole }: { userRole?: string }) => {
         <h2 className="text-2xl my-2 text-center px-14 dark:text-neargray-10">
           Choose a plan that&apos;s right for you.
         </h2>
-        <div className="my-4 flex justify-center items-center font-thin">
+        <div className="my-4 flex justify-center items-center font-medium">
           <p
             className={`${
-              !interval ? 'text-black dark:text-neargray-10' : 'text-gray-600'
-            } text-sm mx-2`}
+              !interval ? 'opacity-100' : 'opacity-50'
+            } text-sm mx-2 text-nearblue-600 dark:text-neargray-10`}
           >
             Monthly{' '}
           </p>
@@ -113,8 +113,8 @@ const CampaignPlans = ({ userRole }: { userRole?: string }) => {
           </span>
           <p
             className={`${
-              interval ? 'text-black dark:text-neargray-10' : 'text-gray-500'
-            } text-sm`}
+              interval ? 'opacity-100' : 'opacity-50'
+            } text-sm text-nearblue-600 dark:text-neargray-10`}
           >
             Annually{' '}
           </p>

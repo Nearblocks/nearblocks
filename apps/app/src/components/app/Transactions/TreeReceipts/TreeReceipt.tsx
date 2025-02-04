@@ -32,8 +32,8 @@ const TreeReceipt = (props: Props) => {
         <div
           className={`relative ${
             show === receipt.receipt_id
-              ? '!text-white bg-green-500 dark:bg-green-250'
-              : 'text-green-500'
+              ? '!text-white bg-green-500 dark:bg-green-900'
+              : 'text-green-500 '
           } !border-2 !border-solid !border-green-600 dark:!border-green-250 dark:text-green-250 !rounded-lg cursor-pointer`}
           onClick={() => {
             setShow(receipt.receipt_id);

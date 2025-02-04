@@ -196,7 +196,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
             )}
           </div>
         ) : (
-          <div className="w-4 h-4 bg-gray-300 text-black flex items-center justify-center text-xs dark:bg-black-200 dark:text-white">
+          <div className="w-4 h-4 bg-gray-300 text-nearblue-600 flex items-center justify-center text-xs dark:bg-black-200 dark:text-neargray-10">
             ?
           </div>
         ),
@@ -234,7 +234,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
               tooltip={row.accountId}
             >
               <Link
-                className="text-green-500 dark:text-green-250 hover:no-underline font-semibold"
+                className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
                 href={`/node-explorer/${row.accountId}`}
               >
                 {shortenAddress(row.accountId)}
@@ -505,7 +505,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                             latestBlock.blocks[0].block_height,
                         ) > 50
                       ? 'text-yellow-500 dark:text-yellow-500'
-                      : 'text-black dark:text-white '
+                      : 'text-nearblue-600 dark:text-neargray-10 '
                   }`}
                 >
                   {telemetry?.lastHeight ? telemetry?.lastHeight : '-'}
@@ -531,7 +531,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                   </div>
                 </div>
                 <div
-                  className={`flex flex-wrap text-xs text-left font-bold text-black dark:text-white tracking-wider`}
+                  className={`flex flex-wrap text-xs text-left font-bold text-nearblue-600 dark:text-neargray-10 tracking-wider`}
                 >
                   {telemetry?.lastSeen ? timeAgo(telemetry?.lastSeen) : '-'}
                 </div>

@@ -94,7 +94,7 @@ const NFTInventory = ({ count, error, tab, token, tokens }: Props) => {
                   <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
                     Token ID:{' '}
                     <Link
-                      className="text-green dark:text-green-250 hover:no-underline font-semibold"
+                      className="text-green dark:text-green-250 hover:no-underline font-medium"
                       href={`/nft-token/${nft?.contract}/${nft?.token}`}
                     >
                       {nft?.token}
@@ -104,7 +104,7 @@ const NFTInventory = ({ count, error, tab, token, tokens }: Props) => {
                     <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10">
                       Owner:{' '}
                       <Link
-                        className="text-green dark:text-green-250 hover:no-underline font-semibold"
+                        className="text-green dark:text-green-250 hover:no-underline font-medium"
                         href={`/address/${nft?.asset?.owner}`}
                       >
                         {nft?.asset?.owner}

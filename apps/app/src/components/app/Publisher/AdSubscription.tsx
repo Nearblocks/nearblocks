@@ -26,7 +26,7 @@ const AdSubscription = ({ role }: { role?: string }) => {
         <SubscriptionStats />
         <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
           <div className="px-5 pt-2 pb-4">
-            <p className="text-black dark:text-neargray-10">
+            <p className="text-nearblue-600 dark:text-neargray-10">
               Campaign Subscriptions
             </p>
             <p className="text-sm text-gray-600 dark:text-neargray-10 mt-2">
@@ -111,10 +111,10 @@ const AdSubscription = ({ role }: { role?: string }) => {
                                   <Plan />
                                 </span>
                               </div>
-                              <h3 className="h-5 font-bold text-lg text-black dark:text-neargray-10">
+                              <h3 className="h-5 font-semibold text-lg text-nearblue-600 dark:text-neargray-10">
                                 Campaign Subscriptions Empty
                               </h3>
-                              <p className="mb-0 py-4 font-bold text-sm text-gray-500 dark:text-neargray-10">
+                              <p className="mb-0 py-4 font-semibold text-sm text-gray-500 dark:text-neargray-10">
                                 No Campaign Subscriptions Found
                               </p>
                             </div>
@@ -125,7 +125,7 @@ const AdSubscription = ({ role }: { role?: string }) => {
                   {subscriptions &&
                     subscriptions?.map((key: any) => (
                       <tr className="hover:bg-blue-900/5" key={key.id}>
-                        <td className="px-6 py-4 text-xs text-black dark:text-neargray-10">
+                        <td className="px-6 py-4 text-xs text-nearblue-600 dark:text-neargray-10">
                           <Tooltip
                             className={'ml-5 mb-3 left-1/2 max-w-[200px]'}
                             position="top"
@@ -155,13 +155,13 @@ const AdSubscription = ({ role }: { role?: string }) => {
                             </span>
                           </td>
                         )}
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top">
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 align-top">
                           {dayjs(key.start_date).format('YYYY-MM-DD')}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top">
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 align-top">
                           {dayjs(key.end_date).format('YYYY-MM-DD')}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-xs text-black dark:text-neargray-10 align-top">
+                        <td className="px-6 py-4 whitespace-nowrap text-xs text-nearblue-600 dark:text-neargray-10 align-top">
                           {key.status}
                         </td>
                       </tr>
