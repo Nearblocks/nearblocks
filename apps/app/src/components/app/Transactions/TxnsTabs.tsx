@@ -14,6 +14,7 @@ export default async function TxnsTabs({
   const options: RequestInit = { next: { revalidate: 10 } };
   const data = (await getRequest(`txns/${hash}`, {}, options)) || {};
   const stats = (await getRequest(`stats`, {}, options)) || [];
+  const syncData = (await getRequest(`sync/status`, {}, options)) || [];
   const txn = data?.txns?.[0];
   let price: null | number = null;
   if (txn?.block_timestamp) {
@@ -41,6 +42,9 @@ export default async function TxnsTabs({
 
   const tab = searchParams?.tab || 'overview';
 
+  const balanceIndexerStatus =
+    syncData && syncData?.status?.indexers?.balance?.sync;
+
   return (
     <TxnsTabActions
       hash={hash}
@@ -49,6 +53,7 @@ export default async function TxnsTabs({
       stats={stats}
       tab={tab}
       txn={txn}
+      status={balanceIndexerStatus}
     />
   );
 }
