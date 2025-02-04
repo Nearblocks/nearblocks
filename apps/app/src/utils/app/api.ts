@@ -55,6 +55,7 @@ export const getRequest = async (
 
       const delay = Math.pow(2, attempt) * 1000;
       await new Promise((resolve) => setTimeout(resolve, delay));
+      throw error;
     }
   }
 };

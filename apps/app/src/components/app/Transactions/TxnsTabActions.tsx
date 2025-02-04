@@ -35,7 +35,7 @@ export type RpcProvider = {
   url: string;
 };
 
-const TxnsTabActions = ({ hash, price, stats, tab, txn }: any) => {
+const TxnsTabActions = ({ hash, price, stats, tab, txn, status }: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
@@ -343,6 +343,7 @@ const TxnsTabActions = ({ hash, price, stats, tab, txn }: any) => {
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}
+                    status={status}
                   />
                 )}
                 {tab === 'execution' && (

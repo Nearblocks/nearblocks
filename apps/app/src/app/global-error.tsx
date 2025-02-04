@@ -46,15 +46,15 @@ export default function GlobalError({
         <title>Error - Nearblocks</title>
       </head>
       <body className="h-full">
-        <section className="flex flex-col items-center justify-center relative h-full bg-white dark:bg-nearblack">
-          <div className="errorContainer h-screen flex flex-col items-center justify-center w-full">
-            <div className="px-3 errorContent absolute flex flex-col justify-between">
-              <div className="text-center text-nearblue-600 dark:text-neargray-10 text-3xl pt-28 font-semibold">
-                Server Error
+        <section className="flex flex-col items-center justify-center relative">
+          <div className="globalErrorContainer flex flex-col items-center justify-center">
+            <div className="px-3  errorContent absolute flex flex-col justify-center">
+              <div className="text-center text-nearblue-600 dark:text-neargray-10 text-3xl pt-20 font-semibold">
+                Server Error{' '}
               </div>
               <Content reset={reset} />
             </div>
-            <div className="globalErrorBg"></div>
+            <div className="errorBg"></div>
           </div>
         </section>
       </body>
