@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  api-user:
+    container_name: api-user
+    build:
+      context: .
+      dockerfile: ./apps/api-user/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: api.user.env
+    ports:
+      - '192.168.1.75:3008:3008'
+
+volumes:
+  postgres_data:
