@@ -9,6 +9,7 @@ const env = cleanEnv(process.env, {
   AWS_URL: str(),
   DATABASE_URL: str(),
   JWT_SECRET: str(),
+  LOGO_URL: str({ default: '' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -29,6 +30,7 @@ const config: Config = {
   awsUrl: env.AWS_URL,
   dbUrl: env.DATABASE_URL,
   jwtSecret: env.JWT_SECRET,
+  logoUrl: env.LOGO_URL,
   network: env.NETWORK,
   port: 3008,
   redisPassword: env.REDIS_PASSWORD,

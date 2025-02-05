@@ -1,4 +1,8 @@
+import config from '#config';
 import { VerifyData } from '#libs/mailer';
+
+const LOGO_URL =
+  config.logoUrl || 'https://beta.nearblocks.io/images/nearblocksblack.svg';
 
 const verify = (data: VerifyData) =>
   `
@@ -95,13 +99,13 @@ const verify = (data: VerifyData) =>
     </table></td>
     </tr>
     <tr>
-    <td align="left" style="padding:20px;Margin:0;border-radius:5px 5px 0px 0px;background-color:#ffffff" bgcolor="#ffffff">
+    <td align="left" style="padding:30px 20px 0 20px;Margin:0;border-radius:5px 5px 0px 0px;background-color:#ffffff" bgcolor="#ffffff">
     <table cellpadding="0" cellspacing="0" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
     <tr>
     <td align="center" valign="top" style="padding:0;Margin:0;width:560px">
     <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
     <tr>
-    <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://beta.nearblocks.io" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2CB543;font-size:14px"><img class="adapt-img" src="https://beta.nearblocks.io/images/nearblocksblack.svg" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="192"/></a></td>
+    <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://beta.nearblocks.io" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2CB543;font-size:14px"><img class="adapt-img" src="${LOGO_URL}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="192"/></a></td>
     </tr>
     </table></td>
     </tr>
@@ -166,7 +170,7 @@ const verify = (data: VerifyData) =>
     </table></td>
     </tr>
     <tr>
-    <td align="left" bgcolor="#ffffff" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px;background-color:#ffffff;border-radius:0px 0px 5px 5px">
+    <td align="left" bgcolor="#ffffff" style="padding:0;Margin:0;padding-top:5px;padding-bottom:20px;background-color:#ffffff;border-radius:0px 0px 5px 5px">
     <table cellpadding="0" cellspacing="0" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
     <tr>
     <td align="center" valign="top" style="padding:0;Margin:0;width:600px">
@@ -189,12 +193,6 @@ const verify = (data: VerifyData) =>
     <tr>
     <td align="center" valign="top" style="padding:0;Margin:0;width:600px">
     <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-    <tr>
-    <td align="center" style="padding:20px;Margin:0;font-size:0">
-    <table border="0" width="100%" height="100%" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-    <tr>
-    <td style="padding:0;Margin:0;border-bottom:0px solid #cccccc;background:unset;height:1px;width:100%;margin:0px"></td>
-    </tr>
     </table></td>
     </tr>
     </table></td>
