@@ -13,7 +13,6 @@ const StartForm = ({
   campaignId,
   campaignMutate,
   loading,
-  mutate,
 }: CampaignProps) => {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
@@ -59,7 +58,6 @@ const StartForm = ({
           );
         }
         setChecked((curr) => !curr);
-        mutate();
         campaignMutate();
         router.push('/campaign');
       }
@@ -107,7 +105,6 @@ const StartForm = ({
   return (
     <>
       <div className="w-full bg-white dark:bg-black-600 rounded-xl soft-shadow h-fit my-4">
-        {/* <div className="pl-8 pb-3 border-b dark:border-black-200"> */}
         <div className="border-b px-5 py-5 dark:border-black-200">
           <p className="text-nearblue-600 dark:text-neargray-10">
             {!campaignData || campaignData?.data?.is_active == 0

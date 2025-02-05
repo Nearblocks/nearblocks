@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { getCookie, setCookie } from '@/utils/app/actions';
+import Cookies from 'js-cookie';
 
 interface ConfirmEmailClientProps {
   authToken?: string;
@@ -13,16 +13,13 @@ const EmailUpdate = ({ authToken, status }: ConfirmEmailClientProps) => {
   const onResend = () => router.push('/resend');
 
   useEffect(() => {
-    const handleAuth = async () => {
-      if (authToken) {
-        setCookie('token', authToken);
-        const tokenCookie = await getCookie('token');
-        if (tokenCookie) {
-          router.replace('/user/overview');
-        }
+    if (authToken) {
+      Cookies.set('token', authToken, { expires: 1 / 24 });
+      const tokenCookie = Cookies.get('token');
+      if (tokenCookie) {
+        router.replace('/user/overview');
       }
-    };
-    handleAuth();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 

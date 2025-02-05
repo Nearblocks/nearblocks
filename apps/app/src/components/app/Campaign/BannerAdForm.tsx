@@ -24,7 +24,6 @@ const BannerAdForm = ({
   campaignId,
   campaignMutate,
   loading,
-  mutate,
 }: CampaignProps) => {
   const validationSchema = bannerCampaignValidation(campaignData);
   const [bannerPreview, setBannerPreview] = useState<BannerPreview>({});
@@ -78,7 +77,6 @@ const BannerAdForm = ({
         });
       }
       setIsSubmitting(false);
-      mutate();
       campaignMutate();
     } catch (error: any) {
       if (error?.response?.data?.message) {
@@ -348,7 +346,6 @@ const BannerAdForm = ({
           campaignId={campaignId}
           campaignMutate={campaignMutate}
           loading={loading}
-          mutate={mutate}
         />
       </div>
     </>

@@ -22,7 +22,6 @@ const TextAdForm = ({
   campaignId,
   campaignMutate,
   loading,
-  mutate,
 }: CampaignProps) => {
   const validationSchema = textCampaignValidation(campaignData);
 
@@ -77,7 +76,6 @@ const TextAdForm = ({
         });
       }
       setIsSubmitting(false);
-      mutate();
       campaignMutate();
     } catch (error: any) {
       const message = catchErrors(error);
@@ -368,7 +366,6 @@ const TextAdForm = ({
           campaignId={campaignId}
           campaignMutate={campaignMutate}
           loading={loading}
-          mutate={mutate}
         />
       </div>
     </>

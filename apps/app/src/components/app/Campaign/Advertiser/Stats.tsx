@@ -5,14 +5,20 @@ import { localFormat } from '@/utils/app/libs';
 
 import Skeleton from '../../skeleton/common/Skeleton';
 
-type Props = {
-  campaignId?: string;
-  isTextHide?: boolean;
-  statsMutate?: () => void;
+type Stats = {
+  totalImpression: number;
+  totalClicks: number;
+  totalSpent: number;
 };
 
-const AdImpressions = ({ campaignId, isTextHide }: Props) => {
-  const { data, loading } = useAuth('advertiser/campaigns/stats');
+interface Props {
+  campaignId?: string;
+  data?: Stats;
+  loading?: boolean;
+  isTextHide?: boolean;
+}
+
+const AdImpressions = ({ campaignId, isTextHide, data, loading }: Props) => {
   const { data: campaignStats, loading: campaignDataLoading } = useAuth(
     campaignId ? `campaigns/${campaignId}/current-month-stats` : '',
   );
@@ -20,9 +26,9 @@ const AdImpressions = ({ campaignId, isTextHide }: Props) => {
   const { data: campaignOverAllStats, loading: campaignOverAllDataLoading } =
     useAuth(campaignId ? `campaigns/${campaignId}/total-stats` : '');
 
-  let totalImpression = +data?.totalImpression ? +data?.totalImpression : '0';
-  let totalClicks = +data?.totalClicks ? +data?.totalClicks : '0';
-  let totalSpent = +data?.totalSpent / 100 ? +data?.totalSpent / 100 : '$0';
+  let totalImpression = data?.totalImpression ?? 0;
+  let totalClicks = data?.totalClicks ?? 0;
+  let totalSpent = data?.totalSpent ? data.totalSpent / 100 : '$0';
 
   return (
     <>

@@ -24,7 +24,7 @@ const APISubscription = ({ role }: { role?: string }) => {
     <>
       <UserLayout role={role} title="API Subscriptions">
         <SubscriptionStats type="api" />
-        <div className="w-full pt-2 pb-3 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
+        <div className="w-full pt-2 pb-2 bg-white dark:bg-black-600 dark:text-neargray-10 rounded-xl soft-shadow h-fit mb-4 mt-8">
           <div className="px-5 pt-2 pb-4">
             <p className="text-nearblue-600 dark:text-neargray-10">
               API Subscriptions
@@ -39,81 +39,81 @@ const APISubscription = ({ role }: { role?: string }) => {
                 <thead className="bg-gray-100 dark:bg-black-300 dark:text-neargray-10">
                   <tr>
                     <th
-                      className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 w-[5.5%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
-                      USER
+                      <div className="pl-2">USER</div>
                     </th>
                     <th
-                      className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 w-[8.3%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
                       PLAN
                     </th>
                     <th
-                      className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 w-[7.5%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
                       PRICE
                     </th>
                     <th
-                      className="px-6 py-4 text-left text-xs whitespace-nowrap font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 w-[2%] text-left text-xs whitespace-nowrap font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
                       START DATE
                     </th>
                     <th
-                      className="px-6 py-4 text-left text-xs whitespace-nowrap font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 w-[2%] text-left text-xs whitespace-nowrap font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
                       END DATE
                     </th>
                     <th
-                      className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 w-[2%] text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
                       scope="col"
                     >
                       STATUS
                     </th>
                     <th
-                      className="px-6 py-4 text-center text-xs w-6 font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 text-start text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap"
                       scope="col"
                     >
-                      Requests Remaining (24H)
+                      <div className="pl-3">Requests Remaining (24H)</div>
                     </th>
                     <th
-                      className="px-6 py-4 text-center text-xs w-6 font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider"
+                      className="px-3 py-4 text-start text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap"
                       scope="col"
                     >
-                      Requests Remaining (Monthly)
+                      <div className="pl-3">Requests Remaining (Monthly)</div>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-black-600 divide-y divide-gray-200 dark:divide-black-200">
                   {loading &&
-                    [...Array(2)].map((_, i) => (
-                      <tr className="hover:bg-blue-900/5 h-[100px]" key={i}>
-                        <td className="w-[5.5%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                    [...Array(3)].map((_, i) => (
+                      <tr className="hover:bg-blue-900/5 h-[80px]" key={i}>
+                        <td className="w-[8.4%] px-5 py-2.5 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="w-[8.3%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
-                          <Skeleton className="h-4 " />
-                        </td>
-                        <td className="w-[7.5%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[1%] px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="w-[2%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[2%] px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="w-[2%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[2%] px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="w-[2%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[2%] px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="w-[7%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[3%] px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
-                        <td className="w-[5.5%] px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                        <td className="w-[20%] px-3 py-2 pl-6 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
+                          <Skeleton className="h-4" />
+                        </td>
+                        <td className="w-[4%] px-3 py-2 pl-6 text-left text-xs font-semibold text-gray-600 dark:text-neargray-10 uppercase tracking-wider">
                           <Skeleton className="h-4" />
                         </td>
                       </tr>
@@ -153,103 +153,85 @@ const APISubscription = ({ role }: { role?: string }) => {
                           : 0;
                       return (
                         <tr className="hover:bg-blue-900/5" key={key.id}>
-                          <td className="px-6 py-4 text-xs text-nearblue-600 pt-6 dark:text-neargray-10 align-middle max-w-52 text-ellipsis">
+                          <td className="px-5 py-2.5 text-xs text-nearblue-600 dark:text-neargray-10 max-w-52 text-ellipsis pt-6">
                             <Tooltip
-                              className={'left-25 mb-3 max-w-[200px]'}
+                              className="left-24 mb-3 max-w-[200px]"
                               position="top"
                               tooltip={key?.user_email}
                             >
-                              <span className="whitespace-nowrap inline-block truncate max-w-[100px]">
+                              <span className="whitespace-nowrap inline-block truncate max-w-[80px]">
                                 {key?.username}
                               </span>
                             </Tooltip>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-green-500 dark:text-green-250 align-middle">
-                            <div className="flex">
-                              <p className="mr-2">{key?.campaign_plan_title}</p>
-                            </div>
+                          <td className="px-3 py-3 text-xs text-green-500 dark:text-green-250 whitespace-nowrap pt-6">
+                            <p>{key?.campaign_plan_title}</p>
                           </td>
-                          {key?.subscription_type === 'monthly' ? (
-                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
-                              <span>
-                                ${dollarFormat(key?.price / 100)}
-                                /mo
-                              </span>
-                            </td>
-                          ) : (
-                            <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
-                              <span>
-                                ${dollarFormat(key?.price / 100)}
-                                /yr
-                              </span>
-                            </td>
-                          )}
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
+                          <td className="px-3 py-3 text-xs text-nearblue-600 dark:text-neargray-10 whitespace-nowrap pt-6">
+                            <span>
+                              ${dollarFormat(key?.price / 100)}
+                              {key?.subscription_type === 'monthly'
+                                ? '/mo'
+                                : '/yr'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 text-xs text-nearblue-600 dark:text-neargray-10 whitespace-nowrap pt-6">
                             {dayjs(key.start_date).format('YYYY-MM-DD')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
+                          <td className="px-3 py-3 text-xs text-nearblue-600 dark:text-neargray-10 whitespace-nowrap pt-6">
                             {dayjs(key.end_date).format('YYYY-MM-DD')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs pt-6 text-nearblue-600 dark:text-neargray-10 align-middle">
+                          <td className="px-3 py-3 text-xs text-nearblue-600 dark:text-neargray-10 whitespace-nowrap pt-6">
                             {key.status}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap flex items-center text-xs text-gray-600 dark:text-neargray-10 align-top">
-                            <div className="flex flex-col items-center px-2 hover:bg-neargreen/5 dark:hover:bg-black-200">
-                              <>
-                                <p className="text-sm font-semibold text-nearblue-600 dark:text-neargray-10">
-                                  {localFormat(key?.remainingDaily)}
+                          <td className="px-3 py-3 text-xs text-gray-600 dark:text-neargray-10 w-60 align-middle">
+                            <div className="flex flex-col items-start px-3 hover:bg-neargreen/5 dark:hover:bg-black-200">
+                              <p className="text-sm font-semibold text-nearblue-600 dark:text-neargray-10">
+                                {localFormat(key?.remainingDaily)}
+                              </p>
+                              <div className="w-full bg-gray-200 dark:bg-neargray-50 h-2 rounded-full mt-2">
+                                <div
+                                  className="bg-green-500 dark:bg-green-250 h-2 rounded-full"
+                                  style={{
+                                    width: `${dailyPercentage}%`,
+                                    maxWidth: '100%',
+                                  }}
+                                ></div>
+                              </div>
+                              <div className="flex whitespace-nowrap text-xs mt-1">
+                                <p>
+                                  {localFormat(String(key?.consumedDaily))} /{' '}
+                                  {localFormat(key?.dayLimit)}
                                 </p>
-                                <div>
-                                  <div className="w-full bg-gray-200 dark:bg-neargray-50 h-2 rounded-full mt-2">
-                                    <div
-                                      className="bg-green-500 dark:bg-green-250 h-2 rounded-full"
-                                      style={{
-                                        maxWidth: '100%',
-                                        width: `${dailyPercentage}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                  <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 justify-between mt-1">
-                                    <p className="text-xs">
-                                      {localFormat(String(key?.consumedDaily))}{' '}
-                                      / {localFormat(key?.dayLimit)}
-                                    </p>
-                                    <p className="text-xs text-gray-500 dark:text-neargray-50">
-                                      Daily (24H) Quota
-                                    </p>
-                                  </div>
-                                </div>
-                              </>
+                                <p className="text-gray-500 dark:text-neargray-50 mx-1">
+                                  Daily (24H) Quota
+                                </p>
+                              </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 dark:text-neargray-10 align-top">
-                            <div className="flex flex-col items-center px-2 hover:bg-neargreen/5 dark:hover:bg-black-200">
-                              <>
-                                <p className="text-sm font-semibold text-nearblue-600 dark:text-neargray-10">
-                                  {localFormat(key?.remainingMonthly)}
+                          <td className="px-3 py-3 text-xs text-gray-600 dark:text-neargray-10 w-60 text-center">
+                            <div className="flex flex-col items-start px-3 hover:bg-neargreen/5 dark:hover:bg-black-200">
+                              <p className="text-sm font-semibold text-nearblue-600 dark:text-neargray-10">
+                                {localFormat(key?.remainingMonthly)}
+                              </p>
+                              <div className="w-full bg-gray-200 dark:bg-neargray-50 h-2 rounded-full mt-2">
+                                <div
+                                  className="bg-green-500 dark:bg-green-250 h-2 rounded-full"
+                                  style={{
+                                    width: `${monthlyPercentage}%`,
+                                    maxWidth: '100%',
+                                  }}
+                                ></div>
+                              </div>
+                              <div className="flex whitespace-nowrap text-xs mt-1">
+                                <p>
+                                  {localFormat(String(key?.consumed))} /{' '}
+                                  {localFormat(key?.monthLimit)}
                                 </p>
-                                <div>
-                                  {/* Progress bar for daily usage */}
-                                  <div className="w-full bg-gray-200 dark:bg-neargray-50 h-2 rounded-full mt-2">
-                                    <div
-                                      className="bg-green-500 dark:bg-green-250 h-2 rounded-full"
-                                      style={{
-                                        maxWidth: '100%',
-                                        width: `${monthlyPercentage}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                  <div className="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 justify-between mt-1">
-                                    <p className="text-xs">
-                                      {localFormat(String(key?.consumed))} /{' '}
-                                      {localFormat(key?.monthLimit)}
-                                    </p>
-                                    <p className="text-xs text-gray-500 dark:text-neargray-50">
-                                      Monthly Quota
-                                    </p>
-                                  </div>
-                                </div>
-                              </>
+                                <p className="text-gray-500 dark:text-neargray-50 mx-1">
+                                  Monthly Quota
+                                </p>
+                              </div>
                             </div>
                           </td>
                         </tr>

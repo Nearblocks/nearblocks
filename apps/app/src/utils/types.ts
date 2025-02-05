@@ -1771,7 +1771,6 @@ export type CampaignProps = {
   campaignId?: string;
   campaignMutate: () => void;
   loading: boolean;
-  mutate: () => void;
 };
 
 export type currentCampaign = {
