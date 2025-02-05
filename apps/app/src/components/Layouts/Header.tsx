@@ -176,7 +176,7 @@ const Header = ({
       const utcDate = Date.parse(new Date(timestamp).toISOString());
       const currentTime = Date.now();
 
-      if ((currentTime - utcDate) / (1000 * 60) > 2) {
+      if ((currentTime - utcDate) / (1000 * 60) > 10) {
         return false;
       }
     }
