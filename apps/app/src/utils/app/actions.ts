@@ -5,21 +5,6 @@ import { notFound, redirect, RedirectType } from 'next/navigation';
 import { UserToken } from '../types';
 import { getUserDataFromToken } from './libs';
 
-export async function setCurrentTheme(theme: string) {
-  const cookieStore = await cookies();
-  cookieStore.set('theme', theme, {
-    maxAge: 60 * 60 * 24 * 365,
-    path: '/',
-  });
-}
-
-export async function setCookie(name: string, value: string) {
-  const cookieStore = await cookies();
-  cookieStore.set(name, value, {
-    maxAge: 60 * 60,
-  });
-}
-
 export async function deleteCookie(name: string) {
   const cookieStore = await cookies();
   cookieStore.delete(name);

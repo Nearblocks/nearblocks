@@ -20,7 +20,6 @@ import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import SwitchButton from '../SwitchButton';
 import { useConfig } from '@/hooks/app/useConfig';
-import { getCookie, setCookie } from '@/utils/app/actions';
 import { UserToken } from '@/utils/types';
 
 const ApiActions = ({
@@ -64,6 +63,7 @@ const ApiActions = ({
 
       const redirectUrl = res?.data['url '];
       if (redirectUrl) {
+        resetStripePlan();
         router.push(redirectUrl);
         return;
       }
@@ -78,12 +78,10 @@ const ApiActions = ({
       router.push('/user/plan');
     } catch (error) {
       const statusCode = get(error, 'response.status') || null;
-
+      resetStripePlan();
       if (statusCode === 422) {
-        resetStripePlan();
         router.push('/user/plan?status=exists');
       } else if (statusCode === 400) {
-        resetStripePlan();
         router.push('/user/plan?status=invalid');
       }
     }
@@ -141,11 +139,15 @@ const ApiActions = ({
           if (role === 'publisher') {
             toast.warning('Unauthorized Access!');
           } else if (role === 'advertiser') {
-            setCookie('stripe-plan-id', plan?.id as string);
-            setCookie('interval', !interval ? 'month' : ('year' as string));
-            const stripePlanId = await getCookie('stripe-plan-id');
+            Cookies.set('stripe-plan-id', plan?.id as string, {
+              expires: 1 / 24,
+            });
+            Cookies.set('interval', !interval ? 'month' : ('year' as string), {
+              expires: 1 / 24,
+            });
+            const stripePlanId = Cookies.get('stripe-plan-id');
             const planInterval =
-              (await getCookie('interval')) === 'year' ? 'year' : 'month';
+              Cookies.get('interval') === 'year' ? 'year' : 'month';
             if (stripePlanId && planInterval) {
               subscribePlan(stripePlanId, planInterval);
             }
@@ -156,8 +158,10 @@ const ApiActions = ({
           router.replace('/user/overview');
         }
       } else {
-        setCookie('stripe-plan-id', plan?.id as string);
-        setCookie('interval', !interval ? 'month' : ('year' as string));
+        Cookies.set('stripe-plan-id', plan?.id as string, { expires: 1 / 24 });
+        Cookies.set('interval', !interval ? 'month' : ('year' as string), {
+          expires: 1 / 24,
+        });
         router.push(
           `/login?id=${plan?.id}&interval=${interval ? 'year' : 'month'}`,
         );

@@ -15,7 +15,7 @@ import { request } from '@/hooks/app/useAuth';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { catchErrors, getUserDataFromToken } from '@/utils/app/libs';
-import { getCookie, setCookie } from '@/utils/app/actions';
+import { getCookie } from '@/utils/app/actions';
 import { UserToken } from '@/utils/types';
 
 interface Props {
@@ -59,6 +59,7 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
       const redirectUrl = res?.data['url '];
 
       if (redirectUrl) {
+        resetStripePlan();
         router.push(redirectUrl);
         return;
       }
@@ -73,12 +74,10 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
       router.push('/user/plan');
     } catch (error) {
       const statusCode = get(error, 'response.status') || null;
-
+      resetStripePlan();
       if (statusCode === 422) {
-        resetStripePlan();
         router.push('/user/plan?status=exists');
       } else if (statusCode === 400) {
-        resetStripePlan();
         router.push('/user/plan?status=invalid');
       }
     }
@@ -87,8 +86,8 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
   useEffect(() => {
     const updateCookies = async () => {
       if (id) {
-        setCookie('stripe-plan-id', id as string);
-        setCookie('interval', interval as string);
+        Cookies.set('stripe-plan-id', id as string, { expires: 1 / 24 });
+        Cookies.set('interval', interval as string, { expires: 1 / 24 });
       } else {
         resetStripePlan();
       }
@@ -130,12 +129,12 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
         const userData: any = getUserDataFromToken(respToken);
 
         if (userData) {
-          setCookie('token', respToken);
+          Cookies.set('token', respToken, { expires: 1 / 24 });
           const tokenCookie = await getCookie('token');
           if (tokenCookie) {
-            const stripePlanId = await getCookie('stripe-plan-id');
+            const stripePlanId = Cookies.get('stripe-plan-id');
             const interval =
-              (await getCookie('interval')) === 'year' ? 'year' : 'month';
+              Cookies.get('interval') === 'year' ? 'year' : 'month';
             if (stripePlanId && interval) {
               subscribePlan(stripePlanId, interval);
             } else {

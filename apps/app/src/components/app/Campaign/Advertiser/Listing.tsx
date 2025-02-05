@@ -16,7 +16,7 @@ import { useConfig } from '@/hooks/app/useConfig';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const Listing = () => {
+const Listing = ({ mutate: statsMutate }: { mutate: () => void }) => {
   const [currentCampaign, setCurrentCampaign] =
     useState<currentCampaign | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -249,6 +249,7 @@ const Listing = () => {
                                 handleCampaignCancellation
                               }
                               mutate={mutate}
+                              statsMutate={statsMutate}
                               setButtonLoading={setButtonLoading}
                             />
                           </DialogRoot>

@@ -176,9 +176,18 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === '/') {
+        event.preventDefault();
+        document.getElementById('searchInput')?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
+      document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);

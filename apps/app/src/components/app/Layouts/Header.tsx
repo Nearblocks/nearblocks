@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link, routing, usePathname } from '@/i18n/routing';
-import { setCurrentTheme } from '@/utils/app/actions';
 import { getUserDataFromToken, nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
 
@@ -276,7 +275,7 @@ const Header = ({
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    setCurrentTheme(newTheme);
+    Cookies.set('theme', newTheme, { expires: 365, path: '/' });
     setTheme(newTheme);
   };
 

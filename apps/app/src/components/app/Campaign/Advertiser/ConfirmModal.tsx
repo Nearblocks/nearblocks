@@ -7,10 +7,15 @@ type Props = {
   buttonLoading: boolean;
   handleCampaignCancellation: () => Promise<void>;
   mutate: () => void;
+  statsMutate: () => void;
   setButtonLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ConfirmModal = ({ handleCampaignCancellation, mutate }: Props) => {
+const ConfirmModal = ({
+  handleCampaignCancellation,
+  mutate,
+  statsMutate,
+}: Props) => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
 
@@ -24,6 +29,7 @@ const ConfirmModal = ({ handleCampaignCancellation, mutate }: Props) => {
         });
       }
       mutate();
+      statsMutate();
     } catch (error) {
       if (!toast.isActive('campaign-cancelled-error')) {
         toast.error('Failed to cancel campaign', {

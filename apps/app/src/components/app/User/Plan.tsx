@@ -160,7 +160,7 @@ const Plan = ({ role, status }: { role?: string; status?: string }) => {
             </p>
             {loading || error ? (
               <div className="w-full">
-                <Skeleton className="flex w-full h-8" />
+                <Skeleton className="flex w-full h-5 mb-2" />
               </div>
             ) : (
               <div>

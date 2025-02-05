@@ -1,15 +1,14 @@
 'use client';
 import { useTheme } from 'next-themes';
 import { useEffect } from 'react';
-
-import { setCurrentTheme } from '@/utils/app/actions';
+import Cookies from 'js-cookie';
 
 const ThemeInitializer = ({ initialTheme }: { initialTheme: string }) => {
   const { theme } = useTheme();
 
   useEffect(() => {
     if (theme && initialTheme !== theme) {
-      setCurrentTheme(theme);
+      Cookies.set('theme', theme, { expires: 365, path: '/' });
       setTimeout(() => {
         window.location.reload();
       }, 500);

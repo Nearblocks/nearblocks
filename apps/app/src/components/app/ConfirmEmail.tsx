@@ -5,7 +5,6 @@ import React, { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { request } from '@/hooks/app/useAuth';
 import { useConfig } from '@/hooks/app/useConfig';
-import { getCookie, setCookie } from '@/utils/app/actions';
 
 interface ConfirmEmailClientProps {
   authToken?: string;
@@ -33,6 +32,7 @@ const ConfirmEmail = ({ authToken, status }: ConfirmEmailClientProps) => {
 
       const redirectUrl = res?.data['url '];
       if (redirectUrl) {
+        resetStripePlan();
         router.push(redirectUrl);
         return;
       }
@@ -46,35 +46,30 @@ const ConfirmEmail = ({ authToken, status }: ConfirmEmailClientProps) => {
       router.push('/user/plan');
     } catch (error) {
       const statusCode = get(error, 'response.status') || null;
-
+      resetStripePlan();
       if (statusCode === 422) {
-        resetStripePlan();
         router.push('/user/plan?status=exists');
       } else if (statusCode === 400) {
-        resetStripePlan();
         router.push('/user/plan?status=invalid');
       }
     }
   };
 
   useEffect(() => {
-    const handleAuth = async () => {
-      if (authToken) {
-        setCookie('token', authToken);
-        const tokenCookie = await getCookie('token');
-        if (tokenCookie) {
-          const stripePlanId = await getCookie('stripe-plan-id');
-          const interval =
-            (await getCookie('interval')) === 'year' ? 'year' : 'month';
-          if (stripePlanId && interval) {
-            subscribePlan(stripePlanId, interval);
-          } else {
-            router.replace('/user/overview');
-          }
+    if (authToken) {
+      Cookies.set('token', authToken, { expires: 1 / 24 });
+      const tokenCookie = Cookies.get('token');
+      if (tokenCookie) {
+        const stripePlanId = Cookies.get('stripe-plan-id');
+        const interval = Cookies.get('interval') === 'year' ? 'year' : 'month';
+
+        if (stripePlanId && interval) {
+          subscribePlan(stripePlanId, interval);
+        } else {
+          router.replace('/user/overview');
         }
       }
-    };
-    handleAuth();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 

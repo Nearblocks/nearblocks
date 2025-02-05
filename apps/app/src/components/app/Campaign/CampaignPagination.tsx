@@ -37,7 +37,7 @@ const CampaignPagination = ({
   return (
     <>
       <div
-        className={`bg-white px-4 pt-2 border-t dark:border-black-200 dark:bg-black-600 dark:text-neargray-10 flex items-center lg:justify-between justify-end`}
+        className={`bg-white px-4 pt-2 border-t dark:border-black-200 dark:bg-black-600 dark:text-neargray-10 flex items-center lg:justify-between justify-end rounded-b-xl`}
       >
         <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div></div>

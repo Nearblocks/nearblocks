@@ -18,7 +18,6 @@ const CampaignEdit = ({
   campaignId?: string;
   userRole?: string;
 }) => {
-  const { mutate } = useAuth('/campaigns/subscription-info');
   const {
     data: campaignData,
     loading,
@@ -49,7 +48,6 @@ const CampaignEdit = ({
                 campaignId={campaignId}
                 campaignMutate={campaignMutate}
                 loading={loading}
-                mutate={mutate}
               />
             ) : (
               <BannerAdForm
@@ -57,7 +55,6 @@ const CampaignEdit = ({
                 campaignId={campaignId}
                 campaignMutate={campaignMutate}
                 loading={loading}
-                mutate={mutate}
               />
             )}
           </div>
