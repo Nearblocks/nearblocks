@@ -12,12 +12,16 @@ import {
   weight,
   yoctoToNear,
 } from '@/utils/app/libs';
-import { AccountDataInfo, ContractCodeInfo } from '@/utils/types';
+import {
+  AccountContractInfo,
+  AccountDataInfo,
+  ContractCodeInfo,
+} from '@/utils/types';
 
 import TokenImage from '../common/TokenImage';
 
 export default function AccountMoreInfo({
-  accountData,
+  accountData: account,
   deploymentData,
   id,
   nftTokenData,
@@ -26,9 +30,26 @@ export default function AccountMoreInfo({
 }: any) {
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
+  const [accountData, setAccountData] = useState<AccountContractInfo>(account);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const t = useTranslations();
+
+  useEffect(() => {
+    if (
+      status &&
+      accountData &&
+      accountView &&
+      !accountData?.storage_usage &&
+      accountView?.storage_usage
+    ) {
+      setAccountData((prevData) => ({
+        ...prevData,
+        storage_usage: accountView.storage_usage,
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountView, status]);
 
   useEffect(() => {
     const loadSchema = async () => {
