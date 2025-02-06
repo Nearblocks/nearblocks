@@ -1,10 +1,6 @@
-import { cookies } from 'next/headers';
 import { ErrorBoundary } from 'react-error-boundary';
-
 import { getRequest } from '@/utils/app/api';
-import { RpcProviders } from '@/utils/app/rpc';
 import { SpamToken } from '@/utils/types';
-
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
 import AccountAlerts from './AccountAlerts';
@@ -13,8 +9,6 @@ import AccountOverview from './AccountOverview';
 import MultichainInfo from './MultichainInfo';
 
 export default async function Balance({ id }: { id: string }) {
-  const cookieStore = await cookies();
-  const rpcUrl = cookieStore.get('rpcUrl')?.value || RpcProviders?.[0]?.url;
   const options: RequestInit = { next: { revalidate: 10 } };
 
   const [
@@ -27,11 +21,11 @@ export default async function Balance({ id }: { id: string }) {
     multiChainAccountsData,
     syncData,
   ] = await Promise.all([
-    getRequest(`account/${id}?rpc=${rpcUrl}`, {}, options),
+    getRequest(`account/${id}`, {}, options),
     getRequest('stats', {}, options),
     getRequest(`fts/${id}`, {}, options),
     getRequest(`account/${id}/inventory`, {}, options),
-    getRequest(`account/${id}/contract/deployments?rpc=${rpcUrl}`, {}, options),
+    getRequest(`account/${id}/contract/deployments`, {}, options),
     getRequest(`nfts/${id}`, {}, options),
     getRequest(`chain-abstraction/${id}/multi-chain-accounts`, {}, options),
     getRequest(`sync/status`, {}, options),
