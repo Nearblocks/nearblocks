@@ -1806,6 +1806,7 @@ export enum FilterKind {
   MULTICHAIN_ADDRESS = 'multichain_address',
   EVENT = 'event',
   INVOLVED = 'involved',
+  CONTRACT = 'contract',
   A = 'a',
 }
 

@@ -29,13 +29,6 @@ import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
-const initialForm = {
-  action: '',
-  from: '',
-  method: '',
-  to: '',
-};
-
 interface TxnsProps {
   count: string;
   cursor: string;
@@ -56,6 +49,12 @@ const TransactionActions = ({
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');
   const [page, setPage] = useState(1);
+  const initialForm = {
+    action: searchParams?.get('action') || '',
+    from: searchParams?.get('from') || '',
+    method: searchParams?.get('method') || '',
+    to: searchParams?.get('to') || '',
+  };
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
   const t = useTranslations();
