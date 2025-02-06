@@ -45,52 +45,61 @@ const fetch = async (url: string) => {
 };
 
 export const streamFiles = async (file: string) => {
-  const response = await fetch(file);
+  return await retry(
+    async () => {
+      const response = await fetch(file);
 
-  const readable = new Readable({
-    objectMode: true,
-    async read(this) {
-      try {
+      return new Promise<Readable>((resolve, reject) => {
+        const readable = new Readable({
+          objectMode: true,
+          read() {},
+        });
+
         const stream = new tar.Parser();
+
+        stream.on('error', (err) => {
+          reject(err);
+        });
+
+        response.on('error', (err) => {
+          reject(err);
+        });
 
         stream.on('entry', (entry: tar.ReadEntry) => {
           if (entry.type === 'File' && entry.path.endsWith('.json')) {
             const chunks: Buffer[] = [];
-
             entry.on('data', (chunk: Buffer) => chunks.push(chunk));
             entry.on('end', () => {
               try {
                 const json = Buffer.concat(chunks).toString();
                 const parsed = JSON.parse(json);
-
-                this.push(camelCaseKeys(parsed));
+                readable.push(camelCaseKeys(parsed));
               } catch (error) {
-                this.emit('error', error);
-                this.push(null);
+                readable.emit('error', error);
+                readable.push(null);
               }
             });
           } else {
-            this.emit(
+            readable.emit(
               'error',
               new Error('Unknown file received', {
                 cause: { path: entry.path, type: entry.type },
               }),
             );
-            this.push(null);
+            readable.push(null);
           }
         });
 
-        stream.on('end', () => this.push(null));
+        stream.on('end', () => {
+          readable.push(null);
+          resolve(readable);
+        });
 
         response.pipe(stream);
-      } catch (error) {
-        this.emit('error', error);
-        this.push(null);
-      }
+      });
     },
-  });
-
-  return readable;
+    { exponential: true, logger: retryLogger, retries },
+  );
 };
 
 export async function* streamBlock(config: BlockStreamConfig) {
