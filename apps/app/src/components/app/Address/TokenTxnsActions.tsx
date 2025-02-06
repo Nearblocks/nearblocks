@@ -28,11 +28,7 @@ import FaInbox from '../Icons/FaInbox';
 import Filter from '../Icons/Filter';
 import SortIcon from '../Icons/SortIcon';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-
-const initialForm = {
-  event: '',
-  involved: '',
-};
+import { CopyButton } from '../common/CopyButton';
 
 interface TokenTxnsProps {
   count: string;
@@ -55,6 +51,11 @@ const TokenTxnsActions = ({
   const order = searchParams?.get('order');
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
+  const initialForm = {
+    event: searchParams?.get('event') || '',
+    involved: searchParams?.get('involved') || '',
+    contract: searchParams?.get('contract') || '',
+  };
   const [form, setForm] = useState(initialForm);
   const t = useTranslations();
   const errorMessage = t('noTxns') || 'No transactions found!';
@@ -83,13 +84,14 @@ const TokenTxnsActions = ({
 
     setPage(1);
 
-    const { event, involved } = form;
+    const { event, involved, contract } = form;
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
       ...updatedQuery,
       ...(event && { event }),
       ...(involved && { involved }),
+      ...(contract && { contract }),
     };
 
     const newQueryString = QueryString.stringify(queryParams);
@@ -117,7 +119,8 @@ const TokenTxnsActions = ({
 
   const onAllClear = () => {
     setForm(initialForm);
-    const { cursor, event, involved, page, ...newQuery } = currentParams;
+    const { cursor, event, involved, contract, page, ...newQuery } =
+      currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
   };
@@ -405,6 +408,7 @@ const TokenTxnsActions = ({
                   </Link>
                 </div>
               </Tooltip>
+              <CopyButton textToCopy={row?.ft?.contract} />
               {row?.ft?.symbol && (
                 <Tooltip
                   className={'left-1/2 max-w-[200px]'}
@@ -420,8 +424,55 @@ const TokenTxnsActions = ({
           )
         );
       },
-      header: <>Token</>,
-      key: 'block_height',
+      header: (
+        <PopoverRoot>
+          <PopoverTrigger
+            asChild
+            className="flex items-center text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
+            <button>
+              Token
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 p-2 z-20"
+            marginTop={3}
+            marginLeft={20}
+            roundedBottom={'lg'}
+            roundedTop={'none'}
+            width={'48'}
+          >
+            <form className="flex flex-col" onSubmit={onFilter}>
+              <input
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                name="contract"
+                onChange={onChange}
+                placeholder={t('tokenPlaceholder') || 'Search by token'}
+                value={form.contract}
+              />
+              <div className="flex">
+                <button
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
+                  type="submit"
+                >
+                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
+                  {t('filter.filter') || 'Filter'}
+                </button>
+                <button
+                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
+                  name="contract"
+                  onClick={onClear}
+                  type="button"
+                >
+                  {t('filter.clear') || 'Clear'}
+                </button>
+              </div>
+            </form>
+          </PopoverContent>
+        </PopoverRoot>
+      ),
+      key: 'token',
       tdClassName:
         'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
@@ -472,6 +523,7 @@ const TokenTxnsActions = ({
   const modifiedFilter = getFilteredQueryParams(currentParams, [
     FilterKind.EVENT,
     FilterKind.INVOLVED,
+    FilterKind.CONTRACT,
   ]);
 
   return (

@@ -29,13 +29,6 @@ import Filter from '../Icons/Filter';
 import Near from '../Icons/Near';
 import SortIcon from '../Icons/SortIcon';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-
-const initialForm = {
-  chain: '',
-  from: '',
-  multichain_address: '',
-};
-
 interface MultiChainTxnsProps {
   count: string;
   cursor: string;
@@ -58,6 +51,11 @@ const MultiChainTxns = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
+  const initialForm = {
+    chain: searchParams?.get('chain') || '',
+    from: searchParams?.get('from') || '',
+    multichain_address: searchParams?.get('multichain_address') || '',
+  };
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
   const errorMessage = t ? t('noTxns') : ' No transactions found!';

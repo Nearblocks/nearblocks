@@ -43,19 +43,18 @@ interface ListProps {
   };
 }
 
-const initialForm = {
-  action: '',
-  from: '',
-  method: '',
-  to: '',
-};
-
 const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const order = searchParams?.get('order');
   const [showAge, setShowAge] = useState(true);
+  const initialForm = {
+    action: searchParams?.get('action') || '',
+    from: searchParams?.get('from') || '',
+    method: searchParams?.get('method') || '',
+    to: searchParams?.get('to') || '',
+  };
   const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
   const t = useTranslations();
