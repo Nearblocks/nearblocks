@@ -5,7 +5,7 @@ import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { getLimit } from '#libs/utils';
 
-const TABLE = 'account_near_stats';
+const TABLE = 'account_near_stats_new';
 
 export const syncNearStats = async () => {
   // eslint-disable-next-line no-constant-condition
@@ -47,7 +47,7 @@ const nearStats = async () => {
     }
 
     const start = synced ? +synced + 1 : +first.block_height;
-    let end = +last.block_height - 1;
+    let end = +last.block_height - 5;
     const diff = end - start;
     const limit = getLimit(start);
 

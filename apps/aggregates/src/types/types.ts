@@ -3,8 +3,5 @@ export interface Config {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  ftHoldersTable: string;
-  nftHoldersTable: string;
   sentryDsn?: string;
-  tpsTable: string;
 }

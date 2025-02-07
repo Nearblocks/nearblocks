@@ -2,12 +2,11 @@ import { logger } from 'nb-logger';
 import { TPS } from 'nb-types';
 import { sleep } from 'nb-utils';
 
-import config from '#config';
 import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { nsToS, sToNs } from '#libs/utils';
 
-const TABLE = config.tpsTable;
+const TABLE = 'tps';
 
 export const syncTPS = async () => {
   // eslint-disable-next-line no-constant-condition

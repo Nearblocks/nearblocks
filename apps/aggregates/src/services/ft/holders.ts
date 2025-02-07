@@ -1,12 +1,11 @@
 import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
-import config from '#config';
 import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { getLimit } from '#libs/utils';
 
-const TABLE = config.ftHoldersTable;
+const TABLE = 'ft_holders_new';
 
 export const syncHolders = async () => {
   // eslint-disable-next-line no-constant-condition
@@ -46,7 +45,7 @@ const holders = async (): Promise<boolean> => {
     }
 
     const start = synced ? +synced + 1 : +first.block_height;
-    let end = +last - 1;
+    let end = +last - 5;
     const diff = end - start;
     const limit = getLimit(start);
 

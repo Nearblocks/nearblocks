@@ -48,15 +48,13 @@ export const onMessage = async (message: Message) => {
 
     await storeBalance(dbWrite, message);
 
-    if (message.block.header.height % 10 === 0) {
-      await dbWrite('settings')
-        .insert({
-          key: indexerKey,
-          value: { sync: message.block.header.height },
-        })
-        .onConflict('key')
-        .merge();
-    }
+    await dbWrite('settings')
+      .insert({
+        key: indexerKey,
+        value: { sync: message.block.header.height },
+      })
+      .onConflict('key')
+      .merge();
   } catch (error) {
     logger.error(
       `aborting... block ${message.block.header.height} ${message.block.header.hash}`,

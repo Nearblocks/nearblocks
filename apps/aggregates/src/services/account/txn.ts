@@ -5,7 +5,7 @@ import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { getLimit } from '#libs/utils';
 
-const TABLE = 'account_stats';
+const TABLE = 'account_stats_new';
 
 export const syncTxnStats = async () => {
   // eslint-disable-next-line no-constant-condition

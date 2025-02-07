@@ -5,7 +5,7 @@ import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { getLimit } from '#libs/utils';
 
-const TABLE = 'account_ft_stats';
+const TABLE = 'account_ft_stats_new';
 
 export const syncFTStats = async () => {
   // eslint-disable-next-line no-constant-condition
@@ -47,7 +47,7 @@ const ftStats = async () => {
     }
 
     const start = synced ? +synced + 1 : +first.block_height;
-    let end = +last.block_height - 1;
+    let end = +last.block_height - 5;
     const diff = end - start;
     const limit = getLimit(start);
 
@@ -72,13 +72,19 @@ const ftStats = async () => {
           contract_account_id AS contract,
           affected_account_id AS account,
           SUM(delta_amount) AS delta_amount,
-          SUM(delta_amount) FILTER (
-            WHERE
-              delta_amount > 0
+          COALESCE(
+            SUM(delta_amount) FILTER (
+              WHERE
+                delta_amount > 0
+            ),
+            0
           ) AS amount_in,
-          SUM(ABS(delta_amount)) FILTER (
-            WHERE
-              delta_amount <= 0
+          COALESCE(
+            SUM(ABS(delta_amount)) FILTER (
+              WHERE
+                delta_amount <= 0
+            ),
+            0
           ) AS amount_out,
           COUNT(*) AS txns,
           COUNT(*) FILTER (
