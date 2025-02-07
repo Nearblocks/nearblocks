@@ -7,10 +7,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  FT_HOLDERS_TABLE: str({ default: '' }),
-  NFT_HOLDERS_TABLE: str({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
-  TPS_TABLE: str({ default: '' }),
 });
 
 const config: Config = {
@@ -18,10 +15,7 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  ftHoldersTable: env.FT_HOLDERS_TABLE,
-  nftHoldersTable: env.NFT_HOLDERS_TABLE,
   sentryDsn: env.SENTRY_DSN,
-  tpsTable: env.TPS_TABLE,
 };
 
 export default config;
