@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import account from '#routes/account';
+import accounts from '#routes/accounts';
 import analytics from '#routes/analytics';
 import blocks from '#routes/blocks';
 import campaigns from '#routes/campaigns';
@@ -23,6 +24,7 @@ const routes = () => {
   const app = Router();
 
   account(app);
+  accounts(app);
   analytics(app);
   blocks(app);
   charts(app);
