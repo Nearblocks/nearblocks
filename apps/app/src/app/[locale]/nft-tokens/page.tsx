@@ -6,7 +6,7 @@ import { getRequest } from '@/utils/app/api';
 export default async function NFTTokens(props: any) {
   const searchParams = await props.searchParams;
   const dataResult = await getRequest(
-    `nfts?sort=txns_day&per_page=50&${QueryString.stringify(searchParams)}`,
+    `nfts?per_page=50&${QueryString.stringify(searchParams)}`,
   );
 
   const countResult = await getRequest(

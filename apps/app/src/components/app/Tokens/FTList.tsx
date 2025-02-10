@@ -29,11 +29,6 @@ const initialForm = {
   search: '',
 };
 
-const initialSorting: Sorting = {
-  order: 'desc',
-  sort: 'onchain_market_cap',
-};
-
 interface Props {
   data: {
     cursor: string;
@@ -52,6 +47,12 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const order = searchParams?.get('order');
+  const sort = searchParams?.get('sort');
+  const initialSorting: Sorting = {
+    order: order === 'asc' ? 'asc' : 'desc',
+    sort: sort || 'onchain_market_cap',
+  };
   const page = searchParams?.get('page');
   const search = searchParams?.get('search');
   const pagination = { page: page ? Number(page) : 1, per_page: 50 };
@@ -168,17 +169,30 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
     }
   };
 
-  const onOrder = (sortKey: string) => {
-    const currentOrder = searchParams?.get('order') || 'desc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+  useEffect(() => {
+    if (!order && !sort) {
+      setSorting(initialSorting);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order, sort]);
 
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
-    const newParams = { ...currentParams, order: newOrder };
-    const newQueryString = QueryString.stringify(newParams);
-    setSorting((state) => {
-      const newState: Sorting = { ...state, order: newOrder, sort: sortKey };
-      return newState;
+  const onOrder = (sortKey: string) => {
+    const {
+      sort: currentSort = 'onchain_market_cap',
+      order: currentOrder = 'desc',
+    } = QueryString.parse(searchParams?.toString() || '');
+    const newOrder =
+      currentSort === sortKey && currentOrder === 'desc' ? 'asc' : 'desc';
+    const newQueryString = QueryString.stringify({
+      ...QueryString.parse(searchParams?.toString() || ''),
+      sort: sortKey,
+      order: newOrder,
     });
+    setSorting((state) => ({
+      ...state,
+      order: newOrder,
+      sort: sortKey,
+    }));
     router.push(`${pathname}?${newQueryString}`);
   };
 
@@ -232,7 +246,22 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
           tokenPrice={row?.price}
         />
       ),
-      header: <span>{t ? t('fts.top.price') : 'PRICE'}</span>,
+      header: (
+        <span>
+          <button
+            className="w-full py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
+            onClick={() => onOrder('price')}
+            type="button"
+          >
+            {sorting?.sort === 'price' && (
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
+                <SortIcon order={sorting?.order} />
+              </div>
+            )}
+            {t ? t('fts.top.price') : 'PRICE'}
+          </button>
+        </span>
+      ),
       key: 'price',
       tdClassName:
         'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
@@ -258,8 +287,21 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
         </span>
       ),
       header: (
-        <span className=" whitespace-nowrap">
-          {t ? t('fts.top.change') : 'CHANGE'} (%)
+        <span>
+          <button
+            className="w-full py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
+            onClick={() => onOrder('change')}
+            type="button"
+          >
+            {sorting?.sort === 'change' && (
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
+                <SortIcon order={sorting?.order} />
+              </div>
+            )}
+            <span className="flex whitespace-nowrap">
+              {t ? t('fts.top.change') : 'CHANGE'} (%)
+            </span>
+          </button>
         </span>
       ),
       key: 'change_24',
@@ -278,7 +320,22 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
           )}
         </span>
       ),
-      header: <span>{t ? t('fts.top.volume') : 'VOLUME'} (24H)</span>,
+      header: (
+        <span>
+          <button
+            className="w-full py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
+            onClick={() => onOrder('volume')}
+            type="button"
+          >
+            {sorting?.sort === 'volume' && (
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
+                <SortIcon order={sorting?.order} />
+              </div>
+            )}
+            {t ? t('fts.top.volume') : 'VOLUME'} (24H)
+          </button>
+        </span>
+      ),
       key: 'volume_24h',
       tdClassName:
         'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-middle',
@@ -297,19 +354,30 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
         </span>
       ),
       header: (
-        <span className="flex">
-          <span className="uppercase whitespace-nowrap">Circulating MC</span>
-          <Tooltip
-            className={'w-96 -mr-28 right-1/2 max-w-[200px]'}
-            position="bottom"
-            tooltip={
-              'Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
-            }
+        <span>
+          <button
+            className="w-full py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
+            onClick={() => onOrder('market_cap')}
+            type="button"
           >
-            <div>
-              <Question className="w-4 h-4 fill-current ml-1" />
-            </div>
-          </Tooltip>
+            {sorting?.sort === 'market_cap' && (
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
+                <SortIcon order={sorting?.order} />
+              </div>
+            )}
+            <span className="uppercase whitespace-nowrap">Circulating MC</span>
+            <Tooltip
+              className={'w-96 -mr-28 right-1/2 max-w-[200px]'}
+              position="bottom"
+              tooltip={
+                'Calculated by multiplying the number of tokens in circulating supply across all chains with the current market price per token.'
+              }
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current ml-1" />
+              </div>
+            </Tooltip>
+          </button>
         </span>
       ),
       key: 'market_cap',

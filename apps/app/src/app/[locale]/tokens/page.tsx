@@ -6,9 +6,7 @@ import { getRequest } from '@/utils/app/api';
 export default async function Tokens(props: any) {
   const searchParams = await props.searchParams;
   const dataResult = await getRequest(
-    `fts?sort=onchain_market_cap&per_page=50&${QueryString.stringify(
-      searchParams,
-    )}`,
+    `fts?per_page=50&${QueryString.stringify(searchParams)}`,
   );
 
   const countResult = await getRequest(
