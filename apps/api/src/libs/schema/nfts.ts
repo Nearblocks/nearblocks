@@ -8,7 +8,7 @@ const list = z.object({
   per_page: z.number().int().positive().max(50).optional().default(50),
   search: z.string().optional(),
   sort: z
-    .enum(['name', 'holders', 'tokens', 'txns_day'])
+    .enum(['holders', 'tokens', 'txns_day'])
     .optional()
     .default('txns_day'),
 });
@@ -23,14 +23,13 @@ const txns = z.object({
   per_page: z.number().int().positive().max(250).optional().default(25),
 });
 
-const txnsCount = z.object({});
-
 const item = z.object({
   contract: z.string(),
 });
 
 const nftTxns = z.object({
   a: z.string().optional(),
+  account: z.string().optional(),
   contract: z.string(),
   cursor: z.string().length(35).optional(),
   event: z.nativeEnum(EventKind).optional(),
@@ -40,6 +39,8 @@ const nftTxns = z.object({
 });
 
 const nftTxnsCount = z.object({
+  a: z.string().optional(),
+  account: z.string().optional(),
   contract: z.string(),
   event: z.nativeEnum(EventKind).optional(),
 });
@@ -89,7 +90,6 @@ const tokenTxnsCount = z.object({
 export type List = z.infer<typeof list>;
 export type Count = z.infer<typeof count>;
 export type Txns = z.infer<typeof txns>;
-export type TxnsCount = z.infer<typeof txnsCount>;
 export type Item = z.infer<typeof item>;
 export type NftTxns = z.infer<typeof nftTxns>;
 export type NftTxnsCount = z.infer<typeof nftTxnsCount>;
@@ -115,5 +115,4 @@ export default {
   tokenTxns,
   tokenTxnsCount,
   txns,
-  txnsCount,
 };

@@ -22,7 +22,7 @@ const routes = (app: Router) => {
    *       - NFTs
    *     parameters:
    *       - in: query
-   *         name: search.query
+   *         name: search
    *         description: Search keyword
    *         schema:
    *           type: string
@@ -42,6 +42,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 50
    *           default: 50
+   *       - in: query
+   *         name: sort
+   *         description: Sort field
+   *         schema:
+   *           type: string
+   *           enum: [holders, tokens, txns_day]
+   *           default: txns_day
    *       - in: query
    *         name: order
    *         description: Sort order
@@ -64,7 +71,7 @@ const routes = (app: Router) => {
    *       - NFTs
    *     parameters:
    *       - in: query
-   *         name: search.query
+   *         name: search
    *         description: Search keyword
    *         schema:
    *           type: string
@@ -83,7 +90,7 @@ const routes = (app: Router) => {
    *       - NFTs
    *     parameters:
    *       - in: query
-   *         name: cursor.query
+   *         name: cursor
    *         description: Next page cursor, takes precedence over 'page' if provided
    *         schema:
    *           type: string
@@ -122,7 +129,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validator(schema.txnsCount), nft.txnsCount);
+  route.get('/txns/count', nft.txnsCount);
 
   /**
    * @openapi
@@ -165,7 +172,18 @@ const routes = (app: Router) => {
    *           contract:
    *             value: example-contract-id
    *       - in: query
-   *         name: cursor.query
+   *         name: account
+   *         description: Affected account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: event
+   *         description: Event type
+   *         schema:
+   *           type: string
+   *           enum: [MINT, BURN, TRANSFER]
+   *       - in: query
+   *         name: cursor
    *         description: Next page cursor, takes precedence over 'page' if provided
    *         schema:
    *           type: string
@@ -187,6 +205,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 250
    *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
    *     responses:
    *       200:
    *         description: Success response
@@ -210,6 +235,17 @@ const routes = (app: Router) => {
    *         examples:
    *           contract:
    *             value: example-contract-id
+   *       - in: query
+   *         name: account
+   *         description: Affected account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: event
+   *         description: Event type
+   *         schema:
+   *           type: string
+   *           enum: [MINT, BURN, TRANSFER]
    *     responses:
    *       200:
    *         description: Success response
@@ -253,6 +289,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 250
    *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
    *     responses:
    *       200:
    *         description: Success response
@@ -304,11 +347,6 @@ const routes = (app: Router) => {
    *           contract:
    *             value: example-contract-id
    *       - in: query
-   *         name: token.query
-   *         description: Token ID
-   *         schema:
-   *           type: string
-   *       - in: query
    *         name: page
    *         description: Page number
    *         schema:
@@ -347,11 +385,6 @@ const routes = (app: Router) => {
    *         examples:
    *           contract:
    *             value: example-contract-id
-   *       - in: query
-   *         name: token.query
-   *         description: Token ID
-   *         schema:
-   *           type: string
    *     responses:
    *       200:
    *         description: Success response
@@ -425,7 +458,13 @@ const routes = (app: Router) => {
    *           token:
    *             value: example-token-id
    *       - in: query
-   *         name: cursor.query
+   *         name: event
+   *         description: Event type
+   *         schema:
+   *           type: string
+   *           enum: [MINT, BURN, TRANSFER]
+   *       - in: query
+   *         name: cursor
    *         description: Next page cursor, takes precedence over 'page' if provided
    *         schema:
    *           type: string
@@ -447,6 +486,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 250
    *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
    *     responses:
    *       200:
    *         description: Success response
@@ -483,6 +529,12 @@ const routes = (app: Router) => {
    *         examples:
    *           token:
    *             value: example-token-id
+   *       - in: query
+   *         name: event
+   *         description: Event type
+   *         schema:
+   *           type: string
+   *           enum: [MINT, BURN, TRANSFER]
    *     responses:
    *       200:
    *         description: Success response
