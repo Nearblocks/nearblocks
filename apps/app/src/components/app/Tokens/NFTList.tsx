@@ -14,10 +14,7 @@ import Table from '../common/Table';
 import TokenImage from '../common/TokenImage';
 import FaInbox from '../Icons/FaInbox';
 import SortIcon from '../Icons/SortIcon';
-const initialSorting: Sorting = {
-  order: 'desc',
-  sort: 'txns_day',
-};
+
 const initialForm = {
   search: '',
 };
@@ -41,6 +38,8 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');
   const search = searchParams?.get('search');
+  const order = searchParams?.get('order');
+  const sort = searchParams?.get('sort');
   const pagination = { page: page ? Number(page) : 1, per_page: 50 };
   const [searchResults, setSearchResults] = useState<Token[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -48,6 +47,10 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef: any = useRef(null);
   const [form, setForm] = useState(initialForm);
+  const initialSorting: Sorting = {
+    order: order === 'asc' ? 'asc' : 'desc',
+    sort: sort || 'txns_day',
+  };
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
   const errorMessage = t ? t('fts.top.empty') : 'No tokens found!';
 
@@ -155,17 +158,28 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
     }
   };
 
-  const onOrder = (sortKey: string) => {
-    const currentOrder = searchParams?.get('order') || 'desc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+  useEffect(() => {
+    if (!order && !sort) {
+      setSorting(initialSorting);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order, sort]);
 
-    const currentParams = QueryString.parse(searchParams?.toString() || '');
-    const newParams = { ...currentParams, order: newOrder };
-    const newQueryString = QueryString.stringify(newParams);
-    setSorting((state) => {
-      const newState: Sorting = { ...state, order: newOrder, sort: sortKey };
-      return newState;
+  const onOrder = (sortKey: string) => {
+    const { sort: currentSort = 'txns_day', order: currentOrder = 'desc' } =
+      QueryString.parse(searchParams?.toString() || '');
+    const newOrder =
+      currentSort === sortKey && currentOrder === 'desc' ? 'asc' : 'desc';
+    const newQueryString = QueryString.stringify({
+      ...QueryString.parse(searchParams?.toString() || ''),
+      sort: sortKey,
+      order: newOrder,
     });
+    setSorting((state) => ({
+      ...state,
+      order: newOrder,
+      sort: sortKey,
+    }));
     router.push(`${pathname}?${newQueryString}`);
   };
 
@@ -217,7 +231,22 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
           {row?.tokens ? localFormat(row?.tokens) : row?.tokens ?? ''}
         </span>
       ),
-      header: <span>Tokens</span>,
+      header: (
+        <span>
+          <button
+            className="w-full py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
+            onClick={() => onOrder('tokens')}
+            type="button"
+          >
+            {sorting?.sort === 'tokens' && (
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
+                <SortIcon order={sorting?.order} />
+              </div>
+            )}
+            Tokens
+          </button>
+        </span>
+      ),
       key: 'tokens',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
@@ -228,7 +257,22 @@ const List = ({ data, error, handleSearch, tokensCount }: Props) => {
       cell: (row: Token) => (
         <span>{row?.holders ? localFormat(row?.holders) : ''}</span>
       ),
-      header: <span>Holders</span>,
+      header: (
+        <span>
+          <button
+            className="w-full py-2 text-left text-xs font-semibold  tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex flex-row"
+            onClick={() => onOrder('holders')}
+            type="button"
+          >
+            {sorting?.sort === 'holders' && (
+              <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
+                <SortIcon order={sorting?.order} />
+              </div>
+            )}
+            Holders
+          </button>
+        </span>
+      ),
       key: 'holders',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top',
