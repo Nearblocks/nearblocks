@@ -8,14 +8,7 @@ const list = z.object({
   per_page: z.number().int().positive().max(50).optional().default(50),
   search: z.string().optional(),
   sort: z
-    .enum([
-      'name',
-      'price',
-      'change',
-      'volume',
-      'market_cap',
-      'onchain_market_cap',
-    ])
+    .enum(['price', 'change', 'volume', 'market_cap', 'onchain_market_cap'])
     .optional()
     .default('onchain_market_cap'),
 });
@@ -28,12 +21,6 @@ const txns = z.object({
   cursor: z.string().length(35).optional(),
   page: z.number().int().positive().max(200).optional().default(1),
   per_page: z.number().int().positive().max(250).optional().default(25),
-});
-
-const txnsCount = z.object({
-  event: z.nativeEnum(EventKind).optional(),
-  from: z.string().optional(),
-  to: z.string().optional(),
 });
 
 const item = z.object({
@@ -72,7 +59,6 @@ const holdersCount = z.object({
 export type List = z.infer<typeof list>;
 export type Count = z.infer<typeof count>;
 export type Txns = z.infer<typeof txns>;
-export type TxnsCount = z.infer<typeof txnsCount>;
 export type Item = z.infer<typeof item>;
 export type FtTxns = z.infer<typeof ftTxns>;
 export type FtTxnsCount = z.infer<typeof ftTxnsCount>;
@@ -88,5 +74,4 @@ export default {
   item,
   list,
   txns,
-  txnsCount,
 };

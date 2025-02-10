@@ -21,7 +21,7 @@ const routes = (app: Router) => {
    *       - FTs
    *     parameters:
    *       - in: query
-   *         name: search.query
+   *         name: search
    *         description: Search keyword
    *         schema:
    *           type: string
@@ -41,6 +41,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 50
    *           default: 50
+   *       - in: query
+   *         name: sort
+   *         description: Sort field
+   *         schema:
+   *           type: string
+   *           enum: [price, change, volume, market_cap, onchain_market_cap]
+   *           default: onchain_market_cap
    *       - in: query
    *         name: order
    *         description: Sort order
@@ -63,7 +70,7 @@ const routes = (app: Router) => {
    *       - FTs
    *     parameters:
    *       - in: query
-   *         name: search.query
+   *         name: search
    *         description: Search keyword
    *         schema:
    *           type: string
@@ -121,7 +128,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validator(schema.txnsCount), ft.txnsCount);
+  route.get('/txns/count', ft.txnsCount);
 
   /**
    * @openapi
@@ -169,6 +176,12 @@ const routes = (app: Router) => {
    *         schema:
    *           type: string
    *       - in: query
+   *         name: event
+   *         description: Event type
+   *         schema:
+   *           type: string
+   *           enum: [MINT, BURN, TRANSFER]
+   *       - in: query
    *         name: cursor
    *         description: Next page cursor. Takes precedence over 'page' if provided.
    *         schema:
@@ -191,6 +204,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 250
    *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
    *     responses:
    *       200:
    *         description: Success response
@@ -219,6 +239,12 @@ const routes = (app: Router) => {
    *         description: Affected account ID
    *         schema:
    *           type: string
+   *       - in: query
+   *         name: event
+   *         description: Event type
+   *         schema:
+   *           type: string
+   *           enum: [MINT, BURN, TRANSFER]
    *     responses:
    *       200:
    *         description: Success response
@@ -262,6 +288,13 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 250
    *           default: 25
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
    *     responses:
    *       200:
    *         description: Success response
