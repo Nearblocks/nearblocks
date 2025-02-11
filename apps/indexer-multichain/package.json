@@ -25,7 +25,6 @@
     "envalid": "8.0.0",
     "js-sha3": "0.9.3",
     "near-api-js": "5.0.1",
-    "near-lake-framework": "2.0.0",
     "viem": "2.21.35"
   },
   "devDependencies": {
@@ -34,10 +33,9 @@
     "@types/node": "22",
     "eslint-config-custom-node": "*",
     "nb-json": "*",
+    "nb-blocks": "*",
     "nb-knex": "*",
-    "nb-lake": "*",
     "nb-logger": "*",
-    "nb-neardata": "*",
     "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
