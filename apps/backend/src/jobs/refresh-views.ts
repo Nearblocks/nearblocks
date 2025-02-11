@@ -32,14 +32,6 @@ import sentry from '#libs/sentry';
     await sleep(1000);
   }
 
-  try {
-    await knex.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY eth_accounts');
-  } catch (error) {
-    sentry.captureException(error);
-    logger.error(error);
-    await sleep(1000);
-  }
-
   logger.info({ action: 'job ended', job: 'refresh-views' });
 
   if (parentPort) {
