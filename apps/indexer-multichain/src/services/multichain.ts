@@ -1,5 +1,4 @@
-import { types } from 'near-lake-framework';
-
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
 import { logger } from 'nb-logger';
 import { MultichainAccount, MultichainTransaction } from 'nb-types';
 import { retry } from 'nb-utils';
@@ -8,7 +7,7 @@ import bitcoin from '#libs/bitcoin';
 import ethereum from '#libs/ethereum';
 import { isFunctionCallAction } from '#libs/guards';
 import { signer } from '#libs/kdf';
-import knex from '#libs/knex';
+import { dbRead, dbWrite } from '#libs/knex';
 import { decodeArgs, jsonParse } from '#libs/utils';
 import { Chains } from '#types/enum';
 import { Sign } from '#types/types';
@@ -27,7 +26,7 @@ const errorData = {
   publicKey: null,
 };
 
-export const storeMultichainData = async (message: types.StreamerMessage) => {
+export const storeMultichainData = async (message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkData(
@@ -42,7 +41,7 @@ export const storeMultichainData = async (message: types.StreamerMessage) => {
 export const storeChunkData = async (
   blockHeight: number,
   blockTimestamp: string,
-  executionOutcomes: types.ExecutionOutcomeWithReceipt[],
+  executionOutcomes: ExecutionOutcomeWithReceipt[],
 ) => {
   const accounts: MultichainAccount[] = [];
   const transactions: MultichainTransaction[] = [];
@@ -104,7 +103,7 @@ export const storeChunkData = async (
   if (accounts.length) {
     promises.push(
       retry(async () => {
-        await knex('multichain_accounts')
+        await dbWrite('multichain_accounts')
           .insert(accounts)
           .onConflict(['account_id', 'chain', 'path'])
           .ignore();
@@ -115,7 +114,7 @@ export const storeChunkData = async (
   if (transactions.length) {
     promises.push(
       retry(async () => {
-        await knex('multichain_transactions')
+        await dbWrite('multichain_transactions')
           .insert(transactions)
           .onConflict(['receipt_id'])
           .ignore();
@@ -197,7 +196,7 @@ const getEvmData = async (
   parsedPath: string,
 ): Promise<ChainData> => {
   try {
-    const address = await knex('multichain_accounts')
+    const address = await dbRead('multichain_accounts')
       .where('account_id', predecessor)
       .where('chain', Chains.ETHEREUM)
       .where('path', parsedPath)
@@ -226,7 +225,7 @@ const getBtcData = async (
   parsedPath: string,
 ): Promise<ChainData> => {
   try {
-    const address = await knex('multichain_accounts')
+    const address = await dbRead('multichain_accounts')
       .where('account_id', predecessor)
       .where('chain', Chains.BITCOIN)
       .where('path', parsedPath)

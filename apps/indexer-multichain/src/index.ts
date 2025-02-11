@@ -1,14 +1,14 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info(
-      { data_source: config.dataSource, network: config.network },
+      { network: config.network },
       'initializing multichain indexer...',
     );
     logger.info('syncing blockchain data...');
@@ -23,7 +23,11 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([knex.destroy(), sentry.close(1_000)]);
+    await Promise.all([
+      dbRead.destroy(),
+      dbWrite.destroy(),
+      sentry.close(1_000),
+    ]);
   } catch (error) {
     logger.error(error);
   }
