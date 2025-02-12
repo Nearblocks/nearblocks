@@ -6,6 +6,7 @@ import NFTDetail from '@/components/app/skeleton/nft/NFTDetail';
 import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
 import { Token } from '@/utils/types';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -69,8 +70,8 @@ export default async function DetailsLayout({
   params: any;
 }) {
   return (
-    <>
+    <ErrorBoundary fallback={<NFTDetail error reset />}>
       <Suspense fallback={<NFTDetail />}>{children}</Suspense>
-    </>
+    </ErrorBoundary>
   );
 }

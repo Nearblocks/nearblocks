@@ -17,6 +17,7 @@ import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
 import WarningIcon from '../../Icons/WarningIcon';
 import TokenTransfers from './TokenTransfers';
+import { convertTimestampToTimes } from '@/utils/app/libs';
 interface Props {
   error: boolean;
   id: string;
@@ -40,6 +41,7 @@ const NFTDetails = ({
 }: Props) => {
   const [indices, setIndices] = useState<number[]>([1, 2]);
   const [isVisible, setIsVisible] = useState(true);
+  const [utc, setUtc] = useState(true);
   const token: Token = tokenInfo?.tokens?.[0];
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
@@ -67,12 +69,21 @@ const NFTDetails = ({
   const handleClose = () => {
     setIsVisible(false);
   };
+  const firstObject = txnsList?.txns?.[0] || null;
+  const isBurned =
+    firstObject?.cause === 'BURN'
+      ? { timestamp: firstObject?.block_timestamp }
+      : null;
+
+  const { utcTime, localTime } = convertTimestampToTimes(
+    isBurned?.timestamp ?? '',
+  );
+
   return (
     <div className="container-xxl mx-auto px-5">
       {isTokenSpam(token?.contract || id) && isVisible && (
         <>
-          <div className="py-2"></div>
-          <div className="w-full flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
+          <div className="w-full mt-6 flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
             <p className="items-center">
               <WarningIcon className="w-5 h-5 fill-current mx-1 inline-flex" />
               This token is reported to have been spammed to many users. Please
@@ -94,6 +105,25 @@ const NFTDetails = ({
             </span>
           </div>
         </>
+      )}
+      {isBurned && (
+        <div className="w-full flex justify-between mt-6 border border-yellow-600 border-opacity-25 bg-opacity-10 bg-yellow-300 text-yellow-600 rounded-lg p-4 text-sm dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60">
+          <p className="mb-0 items-center break-words">
+            <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
+            This NFT was burned on
+            <span className="ml-0.5">
+              <Tooltip
+                className={'left-1/2 mb-3 whitespace-nowrap max-w-[200px]'}
+                position="top"
+                tooltip={utc ? 'Switch to local time' : 'Switch to UTC'}
+              >
+                <button onClick={() => setUtc((prevState) => !prevState)}>
+                  {`(${utc ? utcTime : localTime})`}
+                </button>
+              </Tooltip>
+            </span>
+          </p>
+        </div>
       )}
       <div className="grid md:grid-cols-12 pt-4 mb-2">
         <div className="md:col-span-5 lg:col-span-4 pt-4">

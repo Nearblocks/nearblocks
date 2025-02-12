@@ -4,8 +4,9 @@ import Buttons from '@/components/app/common/Button';
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import ListCheck from '@/components/app/Icons/ListCheck';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
-/* import SponserdText from '@/components/app/SponserdText'; */
 import { appUrl, networkId } from '@/utils/app/config';
+import AddressValidator from '@/components/app/Address/AddressValidator';
+import { getRequest } from '@/utils/app/api';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -50,11 +51,13 @@ export default async function AddressLayout(props: {
 
   const { children } = props;
 
+  const accountData = await getRequest(`account/${id}`, {});
+
   return (
     <>
       <div className="relative container-xxl mx-auto px-4">
         <div className="flex items-center justify-between flex-wrap">
-          <div className="flex md:flex-wrap w-full border-b mb-5 dark:border-black-200">
+          <div className="flex md:flex-wrap w-full border-b dark:border-black-200">
             <div className="sm:flex flex-1 py-2 justify-between md:items-center dark:text-neargray-10 w-full ">
               <h1 className="break-all text-lg py-2 px-1 dark:text-neargray-10 text-nearblue-600 font-bold">
                 Near Account:&nbsp;
@@ -102,13 +105,12 @@ export default async function AddressLayout(props: {
               </div>
             </div>
           </div>
-          {/*  <div className="container-xxl justify-left pl-2 pb-6 dark:text-neargray-10 text-gray-700">
-            <div className="min-h-[80px] md:min-h-[25px]">
-              <SponserdText />
-            </div>
-          </div> */}
+          <AddressValidator
+            id={id as string}
+            accountData={accountData?.account?.[0]}
+          />
         </div>
-        {children}
+        <div className="py-2">{children}</div>
       </div>
     </>
   );

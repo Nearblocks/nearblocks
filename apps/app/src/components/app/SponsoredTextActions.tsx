@@ -1,22 +1,13 @@
 'use client';
 import { useConfig } from '@/hooks/app/useConfig';
+import { TextAdData } from '@/utils/types';
 import React, { useEffect, useMemo, useState } from 'react';
-
-interface TextAdData {
-  icon: string;
-  id: string;
-  linkName: string;
-  siteName: string;
-  text: string;
-  clickUrl: string;
-  impressionUrl: string;
-}
 
 interface PropType {
   textAdInfo: TextAdData;
 }
 
-const SponseredTextActions = ({ textAdInfo }: PropType) => {
+const SponsoredTextActions = ({ textAdInfo }: PropType) => {
   const [isMobile, setIsMobile] = useState(false);
   const { userAuthURL } = useConfig();
 
@@ -75,4 +66,4 @@ const SponseredTextActions = ({ textAdInfo }: PropType) => {
   );
 };
 
-export default SponseredTextActions;
+export default SponsoredTextActions;

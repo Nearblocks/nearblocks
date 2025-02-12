@@ -2,15 +2,11 @@ import { getTranslations } from 'next-intl/server';
 import { ErrorBoundary } from 'react-error-boundary';
 import { getRequest } from '@/utils/app/api';
 import ErrorMessage from '../common/ErrorMessage';
-/* import { userAuthURL } from '@/utils/app/config'; */
 import Search from '../common/Search';
 import FaInbox from '../Icons/FaInbox';
-/* import SponserdText from '../SponserdText'; */
 import HomeLatestBlocks from './LatestBlocks';
 import HomeLatestTxns from './LatestTxns';
 import HomeOverview from './Overview';
-/* import Banner from '../Banner';
-import { BannerAdData } from '@/utils/types'; */
 
 export default async function Home({
   locale,
@@ -20,13 +16,6 @@ export default async function Home({
   theme: string;
 }) {
   const t = await getTranslations({ locale });
-  /*  const bannerData: BannerAdData = await getRequest(
-    `${userAuthURL}campaigns`,
-    {},
-    {},
-    false,
-  ); */
-
   const handleFilterAndKeyword = async (
     keyword: string,
     filter: string,
@@ -104,13 +93,7 @@ export default async function Home({
                 <Search handleFilterAndKeyword={handleFilterAndKeyword} />
               </div>
               <div className="text-white"></div>
-              {/*  <div className="text-white pt-3 min-h-[80px] md:min-h-[35px]">
-                <SponserdText />
-              </div> */}
             </div>
-            {/*    <div className="lg:!flex hidden w-2/5 justify-center">
-              <Banner bannerInfo={bannerData} />
-            </div> */}
           </div>
         </div>
       </div>
@@ -127,11 +110,7 @@ export default async function Home({
       >
         <HomeOverview theme={theme} />
       </ErrorBoundary>
-      <div className="py-2">
-        {/*  <div className="lg:!hidden block container mx-auto px-3 py-2">
-          <Banner bannerInfo={bannerData} />
-        </div> */}
-      </div>
+      <div className="py-2"></div>
       <section>
         <div className="container-xxl mx-auto px-5 z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

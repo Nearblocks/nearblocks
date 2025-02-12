@@ -4,7 +4,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import List from '@/components/app/Blocks/List';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
-import TableSummary from '@/components/app/common/TableSummary';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import ListSkeleton from '@/components/app/skeleton/blocks/list';
 
@@ -24,7 +23,6 @@ export default async function Blocks(props: {
 
   const errorBoundaryFallback = (
     <>
-      <TableSummary text="" />
       <div className="overflow-x-auto">
         <div className="bg-white dark:bg-black-600 border soft-shadow rounded-xl pb-1">
           <div className="pl-6 max-w-lg w-full py-5">
