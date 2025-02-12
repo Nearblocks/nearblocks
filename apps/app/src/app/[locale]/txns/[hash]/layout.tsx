@@ -1,11 +1,9 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
-
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import ListCheck from '@/components/app/Icons/ListCheck';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
-/* import SponserdText from '@/components/app/SponserdText'; */
 import { networkId } from '@/utils/app/config';
 import { appUrl } from '@/utils/app/config';
 
@@ -102,11 +100,6 @@ export default async function TxnsLayout(props: {
           </ul>
         </div>
       </div>
-      {/*  <div className="container-xxl mx-auto pt-3 pb-6 px-5 dark:text-neargray-10 text-gray-700">
-        <div className="min-h-[44px] md:min-h-[25px]">
-          <SponserdText />
-        </div>
-      </div> */}
       {children}
     </>
   );

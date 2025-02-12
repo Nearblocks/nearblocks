@@ -305,7 +305,7 @@ const TxnsTabActions = ({ hash, price, stats, tab, txn, status }: any) => {
           <>
             <div className="md:flex justify-between">
               <div className="w-full overflow-x-auto">
-                <div className="flex  min-w-full min-h-fit pt-2">
+                <div className="flex  min-w-full min-h-fit pt-3">
                   {tabs?.map(({ label, name }) => {
                     return (
                       <Link

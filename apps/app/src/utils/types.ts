@@ -1835,3 +1835,11 @@ export type BannerAdData = {
   id?: string;
   mobileImage: string;
 };
+
+export type TextAdData = {
+  icon: string;
+  id: string;
+  linkName: string;
+  siteName: string;
+  text: string;
+};

@@ -39,7 +39,7 @@ export default async function AddressIndex(props: {
         <Balance id={id} />
       </Suspense>
 
-      <div className="py-3"></div>
+      <div className="py-2"></div>
 
       <ErrorBoundary fallback={<TabSkeletion error reset />}>
         <Suspense fallback={<TabSkeletion />} key={JSON.stringify(rest)}>
