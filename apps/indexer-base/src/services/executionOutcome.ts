@@ -37,10 +37,7 @@ export const storeExecutionOutcomes = async (
 
       promises.push(
         retry(async () => {
-          await knex('execution_outcomes')
-            .insert(batch)
-            .onConflict(['receipt_id'])
-            .ignore();
+          await knex('execution_outcomes').insert(batch);
         }),
       );
     }
@@ -52,14 +49,7 @@ export const storeExecutionOutcomes = async (
 
       promises.push(
         retry(async () => {
-          await knex('execution_outcome_receipts')
-            .insert(batch)
-            .onConflict([
-              'executed_receipt_id',
-              'index_in_execution_outcome',
-              'produced_receipt_id',
-            ])
-            .ignore();
+          await knex('execution_outcome_receipts').insert(batch);
         }),
       );
     }

@@ -117,10 +117,7 @@ export const storeChunkAccounts = async (
 
   if (accounts.size) {
     await retry(async () => {
-      await knex('accounts')
-        .insert([...accounts.values()])
-        .onConflict(['account_id'])
-        .ignore();
+      await knex('accounts').insert([...accounts.values()]);
     });
   }
 

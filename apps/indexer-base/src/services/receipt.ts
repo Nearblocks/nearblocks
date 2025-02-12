@@ -59,10 +59,7 @@ export const storeReceipts = async (
 
       promises.push(
         retry(async () => {
-          await knex('receipts')
-            .insert(batch)
-            .onConflict(['receipt_id'])
-            .ignore();
+          await knex('receipts').insert(batch);
         }),
       );
     }
@@ -74,10 +71,7 @@ export const storeReceipts = async (
 
       promises.push(
         retry(async () => {
-          await knex('action_receipt_actions')
-            .insert(batch)
-            .onConflict(['receipt_id', 'index_in_action_receipt'])
-            .ignore();
+          await knex('action_receipt_actions').insert(batch);
         }),
       );
     }
@@ -89,10 +83,7 @@ export const storeReceipts = async (
 
       promises.push(
         retry(async () => {
-          await knex('action_receipt_input_data')
-            .insert(batch)
-            .onConflict(['input_data_id', 'input_to_receipt_id'])
-            .ignore();
+          await knex('action_receipt_input_data').insert(batch);
         }),
       );
     }
@@ -104,10 +95,7 @@ export const storeReceipts = async (
 
       promises.push(
         retry(async () => {
-          await knex('action_receipt_output_data')
-            .insert(batch)
-            .onConflict(['output_data_id', 'output_from_receipt_id'])
-            .ignore();
+          await knex('action_receipt_output_data').insert(batch);
         }),
       );
     }

@@ -187,10 +187,7 @@ export const storeChunkAccessKeys = async (
 
   if (accessKeys.size) {
     await retry(async () => {
-      await knex('access_keys')
-        .insert([...accessKeys.values()])
-        .onConflict(['public_key', 'account_id'])
-        .ignore();
+      await knex('access_keys').insert([...accessKeys.values()]);
     });
   }
 

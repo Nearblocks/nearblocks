@@ -11,7 +11,7 @@ export const storeBlock = async (
   const data = getBlockData(message);
 
   await retry(async () => {
-    await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
+    await knex('blocks').insert(data);
   });
 };
 
