@@ -9,8 +9,6 @@ import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino';
 
 import config from '#config';
 
-import logger from './logger.js';
-
 export const sdk = new BaselimeSDK({
   baselimeKey: config.otelExporterApiKey,
   collectorUrl: config.otelExporterEndpoint,
@@ -32,4 +30,3 @@ export const sdk = new BaselimeSDK({
 });
 
 sdk.start();
-logger.info('OpenTelemetry SDK started successfully.');
