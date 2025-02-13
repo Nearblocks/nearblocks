@@ -210,7 +210,7 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
             <MenuButton className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
               {'FROM'} <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+            <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="from"
@@ -235,7 +235,7 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     name="from"
                     type="button"
                     onClick={onClear}
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                   >
                     {t ? t('txns:filter.clear') : 'Clear'}
                   </button>
@@ -282,7 +282,7 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               {'DESTINATION CHAIN'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+            <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="chain"
@@ -303,7 +303,7 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     name="chain"
                     type="button"
                     onClick={onClear}
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                   >
                     {t ? t('txns:filter.clear') : 'Clear'}
                   </button>
@@ -385,7 +385,7 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
               {'DESTINATION ADDRESS'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+            <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="multichain_address"
@@ -406,7 +406,7 @@ const MultiChainTxns = ({ txns, count, error, cursor, tab }: TxnsProps) => {
                     name="multichain_address"
                     type="button"
                     onClick={onClear}
-                    className="flex-1 rounded bg-gray-300 text-xs h-7"
+                    className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-white text-xs h-7"
                   >
                     {t ? t('txns:filter.clear') : 'Clear'}
                   </button>

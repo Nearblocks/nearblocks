@@ -174,7 +174,7 @@ const TokenTransactions = ({
               {t ? t('txns:type') : 'METHOD'}{' '}
               <Filter className="h-4 w-4 fill-current ml-2" />
             </MenuButton>
-            <MenuList className="bg-white shadow-lg border rounded-b-lg p-2">
+            <MenuList className="z-50 bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 rounded-b-lg p-2">
               <form onSubmit={onFilter} className="flex flex-col">
                 <input
                   name="event"
@@ -186,7 +186,7 @@ const TokenTransactions = ({
                 <div className="flex">
                   <button
                     type="submit"
-                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white dark:text-black text-xs mr-2"
+                    className="flex items-center justify-center flex-1 rounded bg-green-500 h-7 text-white text-xs mr-2"
                   >
                     <Filter className="h-3 w-3 fill-current mr-2" />{' '}
                     {t ? t('txns:filter.filter') : 'Filter'}
