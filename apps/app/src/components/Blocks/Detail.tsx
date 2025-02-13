@@ -189,50 +189,47 @@ const Details = (props: Props) => {
                 <div className="w-full md:w-3/4">
                   <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
+              ) : block?.transactions_agg?.count ? (
+                <div className="w-full md:w-3/4 break-words">
+                  {t ? (
+                    <>
+                      <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                        {t('blocks:block.transactions.1', {
+                          txns: block?.transactions_agg?.count
+                            ? localFormat(
+                                block?.transactions_agg?.count?.toString(),
+                              )
+                            : block?.transactions_agg?.count?.toString() ?? '',
+                        })}
+                      </LinkWrapper>
+                      &nbsp;
+                      {t('blocks:block.transactions.2', {
+                        receipts: block?.receipts_agg?.count
+                          ? localFormat(block?.receipts_agg?.count?.toString())
+                          : block?.receipts_agg?.count?.toString() ?? '',
+                      })}{' '}
+                    </>
+                  ) : (
+                    <>
+                      (
+                      <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
+                        {block?.transactions_agg?.count
+                          ? localFormat(
+                              block?.transactions_agg?.count.toString(),
+                            )
+                          : block?.transactions_agg?.count.toString() ??
+                            '' + ' transactions'}
+                      </LinkWrapper>
+                      ) + `and $
+                      {block?.receipts_agg?.count
+                        ? localFormat(block?.receipts_agg?.count.toString())
+                        : block?.receipts_agg?.count ?? ''}{' '}
+                      receipts`
+                    </>
+                  )}
+                </div>
               ) : (
-                block?.transactions_agg?.count && (
-                  <div className="w-full md:w-3/4 break-words">
-                    {t ? (
-                      <>
-                        <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
-                          {t('blocks:block.transactions.1', {
-                            txns: block?.transactions_agg?.count
-                              ? localFormat(
-                                  block?.transactions_agg?.count?.toString(),
-                                )
-                              : block?.transactions_agg?.count?.toString() ??
-                                '',
-                          })}
-                        </LinkWrapper>
-                        &nbsp;
-                        {t('blocks:block.transactions.2', {
-                          receipts: block?.receipts_agg?.count
-                            ? localFormat(
-                                block?.receipts_agg?.count?.toString(),
-                              )
-                            : block?.receipts_agg?.count?.toString() ?? '',
-                        })}{' '}
-                      </>
-                    ) : (
-                      <>
-                        (
-                        <LinkWrapper href={`/txns?block=${block?.block_hash}`}>
-                          {block?.transactions_agg?.count
-                            ? localFormat(
-                                block?.transactions_agg?.count.toString(),
-                              )
-                            : block?.transactions_agg?.count.toString() ??
-                              '' + ' transactions'}
-                        </LinkWrapper>
-                        ) + `and $
-                        {block?.receipts_agg?.count
-                          ? localFormat(block?.receipts_agg?.count.toString())
-                          : block?.receipts_agg?.count ?? ''}{' '}
-                        receipts`
-                      </>
-                    )}
-                  </div>
-                )
+                0
               )}
             </div>
             <div className="flex flex-wrap p-4">
