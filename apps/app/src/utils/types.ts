@@ -519,6 +519,7 @@ export type EventPropsInfo = {
   event: TransactionLog;
   actionsLog?: any;
   allActionLog?: any;
+  isInteracted?: boolean;
 };
 
 export type DepositPropsInfo = {

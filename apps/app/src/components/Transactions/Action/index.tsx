@@ -21,6 +21,7 @@ const EventLogs = (props: EventPropsInfo) => {
             event={props.event}
             actionsLog={props?.actionsLog}
             allActionLog={props?.allActionLog}
+            isInteracted={props?.isInteracted}
           />
         );
       default:
