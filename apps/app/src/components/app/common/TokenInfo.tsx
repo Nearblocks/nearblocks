@@ -11,29 +11,32 @@ import TokenImage from './TokenImage';
 import useRpc from '@/hooks/app/useRpc';
 
 const TokenInfo = (props: TokenInfoProps) => {
-  const { contract, amount, decimals, isShowText } = props;
-
+  const { contract, amount, decimals, isShowText, metaInfo } = props;
+  const apiMeta = metaInfo && metaInfo[0]?.metadata;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const rpcAmount = localFormat(
-    tokenAmount(amount, decimals || meta?.decimals, true),
+    tokenAmount(amount, decimals || apiMeta?.decimals || meta?.decimals, true),
   );
 
   useEffect(() => {
-    setLoading(true);
-    ftMetadata(contract)
-      .then((data) => {
-        setMeta(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
+    if (!apiMeta) {
+      setLoading(true);
+      ftMetadata(contract)
+        .then((data) => {
+          setMeta(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setLoading(false);
+        });
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
+  }, [contract, metaInfo]);
 
   const Loader = ({
     className = '',
@@ -48,7 +51,7 @@ const TokenInfo = (props: TokenInfoProps) => {
   );
 
   return loading ? (
-    <Loader wrapperClassName="flex w-full max-w-xs" />
+    <Loader wrapperClassName="flex !w-52 max-w-xs" />
   ) : (
     <>
       <span className="font-normal pl-1">{rpcAmount}</span>
@@ -58,16 +61,18 @@ const TokenInfo = (props: TokenInfoProps) => {
       >
         <span className="flex items-center">
           <TokenImage
-            src={meta?.icon}
-            alt={meta?.name}
+            src={apiMeta ? apiMeta?.icon : meta?.icon}
+            alt={apiMeta ? apiMeta?.name : meta?.name}
             className="w-4 h-4 mx-1"
           />
-          {shortenToken(meta?.name)}
+          {shortenToken(apiMeta ? apiMeta?.name : meta?.name)}
           <span>
             &nbsp;(
             {isShowText
-              ? `i${shortenTokenSymbol(meta?.symbol)}`
-              : shortenTokenSymbol(meta?.symbol)}
+              ? `i${shortenTokenSymbol(
+                  apiMeta ? apiMeta?.symbol : meta?.symbol,
+                )}`
+              : shortenTokenSymbol(apiMeta ? apiMeta?.symbol : meta?.symbol)}
             )
           </span>
         </span>

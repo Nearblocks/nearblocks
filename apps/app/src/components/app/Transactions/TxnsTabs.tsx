@@ -2,6 +2,8 @@ import { getRequest } from '@/utils/app/api';
 import { nanoToMilli } from '@/utils/app/libs';
 
 import TxnsTabActions from './TxnsTabActions';
+import { processTransactionWithTokens } from '@/utils/near';
+import { ApiTxnData } from '@/utils/types';
 
 export default async function TxnsTabs({
   hash,
@@ -12,10 +14,11 @@ export default async function TxnsTabs({
   searchParams: any;
 }) {
   const options: RequestInit = { next: { revalidate: 10 } };
-  const data = (await getRequest(`txns/${hash}`, {}, options)) || {};
+  const data = (await getRequest(`txns/${hash}/full`, {}, options)) || {};
   const stats = (await getRequest(`stats`, {}, options)) || [];
   const syncData = (await getRequest(`sync/status`, {}, options)) || [];
   const txn = data?.txns?.[0];
+  console.log({ apiTxnData: data });
   let price: null | number = null;
   if (txn?.block_timestamp) {
     const timestamp = new Date(nanoToMilli(txn.block_timestamp));
@@ -45,6 +48,12 @@ export default async function TxnsTabs({
   const balanceIndexerStatus =
     syncData && syncData?.status?.indexers?.balance?.sync;
 
+  const txnData: ApiTxnData = await processTransactionWithTokens(txn);
+
+  console.log({ actions: txnData.actions });
+  console.log({ subActions: txnData.subActions });
+  console.log({ tokenMetadata: txnData.tokenMetadata });
+
   return (
     <TxnsTabActions
       hash={hash}
@@ -54,6 +63,7 @@ export default async function TxnsTabs({
       tab={tab}
       txn={txn}
       status={balanceIndexerStatus}
+      apiTxnActionsData={txnData}
     />
   );
 }
