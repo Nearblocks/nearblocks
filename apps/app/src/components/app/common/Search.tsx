@@ -16,6 +16,8 @@ import { NetworkId } from '@/utils/types';
 import ArrowDown from '../Icons/ArrowDown';
 import SearchIcon from '../Icons/SearchIcon';
 import { Spinner } from './Spinner';
+import useStatsStore from '@/stores/app/syncStats';
+import { handleFilterAndKeyword } from '@/utils/app/actions';
 
 export const SearchToast = ({ networkId }: any) => {
   if (networkId === 'testnet') {
@@ -45,7 +47,7 @@ const t = (key: string, p?: any): any => {
   return simulateAbsence ? undefined : { key, p };
 };
 
-const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
+const Search = ({ disabled, header = false }: any) => {
   const router = useIntlRouter();
   const pathname = usePathname();
   const [keyword, setKeyword] = useState('');
@@ -54,7 +56,7 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const containerRef: any = useRef<HTMLDivElement>(null);
-
+  const indexers = useStatsStore((state) => state.syncStatus);
   const isLocale = (value: null | string): any => {
     return routing?.locales?.includes(value as any);
   };
@@ -80,7 +82,9 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
 
   const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
 
-  const redirect = async (route: { type: string; path: string }) => {
+  type redirectRoute = { type: string; path: string };
+
+  const redirect = async (route: redirectRoute) => {
     const newPath =
       route?.type === 'block'
         ? `/blocks/${route?.path}`
@@ -88,6 +92,8 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
         ? `/txns/${route?.path}`
         : route?.type === 'address'
         ? `/address/${route?.path}`
+        : route?.type === 'token'
+        ? `/token/${route?.path}`
         : null;
 
     if (newPath === pathname) {
@@ -114,41 +120,38 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
     result?.blocks?.length > 0 ||
     result?.txns?.length > 0 ||
     result?.accounts?.length > 0 ||
-    result?.receipts?.length > 0;
+    result?.receipts?.length > 0 ||
+    result?.tokens?.length > 0;
 
   useEffect(() => {
     if (keyword) {
       (async () => {
         try {
-          const data = await handleFilterAndKeyword(keyword, filter);
-
-          const isDataEmpty =
-            data &&
-            Object.values(data).every(
-              (value) => Array.isArray(value) && value.length === 0,
-            );
-
-          if (isDataEmpty) {
+          const data = await handleFilterAndKeyword(keyword, filter, false);
+          if (data) {
+            if (
+              Object.values(data).some(
+                (value) => Array.isArray(value) && value.length > 0,
+              )
+            ) {
+              setResult(data);
+            } else {
+              if (indexers?.base && !indexers?.base?.sync) {
+                const rpcData = await rpcSearch(rpcUrl, keyword);
+                setResult(rpcData || {});
+              }
+            }
+          } else {
             const rpcData = await rpcSearch(rpcUrl, keyword);
             setResult(rpcData || {});
-          } else {
-            setResult(data);
           }
         } catch (error) {
           console.log('Error in handleFilterAndKeyword:', error);
-
-          try {
-            const rpcData = await rpcSearch(rpcUrl, keyword);
-            setResult(rpcData || {});
-          } catch (rpcError) {
-            console.error('RPC Search fallback error:', rpcError);
-            setResult({});
-          }
         }
       })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, keyword, handleFilterAndKeyword]);
+  }, [filter, keyword]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSave = useCallback(
@@ -158,6 +161,10 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
 
   const handleChange = (event: any) => {
     const { value: nextValue } = event.target;
+    if (nextValue === '') {
+      setResult({});
+      debouncedSave.cancel();
+    }
     debouncedSave(nextValue.replace(/[\s,]/g, ''));
   };
 
@@ -208,6 +215,12 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
       return redirect(route);
     }
 
+    const rpcRoute = await rpcSearch(rpcUrl, query, true);
+
+    if (rpcRoute) {
+      return redirect(rpcRoute as redirectRoute);
+    }
+
     return toast.error(SearchToast(networkId as NetworkId));
   };
 
@@ -236,6 +249,9 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
           </option>
           <option value="/accounts">
             {t('search.filters.addresses') || 'Addresses'}
+          </option>
+          <option value="/tokens">
+            {t('search.filters.token') || 'Tokens'}
           </option>
         </select>
         <ArrowDown
@@ -338,6 +354,24 @@ const Search = ({ disabled, handleFilterAndKeyword, header = false }: any) => {
                     >
                       #{localFormat(block.block_height)} (0x
                       {shortenHex(block.block_hash)})
+                    </div>
+                  ))}
+                </>
+              )}
+              {result?.tokens?.length > 0 && (
+                <>
+                  <h3 className=" mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                    {t('search.list.tokens') || 'Tokens'}
+                  </h3>
+                  {result.tokens.map((token: any) => (
+                    <div
+                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                      key={token.contract}
+                      onClick={() =>
+                        onSelect({ path: token.contract, type: 'token' })
+                      }
+                    >
+                      {shortenAddress(token.contract)}
                     </div>
                   ))}
                 </>

@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { manrope } from '@/fonts/font';
-import { GTMID } from '@/utils/app/config';
+import { GTMID, networkId } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
 import ThemeInitializer from './ThemeInitializer';
@@ -26,6 +26,7 @@ const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();
   const theme = (await cookies()).get('theme')?.value || 'light';
   const token = await getCookie('token');
+  const network = networkId;
 
   const getLatestStats = async () => {
     'use server';
@@ -36,66 +37,12 @@ const Layout = async ({ children, locale }: LayoutProps) => {
   const getSyncStatus = async () => {
     'use server';
     const sync = await getRequest('sync/status');
-    const syncTimestamp = sync?.status?.indexers?.base?.timestamp;
-    return syncTimestamp;
+    const indexers = sync?.status?.indexers;
+    return indexers;
   };
 
   const stats = await getLatestStats();
-  const sync = await getSyncStatus();
-
-  const handleFilterAndKeyword = async (
-    keyword: string,
-    filter: string,
-    returnPath: any,
-  ) => {
-    'use server';
-
-    if (keyword.includes('.')) {
-      keyword = keyword.toLowerCase();
-    }
-
-    const res = await getRequest(`search${filter}?keyword=${keyword}`);
-
-    const data = {
-      accounts: [],
-      blocks: [],
-      receipts: [],
-      txns: [],
-    };
-
-    if (res?.blocks?.length) {
-      if (returnPath) {
-        return { path: res.blocks[0].block_hash, type: 'block' };
-      }
-      data.blocks = res.blocks;
-    }
-
-    if (res?.txns?.length) {
-      if (returnPath) {
-        return { path: res.txns[0].transaction_hash, type: 'txn' };
-      }
-      data.txns = res.txns;
-    }
-
-    if (res?.receipts?.length) {
-      if (returnPath) {
-        return {
-          path: res.receipts[0].originated_from_transaction_hash,
-          type: 'txn',
-        };
-      }
-      data.receipts = res.receipts;
-    }
-
-    if (res?.accounts?.length) {
-      if (returnPath) {
-        return { path: res.accounts[0].account_id, type: 'address' };
-      }
-      data.accounts = res.accounts;
-    }
-
-    return returnPath ? null : data;
-  };
+  const indexers = await getSyncStatus();
 
   return (
     <html
@@ -122,6 +69,16 @@ const Layout = async ({ children, locale }: LayoutProps) => {
           type="image/png"
         />
         <link href="/site.webmanifest" rel="manifest" />
+        <link
+          rel="search"
+          type="application/opensearchdescription+xml"
+          href={
+            network === 'testnet'
+              ? '/opensearch_testnet.xml'
+              : '/opensearch_mainnet.xml'
+          }
+          title="nearblocks"
+        />
       </head>
       <body className={`overflow-x-hidden dark:bg-black-300`}>
         <noscript>
@@ -156,10 +113,9 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                   theme={theme}
                   token={token}
                   stats={stats}
-                  sync={sync}
+                  sync={indexers}
                   getLatestStats={getLatestStats}
                   getSyncStatus={getSyncStatus}
-                  handleFilterAndKeyword={handleFilterAndKeyword}
                 >
                   {children}
                 </LayoutActions>

@@ -52,6 +52,18 @@ type RpcSearchResult = {
   txns: { transaction_hash: string }[];
 };
 
+type response = {
+  receipt_id: string;
+  parent_transaction_hash: string;
+  transaction: {
+    hash: string;
+  };
+  header: {
+    height: number;
+    hash: string;
+  };
+};
+
 const receiptRpc =
   networkId === 'mainnet'
     ? `https://beta.rpc.mainnet.near.org`
@@ -72,7 +84,7 @@ export const rpcSearch = async (
 
   const isQueryLong = keyword.length >= 43;
 
-  const [account, block, txn, receipt] = await Promise.all([
+  const [account, block, txn, receipt]: response[] = await Promise.all([
     isValidAccount(keyword.toLocaleLowerCase())
       ? getAccount(rpcUrl, keyword.toLocaleLowerCase())
       : undefined,
@@ -136,8 +148,7 @@ export const rpcSearch = async (
       },
     ];
   }
-
-  return data;
+  return returnPath ? null : data;
 };
 
 export const getAccount = async (rpc: string, accountId: string) => {

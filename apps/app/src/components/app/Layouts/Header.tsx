@@ -153,7 +153,6 @@ const languages = [
 ];
 
 const Header = ({
-  handleFilterAndKeyword,
   stats: initialStats,
   sync: initialSync,
   token: tokenCookie,
@@ -164,7 +163,7 @@ const Header = ({
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
   const [stats, setStats] = useState(initialStats);
-  const [sync, setSync] = useState<string>(initialSync);
+  const [sync, setSync] = useState<string>(initialSync?.base?.timestamp);
   const [token, setToken] = useState<string | undefined>(tokenCookie);
 
   useEffect(() => {
@@ -200,16 +199,23 @@ const Header = ({
 
   const setLatestStats = useStatsStore((state) => state.setLatestStats);
   const setSyncStat = useStatsStore((state) => state.setSyncStatus);
+  useEffect(() => {
+    if (initialStats) {
+      setSyncStat(initialSync);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const pathname = usePathname();
 
   useEffect(() => {
     const fetchSyncStats = async () => {
       try {
-        const syncTimestamp = await getSyncStatus();
+        const indexers = await getSyncStatus();
+        const syncTimestamp = indexers?.base?.timestamp;
         if (typeof syncTimestamp === 'string') {
           setSync(syncTimestamp);
-          setSyncStat(syncTimestamp);
         }
+        setSyncStat(indexers);
       } catch (error) {
         console.error('Error fetching syncStats:', error);
       }
@@ -356,10 +362,7 @@ const Header = ({
           <div className="w-full lg:!w-2/4 flex justify-end items-center gap-3 h-10">
             {showSearch && (
               <div className="w-full md:w-[70%] flex items-center">
-                <Search
-                  handleFilterAndKeyword={handleFilterAndKeyword}
-                  header
-                />
+                <Search header />
               </div>
             )}
             <ul className="hidden md:flex justify-end text-gray-500 pb-4 md:pb-0">
