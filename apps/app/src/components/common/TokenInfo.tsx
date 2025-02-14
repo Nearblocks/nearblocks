@@ -43,12 +43,12 @@ const TokenInfo = (props: TokenInfoProps) => {
     wrapperClassName?: string;
   }) => (
     <div
-      className={`bg-gray-200 dark:bg-black-200 h-5 w-full max-w-xs rounded shadow-sm animate-pulse ${className} ${wrapperClassName}`}
+      className={`bg-gray-200 dark:bg-black-200 h-4 w-full max-w-xs rounded shadow-sm animate-pulse ${className} ${wrapperClassName}`}
     ></div>
   );
 
   return loading ? (
-    <Loader wrapperClassName="flex w-full max-w-xs" />
+    <Loader wrapperClassName="flex !w-32 max-w-xs" />
   ) : (
     <>
       <span className="font-normal pl-1">{rpcAmount}</span>
