@@ -10,6 +10,7 @@ import { usePathname } from '@/i18n/routing';
 import { Link } from '@/i18n/routing';
 import { useRpcStore } from '@/stores/app/rpc';
 import {
+  apiMainActions,
   calculateGasUsed,
   calculateTotalDeposit,
   calculateTotalGas,
@@ -35,7 +36,15 @@ export type RpcProvider = {
   url: string;
 };
 
-const TxnsTabActions = ({ hash, price, stats, tab, txn, status }: any) => {
+const TxnsTabActions = ({
+  hash,
+  price,
+  stats,
+  tab,
+  txn,
+  status,
+  apiTxnActionsData,
+}: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
@@ -189,7 +198,6 @@ const TxnsTabActions = ({ hash, price, stats, tab, txn, status }: any) => {
               txnExists.transaction_outcome.block_hash,
             );
           }
-
           const modifiedTxns = {
             actions_agg: {
               deposit: calculateTotalDeposit(txnExists?.transaction.actions),
@@ -344,6 +352,7 @@ const TxnsTabActions = ({ hash, price, stats, tab, txn, status }: any) => {
                     statsData={stats}
                     txn={txn ? txn : rpcData}
                     status={status}
+                    apiTxnActionsData={apiTxnActionsData}
                   />
                 )}
                 {tab === 'execution' && (

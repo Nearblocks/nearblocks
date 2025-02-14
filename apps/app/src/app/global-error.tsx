@@ -41,18 +41,18 @@ export default function GlobalError({
   console.log(error);
 
   return (
-    <html className="h-full">
+    <html>
       <head>
         <title>Error - Nearblocks</title>
       </head>
-      <body className="h-full">
+      <body>
         <section className="flex flex-col items-center justify-center relative">
-          <div className="globalErrorContainer flex flex-col items-center justify-center">
-            <div className="px-3  errorContent absolute flex flex-col justify-center">
+          <div className="globalErrorContainer flex flex-col items-center justify-end">
+            <div className="px-3 errorContent absolute flex flex-col justify-center">
               <div className="text-center text-nearblue-600 dark:text-neargray-10 text-3xl pt-20 font-semibold">
                 Server Error{' '}
               </div>
-              <Content reset={reset} />
+              <Content reset={reset} /> 
             </div>
             <div className="errorBg"></div>
           </div>

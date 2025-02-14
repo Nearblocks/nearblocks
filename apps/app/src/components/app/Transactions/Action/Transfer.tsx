@@ -9,7 +9,6 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 
 const Transfer = (props: ActionPropsInfo) => {
   const params = useParams();
-
   return (
     <div className="action flex flex-wrap items-center break-all">
       {props?.action?.receiptId && params?.hash ? (

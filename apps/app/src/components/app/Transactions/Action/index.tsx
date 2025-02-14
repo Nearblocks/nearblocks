@@ -9,7 +9,12 @@ const EventLogs = (props: EventPropsInfo) => {
     switch (props.event.contract) {
       case 'wrap.near':
       case 'wrap.testnet':
-        return <WrapContract event={props.event} />;
+        return (
+          <WrapContract
+            event={props.event}
+            tokenMetadata={props?.tokenMetadata}
+          />
+        );
       case 'v2.ref-finance.near':
         return <RefContract event={props.event} />;
       case 'contract.main.burrow.near':
@@ -21,6 +26,7 @@ const EventLogs = (props: EventPropsInfo) => {
             event={props.event}
             actionsLog={props?.actionsLog}
             allActionLog={props?.allActionLog}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       default:
