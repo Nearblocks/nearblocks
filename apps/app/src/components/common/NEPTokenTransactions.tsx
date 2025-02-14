@@ -148,7 +148,7 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
                             </div>
                           </>
                         )}
-                        <div className="font-bold pl-1">For</div>
+                        <div className="font-bold pl-1 pr-0.5">For</div>
                         <TokenInfo
                           contract={contract}
                           amount={amounts[tokenIndex] || '0'}
@@ -297,7 +297,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
             return (
               <div
                 key={`${tokenIndex}`}
-                className="flex flex-wrap break-all leading-7"
+                className="flex items-center flex-wrap break-all leading-7"
               >
                 <div className="cursor-pointer">
                   {item.address !== 'system' ? (
@@ -311,7 +311,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
                     <span className="font-normal pl-1">system</span>
                   )}
                 </div>
-                <div className="font-bold pl-1">{item?.type}</div>
+                <div className="font-bold pl-1 pr-0.5">{item?.type}</div>
                 <TokenInfo
                   contract={item?.token?.split(':')[1]}
                   amount={item?.amount || '0'}

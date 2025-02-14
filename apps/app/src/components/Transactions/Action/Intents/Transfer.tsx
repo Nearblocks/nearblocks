@@ -55,6 +55,18 @@ const Transfer = ({ event, data }: Props) => {
 
   if (validSwaps?.length === 0) return null;
 
+  const Loader = ({
+    className = '',
+    wrapperClassName = '',
+  }: {
+    className?: string;
+    wrapperClassName?: string;
+  }) => (
+    <div
+      className={`bg-gray-200 dark:bg-black-200 h-5 w-full max-w-xs rounded shadow-sm animate-pulse ${className} ${wrapperClassName}`}
+    ></div>
+  );
+
   return (
     <div className="flex flex-col space-y-4">
       {validSwaps.map(([account, { sent, received }]) => (
@@ -75,29 +87,37 @@ const Transfer = ({ event, data }: Props) => {
           >
             {shortenText(account)}
           </Link>
-          <span className="font-semibold text-gray pl-1"> Swap </span>
+          <span className="font-semibold text-gray pl-1 pr-0.5"> Swap </span>
 
-          {sent.map(({ token, amount }, index) => (
-            <TokenInfo
-              key={`sent-${token}-${index}`}
-              contract={token.split(':')[1] || token}
-              amount={amount}
-              isShowText
-            />
-          ))}
+          {sent?.length > 0 ? (
+            sent?.map(({ token, amount }, index) => (
+              <TokenInfo
+                key={`sent-${token}-${index}`}
+                contract={token?.split(':')[1] || token}
+                amount={amount}
+                isShowText
+              />
+            ))
+          ) : (
+            <Loader wrapperClassName="flex w-full max-w-xs" />
+          )}
 
-          <span className="font-bold text-gray pl-1 text-sm whitespace-nowrap">
+          <span className="font-bold text-gray px-0.5 text-sm whitespace-nowrap">
             For
           </span>
 
-          {received.map(({ token, amount }, index) => (
-            <TokenInfo
-              key={`received-${token}-${index}`}
-              contract={token.split(':')[1] || token}
-              amount={amount}
-              isShowText
-            />
-          ))}
+          {received?.length > 0 ? (
+            received?.map(({ token, amount }, index) => (
+              <TokenInfo
+                key={`received-${token}-${index}`}
+                contract={token?.split(':')[1] || token}
+                amount={amount}
+                isShowText
+              />
+            ))
+          ) : (
+            <Loader wrapperClassName="flex w-full max-w-xs" />
+          )}
 
           <span className="font-bold text-gray pl-1 text-sm sm:text-base flex items-center">
             On{' '}

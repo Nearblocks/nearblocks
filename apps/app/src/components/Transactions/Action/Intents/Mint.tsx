@@ -130,7 +130,7 @@ const Mint = ({ event, data, parsedActionLogs }: Props) => {
         <FaRight className="text-gray-400 text-xs" />
       )}
 
-      <span className="font-semibold text-gray pl-1">Deposit</span>
+      <span className="font-semibold text-gray pl-1 pr-0.5">Deposit</span>
       <TokenInfo
         contract={token?.split(':')[1]}
         amount={amount}
