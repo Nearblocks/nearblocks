@@ -246,7 +246,6 @@ const Details = (props: Props) => {
       return true;
     }
   });
-
   const updatedMainTxnsActions =
     mainTxnsActions &&
     mainTxnsActions?.map((txn) => {
@@ -629,6 +628,7 @@ const Details = (props: Props) => {
                         key={i}
                         event={event}
                         allActionLog={allActions}
+                        isInteracted
                       />
                     ))}
                     {actions?.map((action: any, i: number) => (
