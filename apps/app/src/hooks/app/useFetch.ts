@@ -16,7 +16,7 @@ export const defaultOptions = {
   shouldRetryOnError: false,
 };
 
-const request = axios.create({ baseURL });
+const request = axios.create({ baseURL, timeout: 10000 });
 
 declare module 'axios' {
   export interface AxiosRequestConfig {

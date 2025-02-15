@@ -1,5 +1,4 @@
 import qs from 'qs';
-
 import { apiUrl, appUrl } from './config';
 
 const fetchKey = process.env.API_ACCESS_KEY;
@@ -20,15 +19,25 @@ export const getRequest = async (
     : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
   const MAX_RETRIES = 3;
+  const TIMEOUT = 10000;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+
     try {
       const headers = new Headers({
         Authorization: `Bearer ${fetchKey}`,
       });
 
-      const mergedOptions = { headers, ...options };
+      const mergedOptions: RequestInit = {
+        headers,
+        signal: controller.signal,
+        ...options,
+      };
+
       const response = await fetch(url, mergedOptions);
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         const contentType = response.headers.get('content-type');
@@ -36,26 +45,27 @@ export const getRequest = async (
         return isJson ? response.json() : response.text();
       }
 
-      if (response.status !== 200) {
-        console.error(
-          `Server error on ${url} attempt ${attempt}: ${response.statusText}`,
-        );
-        if (attempt === MAX_RETRIES - 1) return null;
-      }
-    } catch (error: any) {
-      const isNetworkError =
-        error instanceof TypeError || (error as Error).name === 'NetworkError';
       console.error(
-        `Error on attempt ${attempt + 1}: ${(error as Error).message}`,
+        `Server error on ${url}, attempt ${attempt + 1}: ${
+          response.statusText
+        }`,
       );
+    } catch (error: any) {
+      clearTimeout(timeoutId);
 
-      if (!isNetworkError || attempt + 1 === MAX_RETRIES) {
+      if (error.name === 'AbortError') {
+        console.error(`Request to ${url} timed out`);
+        throw new Error('Request timeout');
+      }
+
+      console.error(`Error on attempt ${attempt + 1}:`, error);
+
+      if (attempt === MAX_RETRIES - 1) {
         throw error;
       }
 
       const delay = Math.pow(2, attempt) * 1000;
       await new Promise((resolve) => setTimeout(resolve, delay));
-      throw error;
     }
   }
 };
