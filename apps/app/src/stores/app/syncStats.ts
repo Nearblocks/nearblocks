@@ -1,10 +1,22 @@
 import { create } from 'zustand';
 
+type SyncData = {
+  height: string;
+  sync: boolean;
+  timestamp: string;
+};
+
+type DataObject = {
+  balance: SyncData;
+  base: SyncData;
+  events: SyncData;
+};
+
 interface StoreState {
   latestStats: any;
-  syncStatus: string | null;
+  syncStatus: DataObject | null;
   setLatestStats: (latestStats: any) => void;
-  setSyncStatus: (syncStatus: string | null) => void;
+  setSyncStatus: (syncStatus: DataObject | null) => void;
 }
 
 const useStatsStore = create<StoreState>((set) => ({
