@@ -15,9 +15,10 @@ import Overview from '@/components/Transactions/Overview';
 import LatestTransactions from '@/components/Transactions/Latest';
 import { fetchData } from '@/utils/fetchData';
 import { toast } from 'react-toastify';
-import search from '@/utils/search';
+import search, { rpcSearch } from '@/utils/search';
 import { useRouter } from 'next/router';
 import { getCookieFromRequest } from '@/utils/libs';
+import { useRpcStore } from '@/stores/rpc';
 
 const network = env('NEXT_PUBLIC_NETWORK_ID');
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
@@ -93,6 +94,7 @@ const HomePage = ({
   const blocks = blockDetails?.blocks || [];
   const txns = txnsDetails?.txns || [];
   const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
 
   useEffect(() => {
     const loadResults = async (keyword: string) => {
@@ -101,15 +103,20 @@ const HomePage = ({
       if (route) {
         return redirect(route);
       }
-
-      return toast.error(SearchToast);
+      const rpcRoute = await rpcSearch(rpcUrl, keyword, true);
+      if (rpcRoute) {
+        return redirect(rpcRoute);
+      }
+      return toast.error(SearchToast, {
+        toastId: 'search-error',
+      });
     };
-
-    const keyword = typeof q === 'string' ? q.trim() : '';
+    const keyword = typeof q === 'string' ? q?.replace(/[\s,]/g, '') : '';
 
     if (keyword) {
       loadResults(keyword);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
 
   return (
