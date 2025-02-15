@@ -36,6 +36,7 @@ import {
   txnLogs,
 } from '@/utils/near';
 import {
+  ApiTxnData,
   FtsInfo,
   InventoryInfo,
   MtEventLogData,
@@ -75,6 +76,7 @@ interface Props {
   };
   txn: TransactionInfo;
   status: boolean;
+  apiTxnActionsData: ApiTxnData;
 }
 
 const Details = (props: Props) => {
@@ -87,6 +89,7 @@ const Details = (props: Props) => {
     statsData,
     txn,
     status,
+    apiTxnActionsData,
   } = props;
   const [more, setMore] = useState(false);
   const [utc, setUtc] = useState(true);
@@ -99,6 +102,7 @@ const Details = (props: Props) => {
   const [isScrollable, setIsScrollable] = useState(false);
   const [isActionScrollable, setIsActionScrollable] = useState(false);
 
+  const { actions: apiActions, subActions, tokenMetadata } = apiTxnActionsData;
   const { fts, nfts } = useMemo(() => {
     function tokensTransfers(receipts: InventoryInfo[]) {
       let fts: FtsInfo[] = [];
@@ -270,32 +274,43 @@ const Details = (props: Props) => {
   });
 
   const updatedMainTxnsActions =
-    mainTxnsActions &&
-    mainTxnsActions?.map((txn) => {
-      const filteredNepLogs = logs?.filter((item: any) => {
-        try {
-          const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
-          if (logContent) {
-            const jsonLog = JSON.parse(logContent[1]);
-            return jsonLog?.standard === 'nep245';
-          }
-          return false;
-        } catch {
-          return false;
-        }
-      });
-      if (filteredNepLogs?.length > 0) {
-        return {
-          ...txn,
-          logs: [...filteredNepLogs],
-        };
-      } else {
-        return {
-          ...txn,
-          logs: [...txn.logs, ...filteredNepLogs],
-        };
-      }
-    });
+    !status || apiActions.length === 0
+      ? mainTxnsActions
+      : apiActions?.map((txn: any) => {
+          const filteredNepLogs = logs?.filter((item: any) => {
+            try {
+              const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
+              if (logContent) {
+                const jsonLog = JSON.parse(logContent[1]);
+                return jsonLog?.standard === 'nep245';
+              }
+              return false;
+            } catch {
+              return false;
+            }
+          });
+
+          const filterNepSubLogs = (subActions: any) => {
+            if (!subActions?.[0]?.logs) {
+              return [];
+            }
+
+            const filteredLogs = subActions[0]?.logs && subActions[0]?.logs;
+            return filteredLogs;
+          };
+
+          const filteredNepSubLogs = subActions
+            ? filterNepSubLogs(subActions)
+            : null;
+
+          return {
+            ...txn,
+            logs:
+              filteredNepLogs?.length > 0
+                ? [...filteredNepSubLogs]
+                : [...txn.logs, ...filteredNepLogs],
+          };
+        });
 
   const totalTokenIdsCount = actionLogs?.reduce(
     (totalCount: number, item: any) => {
@@ -583,6 +598,7 @@ const Details = (props: Props) => {
                                   updatedMainTxnsActions?.[0]?.actionsLog
                                 }
                                 allActionLog={allActions}
+                                tokenMetadata={tokenMetadata}
                               />
                             ),
                           )}
@@ -593,20 +609,24 @@ const Details = (props: Props) => {
                                 const logs = updatedMainTxnsActions[0]?.logs;
                                 return logs?.every((log: any) => {
                                   const logData = log?.logs;
-                                  const parsedLog = logData?.startsWith(
-                                    'EVENT_JSON:',
-                                  )
-                                    ? JSON.parse(
-                                        logData.replace('EVENT_JSON:', ''),
-                                      )
-                                    : null;
-                                  return parsedLog?.standard !== 'nep245';
+                                  const isJson =
+                                    typeof logData === 'string' &&
+                                    logData?.startsWith('EVENT_JSON:');
+                                  if (isJson) {
+                                    const parsedJson = JSON.parse(
+                                      logData.replace('EVENT_JSON:', ''),
+                                    );
+
+                                    return parsedJson?.standard !== 'nep245';
+                                  } else {
+                                    return logData?.standard !== 'nep245';
+                                  }
                                 });
                               } catch (error) {
                                 return false;
                               }
                             })()) &&
-                          updatedMainTxnsActions.map(
+                          updatedMainTxnsActions?.map(
                             (action: any, i: number) => (
                               <Actions key={i} action={action} />
                             ),

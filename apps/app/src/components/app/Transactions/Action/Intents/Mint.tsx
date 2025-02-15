@@ -31,9 +31,10 @@ interface Props {
   event: TransactionLog;
   data: DataItem[];
   parsedActionLogs?: any[];
+  meta: any;
 }
 
-const Mint = ({ event, data, parsedActionLogs }: Props) => {
+const Mint = ({ event, data, parsedActionLogs, meta }: Props) => {
   const params = useParams<{ hash: string }>();
   const hash = params?.hash;
 
@@ -116,63 +117,69 @@ const Mint = ({ event, data, parsedActionLogs }: Props) => {
     amount: string,
     idx: number,
     isLast: boolean,
-  ) => (
-    <div
-      key={idx}
-      className={`flex flex-wrap items-center justify-start align-middle ${
-        !isLast ? 'mb-1 sm:!mb-1' : ''
-      }`}
-    >
-      {event?.receiptId && hash ? (
-        <Link href={`/txns/${hash}#execution#${event?.receiptId}`}>
-          <FaRight className="text-gray-400 cursor-pointer text-xs" />
-        </Link>
-      ) : (
-        <FaRight className="text-gray-400 text-xs" />
-      )}
-
-      <span className="font-semibold text-gray pl-1">Deposit</span>
-      <TokenInfo
-        contract={token?.split(':')[1]}
-        amount={amount}
-        isShowText={true}
-      />
-      <div className="ml-1 flex items-center">
-        by
-        {transactionParties && (
-          <span className="text-green-500 dark:text-green-250">
-            <AddressOrTxnsLink
-              className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-0.5 ml-0.5 h-6"
-              currentAddress={transactionParties.sender}
-            />
-          </span>
+  ) => {
+    const metaInfo = meta?.filter(
+      (meta: any) => meta.contractId === token?.split(':')[1],
+    );
+    return (
+      <div
+        key={idx}
+        className={`flex flex-wrap items-center justify-start align-middle ${
+          !isLast ? 'mb-1 sm:!mb-1' : ''
+        }`}
+      >
+        {event?.receiptId && hash ? (
+          <Link href={`/txns/${hash}#execution#${event?.receiptId}`}>
+            <FaRight className="text-gray-400 cursor-pointer text-xs" />
+          </Link>
+        ) : (
+          <FaRight className="text-gray-400 text-xs" />
         )}
-      </div>
-      <div className="flex items-center font-bold text-gray text-sm sm:text-xs pl-1">
-        On
-        <Link
-          href="/address/intents.near"
-          className="inline-flex items-center text-green-500 dark:text-green-250 font-normal hover:no-underline pl-1"
-        >
-          <IntentsIcon className="h-4 w-4 mr-1" /> intents.near
-        </Link>
-      </div>
-      {txns && txns?.txnsHash && (
-        <div className="inline-flex items-center pl-1">
+
+        <span className="font-semibold text-gray pl-1">Deposit</span>
+        <TokenInfo
+          contract={token?.split(':')[1]}
+          amount={amount}
+          isShowText={true}
+          metaInfo={metaInfo}
+        />
+        <div className="ml-1 flex items-center">
+          by
+          {transactionParties && (
+            <span className="text-green-500 dark:text-green-250">
+              <AddressOrTxnsLink
+                className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-0.5 ml-0.5 h-6"
+                currentAddress={transactionParties.sender}
+              />
+            </span>
+          )}
+        </div>
+        <div className="flex items-center font-bold text-gray text-sm sm:text-xs pl-1">
+          On
           <Link
-            href={txns.externalLink || '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-500 dark:text-green-250 font-normal hover:no-underline inline-flex items-center justify-center"
+            href="/address/intents.near"
+            className="inline-flex items-center text-green-500 dark:text-green-250 font-normal hover:no-underline pl-1"
           >
-            {`(${shortenText(txns.txnsHash)} `}
-            <ArrowUpRightSquare className="text-green-500 dark:text-green-250 w-4 h-4 ml-1" />
-            {')'}
+            <IntentsIcon className="h-4 w-4 mr-1" /> intents.near
           </Link>
         </div>
-      )}
-    </div>
-  );
+        {txns && txns?.txnsHash && (
+          <div className="inline-flex items-center pl-1">
+            <Link
+              href={txns.externalLink || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-500 dark:text-green-250 font-normal hover:no-underline inline-flex items-center justify-center"
+            >
+              {`(${shortenText(txns.txnsHash)} `}
+              <ArrowUpRightSquare className="text-green-500 dark:text-green-250 w-4 h-4 ml-1" />
+              {')'}
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="action flex flex-col justify-center break-all leading-7">

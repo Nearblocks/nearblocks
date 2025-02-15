@@ -21,6 +21,7 @@ interface Props {
   event: TransactionLog;
   data: DataItem[];
   actionsLog: any;
+  meta: any;
 }
 
 interface SignedIntent {
@@ -31,7 +32,7 @@ interface SignedIntent {
   memo?: string;
 }
 
-const Burn = ({ event, data, actionsLog }: Props) => {
+const Burn = ({ event, data, actionsLog, meta }: Props) => {
   const params = useParams<{ hash: string }>();
   const hash = params?.hash;
   const [address, setAddress] = useState<any>();
@@ -91,7 +92,9 @@ const Burn = ({ event, data, actionsLog }: Props) => {
     <div className="action flex flex-col break-all">
       {data?.map((item) => {
         const { token_ids, amounts } = item;
-
+        const metaInfo = meta?.filter(
+          (meta: any) => meta.contractId === token_ids[0]?.split(':')[1],
+        );
         if (token_ids && amounts && token_ids?.length > 0) {
           return (
             <div key={0} className="flex flex-wrap items-center justify-start">
@@ -107,6 +110,7 @@ const Burn = ({ event, data, actionsLog }: Props) => {
                 contract={token_ids[0]?.split(':')[1]}
                 amount={amounts[0]}
                 isShowText={true}
+                metaInfo={metaInfo}
               />
               {address && Object.keys(address)?.length > 0 && (
                 <div className="flex items-center">

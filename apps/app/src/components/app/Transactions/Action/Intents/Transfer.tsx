@@ -17,12 +17,12 @@ interface DataItem {
 interface Props {
   event: TransactionLog;
   data: DataItem[];
+  meta: any;
 }
 
-const Transfer = ({ event, data }: Props) => {
+const Transfer = ({ event, data, meta }: Props) => {
   const params = useParams<{ hash: string }>();
   const hash = params?.hash;
-
   const reversedData = [...data];
 
   const selectedData =
@@ -76,6 +76,9 @@ const Transfer = ({ event, data }: Props) => {
             const contractName = token?.includes(':')
               ? token?.split(':')[1]
               : token;
+            const metaInfo = meta?.filter(
+              (meta: any) => meta.contractId === contractName,
+            );
             const isLastToken = index === tokens?.length - 1;
 
             return (
@@ -85,6 +88,7 @@ const Transfer = ({ event, data }: Props) => {
                     contract={contractName}
                     amount={amount}
                     isShowText={true}
+                    metaInfo={metaInfo}
                   />
                 )}
                 {isLastToken && (
@@ -96,6 +100,7 @@ const Transfer = ({ event, data }: Props) => {
                       contract={contractName}
                       amount={amount}
                       isShowText={true}
+                      metaInfo={metaInfo}
                     />
                   </>
                 )}

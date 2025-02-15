@@ -77,6 +77,21 @@ export type MetaInfo = {
   symbol: string;
 };
 
+export type ApiMetaInfo = {
+  contractId: string;
+  metadata: {
+    decimals: number;
+    description: string;
+    icon: string | null;
+    marketCap: string;
+    name: string;
+    price: string;
+    symbol: string;
+    volume24h: string;
+    website: string;
+  };
+};
+
 export type FtsInfo = {
   affected_account_id: string;
   block_timestamp: string;
@@ -484,7 +499,7 @@ export type RPCTransactionInfo = {
 
 export type TransactionLog = {
   contract: string;
-  logs: string;
+  logs: any;
   receiptId?: string;
 };
 
@@ -521,6 +536,7 @@ export type EventPropsInfo = {
   event: TransactionLog;
   actionsLog?: any;
   allActionLog?: any;
+  tokenMetadata?: ProcessedTokenMeta[];
 };
 
 export type DepositPropsInfo = {
@@ -754,6 +770,7 @@ export type TokenInfoProps = {
   decimals?: any;
   transferAmount?: string;
   isShowText?: boolean;
+  metaInfo?: ApiMetaInfo[];
 };
 
 export type ValidatorFullData = {
@@ -1842,4 +1859,48 @@ export type TextAdData = {
   linkName: string;
   siteName: string;
   text: string;
+};
+
+export type ActionInfo = {
+  to: string;
+  from: string;
+  receiptId: string;
+  logs: Array<{
+    logs: string;
+    contract: string;
+    receiptId: string;
+  }>;
+  actionsLog: Array<{
+    args: {
+      deposit: number;
+      gas: number;
+      method_name?: string;
+      args?: any;
+    };
+    [key: string]: any;
+  }>;
+  [key: string]: any;
+};
+
+export type TokenMetadata = {
+  name: string;
+  symbol: string;
+  decimals: number;
+  price: string;
+  marketCap: string;
+  volume24h: string;
+  description: string;
+  website: string;
+  icon: string | null;
+};
+
+export type ProcessedTokenMeta = {
+  contractId: string;
+  metadata: TokenMetadata;
+};
+
+export type ApiTxnData = {
+  actions: ActionInfo[];
+  subActions: ActionInfo[];
+  tokenMetadata: ProcessedTokenMeta[];
 };

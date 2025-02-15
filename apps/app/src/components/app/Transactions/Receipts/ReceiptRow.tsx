@@ -32,7 +32,6 @@ interface Props {
 
 const ReceiptRow = (props: Props) => {
   const { block, borderFlag, receipt, statsData } = props;
-  console.log({ receipt });
   const t = useTranslations();
   const [pageHash] = useHash();
   const loading = false;

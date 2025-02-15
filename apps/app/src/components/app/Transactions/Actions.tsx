@@ -13,6 +13,8 @@ import Stake from './Action/Stake';
 import Transfer from './Action/Transfer';
 
 const Actions = (props: ActionPropsInfo) => {
+  console.log('enter actions');
+  console.log({ action_kind: props?.action?.action_kind });
   const showAction = () => {
     switch (props.action.action_kind) {
       case 'ADD_KEY':
@@ -31,13 +33,15 @@ const Actions = (props: ActionPropsInfo) => {
       case 'DeployContract':
         return <DeployContract action={props.action} />;
       case 'FunctionCall':
+      case 'FUNCTION_CALL':
         return <FunctionCall action={props.action} />;
       case 'Stake':
         return <Stake action={props.action} />;
       case 'Transfer':
+      case 'TRANSFER':
         return <Transfer action={props.action} />;
       case 'Delegate':
-      case 'DELEGATE':
+      case 'DELEGATE_ACTION':
         const delegateAction: any | DelegateActionView =
           props.action?.args?.delegate_action?.actions &&
           props.action?.args?.delegate_action?.actions?.map(
