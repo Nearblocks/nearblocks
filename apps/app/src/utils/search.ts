@@ -176,7 +176,7 @@ export const rpcSearch = async (
     ];
   }
 
-  return data;
+  return returnPath ? null : data;
 };
 
 export default search;
