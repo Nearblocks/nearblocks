@@ -117,7 +117,10 @@ export const storeChunkAccounts = async (
 
   if (accounts.size) {
     await retry(async () => {
-      await knex('accounts').insert([...accounts.values()]);
+      await knex('accounts_nib')
+        .insert([...accounts.values()])
+        .onConflict(['account_id'])
+        .ignore();
     });
   }
 
@@ -125,7 +128,7 @@ export const storeChunkAccounts = async (
     await Promise.all(
       [...accountsToUpdate.values()].map(async (account) => {
         await retry(async () => {
-          await knex('accounts')
+          await knex('accounts_nib')
             .update('deleted_by_receipt_id', account.deleted_by_receipt_id)
             .update('deleted_by_block_height', account.deleted_by_block_height)
             .where('account_id', account.account_id)

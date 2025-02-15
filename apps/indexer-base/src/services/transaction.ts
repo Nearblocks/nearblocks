@@ -34,7 +34,10 @@ export const storeTransactions = async (
 
       promises.push(
         retry(async () => {
-          await knex('transactions').insert(batch);
+          await knex('transactions_nib')
+            .insert(batch)
+            .onConflict(['transaction_hash'])
+            .ignore();
         }),
       );
     }

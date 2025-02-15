@@ -174,7 +174,7 @@ export const storeChunkAccessKeys = async (
     await Promise.all(
       [...deletedAccounts.values()].map(async (key) => {
         await retry(async () => {
-          await knex('access_keys')
+          await knex('access_keys_nib')
             .update('deleted_by_receipt_id', key.receiptId)
             .update('deleted_by_block_height', block.height)
             .where('account_id', key.accountId)
@@ -187,7 +187,10 @@ export const storeChunkAccessKeys = async (
 
   if (accessKeys.size) {
     await retry(async () => {
-      await knex('access_keys').insert([...accessKeys.values()]);
+      await knex('access_keys_nib')
+        .insert([...accessKeys.values()])
+        .onConflict(['public_key', 'account_id'])
+        .ignore();
     });
   }
 
@@ -195,7 +198,7 @@ export const storeChunkAccessKeys = async (
     await Promise.all(
       [...accessKeysToUpdate.values()].map(async (key) => {
         await retry(async () => {
-          await knex('access_keys')
+          await knex('access_keys_nib')
             .update('deleted_by_receipt_id', key.deleted_by_receipt_id)
             .update('deleted_by_block_height', key.deleted_by_block_height)
             .where('account_id', key.account_id)

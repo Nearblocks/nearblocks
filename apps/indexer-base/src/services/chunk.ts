@@ -20,7 +20,7 @@ export const storeChunks = async (
 
   if (data.length) {
     await retry(async () => {
-      await knex('chunks').insert(data);
+      await knex('chunks_nib').insert(data).onConflict(['chunk_hash']).ignore();
     });
   }
 };
