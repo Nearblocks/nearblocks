@@ -63,10 +63,10 @@ export function yoctoToNear(yocto: string, format: boolean) {
 }
 
 export function truncateString(str: string, maxLength: number, suffix: string) {
-  if (str.length <= maxLength) {
+  if (str?.length <= maxLength) {
     return str;
   }
-  return str.substring(0, maxLength) + suffix;
+  return str?.substring(0, maxLength) + suffix;
 }
 
 export function currency(number: string) {
@@ -676,3 +676,20 @@ export function parseNestedJSON(obj: any): any {
 
   return result;
 }
+
+export const parseEventJson = (log: string) => {
+  if (!log?.startsWith('EVENT_JSON:')) return log;
+
+  const jsonString = log.replace('EVENT_JSON:', '').trim();
+
+  if (typeof jsonString !== 'string') {
+    throw new Error('jsonString is not a valid string');
+  }
+
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    const fixedJsonString = jsonString.replace(/\\"/g, '"');
+    return JSON.parse(fixedJsonString);
+  }
+};

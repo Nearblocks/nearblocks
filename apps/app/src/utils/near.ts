@@ -3,6 +3,7 @@ import Big from 'big.js';
 import {
   Action,
   ActionError,
+  ActionInfo,
   ActionType,
   ExecutionOutcomeWithIdView,
   ExecutionStatusView,
@@ -16,6 +17,7 @@ import {
   OutcomeInfo,
   ParsedReceipt,
   ParseOutcomeInfo,
+  ProcessedTokenMeta,
   ReceiptsInfo,
   ReceiptView,
   RPCCompilationError,
@@ -27,7 +29,8 @@ import {
   TxExecutionError,
 } from '@/utils/types';
 import { intentsAddressList, supportedNetworks } from './app/config';
-import { isValidJson } from './libs';
+import { isValidJson, parseEventJson } from './libs';
+import { getRequest } from './app/api';
 
 export function localFormat(number: string) {
   const bigNumber = Big(number);
@@ -348,6 +351,218 @@ export function mainActions(rpcTxn: any) {
   }
 
   return txActions;
+}
+
+export function apiRemainingLogs(
+  apiTxn: any,
+): Array<{ logs: any; contract: string; receiptId: string }> {
+  const remainingReceipts = apiTxn?.receipts?.slice(1) || [];
+
+  const allRemainingLogs: Array<{
+    logs: any;
+    contract: string;
+    receiptId: string;
+  }> = [];
+
+  remainingReceipts.forEach((receipt: any) => {
+    const receiptLogs =
+      receipt?.outcome?.logs?.map((log: string) => ({
+        logs: parseEventJson(log),
+        contract: receipt?.receiver_account_id || apiTxn?.receiver_account_id,
+        receiptId: receipt?.receipt_id,
+      })) || [];
+
+    allRemainingLogs.push(...receiptLogs);
+  });
+
+  return allRemainingLogs;
+}
+
+export function apiSubActions(apiTxn: any): ActionInfo[] {
+  const txActions: ActionInfo[] = [];
+  const transaction = apiTxn?.actions || [];
+  const from = apiTxn?.signer_account_id;
+  const to = apiTxn?.receiver_account_id;
+  const receipt = apiTxn?.receipts?.[0]?.receipt_id;
+
+  const remainingLogs = apiRemainingLogs(apiTxn);
+
+  const allLogs = [...remainingLogs];
+
+  const actionsLog =
+    apiTxn?.actions?.map((action: any) => {
+      const actionInfo = processApiAction(action);
+      return {
+        ...actionInfo,
+        args: {
+          deposit: actionInfo?.args?.deposit || 0,
+          gas: actionInfo?.args?.gas || apiTxn?.actions_agg?.gas_attached || 0,
+          method_name: actionInfo?.args?.method_name,
+          args: actionInfo?.args?.args,
+        },
+      };
+    }) || [];
+
+  for (let i = 0; i < transaction.length; i++) {
+    const action = processApiAction(transaction[i]);
+    txActions.push({
+      to,
+      from,
+      receiptId: receipt,
+      logs: allLogs,
+      actionsLog,
+      ...action,
+    });
+  }
+
+  return txActions;
+}
+
+export function apiMainActions(apiTxn: any): ActionInfo[] {
+  const txActions: ActionInfo[] = [];
+
+  const transaction = apiTxn?.actions || [];
+  const firstReceipt = apiTxn?.receipts?.[0];
+  const from = apiTxn?.signer_account_id;
+  const to = apiTxn?.receiver_account_id;
+  const receipt = firstReceipt?.receipt_id;
+  const args = apiTxn?.actions_agg;
+  const logs =
+    firstReceipt?.outcome?.logs?.map((log: string) => ({
+      logs: parseEventJson(log),
+      contract: to,
+      receiptId: receipt,
+    })) || [];
+  const actionsLog =
+    apiTxn?.actions?.map((action: any) => {
+      const actionInfo = processApiAction(action);
+
+      return {
+        ...actionInfo,
+        args: {
+          deposit: actionInfo?.args?.deposit || 0,
+          gas: actionInfo?.args?.gas || apiTxn?.actions_agg?.gas_attached || 0,
+          method_name: actionInfo?.args?.method_name,
+          args: actionInfo?.args?.args,
+        },
+      };
+    }) || [];
+
+  for (let i = 0; i < transaction.length; i++) {
+    const action = processApiAction(transaction[i], args);
+
+    txActions.push({
+      to,
+      from,
+      receiptId: receipt,
+      logs,
+      actionsLog,
+      ...action,
+    });
+  }
+  return txActions;
+}
+
+function processApiAction(action: any, args?: any) {
+  if (!action) return {};
+
+  return {
+    action_kind: action.action,
+    args: {
+      method_name: action.method,
+      args: action.args,
+      deposit: args?.deposit || 0,
+      gas: args?.gas_attached || 0,
+    },
+  };
+}
+
+async function processTokenMetadata(
+  logs: any[],
+): Promise<ProcessedTokenMeta[]> {
+  const processedTokens: ProcessedTokenMeta[] = [];
+  const processedContracts = new Set();
+
+  const extractTokenIds = (logs: any[]): string[] => {
+    const tokenIds: string[] = [];
+
+    logs.forEach((log) => {
+      if (log?.logs?.data && log?.logs?.standard === 'nep245') {
+        log.logs.data.forEach((dataItem: any) => {
+          if (dataItem?.token_ids && Array.isArray(dataItem.token_ids)) {
+            dataItem.token_ids.forEach((token: string) => {
+              const contractName = token?.includes(':')
+                ? token?.split(':')[1]
+                : token;
+              if (contractName) {
+                tokenIds.push(contractName);
+              }
+            });
+          }
+        });
+      } else if (typeof log?.logs === 'string') {
+        const contractName = log.contract;
+        if (contractName) {
+          tokenIds.push(contractName);
+        }
+      }
+    });
+
+    return [...new Set(tokenIds)];
+  };
+
+  const uniqueTokenIds = extractTokenIds(logs);
+
+  for (const contractId of uniqueTokenIds) {
+    if (processedContracts.has(contractId)) continue;
+
+    try {
+      const options: RequestInit = { next: { revalidate: 10 } };
+      const response = await getRequest(`fts/${contractId}`, {}, options);
+
+      if (response?.contracts?.[0]) {
+        const contract = response.contracts[0];
+
+        processedTokens.push({
+          contractId,
+          metadata: {
+            name: contract.name || '',
+            symbol: contract.symbol || '',
+            decimals: contract.decimals || 0,
+            price: contract.price || '0',
+            marketCap: contract.onchain_market_cap || '0',
+            volume24h: contract.volume_24h || '0',
+            description: contract.description || '',
+            website: contract.website || '',
+            icon: contract.icon,
+          },
+        });
+
+        processedContracts.add(contractId);
+      }
+    } catch (error) {
+      console.error(`Error fetching metadata for ${contractId}:`, error);
+    }
+  }
+
+  return processedTokens;
+}
+
+export async function processTransactionWithTokens(apiTxn: any) {
+  const actions = apiMainActions(apiTxn);
+  const subActions = apiSubActions(apiTxn);
+  const allLogs = (
+    actions && actions[0] && actions[0].logs ? actions[0].logs : []
+  ).concat(
+    subActions && subActions[0] && subActions[0].logs ? subActions[0].logs : [],
+  );
+  const tokenMetadata = await processTokenMetadata(allLogs || []);
+
+  return {
+    actions,
+    subActions,
+    tokenMetadata,
+  };
 }
 
 export function valueFromObj(obj: Obj): string | undefined {
