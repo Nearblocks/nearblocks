@@ -105,7 +105,9 @@ const Burn = ({ event, data, actionsLog }: Props) => {
               ) : (
                 <FaRight className="text-gray-400 text-xs" />
               )}
-              <span className="font-semibold text-gray pl-1">Withdraw</span>
+              <span className="font-semibold text-gray pl-1 pr-0.5">
+                Withdraw
+              </span>
               <TokenInfo
                 contract={token_ids[0]?.split(':')[1]}
                 amount={amounts[0]}
