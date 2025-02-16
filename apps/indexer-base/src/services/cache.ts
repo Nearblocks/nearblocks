@@ -7,53 +7,58 @@ import redis from '#libs/redis';
 
 export const prepareCache = async (message: types.StreamerMessage) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
-  const txns = chunks.flatMap((chunk) => chunk.transactions);
-  const receipts = chunks.flatMap((chunk) => chunk.receipts);
-  const outcomes = message.shards.flatMap(
-    (shard) => shard.receiptExecutionOutcomes,
-  );
-
-  await Promise.all([
-    txns.map(async (txn) => {
+  const txns = chunks
+    .flatMap((chunk) => chunk.transactions)
+    .map((txn) => {
       const transactionHash = txn.transaction.hash;
       const receiptId = txn.outcome.executionOutcome.outcome.receiptIds[0];
 
-      await redis.set(receiptId, transactionHash, config.cacheExpiry);
-    }),
-    receipts.map(async (receipt) => {
+      return redis.set(receiptId, transactionHash, config.cacheExpiry);
+    });
+  const receipts = chunks
+    .flatMap((chunk) => chunk.receipts)
+    .map(async (receipt) => {
       const receiptOrDataId: string =
         'Data' in receipt.receipt
           ? receipt.receipt.Data.dataId
           : receipt.receiptId;
 
       const parentHash = await retry(async () => {
-        return await redis.get(receiptOrDataId);
+        return redis.get(receiptOrDataId);
       });
 
       if (parentHash && 'Action' in receipt.receipt) {
-        const dataIds = receipt.receipt.Action.outputDataReceivers.map(
-          (receiver) => receiver.dataId,
+        const inputs = receipt.receipt.Action.inputDataIds.map((dataId) =>
+          redis.set(dataId, parentHash, config.cacheExpiry),
         );
 
-        await Promise.all(
-          dataIds.map(async (dataId) => {
-            await redis.set(dataId, parentHash, config.cacheExpiry);
-          }),
+        const outputs = receipt.receipt.Action.outputDataReceivers.map(
+          (receiver) =>
+            redis.set(receiver.dataId, parentHash, config.cacheExpiry),
         );
+
+        return Promise.all([...inputs, ...outputs]);
       }
-    }),
-    outcomes.map(async (outcome) => {
+
+      return;
+    });
+  const outcomes = message.shards
+    .flatMap((shard) => shard.receiptExecutionOutcomes)
+    .map(async (outcome) => {
       const parentHash = await retry(async () => {
-        return await redis.get(outcome.executionOutcome.id);
+        return redis.get(outcome.executionOutcome.id);
       });
 
       if (parentHash) {
-        await Promise.all(
+        return Promise.all(
           outcome.executionOutcome.outcome.receiptIds.map(async (receiptId) => {
-            await redis.set(receiptId, parentHash, config.cacheExpiry);
+            return redis.set(receiptId, parentHash, config.cacheExpiry);
           }),
         );
       }
-    }),
-  ]);
+
+      return;
+    });
+
+  await Promise.all([...txns, ...receipts, ...outcomes]);
 };
