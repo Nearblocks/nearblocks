@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { manrope } from '@/fonts/font';
-import { GTMID, networkId } from '@/utils/app/config';
+import { gTag, networkId } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
 import ThemeInitializer from './ThemeInitializer';
@@ -79,30 +79,20 @@ const Layout = async ({ children, locale }: LayoutProps) => {
           }
           title="nearblocks"
         />
-      </head>
-      <body className={`overflow-x-hidden dark:bg-black-300`}>
-        <noscript>
-          <iframe
-            height="0"
-            src={`https://www.googletagmanager.com/ns.html?id=${GTMID}`}
-            style={{ display: 'none', visibility: 'hidden' }}
-            width="0"
-          />
-        </noscript>
-        <Script id="gtm" strategy="afterInteractive">
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${gTag}`}
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
-            (function(w,d,s,l,i){
-              w[l]=w[l]||[];
-              w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-              var f=d.getElementsByTagName(s)[0],
-                  j=d.createElement(s),
-                  dl=l!='dataLayer'?'&l='+l:'';
-              j.async=true;
-              j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-              f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','${GTMID}');
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gTag}');
           `}
         </Script>
+      </head>
+      <body className={`overflow-x-hidden dark:bg-black-300`}>
         <PublicEnvProvider>
           <NextIntlClientProvider messages={messages}>
             <AddressHoverProvider>

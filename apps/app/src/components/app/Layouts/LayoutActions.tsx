@@ -48,7 +48,7 @@ const LayoutActions = ({
   const { networkId } = useConfig();
   const searchParams = useSearchParams();
   const router = useIntlRouter();
-  const query = searchParams?.get('query');
+  const query = searchParams?.get('q');
 
   const initializedRef = useRef(false);
   const useRpcStoreWithProviders = () => {
@@ -88,7 +88,7 @@ const LayoutActions = ({
         case 'token':
           return router.push(`/token/${route?.path}`);
         default:
-          return toast.error(SearchToast);
+          return toast.error(SearchToast(networkId as NetworkId));
       }
     };
     const loadResults = async (keyword: string) => {

@@ -3,5 +3,5 @@
   <Description>Search NearBlocks</Description>
   <InputEncoding>UTF-8</InputEncoding>
   <Image width="16" height="16" type="image/png">https://nearblocks.io/favicon_16x16.png</Image>
-  <Url type="text/html" method="get" template="https://nearblocks.io?query={searchTerms}"/>
+  <Url type="text/html" method="get" template="https://nearblocks.io?q={searchTerms}"/>
 </OpenSearchDescription>
