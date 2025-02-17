@@ -102,7 +102,11 @@ const Details = (props: Props) => {
   const [isScrollable, setIsScrollable] = useState(false);
   const [isActionScrollable, setIsActionScrollable] = useState(false);
 
-  const { actions: apiActions, subActions, tokenMetadata } = apiTxnActionsData;
+  const {
+    logs: apiLogs,
+    actions: apiActions,
+    tokenMetadata,
+  } = apiTxnActionsData;
   const { fts, nfts } = useMemo(() => {
     function tokensTransfers(receipts: InventoryInfo[]) {
       let fts: FtsInfo[] = [];
@@ -290,25 +294,22 @@ const Details = (props: Props) => {
             }
           });
 
-          const filterNepSubLogs = (subActions: any) => {
-            if (!subActions?.[0]?.logs) {
-              return [];
+          const filteredApiNepLogs = apiLogs?.filter((log: any) => {
+            try {
+              if (log?.logs?.standard === 'nep245') {
+                return log;
+              }
+              return false;
+            } catch {
+              return false;
             }
-
-            const filteredLogs = subActions[0]?.logs && subActions[0]?.logs;
-            return filteredLogs;
-          };
-
-          const filteredNepSubLogs = subActions
-            ? filterNepSubLogs(subActions)
-            : null;
+          });
 
           return {
             ...txn,
-            logs:
-              filteredNepLogs?.length > 0
-                ? [...filteredNepSubLogs]
-                : [...txn.logs, ...filteredNepLogs],
+            logs: status
+              ? [...filteredApiNepLogs]
+              : [...txn.logs, ...filteredNepLogs],
           };
         });
 
@@ -755,6 +756,7 @@ const Details = (props: Props) => {
                               key={i}
                               event={event}
                               allActionLog={allActions}
+                              isInteracted
                             />
                           ),
                         )}

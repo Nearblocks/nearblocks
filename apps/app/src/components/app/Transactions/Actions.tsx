@@ -13,8 +13,6 @@ import Stake from './Action/Stake';
 import Transfer from './Action/Transfer';
 
 const Actions = (props: ActionPropsInfo) => {
-  console.log('enter actions');
-  console.log({ action_kind: props?.action?.action_kind });
   const showAction = () => {
     switch (props.action.action_kind) {
       case 'ADD_KEY':

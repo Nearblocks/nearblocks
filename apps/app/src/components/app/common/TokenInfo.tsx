@@ -20,7 +20,6 @@ const TokenInfo = (props: TokenInfoProps) => {
   const rpcAmount = localFormat(
     tokenAmount(amount, decimals || apiMeta?.decimals || meta?.decimals, true),
   );
-
   useEffect(() => {
     if (!apiMeta) {
       setLoading(true);
