@@ -537,6 +537,7 @@ export type EventPropsInfo = {
   actionsLog?: any;
   allActionLog?: any;
   tokenMetadata?: ProcessedTokenMeta[];
+  isInteracted?: boolean;
 };
 
 export type DepositPropsInfo = {
@@ -1900,6 +1901,7 @@ export type ProcessedTokenMeta = {
 };
 
 export type ApiTxnData = {
+  logs: TransactionLog[];
   actions: ActionInfo[];
   subActions: ActionInfo[];
   tokenMetadata: ProcessedTokenMeta[];

@@ -9,6 +9,7 @@ const IntentsContract = (props: EventPropsInfo) => {
   const actionsLog = props?.actionsLog;
   const allActionLog = props?.allActionLog;
   const metaData = props?.tokenMetadata;
+  const isInteracted = props?.isInteracted;
 
   const decodeArgs = (args: string | undefined): Record<string, any> | null => {
     if (!args) return null;
@@ -62,7 +63,20 @@ const IntentsContract = (props: EventPropsInfo) => {
           );
         case 'mt_transfer':
           return (
-            <Transfer event={props?.event} data={log?.data} meta={metaData} />
+            isInteracted && (
+              <Transfer event={props?.event} data={log?.data} meta={metaData} />
+            )
+          );
+        default:
+          return null;
+      }
+    } else if (log?.standard === 'dip4') {
+      switch (log?.event) {
+        case 'token_diff':
+          return (
+            !isInteracted && (
+              <Transfer event={props?.event} data={log?.data} meta={metaData} />
+            )
           );
         default:
           return null;

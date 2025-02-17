@@ -144,14 +144,16 @@ const Mint = ({ event, data, parsedActionLogs, meta }: Props) => {
           metaInfo={metaInfo}
         />
         <div className="ml-1 flex items-center">
-          by
           {transactionParties && (
-            <span className="text-green-500 dark:text-green-250">
-              <AddressOrTxnsLink
-                className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-0.5 ml-0.5 h-6"
-                currentAddress={transactionParties.sender}
-              />
-            </span>
+            <>
+              by
+              <span className="text-green-500 dark:text-green-250">
+                <AddressOrTxnsLink
+                  className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-0.5 ml-0.5 h-6"
+                  currentAddress={transactionParties.sender}
+                />
+              </span>
+            </>
           )}
         </div>
         <div className="flex items-center font-bold text-gray text-sm sm:text-xs pl-1">

@@ -686,10 +686,15 @@ export const parseEventJson = (log: string) => {
     throw new Error('jsonString is not a valid string');
   }
 
-  try {
-    return JSON.parse(jsonString);
-  } catch (error) {
+  if (!isValidJson(jsonString)) {
     const fixedJsonString = jsonString.replace(/\\"/g, '"');
-    return JSON.parse(fixedJsonString);
+
+    if (isValidJson(fixedJsonString)) {
+      return JSON.parse(fixedJsonString);
+    } else {
+      return null;
+    }
   }
+
+  return JSON.parse(jsonString);
 };

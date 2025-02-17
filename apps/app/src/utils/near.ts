@@ -134,15 +134,36 @@ export function txnLogs(txn: RPCTransactionInfo): TransactionLog[] {
 
   const outcomes = txn?.receipts_outcome || [];
 
-  for (let i = 1; i < outcomes.length; i++) {
+  for (let i = 1; i < outcomes?.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
 
-    if (logs.length > 0) {
-      const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
+    if (logs?.length > 0) {
+      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
         contract: outcome?.outcome?.executor_id || '',
         logs: log,
-        receiptId: outcome.id,
+        receiptId: outcome?.id,
+      }));
+      txLogs = [...txLogs, ...mappedLogs];
+    }
+  }
+  return txLogs;
+}
+
+export function apiTxnLogs(txn: any): TransactionLog[] {
+  let txLogs: TransactionLog[] = [];
+
+  const outcomes = txn?.receipts || [];
+
+  for (let i = 1; i < outcomes?.length; i++) {
+    const outcome = outcomes[i];
+    let logs = outcome?.outcome?.logs || [];
+
+    if (logs?.length > 0) {
+      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
+        contract: outcome?.outcome?.executor_account_id || '',
+        logs: parseEventJson(log),
+        receiptId: outcome?.receipt_id,
       }));
       txLogs = [...txLogs, ...mappedLogs];
     }
@@ -483,38 +504,8 @@ async function processTokenMetadata(
   const processedTokens: ProcessedTokenMeta[] = [];
   const processedContracts = new Set();
 
-  const extractTokenIds = (logs: any[]): string[] => {
-    const tokenIds: string[] = [];
-
-    logs.forEach((log) => {
-      if (log?.logs?.data && log?.logs?.standard === 'nep245') {
-        log.logs.data.forEach((dataItem: any) => {
-          if (dataItem?.token_ids && Array.isArray(dataItem.token_ids)) {
-            dataItem.token_ids.forEach((token: string) => {
-              const contractName = token?.includes(':')
-                ? token?.split(':')[1]
-                : token;
-              if (contractName) {
-                tokenIds.push(contractName);
-              }
-            });
-          }
-        });
-      } else if (typeof log?.logs === 'string') {
-        const contractName = log.contract;
-        if (contractName) {
-          tokenIds.push(contractName);
-        }
-      }
-    });
-
-    return [...new Set(tokenIds)];
-  };
-
-  const uniqueTokenIds = extractTokenIds(logs);
-
-  for (const contractId of uniqueTokenIds) {
-    if (processedContracts.has(contractId)) continue;
+  const fetchTokenMetadata = async (contractId: string) => {
+    if (processedContracts.has(contractId)) return;
 
     try {
       const options: RequestInit = { next: { revalidate: 10 } };
@@ -543,12 +534,62 @@ async function processTokenMetadata(
     } catch (error) {
       console.error(`Error fetching metadata for ${contractId}:`, error);
     }
+  };
+
+  const processContract = (token: string) => {
+    const contractName = token?.includes(':') ? token?.split(':')[1] : token;
+    if (contractName) {
+      return contractName;
+    }
+    return null;
+  };
+
+  for (const log of logs) {
+    if (log?.logs?.data && log?.logs?.standard === 'nep245') {
+      for (const dataItem of log.logs.data) {
+        if (dataItem?.token_ids && Array.isArray(dataItem.token_ids)) {
+          for (const token of dataItem.token_ids) {
+            const contractName = processContract(token);
+            if (contractName) {
+              await fetchTokenMetadata(contractName);
+            }
+          }
+        }
+      }
+    } else if (
+      log?.logs?.standard === 'dip4' &&
+      log?.logs?.event === 'token_diff'
+    ) {
+      if (log?.contract) {
+        await fetchTokenMetadata(log.contract);
+      }
+
+      if (log?.logs?.data && Array.isArray(log.logs.data)) {
+        for (const dataItem of log.logs.data) {
+          if (dataItem?.diff) {
+            const diffKeys = Object.keys(dataItem.diff);
+
+            if (diffKeys.length === 2) {
+              for (const key of diffKeys) {
+                const contractName = processContract(key);
+                if (contractName) {
+                  await fetchTokenMetadata(contractName);
+                }
+              }
+            }
+          }
+        }
+      }
+    } else if (typeof log?.logs === 'string' && log?.contract) {
+      await fetchTokenMetadata(log.contract);
+    }
   }
 
   return processedTokens;
 }
 
 export async function processTransactionWithTokens(apiTxn: any) {
+  const logs = apiTxnLogs(apiTxn);
   const actions = apiMainActions(apiTxn);
   const subActions = apiSubActions(apiTxn);
   const allLogs = (
@@ -557,8 +598,8 @@ export async function processTransactionWithTokens(apiTxn: any) {
     subActions && subActions[0] && subActions[0].logs ? subActions[0].logs : [],
   );
   const tokenMetadata = await processTokenMetadata(allLogs || []);
-
   return {
+    logs,
     actions,
     subActions,
     tokenMetadata,
