@@ -64,6 +64,7 @@ jobs:
         if: |
           env.CURRENT_DIGEST != env.NEW_DIGEST && 
           matrix.service != 'indexer-dex' && 
+          matrix.service != 'indexer-s3' && 
           matrix.service != 'explorer-selector'
         run: |
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
