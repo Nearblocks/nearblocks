@@ -8,7 +8,7 @@ const camelCase = (str: string): string => {
   return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
 };
 
-const camelCaseKeys = <T>(obj: T): T => {
+export const camelCaseKeys = <T>(obj: T): T => {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
   }

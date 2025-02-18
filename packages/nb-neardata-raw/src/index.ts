@@ -1,3 +1,4 @@
+import { EventEmitter } from 'events';
 import { Readable } from 'stream';
 
 import axios from 'axios';
@@ -7,6 +8,8 @@ import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import { camelCaseKeys } from './utils.js';
+
 export type BlockStreamConfig = {
   end: number;
   network: string;
@@ -15,6 +18,7 @@ export type BlockStreamConfig = {
 };
 
 const retries = 5;
+EventEmitter.defaultMaxListeners = 20;
 
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
@@ -41,84 +45,130 @@ const fetch = async (url: string) => {
 };
 
 export const streamFiles = async (file: string) => {
-  const response = await fetch(file);
+  return await retry(
+    async () => {
+      const response = await fetch(file);
 
-  const readable = new Readable({
-    objectMode: true,
-    async read(this) {
-      try {
+      return new Promise<Readable>((resolve, reject) => {
+        const readable = new Readable({
+          objectMode: true,
+          read() {},
+        });
+
         const stream = new tar.Parser();
-        let files = 0;
+
+        stream.on('error', (err) => {
+          reject(err);
+        });
+
+        response.on('error', (err) => {
+          reject(err);
+        });
 
         stream.on('entry', (entry: tar.ReadEntry) => {
           if (entry.type === 'File' && entry.path.endsWith('.json')) {
             const chunks: Buffer[] = [];
-            files++;
-
             entry.on('data', (chunk: Buffer) => chunks.push(chunk));
             entry.on('end', () => {
               try {
                 const json = Buffer.concat(chunks).toString();
                 const parsed = JSON.parse(json);
-
-                this.push(parsed);
+                readable.push(camelCaseKeys(parsed));
               } catch (error) {
-                this.emit('error', error);
-                this.push(null);
+                readable.emit('error', error);
+                readable.push(null);
               }
             });
           } else {
-            this.emit(
+            readable.emit(
               'error',
               new Error('Unknown file received', {
                 cause: { path: entry.path, type: entry.type },
               }),
             );
-            this.push(null);
+            readable.push(null);
           }
         });
 
         stream.on('end', () => {
-          if (!files) {
-            this.emit(
-              'error',
-              new Error('No json files found', {
-                cause: { file },
-              }),
-            );
-          }
-
-          this.push(null);
+          readable.push(null);
+          resolve(readable);
         });
 
         response.pipe(stream);
-      } catch (error) {
-        this.emit('error', error);
-        this.push(null);
-      }
+      });
     },
+    { exponential: true, logger: retryLogger, retries },
+  );
+};
+
+export const streamBlock = (config: BlockStreamConfig) => {
+  const url = config.url ?? endpoint(config.network);
+  const startBlock = config.start;
+  const endBlock = config.end;
+
+  let isFetching = false;
+  let next = 0;
+  const limit = 10;
+  const highWaterMark = limit * 20;
+  const blocks: number[] = [];
+  const start = Math.floor(startBlock / 10) * 10;
+  const end = Math.floor(endBlock / 10) * 10;
+
+  for (let i = start; i <= end; i += limit) {
+    blocks.push(i);
+  }
+
+  const readable = new Readable({
+    highWaterMark,
+    objectMode: true,
+    read() {},
   });
+
+  const fetchBlocks = async () => {
+    if (isFetching) return;
+
+    isFetching = true;
+
+    try {
+      const remaining = highWaterMark - readable.readableLength;
+
+      if (remaining > 10) {
+        const promises: Promise<Readable>[] = [];
+        const concurrency = Math.min(limit, blocks.length - next, remaining);
+
+        for (let i = next; i < next + concurrency; i++) {
+          const block = blocks[i];
+          const base = String(block).padStart(12, '0');
+          const folder = base.slice(0, 6);
+          const subFolder = base.slice(6, 9);
+          const file = `${url}/${folder}/${subFolder}/${base}.tgz`;
+
+          promises.push(streamFiles(file));
+        }
+
+        const streams = await Promise.all(promises);
+
+        for (const stream of streams) {
+          for await (const message of stream) {
+            if (message && !readable.push(message)) {
+              return;
+            }
+          }
+
+          next++;
+        }
+      }
+    } catch (error) {
+      readable.destroy(error as Error);
+    } finally {
+      isFetching = false;
+    }
+  };
+
+  const interval = setInterval(fetchBlocks, 10);
+
+  readable.on('close', () => clearInterval(interval));
 
   return readable;
 };
-
-export async function* streamBlock(config: BlockStreamConfig) {
-  const url = config.url ?? endpoint(config.network);
-  const startBlock = config.start;
-  const start = Math.floor(startBlock / 10) * 10;
-  const endBlock = config.end;
-  const end = Math.floor(endBlock / 10) * 10;
-
-  for (let block = start; block <= end; block += 10) {
-    const base = String(block).padStart(12, '0');
-    const folder = base.slice(0, 6);
-    const subFolder = base.slice(6, 9);
-    const file = `${url}/${folder}/${subFolder}/${base}.tgz`;
-
-    const stream = await streamFiles(file);
-
-    for await (const message of stream) {
-      yield message;
-    }
-  }
-}

@@ -18,6 +18,7 @@ jobs:
             indexer-events,
             indexer-dex,
             indexer-multichain,
+            indexer-s3,
             explorer-selector,
             aggregates,
           ]
