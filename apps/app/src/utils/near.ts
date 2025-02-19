@@ -310,7 +310,7 @@ function displayArgs(args: any) {
 
 export function mainActions(rpcTxn: any) {
   const txActions = [];
-  const transaction = rpcTxn?.transaction.actions || [];
+  const transaction = rpcTxn?.transaction?.actions || [];
   const receipt = rpcTxn?.transaction_outcome?.outcome?.receipt_ids[0];
   const from = rpcTxn?.transaction?.signer_id;
   const to = rpcTxn?.transaction?.receiver_id;
