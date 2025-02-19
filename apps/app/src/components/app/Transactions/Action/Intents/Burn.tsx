@@ -105,6 +105,14 @@ const Burn = ({ event, data, actionsLog, meta }: Props) => {
               ) : (
                 <FaRight className="text-gray-400 text-xs" />
               )}
+              {!address && (
+                <div className="flex items-center">
+                  <AddressOrTxnsLink
+                    className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-0.5 h-6"
+                    currentAddress={item?.owner_id}
+                  />
+                </div>
+              )}
               <span className="font-semibold text-gray pl-1">Withdraw</span>
               <TokenInfo
                 contract={token_ids[0]?.split(':')[1]}
@@ -125,17 +133,7 @@ const Burn = ({ event, data, actionsLog, meta }: Props) => {
                   />
                 </div>
               )}
-              {!address && (
-                <div className="flex items-center">
-                  <span className="font-bold text-gray text-sm sm:text-xs pl-1">
-                    To
-                  </span>
-                  <AddressOrTxnsLink
-                    className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-0.5 ml-1 h-6"
-                    currentAddress={item?.owner_id}
-                  />
-                </div>
-              )}
+
               <div className="flex items-center pl-0.5">
                 <span className="font-bold text-gray text-sm sm:text-xs mr-1">
                   From
