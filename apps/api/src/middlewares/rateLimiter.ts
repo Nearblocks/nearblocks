@@ -125,12 +125,21 @@ const rateLimiter = catchAsync(
     const consumeCount = Math.ceil(+perPage / 25);
 
     try {
-      await rateLimit.consume(id, consumeCount);
-
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
+        const now = dayjs.utc().toISOString();
+        const usageKey = `usage:${keyId}:${now.split('T')[0]}`;
+        await ratelimiterRedisClient.hincrby(usageKey, now, consumeCount);
+        await ratelimiterRedisClient.expire(usageKey, 60 * 60 * 24 * 31);
+
         await rateLimit.consume(tokenKey, consumeCount);
       }
+    } catch (error) {
+      logger.error(error);
+    }
+
+    try {
+      await rateLimit.consume(id, consumeCount);
 
       return next();
     } catch (error) {
@@ -177,11 +186,22 @@ const useFreePlan = async (
   const rateLimit = rateLimiterUnion(plan, baseUrl);
 
   try {
-    await rateLimit.consume(key, consumeCount);
-
     if (tokenKey) {
+      const [, keyId] = tokenKey.split('_');
+      const tokenKeyValue = parseInt(keyId, 10);
+      const now = dayjs.utc().toISOString();
+      const usageKey = `usage:${tokenKeyValue}:${now.split('T')[0]}`;
+      await ratelimiterRedisClient.hincrby(usageKey, now, consumeCount);
+      await ratelimiterRedisClient.expire(usageKey, 60 * 60 * 24 * 31);
+
       await rateLimit.consume(tokenKey, consumeCount);
     }
+  } catch (error) {
+    logger.error(error);
+  }
+
+  try {
+    await rateLimit.consume(key, consumeCount);
 
     return next();
   } catch (error) {
