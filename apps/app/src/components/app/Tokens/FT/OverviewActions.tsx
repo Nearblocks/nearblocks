@@ -18,12 +18,12 @@ import { SpamToken, StatusInfo, Token } from '@/utils/types';
 import Links from '../../common/Links';
 import TokenImage from '../../common/TokenImage';
 import Tooltip from '../../common/Tooltip';
-import ListCheck from '../../Icons/ListCheck';
 import Question from '../../Icons/Question';
 import WarningIcon from '../../Icons/WarningIcon';
 import Skeleton from '../../skeleton/common/Skeleton';
 import MarketCap from './MarketCap';
 import TokenPrice from './TokenPrice';
+import ActionMenuPopover from '../../common/ActionMenuPopover';
 
 interface Props {
   holders: string;
@@ -50,7 +50,6 @@ const OverviewActions = ({
 }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
   const [showMarketCap, setShowMarketCap] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
@@ -68,10 +67,6 @@ const OverviewActions = ({
   }
   const handleClose = () => {
     setIsVisible(false);
-  };
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
   };
 
   const addToMetaMask = async () => {
@@ -132,21 +127,12 @@ const OverviewActions = ({
               </span>
             </h1>
             <div className="relative md:pt-0 pt-2 text-gray-500 text-xs ml-auto">
-              <span className="group flex w-full relative h-full">
-                <button
-                  className="flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1"
-                  disabled={!token}
-                  onClick={toggleDropdown}
-                >
-                  <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
-                    <ListCheck className="h-4 dark:filter dark:invert" />
-                  </div>
-                </button>
-                {isOpen && (
-                  <ul className="bg-white dark:bg-black-600 soft-shadow min-w-full absolute top-full right-0 rounded-md py-1 z-[99]">
-                    <li className="pb-2" onClick={toggleDropdown}>
+              <span className="group flex w-full h-full">
+                <ActionMenuPopover positionClass="right-0" disabled={!token}>
+                  <ul>
+                    <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2">
                       <button
-                        className="flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250 w-full text-left"
+                        className="flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250 w-full text-xs"
                         id="add-to-metamask-btn"
                         onClick={addToMetaMask}
                       >
@@ -162,7 +148,7 @@ const OverviewActions = ({
                       </button>
                     </li>
                   </ul>
-                )}
+                </ActionMenuPopover>
               </span>
             </div>
           </div>

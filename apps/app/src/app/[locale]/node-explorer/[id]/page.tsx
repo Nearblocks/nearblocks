@@ -43,8 +43,8 @@ export default async function Delegator(props: {
                   )}
                 </div>
                 <div>
-                  <div className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
-                    <span className="ml-2">
+                  <div className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs font-normal">
+                    <span className="ml-2 text-xs">
                       <RpcMenu />
                     </span>
                   </div>

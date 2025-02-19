@@ -1,12 +1,12 @@
 import { headers } from 'next/headers';
 
 import Buttons from '@/components/app/common/Button';
-import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
-import ListCheck from '@/components/app/Icons/ListCheck';
-import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import { appUrl, networkId } from '@/utils/app/config';
 import AddressValidator from '@/components/app/Address/AddressValidator';
 import { getRequest } from '@/utils/app/api';
+import RpcMenu from '@/components/app/Layouts/RpcMenu';
+import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
+import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -58,8 +58,8 @@ export default async function AddressLayout(props: {
       <div className="relative container-xxl mx-auto px-4">
         <div className="flex items-center justify-between flex-wrap">
           <div className="flex md:flex-wrap w-full border-b dark:border-black-200">
-            <div className="sm:flex flex-1 py-2 justify-between md:items-center dark:text-neargray-10 w-full ">
-              <h1 className="break-all text-lg py-2 px-1 dark:text-neargray-10 text-nearblue-600 font-bold">
+            <div className="sm:flex flex-1 py-3 justify-between md:items-center dark:text-neargray-10 w-full ">
+              <h1 className="break-all text-lg py-2 px-1 dark:text-neargray-10 text-nearblue-600 font-bold md:inline-flex ">
                 Near Account:&nbsp;
                 {id && (
                   <span className="text-green-500 dark:text-green-250 mx-0.5">
@@ -70,38 +70,31 @@ export default async function AddressLayout(props: {
                   <Buttons address={id as string} />
                 </span>
               </h1>
-              <div>
-                <ul className="flex relative md:pt-2 sm:pb-2 items-center text-gray-500 text-xs">
-                  <span className="ml-2">
-                    <RpcMenu />
-                  </span>
-                  <li className="ml-3 max-md:mb-2">
-                    <span className="group flex w-full relative h-full">
-                      <a
-                        className={`md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 hover:no-underline px-0 py-1`}
-                        href="#"
-                      >
-                        <div className="py-2 px-2 h-8 bg-gray-100 dark:bg-black-200 rounded border">
-                          <ListCheck className="h-4 dark:filter dark:invert" />
-                        </div>
-                      </a>
-                      <ul className="bg-white dark:bg-black-600 soft-shadow hidden min-w-full absolute top-full right-0 rounded-lg group-hover:block py-1 z-[99]">
-                        <li className="pb-2">
-                          <a
-                            className={`flex items-center whitespace-nowrap px-2 pt-2 hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                            href={`https://validate.nearblocks.io/address/${id}?network=${networkId}`}
-                            target="_blank"
-                          >
-                            Validate Account
-                            <span className="w-4 ml-3 dark:text-green-250">
-                              <FaCheckCircle />
+              <div className="flex relative items-center text-center justify-between text-gray-500 text-xs">
+                <div className="items-center flex gap-2">
+                  <RpcMenu />
+                  <span className="group flex w-full h-full">
+                    <ActionMenuPopover>
+                      <ul>
+                        <li className="hover:bg-gray-100 dark:hover:bg-black-200 px-2 py-1 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250">
+                          <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center">
+                            <span className="mr-2">
+                              <FaDoubleCheck />
                             </span>
-                          </a>
+                            <a
+                              className="text-xs"
+                              href={`https://lite.nearblocks.io/address/${id}?network=${networkId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Validate Account
+                            </a>
+                          </span>
                         </li>
                       </ul>
-                    </span>
-                  </li>
-                </ul>
+                    </ActionMenuPopover>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
