@@ -5,15 +5,17 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
-
-import ArrowDown from '../Icons/ArrowDown';
 import Check from '../Icons/Check';
 import Rpc from '../Icons/Rpc';
+import {
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
-const RpcMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const RpcMenu = ({ positionClass }: { positionClass?: string }) => {
   const [isClient, setIsClient] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { RpcProviders } = useRpcProvider();
   const initializedRef = useRef(false);
   const router = useRouter();
@@ -38,72 +40,63 @@ const RpcMenu = () => {
 
   const { rpc: rpcUrl, setRpc } = useRpcStoreWithProviders();
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
   const handleSelect = (url: string) => {
     setRpc(url);
-    setIsOpen(false);
     router.refresh();
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [dropdownRef]);
-
-  if (!isClient) return null;
-
   return (
-    <li className="relative group flex h-8 justify-end max-md:mb-2">
-      <span className="border rounded-md bg-gray-100 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 hover:text-green-500 dark:hover:text-green-250 ">
-        <div className="absolute max-md:hidden left-2.5 top-2 md:flex items-center pointer-events-none">
-          <Rpc className="h-3.5 dark:text-neargray-10" />
-        </div>
-        <button
-          className="h-full max-md:!w-24 md:w-28 pl-3 pr-6 md:!px-7 py-1 truncate cursor-pointer focus:outline-none appearance-none"
-          onClick={toggleDropdown}
+    <div className="relative group flex">
+      <PopoverRoot
+        positioning={{ sameWidth: true }}
+        onOpenChange={() => setIsPopoverOpen((prev) => !prev)}
+      >
+        <PopoverTrigger
+          asChild
+          className="md:flex justify-center w-full hover:text-green-500 dark:hover:text-green-250 text-nearblue-600 dark:text-neargray-10 hover:no-underline px-0 py-1 "
         >
-          {RpcProviders.find((provider) => provider.url === rpcUrl)?.name ||
-            'Select RPC'}
-        </button>
-        <ArrowDown className="absolute right-2.5 top-2 w-4 h-4 fill-current pointer-events-none" />
-      </span>
-      {isOpen && (
-        <div className="absolute py-1 z-10 left-0 top-full">
-          <ul className="hidden group-hover:block w-36 bg-white dark:bg-black-600 border border-gray-300 dark:border-black-200 rounded-md soft-shadow">
-            {RpcProviders.map((provider) => (
-              <li
-                className={`flex justify-between items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-black-500 hover:text-green-400 dark:hover:text-green-250 dark:text-neargray-10 ${
-                  provider.url === rpcUrl
-                    ? 'bg-gray-100 dark:bg-black-500 text-green-500 dark:!text-green-250'
-                    : ''
-                }`}
-                key={provider.url}
-                onClick={() => handleSelect(provider.url)}
-              >
-                <span>{provider.name}</span>
-                {provider.url === rpcUrl && (
-                  <Check className="w-3 mr-2 text-green-500 dark:text-green-250" />
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </li>
+          <button
+            className={`border px-2.5 py-1.5 cursor-pointer focus:outline-none flex items-center rounded-md text-nearblue-600 dark:text-neargray-10 dark:border-gray-800 ${
+              isPopoverOpen
+                ? 'bg-gray-100 dark:bg-black-200'
+                : 'bg-white dark:bg-black-600 hover:bg-gray-100 dark:hover:bg-black-200'
+            }`}
+          >
+            <Rpc className="h-4 w-4 dark:text-neargray-10" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          className={`bg-white w-44 -mt-1 md:left-auto rounded-md soft-shadow border z-10 dark:border-gray-800 dark:bg-black overflow-visible ${
+            positionClass ? positionClass : 'md:right-0'
+          } `}
+          style={{
+            position: 'absolute',
+            transform: 'translateX(0)',
+          }}
+        >
+          {isClient && (
+            <ul className="p-0.5">
+              {RpcProviders.map((provider) => (
+                <li
+                  className={`flex justify-between items-center text-xs px-4 py-2 m-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-black-200 hover:text-green-400 dark:hover:text-green-250 text-nearblue-600 dark:text-neargray-10 rounded-md ${
+                    provider.url === rpcUrl
+                      ? 'bg-gray-100 dark:bg-black-200 text-green-500 dark:!text-green-250'
+                      : ''
+                  }`}
+                  key={provider.url}
+                  onClick={() => handleSelect(provider.url)}
+                >
+                  <span>{provider.name}</span>
+                  {provider.url === rpcUrl && (
+                    <Check className="w-3 mr-2 text-green-500 dark:text-green-250" />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </PopoverContent>
+      </PopoverRoot>
+    </div>
   );
 };
 

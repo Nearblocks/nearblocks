@@ -47,13 +47,13 @@ const Buttons = ({ address }: Props) => {
     <>
       <span className="inline-flex mr-1.5 h-7">
         <Tooltip
-          className="whitespace-nowrap ml-20 mt-3 max-w-[200px]"
-          position={'bottom'}
+          className="whitespace-nowrap ml-20 mb-3 max-w-[200px]"
+          position={'top'}
           tooltip="Copy account ID to clipboard"
         >
           <span className="relative">
             {showTooltip && (
-              <span className="absolute bg-black bg-opacity-90 z-30 -left-full -top-9 text-xs text-white break-normal px-3 py-2">
+              <span className="absolute bg-black bg-opacity-90 z-30 -left-full -top-10 text-xs text-white break-normal px-3 py-2 rounded-lg">
                 Copied!
               </span>
             )}
@@ -71,8 +71,8 @@ const Buttons = ({ address }: Props) => {
         <DialogTrigger asChild>
           <button>
             <Tooltip
-              className="whitespace-nowrap ml-16 max-w-[200px]"
-              position={'bottom'}
+              className="whitespace-nowrap ml-16 mb-3 max-w-[200px]"
+              position={'top'}
               tooltip="Click to view QR Code"
             >
               <div className="bg-green-500 flex dark:bg-black-200 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7">
