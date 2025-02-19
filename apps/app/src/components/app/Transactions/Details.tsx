@@ -277,41 +277,62 @@ const Details = (props: Props) => {
     }
   });
 
+  const rpcMainTxnsActions =
+    mainTxnsActions &&
+    mainTxnsActions?.map((txn) => {
+      const filteredNepLogs = logs?.filter((item: any) => {
+        try {
+          const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
+          if (logContent) {
+            const jsonLog = JSON.parse(logContent[1]);
+            return jsonLog?.standard === 'nep245';
+          }
+          return false;
+        } catch {
+          return false;
+        }
+      });
+      if (filteredNepLogs?.length > 0) {
+        return {
+          ...txn,
+          logs: [...filteredNepLogs],
+        };
+      } else {
+        return {
+          ...txn,
+          logs: [...txn.logs, ...filteredNepLogs],
+        };
+      }
+    });
+
+  const apiMainTxnsActions = apiActions?.map((txn: any) => {
+    const filteredApiNepLogs = apiLogs?.filter((log: any) => {
+      try {
+        if (log?.logs?.standard === 'nep245') {
+          return log;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    });
+    if (filteredApiNepLogs?.length > 0) {
+      return {
+        ...txn,
+        logs: [...filteredApiNepLogs],
+      };
+    } else {
+      return {
+        ...txn,
+        logs: [...txn.logs, ...filteredApiNepLogs],
+      };
+    }
+  });
+
   const updatedMainTxnsActions =
-    !status || apiActions.length === 0
-      ? mainTxnsActions
-      : apiActions?.map((txn: any) => {
-          const filteredNepLogs = logs?.filter((item: any) => {
-            try {
-              const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
-              if (logContent) {
-                const jsonLog = JSON.parse(logContent[1]);
-                return jsonLog?.standard === 'nep245';
-              }
-              return false;
-            } catch {
-              return false;
-            }
-          });
-
-          const filteredApiNepLogs = apiLogs?.filter((log: any) => {
-            try {
-              if (log?.logs?.standard === 'nep245') {
-                return log;
-              }
-              return false;
-            } catch {
-              return false;
-            }
-          });
-
-          return {
-            ...txn,
-            logs: status
-              ? [...filteredApiNepLogs]
-              : [...txn.logs, ...filteredNepLogs],
-          };
-        });
+    status && apiMainTxnsActions.length > 0
+      ? apiMainTxnsActions
+      : rpcMainTxnsActions;
 
   const totalTokenIdsCount = actionLogs?.reduce(
     (totalCount: number, item: any) => {
