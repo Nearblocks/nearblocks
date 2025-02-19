@@ -50,7 +50,11 @@ const Balance = ({
   const router = useRouter();
   const { id } = router.query;
   const { t } = useTranslation();
-  const balance = status ? accountData?.amount : accountView?.amount;
+  const balance = status
+    ? accountData?.deleted?.transaction_hash
+      ? null
+      : accountData?.amount
+    : accountView?.amount;
   const stakedBalace = status ? accountData?.locked : accountView?.locked;
   const storageUsed = status
     ? accountData?.storage_usage
