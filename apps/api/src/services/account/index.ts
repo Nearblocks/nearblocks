@@ -60,7 +60,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
     WHERE
       be.affected_account_id = ${account}
     ORDER BY
-      be.block_height DESC
+      be.event_index DESC
     LIMIT
       1;
   `;
