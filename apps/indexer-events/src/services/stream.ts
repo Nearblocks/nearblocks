@@ -7,6 +7,15 @@ import sentry from '#libs/sentry';
 import { storeEvents } from '#services/events';
 
 const indexerKey = 'events';
+const s3Config = {
+  credentials: {
+    accessKeyId: config.s3AccessKey,
+    secretAccessKey: config.s3SecretKey,
+  },
+  endpoint: config.s3Endpoint,
+  forcePathStyle: true,
+  region: config.s3Region,
+};
 
 export const syncData = async () => {
   const settings = await dbRead('settings').where({ key: indexerKey }).first();
@@ -15,15 +24,17 @@ export const syncData = async () => {
   let startBlockHeight = config.startBlockHeight;
 
   if (!startBlockHeight && latestBlock) {
-    startBlockHeight = +latestBlock + 1;
+    startBlockHeight = +latestBlock;
   }
 
-  const startBlock = startBlockHeight || config.genesisHeight;
+  const startBlock = startBlockHeight || 0;
 
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
     dbConfig: streamConfig,
+    s3Bucket: config.s3Bucket,
+    s3Config,
     start: startBlock,
   });
 
@@ -44,9 +55,7 @@ export const syncData = async () => {
 
 export const onMessage = async (message: Message) => {
   try {
-    if (message.block.header.height % 100 === 0) {
-      logger.info(`syncing block: ${message.block.header.height}`);
-    }
+    logger.info(`syncing block: ${message.block.header.height}`);
 
     await storeEvents(dbWrite, message);
 
