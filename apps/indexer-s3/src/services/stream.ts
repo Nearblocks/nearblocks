@@ -70,7 +70,7 @@ export const syncData = async () => {
 const uploadBlock = async (message: types.StreamerMessage) => {
   const command = new PutObjectCommand({
     Body: JSON.stringify(message),
-    Bucket: 'nearblocks',
+    Bucket: 'nearblocks-nearlake',
     ContentType: 'application/json',
     Key: `${message.block.header.height}.json`,
   });
