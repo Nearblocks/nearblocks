@@ -1,18 +1,19 @@
 import { Readable } from 'stream';
 
+import { GetObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+
 import { createKnex, Knex, KnexConfig } from 'nb-knex';
 import { logger } from 'nb-logger';
-import { retry, sleep } from 'nb-utils';
+import { retry } from 'nb-utils';
+
+import { Message } from './type.js';
 
 export * from './type.js';
 
-interface BlockReadable extends Readable {
-  block?: number;
-  final?: number;
-}
-
 export type BlockStreamConfig = {
   dbConfig: KnexConfig | string;
+  s3Bucket: string;
+  s3Config: S3ClientConfig;
   start: number;
 };
 
@@ -23,12 +24,14 @@ const retryLogger = (attempt: number, error: unknown) => {
   logger.error({ attempt });
 };
 
-const fetch = async (knex: Knex, block: number, limit: number) => {
-  return await retry(
+const fetchBlocks = (knex: Knex, start: number, limit: number) => {
+  return retry(
     async () => {
       const blocks = await knex('blocks')
-        .select('block_json', 'block_bytea')
-        .whereBetween('block_height', [block, block + limit - 1]);
+        .select('block_height')
+        .where('block_height', '>', start)
+        .orderBy('block_height')
+        .limit(limit);
 
       return blocks;
     },
@@ -36,15 +39,20 @@ const fetch = async (knex: Knex, block: number, limit: number) => {
   );
 };
 
-const fetchFinal = async (knex: Knex) => {
-  return await retry(
+const fetchJson = (s3: S3Client, bucket: string, block: number) => {
+  return retry(
     async () => {
-      const block = await knex('blocks')
-        .select('block_height')
-        .orderBy('block_height', 'desc')
-        .first();
+      const response = await s3.send(
+        new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` }),
+      );
 
-      return block?.block_height;
+      const chunks: Buffer[] = [];
+
+      for await (const chunk of response.Body as Readable) {
+        chunks.push(chunk);
+      }
+
+      return Buffer.concat(chunks).toString('utf8');
     },
     { exponential: true, logger: retryLogger, retries },
   );
@@ -52,70 +60,57 @@ const fetchFinal = async (knex: Knex) => {
 
 export const streamBlock = (config: BlockStreamConfig) => {
   const knex: Knex = createKnex(config.dbConfig);
-  const start = config.start;
+  const s3 = new S3Client(config.s3Config);
+  let start = config.start;
+  let isFetching = false;
   const limit = 20;
+  const highWaterMark = limit * 10;
 
   const readable = new Readable({
-    highWaterMark: limit * 2 + 1,
+    highWaterMark,
     objectMode: true,
-    async read(this: BlockReadable) {
-      try {
-        // eslint-disable-next-line no-constant-condition
-        whileLoop: while (true) {
-          const block = this.block || start;
-          const shouldFetch = !this.final || block >= this.final - limit * 5;
-          const isInLimit = !this.final || this.final - block > limit + 1;
+    read() {},
+  });
 
-          if (shouldFetch) {
-            this.final = await fetchFinal(knex);
+  const getBlocks = async () => {
+    if (isFetching) return;
+
+    isFetching = true;
+
+    try {
+      const remaining = highWaterMark - readable.readableLength;
+
+      if (remaining > limit) {
+        const blocks = await fetchBlocks(knex, start, limit);
+
+        blocks.pop();
+
+        const jsons = await Promise.all(
+          blocks.map((block) =>
+            fetchJson(s3, config.s3Bucket, block.block_height),
+          ),
+        );
+
+        for (const json of jsons) {
+          const parsed: Message = JSON.parse(json);
+
+          if (!readable.push(parsed)) {
+            return;
           }
 
-          const concurrency = isInLimit ? limit : 1;
-          const shouldWait = this.final && block >= this.final;
-
-          if (shouldWait) {
-            await sleep(1000);
-            continue whileLoop;
-          }
-
-          const responses = await fetch(knex, block, concurrency);
-
-          if (!responses.length) {
-            if (concurrency !== 1) {
-              throw Error('missing blocks');
-            }
-
-            this.block = block + concurrency;
-            continue whileLoop;
-          }
-
-          for (const response of responses) {
-            if (!response.block_json && !response.block_bytea) {
-              throw Error('missing block json');
-            }
-
-            const blockData =
-              response.block_json ||
-              JSON.parse(response.block_bytea.toString());
-
-            if (!this.push(blockData)) {
-              this.pause();
-            }
-          }
-
-          this.block = block + concurrency;
-          break whileLoop;
+          start = parsed.block.header.height;
         }
-      } catch (error) {
-        this.emit('error', error);
-        this.push(null);
       }
-    },
-  });
+    } catch (error) {
+      readable.destroy(error as Error);
+    } finally {
+      isFetching = false;
+    }
+  };
 
-  readable.on('drain', () => {
-    readable.resume();
-  });
+  const interval = setInterval(getBlocks, 100);
+
+  readable.on('close', () => clearInterval(interval));
 
   return readable;
 };

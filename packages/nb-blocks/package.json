@@ -1,6 +1,6 @@
 {
   "name": "nb-blocks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -11,6 +11,7 @@
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "3.749.0",
     "eslint-config-custom-node": "*",
     "nb-knex": "*",
     "nb-logger": "*",
