@@ -310,15 +310,17 @@ function displayArgs(args: any) {
 
 export function mainActions(rpcTxn: any) {
   const txActions = [];
-  const transaction = rpcTxn?.transaction.actions || [];
+  const transaction = rpcTxn?.transaction?.actions || [];
   const receipt = rpcTxn?.transaction_outcome?.outcome?.receipt_ids[0];
   const from = rpcTxn?.transaction?.signer_id;
   const to = rpcTxn?.transaction?.receiver_id;
-  const logs = rpcTxn?.receipts_outcome[0]?.outcome?.logs?.map((log: any) => ({
-    logs: log,
-    contract: to,
-    receiptId: receipt,
-  }));
+  const logs = rpcTxn?.receipts_outcome?.[0]?.outcome?.logs?.map(
+    (log: any) => ({
+      logs: log,
+      contract: to,
+      receiptId: receipt,
+    }),
+  );
 
   const actionsLog = rpcTxn?.transaction?.actions.map((log: any) => {
     const actionInfo: any = mapRpcActionToAction(log);

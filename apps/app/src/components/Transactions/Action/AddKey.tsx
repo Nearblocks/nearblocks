@@ -12,7 +12,7 @@ const AddKey = (props: TransactionActionInfo) => {
 
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
-      <div className="py-1">
+      <div className="py-1 flex items-center">
         {props?.action?.receiptId && hash ? (
           <Link
             href={`/txns/${hash}#execution#${props.action?.receiptId}`}
@@ -28,7 +28,7 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}
         <Link
           href={`/address/${props.receiver}`}
-          className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
+          className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
         >
           {shortenAddress(props.receiver)}
         </Link>
@@ -42,13 +42,13 @@ const AddKey = (props: TransactionActionInfo) => {
 
   if (props.args.access_key.permission.permission_kind) {
     return (
-      <div className="py-1">
+      <div className="py-1 flex items-center">
         {props?.action?.receiptId && hash ? (
           <Link
             href={`/txns/${hash}#execution#${props.action?.receiptId}`}
-            className="cursor-pointer"
+            className="cursor-pointer flex items-center"
           >
-            <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
+            <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1 mb-1" />
           </Link>
         ) : (
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
@@ -58,7 +58,7 @@ const AddKey = (props: TransactionActionInfo) => {
         {t ? t('txns:txn.actions.addKey.2') : 'added for'}{' '}
         <Link
           href={`/address/${props.receiver}`}
-          className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
+          className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
         >
           {shortenAddress(props.receiver)}
         </Link>
@@ -71,7 +71,7 @@ const AddKey = (props: TransactionActionInfo) => {
   }
 
   return (
-    <div className="py-1">
+    <div className="py-1 flex items-center">
       {props?.action?.receiptId && hash ? (
         <Link
           href={`/txns/${hash}#execution#${props.action?.receiptId}`}
@@ -90,7 +90,7 @@ const AddKey = (props: TransactionActionInfo) => {
       </span>
       <Link
         href={`/address/${props.args.access_key.permission.FunctionCall.receiver_id}`}
-        className="text-green-500 dark:text-green-250 font-bold hover:no-underline mr-1"
+        className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
       >
         {shortenAddress(
           props.args.access_key.permission.FunctionCall.receiver_id,
