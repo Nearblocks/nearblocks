@@ -8,7 +8,6 @@ export interface Config {
   dbUrl: string;
   dbUrlRead: string;
   delta: number;
-  genesisHeight: number;
   insertLimit: number;
   network: Network;
   preloadSize: number;
@@ -16,6 +15,11 @@ export interface Config {
   redisSentinelName: string;
   redisSentinelUrls: string;
   redisUrl: string;
+  s3AccessKey: string;
+  s3Bucket: string;
+  s3Endpoint: string;
+  s3Region: string;
+  s3SecretKey: string;
   sentryDsn?: string;
   startBlockHeight: number;
 }
