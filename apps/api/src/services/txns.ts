@@ -563,7 +563,9 @@ const full = catchAsync(async (req: RequestValidator<Full>, res: Response) => {
               'method',
               action_receipt_actions.args ->> 'method_name',
               'args',
-              action_receipt_actions.args ->> 'args_json'
+              action_receipt_actions.args ->> 'args_json',
+              'args_full',
+              action_receipt_actions.args
             )
           )
         FROM
