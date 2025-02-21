@@ -1,4 +1,4 @@
-import { cleanEnv, num, str } from 'envalid';
+import { cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -12,8 +12,13 @@ const env = cleanEnv(process.env, {
   DATABASE_URL_READ: str({ default: '' }),
   DEX_START_BLOCK: num({ default: 45_753_330 }),
   NETWORK: str({
-    choices: [Network.MAINNET, Network.TESTNET],
+    choices: [Network.MAINNET],
   }),
+  S3_ACCESS_KEY: str(),
+  S3_BUCKET: str({ default: 'nearblocks' }),
+  S3_ENDPOINT: url(),
+  S3_REGION: str({ default: '' }),
+  S3_SECRET_KEY: str(),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -25,6 +30,11 @@ const config: Config = {
   dbUrlRead: env.DATABASE_URL_READ,
   NEAR_TOKEN: 'wrap.near',
   network: env.NETWORK,
+  s3AccessKey: env.S3_ACCESS_KEY,
+  s3Bucket: env.S3_BUCKET,
+  s3Endpoint: env.S3_ENDPOINT,
+  s3Region: env.S3_REGION,
+  s3SecretKey: env.S3_SECRET_KEY,
   sentryDsn: env.SENTRY_DSN,
   STABLE_TOKENS: [
     'usdt.tether-token.near', // USDt

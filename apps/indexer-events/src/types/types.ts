@@ -13,8 +13,12 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbUrlRead: string;
-  genesisHeight: number;
   network: Network;
+  s3AccessKey: string;
+  s3Bucket: string;
+  s3Endpoint: string;
+  s3Region: string;
+  s3SecretKey: string;
   sentryDsn?: string;
   startBlockHeight: number;
 };

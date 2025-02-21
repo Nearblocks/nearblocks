@@ -3,7 +3,6 @@ import { stream, types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
 import { streamBlock } from 'nb-neardata-raw';
-import { retry } from 'nb-utils';
 
 import config from '#config';
 import { DataSource } from '#types/enum';
@@ -36,11 +35,11 @@ if (config.nearlakeEndpoint) {
 }
 
 export const syncData = async () => {
-  if (config.dataSource === DataSource.FAST_NEAR) {
+  if (config.dataSource === DataSource.FAST_NEAR_RAW) {
     const stream = streamBlock({
       end: config.endBlockHeight,
       network: config.network,
-      start: config.startBlockHeight || config.genesisHeight,
+      start: config.startBlockHeight,
       url: config.fastnearEndpoint,
     });
 
@@ -53,16 +52,30 @@ export const syncData = async () => {
       process.exit();
     });
 
+    let blocks = [];
+
     for await (const message of stream) {
-      await onMessage(message);
+      blocks.push(message);
+
+      if (blocks.length >= 10) {
+        await onMessage(blocks);
+        blocks = [];
+      }
     }
   } else {
+    let blocks = [];
+
     for await (const message of stream(lakeConfig)) {
       if (message.block.header.height >= config.endBlockHeight) {
         process.exit();
       }
 
-      await onMessage(message);
+      blocks.push(message);
+
+      if (blocks.length >= 10) {
+        await onMessage(blocks);
+        blocks = [];
+      }
     }
   }
 };
@@ -70,7 +83,7 @@ export const syncData = async () => {
 const uploadBlock = async (message: types.StreamerMessage) => {
   const command = new PutObjectCommand({
     Body: JSON.stringify(message),
-    Bucket: 'nearblocks-nearlake',
+    Bucket: config.s3Bucket,
     ContentType: 'application/json',
     Key: `${message.block.header.height}.json`,
   });
@@ -78,24 +91,20 @@ const uploadBlock = async (message: types.StreamerMessage) => {
   await s3Client.send(command);
 };
 
-export const onMessage = async (message: types.StreamerMessage) => {
+export const onMessage = async (messages: types.StreamerMessage[]) => {
   try {
-    logger.info(`syncing block: ${message.block.header.height}`);
-
     const start = performance.now();
 
-    await retry(async () => {
-      await uploadBlock(message);
-    });
+    await Promise.all(messages.map((message) => uploadBlock(message)));
 
     logger.info({
-      block: message.block.header.height,
+      blocks: `${messages[0].block.header.height} - ${
+        messages[messages.length - 1].block.header.height
+      }`,
       time: `${performance.now() - start} ms`,
     });
   } catch (error) {
-    logger.error(
-      `aborting... block ${message.block.header.height} ${message.block.header.hash}`,
-    );
+    logger.error(`aborting... blocks ${JSON.stringify(messages)}`);
     logger.error(error);
     process.exit();
   }

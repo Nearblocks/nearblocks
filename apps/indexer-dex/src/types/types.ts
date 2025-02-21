@@ -8,6 +8,11 @@ export type Config = {
   dbUrlRead: string;
   NEAR_TOKEN: string;
   network: Network;
+  s3AccessKey: string;
+  s3Bucket: string;
+  s3Endpoint: string;
+  s3Region: string;
+  s3SecretKey: string;
   sentryDsn?: string;
   STABLE_TOKENS: string[];
   startBlockHeight: number;

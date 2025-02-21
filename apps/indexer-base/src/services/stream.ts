@@ -13,19 +13,25 @@ import { prepareCache } from '#services/cache';
 import { storeChunks } from '#services/chunk';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
+import { uploadJson } from '#services/s3';
 import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
 
 const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
-  s3BucketName: config.s3BucketName,
-  s3RegionName: config.s3RegionName,
+  credentials: () =>
+    Promise.resolve({
+      accessKeyId: config.nearlakeAccessKey,
+      secretAccessKey: config.nearlakeSecretKey,
+    }),
+  s3BucketName: config.nearlakeBucketName,
+  s3RegionName: config.nearlakeRegionName,
   startBlockHeight: config.startBlockHeight,
 };
 
-if (config.s3Endpoint) {
+if (config.nearlakeEndpoint) {
   lakeConfig.s3ForcePathStyle = true;
-  lakeConfig.s3Endpoint = config.s3Endpoint;
+  lakeConfig.s3Endpoint = config.nearlakeEndpoint;
 }
 
 export const syncData = async () => {
@@ -35,7 +41,7 @@ export const syncData = async () => {
     let startBlockHeight = config.startBlockHeight;
 
     if (!startBlockHeight && block) {
-      const next = +block.block_height - 10;
+      const next = +block.block_height - config.delta;
       startBlockHeight = next;
       logger.info(`last synced block: ${block.block_height}`);
       logger.info(`syncing from block: ${next}`);
@@ -94,6 +100,7 @@ export const onMessage = async (message: types.StreamerMessage) => {
       storeExecutionOutcomes(knex, message),
       storeAccounts(knex, message),
       storeAccessKeys(knex, message),
+      uploadJson(message),
     ]);
 
     logger.info({
