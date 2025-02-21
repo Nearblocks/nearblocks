@@ -116,11 +116,11 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
 
   return (
     <div className="w-full">
-      <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10 divide-y dark:divide-black-200">
-        <div className="flex flex-wrap p-4">
+      <div className="h-full bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 divide-y dark:divide-black-200">
+        <div className="flex flex-wrap py-4 px-1.5">
           <div className="w-full">
-            <div className="flex items-center pb-3">
-              <FaCode className="mr-2 text-nearblue-600 dark:text-neargray-10" />
+            <div className={`flex items-center  ${verifierData ? 'pb-5' : ''}`}>
+              <FaCode className="mr-2" />
               <span className="font-bold">
                 {verifierData
                   ? 'Contract Source Code'
@@ -129,7 +129,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
             </div>
 
             {fileDataLoading ? (
-              <Loader wrapperClassName="w-full md:w-full my-4 " />
+              <Loader wrapperClassName="w-full md:w-full" />
             ) : (
               <>
                 {fileDataError ? (

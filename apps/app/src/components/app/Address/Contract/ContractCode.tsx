@@ -62,7 +62,21 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   };
 
   return (
-    <div className="w-full mt-3">
+    <div className="w-full">
+      {!error &&
+        !(verifiers?.length === 0 && contractData?.contractMetadata) && (
+          <div className="mb-1 pt-1 dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
+            <VerificationStatus
+              accountId={accountId}
+              contractMetadata={contractData?.contractMetadata}
+              selectedVerifier={selectedVerifier}
+              setSelectedVerifier={setSelectedVerifier}
+              statusLoading={statusLoading}
+              verificationData={verificationData}
+              verifiers={verifiers}
+            />
+          </div>
+        )}
       <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10 divide-y dark:divide-black-200">
         {error && (
           <ErrorMessage
@@ -75,9 +89,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           verifiers.length === 0) &&
           contractData?.contractMetadata &&
           !error && (
-            <div className="flex flex-wrap">
+            <div className="flex flex-wrap px-1 pt-1 text-nearblue-600 dark:text-neargray-10">
               <div className="w-full lg:w-1/2 pr-2">
-                <div className="flex flex-wrap p-4">
+                <div className="flex flex-nowrap py-3">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-16 max-w-[200px] w-28'}
@@ -90,7 +104,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                     </Tooltip>
                     Version
                   </div>
-                  <div className="w-full md:w-3/4 break-words">
+                  <div className="w-full md:w-3/4 break-words font-bold">
                     {!contractData?.contractMetadata ? (
                       <Loader wrapperClassName="w-full" />
                     ) : contractData?.contractMetadata?.version ? (
@@ -101,7 +115,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-start flex-wrap p-4">
+                <div className="flex items-start flex-nowrap py-3">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-20 max-w-[200px] w-36'}
@@ -114,7 +128,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                     </Tooltip>
                     Standards
                   </div>
-                  <div className="w-full md:w-3/4 break-words space-y-3">
+                  <div className="w-full md:w-3/4 break-words space-y-3 font-bold">
                     {!contractData?.contractMetadata ? (
                       <Loader wrapperClassName="w-full" />
                     ) : contractData?.contractMetadata?.standards &&
@@ -132,7 +146,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-start flex-wrap p-4">
+                <div className="flex items-start flex-wrap py-3">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-24 max-w-[200px] w-44'}
@@ -184,7 +198,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               </div>
 
               <div className="w-full lg:w-1/2">
-                <div className="flex items-start flex-wrap p-4">
+                <div className="flex items-start flex-wrap py-3">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-25 max-w-[200px] w-48'}
@@ -216,7 +230,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-start flex-wrap p-4">
+                <div className="flex items-start flex-wrap py-3">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-25 max-w-[200px] w-48'}
@@ -231,7 +245,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                     </Tooltip>
                     Build Environment
                   </div>
-                  <div className="w-full md:w-3/4 break-words">
+                  <div className="w-full md:w-3/4 break-words font-bold">
                     {!contractData?.contractMetadata ? (
                       <Loader wrapperClassName="w-full" />
                     ) : contractData?.contractMetadata?.build_info
@@ -246,7 +260,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-start flex-wrap p-4">
+                <div className="flex items-start flex-wrap py-3">
                   <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                     <Tooltip
                       className={'left-[5.5rem] max-w-[200px] w-40'}
@@ -264,9 +278,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                       <Loader wrapperClassName="w-full" />
                     ) : (
                       <textarea
-                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 flex-1 resize-y "
+                        className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 px-2 py-2 flex-1 resize-y "
                         readOnly
-                        rows={3}
+                        rows={2}
                         value={
                           contractData?.contractMetadata?.build_info
                             ?.build_command?.length &&
@@ -287,16 +301,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         {!error &&
           !(verifiers?.length === 0 && contractData?.contractMetadata) && (
             <div>
-              <VerificationStatus
-                accountId={accountId}
-                contractMetadata={contractData?.contractMetadata}
-                selectedVerifier={selectedVerifier}
-                setSelectedVerifier={setSelectedVerifier}
-                statusLoading={statusLoading}
-                verificationData={verificationData}
-                verifiers={verifiers}
-              />
-
               {!statusLoading && (
                 <VerifiedData
                   base64Code={contractData?.base64Code}
