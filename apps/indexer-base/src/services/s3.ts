@@ -14,6 +14,8 @@ const s3Client = new S3Client({
 });
 
 export const uploadJson = async (message: types.StreamerMessage) => {
+  if (config.disableS3Upload) return;
+
   const command = new PutObjectCommand({
     Body: JSON.stringify(message),
     Bucket: config.s3Bucket,

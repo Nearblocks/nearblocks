@@ -1,4 +1,4 @@
-import { cleanEnv, num, str, url } from 'envalid';
+import { bool, cleanEnv, num, str, url } from 'envalid';
 import { types } from 'near-lake-framework';
 
 import { Network } from 'nb-types';
@@ -16,6 +16,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  DISABLE_S3_UPLOAD: bool({ default: false }),
   FASTNEAR_ENDPOINT: str({ default: undefined }),
   NEARLAKE_ACCESS_KEY: str(),
   NEARLAKE_ENDPOINT: url({ default: '' }),
@@ -65,6 +66,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 10, // start from blocks earlier on sync interuption
+  disableS3Upload: env.DISABLE_S3_UPLOAD,
   fastnearEndpoint: env.FASTNEAR_ENDPOINT,
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,

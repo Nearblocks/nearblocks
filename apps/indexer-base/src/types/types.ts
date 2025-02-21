@@ -10,6 +10,7 @@ export interface Config {
   dbKey: string;
   dbUrl: string;
   delta: number;
+  disableS3Upload: boolean;
   fastnearEndpoint?: string;
   genesisFile: string;
   genesisHeight: number;
