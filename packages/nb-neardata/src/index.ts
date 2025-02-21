@@ -81,7 +81,7 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await fetch(`${url}/v0/last_block/optimistic`, {
+      const response = await fetch(`${url}/v0/last_block/final`, {
         method: 'GET',
         signal: AbortSignal.timeout(30000),
       });
