@@ -408,7 +408,7 @@ export function gasPercentage(gasUsed: string, gasAttached: string) {
 }
 
 export function shortenHex(address: string) {
-  return `${address && address.substr(0, 6)}...${address.substr(-4)}`;
+  return `${address && address?.substr(0, 6)}...${address?.substr(-4)}`;
 }
 export function formatDate(dateString: string) {
   const inputDate = new Date(dateString);

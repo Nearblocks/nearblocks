@@ -486,7 +486,6 @@ export function apiMainActions(apiTxn: any): ActionInfo[] {
 
 function processApiAction(action: any, args?: any) {
   if (!action) return {};
-
   return {
     action_kind: action.action,
     args: {
@@ -494,6 +493,7 @@ function processApiAction(action: any, args?: any) {
       args: action.args,
       deposit: args?.deposit || 0,
       gas: args?.gas_attached || 0,
+      ...action?.args_full,
     },
   };
 }

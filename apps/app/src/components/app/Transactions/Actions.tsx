@@ -14,42 +14,46 @@ import Transfer from './Action/Transfer';
 
 const Actions = (props: ActionPropsInfo) => {
   const showAction = () => {
-    switch (props.action.action_kind) {
+    switch (props?.action?.action_kind) {
       case 'ADD_KEY':
       case 'AddKey':
         return (
           <AddKey
-            action={props.action}
-            args={props.action.args}
-            receiver={props.action?.to}
+            action={props?.action}
+            args={props?.action?.args}
+            receiver={props?.action?.to}
           />
         );
       case 'CreateAccount':
-        return <CreateAccount action={props.action} />;
+      case 'CREATE_ACCOUNT':
+        return <CreateAccount action={props?.action} />;
       case 'DeleteAccount':
-        return <DeleteAccount action={props.action} />;
+      case 'DELETE_ACCOUNT':
+        return <DeleteAccount action={props?.action} />;
       case 'DeployContract':
-        return <DeployContract action={props.action} />;
+      case 'DEPLOY_CONTRACT':
+        return <DeployContract action={props?.action} />;
       case 'FunctionCall':
       case 'FUNCTION_CALL':
-        return <FunctionCall action={props.action} />;
+        return <FunctionCall action={props?.action} />;
       case 'Stake':
-        return <Stake action={props.action} />;
+      case 'STAKE':
+        return <Stake action={props?.action} />;
       case 'Transfer':
       case 'TRANSFER':
-        return <Transfer action={props.action} />;
+        return <Transfer action={props?.action} />;
       case 'Delegate':
       case 'DELEGATE_ACTION':
         const delegateAction: any | DelegateActionView =
-          props.action?.args?.delegate_action?.actions &&
-          props.action?.args?.delegate_action?.actions?.map(
+          props?.action?.args?.delegate_action?.actions &&
+          props?.action?.args?.delegate_action?.actions?.map(
             (txn: ActionType | any) => {
               const action = mapRpcActionToAction(txn);
               return {
                 ...action,
-                from: props.action?.from,
-                receiptId: props.action?.receiptId,
-                to: props.action?.to,
+                from: props?.action?.from,
+                receiptId: props?.action?.receiptId,
+                to: props?.action?.to,
               };
             },
           );
@@ -61,13 +65,13 @@ const Actions = (props: ActionPropsInfo) => {
               <Actions
                 action={subAction}
                 key={i}
-                receiver={props.action?.args?.delegate_action?.receiver_id}
+                receiver={props?.action?.args?.delegate_action?.receiver_id}
               />
             </div>
           ))
         );
       default:
-        return <div>{props.action.action_kind}</div>;
+        return <div>{props?.action?.action_kind}</div>;
     }
   };
 

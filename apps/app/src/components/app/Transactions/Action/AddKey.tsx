@@ -13,7 +13,7 @@ const AddKey = (props: TransactionActionInfo) => {
   const t = useTranslations();
   if (typeof props.args.access_key?.permission !== 'object') {
     return (
-      <div className="py-1">
+      <div className="py-1 flex items-center">
         {props?.action?.receiptId && params?.hash ? (
           <Link
             href={`/txns/${params?.hash}?tab=execution#${props?.action?.receiptId}`}
@@ -37,7 +37,7 @@ const AddKey = (props: TransactionActionInfo) => {
 
   if (props.args.access_key.permission.permission_kind) {
     return (
-      <div className="py-1">
+      <div className="py-1 flex items-center">
         {props?.action?.receiptId && params?.hash ? (
           <Link
             href={`/txns/${params?.hash}?tab=execution#${props?.action?.receiptId}`}
@@ -60,7 +60,7 @@ const AddKey = (props: TransactionActionInfo) => {
   }
 
   return (
-    <div className="py-1">
+    <div className="py-1 flex items-center">
       {props?.action?.receiptId && params?.hash ? (
         <Link
           href={`/txns/${params?.hash}?tab=execution#${props?.action?.receiptId}`}
