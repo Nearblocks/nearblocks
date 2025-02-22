@@ -60,15 +60,15 @@ jobs:
           NEW_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}:latest | jq -r '.config.digest')
           echo "NEW_DIGEST=$NEW_DIGEST" >> $GITHUB_ENV
 
-      - name: Deploy testnet
-        if: |
-          env.CURRENT_DIGEST != env.NEW_DIGEST && 
-          matrix.service != 'indexer-dex' && 
-          matrix.service != 'indexer-s3' && 
-          matrix.service != 'explorer-selector'
-        run: |
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
-          export KUBECONFIG=$(pwd)/kubeconfig
-
-          kubectl set -n nearblocks-testnet image deployment/testnet-${{ matrix.service }} ${{ matrix.service }}=ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
-          kubectl rollout -n nearblocks-testnet status deployment/testnet-${{ matrix.service }} --timeout=600s
+#      - name: Deploy testnet
+#        if: |
+#          env.CURRENT_DIGEST != env.NEW_DIGEST && 
+#          matrix.service != 'indexer-dex' && 
+#          matrix.service != 'indexer-s3' && 
+#          matrix.service != 'explorer-selector'
+#        run: |
+#          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+#          export KUBECONFIG=$(pwd)/kubeconfig
+#
+#          kubectl set -n nearblocks-testnet image deployment/testnet-${{ matrix.service }} ${{ matrix.service }}=ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
+#          kubectl rollout -n nearblocks-testnet status deployment/testnet-${{ matrix.service }} --timeout=600s
