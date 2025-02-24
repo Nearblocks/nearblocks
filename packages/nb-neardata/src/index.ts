@@ -81,6 +81,7 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
+<<<<<<< HEAD
       let finalBlockUrl = `${url}/v0/last_block/final`;
 
       // TEMPORARY FIX: For testnet, fetch latest block from RPC since fastnear's final block endpoint
@@ -110,6 +111,9 @@ const fetchFinal = async (url: string): Promise<Message> => {
       }
 
       const response = await fetch(finalBlockUrl, {
+=======
+      const response = await fetch(`${url}/v0/last_block/final`, {
+>>>>>>> parent of 1c3db81c (hotfix(indexer): use rpc to get the final block on testnet)
         method: 'GET',
         signal: AbortSignal.timeout(30000),
       });
@@ -119,6 +123,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
       }
 
       const data = await response.json();
+
       return data as Message;
     },
     { exponential: true, logger: retryLogger, retries },
