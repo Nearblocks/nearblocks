@@ -7,6 +7,7 @@ import { streamBlock } from 'nb-neardata-raw';
 import config from '#config';
 import { DataSource } from '#types/enum';
 
+const batchSize = 100;
 const s3Client = new S3Client({
   credentials: {
     accessKeyId: config.s3AccessKey,
@@ -57,7 +58,7 @@ export const syncData = async () => {
     for await (const message of stream) {
       blocks.push(message);
 
-      if (blocks.length >= 10) {
+      if (blocks.length >= batchSize) {
         await onMessage(blocks);
         blocks = [];
       }
@@ -72,7 +73,7 @@ export const syncData = async () => {
 
       blocks.push(message);
 
-      if (blocks.length >= 10) {
+      if (blocks.length >= batchSize) {
         await onMessage(blocks);
         blocks = [];
       }
