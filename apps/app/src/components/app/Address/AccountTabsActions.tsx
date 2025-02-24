@@ -40,7 +40,7 @@ const AccountTabsActions = ({
       'text-xs leading-4 font-medium inline-block whitespace-nowrap cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
       {
         'bg-green-600 dark:bg-green-250 text-white': selected,
-        'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
+        'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:hover:bg-black-100 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
           !selected,
       },
     );

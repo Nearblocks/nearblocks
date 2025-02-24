@@ -111,105 +111,101 @@ const Info = (props: Props) => {
 
   return (
     <div className="w-full mt-3">
-      <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10 divide-y dark:divide-black-200">
-        <div>
-          <div className="flex flex-wrap p-4">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
-              <Tooltip
-                className={'left-[5.6rem] max-w-[200px] w-40'}
-                position="bottom"
-                tooltip={'Latest time the contract deployed'}
-              >
-                <div>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </div>
-              </Tooltip>
-              Last Updated
-            </div>
-            {!deployments ? (
-              <div className="w-full md:w-3/4">
-                <Loader wrapperClassName="flex w-full max-w-xl" />
+      <div className="h-full bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 divide-y dark:divide-black-200 px-1">
+        <div className="flex flex-wrap py-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip
+              className={'left-[5.6rem] max-w-[200px] w-40'}
+              position="bottom"
+              tooltip={'Latest time the contract deployed'}
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
               </div>
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {action?.block_timestamp &&
-                  convertToUTC(nanoToMilli(action?.block_timestamp), true)}
-              </div>
-            )}
+            </Tooltip>
+            Last Updated
           </div>
+          {!deployments ? (
+            <div className="w-full md:w-3/4">
+              <Loader wrapperClassName="flex w-full max-w-xl" />
+            </div>
+          ) : (
+            <div className="w-full md:w-3/4 break-words">
+              {action?.block_timestamp &&
+                convertToUTC(nanoToMilli(action?.block_timestamp), true)}
+            </div>
+          )}
+        </div>
 
-          <div className="flex flex-wrap p-4">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
-              <Tooltip
-                className={'left-28 max-w-[200px] w-80'}
-                position="bottom"
-                tooltip={`The transaction unique identifier (hash) that the contract is latest deployed.`}
-              >
-                <div>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </div>
-              </Tooltip>
-              Transaction Hash
-            </div>
-            {!deployments ? (
-              <Loader wrapperClassName="w-32" />
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {action?.transaction_hash && (
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/txns/${action.transaction_hash}`}
-                  >
-                    {action.transaction_hash}
-                  </Link>
-                )}
+        <div className="flex flex-wrap py-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
+            <Tooltip
+              className={'left-28 max-w-[200px] w-80'}
+              position="bottom"
+              tooltip={`The transaction unique identifier (hash) that the contract is latest deployed.`}
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
               </div>
-            )}
+            </Tooltip>
+            Transaction Hash
           </div>
+          {!deployments ? (
+            <Loader wrapperClassName="w-32" />
+          ) : (
+            <div className="w-full md:w-3/4 break-words">
+              {action?.transaction_hash && (
+                <Link
+                  className="text-green-500 dark:text-green-250 hover:no-underline"
+                  href={`/txns/${action.transaction_hash}`}
+                >
+                  {action.transaction_hash}
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
 
-          <div className="flex flex-wrap p-4">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
-              <Tooltip
-                className={'left-28 max-w-[200px] w-80'}
-                position="bottom"
-                tooltip={`Locked contract means that there are no access keys allowing the contract code to be re-deployed`}
-              >
-                <div>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </div>
-              </Tooltip>
-              Contract Locked
-            </div>
-            {!deployments ? (
-              <Loader wrapperClassName="w-32" />
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
+        <div className="flex flex-wrap py-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
+            <Tooltip
+              className={'left-28 max-w-[200px] w-80'}
+              position="bottom"
+              tooltip={`Locked contract means that there are no access keys allowing the contract code to be re-deployed`}
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
               </div>
-            )}
+            </Tooltip>
+            Contract Locked
           </div>
+          {!deployments ? (
+            <Loader wrapperClassName="w-32" />
+          ) : (
+            <div className="w-full md:w-3/4 break-words">
+              {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
+            </div>
+          )}
+        </div>
 
-          <div className="flex flex-wrap p-4">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
-              <Tooltip
-                className={'left-28 max-w-[200px] w-80'}
-                position="bottom"
-                tooltip={`Checksum (SHA-256 in base58 encoding) of the contract binary.`}
-              >
-                <div>
-                  <Question className="w-4 h-4 fill-current mr-1" />
-                </div>
-              </Tooltip>
-              Code Hash
-            </div>
-            {!deployments || !contract ? (
-              <Loader wrapperClassName="w-32" />
-            ) : (
-              <div className="w-full md:w-3/4 break-words">
-                {contract?.hash}
+        <div className="flex flex-wrap py-4">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
+            <Tooltip
+              className={'left-28 max-w-[200px] w-80'}
+              position="bottom"
+              tooltip={`Checksum (SHA-256 in base58 encoding) of the contract binary.`}
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1" />
               </div>
-            )}
+            </Tooltip>
+            Code Hash
           </div>
+          {!deployments || !contract ? (
+            <Loader wrapperClassName="w-32" />
+          ) : (
+            <div className="w-full md:w-3/4 break-words">{contract?.hash}</div>
+          )}
         </div>
       </div>
     </div>

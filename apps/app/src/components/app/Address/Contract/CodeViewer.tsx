@@ -60,8 +60,8 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ content, language, name }) => {
 
   return (
     <div className="pb-4">
-      <div className="flex items-center justify-between mb-1">
-        <span className="flex items-center">{name}</span>
+      <div className="sm:flex flex-wrap items-center md:justify-between mb-1">
+        <div className="flex mb-1">{name}</div>
         <div className="flex items-center">
           <Tooltip
             className={'left-1/2 max-w-[200px] w-36'}
