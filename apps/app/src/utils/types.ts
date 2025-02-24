@@ -753,6 +753,7 @@ export type TokenInfoProps = {
   decimals?: any;
   transferAmount?: string;
   isShowText?: boolean;
+  protocolFee?: boolean;
 };
 
 export type ValidatorFullData = {

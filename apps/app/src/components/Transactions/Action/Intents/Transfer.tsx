@@ -113,6 +113,7 @@ const Transfer = ({ event, data }: Props) => {
                 contract={token?.split(':')[1] || token}
                 amount={amount}
                 isShowText
+                protocolFee
               />
             ))
           ) : (

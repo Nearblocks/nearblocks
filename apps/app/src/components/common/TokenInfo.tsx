@@ -1,24 +1,37 @@
-import {
-  localFormat,
-  shortenToken,
-  shortenTokenSymbol,
-  tokenAmount,
-} from '@/utils/libs';
+import { localFormat, shortenToken, shortenTokenSymbol } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import useRpc from '@/hooks/useRpc';
 import TokenImage from './TokenImage';
+import Big from 'big.js';
 
 const TokenInfo = (props: TokenInfoProps) => {
-  const { contract, amount, decimals, isShowText } = props;
+  const { contract, amount, decimals, isShowText, protocolFee } = props;
 
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
   const [loading, setLoading] = useState(true);
 
+  const calculateAmount = (amount: string, decimals: string): string => {
+    if (!amount) return 'N/A';
+
+    const decimalNumber = Number(decimals);
+    if (isNaN(decimalNumber)) return '0';
+
+    let amountBig = Big(amount);
+
+    const near = amountBig.div(Big(10).pow(decimalNumber));
+
+    const finalAmount = protocolFee ? near.mul(0.99) : near;
+
+    const formattedValue = finalAmount.toFixed(8).replace(/\.?0+$/, '');
+
+    return formattedValue;
+  };
+
   const rpcAmount = localFormat(
-    tokenAmount(amount, decimals || meta?.decimals, true),
+    calculateAmount(amount, decimals || meta?.decimals || '0'),
   );
 
   useEffect(() => {
@@ -75,4 +88,5 @@ const TokenInfo = (props: TokenInfoProps) => {
     </>
   );
 };
+
 export default TokenInfo;
