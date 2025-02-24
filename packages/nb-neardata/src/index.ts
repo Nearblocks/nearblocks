@@ -78,22 +78,6 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
   );
 };
 
-// HOTFIX
-interface RPCResponse {
-  id: string;
-  jsonrpc: string;
-  result: {
-    sync_info: {
-      latest_block_hash: string;
-      latest_block_height: number;
-      latest_block_time: string;
-      syncing: boolean;
-      // ...
-    };
-    // ...
-  };
-}
-
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
@@ -120,7 +104,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
           throw new Error(`RPC status: ${rpcResponse.status}`);
         }
 
-        const rpcData = (await rpcResponse.json()) as RPCResponse;
+        const rpcData = (await rpcResponse.json());
         const latestBlock = rpcData.result.sync_info.latest_block_height;
         finalBlockUrl = `${url}/v0/block/${latestBlock}`;
       }
