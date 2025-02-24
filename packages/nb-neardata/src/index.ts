@@ -81,35 +81,7 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
-      let finalBlockUrl = `${url}/v0/last_block/final`;
-
-      // TEMPORARY FIX: For testnet, fetch latest block from RPC since fastnear's final block endpoint
-      // is currently broken and always redirects to a fixed old block
-      if (url.includes('testnet')) {
-        const rpcResponse = await fetch('https://rpc.testnet.near.org', {
-          body: JSON.stringify({
-            id: 'dontcare',
-            jsonrpc: '2.0',
-            method: 'status',
-            params: [],
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'POST',
-          signal: AbortSignal.timeout(30000),
-        });
-
-        if (!rpcResponse.ok) {
-          throw new Error(`RPC status: ${rpcResponse.status}`);
-        }
-
-        const rpcData = (await rpcResponse.json());
-        const latestBlock = rpcData.result.sync_info.latest_block_height;
-        finalBlockUrl = `${url}/v0/block/${latestBlock}`;
-      }
-
-      const response = await fetch(finalBlockUrl, {
+      const response = await fetch(`${url}/v0/last_block/final`, {
         method: 'GET',
         signal: AbortSignal.timeout(30000),
       });
@@ -119,6 +91,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
       }
 
       const data = await response.json();
+
       return data as Message;
     },
     { exponential: true, logger: retryLogger, retries },
