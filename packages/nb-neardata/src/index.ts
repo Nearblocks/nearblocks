@@ -78,6 +78,7 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
   );
 };
 
+/*
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
@@ -97,6 +98,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
     { exponential: true, logger: retryLogger, retries },
   );
 };
+*/
 
 export const streamBlock = (config: BlockStreamConfig) => {
   const url = config.url ?? endpoint(config.network);
@@ -117,6 +119,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
     isFetching = true;
 
     try {
+      /*
       const remaining = highWaterMark - readable.readableLength;
 
       if (block % 10 === 0 && remaining >= 5) {
@@ -140,6 +143,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
         block += concurrency;
         return;
       }
+      */
 
       const result = await fetchBlock(url, block);
 
