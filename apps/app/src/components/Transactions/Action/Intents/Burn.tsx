@@ -37,7 +37,6 @@ const Burn = ({ event, data, actionsLog }: Props) => {
   const [networkType, setNetworkType] = useState<any>();
 
   const networkIcon = useNetworkIcons({ network: networkType });
-
   useEffect(() => {
     const args = actionsLog[0]?.args?.args;
     let parsedArgs;
@@ -105,6 +104,17 @@ const Burn = ({ event, data, actionsLog }: Props) => {
               ) : (
                 <FaRight className="text-gray-400 text-xs" />
               )}
+              {!address && (
+                <div className="flex items-center">
+                  <Link
+                    href={`/address/${item?.owner_id}`}
+                    className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-"
+                  >
+                    {networkIcon}
+                    <span className="pl-1">{shortenText(item?.owner_id)}</span>
+                  </Link>
+                </div>
+              )}
               <span className="font-semibold text-gray pl-1 pr-0.5">
                 Withdraw
               </span>
@@ -129,20 +139,7 @@ const Burn = ({ event, data, actionsLog }: Props) => {
                   </Link>
                 </div>
               )}
-              {!address && (
-                <div className="flex items-center">
-                  <span className="font-bold text-gray text-sm sm:text-xs pl-1">
-                    To
-                  </span>
-                  <Link
-                    href={`/address/${item?.owner_id}`}
-                    className="inline-flex items-center text-green-500 dark:text-green-250 whitespace-nowrap font-normal pl-"
-                  >
-                    {networkIcon}
-                    <span className="pl-1">{shortenText(item?.owner_id)}</span>
-                  </Link>
-                </div>
-              )}
+
               <div className="flex items-center pl-1">
                 <span className="font-bold text-gray text-sm sm:text-xs">
                   From
