@@ -214,3 +214,5 @@ export const supportedNetworks = {
   doge: 'doge',
   xrp: 'xrp',
 } as const;
+
+export const GTM_ID = env('NEXT_PUBLIC_GTM_ID') || 'GTM-P285ZPV2';
