@@ -40,6 +40,11 @@ const nextConfig = nextTranslate({
         destination: '/blocks/:slug',
         permanent: true,
       },
+      {
+        source: '/api/healthcheck',
+        destination: '/api/health-check',
+        permanent: true,
+      },
     ];
   },
   generateBuildId: async () => {
