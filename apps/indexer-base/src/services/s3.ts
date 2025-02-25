@@ -1,4 +1,5 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
 
 import { Message } from 'nb-neardata';
 
@@ -11,7 +12,12 @@ const s3Client = new S3Client({
   },
   endpoint: config.s3Endpoint,
   forcePathStyle: true,
+  maxAttempts: 3,
   region: config.s3Region,
+  requestHandler: new NodeHttpHandler({
+    connectionTimeout: 5000,
+    requestTimeout: 10000,
+  }),
 });
 
 export const uploadJson = async (message: Message) => {

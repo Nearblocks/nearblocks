@@ -1,5 +1,6 @@
-import { types } from 'near-lake-framework';
+import { types } from '@near-lake/framework';
 
+import { Action } from 'nb-neardata';
 import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
 
 export interface Config {
@@ -38,7 +39,7 @@ export interface Config {
 
 export type ActionReceipt = {
   Action: {
-    actions: types.Action[];
+    actions: Action[];
     gasPrice: string;
     inputDataIds: string[];
     outputDataReceivers: DataReceiver[];
