@@ -1,6 +1,5 @@
-import { types } from 'near-lake-framework';
-
 import { Knex } from 'nb-knex';
+import { BlockHeader, ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { Account } from 'nb-types';
 import { retry } from 'nb-utils';
 
@@ -30,10 +29,7 @@ export const getGenesisAccountData = (
   deleted_by_receipt_id: null,
 });
 
-export const storeAccounts = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeAccounts = async (knex: Knex, message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkAccounts(
@@ -47,8 +43,8 @@ export const storeAccounts = async (
 
 export const storeChunkAccounts = async (
   knex: Knex,
-  outcomes: types.ExecutionOutcomeWithReceipt[],
-  block: types.BlockHeader,
+  outcomes: ExecutionOutcomeWithReceipt[],
+  block: BlockHeader,
 ) => {
   if (!outcomes.length) return;
 

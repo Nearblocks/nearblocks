@@ -1,5 +1,6 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { types } from 'near-lake-framework';
+
+import { Message } from 'nb-neardata';
 
 import config from '#config';
 
@@ -13,7 +14,7 @@ const s3Client = new S3Client({
   region: config.s3Region,
 });
 
-export const uploadJson = async (message: types.StreamerMessage) => {
+export const uploadJson = async (message: Message) => {
   if (config.disableS3Upload) return;
 
   const command = new PutObjectCommand({

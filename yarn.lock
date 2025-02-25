@@ -5853,6 +5853,22 @@
     "@near-js/utils" "1.0.1"
     borsh "1.0.0"
 
+"@near-lake/framework@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@near-lake/framework/-/framework-0.1.5.tgz#9c8b0c03524ddcca520a89dce6c09e50e684ece7"
+  integrity sha512-Mb4snfrorJnYYS6YHOOSnkw7p5RtiV3V//X41BnIl52bbN4WG8ImTJ0cNl8vDOcCL7K8UngfZMd1bsxrVm+9gw==
+  dependencies:
+    "@aws-sdk/client-s3" "^3.32.0"
+    "@near-lake/primitives" "^0.5.2"
+
+"@near-lake/primitives@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@near-lake/primitives/-/primitives-0.5.2.tgz#13b6272d31ece190a49c5afef40d1ac606376204"
+  integrity sha512-jw3Wt4zBfn1kfL3FKIICYcjgokz/IlkJ+L/QtWKFEx83JyEZm7MUU2XnWuliCGS/qCjttmwnEgJuBm4WCohFHQ==
+  dependencies:
+    borsh "^2.0.0"
+    borsher "^1.2.1"
+
 "@near-wallet-selector/bitte-wallet@^8.9.15":
   version "8.9.15"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/bitte-wallet/-/bitte-wallet-8.9.15.tgz#2b4274d4f0447cc54bcf4a574e401adcffa107ac"
@@ -9756,7 +9772,7 @@
     tslib "^2.6.2"
     uuid "^9.0.1"
 
-"@smithy/middleware-retry@^4.0.5", "@smithy/middleware-retry@^4.0.6":
+"@smithy/middleware-retry@^4.0.5":
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/@smithy/middleware-retry/-/middleware-retry-4.0.6.tgz#07f8259dc05835e317aaf37af7e79bae349eabb4"
   integrity sha512-s8QzuOQnbdvRymD9Gt9c9zMq10wUQAHQ3z72uirrBHCwZcLTrL5iCOuVTMdka2IXOYhQE890WD5t6G24+F+Qcg==
@@ -10325,7 +10341,7 @@
     bowser "^2.11.0"
     tslib "^2.6.2"
 
-"@smithy/util-defaults-mode-browser@^4.0.5", "@smithy/util-defaults-mode-browser@^4.0.6":
+"@smithy/util-defaults-mode-browser@^4.0.5":
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/@smithy/util-defaults-mode-browser/-/util-defaults-mode-browser-4.0.6.tgz#4ee93d8e32c8211709437aa29c5fe616895e7c51"
   integrity sha512-N8+VCt+piupH1A7DgSVDNrVHqRLz8r6DvBkpS7EWHiIxsUk4jqGuQLjqC/gnCzmwGkVBdNruHoYAzzaSQ8e80w==
@@ -10373,7 +10389,7 @@
     "@smithy/types" "^3.5.0"
     tslib "^2.6.2"
 
-"@smithy/util-defaults-mode-node@^4.0.5", "@smithy/util-defaults-mode-node@^4.0.6":
+"@smithy/util-defaults-mode-node@^4.0.5":
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/@smithy/util-defaults-mode-node/-/util-defaults-mode-node-4.0.6.tgz#213e5b32549beb48aeccbcf99cf56c97db47e70b"
   integrity sha512-9zhx1shd1VwSSVvLZB8CM3qQ3RPD3le7A3h/UPuyh/PC7g4OaWDi2xUNzamsVoSmCGtmUBONl56lM2EU6LcH7A==
@@ -13301,10 +13317,18 @@ borsh@1.0.0:
   resolved "https://registry.yarnpkg.com/borsh/-/borsh-1.0.0.tgz#b564c8cc8f7a91e3772b9aef9e07f62b84213c1f"
   integrity sha512-fSVWzzemnyfF89EPwlUNsrS5swF5CrtiN4e+h0/lLf4dz2he4L3ndM20PS9wj7ICSkXJe/TQUHdaPTq15b1mNQ==
 
-borsh@2.0.0:
+borsh@2.0.0, borsh@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/borsh/-/borsh-2.0.0.tgz#042a9f109565caac3c6a21297cd8c0ae8db3149d"
   integrity sha512-kc9+BgR3zz9+cjbwM8ODoUB4fs3X3I5A/HtX7LZKxCLaMrEeDFoBpnhZY//DTS1VZBSs6S5v46RZRbZjRFspEg==
+
+borsher@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/borsher/-/borsher-1.2.1.tgz#a40f371ef1755f16b056034e2d47951f08180583"
+  integrity sha512-vP5g3q2BWxqjgGuQeLKJr1ymr3yvFDSFAtN+UZa5L1BB82eFCYnrLCEj+6uiJnzhtJ7IXZfYUYu4EYBnI949Xg==
+  dependencies:
+    borsh "^2.0.0"
+    buffer "^6.0.3"
 
 bos-cli@^0.3.13:
   version "0.3.13"

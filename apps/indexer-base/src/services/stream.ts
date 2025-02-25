@@ -1,7 +1,7 @@
-import { stream, types } from 'near-lake-framework';
+import { stream, types } from '@near-lake/framework';
 
 import { logger } from 'nb-logger';
-import { streamBlock } from 'nb-neardata';
+import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
@@ -75,12 +75,12 @@ export const syncData = async () => {
     }
 
     for await (const message of stream(lakeConfig)) {
-      await onMessage(message);
+      await onMessage(message as unknown as Message);
     }
   }
 };
 
-export const onMessage = async (message: types.StreamerMessage) => {
+export const onMessage = async (message: Message) => {
   try {
     if (message.block.header.height % 1000 === 0)
       logger.info(`syncing block: ${message.block.header.height}`);

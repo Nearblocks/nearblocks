@@ -1,6 +1,10 @@
-import { types } from 'near-lake-framework';
-
 import { Knex } from 'nb-knex';
+import {
+  AccessKeyFunctionCallPermission,
+  BlockHeader,
+  ExecutionOutcomeWithReceipt,
+  Message,
+} from 'nb-neardata';
 import { AccessKey, AccessKeyPermissionKind } from 'nb-types';
 import { retry } from 'nb-utils';
 
@@ -49,10 +53,7 @@ export const getGenesisAccessKeyData = (
   };
 };
 
-export const storeAccessKeys = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeAccessKeys = async (knex: Knex, message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkAccessKeys(
@@ -66,8 +67,8 @@ export const storeAccessKeys = async (
 
 export const storeChunkAccessKeys = async (
   knex: Knex,
-  block: types.BlockHeader,
-  outcomes: types.ExecutionOutcomeWithReceipt[],
+  block: BlockHeader,
+  outcomes: ExecutionOutcomeWithReceipt[],
 ) => {
   if (!outcomes.length) return;
 
@@ -215,7 +216,7 @@ const getAccessKeyData = (
   blockHeight: number,
   account: string,
   publicKey: string,
-  permission: string | types.AccessKeyFunctionCallPermission,
+  permission: AccessKeyFunctionCallPermission | string,
   receipt: null | string,
   deletedReceipt: null | string = null,
   deletedBlock: null | number = null,

@@ -24,7 +24,7 @@ export type ChunkHeader = {
   prevBlockHash: string;
   prevStateRoot: string;
   rentPaid: string;
-  shardID: number;
+  shardId: number;
   signature: string;
   txRoot: string;
   validatorProposals: ValidatorProposal[];
@@ -57,7 +57,7 @@ export type BlockHeader = {
   chunkReceiptsRoot: string;
   chunksIncluded: number;
   chunkTxRoot: string;
-  epochID: string;
+  epochId: string;
   epochSyncDataHash: null | string;
   gasPrice: string;
   hash: string;
@@ -66,7 +66,7 @@ export type BlockHeader = {
   lastFinalBlock: string;
   latestProtocolVersion: number;
   nextBpHash: string;
-  nextEpochID: string;
+  nextEpochId: string;
   outcomeRoot: string;
   prevHash: string;
   prevHeight: number;
@@ -89,7 +89,7 @@ export type ChallengeResult = {
 export type Shard = {
   chunk?: Chunk;
   receiptExecutionOutcomes: ExecutionOutcomeWithReceipt[];
-  shardID: number;
+  shardId: number;
   stateChanges: StateChange[];
 };
 

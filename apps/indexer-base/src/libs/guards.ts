@@ -1,51 +1,52 @@
-import { types } from 'near-lake-framework';
+import {
+  AccessKeyFunctionCallPermission,
+  Action,
+  AddKeyAction,
+  DelegateAction,
+  DeleteAccountAction,
+  DeleteKeyAction,
+  DeployContractAction,
+  FunctionCallAction,
+  StakeAction,
+  TransferAction,
+} from 'nb-neardata';
 
 export const isCreateAccountAction = (
-  action: types.Action,
+  action: Action,
 ): action is 'CreateAccount' => typeof action === 'string';
 
 export const isFunctionCallAction = (
-  action: types.Action,
-): action is types.FunctionCallAction =>
-  (action as types.FunctionCallAction).FunctionCall !== undefined;
+  action: Action,
+): action is FunctionCallAction =>
+  (action as FunctionCallAction).FunctionCall !== undefined;
 
 export const isDeployContractAction = (
-  action: types.Action,
-): action is types.DeployContractAction =>
-  (action as types.DeployContractAction).DeployContract !== undefined;
+  action: Action,
+): action is DeployContractAction =>
+  (action as DeployContractAction).DeployContract !== undefined;
 
-export const isTransferAction = (
-  action: types.Action,
-): action is types.TransferAction =>
-  (action as types.TransferAction).Transfer !== undefined;
+export const isTransferAction = (action: Action): action is TransferAction =>
+  (action as TransferAction).Transfer !== undefined;
 
-export const isStakeAction = (
-  action: types.Action,
-): action is types.StakeAction =>
-  (action as types.StakeAction).Stake !== undefined;
+export const isStakeAction = (action: Action): action is StakeAction =>
+  (action as StakeAction).Stake !== undefined;
 
-export const isAddKeyAction = (
-  action: types.Action,
-): action is types.AddKeyAction =>
-  (action as types.AddKeyAction).AddKey !== undefined;
+export const isAddKeyAction = (action: Action): action is AddKeyAction =>
+  (action as AddKeyAction).AddKey !== undefined;
 
 export const isAccessKeyFunctionCallPermission = (
-  accessKeyPermission: string | types.AccessKeyFunctionCallPermission,
-): accessKeyPermission is types.AccessKeyFunctionCallPermission =>
-  (accessKeyPermission as types.AccessKeyFunctionCallPermission)
-    .FunctionCall !== undefined;
+  accessKeyPermission: AccessKeyFunctionCallPermission | string,
+): accessKeyPermission is AccessKeyFunctionCallPermission =>
+  (accessKeyPermission as AccessKeyFunctionCallPermission).FunctionCall !==
+  undefined;
 
-export const isDeleteKeyAction = (
-  action: types.Action,
-): action is types.DeleteKeyAction =>
-  (action as types.DeleteKeyAction).DeleteKey !== undefined;
+export const isDeleteKeyAction = (action: Action): action is DeleteKeyAction =>
+  (action as DeleteKeyAction).DeleteKey !== undefined;
 
 export const isDeleteAccountAction = (
-  action: types.Action,
-): action is types.DeleteAccountAction =>
-  (action as types.DeleteAccountAction).DeleteAccount !== undefined;
+  action: Action,
+): action is DeleteAccountAction =>
+  (action as DeleteAccountAction).DeleteAccount !== undefined;
 
-export const isDelegateAction = (
-  action: types.Action,
-): action is types.DelegateAction =>
-  (action as types.DelegateAction).Delegate !== undefined;
+export const isDelegateAction = (action: Action): action is DelegateAction =>
+  (action as DelegateAction).Delegate !== undefined;

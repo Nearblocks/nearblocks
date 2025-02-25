@@ -1,13 +1,9 @@
-import { types } from 'near-lake-framework';
-
 import { Knex } from 'nb-knex';
+import { Block as JBlock, Message, Shard } from 'nb-neardata';
 import { Block } from 'nb-types';
 import { retry } from 'nb-utils';
 
-export const storeBlock = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeBlock = async (knex: Knex, message: Message) => {
   const data = getBlockData(message);
 
   await retry(async () => {
@@ -15,7 +11,7 @@ export const storeBlock = async (
   });
 };
 
-const getBlockData = (message: types.StreamerMessage): Block => {
+const getBlockData = (message: Message): Block => {
   const block = message.block;
   const blockJson = cleanupJson(message);
 
@@ -32,7 +28,7 @@ const getBlockData = (message: types.StreamerMessage): Block => {
   };
 };
 
-const cleanupJson = (message: types.StreamerMessage) => {
+const cleanupJson = (message: Message) => {
   const block = getBlock(message.block);
   const shards = message.shards.map((shard) => {
     return {
@@ -46,7 +42,7 @@ const cleanupJson = (message: types.StreamerMessage) => {
   return JSON.stringify({ block, shards });
 };
 
-const getBlock = (block: types.Block) => {
+const getBlock = (block: JBlock) => {
   const author = block.author;
   const {
     approvals,
@@ -59,7 +55,7 @@ const getBlock = (block: types.Block) => {
   return { author, header };
 };
 
-const getChunk = (shard: types.Shard) => {
+const getChunk = (shard: Shard) => {
   if (!shard.chunk) return null;
 
   const transactions = shard.chunk.transactions.map((transaction) => {
@@ -74,7 +70,7 @@ const getChunk = (shard: types.Shard) => {
   return { ...shard.chunk, transactions };
 };
 
-const getExecutions = (shard: types.Shard) => {
+const getExecutions = (shard: Shard) => {
   return shard.receiptExecutionOutcomes.map((outcomes) => {
     const { proof, ...executionOutcome } = outcomes.executionOutcome;
     const { metadata, ...outcome } = outcomes.executionOutcome.outcome;
