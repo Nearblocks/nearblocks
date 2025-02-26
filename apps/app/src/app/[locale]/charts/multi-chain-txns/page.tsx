@@ -55,14 +55,14 @@ export default async function AddressesChart() {
     <section>
       <div>
         <div className="container-xxl mx-auto p-5">
-          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
+          <h1 className="text-lg font-medium dark:text-neargray-10 text-nearblue-600">
             {'Multi Chain Transactions Chart'}
           </h1>
         </div>
       </div>
       <div className="container-xxl mx-auto px-4">
         <div className="relative">
-          <Suspense fallback={<ChartDetails chartTypes="addresses" />}>
+          <Suspense fallback={<ChartDetails chartTypes="multi-chain-txns" />}>
             <Chart
               chartsData={data}
               chartTypes={'multi-chain-txns'}

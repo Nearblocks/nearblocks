@@ -60,7 +60,7 @@ export default async function TransactionList(props: {
       <div>
         <div className="container-xxl mx-auto px-5">
           <h1
-            className="py-5 text-lg font-bold dark:text-neargray-10 text-nearblue-600"
+            className="py-5 text-lg font-medium dark:text-neargray-10 text-nearblue-600"
             suppressHydrationWarning={true}
           >
             {t('txnsHeading') || 'Latest Near Protocol Transactions'}

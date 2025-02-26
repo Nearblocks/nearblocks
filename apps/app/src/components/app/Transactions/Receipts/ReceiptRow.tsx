@@ -132,7 +132,7 @@ const ReceiptRow = (props: Props) => {
         }
         id={`${receipt?.receipt_id}`}
       >
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-48 left-25 max-w-[200px]'}
@@ -154,7 +154,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-start px-4 py-2.5">
+        <div className="flex flex-wrap items-start px-4 py-3">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -180,7 +180,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -215,8 +215,8 @@ const ReceiptRow = (props: Props) => {
           )}
         </div>
         <div>
-          <div className="flex flex-wrap px-4 py-2.5">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-[1.625rem]">
+          <div className="flex flex-wrap px-4 py-3">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
                 tooltip={t('txnDetails.receipts.from.tooltip')}
@@ -232,7 +232,7 @@ const ReceiptRow = (props: Props) => {
                 <Loader wrapperClassName="flex w-72 max-w-sm" />
               </div>
             ) : receipt?.predecessor_id ? (
-              <div className="w-full md:w-3/4 word-break">
+              <div className="w-full md:w-3/4 word-break h-6">
                 <AddressOrTxnsLink
                   copy
                   currentAddress={receipt?.predecessor_id}
@@ -242,8 +242,8 @@ const ReceiptRow = (props: Props) => {
               ''
             )}
           </div>
-          <div className="flex flex-wrap px-4 py-2.5">
-            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-[1.625rem]">
+          <div className="flex flex-wrap px-4 py-3">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
               <Tooltip
                 className={'w-96 left-25 max-w-[200px]'}
                 tooltip={t('txnDetails.receipts.to.tooltip')}
@@ -259,7 +259,7 @@ const ReceiptRow = (props: Props) => {
                 <Loader wrapperClassName="flex w-72 max-w-xs" />
               </div>
             ) : receipt?.receiver_id ? (
-              <div className="w-full md:w-3/4 word-break">
+              <div className="w-full md:w-3/4 word-break h-6">
                 <AddressOrTxnsLink copy currentAddress={receipt?.receiver_id} />
               </div>
             ) : (
@@ -267,8 +267,8 @@ const ReceiptRow = (props: Props) => {
             )}
           </div>
         </div>
-        <div className="flex flex-wrap px-4 py-2.5">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
+        <div className="flex flex-wrap px-4 py-3">
+          <div className="flex items-center w-full md:w-1/4 mb-3 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
               tooltip={t('txnDetails.receipts.burnt.tooltip')}
@@ -286,7 +286,7 @@ const ReceiptRow = (props: Props) => {
               <Loader wrapperClassName="flex w-36" />
             </div>
           ) : receipt?.outcome?.gas_burnt ? (
-            <div className="w-full items-center text-xs flex md:w-3/4 break-words">
+            <div className="w-full items-center text-xs flex md:w-3/4 break-words h-6">
               <div className="bg-orange-50  dark:bg-black-200 rounded-md px-2 py-1">
                 <span className="text-xs mr-2">🔥 </span>
                 {receipt?.outcome?.gas_burnt
@@ -304,7 +304,7 @@ const ReceiptRow = (props: Props) => {
           )}
         </div>
         <div className="flex items-start flex-wrap px-4 py-2.5">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 sm:mt-1">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
               tooltip={t('txnDetails.receipts.actions.tooltip')}
@@ -335,7 +335,7 @@ const ReceiptRow = (props: Props) => {
             ''
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2.5">
+        <div className="flex items-start flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -364,7 +364,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2.5">
+        <div className="flex items-start flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -386,7 +386,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           )}
         </div>
-        <div className="flex items-start flex-wrap px-4 py-2.5">
+        <div className="flex items-start flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}

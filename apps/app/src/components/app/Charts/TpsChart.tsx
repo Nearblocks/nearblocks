@@ -81,7 +81,7 @@ const TpsChart: React.FC<Props> = ({
       image: `/images/charts/blocks.svg`,
       image_dark: `/images/charts/blocks_dark.svg`,
       link: '/charts/blocks',
-      text: t ? t('blocksCharts.heading') : 'New Blocks',
+      text: t ? t('blocksCharts.heading') : 'Near Block Count',
     },
     {
       exclude: false,

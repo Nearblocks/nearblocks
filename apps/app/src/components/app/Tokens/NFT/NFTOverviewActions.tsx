@@ -63,7 +63,7 @@ const NFTOverviewActions = ({
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <h1 className="break-all space-x-2 text-lg font-bold dark:text-neargray-10 text-nearblue-600 leading-8 py-5 px-2">
+          <h1 className="break-all space-x-2 text-lg font-medium dark:text-neargray-10 text-nearblue-600 leading-8 py-5 px-2">
             <span className="inline-flex align-middle h-7 w-7">
               <TokenImage
                 alt={token?.name}
@@ -72,7 +72,7 @@ const NFTOverviewActions = ({
               />
             </span>
             <span className="inline-flex align-middle ">Token: </span>
-            <span className="inline-flex align-middle font-semibold">
+            <span className="break-all align-middle font-semibold">
               {token?.name}
             </span>
           </h1>

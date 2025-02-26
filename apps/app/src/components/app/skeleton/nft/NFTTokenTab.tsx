@@ -20,7 +20,7 @@ const NFTTokenTabSkeletion = forwardRef(
         'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
         {
           'bg-green-600 dark:bg-green-250 text-white': selected,
-          'hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
+          'hover:bg-neargray-800 dark:hover:bg-black-100 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
             !selected,
         },
       );
@@ -35,7 +35,7 @@ const NFTTokenTabSkeletion = forwardRef(
         {!error && (
           <div className="flex items-center justify-between flex-wrap">
             <div className="w-80 max-w-xs py-4 px-1 bg-neargray-25 dark:bg-black-300">
-              <Skeleton className="h-6 flex mt-2" />
+              <Skeleton className="h-6 flex mt-3 mb-1.5" />
             </div>{' '}
           </div>
         )}
@@ -58,7 +58,7 @@ const NFTTokenTabSkeletion = forwardRef(
                       <Skeleton className="h-4 w-40" />
                     </div>
 
-                    <div className="flex flex-wrap py-5 text-sm text-gray-600">
+                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
                       <div className="w-full md:w-1/4 mb-2 md:mb-0">
                         <Skeleton className="h-5 w-28" />
                       </div>
@@ -94,7 +94,7 @@ const NFTTokenTabSkeletion = forwardRef(
                       <Skeleton className="h-4 w-40" />
                     </div>
 
-                    <div className="flex flex-wrap py-5 text-sm text-gray-600">
+                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
                       <div className="w-full md:w-1/4 mb-2 md:mb-0">
                         <Skeleton className="h-5 w-28" />
                       </div>
@@ -116,7 +116,7 @@ const NFTTokenTabSkeletion = forwardRef(
             </div>
           )}
           <div className="py-6"></div>
-          <div className="block lg:flex lg:space-x-2 mb-4 sm:mt-0 -mt-0.5">
+          <div className="block lg:flex lg:space-x-2 mb-4 sm:mt-1 -mt-0.5">
             <div className="w-full">
               <div className=" flex">
                 {tabs?.map(({ label, name }) => {

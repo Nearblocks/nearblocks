@@ -544,13 +544,13 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
             <>
               <button className="hover:no-underline">
                 <Link
-                  className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap"
+                  className="flex items-center text-nearblue-600 h-7 dark:text-neargray-10 gap-x-1 font-medium py-1 px-2.5 border border-neargray-700 dark:border-black-200 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap text-xs"
                   href={`/exportdata?address=${id}&type=receipts`}
                 >
-                  <p>CSV Export</p>
-                  <span className="ml-2">
+                  <span>
                     <Download />
                   </span>
+                  <p className="-mb-0.5">CSV Export</p>
                 </Link>
               </button>
             </>

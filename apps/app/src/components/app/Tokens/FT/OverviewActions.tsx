@@ -108,12 +108,12 @@ const OverviewActions = ({
     <>
       <div className="flex items-center justify-between flex-wrap">
         {!token ? (
-          <div className="w-80 max-w-xs px-2 py-4">
+          <div className="w-80 max-w-xs px-2 py-5">
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <div className="flex items-center w-full py-4 px-2">
-            <h1 className="break-all font-bold dark:text-neargray-10 text-nearblue-600 text-lg pr-2">
+          <div className="sm:flex flex-1 items-center w-full py-5 px-2">
+            <h1 className="break-all font-medium dark:text-neargray-10 text-nearblue-600 text-lg pr-2">
               <span className="inline-flex align-middle h-7 w-7 -ml-1">
                 <TokenImage
                   alt={token?.name}
@@ -122,13 +122,13 @@ const OverviewActions = ({
                 />
               </span>
               <span className="inline-flex align-middle mx-2">Token:</span>
-              <span className="inline-flex align-middle font-semibold">
+              <span className="break-all align-middle font-semibold">
                 {token?.name}
               </span>
             </h1>
             <div className="relative md:pt-0 pt-2 text-gray-500 text-xs ml-auto">
               <span className="group flex w-full h-full">
-                <ActionMenuPopover positionClass="right-0" disabled={!token}>
+                <ActionMenuPopover disabled={!token}>
                   <ul>
                     <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2">
                       <button
