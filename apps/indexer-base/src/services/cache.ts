@@ -1,11 +1,10 @@
-import { types } from 'near-lake-framework';
-
+import { Message } from 'nb-neardata';
 import { retry } from 'nb-utils';
 
 import config from '#config';
 import redis from '#libs/redis';
 
-export const prepareCache = async (message: types.StreamerMessage) => {
+export const prepareCache = async (message: Message) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
   const txns = chunks
     .flatMap((chunk) => chunk.transactions)

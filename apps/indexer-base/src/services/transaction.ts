@@ -1,6 +1,5 @@
-import { types } from 'near-lake-framework';
-
 import { Knex } from 'nb-knex';
+import { IndexerTransactionWithOutcome, Message } from 'nb-neardata';
 import { Transaction } from 'nb-types';
 import { retry } from 'nb-utils';
 
@@ -9,10 +8,7 @@ import { mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
-export const storeTransactions = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeTransactions = async (knex: Knex, message: Message) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
   const transactions = chunks.flatMap((chunk) => {
     return chunk.transactions.map((txn, index) =>
@@ -47,7 +43,7 @@ export const storeTransactions = async (
 };
 
 const getTransactionData = (
-  tx: types.IndexerTransactionWithOutcome,
+  tx: IndexerTransactionWithOutcome,
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,

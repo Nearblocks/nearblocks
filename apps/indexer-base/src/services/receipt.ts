@@ -1,8 +1,13 @@
 import { difference, uniq } from 'lodash-es';
-import { types } from 'near-lake-framework';
 
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
+import {
+  Action,
+  DataReceiver,
+  Receipt as JReceipt,
+  Message,
+} from 'nb-neardata';
 import {
   ActionReceiptAction,
   ActionReceiptInputData,
@@ -18,10 +23,7 @@ import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
-export const storeReceipts = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeReceipts = async (knex: Knex, message: Message) => {
   let receiptData: Receipt[] = [];
   let receiptActionsData: ActionReceiptAction[] = [];
   let receiptInputData: ActionReceiptInputData[] = [];
@@ -121,7 +123,7 @@ const storeChunkReceipts = async (
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
-  receipts: types.Receipt[],
+  receipts: JReceipt[],
 ) => {
   const receiptOrDataIds = receipts.map((receipt) =>
     'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
@@ -349,7 +351,7 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
 };
 
 const getReceiptData = (
-  receipt: types.Receipt,
+  receipt: JReceipt,
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
@@ -373,7 +375,7 @@ const getActionReceiptActionData = (
   blockTimestamp: string,
   receiptId: string,
   actionIndex: number,
-  action: types.Action,
+  action: Action,
   predecessorId: string,
   receiverId: string,
 ): ActionReceiptAction => {
@@ -401,7 +403,7 @@ const getActionReceiptInputData = (
 
 const getActionReceiptOutputData = (
   receiptId: string,
-  dataReceiver: types.DataReceiver,
+  dataReceiver: DataReceiver,
 ): ActionReceiptOutputData => ({
   output_data_id: dataReceiver.dataId,
   output_from_receipt_id: receiptId,

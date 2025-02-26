@@ -1,6 +1,5 @@
-import { types } from 'near-lake-framework';
-
 import { Knex } from 'nb-knex';
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
@@ -9,10 +8,7 @@ import { jsonStringify, mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
-export const storeExecutionOutcomes = async (
-  knex: Knex,
-  message: types.StreamerMessage,
-) => {
+export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
   let outcomes: ExecutionOutcome[] = [];
   let outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
@@ -71,7 +67,7 @@ export const storeExecutionOutcomes = async (
 export const storeChunkExecutionOutcomes = (
   shardId: number,
   blockTimestamp: string,
-  executionOutcomes: types.ExecutionOutcomeWithReceipt[],
+  executionOutcomes: ExecutionOutcomeWithReceipt[],
 ) => {
   const outcomes: ExecutionOutcome[] = [];
   const outcomeReceipts: ExecutionOutcomeReceipt[] = [];
@@ -106,7 +102,7 @@ const getExecutionOutcomeData = (
   shardId: number,
   blockTimestamp: string,
   indexInChunk: number,
-  outcome: types.ExecutionOutcomeWithReceipt,
+  outcome: ExecutionOutcomeWithReceipt,
 ): ExecutionOutcome => ({
   executed_in_block_hash: outcome.executionOutcome.blockHash,
   executed_in_block_timestamp: blockTimestamp,
