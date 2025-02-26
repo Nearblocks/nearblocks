@@ -49,7 +49,7 @@ export default async function TokenTxns(props: {
     <section>
       <div>
         <div className="container-xxl mx-auto p-5">
-          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
+          <h1 className="text-lg font-medium dark:text-neargray-10 text-nearblue-600">
             {t ? t('fts.heading') : 'Token Transfers'}
           </h1>
         </div>

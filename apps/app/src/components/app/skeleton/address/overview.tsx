@@ -15,30 +15,33 @@ const Loader = (props: { className?: string; wrapperClassName?: string }) => {
 const OverviewActionsSkeleton = () => {
   return (
     <Tabs className={'pb-1 px-4 py-3'}>
-      <TabList className={'flex flex-wrap'}>
+      <TabList className={'flex flex-wrap gap-x-1 gap-y-2 pt-2'}>
         <Tab
-          className={`px-2 mr-1 md:px-3 border py-2 text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
-          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+          className={`px-2.5 mr-1 border dark:border-black-200 py-1.5 text-xs font-semibold rounded-lg cursor-pointer outline-none 
+    text-nearblue-600 dark:text-neargray-10 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:hover:bg-black-100`}
+          selectedClassName="!bg-green-600 dark:!bg-green-250 !text-white"
         >
           Contract Info
         </Tab>
         <Tab
-          className={`px-2 mr-1 md:px-3 border py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
-          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+          className={`px-2.5 mr-1 border dark:border-black-200 py-1.5 text-xs font-semibold rounded-lg cursor-pointer outline-none 
+    text-nearblue-600 dark:text-neargray-10 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:hover:bg-black-100`}
+          selectedClassName="!bg-green-600 dark:!bg-green-250 !text-white"
         >
           Contract Code
         </Tab>
         <Tab
-          className={`px-2 mr-1 md:px-3 border py-2  text-xs font-medium rounded-md text-gray-500 hover:text-green-500 hover:border-green-500 cursor-pointer outline-none`}
-          selectedClassName="text-green-500 border-green-500 dark:text-neargray-10"
+          className={`px-2.5 mr-1 border dark:border-black-200 py-1.5 text-xs font-semibold rounded-lg cursor-pointer outline-none 
+    text-nearblue-600 dark:text-neargray-10 hover:bg-neargray-800 bg-neargray-700 dark:bg-black-200 dark:hover:bg-black-100`}
+          selectedClassName="!bg-green-600 dark:!bg-green-250 !text-white"
         >
           Contract Methods
         </Tab>
       </TabList>
       <TabPanel>
-        <div className="w-full border-t dark:border-black-200 mt-3">
-          <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10">
-            <div className="flex flex-wrap p-4">
+        <div className="w-full mt-3">
+          <div className="h-full bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 divide-y dark:divide-black-200 px-1">
+            <div className="flex flex-wrap py-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'left-[5.6rem] max-w-[200px] w-40'}
@@ -55,7 +58,7 @@ const OverviewActionsSkeleton = () => {
                 <Loader wrapperClassName="flex w-full max-w-xl" />
               </div>
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap py-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
                 <Tooltip
                   className={'left-28 max-w-[200px] w-80'}
@@ -70,7 +73,7 @@ const OverviewActionsSkeleton = () => {
               </div>
               <Loader wrapperClassName="w-32" />
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap py-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
                 <Tooltip
                   className={'left-28 max-w-[200px] w-80'}
@@ -85,7 +88,7 @@ const OverviewActionsSkeleton = () => {
               </div>
               <Loader wrapperClassName="w-32" />
             </div>
-            <div className="flex flex-wrap p-4">
+            <div className="flex flex-wrap py-4">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
                 <Tooltip
                   className={'left-28 max-w-[200px] w-80'}

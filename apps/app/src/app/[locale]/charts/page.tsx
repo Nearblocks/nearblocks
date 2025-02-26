@@ -19,7 +19,7 @@ export default async function ChartIndex(props: {
     <>
       <div>
         <div className="container-xxl mx-auto p-5">
-          <h1 className="text-lg dark:text-neargray-10 text-nearblue-600 font-bold">
+          <h1 className="text-lg dark:text-neargray-10 text-nearblue-600 font-medium">
             {t('charts.heading')}
           </h1>
         </div>

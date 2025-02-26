@@ -393,14 +393,14 @@ const Details = (props: Props) => {
         <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
           <div className="text-sm text-nearblue-600 dark:text-neargray-10 py-2">
             {networkId === 'testnet' && (
-              <div className="flex flex-wrap px-4 py-2.5 text-red-500">
+              <div className="flex flex-wrap px-4 py-3.5 text-red-500">
                 {t
                   ? t('testnetNotice')
                   : '[ This is a Testnet transaction only ]'}
               </div>
             )}
 
-            <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -422,7 +422,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap items-start px-4 py-2">
+            <div className="flex flex-wrap items-start px-4 py-3">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -467,7 +467,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -503,7 +503,7 @@ const Details = (props: Props) => {
                 ''
               )}
             </div>
-            <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -548,7 +548,7 @@ const Details = (props: Props) => {
                 ''
               )}
             </div>
-            <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -580,7 +580,7 @@ const Details = (props: Props) => {
               className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1"
               id="mainaction-row"
             >
-              <div className="flex items-start flex-wrap px-4 py-2">
+              <div className="flex items-start flex-wrap px-4 py-2.5">
                 <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7">
                   <Tooltip
                     className={'w-96 left-25 max-w-[200px]'}
@@ -692,8 +692,8 @@ const Details = (props: Props) => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1">
-            <div className="flex flex-wrap px-4 py-2">
+          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
+            <div className="flex flex-wrap px-4 py-3">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -719,7 +719,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap px-4 py-2">
+            <div className="flex flex-wrap px-4 py-3">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -753,7 +753,7 @@ const Details = (props: Props) => {
               id="action-row"
               className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10"
             >
-              <div className="flex items-start flex-wrap pl-4 sm:!pl-2">
+              <div className="flex items-start flex-wrap pl-4 sm:!pl-2 pb-2">
                 <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0"></div>
                 {loading || (actions?.length === 0 && logs?.length === 0) ? (
                   <div className="w-full md:w-3/4">
@@ -799,8 +799,8 @@ const Details = (props: Props) => {
           </div>
 
           {(fts?.length > 0 || nfts?.length > 0) && (
-            <div className="flex items-start flex-wrap px-4 py-3">
-              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-1">
+            <div className="flex items-start flex-wrap px-4 py-3.5">
+              <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
                   tooltip={'List of tokens transferred in the transaction'}
@@ -1065,22 +1065,26 @@ const Details = (props: Props) => {
           )}
           {showRow && (
             <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
-              <div className="flex items-start flex-wrap px-4 py-2.5">
-                <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+              <div className="flex items-start flex-wrap px-4 py-3.5">
+                <div className="flex w-full md:w-1/4 mb-2 md:mb-0">
                   <Tooltip
                     tooltip={
                       'List of NEP-245 tokens transferred in the transaction'
                     }
-                    className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    className={'w-96 left-25 max-w-[200px]'}
                   >
-                    <div>
-                      <Question className="w-4 h-4 fill-current mr-1" />
-                    </div>
+                    <span className="flex items-center">
+                      <Question className="w-4 h-4 fill-current" />
+                    </span>
                   </Tooltip>
-                  NEP-245 Tokens Transferred
-                  <div className="px-[0.65em] py-[0.45em] rounded-[1rem] leading-[.50rem] bg-neargray-700 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 ml-1 font-semibold items-center text-center justify-center">
-                    {`${totalTokenIdsCount}`}
-                  </div>
+                  <span className="-mt-0.5 pl-1 flex-wrap sm:flex-nowarp flex">
+                    NEP-245 Tokens Transferred
+                    <span className="h-5 flex">
+                      <span className="flex px-2 rounded-full bg-neargray-700 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 md:ml-0 ml-1 font-semibold items-center text-center justify-center text-xs max-w-[200px]">
+                        {`${totalTokenIdsCount}`}
+                      </span>
+                    </span>
+                  </span>
                 </div>
                 {loading ? (
                   <div className="w-full md:w-3/4">
@@ -1095,7 +1099,7 @@ const Details = (props: Props) => {
             </div>
           )}
           <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1">
-            <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -1133,7 +1137,7 @@ const Details = (props: Props) => {
                 </div>
               )}
             </div>
-            <div className="flex flex-wrap px-4 py-2.5">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -1169,7 +1173,7 @@ const Details = (props: Props) => {
             </div>
           </div>
           {networkId === 'mainnet' && price && (
-            <div className="flex flex-wrap px-4 py-3">
+            <div className="flex flex-wrap px-4 py-3.5">
               <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                 <Tooltip
                   className={'w-96 left-25 max-w-[200px]'}
@@ -1197,7 +1201,7 @@ const Details = (props: Props) => {
             <AccordionItem value="">
               <AccordionItemContent className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b py-0">
                 <div className="py-1">
-                  <div className="flex flex-wrap px-4 py-2.5">
+                  <div className="flex flex-wrap px-4 py-3.5">
                     <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                       <Tooltip
                         className={'w-96 left-32 max-w-[250px]'}
@@ -1230,7 +1234,7 @@ const Details = (props: Props) => {
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-wrap px-4 py-2">
+                  <div className="flex flex-wrap px-4 py-3">
                     <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
                       <Tooltip
                         className={'w-96 left-25 max-w-[200px]'}
@@ -1271,7 +1275,7 @@ const Details = (props: Props) => {
                   </div>
                 </div>
               </AccordionItemContent>
-              <div className="flex flex-wrap px-4 py-3">
+              <div className="flex flex-wrap px-4 py-3.5">
                 <AccordionItemTrigger
                   buttonColor="text-green-500 dark:text-green-250"
                   className="focus:outline-none text-green-500 dark:text-green-250 flex items-center cursor-pointer"

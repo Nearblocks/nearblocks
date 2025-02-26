@@ -54,7 +54,7 @@ export default async function Blocks(props: {
     <>
       <div>
         <div className="container-xxl mx-auto px-5">
-          <h1 className="py-5 dark:text-neargray-10 text-nearblue-600 text-lg font-bold">
+          <h1 className="py-5 dark:text-neargray-10 text-nearblue-600 text-lg font-medium">
             {t('blockHeading') || 'Latest Near Protocol Blocks'}
           </h1>
         </div>

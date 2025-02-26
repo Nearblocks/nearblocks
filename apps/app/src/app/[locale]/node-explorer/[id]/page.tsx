@@ -26,7 +26,7 @@ export default async function Delegator(props: {
         ) : (
           <div className="md:flex-wrap w-full">
             <div className="break-words px-1">
-              <div className="py-5 sm:flex flex-1 md:items-center w-full justify-between text-lg font-bold dark:text-neargray-10 text-nearblue-600">
+              <div className="py-5 sm:flex flex-1 md:items-center w-full justify-between text-lg font-medium dark:text-neargray-10 text-nearblue-600">
                 <div className="md:flex-wrap flex-wrap">
                   <span className="whitespace-nowrap">
                     Near Validator:&nbsp;

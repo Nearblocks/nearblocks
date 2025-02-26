@@ -10,7 +10,7 @@ export default async function NodeExplorer(props: any) {
     <>
       <div>
         <div className="container-xxl mx-auto p-5">
-          <h1 className="text-lg font-bold dark:text-neargray-10 text-nearblue-600">
+          <h1 className="text-lg font-medium dark:text-neargray-10 text-nearblue-600">
             NEAR Protocol Validator Explorer
           </h1>
         </div>

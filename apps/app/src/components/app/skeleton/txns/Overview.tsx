@@ -16,7 +16,7 @@ const OverviewSkeleton = () => {
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
       <div className="text-sm text-nearblue-600 dark:text-neargray-10 py-2">
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -33,7 +33,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-start px-4 py-2">
+        <div className="flex flex-wrap items-start px-4 py-[0.77rem]">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 h-6">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -50,7 +50,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-[0.77rem]">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -67,7 +67,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -84,7 +84,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -104,8 +104,8 @@ const OverviewSkeleton = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1">
-        <div className="flex flex-wrap px-4 py-2">
+      <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -122,7 +122,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap px-4 py-2">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -141,7 +141,7 @@ const OverviewSkeleton = () => {
       </div>
 
       {/* Tokens Transferred section skeleton */}
-      <div className="flex items-start flex-wrap px-4 py-3">
+      <div className="flex items-start flex-wrap px-4 py-3.5">
         <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
           <Tooltip
             className={'w-96 left-25 max-w-[200px]'}
@@ -159,7 +159,7 @@ const OverviewSkeleton = () => {
       </div>
 
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1">
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -176,7 +176,7 @@ const OverviewSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap px-4 py-2.5">
+        <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip
               className={'w-96 left-25 max-w-[200px]'}
@@ -195,7 +195,7 @@ const OverviewSkeleton = () => {
       </div>
 
       {/* Ⓝ Price section skeleton */}
-      <div className="flex flex-wrap px-4 py-3">
+      <div className="flex flex-wrap px-4 py-3.5">
         <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
           <Tooltip
             className={'w-96 left-25 max-w-[200px]'}

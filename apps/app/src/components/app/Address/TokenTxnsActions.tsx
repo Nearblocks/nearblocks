@@ -496,7 +496,7 @@ const TokenTxnsActions = ({
             }
           >
             <button
-              className="text-left text-xs w-full inline-flex items-center font-semibold uppercase tracking-wider  text-green-500 dark:text-green-250 focus:outline-none whitespace-nowrap"
+              className="text-left text-xs w-full flex items-center font-semibold uppercase tracking-wider  text-green-500 dark:text-green-250 focus:outline-none whitespace-nowrap"
               onClick={toggleShowAge}
               type="button"
             >
@@ -535,13 +535,13 @@ const TokenTxnsActions = ({
           txns?.length > 0 && (
             <button className="hover:no-underline ">
               <Link
-                className="flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-2 border border-neargray-700 dark:border-black-200 px-4 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap"
+                className="flex items-center text-nearblue-600 h-7 dark:text-neargray-10 gap-x-1 font-medium py-1 px-2.5 border border-neargray-700 dark:border-black-200 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap text-xs"
                 href={`/token/exportdata?address=${id}`}
               >
-                <p>CSV Export</p>
-                <span className="ml-2">
+                <span>
                   <Download />
                 </span>
+                <p className="-mb-0.5">CSV Export</p>
               </Link>
             </button>
           )

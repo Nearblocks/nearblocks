@@ -127,7 +127,7 @@ export default function Details(props: Props) {
             {block ? (
               t ? (
                 <>
-                  <span className="font-bold">
+                  <span className="font-medium">
                     {t('block.heading.0') || 'Block'}
                   </span>
                   <span className="pl-1 font-semibold" key={1}>

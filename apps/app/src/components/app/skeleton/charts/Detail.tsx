@@ -62,6 +62,11 @@ const ChartDetails = forwardRef(
         link: '/charts/tps',
         text: 'Near Transactions per Second Chart',
       },
+      {
+        exclude: false,
+        link: '/charts/multi-chain-txns',
+        text: 'multichainTxns.heading',
+      },
     ];
     return (
       <div className={`w-full z-10 ${className}`} ref={ref}>
@@ -72,7 +77,7 @@ const ChartDetails = forwardRef(
               style={{ height: 580 }}
             >
               <div className="leading-7 px-4 text-sm py-4 text-nearblue-600 border-b dark:border-black-200">
-                <div className="max-w-xs py-1">
+                <div className="max-w-xs py-1.5">
                   <Skeleton className="h-4 w-full" />
                 </div>
               </div>
@@ -81,7 +86,7 @@ const ChartDetails = forwardRef(
               </div>
             </div>
             <h2 className="mb-4 px-2 text-lg opacity-70 text-gray-700 dark:text-neargray-10">
-              {t('otherHeading')}
+              {t('charts.otherHeading')}
             </h2>
           </>
         )}
@@ -100,7 +105,7 @@ const ChartDetails = forwardRef(
                   </div>
                   <div className="pl-2 pr-2 py-8">
                     <div>
-                      <Skeleton className="h-72" />
+                      <Skeleton className="h-[16.8rem]" />
                     </div>
                   </div>
                 </div>

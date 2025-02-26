@@ -62,7 +62,7 @@ export default async function TxnsLayout(props: {
     <>
       <div className="md:flex items-center justify-between container-xxl mx-auto px-5">
         <div className="flex justify-between dark:text-neargray-10 border-b w-full dark:border-black-200">
-          <h1 className="py-4 space-x-2 text-lg leading-8 font-bold dark:text-neargray-10 text-nearblue-600">
+          <h1 className="py-4 space-x-2 text-lg leading-8 font-medium dark:text-neargray-10 text-nearblue-600">
             {t ? t('txnDetails.heading') : 'Transaction Details'}
           </h1>
 

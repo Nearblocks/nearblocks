@@ -137,7 +137,7 @@ const NFTDetails = ({
           </div>
         </div>
         <div className="md:col-span-7 lg:col-span-8 md:px-4 lg:pl-8 pt-4">
-          <h1 className="break-all space-x-2 text-xl text-gray-700 dark:text-neargray-10 leading-8 font-bold">
+          <h1 className="break-all space-x-2 text-xl text-gray-700 dark:text-neargray-10 leading-8 font-semibold">
             {token?.title || token?.token}
           </h1>
           <Link

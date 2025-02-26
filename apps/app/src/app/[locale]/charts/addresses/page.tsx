@@ -64,7 +64,7 @@ export default async function AddressesChart(props: {
     <section>
       <div>
         <div className="container-xxl mx-auto p-5">
-          <h1 className="font-bold dark:text-neargray-10 text-nearblue-600 text-lg">
+          <h1 className="font-medium dark:text-neargray-10 text-nearblue-600 text-lg">
             {t('addressesCharts.heading')}
           </h1>
         </div>

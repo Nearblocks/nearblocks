@@ -53,7 +53,7 @@ const TransactionActions = (props: TransActionProps) => {
       return (
         delegateAction &&
         delegateAction.map((subAction: Action | any, i: number) => (
-          <div className="flex flex-col" key={i}>
+          <div className="flex flex-col mt-1" key={i}>
             <p className="text-sm font-semibold">
               Actions delegated for {receiver}
             </p>
