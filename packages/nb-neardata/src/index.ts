@@ -64,7 +64,7 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
 
       if (!response.ok) {
         if (response.status === 404) {
-          await sleep(700);
+          await sleep(100);
         }
 
         throw new Error(`status: ${response.status}`);
@@ -78,7 +78,6 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
   );
 };
 
-/*
 const fetchFinal = async (url: string): Promise<Message> => {
   return await retry(
     async () => {
@@ -98,14 +97,13 @@ const fetchFinal = async (url: string): Promise<Message> => {
     { exponential: true, logger: retryLogger, retries },
   );
 };
-*/
 
 export const streamBlock = (config: BlockStreamConfig) => {
   const url = config.url ?? endpoint(config.network);
   const limit = config.limit ?? 10;
   let isFetching = false;
   let block = config.start;
-  const highWaterMark = limit * 2;
+  const highWaterMark = limit * 5;
 
   const readable = new Readable({
     highWaterMark,
@@ -119,31 +117,47 @@ export const streamBlock = (config: BlockStreamConfig) => {
     isFetching = true;
 
     try {
-      /*
       const remaining = highWaterMark - readable.readableLength;
 
+      logger.warn({ fetchingBlock: block, queueSize: readable.readableLength });
+
       if (block % 10 === 0 && remaining >= 5) {
-        const final = (await fetchFinal(url)).block.header.height;
+        const finalBlocks = [];
 
-        const promises: Promise<Message>[] = [];
-        const concurrency = Math.min(limit, final - block, remaining);
+        for (let i = 0; i < 2; i++) {
+          finalBlocks.push((await fetchFinal(url)).block.header.height);
 
-        for (let i = 0; i < concurrency; i++) {
-          promises.push(fetchBlock(url, block + i));
-        }
-
-        const results = await Promise.all(promises);
-
-        for (const result of results) {
-          if (result && !readable.push(camelCaseKeys(result))) {
-            return;
+          if (i === 0) {
+            await sleep(100);
           }
         }
 
-        block += concurrency;
-        return;
+        const final = Math.max(...finalBlocks);
+        const promises: Promise<Message>[] = [];
+        const concurrency = Math.min(limit, final - block, remaining);
+
+        logger.warn({ concurrency, finalBlock: final });
+
+        if (concurrency > 0) {
+          for (let i = 0; i < concurrency; i++) {
+            promises.push(fetchBlock(url, block + i));
+          }
+
+          const results = await Promise.all(promises);
+
+          for (const result of results) {
+            if (result) {
+              const message: Message = camelCaseKeys(result);
+
+              if (!readable.push(message)) {
+                return;
+              }
+
+              block = message.block.header.height + 1;
+            }
+          }
+        }
       }
-      */
 
       const result = await fetchBlock(url, block);
 
@@ -164,7 +178,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
     }
   };
 
-  const interval = setInterval(fetchBlocks, 500);
+  const interval = setInterval(fetchBlocks, 100);
 
   readable.on('close', () => clearInterval(interval));
 

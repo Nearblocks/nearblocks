@@ -3,9 +3,9 @@ import { createRequire } from 'module';
 import { base58 } from '@scure/base';
 import { decodeBase64, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
-import { types } from 'near-lake-framework';
 
 import { logger } from 'nb-logger';
+import { Action, ExecutionStatus, ReceiptEnum } from 'nb-neardata';
 import {
   AccessKeyPermissionKind,
   ActionKind,
@@ -38,7 +38,7 @@ export const decodeArgs = <T>(args: string): T =>
   json.parse(Buffer.from(args, 'base64').toString());
 
 export const mapExecutionStatus = (
-  status: types.ExecutionStatus,
+  status: ExecutionStatus,
 ): ExecutionOutcomeStatus => {
   const key = toUpper(
     snakeCase(Object.keys(status)[0]),
@@ -47,13 +47,13 @@ export const mapExecutionStatus = (
   return ExecutionOutcomeStatus[key];
 };
 
-export const mapReceiptKind = (receipt: types.ReceiptEnum): ReceiptKind => {
+export const mapReceiptKind = (receipt: ReceiptEnum): ReceiptKind => {
   const key = toUpper(Object.keys(receipt)[0]) as keyof typeof ReceiptKind;
 
   return ReceiptKind[key];
 };
 
-export const mapActionKind = (action: types.Action): ReceiptAction => {
+export const mapActionKind = (action: Action): ReceiptAction => {
   let kind = ActionKind.UNKNOWN;
   let args = {};
   let rlpHash = null;
@@ -172,12 +172,12 @@ export const mapActionKind = (action: types.Action): ReceiptAction => {
 };
 
 export const camelCaseToSnakeCase = (
-  value: Exclude<types.Action, 'CreateAccount'>,
+  value: Exclude<Action, 'CreateAccount'>,
 ) => {
   const newValue: Record<string, unknown> = {};
 
   for (const key in value) {
-    newValue[snakeCase(key)] = value[key as keyof types.Action];
+    newValue[snakeCase(key)] = value[key as keyof Action];
   }
 
   return newValue;
@@ -193,7 +193,7 @@ export const publicKeyFromImplicitAccount = (account: string) => {
   }
 };
 
-export const isExecutionSuccess = (status: types.ExecutionStatus) => {
+export const isExecutionSuccess = (status: ExecutionStatus) => {
   if ('SuccessValue' in status || 'SuccessReceiptId' in status) {
     return true;
   }

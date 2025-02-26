@@ -1,5 +1,5 @@
+import { types } from '@near-lake/framework';
 import { bool, cleanEnv, num, str, url } from 'envalid';
-import { types } from 'near-lake-framework';
 
 import { Network } from 'nb-types';
 
