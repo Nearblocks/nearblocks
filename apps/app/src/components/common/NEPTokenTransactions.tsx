@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { parseEventLogs } from '@/utils/near';
 import FaRight from '../Icons/FaRight';
-import { shortenAddress } from '@/utils/libs';
+import { localFormat, shortenAddress } from '@/utils/libs';
 import TokenInfo from './TokenInfo';
 import { TransactionLog } from '@/utils/types';
 import ArrowDownDouble from '../Icons/ArrowDownDouble';
 
 interface ParsedEventListProps {
   events: TransactionLog[];
+  totalTokenIdsCount?: number;
 }
 
 const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
@@ -334,6 +335,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
 
 const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
   events,
+  totalTokenIdsCount,
 }: ParsedEventListProps) => {
   const [tabIndex, setTabIndex] = useState(1);
 
@@ -350,6 +352,11 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
           onClick={() => onTab(1)}
         >
           <h2 className="p-1.5">All Transfers</h2>
+          {totalTokenIdsCount && (
+            <div className="absolute text-white bg-neargreen text-[10px] h-4 inline-flex items-center font-semibold rounded-full ml-7 -top-2 z-10 px-[0.65em] py-[0.45em]">
+              {localFormat(totalTokenIdsCount.toString())}
+            </div>
+          )}
         </button>
         <button
           className={`pl-1 relative text-xs leading-4 font-medium inline-block cursor-pointer mb-3 mr-3 focus:outline-none rounded-lg ${

@@ -938,9 +938,6 @@ const Details = (props: Props) => {
                 </div>
               </Tooltip>
               NEP-245 Tokens Transferred
-              <div className="px-[0.65em] py-[0.45em] rounded-[1rem] leading-[.50rem] bg-neargray-700 dark:bg-black-200 text-black-500 dark:text-neargray-10 ml-1 font-semibold items-center text-center justify-center">
-                {`${totalTokenIdsCount}`}
-              </div>
             </div>
             {loading ? (
               <div className="w-full md:w-3/4">
@@ -948,7 +945,10 @@ const Details = (props: Props) => {
               </div>
             ) : (
               <div className="relative w-full md:w-3/4">
-                <NEPTokenTransactions events={allEvents} />
+                <NEPTokenTransactions
+                  events={allEvents}
+                  totalTokenIdsCount={totalTokenIdsCount}
+                />
               </div>
             )}
           </div>
