@@ -70,7 +70,7 @@ const Chart = (props: Props) => {
     },
     {
       link: '/charts/blocks',
-      text: t ? t('charts:blocks.heading') : 'New Blocks',
+      text: t ? t('charts:blocks.heading') : 'Near Block Count',
       image: `/images/charts/blocks.svg`,
       image_dark: `/images/charts/blocks_dark.svg`,
       exclude: false,
@@ -200,10 +200,10 @@ const Chart = (props: Props) => {
             'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.';
           break;
         case 'blocks':
-          titleText = 'New Blocks';
+          titleText = 'Near Block Count';
           yLabel = 'Blocks per Day';
           description =
-            'New Blocks Chart shows the historical number of blocks produced daily on Near blockchain.';
+            'Near Block Count Chart shows the historical number of blocks produced daily on Near blockchain.';
           break;
         case 'addresses':
           titleText = 'Near Unique Accounts Chart';

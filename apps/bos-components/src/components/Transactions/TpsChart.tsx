@@ -70,7 +70,7 @@ export default function (props: Props) {
     },
     {
       link: '/charts/blocks',
-      text: t ? t('charts:blocks.heading') : 'New Blocks',
+      text: t ? t('charts:blocks.heading') : 'Near Block Count',
       image: `/images/charts/blocks.svg`,
       image_dark: `/images/charts/blocks_dark.svg`,
       exclude: false,
