@@ -5,7 +5,6 @@ import Transfer from './Transfer';
 
 const IntentsContract = (props: EventPropsInfo) => {
   const log = props?.event?.logs;
-  const actionsLog = props?.actionsLog;
   const allActionLog = props?.allActionLog;
   const isInteracted = props?.isInteracted;
 
@@ -37,13 +36,7 @@ const IntentsContract = (props: EventPropsInfo) => {
       if (eventJson?.standard === 'nep245') {
         switch (eventJson?.event) {
           case 'mt_burn':
-            return (
-              <Burn
-                event={props?.event}
-                data={eventJson?.data}
-                actionsLog={actionsLog}
-              />
-            );
+            return <Burn event={props?.event} data={eventJson?.data} />;
           case 'mt_mint':
             return (
               <Mint
