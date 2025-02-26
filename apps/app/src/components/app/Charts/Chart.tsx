@@ -234,7 +234,7 @@ const Chart = (props: Props) => {
         titleText = 'Near Block Count';
         yLabel = 'Blocks per Day';
         description =
-          'New Blocks Chart shows the historical number of blocks produced daily on Near blockchain.';
+          'Near Block Count Chart shows the historical number of blocks produced daily on Near blockchain.';
         break;
       case 'addresses':
         titleText = 'Near Unique Accounts Chart';
