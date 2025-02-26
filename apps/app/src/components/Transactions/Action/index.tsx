@@ -19,7 +19,6 @@ const EventLogs = (props: EventPropsInfo) => {
         return (
           <IntentsContract
             event={props.event}
-            actionsLog={props?.actionsLog}
             allActionLog={props?.allActionLog}
             isInteracted={props?.isInteracted}
           />

@@ -507,7 +507,6 @@ const Details = (props: Props) => {
                           <EventLogs
                             key={i}
                             event={event}
-                            actionsLog={updatedMainTxnsActions?.[0]?.actionsLog}
                             allActionLog={allActions}
                           />
                         ),
