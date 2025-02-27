@@ -110,11 +110,10 @@ const Block = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const baseIndexerStatus = syncData && syncData?.status?.indexers?.base?.sync;
-
   useEffect(() => {
     const fetchBlockData = async () => {
       setIsLoading(true);
-      if (!baseIndexerStatus) {
+      if (!baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0) {
         try {
           const res = await getBlockDetails(hash);
           if (res) {
@@ -156,18 +155,22 @@ const Block = ({
 
     fetchBlockData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockInfo, error, hash]);
+  }, [blockInfo, error, hash, baseIndexerStatus]);
 
-  const blockHeight = baseIndexerStatus
-    ? Number(blockInfo?.blocks[0]?.block_height)
-    : Number(rpcData?.blocks[0]?.block_height);
+  const blockHeight =
+    !baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0
+      ? Number(rpcData?.blocks[0]?.block_height)
+      : Number(blockInfo?.blocks[0]?.block_height);
 
-  const blockHash = baseIndexerStatus
-    ? blockInfo?.blocks[0]?.block_hash
-    : rpcData?.blocks[0]?.block_hash;
+  const blockHash =
+    !baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0
+      ? rpcData?.blocks[0]?.block_hash
+      : blockInfo?.blocks[0]?.block_hash;
 
-  const block = !baseIndexerStatus ? rpcData : blockInfo;
-
+  const block =
+    !baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0
+      ? rpcData
+      : blockInfo;
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
 
   return (
