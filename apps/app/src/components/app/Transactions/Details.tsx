@@ -667,30 +667,33 @@ const Details = (props: Props) => {
             </div>
           )}
 
-          <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 overflow-hidden py-1">
-            <div className="flex flex-wrap px-4 py-2">
-              <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
-                <Tooltip
-                  className={'w-96 left-[103px] max-w-[202px]'}
-                  tooltip={'Sponsored banner advertisement'}
-                >
-                  <div>
-                    <Question className="w-4 h-4 fill-current mr-1 !mt-[3px]" />
-                  </div>
-                </Tooltip>
-                Sponsored:
-              </div>
-              <div className="w-full md:w-3/4 break-all overflow-auto">
-                <DynamicAd
-                  className="!max-w-[720px] !max-h-[100px] rounded-lg"
-                  breakpoint={1024}
-                  desktopUnitId="IbT2RAk1Cdc36JPkKEfCJQ=="
-                  mobileUnitId="uLZF93wBs/ew1TZnm64OxQ=="
-                  network="Near"
-                />
+          {((txn && Object.keys(txn).length > 0) ||
+            (rpcTxn && Object.keys(rpcTxn).length > 0)) && (
+            <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 overflow-hidden py-1">
+              <div className="flex flex-wrap px-4 py-2">
+                <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
+                  <Tooltip
+                    className={'w-96 left-[103px] max-w-[202px]'}
+                    tooltip={'Sponsored banner advertisement'}
+                  >
+                    <div>
+                      <Question className="w-4 h-4 fill-current mr-1 !mt-[3px]" />
+                    </div>
+                  </Tooltip>
+                  Sponsored:
+                </div>
+                <div className="w-full md:w-3/4 lg:h-[90px] h-[100px] break-all overflow-auto ">
+                  <DynamicAd
+                    className="!max-w-[720px] !max-h-[100px] rounded-lg"
+                    breakpoint={1024}
+                    desktopUnitId="IbT2RAk1Cdc36JPkKEfCJQ=="
+                    mobileUnitId="uLZF93wBs/ew1TZnm64OxQ=="
+                    network="Near"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
             <div className="flex flex-wrap px-4 py-3">

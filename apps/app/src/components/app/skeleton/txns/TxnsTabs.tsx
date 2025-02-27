@@ -57,7 +57,7 @@ function TxnsTabsSkeleton({ hash, tab }: { hash: string; tab: string }) {
                       <h2 className="!relative font-semibold">
                         {label}
                         {name === 'enhanced' && (
-                          <div className="!absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -mt-3 px-1">
+                          <div className="!absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md -mt-4 -ml-4 px-1">
                             NEW
                           </div>
                         )}

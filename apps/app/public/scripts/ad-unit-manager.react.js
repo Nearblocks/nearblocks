@@ -27,7 +27,11 @@ document.head.appendChild(stylesheet);
 intersectionObserver = new IntersectionObserver(
   (entries) =>
     entries.forEach((e) => {
-      const id = e.target.attributes.getNamedItem('data-gm-id').nodeValue;
+      const id = e.target.attributes.getNamedItem('data-gm-id')?.nodeValue;
+      if (!id) return;
+      if (!state[id]) {
+        state[id] = {};
+      }
       if (e.isIntersecting)
         state[id]['timeout'] = setTimeout(
           () => registerImpression(id),

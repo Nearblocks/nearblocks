@@ -25,10 +25,13 @@ const Ad: React.FC<IAd> = ({
   unitId,
 }) => {
   useEffect(() => {
-    if (window.growthmate !== undefined) window.growthmate.register(unitId);
+    const register = () => {
+      if (window.growthmate) window.growthmate.register(unitId);
+    };
 
-    let script: HTMLScriptElement | null =
-      document.querySelector('#gm-ad-script');
+    register();
+
+    let script = document.querySelector<HTMLScriptElement>('#gm-ad-script');
     if (!script) {
       script = document.createElement('script');
       script.src = '/scripts/ad-unit-manager.react.js';
@@ -36,9 +39,12 @@ const Ad: React.FC<IAd> = ({
       document.head.appendChild(script);
     }
 
-    script.addEventListener('load', () => window.growthmate.register(unitId));
+    script.addEventListener('load', register);
 
-    return () => window.growthmate?.unregister(unitId);
+    return () => {
+      if (window.growthmate) window.growthmate.unregister?.(unitId);
+      script?.removeEventListener('load', register);
+    };
   }, [unitId]);
 
   return (
