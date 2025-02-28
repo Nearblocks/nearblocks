@@ -172,7 +172,7 @@ export const userApiURL =
 export const userAuthURL =
   process.env.NEXT_PUBLIC_USER_AUTH_URL || 'https://api.exploreblocks.io/api/';
 
-export const gTag = process.env.NEXT_PUBLIC_GTM_ID || '';
+export const gTag = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-P285ZPV2';
 
 export const intentsAddressList: Record<string, string> = {
   'eth-0xdac17f958d2ee523a2206206994597c13d831ec7':
