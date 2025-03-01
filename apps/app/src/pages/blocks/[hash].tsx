@@ -23,7 +23,6 @@ export const getServerSideProps: GetServerSideProps<{
   statsDetails: any;
   latestBlocks: any;
   signedAccountId: any;
-  syncData: any;
 }> = async (context) => {
   const {
     query: { hash },
@@ -31,12 +30,10 @@ export const getServerSideProps: GetServerSideProps<{
   }: any = context;
 
   try {
-    const [blockInfoResult, syncStatusResult] = await Promise.allSettled([
+    const [blockInfoResult] = await Promise.allSettled([
       fetcher(`blocks/${hash}`),
-      fetcher('sync/status'),
     ]);
-    const getResult = (result: PromiseSettledResult<any>) =>
-      result.status === 'fulfilled' ? result.value : null;
+
     const { statsDetails, latestBlocks } = await fetchData();
 
     const signedAccountId =
@@ -71,7 +68,6 @@ export const getServerSideProps: GetServerSideProps<{
         statsDetails,
         latestBlocks,
         signedAccountId,
-        syncData: getResult(syncStatusResult),
       },
     };
   } catch (error) {
@@ -85,7 +81,6 @@ export const getServerSideProps: GetServerSideProps<{
         statsDetails: null,
         latestBlocks: null,
         signedAccountId: null,
-        syncData: null,
       },
     };
   }
@@ -99,7 +94,6 @@ const Block = ({
   blockInfo,
   price,
   error,
-  syncData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { t } = useTranslation();
 
@@ -109,11 +103,10 @@ const Block = ({
   const [rpcError, setRpcError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const baseIndexerStatus = syncData && syncData?.status?.indexers?.base?.sync;
   useEffect(() => {
     const fetchBlockData = async () => {
       setIsLoading(true);
-      if (!baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0) {
+      if (!blockInfo || blockInfo?.blocks?.length === 0) {
         try {
           const res = await getBlockDetails(hash);
           if (res) {
@@ -155,22 +148,18 @@ const Block = ({
 
     fetchBlockData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockInfo, error, hash, baseIndexerStatus]);
+  }, [blockInfo, error, hash]);
 
-  const blockHeight =
-    !baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0
-      ? Number(rpcData?.blocks[0]?.block_height)
-      : Number(blockInfo?.blocks[0]?.block_height);
+  const blockHeight = !blockInfo?.blocks[0]?.block_height
+    ? Number(rpcData?.blocks[0]?.block_height)
+    : Number(blockInfo?.blocks[0]?.block_height);
 
-  const blockHash =
-    !baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0
-      ? rpcData?.blocks[0]?.block_hash
-      : blockInfo?.blocks[0]?.block_hash;
+  const blockHash = !blockInfo?.blocks[0]?.block_hash
+    ? rpcData?.blocks[0]?.block_hash
+    : blockInfo?.blocks[0]?.block_hash;
 
   const block =
-    !baseIndexerStatus || !blockInfo || blockInfo?.blocks?.length === 0
-      ? rpcData
-      : blockInfo;
+    !blockInfo || blockInfo?.blocks?.length === 0 ? rpcData : blockInfo;
   const thumbnail = `${ogUrl}/thumbnail/block?block_height=${blockHeight}&brand=near`;
 
   return (

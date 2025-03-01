@@ -185,7 +185,7 @@ const Details = (props: Props) => {
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('blocks:block.transactions.0') : 'Transactions'}
               </div>
-              {isLoading ? (
+              {isLoading || !block?.transactions_agg?.count ? (
                 <div className="w-full md:w-3/4">
                   <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
