@@ -101,6 +101,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
 export const streamBlock = (config: BlockStreamConfig) => {
   const url = config.url ?? endpoint(config.network);
   const limit = config.limit ?? 10;
+  let finalFetch = 0;
   let isFetching = false;
   let block = config.start;
   const highWaterMark = limit * 5;
@@ -116,23 +117,20 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
     isFetching = true;
 
+    const remaining = highWaterMark - readable.readableLength;
+
+    if (remaining < 5) return;
+
+    logger.warn({
+      fetchingBlock: block,
+      finalFetch,
+      queueSize: readable.readableLength,
+    });
+
     try {
-      const remaining = highWaterMark - readable.readableLength;
-
-      logger.warn({ fetchingBlock: block, queueSize: readable.readableLength });
-
-      if (block % 10 === 0 && remaining >= 10) {
-        const finalBlocks = [];
-
-        for (let i = 0; i < 2; i++) {
-          finalBlocks.push((await fetchFinal(url)).block.header.height);
-
-          if (i === 0) {
-            await sleep(100);
-          }
-        }
-
-        const final = Math.max(...finalBlocks);
+      if ((!finalFetch || block - finalFetch >= 10) && remaining >= 10) {
+        finalFetch = block;
+        const final = (await fetchFinal(url)).block.header.height;
         const promises: Promise<Message>[] = [];
         const concurrency = Math.min(limit, final - block, remaining - 5);
 
