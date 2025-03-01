@@ -117,17 +117,17 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
     isFetching = true;
 
-    const remaining = highWaterMark - readable.readableLength;
-
-    if (remaining < 5) return;
-
-    logger.warn({
-      fetchingBlock: block,
-      finalFetch,
-      queueSize: readable.readableLength,
-    });
-
     try {
+      const remaining = highWaterMark - readable.readableLength;
+
+      if (remaining < 5) return;
+
+      logger.warn({
+        fetchingBlock: block,
+        finalFetch,
+        queueSize: readable.readableLength,
+      });
+
       if ((!finalFetch || block - finalFetch >= 10) && remaining >= 10) {
         finalFetch = block;
         const final = (await fetchFinal(url)).block.header.height;
