@@ -121,7 +121,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
       logger.warn({ fetchingBlock: block, queueSize: readable.readableLength });
 
-      if (block % 10 === 0 && remaining >= 5) {
+      if (block % 10 === 0 && remaining >= 10) {
         const finalBlocks = [];
 
         for (let i = 0; i < 2; i++) {
@@ -134,7 +134,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
         const final = Math.max(...finalBlocks);
         const promises: Promise<Message>[] = [];
-        const concurrency = Math.min(limit, final - block, remaining);
+        const concurrency = Math.min(limit, final - block, remaining - 5);
 
         logger.warn({ concurrency, finalBlock: final });
 
