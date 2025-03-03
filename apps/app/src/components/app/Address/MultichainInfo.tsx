@@ -23,7 +23,6 @@ interface Props {
 
 const MultichainInfo = ({ multiChainAccounts }: Props) => {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const [positionClass, setPositionClass] = useState('left-0');
   const [hoveredIndex, setHoveredIndex] = useState<null | number>(null);
   const t = useTranslations();
 
@@ -36,20 +35,6 @@ const MultichainInfo = ({ multiChainAccounts }: Props) => {
         : '';
 
     url ? window.open(url, '_blank') : '';
-  };
-
-  const handleMenuOpen = () => {
-    if (buttonRef.current) {
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      const menuWidth = 300;
-      const availableSpaceRight = window.innerWidth - buttonRect.right;
-
-      if (availableSpaceRight < menuWidth) {
-        setPositionClass('right-0');
-      } else {
-        setPositionClass('left-0');
-      }
-    }
   };
 
   return (
@@ -84,7 +69,6 @@ const MultichainInfo = ({ multiChainAccounts }: Props) => {
                     : 'cursor-not-allowed'
                 }`}
                 disabled={!multiChainAccounts?.length}
-                onClick={handleMenuOpen}
                 ref={buttonRef}
               >
                 <button>
@@ -93,16 +77,15 @@ const MultichainInfo = ({ multiChainAccounts }: Props) => {
                 </button>
               </PopoverTrigger>
               <PopoverContent
-                className={`focus:outline-none -mt-2  min-w-fit ${positionClass} bg-white shadow border z-20 dark:border-black-200 dark:bg-black p-2 overflow-hidden`}
+                className={`focus:outline-none -mt-1.5 xl:-left-0 lg:-left-32 md:-left-0 -left-32 max-w-min bg-white shadow border z-20 dark:border-black-200 dark:bg-black p-1.5 overflow-hidden`}
                 rounded={'lg'}
-                width={'48'}
               >
                 <div className="dark:bg-black">
                   <PerfectScrollbar>
                     <div className="max-h-60 dark:bg-black">
                       {multiChainAccounts?.map((address: any, index: any) => (
                         <div
-                          className="pb-2 dark:bg-black flex justify-between items-center p-2 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"
+                          className=" dark:bg-black flex justify-between items-center px-1.5 py-1 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"
                           key={index}
                           onClick={() =>
                             handleChainSelect(
@@ -121,10 +104,10 @@ const MultichainInfo = ({ multiChainAccounts }: Props) => {
                                     <Bitcoin className="w-4 h-4 text-orange-400" />
                                   )}
                                   {address.chain === 'ETHEREUM' && (
-                                    <Ethereum className="w-4 h-4 text-black-200 dark:text-neargray-10" />
+                                    <Ethereum className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
                                   )}
                                 </div>
-                                <span className="ml-2">
+                                <span className="ml-2 text-nearblue-600 dark:text-neargray-10">
                                   {address.path
                                     .toLowerCase()
                                     .includes(
@@ -147,7 +130,7 @@ const MultichainInfo = ({ multiChainAccounts }: Props) => {
                                     : 'opacity-0'
                                 }`}
                               >
-                                <FaExternalLinkAlt />
+                                <FaExternalLinkAlt className="text-nearblue-600 dark:text-neargray-10" />
                               </span>
                             </div>
                           )}

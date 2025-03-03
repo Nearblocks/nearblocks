@@ -32,20 +32,23 @@ export default function AccountMoreInfo({
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [accountData, setAccountData] = useState<AccountContractInfo>(account);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
+  const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
   const t = useTranslations();
 
   useEffect(() => {
     if (
-      status &&
-      accountData &&
-      accountView &&
-      !accountData?.storage_usage &&
-      accountView?.storage_usage
+      (status &&
+        accountData &&
+        accountView &&
+        !accountData?.storage_usage &&
+        accountView?.storage_usage) ||
+      (!accountData?.code_hash && accountView?.code_hash)
     ) {
       setAccountData((prevData) => ({
         ...prevData,
-        storage_usage: accountView.storage_usage,
+        storage_usage: accountView?.storage_usage,
+        code_hash: accountView?.code_hash,
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,8 +107,10 @@ export default function AccountMoreInfo({
 
       if (account) {
         setAccountView(account);
+        setIsAccountLoading(false);
       } else {
         setAccountView(null);
+        setIsAccountLoading(false);
       }
     };
     getAccountDetails();
@@ -144,6 +149,7 @@ export default function AccountMoreInfo({
                   Staked {t('balance') || 'Balance'}:
                 </div>
                 <div className="flex whitespace-nowrap">
+                  {!status && isAccountLoading && <div className="h-5"></div>}
                   {stakedBalace
                     ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
                     : stakedBalace ?? ''}
@@ -163,7 +169,13 @@ export default function AccountMoreInfo({
           </div>
           {(deploymentData?.receipt_predecessor_account_id ||
             (contract && contract?.hash)) && (
-            <div className="flex justify-between w-full flex-wrap py-3">
+            <div
+              className={`flex justify-between w-full flex-wrap py-3 ${
+                deploymentData?.receipt_predecessor_account_id
+                  ? 'visible'
+                  : 'hidden'
+              }`}
+            >
               <div>
                 {deploymentData?.receipt_predecessor_account_id && (
                   <div className="flex-1 pb-2">
@@ -288,7 +300,7 @@ export default function AccountMoreInfo({
               }`}
             >
               <div className="flex-1 w-full break-words">
-                <div className="flex mb-1">
+                <div className="flex mb-2 whitespace-nowrap md:mb-0">
                   {accountView !== null &&
                   accountView?.block_hash === undefined &&
                   accountData?.deleted?.transaction_hash
@@ -346,6 +358,8 @@ export default function AccountMoreInfo({
                   </div>
                 ) : accountInfo?.code_hash ? (
                   'Genesis'
+                ) : isAccountLoading ? (
+                  <div className="h-5"></div>
                 ) : (
                   'N/A'
                 )}

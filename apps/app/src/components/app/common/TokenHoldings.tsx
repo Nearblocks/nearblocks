@@ -80,6 +80,7 @@ const TokenHoldings = (props: Props) => {
         roundedBottom={'lg'}
         roundedTop={'none'}
         position="absolute"
+        suppressHydrationWarning
       >
         <div className="dark:bg-black">
           <PerfectScrollbar>
