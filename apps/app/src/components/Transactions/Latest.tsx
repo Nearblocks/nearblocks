@@ -24,7 +24,7 @@ const LatestTransactions = ({ txns, error }: Props) => {
 
   return (
     <>
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <PerfectScrollbar>
           {!txns && error && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">

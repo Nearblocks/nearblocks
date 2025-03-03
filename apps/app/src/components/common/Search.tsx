@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import debounce from 'lodash/debounce';
 import { toast } from 'react-toastify';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import useTranslation from 'next-translate/useTranslation';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
@@ -42,22 +42,7 @@ export const SearchToast = () => {
   );
 };
 
-export const redirect = (route: any) => {
-  switch (route?.type) {
-    case 'block':
-      return Router.push(`/blocks/${route?.path}`);
-    case 'txn':
-      return Router.push(`/txns/${route?.path}`);
-    case 'receipt':
-      return Router.push(`/txns/${route?.path}`);
-    case 'address':
-      return Router.push(`/address/${route?.path}`);
-    case 'token':
-      return Router.push(`/token/${route?.path}`);
-    default:
-      return toast.error(SearchToast);
-  }
-};
+type redirectRoute = { type: string; path: string };
 
 const Search = ({ header = false }) => {
   const router = useRouter();
@@ -65,9 +50,45 @@ const Search = ({ header = false }) => {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState({} as any);
   const [filter, setFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
   const rpcUrl: string = useRpcStore((state) => state.rpc);
 
   const homeSearch = router.pathname === '/';
+
+  const pathname = router.asPath;
+
+  const redirect = (route: redirectRoute) => {
+    const newPath =
+      route?.type === 'block'
+        ? `/blocks/${route?.path}`
+        : route?.type === 'txn' || route?.type === 'receipt'
+        ? `/txns/${route?.path}`
+        : route?.type === 'address'
+        ? `/address/${route?.path}`
+        : route?.type === 'token'
+        ? `/token/${route?.path}`
+        : null;
+
+    if (newPath === pathname) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (newPath) {
+        return router.push(newPath);
+      } else {
+        return toast.error(SearchToast);
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      return;
+    }
+  };
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [pathname]);
 
   const showResults =
     result?.blocks?.length > 0 ||
@@ -134,13 +155,13 @@ const Search = ({ header = false }) => {
     const route = await search(query, filter, true);
 
     if (route) {
-      return redirect(route);
+      return redirect(route as redirectRoute);
     }
 
     const rpcRoute = await rpcSearch(rpcUrl, query, true);
 
     if (rpcRoute) {
-      return redirect(rpcRoute);
+      return redirect(rpcRoute as redirectRoute);
     }
 
     return toast.error(SearchToast);
@@ -290,7 +311,13 @@ const Search = ({ header = false }) => {
             : 'bg-blue-900/[0.05] dark:bg-black-600'
         } rounded-r-lg px-5 outline-none focus:outline-none border dark:border-black-200`}
       >
-        <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
+        {isLoading ? (
+          <div className="flex items-center justify-center bg-opacity-10 dark:bg-opacity-50">
+            <div className="w-4 h-4 border-2 border-solid dark:border-neargreen-200 border-green border-b-transparent dark:border-b-current rounded-[50%] inline-block box-border animate-spin duration-1000 linear infinite"></div>
+          </div>
+        ) : (
+          <SearchIcon className="text-gray-700 dark:text-gray-100 fill-current " />
+        )}
       </button>
     </form>
   );
