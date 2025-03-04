@@ -21,6 +21,10 @@ const TransfersList = async ({ searchParams }: any) => {
     sync: true,
   };
 
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+
   return (
     <NFTTransfersActions
       data={data}

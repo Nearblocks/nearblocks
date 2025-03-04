@@ -3,16 +3,24 @@ import { useCallback, useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
-import { AccountDataInfo, ContractCodeInfo, KeysInfo } from '@/utils/types';
+import {
+  AccountDataInfo,
+  ContractCodeInfo,
+  KeysInfo,
+  TextAdData,
+} from '@/utils/types';
 
 import WarningIcon from '../Icons/WarningIcon';
+import SponsoredText from '../SponsoredText';
 
 export default function AccountAlerts({
   accountData,
   id,
+  sponsoredText,
 }: {
   accountData: any;
   id: string;
+  sponsoredText?: TextAdData;
 }) {
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
@@ -21,6 +29,9 @@ export default function AccountAlerts({
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [isContractLoading, setIsContractLoading] = useState(true);
   const [accessKeys, setAccessKeys] = useState<[] | KeysInfo>([]);
+  const [accountValid, setAccountValid] = useState(
+    () => accountData?.account?.[0]?.account_id === id,
+  );
 
   const loadSchema = useCallback(async () => {
     if (!id) return;
@@ -35,9 +46,12 @@ export default function AccountAlerts({
           return null;
         }),
         viewAccount(id).catch(() => {
+          setAccountValid(false);
           return null;
         }),
       ]);
+
+      setAccountValid(!!account);
 
       if (code?.code_base64) {
         setContract((prev) => {
@@ -92,9 +106,21 @@ export default function AccountAlerts({
     loadSchema();
   }, [loadSchema]);
 
+  if (accountValid && !isAccountLoading && !isLocked && sponsoredText) {
+    return (
+      <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
+        <div>
+          <div className="pl-1.5 py-4 min-h-[25px]">
+            <SponsoredText sponsoredText={sponsoredText} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (
     !accountView &&
-    accountData?.deleted?.transaction_hash &&
+    accountData?.account?.[0].deleted?.transaction_hash &&
     !isAccountLoading
   ) {
     return (
@@ -105,9 +131,11 @@ export default function AccountAlerts({
               <p className="mb-0 items-center break-words">
                 <WarningIcon className="w-5 h-5 fill-current mx-1 inline-block text-red-600" />
                 {`This account was deleted on ${
-                  accountData?.deleted?.transaction_hash
+                  accountData?.account?.[0]?.deleted?.transaction_hash
                     ? convertToUTC(
-                        nanoToMilli(accountData.deleted.block_timestamp),
+                        nanoToMilli(
+                          accountData?.account?.[0]?.deleted?.block_timestamp,
+                        ),
                         false,
                       )
                     : ''
@@ -121,11 +149,23 @@ export default function AccountAlerts({
     );
   }
 
+  if (accountValid === false) {
+    return (
+      <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
+        <div>
+          <div className="pl-1.5 py-4 min-h-[25px]">
+            This address does not exist.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (
     accountView !== null &&
     isLocked &&
     accountData &&
-    accountData?.deleted?.transaction_hash === null &&
+    accountData?.account?.[0]?.deleted?.transaction_hash === null &&
     Object.keys(accessKeys)?.length === 0 &&
     contract === null &&
     !isContractLoading

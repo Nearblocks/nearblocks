@@ -2,8 +2,7 @@ import { headers } from 'next/headers';
 
 import Buttons from '@/components/app/common/Button';
 import { appUrl, networkId } from '@/utils/app/config';
-import AddressValidator from '@/components/app/Address/AddressValidator';
-import { getRequest } from '@/utils/app/api';
+
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
@@ -51,8 +50,6 @@ export default async function AddressLayout(props: {
 
   const { children } = props;
 
-  const accountData = await getRequest(`account/${id}`, {});
-
   return (
     <>
       <div className="relative container-xxl mx-auto px-4">
@@ -98,10 +95,6 @@ export default async function AddressLayout(props: {
               </div>
             </div>
           </div>
-          <AddressValidator
-            id={id as string}
-            accountData={accountData?.account?.[0]}
-          />
         </div>
         <div className="py-2">{children}</div>
       </div>

@@ -7,6 +7,10 @@ export default async function HomeLatestTxns() {
 
   const txns = txnsDetails?.txns || [];
 
+  if (txnsDetails.message === 'Error') {
+    throw new Error(`Server Error : ${txnsDetails.error}`);
+  }
+
   return (
     <div className="relative ">
       <LatestTransactions error={!txns} txns={txns} />

@@ -6,17 +6,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import TableSummary from '../../common/TableSummary';
-import FaInbox from '../../Icons/FaInbox';
-
-export default function TabSkeletion({
-  error = false,
-  reset,
-}: {
-  error?: boolean;
-  reset?: any;
-}) {
+export default function TabSkeletion({}: { error?: boolean; reset?: any }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const params = useParams<{ id: string }>();
@@ -73,51 +63,25 @@ export default function TabSkeletion({
             </div>
           </div>
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
-            {error && (
-              <>
-                <TableSummary text="" />
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
-                    <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
-                      <tr className="h-[57px]">
-                        <td
-                          className="px-6 py-4 text-gray-400 text-xs"
-                          colSpan={100}
-                        >
-                          <ErrorMessage
-                            icons={<FaInbox />}
-                            message={''}
-                            mutedText="Please try again later"
-                            reset={reset}
-                          />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-            {!error && tab === 'txns' ? (
+            {tab === 'txns' ? (
               <TabPanelGeneralSkeleton tab={tab || 'txns'} />
             ) : null}
-            {!error && tab === 'receipts' ? (
+            {tab === 'receipts' ? (
               <TabPanelGeneralSkeleton tab={tab || 'receipts'} />
             ) : null}
 
-            {!error && tab === 'tokentxns' ? (
-              <TabPanelGeneralSkeleton tab={tab} />
-            ) : null}
+            {tab === 'tokentxns' ? <TabPanelGeneralSkeleton tab={tab} /> : null}
 
-            {!error && tab === 'nfttokentxns' ? (
+            {tab === 'nfttokentxns' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
-            {!error && tab === 'multichaintxns' ? (
+            {tab === 'multichaintxns' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
-            {!error && tab === 'accesskeys' ? (
+            {tab === 'accesskeys' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
-            {!error && tab === 'contract' ? (
+            {tab === 'contract' ? (
               <TabPanelGeneralSkeleton tab={'contract'} />
             ) : null}
           </div>

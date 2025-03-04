@@ -18,7 +18,9 @@ const Transfers = async ({ searchParams }: any) => {
     height: 0,
     sync: true,
   };
-
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
   return (
     <FTTransfersActions
       data={data}

@@ -12,6 +12,10 @@ const Transactions = async ({ id, searchParams }: any) => {
     getRequest(`account/${id}/txns-only/count`, searchParams, options),
   ]);
 
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+
   return (
     <>
       <TransactionActions

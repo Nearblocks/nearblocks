@@ -11,6 +11,10 @@ const MultiChainTransactions = async ({ id, searchParams }: any) => {
     getRequest(`chain-abstraction/${id}/txns/count`, searchParams, options),
   ]);
 
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+
   return (
     <MultiChainTxns
       count={count?.txns?.[0]?.count}

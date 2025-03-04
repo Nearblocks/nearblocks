@@ -9,6 +9,10 @@ export default async function NodeList({ searchParams }: any) {
   );
   const statsDetails = await getRequest('stats');
   const latestBlock = await getRequest('blocks/latest?limit=1');
+
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
   return (
     <NodeListActions
       data={data}

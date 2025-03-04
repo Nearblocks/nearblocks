@@ -39,6 +39,11 @@ const nextConfig = {
         permanent: true,
         source: '/block/:slug',
       },
+      {
+        source: '/api/health-check',
+        destination: '/api/healthcheck',
+        permanent: true,
+      },
     ];
   },
 };

@@ -11,6 +11,10 @@ const Receipts = async ({ id, searchParams }: any) => {
     getRequest(`account/${id}/receipts/count`, searchParams, options),
   ]);
 
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+
   return (
     <>
       <ReceiptActions

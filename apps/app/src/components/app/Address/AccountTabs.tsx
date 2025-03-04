@@ -7,6 +7,10 @@ import Transactions from '@/components/app/Address/Transactions';
 
 import AccountTabsActions from './AccountTabsActions';
 import MultiChainTransactions from './ChainTxns';
+import TableSummary from '../common/TableSummary';
+import ErrorMessage from '../common/ErrorMessage';
+import FaInbox from '../Icons/FaInbox';
+import { ErrorBoundary } from 'react-error-boundary';
 
 export default async function AccountTabs({
   id,
@@ -19,34 +23,70 @@ export default async function AccountTabs({
 }) {
   const tab = searchParams?.tab || 'txns';
 
+  const fallbackError = (
+    <>
+      <TableSummary text="" />
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
+          <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
+            <tr className="h-[57px]">
+              <td className="px-6 py-4 text-gray-400 text-xs" colSpan={100}>
+                <ErrorMessage
+                  icons={<FaInbox />}
+                  message={''}
+                  mutedText="Please try again later"
+                  reset
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+
   return (
     <AccountTabsActions id={id} parse={parse} searchParams={searchParams}>
       {tab === 'txns' ? (
-        <Transactions id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <Transactions id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
 
       {tab === 'receipts' ? (
-        <Receipts id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <Receipts id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
 
       {tab === 'tokentxns' ? (
-        <TokenTransactions id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <TokenTransactions id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
 
       {tab === 'nfttokentxns' ? (
-        <NFTTransactions id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <NFTTransactions id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
 
       {tab === 'multichaintxns' ? (
-        <MultiChainTransactions id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <MultiChainTransactions id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
 
       {tab === 'accesskeys' ? (
-        <AccessKeys id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <AccessKeys id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
 
       {tab === 'contract' ? (
-        <Overview id={id} searchParams={searchParams} />
+        <ErrorBoundary fallback={fallbackError}>
+          <Overview id={id} searchParams={searchParams} />
+        </ErrorBoundary>
       ) : null}
     </AccountTabsActions>
   );

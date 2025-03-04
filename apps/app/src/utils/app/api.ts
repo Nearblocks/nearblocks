@@ -39,33 +39,27 @@ export const getRequest = async (
       const response = await fetch(url, mergedOptions);
       clearTimeout(timeoutId);
 
+      if (response.status !== 200) {
+        throw new Error(`${response.statusText}`);
+      }
+
       if (response.ok) {
         const contentType = response.headers.get('content-type');
         const isJson = contentType?.includes('json');
         return isJson ? response.json() : response.text();
       }
-
-      console.error(
-        `Server error on ${url}, attempt ${attempt + 1}: ${
-          response.statusText
-        }`,
-      );
     } catch (error: any) {
       clearTimeout(timeoutId);
 
-      if (error.name === 'AbortError') {
-        console.error(`Request to ${url} timed out`);
-        throw new Error('Request timeout');
-      }
-
-      console.error(`Error on attempt ${attempt + 1}:`, error);
-
-      if (attempt === MAX_RETRIES - 1) {
-        throw error;
-      }
+      console.error(`Error on attempt ${attempt + 1} - ${url}:`, error);
 
       const delay = Math.pow(2, attempt) * 1000;
       await new Promise((resolve) => setTimeout(resolve, delay));
+      return {
+        message: 'Error',
+        status: 500,
+        error,
+      };
     }
   }
 };

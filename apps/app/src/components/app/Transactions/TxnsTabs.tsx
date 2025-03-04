@@ -45,7 +45,7 @@ export default async function TxnsTabs({
   const tab = searchParams?.tab || 'overview';
 
   const balanceIndexerStatus =
-    syncData && syncData?.status?.indexers?.balance?.sync;
+    syncData && syncData?.status?.indexers?.base?.sync;
   const txnData: ApiTxnData = await processTransactionWithTokens(txn);
   return (
     <TxnsTabActions
