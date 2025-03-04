@@ -27,8 +27,7 @@ import {
 import sentry from '#libs/sentry';
 import { AccessKeyPermission, ReceiptAction, RlpJson } from '#types/types';
 
-const require = createRequire(import.meta.url);
-const json = require('nb-json');
+const json = createRequire(import.meta.url)('nb-json');
 
 export const jsonParse = (args: string) => json.parse(args);
 
