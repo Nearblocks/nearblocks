@@ -7,6 +7,9 @@ const List = async ({ searchParams }: any) => {
     getRequest(`txns`, searchParams),
     getRequest(`txns/count`, searchParams),
   ]);
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
 
   return <ListActions error={!data} txnsCount={count} txnsData={data} />;
 };

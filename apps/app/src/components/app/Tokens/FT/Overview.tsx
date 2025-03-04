@@ -32,6 +32,10 @@ const Overview = async ({ id, searchParams }: any) => {
   const inventoryData = inventoryDataPromise?.inventory;
   const theme = (await cookies()).get('theme')?.value || 'light';
 
+  if (tokenResult.message === 'Error') {
+    throw new Error(`Server Error : ${tokenResult.error}`);
+  }
+
   return (
     <>
       <OverviewActions

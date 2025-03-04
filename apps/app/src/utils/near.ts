@@ -176,15 +176,15 @@ export function txnActionLogs(txn: RPCTransactionInfo): TransactionLog[] {
 
   const outcomes = txn?.receipts_outcome || [];
 
-  for (let i = 0; i < outcomes.length; i++) {
+  for (let i = 0; i < outcomes?.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
 
     if (logs.length > 0) {
-      const mappedLogs: TransactionLog[] = logs.map((log: string) => ({
+      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
         contract: outcome?.outcome?.executor_id || '',
         logs: log,
-        receiptId: outcome.id,
+        receiptId: outcome?.id,
       }));
       txLogs = [...txLogs, ...mappedLogs];
     }
@@ -216,7 +216,7 @@ export function txnActions(txn: RPCTransactionInfo) {
   const txActions = [];
   const receipts = txn?.receipts || [];
 
-  for (let i = 1; i < receipts.length; i++) {
+  for (let i = 1; i < receipts?.length; i++) {
     const receipt = receipts[i];
     const from = receipt?.predecessor_id;
     const to = receipt?.receiver_id;
@@ -225,17 +225,17 @@ export function txnActions(txn: RPCTransactionInfo) {
     if (from === 'system') continue;
 
     if (Array.isArray(receipt?.receipt)) {
-      const actions = receipt.receipt;
+      const actions = receipt?.receipt;
 
-      for (let j = 0; j < actions.length; j++) {
+      for (let j = 0; j < actions?.length; j++) {
         const action = actions[j];
 
-        txActions.push({ from, to, receiptId, ...action });
+        txActions?.push({ from, to, receiptId, ...action });
       }
     } else {
       const actions = receipt?.receipt?.Action?.actions || [];
 
-      for (let j = 0; j < actions.length; j++) {
+      for (let j = 0; j < actions?.length; j++) {
         const action = mapRpcActionToAction(actions[j]);
 
         txActions.push({ from, to, receiptId, ...action });
@@ -344,7 +344,7 @@ export function mainActions(rpcTxn: any) {
     receiptId: receipt,
   }));
 
-  const actionsLog = rpcTxn?.transaction?.actions.map((log: any) => {
+  const actionsLog = rpcTxn?.transaction?.actions?.map((log: any) => {
     const actionInfo: any = mapRpcActionToAction(log);
 
     return {
@@ -353,7 +353,7 @@ export function mainActions(rpcTxn: any) {
         deposit: actionInfo?.args.deposit,
         gas: actionInfo?.args.gas,
         method_name: actionInfo?.args?.method_name,
-        args: displayArgs(actionInfo.args.args),
+        args: displayArgs(actionInfo?.args?.args),
       },
     };
   });

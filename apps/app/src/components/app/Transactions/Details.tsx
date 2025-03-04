@@ -330,9 +330,7 @@ const Details = (props: Props) => {
   });
 
   const updatedMainTxnsActions =
-    status && apiMainTxnsActions.length > 0
-      ? apiMainTxnsActions
-      : rpcMainTxnsActions;
+    apiMainTxnsActions.length > 0 ? apiMainTxnsActions : rpcMainTxnsActions;
 
   const totalTokenIdsCount = actionLogs?.reduce(
     (totalCount: number, item: any) => {

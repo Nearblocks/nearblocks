@@ -37,6 +37,10 @@ export default async function TransactionList(props: {
   const txns24HrCount = dataTxns24HrCount?.txns[0]?.count;
   const networksCount = Object.keys(chain).length;
 
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+
   return (
     <>
       <Stats

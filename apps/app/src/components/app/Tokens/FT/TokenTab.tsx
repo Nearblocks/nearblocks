@@ -77,6 +77,11 @@ export default async function TokenTabs({
           !selected,
       },
     );
+
+  if (dataResult.message === 'Error') {
+    throw new Error(`Server Error : ${dataResult.error}`);
+  }
+
   return (
     <div className="block lg:flex lg:space-x-2 mb-10">
       <div className="w-full ">

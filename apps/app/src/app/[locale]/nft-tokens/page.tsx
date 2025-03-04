@@ -19,6 +19,10 @@ export default async function NFTTokens(props: any) {
     return res.tokens;
   };
 
+  if (dataResult.message === 'Error') {
+    throw new Error(`Server Error : ${dataResult.error}`);
+  }
+
   return (
     <List
       data={dataResult}

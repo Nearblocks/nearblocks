@@ -7,6 +7,10 @@ export default async function HomeLatestBlocks() {
 
   const blocks = blockDetails?.blocks || [];
 
+  if (blockDetails.message === 'Error') {
+    throw new Error(`Server Error : ${blockDetails.error}`);
+  }
+
   return (
     <div className="relative ">
       <LatestBlocks blocks={blocks} error={!blocks} />

@@ -23,6 +23,10 @@ export default async function Tokens(props: any) {
     return res.tokens;
   };
 
+  if (dataResult.message === 'Error') {
+    throw new Error(`Server Error : ${dataResult.error}`);
+  }
+
   return (
     <List
       data={dataResult}

@@ -11,6 +11,10 @@ const AccessKeys = async ({ id, searchParams }: any) => {
     getRequest(`account/${id}/keys/count`, searchParams, options),
   ]);
 
+  if (data.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+
   return (
     <>
       <AccessKeysActions
