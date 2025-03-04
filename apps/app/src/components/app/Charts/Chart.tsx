@@ -197,7 +197,7 @@ const Chart = (props: Props) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, chartTypes]);
+  }, [data, chartTypes, logView]);
 
   const replaceWithNull = chartData.map((item: any) => ({
     ...item,

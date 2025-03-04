@@ -45,10 +45,7 @@ export default function Details(props: Props) {
 
   useEffect(() => {
     const fetchBlockData = async () => {
-      if (
-        !data ||
-        (Array?.isArray(data?.blocks) && data?.blocks?.length === 0)
-      ) {
+      if (!data || data?.blocks?.length === 0) {
         try {
           const res = await getBlockDetails(hash);
 
@@ -107,7 +104,7 @@ export default function Details(props: Props) {
   );
 
   const block =
-    Array.isArray(data?.blocks) && data?.blocks?.length === 0
+    !data || data?.blocks?.length === 0
       ? blockInfo?.blocks?.[0]
       : data?.blocks?.[0];
 
@@ -243,7 +240,7 @@ export default function Details(props: Props) {
               <div className="w-full md:w-1/4 mb-2 md:mb-0">
                 {t ? t('block.transactions.0') : 'Transactions'}
               </div>
-              {isLoading ? (
+              {isLoading || !block?.transactions_agg?.count ? (
                 <div className="w-full md:w-3/4">
                   <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
