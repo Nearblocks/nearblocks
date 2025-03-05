@@ -99,7 +99,7 @@ const TransactionChart: React.FC<{
               'dddd, MMMM DD, YYYY',
             )}</span><br/>
             Transactions: <strong>${dollarFormat(Number(point.y))}</strong><br/>
-            Price: $${dollarFormat((point as any).price)}
+            ${point.price != null ? `Price: $${dollarFormat(point.price)}` : ''}
           `;
         },
       },

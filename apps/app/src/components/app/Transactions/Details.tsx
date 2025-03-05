@@ -330,7 +330,7 @@ const Details = (props: Props) => {
   });
 
   const updatedMainTxnsActions =
-    apiMainTxnsActions.length > 0 ? apiMainTxnsActions : rpcMainTxnsActions;
+    apiMainTxnsActions?.length > 0 ? apiMainTxnsActions : rpcMainTxnsActions;
 
   const totalTokenIdsCount = actionLogs?.reduce(
     (totalCount: number, item: any) => {
@@ -614,9 +614,6 @@ const Details = (props: Props) => {
                               <EventLogs
                                 key={i}
                                 event={event}
-                                actionsLog={
-                                  updatedMainTxnsActions?.[0]?.actionsLog
-                                }
                                 allActionLog={allActions}
                                 tokenMetadata={tokenMetadata}
                               />

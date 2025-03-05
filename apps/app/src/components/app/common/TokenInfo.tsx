@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import TokenImage from './TokenImage';
 import useRpc from '@/hooks/app/useRpc';
+import { useRpcStore } from '@/stores/app/rpc';
+import { isEmpty } from 'lodash';
 
 const TokenInfo = (props: TokenInfoProps) => {
   const { contract, amount, decimals, isShowText, metaInfo } = props;
@@ -16,6 +18,7 @@ const TokenInfo = (props: TokenInfoProps) => {
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
   const [loading, setLoading] = useState(false);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const rpcAmount = localFormat(
     tokenAmount(amount, decimals || apiMeta?.decimals || meta?.decimals, true),
@@ -27,10 +30,15 @@ const TokenInfo = (props: TokenInfoProps) => {
         .then((data) => {
           setMeta(data);
           setLoading(false);
+          if (isEmpty(data)) {
+            setLoading(true);
+            switchRpc();
+          }
         })
         .catch((error) => {
           console.error(error);
-          setLoading(false);
+          setLoading(true);
+          switchRpc();
         });
     }
 
