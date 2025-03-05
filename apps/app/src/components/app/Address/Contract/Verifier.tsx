@@ -12,6 +12,7 @@ import ErrorMessage from '../../common/ErrorMessage';
 import LoadingCircular from '../../common/LoadingCircular';
 import ArrowDown from '../../Icons/ArrowDown';
 import FaInbox from '../../Icons/FaInbox';
+import FaExternalLinkAlt from '../../Icons/FaExternalLinkAlt';
 
 type ContractFormProps = {
   accountId: string;
@@ -202,18 +203,19 @@ const Verifier: React.FC<ContractFormProps> = ({
         className="w-full text-center bg-nearblue dark:bg-gray-950 p-4 text-green dark:text-neargreen-200 text-sm soft-shadow rounded-xl"
         role="alert"
       >
-        <p className="font-bold text-sm">Verification Instructions</p>
-        <p>
+        <p className="font-bold text-base">Verification Instructions</p>
+        <p className="inline-block text-sm">
           If you are the contract owner and wish to verify your smart contract,
           you need to make your source code publicly available. For detailed
-          instructions, check out the &nbsp;
+          instructions, check out the&nbsp;
           <a
-            className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
+            className="text-green-500 dark:text-emerald-500 font-medium hover:no-underline"
             href="https://github.com/SourceScan/verification-guide"
             rel="noopener noreferrer"
             target="_blank"
           >
-            verification guide
+            Verification Guide
+            <FaExternalLinkAlt className="w-3 h-3 ml-1 inline" />
           </a>
           .
         </p>
@@ -221,9 +223,9 @@ const Verifier: React.FC<ContractFormProps> = ({
 
       {(success !== null || verified) && !error && (
         <div
-          className={`w-full flex justify-between text-left border text-sm py-4 px-10 mt-4 soft-shadow rounded-xl ${
+          className={`w-full flex justify-between text-left text-sm py-4 px-6 mt-4 soft-shadow rounded-xl ${
             success || verified
-              ? 'bg-emerald-50  text-emerald-500 border-emerald-100 dark:bg-emerald-500/[0.25] dark:border-neargreen-200'
+              ? 'bg-emerald-50  text-emerald-500 border dark:bg-emerald-500/[0.10] dark:border-neargreen-200'
               : 'bg-red-50 text-red-500 border-red-100 dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300'
           }`}
         >
@@ -233,7 +235,7 @@ const Verifier: React.FC<ContractFormProps> = ({
         </div>
       )}
 
-      <div className="w-full pt-4 pb-8 px-10 bg-white dark:bg-black-600  mt-4 soft-shadow rounded-xl text-neargray-600 dark:text-neargray-10">
+      <div className="w-full py-5 px-6 bg-white dark:bg-black-600  mt-4 soft-shadow rounded-xl text-neargray-600 dark:text-neargray-10">
         <form onSubmit={submitForm}>
           {error && (
             <ErrorMessage
@@ -246,7 +248,7 @@ const Verifier: React.FC<ContractFormProps> = ({
             <div className="flex flex-col rounded-md gap-4">
               <div>
                 <p className="font-semibold text-sm mb-1">Standard</p>
-                {loading || apiLoading ? (
+                {loading ? (
                   <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                 ) : (
                   <>
@@ -274,7 +276,7 @@ const Verifier: React.FC<ContractFormProps> = ({
 
               <div>
                 <p className="font-semibold text-sm mb-1">Contract Address</p>
-                {loading || apiLoading ? (
+                {loading ? (
                   <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                 ) : (
                   <input
@@ -288,7 +290,7 @@ const Verifier: React.FC<ContractFormProps> = ({
 
               <div>
                 <p className="font-semibold text-sm mb-1">Language</p>
-                {loading || apiLoading ? (
+                {loading ? (
                   <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                 ) : (
                   <div className="relative">
@@ -308,7 +310,7 @@ const Verifier: React.FC<ContractFormProps> = ({
 
               <div>
                 <p className="font-semibold text-sm mb-1">Build Environment</p>
-                {loading || apiLoading ? (
+                {loading ? (
                   <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                 ) : (
                   <>
@@ -331,7 +333,7 @@ const Verifier: React.FC<ContractFormProps> = ({
 
               <div>
                 <p className="font-semibold text-sm mb-1">Source Code</p>
-                {loading || apiLoading ? (
+                {loading ? (
                   <Loader wrapperClassName="w-full md:w-full px-3 py-1.5 " />
                 ) : (
                   <>
