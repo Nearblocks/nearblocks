@@ -103,15 +103,23 @@ export const onMessage = async (message: Message) => {
     const cache = performance.now() - start;
     start = performance.now();
 
-    await Promise.all([
-      storeBlock(knex, message),
-      storeChunks(knex, message),
-      storeTransactions(knex, message),
-      storeReceipts(knex, message),
-      storeExecutionOutcomes(knex, message),
-      storeAccounts(knex, message),
-      storeAccessKeys(knex, message),
-      uploadJson(message),
+    await Promise.race([
+      Promise.all([
+        storeBlock(knex, message),
+        storeChunks(knex, message),
+        storeTransactions(knex, message),
+        storeReceipts(knex, message),
+        storeExecutionOutcomes(knex, message),
+        storeAccounts(knex, message),
+        storeAccessKeys(knex, message),
+        uploadJson(message),
+      ]),
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Block processing timed out after 10s')),
+          10000,
+        ),
+      ),
     ]);
 
     logger.info({

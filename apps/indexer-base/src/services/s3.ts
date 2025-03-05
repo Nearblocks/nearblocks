@@ -12,10 +12,22 @@ const s3Client = new S3Client({
   },
   endpoint: config.s3Endpoint,
   forcePathStyle: true,
-  maxAttempts: 3,
+  logger: {
+    debug: () => {},
+    error: console.error,
+    info: () => {},
+    warn: console.warn,
+  },
+  maxAttempts: 5,
   region: config.s3Region,
   requestHandler: new NodeHttpHandler({
     connectionTimeout: 5000,
+    logger: {
+      debug: () => {},
+      error: console.error,
+      info: () => {},
+      warn: console.warn,
+    },
     requestTimeout: 10000,
   }),
 });
