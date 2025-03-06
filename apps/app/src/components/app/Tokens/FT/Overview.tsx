@@ -19,8 +19,8 @@ const Overview = async ({ id, searchParams }: any) => {
   const token: Token = tokenResult?.contracts?.[0];
   const transfers = transferResult?.txns?.[0]?.count;
   const holders = holderResult?.holders?.[0]?.count;
-  const stats = statsResult?.stats[0];
-  const status = syncResult?.status?.aggregates.ft_holders || {
+  const stats = statsResult?.stats?.[0];
+  const status = syncResult?.status?.aggregates?.ft_holders || {
     height: '0',
     sync: true,
     timestamp: '',

@@ -61,25 +61,23 @@ const AccountOverviewActions = ({
 
   useEffect(() => {
     const fetchAccountData = async () => {
-      if (!status) {
-        try {
-          const [account]: any = await Promise.all([
-            viewAccount(params?.id).catch(() => setRpcError(true)),
-          ]);
-          if (account) {
-            setAccountView((prev) => {
-              if (!prev || prev.account_id !== account?.account_id) {
-                return account as any;
-              }
-              return prev;
-            });
-          } else {
-            setAccountView(null);
-          }
-        } catch (error) {
-          setRpcError(true);
-          console.log('Error loading schema:', error);
+      try {
+        const [account]: any = await Promise.all([
+          viewAccount(params?.id).catch(() => setRpcError(true)),
+        ]);
+        if (account) {
+          setAccountView((prev) => {
+            if (!prev || prev.account_id !== account?.account_id) {
+              return account as any;
+            }
+            return prev;
+          });
+        } else {
+          setAccountView(null);
         }
+      } catch (error) {
+        setRpcError(true);
+        console.log('Error loading schema:', error);
       }
     };
 
@@ -87,7 +85,9 @@ const AccountOverviewActions = ({
   }, [accountData, params?.id, viewAccount, rpcUrl, status]);
 
   const accountInfo = accountData || accountView;
-  const balance = status ? accountData?.amount : accountView?.amount;
+  const balance = accountData?.amount
+    ? accountData?.amount
+    : accountView?.amount;
   const nearPrice = statsData?.near_price ?? '';
 
   useEffect(() => {

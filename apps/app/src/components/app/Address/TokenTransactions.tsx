@@ -20,7 +20,6 @@ const TokenTransactions = async ({ id, searchParams }: any) => {
       count={count?.txns?.[0]?.count}
       cursor={data?.cursor}
       error={!data || data === null}
-      id={id}
       txns={data?.txns}
     />
   );

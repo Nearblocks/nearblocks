@@ -1,6 +1,11 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
@@ -33,13 +38,13 @@ interface TxnsProps {
   count: string;
   cursor: string;
   error: boolean;
-  id: string;
   txns: TransactionInfo[];
 }
 
-const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
+const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');
   const [page, setPage] = useState(1);
@@ -377,7 +382,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
             {t('txnSelf') || 'SELF'}
           </span>
-        ) : id === row.predecessor_account_id ? (
+        ) : params?.id === row.predecessor_account_id ? (
           <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60 text-yellow-700 text-xs font-semibold">
             {t('txnOut') || 'OUT'}
           </span>
@@ -545,7 +550,7 @@ const ReceiptActions = ({ count, cursor, error, id, txns }: TxnsProps) => {
               <button className="hover:no-underline">
                 <Link
                   className="flex items-center text-nearblue-600 h-7 dark:text-neargray-10 gap-x-1 font-medium py-1 px-2.5 border border-neargray-700 dark:border-black-200 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap text-xs"
-                  href={`/exportdata?address=${id}&type=receipts`}
+                  href={`/exportdata?address=${params?.id}&type=receipts`}
                 >
                   <span>
                     <Download />

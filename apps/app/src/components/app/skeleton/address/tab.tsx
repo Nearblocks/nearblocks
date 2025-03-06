@@ -6,11 +6,16 @@ import { useParams, useSearchParams } from 'next/navigation';
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
 
-export default function TabSkeletion({}: { error?: boolean; reset?: any }) {
+export default function TabSkeletion({
+  parse,
+}: {
+  error?: boolean;
+  reset?: any;
+  parse: any;
+}) {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const params = useParams<{ id: string }>();
-
   const tab = searchParams?.get('tab') || 'txns';
 
   const tabs = [
@@ -28,6 +33,7 @@ export default function TabSkeletion({}: { error?: boolean; reset?: any }) {
       name: 'multichaintxns',
     },
     { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
+    { label: 'Contract', message: t('contract'), name: 'contract' },
   ];
 
   const getClassName = (selected: boolean) =>
@@ -46,6 +52,12 @@ export default function TabSkeletion({}: { error?: boolean; reset?: any }) {
           <div className="w-full ">
             <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
               {tabs?.map(({ message, name }: any) => {
+                const hasContractTab =
+                  parse?.contract?.[0]?.contract &&
+                  Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
+                  parse.contract[0].contract.methodNames.length > 0;
+
+                if (!hasContractTab && name === 'contract') return null;
                 return (
                   <Link
                     className={getClassName(name === tab)}
@@ -55,8 +67,17 @@ export default function TabSkeletion({}: { error?: boolean; reset?: any }) {
                         : `/address/${params.id}?tab=${name}`
                     }
                     key={name}
+                    prefetch={true}
+                    scroll={false}
                   >
-                    <h2 className="font-semibold"> {message}</h2>
+                    <h2 className="relative font-semibold">
+                      {message}
+                      {name === 'contract' && (
+                        <div className="absolute text-white dark:text-black bg-neargreen text-[8px] h-4 inline-flex items-center rounded-md  -mt-3 px-1">
+                          NEW
+                        </div>
+                      )}
+                    </h2>{' '}
                   </Link>
                 );
               })}

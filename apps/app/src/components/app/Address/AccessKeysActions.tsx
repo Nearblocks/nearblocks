@@ -1,5 +1,10 @@
 'use client';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import QueryString from 'qs';
 import { useEffect, useState } from 'react';
 
@@ -15,15 +20,15 @@ import AccessKeyRow from './AccessKeyRow';
 interface Props {
   count: number;
   error: boolean;
-  id?: string;
   keys: AccountContractInfo[];
   tab?: string;
 }
 
-const AccessKeysActions = ({ count, error, id, keys }: Props) => {
+const AccessKeysActions = ({ count, error, keys }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
   const { viewAccessKeys } = useRpc();
+  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');
   const [showWhen, setShowWhen] = useState(true);
@@ -35,8 +40,11 @@ const AccessKeysActions = ({ count, error, id, keys }: Props) => {
       if (!keys || keys?.length === 0) {
         try {
           const [accessKeyInfo]: any = await Promise.all([
-            viewAccessKeys(id as string).catch((error: any) => {
-              console.log(`Error fetching access keys for ${id}:`, error);
+            viewAccessKeys(params?.id as string).catch((error: any) => {
+              console.log(
+                `Error fetching access keys for ${params?.id}:`,
+                error,
+              );
               return null;
             }),
           ]);
@@ -52,7 +60,7 @@ const AccessKeysActions = ({ count, error, id, keys }: Props) => {
 
     fetchAccountData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keys, id]);
+  }, [keys, params?.id]);
 
   const onOrder = () => {
     const currentOrder = searchParams?.get('order') || 'desc';

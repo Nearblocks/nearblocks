@@ -16,15 +16,12 @@ const Receipts = async ({ id, searchParams }: any) => {
   }
 
   return (
-    <>
-      <ReceiptActions
-        count={count?.txns?.[0]?.count}
-        cursor={data?.cursor}
-        error={!data || data === null}
-        id={id}
-        txns={data?.txns}
-      />
-    </>
+    <ReceiptActions
+      count={count?.txns?.[0]?.count}
+      cursor={data?.cursor}
+      error={!data || data === null}
+      txns={data?.txns}
+    />
   );
 };
 export default Receipts;
