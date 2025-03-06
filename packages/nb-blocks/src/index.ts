@@ -1,6 +1,11 @@
 import { Readable } from 'stream';
 
-import { GetObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  GetObjectCommandOutput,
+  S3Client,
+  S3ClientConfig,
+} from '@aws-sdk/client-s3';
 
 import { createKnex, Knex, KnexConfig } from 'nb-knex';
 import { logger } from 'nb-logger';
@@ -42,9 +47,15 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
 const fetchJson = (s3: S3Client, bucket: string, block: number) => {
   return retry(
     async () => {
-      const response = await s3.send(
-        new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` }),
-      );
+      const response = await Promise.race([
+        s3.send(new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` })),
+        new Promise<GetObjectCommandOutput>((_, reject) =>
+          setTimeout(
+            () => reject(new Error('S3 request timed out after 10s')),
+            10_000,
+          ),
+        ),
+      ]);
 
       const chunks: Buffer[] = [];
 
