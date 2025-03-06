@@ -3,20 +3,19 @@ import classNames from 'classnames';
 import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/routing';
+import { useParams, useSearchParams } from 'next/navigation';
 
 const AccountTabsActions = ({
   children,
-  id,
   parse,
-  searchParams,
 }: {
   children: React.ReactNode;
-  id: string;
   parse: any;
-  searchParams: any;
 }) => {
   const t = useTranslations();
-  const tab = searchParams?.tab || 'txns';
+  const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'txns';
 
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
@@ -44,6 +43,7 @@ const AccountTabsActions = ({
           !selected,
       },
     );
+
   return (
     <div className="block lg:flex lg:space-x-2 mb-10 mt-5">
       <div className=" w-full">
@@ -61,8 +61,8 @@ const AccountTabsActions = ({
                 className={getClassName(name === tab)}
                 href={
                   name === 'txns'
-                    ? `/address/${id}`
-                    : `/address/${id}?tab=${name}`
+                    ? `/address/${params?.id}`
+                    : `/address/${params?.id}?tab=${name}`
                 }
                 key={name}
                 prefetch={true}

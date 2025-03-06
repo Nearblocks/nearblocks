@@ -16,14 +16,11 @@ const AccessKeys = async ({ id, searchParams }: any) => {
   }
 
   return (
-    <>
-      <AccessKeysActions
-        count={count?.keys?.[0]?.count}
-        error={!data || data === null}
-        id={id}
-        keys={data?.keys}
-      />
-    </>
+    <AccessKeysActions
+      count={count?.keys?.[0]?.count}
+      error={!data || data === null}
+      keys={data?.keys}
+    />
   );
 };
 export default AccessKeys;

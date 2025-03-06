@@ -1,7 +1,12 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 import QueryString from 'qs';
 import { useState } from 'react';
 
@@ -34,22 +39,20 @@ interface NftTokenTxnsProps {
   count: string;
   cursor: string;
   error: boolean;
-  id: string;
   txns: TransactionInfo[];
-  // tab: string;
 }
 
 const TimeStamp = dynamic(() => import('../common/TimeStamp'), { ssr: false });
 
 const NFTTransactionActions = ({
   count,
-  cursor, //   tab,
+  cursor,
   error,
-  id,
   txns,
 }: NftTokenTxnsProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');
   const [page, setPage] = useState(1);
@@ -534,7 +537,7 @@ const NFTTransactionActions = ({
             <button className="hover:no-underline ">
               <Link
                 className="flex items-center text-nearblue-600 h-7 dark:text-neargray-10 gap-x-1 font-medium py-1 px-2.5 border border-neargray-700 dark:border-black-200 rounded-md bg-white dark:bg-black-600 hover:bg-neargray-800 whitespace-nowrap text-xs"
-                href={`/nft-token/exportdata?address=${id}`}
+                href={`/nft-token/exportdata?address=${params?.id}`}
               >
                 <span>
                   <Download />

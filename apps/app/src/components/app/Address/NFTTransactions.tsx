@@ -16,15 +16,12 @@ const NFTTransactions = async ({ id, searchParams }: any) => {
   }
 
   return (
-    <>
-      <NFTTransactionActions
-        count={count?.txns?.[0]?.count}
-        cursor={data?.cursor}
-        error={!data || data === null}
-        id={id}
-        txns={data?.txns}
-      />
-    </>
+    <NFTTransactionActions
+      count={count?.txns?.[0]?.count}
+      cursor={data?.cursor}
+      error={!data || data === null}
+      txns={data?.txns}
+    />
   );
 };
 export default NFTTransactions;

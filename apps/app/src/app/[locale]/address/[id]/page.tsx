@@ -26,9 +26,11 @@ export default async function AddressIndex(props: {
   const { id } = params;
 
   const { cursor, page, ...rest } = searchParams;
+
   const options: RequestInit = {
     cache: 'force-cache',
   };
+
   const parse =
     (await getRequest(`account/${id}/contract/parse`, {}, options)) || {};
 
@@ -40,8 +42,11 @@ export default async function AddressIndex(props: {
 
       <div className="py-2"></div>
 
-      <Suspense fallback={<TabSkeletion />} key={JSON.stringify(rest)}>
-        <AccountTabs id={id} parse={parse} searchParams={searchParams} />
+      <Suspense
+        fallback={<TabSkeletion parse={parse} />}
+        key={JSON.stringify(rest)}
+      >
+        <AccountTabs id={id} searchParams={searchParams} />
       </Suspense>
     </>
   );

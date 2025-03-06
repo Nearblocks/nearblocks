@@ -3,15 +3,26 @@ import AccountOverviewActions from './AccountOverviewActions';
 import { SpamToken } from '@/utils/types';
 
 export default async function AccountOverview({ id }: any) {
-  const options: RequestInit = { next: { revalidate: 10 } };
+  const fetchCommonData = async (url?: string | undefined) => {
+    try {
+      if (url) {
+        const response = await getRequest(url);
+        return response;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching ${url}:`, error);
+      return null;
+    }
+  };
 
   const [accountData, statsData, tokenDetails, inventoryData, syncData] =
     await Promise.all([
-      getRequest(`account/${id}`, {}, options),
-      getRequest('stats', {}, options),
-      getRequest(`fts/${id}`, {}, options),
-      getRequest(`account/${id}/inventory`, {}, options),
-      getRequest(`sync/status`, {}, options),
+      fetchCommonData(`account/${id}`),
+      fetchCommonData('stats'),
+      fetchCommonData(`fts/${id}`),
+      fetchCommonData(`account/${id}/inventory`),
+      fetchCommonData(`sync/status`),
     ]);
 
   const spamList: SpamToken = await fetch(

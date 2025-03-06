@@ -24,13 +24,13 @@ import Info from './Info';
 import ViewOrChange from './ViewOrChange';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
 import { shortenAddress } from '@/utils/libs';
+import { useParams } from 'next/navigation';
 
 interface Props {
   accountId?: string;
   contract: ContractCodeInfo;
   contractInfo: ContractParseInfo;
   deployments: any;
-  id: string;
   isLocked?: boolean;
   logOut?: () => void;
   requestSignInWithWallet?: () => void;
@@ -46,7 +46,8 @@ const verifiers = verifierConfig.map((config) => config.accountId);
 
 const OverviewActions = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
-  const { accountId, contractInfo, deployments, id, isLocked, schema } = props;
+  const { accountId, contractInfo, deployments, isLocked, schema } = props;
+  const params = useParams<{ id: string }>();
 
   const [tab, setTab] = useState(0);
 
@@ -203,7 +204,11 @@ const OverviewActions = (props: Props) => {
         </Tab>
       </TabList>
       <TabPanel>
-        <Info data={deployments} id={id} isLocked={isLocked as boolean} />
+        <Info
+          data={deployments}
+          id={params?.id}
+          isLocked={isLocked as boolean}
+        />
       </TabPanel>
       <TabPanel>
         <ContractCode
@@ -263,7 +268,7 @@ const OverviewActions = (props: Props) => {
             >
               {contractInfo?.methodNames?.map((method: any, index: number) => (
                 <ViewOrChange
-                  id={id}
+                  id={params?.id}
                   index={index}
                   key={index}
                   method={method}
@@ -320,7 +325,7 @@ const OverviewActions = (props: Props) => {
           >
             {schema?.body?.functions?.map((func: any, index: number) => (
               <ViewOrChangeAbi
-                id={id}
+                id={params?.id}
                 index={index}
                 key={index}
                 method={func}

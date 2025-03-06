@@ -54,7 +54,7 @@ export default async function TokenTabs({
   const txnCursor = dataResult?.cursor;
   const transfers = transferResult?.txns?.[0]?.count;
   const token: Token = tokenDetails?.contracts?.[0];
-  const status = syncDetails?.status?.aggregates.ft_holders || {
+  const status = syncDetails?.status?.aggregates?.ft_holders || {
     height: '0',
     sync: true,
     timestamp: '',

@@ -2,15 +2,26 @@ import { getRequest } from '@/utils/app/api';
 import AccountMoreInfoActions from './AccountMoreInfoActions';
 
 export default async function AccountMoreInfo({ id }: any) {
-  const options: RequestInit = { next: { revalidate: 10 } };
+  const fetchCommonData = async (url?: string | undefined) => {
+    try {
+      if (url) {
+        const response = await getRequest(url);
+        return response;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching ${url}:`, error);
+      return null;
+    }
+  };
 
   const [accountData, tokenDetails, deploymentData, nftTokenData, syncData] =
     await Promise.all([
-      getRequest(`account/${id}`, {}, options),
-      getRequest(`fts/${id}`, {}, options),
-      getRequest(`account/${id}/contract/deployments`, {}, options),
-      getRequest(`nfts/${id}`, {}, options),
-      getRequest(`sync/status`, {}, options),
+      fetchCommonData(`account/${id}`),
+      fetchCommonData(`fts/${id}`),
+      fetchCommonData(`account/${id}/contract/deployments`),
+      fetchCommonData(`nfts/${id}`),
+      fetchCommonData(`sync/status`),
     ]);
 
   const balanceIndexerStatus =
