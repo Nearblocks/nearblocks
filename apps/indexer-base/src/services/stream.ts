@@ -75,7 +75,7 @@ export const syncData = async (switchSource = false) => {
       });
       stream.on('error', (error: Error) => {
         logger.error(error);
-        process.exit();
+        throw error;
       });
     } else {
       if (!lakeConfig.startBlockHeight && block) {
@@ -90,7 +90,7 @@ export const syncData = async (switchSource = false) => {
       }
     }
   } catch (error) {
-    syncData(true);
+    await syncData(true);
   }
 };
 
@@ -117,7 +117,7 @@ export const onMessage = async (message: Message) => {
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error('Block processing timed out after 10s')),
-          10000,
+          10_000,
         ),
       ),
     ]);
