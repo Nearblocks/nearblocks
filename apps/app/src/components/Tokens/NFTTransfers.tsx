@@ -299,7 +299,9 @@ const TransfersList = ({ data, totalCount, error, status }: ListProps) => {
           >
             <span>
               <Link
-                href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
+                href={`/nft-token/${row?.nft?.contract}/${encodeURIComponent(
+                  row?.token_id,
+                )}`}
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
               >
                 {row?.token_id}

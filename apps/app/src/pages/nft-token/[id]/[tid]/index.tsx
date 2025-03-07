@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<{
     query: { id, tid, ...qs },
     req,
   }: any = context;
-  const apiUrl = `nfts/${id}/tokens/${tid}`;
+  const apiUrl = `nfts/${id}/tokens/${encodeURIComponent(tid)}`;
   const fetchUrl = qs
     ? `${apiUrl}/txns?${QueryString.stringify(qs)}`
     : `${apiUrl}/txns`;
@@ -119,7 +119,10 @@ const NFTokenInfo = ({
         <meta property="og:description" content={meta.description} />
         <meta property="twitter:title" content={meta.title} />
         <meta property="twitter:description" content={meta.description} />
-        <link rel="canonical" href={`${appUrl}/nft-token/${id}/${tid}`} />
+        <link
+          rel="canonical"
+          href={`${appUrl}/nft-token/${id}/${encodeURIComponent(tid)}`}
+        />
       </Head>
       <div className="relative">
         <Detail

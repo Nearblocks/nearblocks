@@ -891,7 +891,10 @@ const Details = (props: Props) => {
                                     NFT Token ID [
                                     <Link
                                       className="text-green hover:no-underline dark:text-green-250"
-                                      href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
+                                      href={`/nft-token/${nft?.nft_meta
+                                        ?.contract}/${encodeURIComponent(
+                                        nft?.token_id,
+                                      )}`}
                                     >
                                       {shortenToken(nft?.token_id ?? '')}
                                     </Link>
@@ -921,7 +924,10 @@ const Details = (props: Props) => {
                             <div className="border rounded ml-2 w-11 h-11 p-1">
                               <Link
                                 className="hover:no-underline"
-                                href={`/nft-token/${nft?.nft_meta?.contract}/${nft?.token_id}`}
+                                href={`/nft-token/${nft?.nft_meta
+                                  ?.contract}/${encodeURIComponent(
+                                  nft?.token_id,
+                                )}`}
                               >
                                 <NFTImage
                                   alt={nft.nft_token_meta.title}

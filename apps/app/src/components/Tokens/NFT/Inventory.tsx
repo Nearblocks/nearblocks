@@ -79,7 +79,9 @@ const Inventory = ({ token, tokens, count, error, tab }: Props) => {
                   key={nft?.contract + nft?.token}
                 >
                   <Link
-                    href={`/nft-token/${nft?.contract}/${nft?.token}`}
+                    href={`/nft-token/${nft?.contract}/${encodeURIComponent(
+                      nft?.token,
+                    )}`}
                     className="w-40 h-40 flex items-center justify-center m-auto overflow-hidden hover:no-underline"
                   >
                     <NFTImage
@@ -92,7 +94,9 @@ const Inventory = ({ token, tokens, count, error, tab }: Props) => {
                   <div className="whitespace-nowrap text-ellipsis overflow-hidden text-xs mb-1 text-nearblue-600 dark:text-neargray-10 mt-4">
                     Token ID:{' '}
                     <Link
-                      href={`/nft-token/${nft?.contract}/${nft?.token}`}
+                      href={`/nft-token/${nft?.contract}/${encodeURIComponent(
+                        nft?.token,
+                      )}`}
                       className="text-green dark:text-green-250 hover:no-underline"
                     >
                       {nft?.token}
