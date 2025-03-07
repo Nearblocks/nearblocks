@@ -1,0 +1,29 @@
+version: '3.6'
+services:
+  prometheus:
+    container_name: mainnet-prometheus
+    image: prom/prometheus
+    ports:
+      - 3011:9090
+    volumes:
+      - prometheus-data:/prometheus
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus-rules.yml:/etc/prometheus/prometheus-rules.yml
+
+  grafana:
+    container_name: mainnet-grafana
+    image: grafana/grafana-oss
+    ports:
+      - 3012:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./monitoring/grafana-sources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./monitoring/grafana-dashboard.json:/var/lib/grafana/dashboards/grafana-dashboard.json
+    depends_on:
+      - prometheus
+    env_file: mainnet.env
+
+volumes:
+  prometheus-data:
+  grafana-data:

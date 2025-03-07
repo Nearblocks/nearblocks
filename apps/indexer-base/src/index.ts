@@ -1,6 +1,7 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
+import { server } from '#libs/http';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncCollidedTxns } from '#services/collidedTxns';
@@ -26,7 +27,7 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([knex.destroy(), sentry.close(1_000)]);
+    await Promise.all([server.close(), knex.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }

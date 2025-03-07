@@ -4,11 +4,13 @@ import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
+import { outcomeHistogram } from '#libs/prom';
 import { jsonStringify, mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
 export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
+  const start = performance.now();
   let outcomes: ExecutionOutcome[] = [];
   let outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
@@ -62,6 +64,7 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
   }
 
   await Promise.all(promises);
+  outcomeHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 export const storeChunkExecutionOutcomes = (

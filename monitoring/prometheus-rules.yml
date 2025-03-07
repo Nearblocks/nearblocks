@@ -1,0 +1,11 @@
+groups:
+  - name: BlockHeightAlert
+    rules:
+      - alert: BlockHeightNotIncreasing
+        expr: rate(block_height_latest[10s]) == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Base indexer not progressing!'
+          description: 'No new blocks for 1 minute.'

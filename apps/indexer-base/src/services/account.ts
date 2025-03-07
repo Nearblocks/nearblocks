@@ -3,11 +3,13 @@ import { BlockHeader, ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { Account } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import {
   isCreateAccountAction,
   isDeleteAccountAction,
   isTransferAction,
 } from '#libs/guards';
+import { accountHistogram } from '#libs/prom';
 import { isEthImplicit, isNearImplicit } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
@@ -30,6 +32,8 @@ export const getGenesisAccountData = (
 });
 
 export const storeAccounts = async (knex: Knex, message: Message) => {
+  const start = performance.now();
+
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkAccounts(
@@ -39,6 +43,8 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
       );
     }),
   );
+
+  accountHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 export const storeChunkAccounts = async (

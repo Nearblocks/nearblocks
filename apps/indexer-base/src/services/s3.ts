@@ -4,6 +4,7 @@ import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { Message } from 'nb-neardata';
 
 import config from '#config';
+import { s3Histogram } from '#libs/prom';
 
 const s3Client = new S3Client({
   credentials: {
@@ -35,6 +36,7 @@ const s3Client = new S3Client({
 export const uploadJson = async (message: Message) => {
   if (config.disableS3Upload) return;
 
+  const start = performance.now();
   const command = new PutObjectCommand({
     Body: JSON.stringify(message),
     Bucket: config.s3Bucket,
@@ -43,4 +45,5 @@ export const uploadJson = async (message: Message) => {
   });
 
   await s3Client.send(command);
+  s3Histogram.labels(config.network).observe(performance.now() - start);
 };

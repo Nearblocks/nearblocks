@@ -5,6 +5,12 @@ import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
+import {
+  blockGauge,
+  blocksHistogram,
+  cacheHistogram,
+  dataSourceGauge,
+} from '#libs/prom';
 import sentry from '#libs/sentry';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
@@ -44,6 +50,9 @@ export const syncData = async (switchSource = false) => {
           : DataSource.FAST_NEAR;
     }
 
+    dataSourceGauge
+      .labels(config.network, source)
+      .set(source === DataSource.FAST_NEAR ? 1 : 0);
     logger.info({ data_source: source, switch_source: switchSource });
 
     const block = await knex('blocks').orderBy('block_height', 'desc').first();
@@ -101,6 +110,7 @@ export const onMessage = async (message: Message) => {
     await prepareCache(message);
 
     const cache = performance.now() - start;
+    cacheHistogram.labels(config.network).observe(cache);
     start = performance.now();
 
     await Promise.race([
@@ -122,10 +132,14 @@ export const onMessage = async (message: Message) => {
       ),
     ]);
 
+    const time = performance.now() - start;
+    blockGauge.labels(config.network).set(message.block.header.height);
+    blocksHistogram.labels(config.network).observe(time);
+
     logger.info({
       block: message.block.header.height,
       cache: `${cache} ms`,
-      db: `${performance.now() - start} ms`,
+      db: `${time} ms`,
     });
   } catch (error) {
     logger.error(
