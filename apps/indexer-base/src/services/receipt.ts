@@ -18,12 +18,14 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { isDelegateAction } from '#libs/guards';
+import { receiptHistogram } from '#libs/prom';
 import redis, { redisClient } from '#libs/redis';
 import { mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
 export const storeReceipts = async (knex: Knex, message: Message) => {
+  const start = performance.now();
   let receiptData: Receipt[] = [];
   let receiptActionsData: ActionReceiptAction[] = [];
   let receiptInputData: ActionReceiptInputData[] = [];
@@ -116,6 +118,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
   }
 
   await Promise.all(promises);
+  receiptHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 const storeChunkReceipts = async (

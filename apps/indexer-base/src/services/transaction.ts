@@ -4,11 +4,13 @@ import { Transaction } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
+import { txnHistogram } from '#libs/prom';
 import { mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
 export const storeTransactions = async (knex: Knex, message: Message) => {
+  const start = performance.now();
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
   const transactions = chunks.flatMap((chunk) => {
     return chunk.transactions.map((txn, index) =>
@@ -40,6 +42,8 @@ export const storeTransactions = async (knex: Knex, message: Message) => {
 
     await Promise.all(promises);
   }
+
+  txnHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 const getTransactionData = (

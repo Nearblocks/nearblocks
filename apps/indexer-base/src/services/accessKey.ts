@@ -8,12 +8,14 @@ import {
 import { AccessKey, AccessKeyPermissionKind } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import {
   isAddKeyAction,
   isDeleteAccountAction,
   isDeleteKeyAction,
   isTransferAction,
 } from '#libs/guards';
+import { keyHistogram } from '#libs/prom';
 import { publicKeyFromImplicitAccount } from '#libs/utils';
 
 type AccessKeyMap = Map<string, AccessKey>;
@@ -54,6 +56,8 @@ export const getGenesisAccessKeyData = (
 };
 
 export const storeAccessKeys = async (knex: Knex, message: Message) => {
+  const start = performance.now();
+
   await Promise.all(
     message.shards.map(async (shard) => {
       await storeChunkAccessKeys(
@@ -63,6 +67,8 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
       );
     }),
   );
+
+  keyHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 export const storeChunkAccessKeys = async (
