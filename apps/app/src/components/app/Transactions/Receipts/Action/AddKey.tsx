@@ -4,6 +4,7 @@ import FaKey from '@/components/app/Icons/FaKey';
 import { Link } from '@/i18n/routing';
 import { shortenAddress, shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
+import { CopyButton } from '@/components/app/common/CopyButton';
 
 const AddKey = (props: TransactionActionInfo) => {
   const t = useTranslations();
@@ -12,8 +13,15 @@ const AddKey = (props: TransactionActionInfo) => {
       <div className="py-1">
         <FaKey className="inline-flex text-emerald-400 mr-1" />{' '}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
-        <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
-        {t ? t('txnDetails.actions.addKey.2') : 'added for'}
+        <span className="font-bold">
+          {shortenHex(props.args.public_key)}
+          {props.args.public_key && (
+            <span className="ml-0.5">
+              <CopyButton textToCopy={props.args.public_key} />
+            </span>
+          )}
+        </span>
+        ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
           href={`/address/${props.receiver}`}
@@ -33,8 +41,15 @@ const AddKey = (props: TransactionActionInfo) => {
       <div className="py-1">
         <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
-        <span className="font-bold">{shortenHex(props.args.public_key)}</span>)
-        {t ? t('txnDetails.actions.addKey.2') : 'added for'}{' '}
+        <span className="font-bold">
+          {shortenHex(props.args.public_key)}
+          {props.args.public_key && (
+            <span className="ml-0.5">
+              <CopyButton textToCopy={props.args.public_key} />
+            </span>
+          )}
+        </span>
+        ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
           href={`/address/${props.receiver}`}
@@ -53,8 +68,15 @@ const AddKey = (props: TransactionActionInfo) => {
     <div className="py-1">
       <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
       {t ? t('txnDetails.actions.addKey.1') : 'Access key'} (
-      <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
-      {t ? t('txnDetails.actions.addKey.2') : 'added for'}
+      <span className="font-bold">
+        {shortenHex(props.args.public_key)}
+        {props.args.public_key && (
+          <span className="ml-0.5">
+            <CopyButton textToCopy={props.args.public_key} />
+          </span>
+        )}
+      </span>
+      ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
       <span className="mx-1">
         {t ? t('txnDetails.actions.addKey.3') : 'contract'}
       </span>

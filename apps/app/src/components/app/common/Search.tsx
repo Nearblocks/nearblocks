@@ -11,15 +11,16 @@ import { routing, useIntlRouter } from '@/i18n/routing';
 import { useRpcStore } from '@/stores/app/rpc';
 import { rpcSearch } from '@/utils/app/rpc';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
-import { NetworkId } from '@/utils/types';
+import { NetworkId, SearchResult, SearchRoute } from '@/utils/types';
 
 import ArrowDown from '../Icons/ArrowDown';
 import SearchIcon from '../Icons/SearchIcon';
 import { Spinner } from './Spinner';
 import useStatsStore from '@/stores/app/syncStats';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
+import useSearchHistory from '@/hooks/app/useSearchHistory';
 
-export const SearchToast = ({ networkId }: any) => {
+export const SearchToast = (networkId: NetworkId) => {
   if (networkId === 'testnet') {
     return (
       <div>
@@ -41,6 +42,29 @@ export const SearchToast = ({ networkId }: any) => {
   );
 };
 
+export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
+  if (!res) return null;
+  if (res.blocks?.length) {
+    return { path: res.blocks[0].block_hash, type: 'block' };
+  }
+  if (res.txns?.length) {
+    return { path: res.txns[0].transaction_hash, type: 'txn' };
+  }
+  if (res.receipts?.length) {
+    return {
+      path: res.receipts[0].originated_from_transaction_hash,
+      type: 'txn',
+    };
+  }
+  if (res.accounts?.length) {
+    return { path: res.accounts[0].account_id, type: 'address' };
+  }
+  if (res.tokens?.length) {
+    return { path: res.tokens[0].contract, type: 'token' };
+  }
+  return null;
+};
+
 const t = (key: string, p?: any): any => {
   p = {};
   const simulateAbsence = true;
@@ -55,6 +79,8 @@ const Search = ({ disabled, header = false }: any) => {
   const [filter, setFilter] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { getSearchResults, setSearchResults, clearSearchHistory } =
+    useSearchHistory();
   const containerRef: any = useRef<HTMLDivElement>(null);
   const indexers = useStatsStore((state) => state.syncStatus);
   const isLocale = (value: null | string): any => {
@@ -82,9 +108,7 @@ const Search = ({ disabled, header = false }: any) => {
 
   const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
 
-  type redirectRoute = { type: string; path: string };
-
-  const redirect = async (route: redirectRoute) => {
+  const redirect = async (route: SearchRoute | null) => {
     const newPath =
       route?.type === 'block'
         ? `/blocks/${route?.path}`
@@ -105,7 +129,7 @@ const Search = ({ disabled, header = false }: any) => {
       if (newPath) {
         return router.push(newPath);
       } else {
-        return toast.error(SearchToast(networkId as NetworkId));
+        return toast.error(SearchToast(networkId));
       }
     } catch (error: any) {
       setIsLoading(false);
@@ -124,32 +148,61 @@ const Search = ({ disabled, header = false }: any) => {
     result?.tokens?.length > 0;
 
   useEffect(() => {
-    if (keyword) {
-      (async () => {
-        try {
-          const data = await handleFilterAndKeyword(keyword, filter, false);
-          if (data) {
+    const fetchData = async () => {
+      if (!keyword) return;
+
+      try {
+        const cachedResults = await getSearchResults(keyword, filter);
+
+        if (cachedResults) {
+          setResult(cachedResults);
+          return;
+        }
+
+        const data = await handleFilterAndKeyword(keyword, filter);
+
+        if (
+          data &&
+          Object.values(data).some(
+            (value) => Array.isArray(value) && value.length > 0,
+          )
+        ) {
+          setResult(data);
+          setSearchResults(keyword, filter, data);
+        } else {
+          if (indexers?.base && !indexers?.base?.sync) {
+            const rpcData = await rpcSearch(rpcUrl, keyword);
+
             if (
-              Object.values(data).some(
-                (value) => Array.isArray(value) && value.length > 0,
+              rpcData &&
+              Object.values(rpcData).some(
+                (arr) => arr.length > 0 && filter !== '/tokens',
               )
             ) {
-              setResult(data);
-            } else {
-              if (indexers?.base && !indexers?.base?.sync) {
-                const rpcData = await rpcSearch(rpcUrl, keyword);
-                setResult(rpcData || {});
-              }
+              setResult(rpcData || {});
+              setSearchResults(keyword, filter, rpcData);
+              return;
             }
-          } else {
-            const rpcData = await rpcSearch(rpcUrl, keyword);
-            setResult(rpcData || {});
           }
-        } catch (error) {
-          console.log('Error in handleFilterAndKeyword:', error);
+
+          const fallbackRpcData = await rpcSearch(rpcUrl, keyword);
+
+          if (
+            fallbackRpcData &&
+            Object.values(fallbackRpcData).some(
+              (arr) => arr.length > 0 && filter !== '/tokens',
+            )
+          ) {
+            setResult(fallbackRpcData || {});
+            setSearchResults(keyword, filter, fallbackRpcData);
+          }
         }
-      })();
-    }
+      } catch (error) {
+        console.log('Error in fetchData:', error);
+      }
+    };
+
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, keyword]);
 
@@ -207,21 +260,50 @@ const Search = ({ disabled, header = false }: any) => {
     ).value;
     const query = text.replace(/[\s,]/g, '');
 
-    if (!query) return toast.error(SearchToast(networkId as NetworkId));
-
-    const route = await handleFilterAndKeyword(query, filter, true);
-
-    if (route) {
-      return redirect(route);
+    if (!query) {
+      return toast.error(SearchToast(networkId));
     }
 
-    const rpcRoute = await rpcSearch(rpcUrl, query, true);
+    const cachedResults = await getSearchResults(keyword, filter);
 
-    if (rpcRoute) {
-      return redirect(rpcRoute as redirectRoute);
+    if (cachedResults) {
+      return redirect(getSearchRoute(cachedResults));
+    } else {
+      const data = await handleFilterAndKeyword(query, filter);
+      const route = getSearchRoute(data);
+
+      if (route) {
+        setSearchResults(keyword, filter, data);
+        return redirect(route);
+      } else {
+        const rpcData = await rpcSearch(rpcUrl, query);
+        const rpcRoute = getSearchRoute(rpcData);
+        if (rpcRoute) {
+          setSearchResults(keyword, filter, rpcData);
+          return redirect(rpcRoute);
+        } else {
+          return toast.error(SearchToast(networkId));
+        }
+      }
     }
+  };
 
-    return toast.error(SearchToast(networkId as NetworkId));
+  const handleClearHistory = async () => {
+    await clearSearchHistory();
+    setResult({});
+    setKeyword('');
+    setIsOpen(false);
+    const searchInput = document.getElementsByClassName(
+      'search',
+    )[0] as HTMLInputElement;
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    toast.success(
+      <div className="whitespace-nowrap text-sm">
+        Search history cleared successfully
+      </div>,
+    );
   };
 
   return (
@@ -275,7 +357,7 @@ const Search = ({ disabled, header = false }: any) => {
           }
         />
         {isOpen && showResults && (
-          <div className="z-50 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-3 shadow border dark:border-black-200">
+          <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-3 shadow border dark:border-black-200">
             <>
               {result?.accounts?.length > 0 && (
                 <>
@@ -377,6 +459,12 @@ const Search = ({ disabled, header = false }: any) => {
                 </>
               )}
             </>
+            <div
+              onClick={handleClearHistory}
+              className="items-center flex justify-center text-xs bg-gray-100 hover:bg-neargray-700 dark:hover:bg-black-200 dark:bg-black-500 cursor-pointer focus:outline-none border dark:border-black-200 text-nearblue-600 dark:text-neargray-10 m-2 px-2 py-1 rounded m"
+            >
+              Clear Search History
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,5 @@
 import { getTranslations } from 'next-intl/server';
 import { ErrorBoundary } from 'react-error-boundary';
-import { getRequest } from '@/utils/app/api';
 import ErrorMessage from '../common/ErrorMessage';
 import Search from '../common/Search';
 import FaInbox from '../Icons/FaInbox';
@@ -16,59 +15,6 @@ export default async function Home({
   theme: string;
 }) {
   const t = await getTranslations({ locale });
-  const handleFilterAndKeyword = async (
-    keyword: string,
-    filter: string,
-    returnPath: any,
-  ) => {
-    'use server';
-
-    if (keyword.includes('.')) {
-      keyword = keyword.toLowerCase();
-    }
-
-    const res = await getRequest(`search${filter}?keyword=${keyword}`);
-
-    const data = {
-      accounts: [],
-      blocks: [],
-      receipts: [],
-      txns: [],
-    };
-
-    if (res?.blocks?.length) {
-      if (returnPath) {
-        return { path: res.blocks[0].block_hash, type: 'block' };
-      }
-      data.blocks = res.blocks;
-    }
-
-    if (res?.txns?.length) {
-      if (returnPath) {
-        return { path: res.txns[0].transaction_hash, type: 'txn' };
-      }
-      data.txns = res.txns;
-    }
-
-    if (res?.receipts?.length) {
-      if (returnPath) {
-        return {
-          path: res.receipts[0].originated_from_transaction_hash,
-          type: 'txn',
-        };
-      }
-      data.receipts = res.receipts;
-    }
-
-    if (res?.accounts?.length) {
-      if (returnPath) {
-        return { path: res.accounts[0].account_id, type: 'address' };
-      }
-      data.accounts = res.accounts;
-    }
-
-    return returnPath ? null : data;
-  };
 
   const errorBoundaryFallback = (
     <div className="h-96 flex items-center">
@@ -90,7 +36,7 @@ export default async function Home({
                 {t('homePage.heroTitle')}
               </h1>
               <div className="h-12" suppressHydrationWarning={true}>
-                <Search handleFilterAndKeyword={handleFilterAndKeyword} />
+                <Search />
               </div>
               <div className="text-white"></div>
             </div>
