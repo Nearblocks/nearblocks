@@ -9,15 +9,16 @@ import useWallet from '@/hooks/app/useWallet';
 import { NearContext } from '../wallet/near-context';
 import Header from './Header';
 import Footer from './Footer';
-import { NetworkId, StatusInfo } from '@/utils/types';
+import { StatusInfo } from '@/utils/types';
 import { toast } from 'react-toastify';
-import { SearchToast } from '../common/Search';
+import { getSearchRoute, SearchToast } from '../common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
 import { rpcSearch } from '@/utils/app/rpc';
 import { useRpcStore } from '@/stores/app/rpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
+import useSearchHistory from '@/hooks/app/useSearchHistory';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -49,6 +50,7 @@ const LayoutActions = ({
   const searchParams = useSearchParams();
   const router = useIntlRouter();
   const query = searchParams?.get('q');
+  const { getSearchResults, setSearchResults } = useSearchHistory();
 
   const initializedRef = useRef(false);
   const useRpcStoreWithProviders = () => {
@@ -88,22 +90,30 @@ const LayoutActions = ({
         case 'token':
           return router.push(`/token/${route?.path}`);
         default:
-          return toast.error(SearchToast(networkId as NetworkId));
+          return toast.error(SearchToast(networkId));
       }
     };
     const loadResults = async (keyword: string) => {
-      const route = await handleFilterAndKeyword(keyword, 'all', true);
-
-      if (route) {
-        return redirect(route);
+      const cachedResults = await getSearchResults(keyword, '');
+      if (cachedResults) {
+        return redirect(getSearchRoute(cachedResults));
+      } else {
+        const data = await handleFilterAndKeyword(keyword, '');
+        const route = getSearchRoute(data);
+        if (route) {
+          setSearchResults(keyword, '', data);
+          return redirect(route);
+        } else {
+          const rpcData = await rpcSearch(rpcUrl, keyword);
+          const rpcRoute = getSearchRoute(rpcData);
+          if (rpcRoute) {
+            setSearchResults(keyword, '', rpcData);
+            return redirect(rpcRoute);
+          } else {
+            return toast.error(SearchToast(networkId));
+          }
+        }
       }
-      const rpcRoute = await rpcSearch(rpcUrl, keyword, true);
-
-      if (rpcRoute) {
-        return redirect(rpcRoute);
-      }
-
-      return toast.error(SearchToast(networkId as NetworkId));
     };
 
     const keyword =

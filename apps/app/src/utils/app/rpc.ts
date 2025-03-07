@@ -1,7 +1,7 @@
 import { baseDecode } from 'borsh';
 import { providers } from 'near-api-js';
 
-import { Account } from '../types';
+import { SearchResult } from '../types';
 import { networkId } from './config';
 import { isValidAccount } from './libs';
 
@@ -44,14 +44,6 @@ export const RpcProviders =
         },
       ];
 
-type RpcSearchResult = {
-  accounts: Account[];
-  blocks: { block_hash: string; block_height: number }[];
-  receipts: { originated_from_transaction_hash: string; receipt_id: string }[];
-  tokens: [];
-  txns: { transaction_hash: string }[];
-};
-
 type response = {
   receipt_id: string;
   parent_transaction_hash: string;
@@ -69,12 +61,8 @@ const receiptRpc =
     ? `https://beta.rpc.mainnet.near.org`
     : `https://beta.rpc.testnet.near.org')`;
 
-export const rpcSearch = async (
-  rpcUrl: string,
-  keyword: string,
-  returnPath?: boolean,
-) => {
-  const data: RpcSearchResult = {
+export const rpcSearch = async (rpcUrl: string, keyword: string) => {
+  const data: SearchResult = {
     accounts: [],
     blocks: [],
     receipts: [],
@@ -98,27 +86,14 @@ export const rpcSearch = async (
   ]);
 
   if (account) {
-    if (returnPath) {
-      return { path: keyword.toLocaleLowerCase(), type: 'address' };
-    }
     data.accounts = [
       {
         account_id: keyword.toLocaleLowerCase(),
-        amount: '',
-        block_hash: '',
-        block_height: 0,
-        code_hash: '',
-        locked: '',
-        storage_paid_at: 0,
-        storage_usage: 0,
       },
     ];
   }
 
   if (block) {
-    if (returnPath) {
-      return { path: block?.header?.hash, type: 'block' };
-    }
     data.blocks = [
       {
         block_hash: block?.header?.hash,
@@ -128,19 +103,10 @@ export const rpcSearch = async (
   }
 
   if (txn) {
-    if (returnPath) {
-      return { path: txn?.transaction?.hash, type: 'txn' };
-    }
     data.txns = [{ transaction_hash: txn?.transaction?.hash }];
   }
 
   if (receipt) {
-    if (returnPath) {
-      return {
-        path: receipt?.parent_transaction_hash,
-        type: 'txn',
-      };
-    }
     data.receipts = [
       {
         originated_from_transaction_hash: receipt?.parent_transaction_hash,
@@ -148,7 +114,7 @@ export const rpcSearch = async (
       },
     ];
   }
-  return returnPath ? null : data;
+  return data;
 };
 
 export const getAccount = async (rpc: string, accountId: string) => {

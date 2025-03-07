@@ -371,11 +371,12 @@ export type EpochStartBlock = {
 };
 export type SearchResult = {
   accounts?: Array<{ account_id: string }>;
-  blocks?: Array<{ block_hash: string; block_height: string }>;
+  blocks?: Array<{ block_hash: string; block_height: number }>;
   receipts?: Array<{
     originated_from_transaction_hash: string;
     receipt_id: string;
   }>;
+  tokens: Array<{ contract: string }>;
   txns?: Array<{ transaction_hash: string }>;
 };
 export type SearchRoute = {
