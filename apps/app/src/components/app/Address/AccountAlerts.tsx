@@ -5,7 +5,7 @@ export default async function AccountAlerts({ id }: { id: string }) {
   const fetchCommonData = async (url?: string | undefined) => {
     try {
       if (url) {
-        const response = await getRequest(`account/${id}`);
+        const response = await getRequest(url);
         return response;
       }
       return null;
@@ -15,7 +15,7 @@ export default async function AccountAlerts({ id }: { id: string }) {
     }
   };
 
-  const accountData = await fetchCommonData();
+  const accountData = await fetchCommonData(`account/${id}`);
 
   if (accountData?.message === 'Error') {
     throw new Error(`Server Error : ${accountData.error}`);

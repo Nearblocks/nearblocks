@@ -43,12 +43,7 @@ export default async function Hash(props: {
       <div className="relative container-xxl mx-auto px-5">
         <ErrorBoundary fallback={errorBoundaryFallback}>
           <Suspense fallback={<HashLoading />}>
-            <Details
-              data={hashData}
-              hash={hash}
-              loading={!hashData}
-              price={priceData}
-            />
+            <Details data={hashData} loading={!hashData} price={priceData} />
           </Suspense>
         </ErrorBoundary>
       </div>

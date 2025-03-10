@@ -43,8 +43,7 @@ const AccountAlertsActions = ({
           return null;
         }),
         viewAccount(params?.id).catch(() => {
-          setAccountValid(false);
-          return null;
+          throw new Error('rpc error');
         }),
       ]);
 
@@ -52,12 +51,12 @@ const AccountAlertsActions = ({
 
       if (code?.code_base64) {
         setContract((prev) => {
-          if (!prev || prev.hash !== code.hash) {
+          if (!prev || prev.hash !== code?.hash) {
             return {
-              block_hash: code.block_hash,
-              block_height: code.block_height,
-              code_base64: code.code_base64,
-              hash: code.hash,
+              block_hash: code?.block_hash,
+              block_height: code?.block_height,
+              code_base64: code?.code_base64,
+              hash: code?.hash,
             };
           }
           return prev;
@@ -70,14 +69,14 @@ const AccountAlertsActions = ({
 
       const locked = (account?.keys || []).every(
         (key: { access_key: { permission: string } }) =>
-          key.access_key.permission !== 'FullAccess',
+          key?.access_key?.permission !== 'FullAccess',
       );
 
       setIsLocked(locked);
 
       if (account) {
         setAccountView((prev) => {
-          if (!prev || prev.account_id !== account.account_id) {
+          if (!prev || prev.account_id !== account?.account_id) {
             return account;
           }
           return prev;
@@ -117,7 +116,7 @@ const AccountAlertsActions = ({
 
   if (
     !accountView &&
-    accountData?.account?.[0].deleted?.transaction_hash &&
+    accountData?.account?.[0]?.deleted?.transaction_hash &&
     !isAccountLoading
   ) {
     return (

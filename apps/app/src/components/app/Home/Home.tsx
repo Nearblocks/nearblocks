@@ -6,6 +6,7 @@ import FaInbox from '../Icons/FaInbox';
 import HomeLatestBlocks from './LatestBlocks';
 import HomeLatestTxns from './LatestTxns';
 import HomeOverview from './Overview';
+import { networkId } from '@/utils/app/config';
 
 export default async function Home({
   locale,
@@ -33,7 +34,11 @@ export default async function Home({
           <div className="flex flex-col lg:flex-row sm:pb-5 lg:!items-center">
             <div className="relative lg:w-3/5 flex-col">
               <h1 className="text-white dark:text-neargray-10 text-2xl font-medium pb-3 flex flex-col">
-                {t('homePage.heroTitle')}
+                {t(
+                  networkId === 'mainnet'
+                    ? 'homePage.heroTitle'
+                    : 'homePage.testnetHeroTitle',
+                )}
               </h1>
               <div className="h-12" suppressHydrationWarning={true}>
                 <Search />
