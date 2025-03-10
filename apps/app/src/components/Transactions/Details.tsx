@@ -546,7 +546,8 @@ const Details = (props: Props) => {
           </div>
         </div>
       )}
-      {(Object.keys(txn).length > 0 || Object.keys(rpcTxn).length > 0) && (
+      {((txn && Object.keys(txn).length > 0) ||
+        (rpcTxn && Object.keys(rpcTxn).length > 0)) && (
         <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 overflow-hidden py-1">
           <div className="flex flex-wrap px-4 py-2">
             <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
