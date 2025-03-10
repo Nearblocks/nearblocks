@@ -44,7 +44,7 @@ export async function generateMetadata(props: {
 
   return {
     alternates: {
-      canonical: `${appUrl}/nft-token/${id}/${tid}`,
+      canonical: `${appUrl}/nft-token/${id}/${encodeURIComponent(tid)}`,
     },
     description: metaDescription,
     openGraph: {
