@@ -72,13 +72,20 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
     {
       header: 'Quantity',
       key: '',
-      cell: (row: HoldersPropsInfo) => (
-        <>
-          {row.amount && token?.decimals
-            ? localFormat(tokenAmount(row.amount, token?.decimals, true))
-            : ''}
-        </>
-      ),
+      cell: (row: HoldersPropsInfo) => {
+        const amountExists = row?.amount !== undefined && row?.amount !== null;
+        const decimalsExist =
+          token?.decimals !== undefined && token?.decimals !== null;
+        const condition = amountExists && decimalsExist;
+
+        return (
+          <>
+            {condition
+              ? localFormat(tokenAmount(row?.amount, token?.decimals, true))
+              : ''}
+          </>
+        );
+      },
       tdClassName:
         'px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
@@ -88,13 +95,21 @@ const Holders = ({ token, status, holder, count, error, tab }: Props) => {
       header: 'Percentage',
       key: 'total_supply',
       cell: (row: HoldersPropsInfo) => {
-        const percentage =
-          token?.total_supply != null &&
-          Number(token.total_supply) !== 0 &&
-          row?.amount &&
-          token?.decimals
-            ? tokenPercentage(token.total_supply, row.amount, token.decimals)
-            : null;
+        const totalSupplyExists = token?.total_supply != null;
+        const totalSupplyNotZero = Number(token?.total_supply) !== 0;
+        const amountExists = row?.amount !== undefined && row?.amount !== null;
+        const decimalsExist =
+          token?.decimals !== undefined && token?.decimals !== null;
+
+        const condition =
+          totalSupplyExists &&
+          totalSupplyNotZero &&
+          amountExists &&
+          decimalsExist;
+
+        const percentage = condition
+          ? tokenPercentage(token?.total_supply, row?.amount, token?.decimals)
+          : null;
 
         return (
           <>
