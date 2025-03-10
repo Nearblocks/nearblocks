@@ -12,7 +12,7 @@ export default async function NFTDetailsIndex(props: {
 
   const { id, tid } = params;
 
-  const apiUrl = `nfts/${id}/tokens/${tid}`;
+  const apiUrl = `nfts/${id}/tokens/${encodeURIComponent(tid)}`;
   const fetchUrl = searchParams
     ? `${apiUrl}/txns?${QueryString.stringify(searchParams)}`
     : `${apiUrl}/txns`;

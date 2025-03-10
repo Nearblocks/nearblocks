@@ -279,7 +279,9 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
         <span>
           <Link
             className="bg-gray-100 dark:bg-black-200 hover:bg-gray-200 px-2 py-1 rounded hover:no-underline"
-            href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
+            href={`/nft-token/${row?.nft?.contract}/${encodeURIComponent(
+              row?.token_id,
+            )}`}
           >
             View NFT &gt;
           </Link>
