@@ -141,8 +141,8 @@
       "targets": [
         {
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "histogram_quantile(0.99, sum by(le) (rate(block_processing_ms_bucket[5s])))",
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(block_processing_ms_bucket[10])))",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "legendFormat": "__auto",
@@ -1963,6 +1963,6 @@
   "timezone": "browser",
   "title": "NearBlocks",
   "uid": "cef0c4ac7de68f",
-  "version": 107,
+  "version": 1,
   "weekStart": ""
 }

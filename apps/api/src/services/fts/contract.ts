@@ -258,7 +258,7 @@ const holders = catchAsync(
         account,
         amount
       FROM
-        ft_holders
+        ft_holders_new
       WHERE
         contract = ${contract}
         AND amount > 0
@@ -284,7 +284,7 @@ const holdersCount = catchAsync(
       SELECT
         ${options.select}
       FROM
-        ft_holders
+        ft_holders_new
       WHERE
         contract = :contract
         AND amount > 0

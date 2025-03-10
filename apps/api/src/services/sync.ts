@@ -153,7 +153,7 @@ const getFTHoldersStatus = async () => {
   const eventsHeight = settings.find((item: Setting) => item.key === 'events')
     ?.value?.sync;
   const ftHoldersHeight = settings.find(
-    (item: Setting) => item.key === 'ft_holders',
+    (item: Setting) => item.key === 'ft_holders_new',
   )?.value?.sync;
 
   if (!ftHoldersHeight) {
@@ -185,7 +185,7 @@ const getNFTHoldersStatus = async () => {
   const settings = await getSettings();
 
   const nftHoldersHeight = settings.find(
-    (item: Setting) => item.key === 'nft_holders',
+    (item: Setting) => item.key === 'nft_holders_new',
   )?.value?.sync;
 
   if (!nftHoldersHeight) {
