@@ -22,9 +22,9 @@ import ErrorMessage from '../common/ErrorMessage';
 import FileSlash from '../Icons/FileSlash';
 import Skeleton from '../skeleton/common/Skeleton';
 import Tooltip from '../common/Tooltip';
+import { useParams } from 'next/navigation';
 interface Props {
   data: any;
-  hash?: any;
   loading?: any;
   price: any;
 }
@@ -35,19 +35,20 @@ interface BlockData {
 
 export default function Details(props: Props) {
   const t = useTranslations();
-  const { data, hash, price } = props;
+  const { data, price } = props;
   const nearPrice = price?.stats[0]?.near_price;
   const { networkId } = useConfig();
   const { getBlockDetails } = useRpc();
   const [blockInfo, setBlockInfo] = useState<BlockData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [utc, setUtc] = useState(true);
+  const params = useParams<{ hash: string }>();
 
   useEffect(() => {
     const fetchBlockData = async () => {
       if (!data || data?.blocks?.length === 0) {
         try {
-          const res = await getBlockDetails(hash);
+          const res = await getBlockDetails(params?.hash);
 
           if (res) {
             let limit = 0;
@@ -88,7 +89,7 @@ export default function Details(props: Props) {
 
     fetchBlockData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, hash]);
+  }, [data, params?.hash]);
 
   interface Props {
     children?: string;
@@ -162,7 +163,7 @@ export default function Details(props: Props) {
               <ErrorMessage
                 icons={<FileSlash />}
                 message="Sorry, We are unable to locate this BlockHash"
-                mutedText={hash ? hash : ''}
+                mutedText={params?.hash ? params?.hash : ''}
               />
             </div>
           </div>
