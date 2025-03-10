@@ -257,7 +257,7 @@ const holders = catchAsync(
         account,
         COUNT(token) AS quantity
       FROM
-        nft_holders
+        nft_holders_new
       WHERE
         contract = ${contract}
         AND quantity > 0
@@ -285,7 +285,7 @@ const holdersCount = catchAsync(
       SELECT
         ${options.select}
       FROM
-        nft_holders
+        nft_holders_new
       WHERE
         contract = :contract
         AND quantity > 0

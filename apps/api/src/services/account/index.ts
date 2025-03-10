@@ -252,8 +252,8 @@ const inventory = catchAsync(
 
     const ftQuery = sql`
       SELECT
-        ft_holders.contract,
-        ft_holders.amount,
+        ft_holders_new.contract,
+        ft_holders_new.amount,
         JSON_BUILD_OBJECT(
           'name',
           meta.name,
@@ -269,7 +269,7 @@ const inventory = catchAsync(
           meta.price
         ) AS ft_meta
       FROM
-        ft_holders
+        ft_holders_new
         INNER JOIN LATERAL (
           SELECT
             contract,
@@ -282,16 +282,16 @@ const inventory = catchAsync(
           FROM
             ft_meta
           WHERE
-            ft_meta.contract = ft_holders.contract
+            ft_meta.contract = ft_holders_new.contract
         ) AS meta ON TRUE
       WHERE
-        ft_holders.account = ${account}
-        AND ft_holders.amount > 0
+        ft_holders_new.account = ${account}
+        AND ft_holders_new.amount > 0
     `;
 
     const nftQuery = sql`
       SELECT
-        nft_holders.*,
+        nft_holders_new.*,
         JSON_BUILD_OBJECT(
           'name',
           meta.name,
@@ -305,24 +305,24 @@ const inventory = catchAsync(
       FROM
         (
           SELECT
-            nft_holders.contract,
-            SUM(nft_holders.quantity) AS quantity
+            nft_holders_new.contract,
+            SUM(nft_holders_new.quantity) AS quantity
           FROM
             (
               SELECT
                 contract,
                 quantity
               FROM
-                nft_holders
+                nft_holders_new
               WHERE
                 account = ${account}
                 AND quantity > 0
-            ) nft_holders
+            ) nft_holders_new
           GROUP BY
-            nft_holders.contract
+            nft_holders_new.contract
           ORDER BY
-            SUM(nft_holders.quantity) DESC
-        ) nft_holders
+            SUM(nft_holders_new.quantity) DESC
+        ) nft_holders_new
         INNER JOIN LATERAL (
           SELECT
             contract,
@@ -333,7 +333,7 @@ const inventory = catchAsync(
           FROM
             nft_meta
           WHERE
-            nft_meta.contract = nft_holders.contract
+            nft_meta.contract = nft_holders_new.contract
         ) AS meta ON TRUE
     `;
 

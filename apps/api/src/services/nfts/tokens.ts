@@ -49,7 +49,7 @@ const list = catchAsync(
           SELECT
             account
           FROM
-            nft_holders
+            nft_holders_new
           WHERE
             contract = tm.contract
             AND token = tm.token
@@ -130,7 +130,7 @@ const item = catchAsync(
           SELECT
             account
           FROM
-            nft_holders
+            nft_holders_new
           WHERE
             contract = tm.contract
             AND token = tm.token
