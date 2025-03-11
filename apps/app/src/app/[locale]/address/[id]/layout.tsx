@@ -55,11 +55,11 @@ export default async function AddressLayout(props: {
       <div className="relative container-xxl mx-auto px-4">
         <div className="flex items-center justify-between flex-wrap">
           <div className="flex md:flex-wrap w-full border-b dark:border-black-200">
-            <div className="sm:flex flex-1 py-3 justify-between md:items-center dark:text-neargray-10 w-full ">
-              <h1 className="break-all text-lg py-2 px-1 dark:text-neargray-10 text-nearblue-600 font-medium md:inline-flex ">
-                Near Account:&nbsp;
+            <div className="md:flex md:flex-wrap py-3 justify-between md:items-center dark:text-neargray-10 w-full">
+              <h1 className="text-lg py-2 px-1 dark:text-neargray-10 text-nearblue-600 font-medium md:inline-flex flex-wrap">
+                <span className="flex">Near Account:&nbsp;</span>
                 {id && (
-                  <span className="text-green-500 dark:text-green-250 mx-0.5">
+                  <span className="text-green-500 dark:text-green-250 sm:ml-0.5 mr-0.5 flex-wrap">
                     @<span className="font-semibold">{id}</span>
                   </span>
                 )}

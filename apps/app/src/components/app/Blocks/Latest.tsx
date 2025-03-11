@@ -163,7 +163,7 @@ const LatestBlocks = ({ blocks, error }: Props) => {
       {blocks && blocks?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Link href="/blocks">
-            <span className="block  dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-medium dark:hover:text-green-250 text-white dark:text-sm text-sm py-2 rounded w-full focus:outline-none hover:no-underline cursor-pointer">
+            <span className="block dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-medium dark:hover:text-green-250 text-white text-[13px] py-2 rounded w-full focus:outline-none hover:no-underline cursor-pointer">
               View all blocks
             </span>
           </Link>

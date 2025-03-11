@@ -23,6 +23,8 @@ import FileSlash from '../Icons/FileSlash';
 import Skeleton from '../skeleton/common/Skeleton';
 import Tooltip from '../common/Tooltip';
 import { useParams } from 'next/navigation';
+import ActionMenuPopover from '../common/ActionMenuPopover';
+import FaDoubleCheck from '../Icons/FaDoubleCheck';
 interface Props {
   data: any;
   loading?: any;
@@ -115,13 +117,13 @@ export default function Details(props: Props) {
 
   return (
     <>
-      <div className="md:flex items-center justify-between">
+      <div className="md:flex items-center justify-between py-3">
         {isLoading ? (
-          <div className="w-40 max-w-xs pr-2 py-6">
+          <div className="w-40 max-w-xs pr-2 py-2">
             <Skeleton className="h-5" />
           </div>
         ) : (
-          <h1 className="text-lg text-nearblue-600 dark:text-neargray-10 pr-2 py-5">
+          <h1 className="text-lg text-nearblue-600 dark:text-neargray-10 pr-2 py-2">
             {block ? (
               t ? (
                 <>
@@ -155,6 +157,29 @@ export default function Details(props: Props) {
             ) : null}
           </h1>
         )}
+        <ActionMenuPopover>
+          <ul>
+            <li className="hover:bg-gray-100 dark:hover:bg-black-200 px-2 py-1 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250">
+              <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center">
+                <span className="mr-2">
+                  <FaDoubleCheck />
+                </span>
+                <a
+                  className="text-xs"
+                  href={
+                    params?.hash
+                      ? `https://nearvalidate.org/blocks/${params?.hash}?network=${networkId}`
+                      : ''
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Validate Block
+                </a>
+              </span>
+            </li>
+          </ul>
+        </ActionMenuPopover>
       </div>
       {!isLoading && !block ? (
         <div className="text-nearblue-700 text-xs px-2 mb-5">

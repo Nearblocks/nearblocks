@@ -164,7 +164,7 @@ const LatestTransactions = ({ error, txns }: Props) => {
       {txns && txns?.length > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Link
-            className="block text-center dark:text-white  border border-green-900/10 font-medium bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white text-sm dark:text-sm py-2 rounded w-full focus:outline-none hover:no-underline"
+            className="block text-center dark:text-white text-[13px] font-medium border border-green-900/10 bg-green-500 dark:hover:text-green-250 dark:bg-black-600/[0.75] hover:bg-green-400 text-white py-2 rounded w-full focus:outline-none hover:no-underline"
             href="/txns"
           >
             View all transactions

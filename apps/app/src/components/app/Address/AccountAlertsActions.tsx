@@ -140,7 +140,7 @@ const AccountAlertsActions = ({
             </div>
           </div>
         </div>
-        <div className="py-2"></div>
+        <div className="py-1"></div>
       </>
     );
   }
@@ -148,10 +148,11 @@ const AccountAlertsActions = ({
     return (
       <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
         <div>
-          <div className="pl-1.5 py-4 min-h-[25px]">
+          <div className="pl-1.5 py-3 min-h-[25px]">
             This address does not exist.
           </div>
         </div>
+        <div className="py-1"></div>
       </div>
     );
   }
@@ -177,7 +178,7 @@ const AccountAlertsActions = ({
             </div>
           </div>
         </div>
-        <div className="py-2"></div>
+        <div className="py-1"></div>
       </>
     );
   }
