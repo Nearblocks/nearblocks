@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 
 import Chart from '@/components/app/Charts/Chart';
-import ChartSkeletion from '@/components/app/skeleton/charts/Index';
+import ChartDetails from '@/components/app/skeleton/charts/Detail';
 
 export default async function ChartIndex(props: {
   params: Promise<{ hash: string; locale: string }>;
@@ -26,7 +26,7 @@ export default async function ChartIndex(props: {
       </div>
       <div className="container-xxl mx-auto px-4">
         <div>
-          <Suspense fallback={<ChartSkeletion />}>
+          <Suspense fallback={<ChartDetails />}>
             <Chart poweredBy={false} theme={theme} />
           </Suspense>
         </div>

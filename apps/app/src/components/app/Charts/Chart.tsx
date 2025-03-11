@@ -431,15 +431,15 @@ const Chart = (props: Props) => {
             className="block bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden mb-10"
             style={{ height: 580 }}
           >
-            <div className="border-b dark:border-black-200 flex justify-between items-center">
-              {chartData?.length > 0 ? (
-                <div className="w-full flex flex-col sm:!flex-row sm:justify-between py-2 items-end sm:!py-0 sm:items-center">
-                  <p className="leading-7 px-4 text-sm py-4 text-nearblue-600 dark:text-neargray-10">
+            <div className="border-b dark:border-black-200 py-4 px-4 flex justify-between items-center">
+              {chartOptions && chartData?.length > 0 ? (
+                <div className="w-full flex sm:justify-between gap-2 flex-wrap">
+                  <p className="leading-7 text-sm text-nearblue-600 dark:text-neargray-10">
                     {chartInfo?.description}
                   </p>
-                  <div className="flex items-center text-nearblue-600 dark:text-neargray-10">
+                  <span className="items-center text-nearblue-600 dark:text-neargray-10 inline-flex">
                     <Tooltip
-                      className={'left-1/2 max-w-[200px] w-40'}
+                      className={'sm:left-1/2 left-20 max-w-[200px] w-40'}
                       position="bottom"
                       tooltip="Toggle between Log View and Normal View. Log View uses logarithmic scale."
                     >
@@ -447,25 +447,25 @@ const Chart = (props: Props) => {
                         <Question className="w-4 h-4 fill-current mr-2" />
                       </span>
                     </Tooltip>
-                    <div className="w-8 flex">
+                    <div className="flex">
                       <SwitchButton
                         onChange={handleToggle}
                         selected={logView}
                       />
                     </div>
-                    <label className="text-nearblue-600 dark:text-neargray-10 text-sm leading-none pr-[15px] px-2">
+                    <label className="text-nearblue-600 dark:text-neargray-10 text-sm leading-none px-2">
                       {'Log View'}
                     </label>
-                  </div>
+                  </span>
                 </div>
               ) : (
-                <div className="py-5 mt-1 ml-4">
-                  <Skeleton className="w-80 h-4" />
+                <div className="py-1 my-0.5 pr-5">
+                  <Skeleton className="sm:w-80 w-40 h-4" />
                 </div>
               )}
             </div>
             <div className="pl-2 pr-2 py-8 h-full ">
-              {chartData?.length ? (
+              {chartData?.length && chartOptions ? (
                 // <iframe
                 //   srcDoc={iframeSrc}
                 //   style={{

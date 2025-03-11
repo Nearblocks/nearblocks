@@ -18,37 +18,29 @@ export default async function Delegator(props: {
 
   return (
     <div className="container-xxl relative mx-auto px-4">
-      <div className="md:flex justify-between">
+      <div className="flex items-center justify-between w-full">
         {!id ? (
           <div className="w-80 max-w-xs px-1 py-5">
             <Skeleton className="h-7" />
           </div>
         ) : (
-          <div className="md:flex-wrap w-full">
-            <div className="break-words px-1">
-              <div className="py-5 sm:flex flex-1 md:items-center w-full justify-between text-lg font-medium dark:text-neargray-10 text-nearblue-600">
-                <div className="md:flex-wrap flex-wrap">
-                  <span className="whitespace-nowrap">
-                    Near Validator:&nbsp;
+          <div className="w-full px-1">
+            <div className="md:flex flex-wrap py-3 md:items-center justify-between text-lg font-medium dark:text-neargray-10 text-nearblue-600">
+              <h1 className="py-2 flex-wrap md:flex">
+                <span className="flex">Near Validator:&nbsp;</span>
+                {id && (
+                  <span className="text-green-500 dark:text-green-250 flex-wrap">
+                    @<span className="font-semibold">{id}</span>
                   </span>
-                  {id && (
-                    <span className="text-center items-center">
-                      <span className="text-green-500 dark:text-green-250">
-                        @<span className="font-semibold">{id}</span>
-                      </span>
-                      <span className="ml-2">
-                        <Buttons address={id} />
-                      </span>
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <div className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs font-normal">
-                    <span className="ml-2 text-xs">
-                      <RpcMenu />
-                    </span>
-                  </div>
-                </div>
+                )}
+                <span className="ml-1.5">
+                  <Buttons address={id} />
+                </span>
+              </h1>
+              <div className="relative items-center text-center text-gray-500 text-xs font-normal flex">
+                <span className="text-xs items-center flex">
+                  <RpcMenu />
+                </span>
               </div>
             </div>
           </div>

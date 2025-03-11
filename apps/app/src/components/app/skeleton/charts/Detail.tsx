@@ -7,7 +7,7 @@ import { useConfig } from '@/hooks/app/useConfig';
 import Skeleton from '../common/Skeleton';
 
 interface Props {
-  chartTypes: string;
+  chartTypes?: string;
   className?: string;
 }
 
@@ -99,7 +99,7 @@ const ChartDetails = forwardRef(
                   key={chart.link}
                 >
                   <div>
-                    <a className="block leading-7 p-3 text-sm text-nearblue-600 dark:text-neargray-10 border-b  dark:border-black-200 truncate">
+                    <a className="block leading-7 p-3 text-sm font-medium text-nearblue-600 dark:text-neargray-10 border-b  dark:border-black-200 truncate">
                       <h2>{t(chart.text)}</h2>
                     </a>
                   </div>
