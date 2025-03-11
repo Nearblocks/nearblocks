@@ -18,10 +18,9 @@ import Question from '../../Icons/Question';
 import WarningIcon from '../../Icons/WarningIcon';
 import TokenTransfers from './TokenTransfers';
 import { convertTimestampToTimes } from '@/utils/app/libs';
+import { useParams } from 'next/navigation';
 interface Props {
   error: boolean;
-  id: string;
-  tid?: string;
   tokenInfo: { tokens: Token[] };
   txnsCount: {
     txns: { count: string }[];
@@ -33,8 +32,7 @@ interface Props {
 }
 const NFTDetails = ({
   error,
-  id,
-  tid,
+
   tokenInfo,
   txnsCount,
   txnsList,
@@ -43,6 +41,8 @@ const NFTDetails = ({
   const [isVisible, setIsVisible] = useState(true);
   const [utc, setUtc] = useState(true);
   const token: Token = tokenInfo?.tokens?.[0];
+  const params = useParams<{ id: string; tid: string }>();
+
   const { data: spamList } = useFetch(
     'https://raw.githubusercontent.com/Nearblocks/spam-token-list/main/tokens.json',
   );
@@ -81,7 +81,7 @@ const NFTDetails = ({
 
   return (
     <div className="container-xxl mx-auto px-5">
-      {isTokenSpam(token?.contract || id) && isVisible && (
+      {isTokenSpam(token?.contract || params?.id) && isVisible && (
         <>
           <div className="w-full mt-6 flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
             <p className="items-center">
@@ -142,7 +142,7 @@ const NFTDetails = ({
           </h1>
           <Link
             className="break-all text-green dark:text-green-250 leading-6 text-sm hover:no-underline font-semibold"
-            href={`/nft-token/${id}`}
+            href={`/nft-token/${params?.id}`}
           >
             <span className="inline-flex align-middle h-5 w-5 mr-2.5">
               <TokenImage
@@ -210,9 +210,9 @@ const NFTDetails = ({
                     <div className="w-full xl:w-3/4 word-break">
                       <Link
                         className="text-green  dark:text-green-250 hover:no-underline font-medium"
-                        href={`/address/${id}`}
+                        href={`/address/${params?.id}`}
                       >
-                        {shortenAddress && shortenAddress(id ?? '')}
+                        {shortenAddress && shortenAddress(params?.id ?? '')}
                       </Link>
                     </div>
                   </div>
@@ -229,7 +229,9 @@ const NFTDetails = ({
                       </Tooltip>
                       Token ID:
                     </div>
-                    <div className="w-full xl:w-3/4 word-break">{tid}</div>
+                    <div className="w-full xl:w-3/4 word-break">
+                      {decodeURIComponent(params?.tid)}
+                    </div>
                   </div>
                   <div className="flex p-4">
                     <div className="flex items-center w-full xl:w-1/4 mb-2 xl:mb-0">
