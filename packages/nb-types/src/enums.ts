@@ -110,6 +110,11 @@ export enum NFTLogKind {
   TRANSFER = 'nft_transfer',
 }
 
+export enum ContractEventType {
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+}
+
 // Used for creating DB event index
 export enum EventType {
   NEP141 = 1,
