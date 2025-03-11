@@ -174,6 +174,10 @@ export const userAuthURL =
 
 export const gTag = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-P285ZPV2';
 
+export const projectId =
+  process.env.NEXT_PUBLIC_REOWN_PROJECT_ID ||
+  '5690251ad29b1ed10f9a41bf343964e1';
+
 export const intentsAddressList: Record<string, string> = {
   'eth-0xdac17f958d2ee523a2206206994597c13d831ec7':
     'eth-0xdac17f958d2ee523a2206206994597c13d831ec7.omft.near',

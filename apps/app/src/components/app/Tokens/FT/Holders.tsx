@@ -74,13 +74,20 @@ const Holders = ({ count, error, holder, status, tab, token }: Props) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: HoldersPropsInfo) => (
-        <>
-          {row.amount && token?.decimals
-            ? localFormat(tokenAmount(row.amount, token?.decimals, true))
-            : ''}
-        </>
-      ),
+      cell: (row: HoldersPropsInfo) => {
+        const amountExists = row?.amount !== undefined && row?.amount !== null;
+        const decimalsExist =
+          token?.decimals !== undefined && token?.decimals !== null;
+        const condition = amountExists && decimalsExist;
+
+        return (
+          <>
+            {condition
+              ? localFormat(tokenAmount(row?.amount, token?.decimals, true))
+              : ''}
+          </>
+        );
+      },
       header: 'Quantity',
       key: '',
       tdClassName:
@@ -90,13 +97,21 @@ const Holders = ({ count, error, holder, status, tab, token }: Props) => {
     },
     {
       cell: (row: HoldersPropsInfo) => {
-        const percentage =
-          token?.total_supply != null &&
-          Number(token.total_supply) !== 0 &&
-          row?.amount &&
-          token?.decimals
-            ? tokenPercentage(token.total_supply, row.amount, token.decimals)
-            : null;
+        const totalSupplyExists = token?.total_supply != null;
+        const totalSupplyNotZero = Number(token?.total_supply) !== 0;
+        const amountExists = row?.amount !== undefined && row?.amount !== null;
+        const decimalsExist =
+          token?.decimals !== undefined && token?.decimals !== null;
+
+        const condition =
+          totalSupplyExists &&
+          totalSupplyNotZero &&
+          amountExists &&
+          decimalsExist;
+
+        const percentage = condition
+          ? tokenPercentage(token?.total_supply, row?.amount, token?.decimals)
+          : null;
         return (
           <>
             {percentage === null
@@ -126,9 +141,14 @@ const Holders = ({ count, error, holder, status, tab, token }: Props) => {
     },
     {
       cell: (row: HoldersPropsInfo) => {
+        const amountExists = row.amount !== undefined && row.amount !== null;
+        const decimalsExist =
+          token?.decimals !== undefined && token?.decimals !== null;
+        const priceExists = token?.price !== undefined && token?.price !== null;
+
         return (
           <span>
-            {row.amount && token?.decimals && token?.price
+            {amountExists && decimalsExist && priceExists
               ? '$' + price(row.amount, token?.decimals, token?.price)
               : ''}
           </span>
