@@ -22,6 +22,7 @@ function svgToBase64(svgString: string) {
 }
 
 export async function GET(request: Request) {
+  const network = process.env.NEXT_PUBLIC_NETWORK_ID;
   const url = new URL(request.url);
   const title = url.searchParams.get('title') || 'Near blocks';
   const basic = url.searchParams.has('basic');
@@ -156,7 +157,9 @@ export async function GET(request: Request) {
               zIndex: 1,
             }}
           >
-            <div>{titleText}</div>
+            <div>{`${
+              network === 'testnet' ? 'TESTNET | ' : ''
+            }${titleText}`}</div>
 
             {blockHash && blockHeight && (
               <div
