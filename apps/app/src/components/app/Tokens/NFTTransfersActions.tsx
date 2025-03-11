@@ -266,7 +266,9 @@ const NFTTransfersActions = ({
             <span>
               <Link
                 className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                href={`/nft-token/${row?.nft?.contract}/${row?.token_id}`}
+                href={`/nft-token/${row?.nft?.contract}/${encodeURIComponent(
+                  row?.token_id,
+                )}`}
               >
                 {row?.token_id}
               </Link>

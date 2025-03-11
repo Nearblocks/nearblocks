@@ -35,8 +35,8 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
   const [showAge, setShowAge] = useState(true);
   const errorMessage = ' No token transfers found!';
   const [page, setPage] = useState(1);
-  const count = txnsCount?.txns[0]?.count;
-  const txns: TransactionInfo[] = data?.txns;
+  const count = txnsCount?.txns?.[0]?.count;
+  const txns: TransactionInfo[] = data?.txns ? data?.txns : [];
   let cursor = data?.cursor;
   const t = useTranslations();
 
