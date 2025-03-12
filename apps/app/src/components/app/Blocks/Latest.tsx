@@ -82,7 +82,7 @@ const LatestBlocks = ({ blocks, error }: Props) => {
             </div>
           )}
           {blocks?.length > 0 && (
-            <div className="px-3 divide-y dark:divide-black-200 h-80">
+            <div className="px-3 divide-y dark:divide-black-200 h-80 lg:overflow-visible overflow-y-scroll">
               {blocks?.map((block: BlocksInfo) => {
                 return (
                   <div
