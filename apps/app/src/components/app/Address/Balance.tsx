@@ -20,18 +20,9 @@ export default async function Balance({ id }: { id: string }) {
     </div>
   );
 
-  const alertErrorFallback = (
-    <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
-      <div>
-        <div className="pl-1.5 py-4 min-h-[25px]">
-          Unable to check account validity.
-        </div>
-      </div>
-    </div>
-  );
   return (
     <>
-      <ErrorBoundary fallback={alertErrorFallback}>
+      <ErrorBoundary fallback={<div />}>
         <AccountAlerts id={id} />
       </ErrorBoundary>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

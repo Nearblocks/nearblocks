@@ -82,7 +82,7 @@ const MultichainInfoActions = ({ multiChainAccounts }: Props) => {
               >
                 <div className="dark:bg-black">
                   <PerfectScrollbar>
-                    <div className="max-h-60 dark:bg-black">
+                    <div className="max-h-60 dark:bg-black lg:overflow-visible overflow-y-scroll">
                       {multiChainAccounts?.map((address: any, index: any) => (
                         <div
                           className=" dark:bg-black flex justify-between items-center px-1.5 py-1 hover:bg-gray-100 dark:hover:bg-black-200 truncate cursor-pointer rounded-lg"

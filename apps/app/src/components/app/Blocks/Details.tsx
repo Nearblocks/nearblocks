@@ -117,9 +117,9 @@ export default function Details(props: Props) {
 
   return (
     <>
-      <div className="md:flex items-center justify-between py-3">
+      <div className="flex flex-wrap items-center justify-between py-3 px-1 w-full">
         {isLoading ? (
-          <div className="w-40 max-w-xs pr-2 py-2">
+          <div className="w-40 max-w-xs pr-2 py-3">
             <Skeleton className="h-5" />
           </div>
         ) : (
@@ -130,7 +130,7 @@ export default function Details(props: Props) {
                   <span className="font-medium">
                     {t('block.heading.0') || 'Block'}
                   </span>
-                  <span className="pl-1 font-semibold" key={1}>
+                  <span className="font-semibold" key={1}>
                     {t('block.heading.1', {
                       block: block?.block_height
                         ? localFormat(block?.block_height.toString())
@@ -146,7 +146,7 @@ export default function Details(props: Props) {
               ) : (
                 <>
                   <span className="font-bold">Block</span>
-                  <span className="pl-1 font-semibold" key={1}>
+                  <span className="font-semibold" key={1}>
                     #
                     {block?.block_height
                       ? localFormat(block?.block_height.toString())

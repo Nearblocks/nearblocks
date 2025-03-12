@@ -84,7 +84,7 @@ const TokenHoldings = (props: Props) => {
       >
         <div className="dark:bg-black">
           <PerfectScrollbar>
-            <div className="max-h-60 dark:bg-black">
+            <div className="max-h-60 dark:bg-black lg:overflow-visible overflow-y-scroll">
               {props.ft?.tokens?.length > 0 && (
                 <>
                   <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10 font-semibold pr-2 pl-1.5 py-2 mx-2 mt-1 rounded-lg">
