@@ -25,7 +25,8 @@ const changes = catchAsync(
         direction,
         cause,
         absolute_staked_amount,
-        absolute_nonstaked_amount
+        absolute_nonstaked_amount,
+        block_timestamp
       FROM
         balance_events
       WHERE
