@@ -17,7 +17,7 @@ if (config.dbCa) {
 const writeConfig = {
   client: 'pg',
   connection: {
-    application_name: 'indexer-balance',
+    application_name: 'indexer-contract',
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
     statement_timeout: 60 * 1000,
@@ -29,7 +29,7 @@ export const readConfig = {
   ...writeConfig,
   connection: {
     ...writeConfig.connection,
-    application_name: 'indexer-balance-read',
+    application_name: 'indexer-contract-read',
     connectionString: config.dbUrlRead || config.dbUrl,
   },
 };
@@ -38,7 +38,7 @@ export const streamConfig = {
   ...readConfig,
   connection: {
     ...readConfig.connection,
-    application_name: 'indexer-balance-stream',
+    application_name: 'indexer-contract-stream',
   },
 };
 
