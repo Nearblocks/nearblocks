@@ -13,6 +13,7 @@ import {
 import WarningIcon from '../Icons/WarningIcon';
 import SponsoredText from '../SponsoredText';
 import { useParams } from 'next/navigation';
+import AddressValidator from './AddressValidator';
 const AccountAlertsActions = ({
   accountData,
   sponsoredText,
@@ -28,7 +29,6 @@ const AccountAlertsActions = ({
   const [isContractLoading, setIsContractLoading] = useState(true);
   const [accessKeys, setAccessKeys] = useState<[] | KeysInfo>([]);
   const params = useParams<{ id: string }>();
-  const [accountValid, setAccountValid] = useState(true);
 
   const loadSchema = useCallback(async () => {
     if (!params?.id) return;
@@ -46,8 +46,6 @@ const AccountAlertsActions = ({
           throw new Error('rpc error');
         }),
       ]);
-
-      setAccountValid(!!account);
 
       if (code?.code_base64) {
         setContract((prev) => {
@@ -102,7 +100,7 @@ const AccountAlertsActions = ({
     loadSchema();
   }, [loadSchema]);
 
-  if (accountValid && !isAccountLoading && !isLocked && sponsoredText) {
+  if (!isAccountLoading && !isLocked && sponsoredText) {
     return (
       <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
         <div>
@@ -144,17 +142,9 @@ const AccountAlertsActions = ({
       </>
     );
   }
-  if (accountValid === false) {
-    return (
-      <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
-        <div>
-          <div className="pl-1.5 py-3 min-h-[25px]">
-            This address does not exist.
-          </div>
-        </div>
-        <div className="py-1"></div>
-      </div>
-    );
+
+  if (accountData || accountView) {
+    return <AddressValidator accountData={accountData} />;
   }
 
   if (
