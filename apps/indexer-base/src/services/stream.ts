@@ -55,11 +55,10 @@ export const syncData = async (switchSource = false) => {
       .set(source === DataSource.FAST_NEAR ? 1 : 0);
     logger.info({ data_source: source, switch_source: switchSource });
 
+    let startBlockHeight = config.startBlockHeight;
     const block = await knex('blocks').orderBy('block_height', 'desc').first();
 
     if (source === DataSource.FAST_NEAR) {
-      let startBlockHeight = config.startBlockHeight;
-
       if (!startBlockHeight && block) {
         const next = +block.block_height - config.delta;
         startBlockHeight = next;
@@ -87,7 +86,7 @@ export const syncData = async (switchSource = false) => {
         throw error;
       });
     } else {
-      if (!lakeConfig.startBlockHeight && block) {
+      if (!startBlockHeight && block) {
         const next = +block.block_height - config.delta;
         lakeConfig.startBlockHeight = next;
         logger.info(`last synced block: ${block.block_height}`);
