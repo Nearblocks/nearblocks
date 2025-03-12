@@ -15,7 +15,7 @@ const env = cleanEnv(process.env, {
     choices: [Network.MAINNET],
   }),
   S3_ACCESS_KEY: str(),
-  S3_BUCKET: str({ default: 'nearblocks' }),
+  S3_BUCKET: str({ default: '' }),
   S3_ENDPOINT: url(),
   S3_REGION: str({ default: '' }),
   S3_SECRET_KEY: str(),
