@@ -1,39 +1,57 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useRpc from '@/hooks/app/useRpc';
 import SponsoredText from '../SponsoredText';
 import { AccountDataInfo, TextAdData } from '@/utils/types';
+import { useParams } from 'next/navigation';
+import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 
 interface AddressValidatorProps {
-  id: string;
   sponsoredText?: TextAdData;
-  accountData?: AccountDataInfo;
+  accountData?: { account: AccountDataInfo[] };
 }
 
 const AddressValidator = ({
-  id,
   sponsoredText,
   accountData,
 }: AddressValidatorProps) => {
+  const params = useParams<{ id: string }>();
   const [accountValid, setAccountValid] = useState(
-    () => accountData?.account_id === id,
+    () => accountData?.account?.[0]?.account_id === params?.id,
   );
+  const initializedRef = useRef(false);
+
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+  const { switchRpc } = useRpcStoreWithProviders();
   const { viewAccount } = useRpc();
 
   useEffect(() => {
-    if (accountData?.account_id !== id) {
-      viewAccount(id)
-        .then((account) => setAccountValid(!!account))
-        .catch(() => setAccountValid(false));
-    }
+    viewAccount(params?.id)
+      .then((account) => setAccountValid(!!account))
+      .catch(() => {
+        setAccountValid(false);
+        switchRpc();
+      });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, accountData]);
+  }, [params?.id, accountData]);
 
   if (accountValid === null) {
     return null;
   }
-
   return (
     <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
       <div>
