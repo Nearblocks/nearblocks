@@ -1904,7 +1904,77 @@ export type ProcessedTokenMeta = {
 
 export type ApiTxnData = {
   logs: TransactionLog[];
-  actions: ActionInfo[];
+  apiActionLogs: any;
+  apiActions: ActionInfo[];
   subActions: ActionInfo[];
   tokenMetadata: ProcessedTokenMeta[];
+};
+
+export type TransactionData = {
+  txns: ApiTransaction[];
+};
+
+export type ApiTransaction = {
+  transaction_hash: string;
+  included_in_block_hash: string;
+  block_timestamp: string;
+  signer_account_id: string;
+  receiver_account_id: string;
+  receipt_conversion_gas_burnt: string;
+  receipt_conversion_tokens_burnt: string;
+  shard_id: string;
+  block: {
+    block_height: number;
+  };
+  actions: Action[];
+  actions_agg: {
+    deposit: number;
+    gas_attached: number;
+  };
+  outcomes: {
+    status: boolean;
+  };
+  outcomes_agg: {
+    transaction_fee: number;
+    gas_used: number;
+  };
+  receipts: ApiReceipt[];
+};
+
+export type ApiAction = {
+  action: string;
+  method: string;
+  args: string;
+  args_full: {
+    gas: number;
+    deposit: string;
+    args_json: {
+      msg: string;
+      amount: string;
+      receiver_id: string;
+    };
+    args_base64: string | null;
+    method_name: string;
+  };
+};
+
+export type ApiReceipt = {
+  receipt_id: string;
+  predecessor_account_id: string;
+  receiver_account_id: string;
+  receipt_kind: string;
+  block: {
+    block_hash: string;
+    block_height: number;
+    block_timestamp: number;
+  };
+  outcome: {
+    gas_burnt: number;
+    tokens_burnt: number;
+    executor_account_id: string;
+    status: boolean;
+    logs: string[];
+  };
+  fts: any[];
+  nfts: any[];
 };
