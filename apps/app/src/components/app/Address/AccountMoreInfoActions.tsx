@@ -148,9 +148,7 @@ const AccountMoreInfoActions = ({
           <div className="flex flex-wrap justify-between w-full py-3">
             <div>
               <div className="flex-1 xl:flex-nowrap flex-wrap items-center pb-2">
-                <div className="mb-2 md:mb-0">
-                  Staked {t('balance') || 'Balance'}:
-                </div>
+                <div className="mb-0">Staked {t('balance') || 'Balance'}:</div>
                 <div className="flex whitespace-nowrap">
                   {!status && isAccountLoading && <div className="h-5"></div>}
                   {stakedBalace
@@ -161,7 +159,7 @@ const AccountMoreInfoActions = ({
             </div>
             <div className="pr-[1.4rem]">
               <div className="flex-1 xl:flex-nowrap flex-wrap items-center">
-                <div className="mb-2 md:mb-0 whitespace-nowrap">
+                <div className="mb-0 whitespace-nowrap">
                   {t('storageUsed') || 'Storage used'}:
                 </div>
                 <div className="flex whitespace-nowrap">
@@ -173,7 +171,7 @@ const AccountMoreInfoActions = ({
           {(deploymentData?.receipt_predecessor_account_id ||
             (contract && contract?.hash)) && (
             <div
-              className={`flex justify-between w-full flex-wrap py-3 ${
+              className={`flex justify-between w-full flex-wrap py-3  ${
                 deploymentData?.receipt_predecessor_account_id
                   ? 'visible'
                   : 'hidden'
@@ -181,8 +179,8 @@ const AccountMoreInfoActions = ({
             >
               <div>
                 {deploymentData?.receipt_predecessor_account_id && (
-                  <div className="flex-1 pb-2">
-                    <div className="mb-2 md:mb-0 whitespace-nowrap">
+                  <div className="flex-1 pb-2 mb-4 sm:!mb-0">
+                    <div className="mb-0  whitespace-nowrap">
                       Contract Creator:
                     </div>
                     <div className="flex lg:w-80 w-full pr-3 lg:whitespace-nowrap flex-wrap">
@@ -211,7 +209,7 @@ const AccountMoreInfoActions = ({
                 <div>
                   {contract && contract?.hash ? (
                     <div className="flex-1 md:w-full">
-                      <div className="mb-2 whitespace-nowrap md:mb-0">
+                      <div className="  whitespace-nowrap mb-0">
                         Contract Locked:
                       </div>
                       <div className="w-full break-words">
@@ -303,7 +301,7 @@ const AccountMoreInfoActions = ({
               }`}
             >
               <div className="flex-1 w-full break-words">
-                <div className="flex mb-2 whitespace-nowrap md:mb-0">
+                <div className="flex  whitespace-nowrap mb-0">
                   {accountView !== null &&
                   accountView?.block_hash === undefined &&
                   accountData?.deleted?.transaction_hash
@@ -372,7 +370,7 @@ const AccountMoreInfoActions = ({
               <div>
                 {contract && contract?.hash ? (
                   <div className="flex-1 md:w-full">
-                    <div className="mb-2 whitespace-nowrap md:mb-0">
+                    <div className="whitespace-nowrap mb-0">
                       Contract Locked:
                     </div>
                     <div className="w-full break-words">

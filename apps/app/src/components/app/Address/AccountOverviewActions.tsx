@@ -194,7 +194,7 @@ const AccountOverviewActions = ({
         </div>
         <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
           <div className="flex-1 flex-wrap py-4">
-            <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="w-full md:w-1/4 mb-0">
               {t('balance') || 'Balance'}:
             </div>
 
