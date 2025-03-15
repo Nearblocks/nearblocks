@@ -28,6 +28,11 @@ export default function TabSkeletion({
       name: 'nfttokentxns',
     },
     {
+      label: 'Balance Changes',
+      message: 'Balance Changes',
+      name: 'balancechanges',
+    },
+    {
       label: 'Multichain Transactions',
       message: t('multi-chainTxns'),
       name: 'multichaintxns',
@@ -94,6 +99,9 @@ export default function TabSkeletion({
             {tab === 'tokentxns' ? <TabPanelGeneralSkeleton tab={tab} /> : null}
 
             {tab === 'nfttokentxns' ? (
+              <TabPanelGeneralSkeleton tab={tab} />
+            ) : null}
+            {tab === 'balancechanges' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
             {tab === 'multichaintxns' ? (

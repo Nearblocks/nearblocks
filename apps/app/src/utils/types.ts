@@ -1907,3 +1907,17 @@ export type ApiTxnData = {
   subActions: ActionInfo[];
   tokenMetadata: ProcessedTokenMeta[];
 };
+
+export type TransactionEvent = {
+  absolute_nonstaked_amount: string;
+  absolute_staked_amount: string;
+  affected_account_id: string;
+  block_height: string;
+  cause: string;
+  direction: string;
+  event_index: string;
+  involved_account_id: string;
+  receipt_id: string;
+  transaction_hash: string;
+  block_timestamp: string;
+};

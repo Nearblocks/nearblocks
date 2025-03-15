@@ -27,6 +27,11 @@ const AccountTabsActions = ({
       name: 'nfttokentxns',
     },
     {
+      label: 'Balance Changes',
+      message: 'Balance Changes',
+      name: 'balancechanges',
+    },
+    {
       label: 'Multichain Transactions',
       message: t('multi-chainTxns'),
       name: 'multichaintxns',

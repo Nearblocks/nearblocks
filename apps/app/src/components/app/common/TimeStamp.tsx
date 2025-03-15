@@ -8,15 +8,19 @@ const TimeStamp = ({ showAge = true, timestamp }: any) => {
   if (!isValidTimestamp) return;
   return (
     <Tooltip
-      className="left-1/2 whitespace-nowrap max-w-[200px]"
+      className="-left-5"
       position="top"
       tooltip={
-        !showAge
-          ? dayjs().to(dayjs(nanoToMilli(timestamp)))
-          : dayjs.utc(nanoToMilli(timestamp || 0)).format('YYYY-MM-DD HH:mm:ss')
+        <span className="flex whitespace-nowrap">
+          {!showAge
+            ? dayjs().to(dayjs(nanoToMilli(timestamp)))
+            : dayjs
+                .utc(nanoToMilli(timestamp || 0))
+                .format('YYYY-MM-DD HH:mm:ss')}
+        </span>
       }
     >
-      <span suppressHydrationWarning>
+      <span suppressHydrationWarning className="flex whitespace-nowrap">
         {showAge
           ? dayjs().to(dayjs(nanoToMilli(timestamp)))
           : dayjs.utc(nanoToMilli(timestamp)).format('YYYY-MM-DD HH:mm:ss')}
