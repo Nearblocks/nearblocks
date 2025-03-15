@@ -143,10 +143,6 @@ const AccountAlertsActions = ({
     );
   }
 
-  if (accountData || accountView) {
-    return <AddressValidator accountData={accountData} />;
-  }
-
   if (
     accountView !== null &&
     isLocked &&
@@ -171,6 +167,10 @@ const AccountAlertsActions = ({
         <div className="py-1"></div>
       </>
     );
+  }
+
+  if (accountData || accountView) {
+    return <AddressValidator accountData={accountData} />;
   }
 
   return null;

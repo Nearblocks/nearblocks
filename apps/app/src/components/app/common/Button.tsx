@@ -47,7 +47,7 @@ const Buttons = ({ address }: Props) => {
     <>
       <span className="inline-flex mr-1.5 h-7">
         <Tooltip
-          className="whitespace-nowrap ml-20 mb-3 max-w-[200px]"
+          className="break-all w-20 sm:!w-max ml-20 mb-3 max-w-[200px]"
           position={'top'}
           tooltip="Copy account ID to clipboard"
         >
@@ -71,7 +71,7 @@ const Buttons = ({ address }: Props) => {
         <DialogTrigger asChild>
           <button>
             <Tooltip
-              className="whitespace-nowrap ml-16 mb-3 max-w-[200px]"
+              className="break-all w-20 sm:!w-max ml-16 mb-3 max-w-[200px]"
               position={'top'}
               tooltip="Click to view QR Code"
             >
