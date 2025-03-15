@@ -679,7 +679,7 @@ const Details = (props: Props) => {
                 </div>
                 <div className="w-full md:w-3/4 lg:h-[90px] h-[100px] break-all overflow-auto ">
                   <DynamicAd
-                    className="!max-w-[720px] !max-h-[100px] rounded-lg"
+                    className="lg:!max-w-[720px] !max-w-[300px] rounded-lg"
                     breakpoint={1024}
                     desktopUnitId="IbT2RAk1Cdc36JPkKEfCJQ=="
                     mobileUnitId="uLZF93wBs/ew1TZnm64OxQ=="

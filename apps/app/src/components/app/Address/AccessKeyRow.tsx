@@ -194,7 +194,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
             <Tooltip
-              className={'left-1/2 max-w-[200px]'}
+              className={'left-1/2 -ml-3 max-w-[200px] whitespace-nowrap'}
               position="top"
               tooltip={
                 !showWhen

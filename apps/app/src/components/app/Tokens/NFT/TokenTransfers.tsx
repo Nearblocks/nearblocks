@@ -241,7 +241,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       cell: (row: TransactionInfo) => (
         <span>
           <Tooltip
-            className={'left-1/2 max-w-[200px]'}
+            className={'left-1/2 -ml-4 max-w-[200px]'}
             position="top"
             tooltip={
               showAge
@@ -268,12 +268,15 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       header: (
         <div>
           <Tooltip
-            className={'whitespace-nowrap max-w-[200px]'}
+            className={'-left-5 max-w-[200px]'}
             position="bottom"
             tooltip={
-              showAge
-                ? 'Click to show Datetime Format'
-                : 'Click to show Age Format'
+              <span className="flex flex-wrap">
+                <span className="whitespace-nowrap">Click to show</span>{' '}
+                <span className="whitespace-nowrap">
+                  {showAge ? 'Datetime' : 'Age'} Format
+                </span>
+              </span>
             }
           >
             <button

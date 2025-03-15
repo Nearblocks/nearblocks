@@ -12,7 +12,7 @@ const TableSummary = ({
           {text}
         </p>
       </div>
-      <div className="sm:flex px-4 text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-between flex-nowrap">
+      <div className="flex px-4 text-sm text-nearblue-600 dark:text-neargray-10 items-center justify-between flex-nowrap">
         <div className="flex pr-2 py-1">{filters}</div>
         <div className="flex items-center sm:mb-0">{linkToDowload}</div>
       </div>
