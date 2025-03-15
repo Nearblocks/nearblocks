@@ -12,6 +12,7 @@ import {
   dataSourceGauge,
 } from '#libs/prom';
 import sentry from '#libs/sentry';
+import { checkFastnear } from '#libs/utils';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
@@ -23,7 +24,9 @@ import { uploadJson } from '#services/s3';
 import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
 
+const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 let source = config.dataSource;
+let shouldSwitchSource = false;
 const lakeConfig: types.LakeConfig = {
   blocksPreloadPoolSize: config.preloadSize,
   credentials: () =>
@@ -41,64 +44,82 @@ if (config.nearlakeEndpoint) {
   lakeConfig.s3Endpoint = config.nearlakeEndpoint;
 }
 
-export const syncData = async (switchSource = false) => {
-  try {
-    if (switchSource) {
+setInterval(async () => {
+  if (source === DataSource.NEAR_LAKE) {
+    try {
+      await checkFastnear();
+      shouldSwitchSource = true;
+    } catch (error) {
+      logger.error(error);
+    }
+  }
+}, ONE_HOUR_IN_MS);
+
+export const syncData = async () => {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try {
+      dataSourceGauge
+        .labels(config.network, source)
+        .set(source === DataSource.FAST_NEAR ? 1 : 0);
+      logger.info({ data_source: source });
+
+      let startBlockHeight = config.startBlockHeight;
+      const block = await knex('blocks')
+        .orderBy('block_height', 'desc')
+        .first();
+
+      if (source === DataSource.FAST_NEAR) {
+        if (!startBlockHeight && block) {
+          const next = +block.block_height - config.delta;
+          startBlockHeight = next;
+          logger.info(`last synced block: ${block.block_height}`);
+          logger.info(`syncing from block: ${next}`);
+        }
+
+        const stream = streamBlock({
+          limit: 50,
+          network: config.network,
+          start: startBlockHeight || config.genesisHeight,
+          url: config.fastnearEndpoint,
+        });
+
+        for await (const message of stream) {
+          await onMessage(message);
+        }
+
+        stream.on('end', () => {
+          logger.error('stream ended');
+          process.exit();
+        });
+        stream.on('error', (error: Error) => {
+          logger.error(error);
+          throw error;
+        });
+      } else {
+        if (!startBlockHeight && block) {
+          const next = +block.block_height - config.delta;
+          lakeConfig.startBlockHeight = next;
+          logger.info(`last synced block: ${block.block_height}`);
+          logger.info(`syncing from block: ${next}`);
+        }
+
+        for await (const message of stream(lakeConfig)) {
+          await onMessage(message as unknown as Message);
+
+          if (shouldSwitchSource) {
+            shouldSwitchSource = false;
+            throw new Error('Trigger to switch to fastnear');
+          }
+        }
+      }
+    } catch (error) {
+      logger.error(error);
       source =
         source === DataSource.FAST_NEAR
           ? DataSource.NEAR_LAKE
           : DataSource.FAST_NEAR;
     }
-
-    dataSourceGauge
-      .labels(config.network, source)
-      .set(source === DataSource.FAST_NEAR ? 1 : 0);
-    logger.info({ data_source: source, switch_source: switchSource });
-
-    let startBlockHeight = config.startBlockHeight;
-    const block = await knex('blocks').orderBy('block_height', 'desc').first();
-
-    if (source === DataSource.FAST_NEAR) {
-      if (!startBlockHeight && block) {
-        const next = +block.block_height - config.delta;
-        startBlockHeight = next;
-        logger.info(`last synced block: ${block.block_height}`);
-        logger.info(`syncing from block: ${next}`);
-      }
-
-      const stream = streamBlock({
-        limit: 50,
-        network: config.network,
-        start: startBlockHeight || config.genesisHeight,
-        url: config.fastnearEndpoint,
-      });
-
-      for await (const message of stream) {
-        await onMessage(message);
-      }
-
-      stream.on('end', () => {
-        logger.error('stream ended');
-        process.exit();
-      });
-      stream.on('error', (error: Error) => {
-        logger.error(error);
-        throw error;
-      });
-    } else {
-      if (!startBlockHeight && block) {
-        const next = +block.block_height - config.delta;
-        lakeConfig.startBlockHeight = next;
-        logger.info(`last synced block: ${block.block_height}`);
-        logger.info(`syncing from block: ${next}`);
-      }
-
-      for await (const message of stream(lakeConfig)) {
-        await onMessage(message as unknown as Message);
-      }
-    }
-  } catch (error) {
-    await syncData(true);
   }
 };
 

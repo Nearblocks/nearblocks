@@ -5,14 +5,16 @@ import { decodeBase64, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
 
 import { logger } from 'nb-logger';
-import { Action, ExecutionStatus, ReceiptEnum } from 'nb-neardata';
+import { Action, ExecutionStatus, Message, ReceiptEnum } from 'nb-neardata';
 import {
   AccessKeyPermissionKind,
   ActionKind,
   ExecutionOutcomeStatus,
+  Network,
   ReceiptKind,
 } from 'nb-types';
 
+import config from '#config';
 import {
   isAccessKeyFunctionCallPermission,
   isAddKeyAction,
@@ -24,6 +26,7 @@ import {
   isStakeAction,
   isTransferAction,
 } from '#libs/guards';
+import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { AccessKeyPermission, ReceiptAction, RlpJson } from '#types/types';
 
@@ -236,4 +239,35 @@ export const decodeRlp = (args: string) => {
   const hexString = hexlify(base64);
 
   return Transaction.from(hexString);
+};
+
+export const checkFastnear = async () => {
+  const url =
+    config.network === Network.MAINNET
+      ? 'https://mainnet.neardata.xyz'
+      : 'https://testnet.neardata.xyz';
+  const finalResponse = await fetch(`${url}/v0/last_block/final`, {
+    method: 'GET',
+    signal: AbortSignal.timeout(30000),
+  });
+  const finalBlock = (await finalResponse.json()) as Message;
+  const latestResponse = await fetch(
+    `${url}/v0/block/${finalBlock.block.header.height}`,
+    {
+      method: 'GET',
+      signal: AbortSignal.timeout(30000),
+    },
+  );
+  const latestBlock = (await latestResponse.json()) as Message;
+  const block = await knex('blocks').orderBy('block_height', 'desc').first();
+
+  logger.info({
+    block: block?.block_height,
+    helthcheck: true,
+    latest: latestBlock.block.header.height,
+  });
+
+  if (!block) throw new Error('No block');
+  if (block.block_height - latestBlock.block.header.height > 100)
+    throw new Error('Not in sync');
 };
