@@ -4,13 +4,15 @@ import { ContractCodeInfo } from '@/utils/types';
 import OverviewActions from './OverviewActions';
 
 const Overview = async ({ id, searchParams }: any) => {
+  const options: RequestInit = { next: { revalidate: 10 } };
+
   const fetchCommonData = async (
     url?: string | undefined,
     searchParams?: any,
   ) => {
     try {
       if (url) {
-        const response = await getRequest(url, searchParams);
+        const response = await getRequest(url, searchParams, options);
         return response;
       }
       return null;

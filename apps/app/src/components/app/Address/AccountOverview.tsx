@@ -3,10 +3,11 @@ import AccountOverviewActions from './AccountOverviewActions';
 import { SpamToken } from '@/utils/types';
 
 export default async function AccountOverview({ id }: any) {
+  const options: RequestInit = { next: { revalidate: 10 } };
   const fetchCommonData = async (url?: string | undefined) => {
     try {
       if (url) {
-        const response = await getRequest(url);
+        const response = await getRequest(url, {}, options);
         return response;
       }
       return null;
