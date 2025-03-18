@@ -11,6 +11,7 @@ jobs:
         service:
           [
             api,
+            api-user,
             app,
             backend,
             indexer-balance,
