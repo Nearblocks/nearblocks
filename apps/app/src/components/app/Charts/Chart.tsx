@@ -4,7 +4,7 @@ import Highcharts from 'highcharts/highstock';
 import { useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
@@ -28,6 +28,122 @@ interface Props {
   theme: string;
 }
 
+const CHART_TYPE_MAPPINGS = {
+  addresses: (stat: ChartStat) => ({
+    addresses: stat.active_accounts,
+    date: stat.date,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.active_accounts),
+  }),
+  blocks: (stat: ChartStat) => ({
+    date: stat.date,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.blocks),
+  }),
+  'market-cap': (stat: ChartStat) => ({
+    date: stat.date,
+    price: Number(stat.near_price),
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.market_cap),
+  }),
+  /*  'multi-chain-txns': (stat: ChartStat) => ({
+    date: stat.date,
+    multiChainTxns: stat.multichain_txns,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.multichain_txns),
+  }), */
+  'near-price': (stat: ChartStat) => ({
+    date: stat.date,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.near_price),
+  }),
+  'near-supply': (stat: ChartStat) => ({
+    date: stat.date,
+    x: new Date(stat.date).valueOf(),
+    y: Number(yoctoToNear(stat.total_supply, false)),
+  }),
+  'txn-fee': (stat: ChartStat) => ({
+    date: stat.date,
+    fee: stat.txn_fee,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.txn_fee_usd),
+  }),
+  'txn-volume': (stat: ChartStat) => ({
+    date: stat.date,
+    volume: stat.txn_volume,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.txn_volume_usd),
+  }),
+  txns: (stat: ChartStat) => ({
+    addresses: stat.active_accounts,
+    blocks: stat.blocks,
+    date: stat.date,
+    x: new Date(stat.date).valueOf(),
+    y: Number(stat.txns),
+  }),
+};
+
+const CHART_INFO_CONFIG = {
+  'market-cap': {
+    title: 'Near Market Capitalization Chart',
+    yLabel: 'Near Market Cap (USD)',
+    description:
+      'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.',
+  },
+  txns: {
+    title: 'Near Daily Transactions Chart',
+    yLabel: 'Transactions per Day',
+    description:
+      'The chart highlights the total number of transactions on Near blockchain with daily individual breakdown for total blocks and total new account seen.',
+  },
+  'near-supply': {
+    title: 'Near Supply Growth Chart',
+    yLabel: 'Near Supply',
+    description:
+      'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.',
+  },
+  blocks: {
+    title: 'Near Block Count',
+    yLabel: 'Blocks per Day',
+    description:
+      'Near Block Count Chart shows the historical number of blocks produced daily on Near blockchain.',
+  },
+  addresses: {
+    title: 'Near Unique Accounts Chart',
+    yLabel: 'Accounts per Day',
+    description:
+      'The chart shows the total distinct numbers of accounts on Near blockchain and the increase in the number of account daily.',
+  },
+  'txn-fee': {
+    title: 'Transaction Fee Chart',
+    yLabel: 'Transaction Fee (USD)',
+    description:
+      'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+  },
+  'txn-volume': {
+    title: 'Transaction Volume Chart',
+    yLabel: 'Transaction Volume (USD)',
+    description:
+      'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+  },
+  'near-price': {
+    title: 'Near Daily Price (USD) Chart',
+    yLabel: 'Near Price (USD)',
+    description:
+      'Near Daily Price (USD) chart shows the daily historical price for Near in USD.',
+  },
+  /*  'multi-chain-txns': {
+    title: 'Multi Chain Transactions Chart',
+    yLabel: 'Multichain Transactions per Day',
+    description: 'The chart highlights the total number of multichain transactions on Near blockchain.',
+  }, */
+  default: {
+    title: 'Near Blockchain Chart',
+    yLabel: 'Value',
+    description: 'Chart displaying Near blockchain metrics',
+  },
+};
+
 const Chart = (props: Props) => {
   const { chartsData, chartTypes, theme: cookieTheme } = props;
   const t = useTranslations();
@@ -37,242 +153,168 @@ const Chart = (props: Props) => {
     title: '',
   });
   const [logView, setLogView] = useState(false);
-
   const [chartOptions, setChartOptions] = useState<Highcharts.Options | null>(
     null,
   );
   const { networkId } = useConfig();
 
-  if (theme == undefined) {
+  if (theme === undefined) {
     theme = cookieTheme;
   }
 
-  const handleToggle = () => {
-    setLogView((prevState) => !prevState);
-  };
+  const handleToggle = useCallback(() => {
+    setLogView((prev) => !prev);
+  }, []);
 
   const data = chartsData?.charts as ChartStat[];
 
-  const charts = [
-    {
-      exclude: `${networkId}` === 'testnet',
-      image: `/images/charts/near-price.svg`,
-      image_dark: `/images/charts/near-price_dark.svg`,
-      link: '/charts/near-price',
-      text: t ? t('charts.nearPrice.heading') : 'Near Daily Price (USD) Chart',
-    },
-    {
-      exclude: `${networkId}` === 'testnet',
-      image: `/images/charts/market-cap.svg`,
-      image_dark: `/images/charts/market-cap_dark.svg`,
-      link: '/charts/market-cap',
-      text: t
-        ? t('marketCapCharts.heading')
-        : 'Near Market Capitalization Chart',
-    },
-    {
-      exclude: false,
-      image: `/images/charts/near-supply.svg`,
-      image_dark: `/images/charts/near-supply_dark.svg`,
-      link: '/charts/near-supply',
-      text: t ? t('nearSupplyCharts.heading') : 'Near Supply Growth Chart',
-    },
-    {
-      exclude: false,
-      image: `/images/charts/txns.svg`,
-      image_dark: `/images/charts/txns_dark.svg`,
-      link: '/charts/txns',
-      text: t ? t('txnsCharts.heading') : 'Near Daily Transactions Chart',
-    },
-    {
-      exclude: false,
-      image: `/images/charts/blocks.svg`,
-      image_dark: `/images/charts/blocks_dark.svg`,
-      link: '/charts/blocks',
-      text: t ? t('blocksCharts.heading') : 'Near Block Count',
-    },
-    {
-      exclude: false,
-      image: `/images/charts/addresses.svg`,
-      image_dark: `/images/charts/addresses_dark.svg`,
-      link: '/charts/addresses',
-      text: t ? t('addressesCharts.heading') : 'Near Unique Accounts Chart',
-    },
-    {
-      exclude: `${networkId}` === 'testnet',
-      image: `/images/charts/txn-fee.svg`,
-      image_dark: `/images/charts/txn-fee_dark.svg`,
-      link: '/charts/txn-fee',
-      text: t ? t('txnFeeCharts.heading') : 'Transaction Fee Chart',
-    },
-    {
-      exclude: `${networkId}` === 'testnet',
-      image: `/images/charts/txn-volume.svg`,
-      image_dark: `/images/charts/txn-volume_dark.svg`,
-      link: '/charts/txn-volume',
-      text: t ? t('txnVolumeCharts.heading') : 'Transaction Volume Chart',
-    },
-    {
-      exclude: false,
-      image: `/images/charts/tps.svg`,
-      image_dark: `/images/charts/tps_dark.svg`,
-      link: '/charts/tps',
-      text: 'Near Transactions per Second Chart',
-    },
-    /* {
+  const charts = useMemo(
+    () => [
+      {
+        exclude: `${networkId}` === 'testnet',
+        image: `/images/charts/near-price.svg`,
+        image_dark: `/images/charts/near-price_dark.svg`,
+        link: '/charts/near-price',
+        text: t
+          ? t('charts.nearPrice.heading')
+          : 'Near Daily Price (USD) Chart',
+      },
+      {
+        exclude: `${networkId}` === 'testnet',
+        image: `/images/charts/market-cap.svg`,
+        image_dark: `/images/charts/market-cap_dark.svg`,
+        link: '/charts/market-cap',
+        text: t
+          ? t('marketCapCharts.heading')
+          : 'Near Market Capitalization Chart',
+      },
+      {
+        exclude: false,
+        image: `/images/charts/near-supply.svg`,
+        image_dark: `/images/charts/near-supply_dark.svg`,
+        link: '/charts/near-supply',
+        text: t ? t('nearSupplyCharts.heading') : 'Near Supply Growth Chart',
+      },
+      {
+        exclude: false,
+        image: `/images/charts/txns.svg`,
+        image_dark: `/images/charts/txns_dark.svg`,
+        link: '/charts/txns',
+        text: t ? t('txnsCharts.heading') : 'Near Daily Transactions Chart',
+      },
+      {
+        exclude: false,
+        image: `/images/charts/blocks.svg`,
+        image_dark: `/images/charts/blocks_dark.svg`,
+        link: '/charts/blocks',
+        text: t ? t('blocksCharts.heading') : 'Near Block Count',
+      },
+      {
+        exclude: false,
+        image: `/images/charts/addresses.svg`,
+        image_dark: `/images/charts/addresses_dark.svg`,
+        link: '/charts/addresses',
+        text: t ? t('addressesCharts.heading') : 'Near Unique Accounts Chart',
+      },
+      {
+        exclude: `${networkId}` === 'testnet',
+        image: `/images/charts/txn-fee.svg`,
+        image_dark: `/images/charts/txn-fee_dark.svg`,
+        link: '/charts/txn-fee',
+        text: t ? t('txnFeeCharts.heading') : 'Transaction Fee Chart',
+      },
+      {
+        exclude: `${networkId}` === 'testnet',
+        image: `/images/charts/txn-volume.svg`,
+        image_dark: `/images/charts/txn-volume_dark.svg`,
+        link: '/charts/txn-volume',
+        text: t ? t('txnVolumeCharts.heading') : 'Transaction Volume Chart',
+      },
+      {
+        exclude: false,
+        image: `/images/charts/tps.svg`,
+        image_dark: `/images/charts/tps_dark.svg`,
+        link: '/charts/tps',
+        text: 'Near Transactions per Second Chart',
+      },
+      /* {
       exclude: false,
       image: `/images/charts/multi-chain-txns.svg`,
       image_dark: `/images/charts/multi-chain-txns_dark.svg`,
       link: '/charts/multi-chain-txns',
       text: t ? t('multichainTxns.heading') : 'Multi Chain Transactions Chart',
     }, */
-  ];
+    ],
+    [networkId, t],
+  );
 
   const chartData = useMemo(() => {
-    try {
-      const chartTypeMappings = {
-        addresses: (stat: ChartStat) => ({
-          addresses: stat.active_accounts,
-          date: stat.date,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.active_accounts),
-        }),
-        blocks: (stat: ChartStat) => ({
-          date: stat.date,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.blocks),
-        }),
-        'market-cap': (stat: ChartStat) => ({
-          date: stat.date,
-          price: Number(stat.near_price),
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.market_cap),
-        }),
-        /*  'multi-chain-txns': (stat: ChartStat) => ({
-          date: stat.date,
-          multiChainTxns: stat.multichain_txns,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.multichain_txns),
-        }), */
-        'near-price': (stat: ChartStat) => ({
-          date: stat.date,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.near_price),
-        }),
-        'near-supply': (stat: ChartStat) => ({
-          date: stat.date,
-          x: new Date(stat.date).valueOf(),
-          y: Number(yoctoToNear(stat.total_supply, false)),
-        }),
-        'txn-fee': (stat: ChartStat) => ({
-          date: stat.date,
-          fee: stat.txn_fee,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txn_fee_usd),
-        }),
-        'txn-volume': (stat: ChartStat) => ({
-          date: stat.date,
-          volume: stat.txn_volume,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txn_volume_usd),
-        }),
-        txns: (stat: ChartStat) => ({
-          addresses: stat.active_accounts,
-          blocks: stat.blocks,
-          date: stat.date,
-          x: new Date(stat.date).valueOf(),
-          y: Number(stat.txns),
-        }),
-      };
+    if (!data || !chartTypes) return [];
 
+    try {
       const mappingFunction =
-        chartTypeMappings[chartTypes as keyof typeof chartTypeMappings];
-      if (mappingFunction) {
-        return data.map(mappingFunction);
-      } else {
-        return [];
-      }
+        CHART_TYPE_MAPPINGS[chartTypes as keyof typeof CHART_TYPE_MAPPINGS];
+      return mappingFunction ? data.map(mappingFunction) : [];
     } catch (error) {
       return [];
     }
+  }, [data, chartTypes]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, chartTypes, logView]);
+  const processedChartData = useMemo(() => {
+    return logView
+      ? chartData.map((item) => ({
+          ...item,
+          y: item.y === 0 ? null : item.y,
+        }))
+      : chartData;
+  }, [chartData, logView]);
 
-  const replaceWithNull = chartData.map((item: any) => ({
-    ...item,
-    y: item.y === 0 ? null : item.y,
-  }));
+  const createTooltipFormatter = useCallback((chartType: string) => {
+    return function (this: Highcharts.TooltipFormatterContextObject) {
+      const point = this.point;
+      const date = dayjs(point.x).format('dddd, MMMM DD, YYYY');
+
+      switch (chartType) {
+        case 'market-cap':
+          return `
+            ${date}<br/>
+            Market Cap: <strong>$${dollarFormat(Number(point.y))}</strong><br/>
+            Near Price: <strong>$${dollarFormat((point as any).price)}</strong>
+          `;
+        case 'txns':
+          return `
+            ${date}<br/>
+            Total Transactions: <strong>${dollarFormat(
+              Number(point.y),
+            )}</strong><br/>
+            Total Blocks Count: <strong>${dollarFormat(
+              (point as any).blocks,
+            )}</strong><br/>
+            New Addresses Seen: <strong>${dollarFormat(
+              (point as any).addresses,
+            )}</strong>
+          `;
+        case 'near-supply':
+          return `
+            ${date}<br/>
+            Total Supply: <strong>${dollarFormat(Number(point.y))} Ⓝ</strong>
+          `;
+        default:
+          return `
+            ${date}<br/>
+            Value: <strong>${dollarFormat(Number(point.y))}</strong>
+          `;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!chartTypes || chartData.length === 0) return;
 
-    let titleText = '';
-    let yLabel = '';
-    let description = '';
-
-    switch (chartTypes) {
-      case 'market-cap':
-        titleText = 'Near Market Capitalization Chart';
-        yLabel = 'Near Market Cap (USD)';
-        description =
-          'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.';
-        break;
-      case 'txns':
-        titleText = 'Near Daily Transactions Chart';
-        yLabel = 'Transactions per Day';
-        description =
-          'The chart highlights the total number of transactions on Near blockchain with daily individual breakdown for total blocks and total new account seen.';
-        break;
-      case 'near-supply':
-        titleText = 'Near Supply Growth Chart';
-        yLabel = 'Near Supply';
-        description =
-          'Near Supply Growth Chart shows a breakdown of daily and the total Near supply.';
-        break;
-      case 'blocks':
-        titleText = 'Near Block Count';
-        yLabel = 'Blocks per Day';
-        description =
-          'Near Block Count Chart shows the historical number of blocks produced daily on Near blockchain.';
-        break;
-      case 'addresses':
-        titleText = 'Near Unique Accounts Chart';
-        yLabel = 'Accounts per Day';
-        description =
-          'The chart shows the total distinct numbers of accounts on Near blockchain and the increase in the number of account daily.';
-        break;
-      case 'txn-fee':
-        titleText = 'Transaction Fee Chart';
-        yLabel = 'Transaction Fee (USD)';
-        description =
-          'The chart shows the daily amount in USD spent per transaction on Near blockchain.';
-        break;
-      case 'txn-volume':
-        titleText = 'Transaction Volume Chart';
-        yLabel = 'Transaction Volume (USD)';
-        description =
-          'The chart shows the daily amount in USD spent per transaction on Near blockchain.';
-        break;
-      case 'near-price':
-        titleText = 'Near Daily Price (USD) Chart';
-        yLabel = 'Near Price (USD)';
-        description =
-          'Near Daily Price (USD) chart shows the daily historical price for Near in USD.';
-        break;
-      /*  case 'multi-chain-txns':
-        titleText = 'Multi Chain Transactions Chart';
-        yLabel = 'Multichain Transactions per Day';
-        description =
-          'The chart highlights the total number of multichain transactions on Near blockchain.';
-        break; */
-      default:
-        titleText = 'Near Blockchain Chart';
-        yLabel = 'Value';
-        description = 'Chart displaying Near blockchain metrics';
-    }
-
-    setChartInfo({ description, title: titleText });
+    const config =
+      CHART_INFO_CONFIG[chartTypes as keyof typeof CHART_INFO_CONFIG] ||
+      CHART_INFO_CONFIG.default;
+    setChartInfo({ description: config.description, title: config.title });
 
     const options: Highcharts.Options = {
       accessibility: {
@@ -298,7 +340,10 @@ const Chart = (props: Props) => {
             },
             chartOptions: {
               chart: {
-                height: chartTypes === 'txns' || 'addresses' ? 350 : 390,
+                height:
+                  chartTypes === 'txns' || chartTypes === 'addresses'
+                    ? 350
+                    : 390,
               },
             },
           },
@@ -334,8 +379,8 @@ const Chart = (props: Props) => {
       series: [
         {
           color: 'rgba(3, 63, 64, 1)',
-          data: logView ? replaceWithNull : chartData,
-          name: titleText,
+          data: processedChartData,
+          name: config.title,
           showInLegend: false,
           type: 'area',
         },
@@ -347,55 +392,10 @@ const Chart = (props: Props) => {
         style: {
           color: theme === 'dark' ? '#e0e0e0' : '#333333',
         },
-        text: titleText,
+        text: config.title,
       },
       tooltip: {
-        formatter: function (this: Highcharts.TooltipFormatterContextObject) {
-          const point = this.point;
-
-          const formatTooltip = () => {
-            switch (chartTypes) {
-              case 'market-cap':
-                return `
-                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
-                  Market Cap: <strong>$${dollarFormat(
-                    Number(point.y),
-                  )}</strong><br/>
-                  Near Price: <strong>$${dollarFormat(
-                    (point as any).price,
-                  )}</strong>
-                `;
-              case 'txns':
-                return `
-                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
-                  Total Transactions: <strong>${dollarFormat(
-                    Number(point.y),
-                  )}</strong><br/>
-                  Total Blocks Count: <strong>${dollarFormat(
-                    (point as any).blocks,
-                  )}</strong><br/>
-                  New Addresses Seen: <strong>${dollarFormat(
-                    (point as any).addresses,
-                  )}</strong>
-                `;
-              case 'near-supply':
-                return `
-                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
-                  Total Supply: <strong>${dollarFormat(
-                    Number(point.y),
-                  )} Ⓝ</strong>
-                `;
-              // Add similar formatting for other chart types
-              default:
-                return `
-                  ${dayjs(point.x).format('dddd, MMMM DD, YYYY')}<br/>
-                  Value: <strong>${dollarFormat(Number(point.y))}</strong>
-                `;
-            }
-          };
-
-          return formatTooltip();
-        },
+        formatter: createTooltipFormatter(chartTypes),
       },
       xAxis: {
         labels: {
@@ -414,14 +414,21 @@ const Chart = (props: Props) => {
           },
         },
         lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-        title: { text: yLabel },
+        title: { text: config.yLabel },
         type: logView ? 'logarithmic' : 'linear',
       },
     };
 
     setChartOptions(options);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartTypes, chartData, theme, logView]);
+  }, [
+    chartTypes,
+    processedChartData,
+    theme,
+    logView,
+    createTooltipFormatter,
+    chartData,
+  ]);
 
   return (
     <div>
@@ -466,16 +473,6 @@ const Chart = (props: Props) => {
             </div>
             <div className="pl-2 pr-2 py-8 h-full ">
               {chartData?.length && chartOptions ? (
-                // <iframe
-                //   srcDoc={iframeSrc}
-                //   style={{
-                //     backgroundColor: theme === 'dark' ? '#0D0D0D' : '#FFFF',
-                //     border: 'none',
-                //     height: '100%',
-                //     width: '100%',
-                //   }}
-                // />
-
                 <HighchartsReact
                   containerProps={{
                     style: {
@@ -528,4 +525,5 @@ const Chart = (props: Props) => {
     </div>
   );
 };
+
 export default Chart;
