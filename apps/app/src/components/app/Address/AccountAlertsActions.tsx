@@ -168,12 +168,7 @@ const AccountAlertsActions = ({
       </>
     );
   }
-
-  if (accountData || accountView) {
-    return <AddressValidator accountData={accountData} />;
-  }
-
-  return null;
+  return <AddressValidator accountData={accountData} />;
 };
 
 export default AccountAlertsActions;
