@@ -10,20 +10,27 @@ import { shortenText } from '@/utils/libs';
 interface TokenDiffEvent {
   account_id: string;
   diff: Record<string, string>;
+  intent_hash?: string;
 }
 
 interface Props {
   event: TransactionLog;
-  data: TokenDiffEvent[];
+  data: TokenDiffEvent[] | TokenDiffEvent;
 }
 
 const Transfer = ({ event, data }: Props) => {
   const router = useRouter();
   const { hash } = router.query;
 
-  if (!data || data?.length === 0) return null;
+  const normalizedData: TokenDiffEvent[] = Array.isArray(data)
+    ? data
+    : data
+    ? [data as TokenDiffEvent]
+    : [];
 
-  const userSwaps = data?.reduce(
+  if (normalizedData.length === 0) return null;
+
+  const userSwaps = normalizedData.reduce(
     (acc, { account_id, diff }) => {
       const swapData = acc[account_id] || { sent: [], received: [] };
 
