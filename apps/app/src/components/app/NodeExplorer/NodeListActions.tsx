@@ -226,8 +226,8 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
     },
     {
       cell: (row: ValidatorEpochData) => (
-        <>
-          <button>
+        <div className="flex-1">
+          <div>
             <Tooltip
               className={'left-1/2 max-w-[210px]'}
               position="top"
@@ -240,16 +240,17 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 {shortenAddress(row.accountId)}
               </Link>
             </Tooltip>
-          </button>
-
-          <Tooltip
-            className={'max-w-[210px] -left-6'}
-            position="top"
-            tooltip={row.publicKey}
-          >
-            <span>{row.publicKey ? shortenAddress(row.publicKey) : ''}</span>
-          </Tooltip>
-        </>
+          </div>
+          <div>
+            <Tooltip
+              className={'max-w-[210px] -left-6'}
+              position="top"
+              tooltip={row.publicKey}
+            >
+              <span>{row.publicKey ? shortenAddress(row.publicKey) : ''}</span>
+            </Tooltip>
+          </div>
+        </div>
       ),
       header: <span>VALIDATOR</span>,
       key: 'accountId',

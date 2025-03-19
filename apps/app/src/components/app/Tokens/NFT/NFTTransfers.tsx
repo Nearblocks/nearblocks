@@ -245,7 +245,7 @@ const NFTTransfers = ({ count, cursor, error, tab, txns }: Props) => {
       header: (
         <>
           <Tooltip
-            className={'left-16 max-w-[200px] whitespace-nowrap'}
+            className={'left-16 max-w-[200px] whitespace-nowrap mt-8'}
             tooltip={
               showAge
                 ? 'Click to show Datetime Format'

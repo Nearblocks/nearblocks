@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import Search from '../../common/Search';
 import Latest from './Latest';
 import HomeOverview from './Overview';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const HomePageSkeleton = ({
   error,
@@ -14,6 +15,7 @@ const HomePageSkeleton = ({
   theme: string;
 }) => {
   const t = useTranslations();
+  const { networkId } = useConfig();
 
   return (
     <div>
@@ -22,7 +24,11 @@ const HomePageSkeleton = ({
           <div className="flex flex-col lg:flex-row sm:pb-5 lg:!items-center">
             <div className="relative lg:w-3/5 flex-col">
               <h1 className="text-white dark:text-neargray-10 text-2xl font-medium pb-3 flex flex-col">
-                {t('homePage.heroTitle')}
+                {t(
+                  networkId === 'mainnet'
+                    ? 'homePage.heroTitle'
+                    : 'homePage.testnetHeroTitle',
+                )}
               </h1>
               <div className="h-12" suppressHydrationWarning={true}>
                 <Search disabled />

@@ -279,12 +279,15 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
       header: (
         <>
           <Tooltip
-            className={'max-w-[200px] whitespace-nowrap'}
+            className={'max-w-[200px] -ml-4'}
             position="bottom"
             tooltip={
-              showAge
-                ? 'Click to show Datetime Format'
-                : 'Click to show Age Format'
+              <span className="flex flex-wrap">
+                <span className="whitespace-nowrap">Click to show</span>{' '}
+                <span className="whitespace-nowrap">
+                  {showAge ? 'Datetime' : 'Age'} Format
+                </span>
+              </span>
             }
           >
             <button

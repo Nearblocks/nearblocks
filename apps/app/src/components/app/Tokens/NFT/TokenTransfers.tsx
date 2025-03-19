@@ -2,12 +2,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { Link } from '@/i18n/routing';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-  nanoToMilli,
-} from '@/utils/libs';
+import { localFormat } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '../../common/ErrorMessage';
@@ -19,6 +14,7 @@ import FaInbox from '../../Icons/FaInbox';
 import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
 import Skeleton from '../../skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import TimeStamp from '../../common/TimeStamp';
 
 interface Props {
   data: {
@@ -145,8 +141,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       },
       header: <span>From</span>,
       key: 'affected_account_id',
-      tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -213,7 +208,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       header: <span>To</span>,
       key: 'involved_account_id',
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+        'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
       thClassName:
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
@@ -240,40 +235,21 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip
-            className={'left-1/2 max-w-[200px]'}
-            position="top"
-            tooltip={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (
         <div>
           <Tooltip
-            className={'whitespace-nowrap max-w-[200px]'}
+            className={'-left-5 max-w-[200px] mt-5'}
             position="bottom"
             tooltip={
-              showAge
-                ? 'Click to show Datetime Format'
-                : 'Click to show Age Format'
+              <span className="flex flex-wrap">
+                <span className="whitespace-nowrap">Click to show</span>{' '}
+                <span className="whitespace-nowrap">
+                  {showAge ? 'Datetime' : 'Age'} Format
+                </span>
+              </span>
             }
           >
             <button
@@ -295,7 +271,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
       ),
       key: 'block_timestamp',
       tdClassName:
-        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
+        'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
   ];
   return (

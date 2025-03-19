@@ -343,7 +343,7 @@ const NFTTransfersActions = ({
       header: (
         <div className="w-full inline-flex px-5 py-4">
           <Tooltip
-            className={'whitespace-nowrap max-w-[200px]'}
+            className={'whitespace-nowrap max-w-[200px] top-6 -ml-4'}
             tooltip={
               showAge
                 ? 'Click to show Datetime Format'

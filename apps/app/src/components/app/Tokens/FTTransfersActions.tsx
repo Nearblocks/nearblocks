@@ -5,12 +5,7 @@ import { useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
-import {
-  formatTimestampToString,
-  getTimeAgoString,
-  localFormat,
-  nanoToMilli,
-} from '@/utils/libs';
+import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { tokenAmount } from '@/utils/near';
 import { TransactionInfo } from '@/utils/types';
 
@@ -23,6 +18,7 @@ import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import TimeStamp from '../common/TimeStamp';
 
 interface ListProps {
   data: {
@@ -325,35 +321,13 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <Tooltip
-            className={'max-w-[200px] left-1/2'}
-            position="top"
-            tooltip={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (
         <div className="w-full inline-flex px-5 py-4">
           <Tooltip
-            className={'max-w-[200px] whitespace-nowrap'}
+            className={'max-w-[200px] whitespace-nowrap top-6'}
             tooltip={
               showAge
                 ? 'Click to show Datetime Format'

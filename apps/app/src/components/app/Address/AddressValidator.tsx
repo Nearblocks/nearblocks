@@ -18,8 +18,9 @@ const AddressValidator = ({
   accountData,
 }: AddressValidatorProps) => {
   const params = useParams<{ id: string }>();
-  const [accountValid, setAccountValid] = useState(
-    () => accountData?.account?.[0]?.account_id === params?.id,
+  const accountId = accountData?.account?.[0]?.account_id;
+  const [accountValid, setAccountValid] = useState<boolean>(
+    () => accountId === params?.id,
   );
   const initializedRef = useRef(false);
 
@@ -39,13 +40,14 @@ const AddressValidator = ({
   const { viewAccount } = useRpc();
 
   useEffect(() => {
-    viewAccount(params?.id)
-      .then((account) => setAccountValid(!!account))
-      .catch(() => {
-        setAccountValid(false);
-        switchRpc();
-      });
-
+    if (accountId == null) {
+      viewAccount(params?.id)
+        .then((account) => setAccountValid(!!account))
+        .catch(() => {
+          setAccountValid(false);
+          switchRpc();
+        });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params?.id, accountData]);
 
@@ -57,12 +59,12 @@ const AddressValidator = ({
       <div>
         {accountValid ? (
           sponsoredText && (
-            <div className="pl-1.5 py-4 min-h-[25px]">
+            <div className="pl-1.5 pb-4 pt-2 min-h-[25px]">
               <SponsoredText sponsoredText={sponsoredText} />
             </div>
           )
         ) : (
-          <div className="pl-1.5 py-4 min-h-[25px]">
+          <div className="pl-1.5 pb-4 pt-2 min-h-[25px]">
             This address does not exist.
           </div>
         )}

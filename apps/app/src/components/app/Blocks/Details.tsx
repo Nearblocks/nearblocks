@@ -223,7 +223,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-xl h-4" />
+                  <Skeleton className="flex w-full max-w-sm h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -306,7 +306,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -325,7 +325,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -347,7 +347,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -365,7 +365,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -381,7 +381,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -402,7 +402,7 @@ export default function Details(props: Props) {
               </div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-sm h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
@@ -423,7 +423,7 @@ export default function Details(props: Props) {
                 </div>
                 {isLoading ? (
                   <div className="w-full md:w-3/4">
-                    <Skeleton className="flex w-full max-w-lg h-4" />
+                    <Skeleton className="flex w-full max-w-xs h-4" />
                   </div>
                 ) : (
                   <div className="w-full md:w-3/4 break-words">
@@ -438,7 +438,7 @@ export default function Details(props: Props) {
               <div className="w-full md:w-1/4 mb-2 md:mb-0">Shard Number</div>
               {isLoading ? (
                 <div className="w-full md:w-3/4">
-                  <Skeleton className="flex w-full max-w-lg h-4" />
+                  <Skeleton className="flex w-full max-w-xs h-4" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
