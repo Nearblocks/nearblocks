@@ -4,14 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Suspense, useState } from 'react';
 
 import { Link } from '@/i18n/routing';
-import {
-  convertToMetricPrefix,
-  formatTimestampToString,
-  gasFee,
-  getTimeAgoString,
-  localFormat,
-  nanoToMilli,
-} from '@/utils/app/libs';
+import { convertToMetricPrefix, gasFee, localFormat } from '@/utils/app/libs';
 import { BlocksInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
@@ -21,6 +14,7 @@ import Clock from '../Icons/Clock';
 import FaInbox from '../Icons/FaInbox';
 import Skeleton from '../skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import TimeStamp from '../common/TimeStamp';
 
 const ListActions = ({
   countLoading,
@@ -64,35 +58,13 @@ const ListActions = ({
     {
       cell: (row: BlocksInfo) => (
         <span>
-          <Tooltip
-            className={'left-1/2 max-w-[200px]'}
-            position="top"
-            tooltip={
-              showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''
-            }
-          >
-            <span>
-              {!showAge
-                ? row?.block_timestamp
-                  ? formatTimestampToString(nanoToMilli(row?.block_timestamp))
-                  : ''
-                : row?.block_timestamp
-                ? getTimeAgoString(nanoToMilli(row?.block_timestamp))
-                : ''}
-            </span>
-          </Tooltip>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (
         <div>
           <Tooltip
-            className={'whitespace-nowrap max-w-[200px]'}
+            className={'whitespace-nowrap max-w-[200px] top-8'}
             tooltip={
               showAge
                 ? 'Click to show Datetime Format'
@@ -100,7 +72,7 @@ const ListActions = ({
             }
           >
             <button
-              className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row"
+              className="w-full flex items-center whitespace-nowrap px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row"
               onClick={toggleShowAge}
               type="button"
             >

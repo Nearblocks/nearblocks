@@ -62,11 +62,11 @@ const ChartDetails = forwardRef(
         link: '/charts/tps',
         text: 'Near Transactions per Second Chart',
       },
-      {
+      /* {
         exclude: false,
         link: '/charts/multi-chain-txns',
         text: 'multichainTxns.heading',
-      },
+      }, */
     ];
     return (
       <div className={`w-full z-10 ${className}`} ref={ref}>

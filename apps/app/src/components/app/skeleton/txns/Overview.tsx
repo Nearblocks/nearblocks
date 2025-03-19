@@ -3,6 +3,7 @@ import React from 'react';
 
 import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
+import { networkId } from '@/utils/app/config';
 
 const Loader = ({ className, wrapperClassName }: any) => (
   <div
@@ -16,6 +17,11 @@ const OverviewSkeleton = () => {
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
       <div className="text-sm text-nearblue-600 dark:text-neargray-10 py-2">
+        {networkId === 'testnet' && (
+          <div className="flex flex-wrap px-4 py-3.5 text-red-500">
+            {t ? t('testnetNotice') : '[ This is a Testnet transaction only ]'}
+          </div>
+        )}
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
             <Tooltip

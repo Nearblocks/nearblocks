@@ -41,15 +41,16 @@ const NFTInventory = ({ count, error, tab, token, tokens }: Props) => {
               </div>
             </div>
           )}
-          {error && tokens.length === 0 && (
-            <div className="px-6 py-4 text-gray-400 text-xs">
-              <ErrorMessage
-                icons={<FaInbox />}
-                message="There are no matching entries"
-                mutedText="Please try again later"
-              />
-            </div>
-          )}
+          {error ||
+            (tokens.length === 0 && (
+              <div className="px-6 py-4 text-gray-400 text-xs">
+                <ErrorMessage
+                  icons={<FaInbox />}
+                  message="There are no matching entries"
+                  mutedText="Please try again later"
+                />
+              </div>
+            ))}
           <div className="flex flex-wrap sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 m-6">
             {!tokens &&
               [...Array(24)].map((_, i) => (
@@ -118,7 +119,9 @@ const NFTInventory = ({ count, error, tab, token, tokens }: Props) => {
                 </div>
               ))}
           </div>
-          {!error && <Paginator count={count} limit={24} pageLimit={200} />}
+          {!error && tokens.length > 0 && (
+            <Paginator count={count} limit={24} pageLimit={200} />
+          )}
         </>
       ) : (
         <div className="w-full h-[500px]"></div>
