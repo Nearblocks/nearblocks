@@ -10,11 +10,12 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 interface TokenDiffEvent {
   account_id: string;
   diff: Record<string, string>;
+  intent_hash?: string;
 }
 
 interface Props {
   event: TransactionLog;
-  data: TokenDiffEvent[];
+  data: TokenDiffEvent[] | TokenDiffEvent;
   meta: any;
 }
 
@@ -22,9 +23,15 @@ const Transfer = ({ event, data, meta }: Props) => {
   const params = useParams<{ hash: string }>();
   const hash = params?.hash;
 
-  if (!data || data?.length === 0) return null;
+  const normalizedData: TokenDiffEvent[] = Array.isArray(data)
+    ? data
+    : data
+    ? [data as TokenDiffEvent]
+    : [];
 
-  const userSwaps = data?.reduce(
+  if (normalizedData?.length === 0) return null;
+
+  const userSwaps = normalizedData?.reduce(
     (acc, { account_id, diff }) => {
       const swapData = acc[account_id] || { sent: [], received: [] };
 
