@@ -1,8 +1,7 @@
-import { Message } from 'nb-neardata';
+import { Message } from 'nb-blocks';
 import { retry } from 'nb-utils';
 
-import config from '#config';
-import redis from '#libs/redis';
+import { lru } from '#libs/lru';
 
 export const prepareCache = async (message: Message) => {
   const chunks = message.shards.flatMap((shard) => shard.chunk || []);
@@ -12,7 +11,7 @@ export const prepareCache = async (message: Message) => {
       const transactionHash = txn.transaction.hash;
       const receiptId = txn.outcome.executionOutcome.outcome.receiptIds[0];
 
-      return redis.set(receiptId, transactionHash, config.cacheExpiry);
+      return lru.set(receiptId, transactionHash);
     });
   const receipts = chunks
     .flatMap((chunk) => chunk.receipts)
@@ -23,17 +22,16 @@ export const prepareCache = async (message: Message) => {
           : receipt.receiptId;
 
       const parentHash = await retry(async () => {
-        return redis.get(receiptOrDataId);
+        return lru.peek(receiptOrDataId);
       });
 
       if (parentHash && 'Action' in receipt.receipt) {
         const inputs = receipt.receipt.Action.inputDataIds.map((dataId) =>
-          redis.set(dataId, parentHash, config.cacheExpiry),
+          lru.set(dataId, parentHash),
         );
 
         const outputs = receipt.receipt.Action.outputDataReceivers.map(
-          (receiver) =>
-            redis.set(receiver.dataId, parentHash, config.cacheExpiry),
+          (receiver) => lru.set(receiver.dataId, parentHash),
         );
 
         return Promise.all([...inputs, ...outputs]);
@@ -45,13 +43,13 @@ export const prepareCache = async (message: Message) => {
     .flatMap((shard) => shard.receiptExecutionOutcomes)
     .map(async (outcome) => {
       const parentHash = await retry(async () => {
-        return redis.get(outcome.executionOutcome.id);
+        return lru.peek(outcome.executionOutcome.id);
       });
 
       if (parentHash) {
         return Promise.all(
           outcome.executionOutcome.outcome.receiptIds.map(async (receiptId) => {
-            return redis.set(receiptId, parentHash, config.cacheExpiry);
+            return lru.set(receiptId, parentHash);
           }),
         );
       }

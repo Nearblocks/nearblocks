@@ -4,7 +4,7 @@ import { logger } from 'nb-logger';
 
 import { register } from '#libs/prom';
 
-const PORT = 3010;
+const PORT = 3011;
 
 export const server = http.createServer(async (req, res) => {
   if (req.url === '/metrics') {

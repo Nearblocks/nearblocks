@@ -1,13 +1,6 @@
-import { difference, uniq } from 'lodash-es';
-
+import { Action, DataReceiver, Receipt as JReceipt, Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
-import {
-  Action,
-  DataReceiver,
-  Receipt as JReceipt,
-  Message,
-} from 'nb-neardata';
 import {
   ActionReceiptAction,
   ActionReceiptInputData,
@@ -18,9 +11,9 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { isDelegateAction } from '#libs/guards';
+import { lru } from '#libs/lru';
 import { receiptHistogram } from '#libs/prom';
-import redis, { redisClient } from '#libs/redis';
-import { mapActionKind, mapReceiptKind } from '#libs/utils';
+import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
@@ -233,10 +226,8 @@ const storeChunkReceipts = async (
 };
 
 const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
-  const receiptOrDataIds = uniq(ids);
-  let txnHashes = await retry(async () => {
-    return await fetchTxnHashesFromCache(receiptOrDataIds);
-  });
+  const receiptOrDataIds = [...new Set(ids)];
+  let txnHashes = fetchTxnHashesFromCache(receiptOrDataIds);
 
   if (txnHashes.size === receiptOrDataIds.length) {
     return txnHashes;
@@ -258,11 +249,12 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
   return txnHashes;
 };
 
-const fetchTxnHashesFromCache = async (receiptOrDataIds: string[]) => {
+const fetchTxnHashesFromCache = (receiptOrDataIds: string[]) => {
   const txnHashes: Map<string, string> = new Map();
-  const hashes = await redisClient.mget(redis.prefixedKeys(receiptOrDataIds));
 
-  hashes.forEach((hash, i) => {
+  receiptOrDataIds.forEach((receiptOrDataId, i) => {
+    const hash = lru.peek(receiptOrDataId);
+
     if (hash) txnHashes.set(receiptOrDataIds[i], hash);
   });
 

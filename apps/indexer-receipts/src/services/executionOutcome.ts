@@ -1,5 +1,5 @@
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 

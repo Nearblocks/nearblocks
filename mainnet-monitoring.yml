@@ -4,7 +4,7 @@ services:
     container_name: mainnet-prometheus
     image: prom/prometheus
     ports:
-      - 3011:9090
+      - 3012:9090
     volumes:
       - prometheus-data:/prometheus
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -14,7 +14,7 @@ services:
     container_name: mainnet-grafana
     image: grafana/grafana-oss
     ports:
-      - 3012:3000
+      - 3013:3000
     volumes:
       - grafana-data:/var/lib/grafana
       - ./monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml

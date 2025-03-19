@@ -24,10 +24,6 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  REDIS_PASSWORD: str({ default: '' }),
-  REDIS_SENTINEL_NAME: str({ default: '' }),
-  REDIS_SENTINEL_URLS: str({ default: '' }),
-  REDIS_URL: url({ default: '' }),
   S3_ACCESS_KEY: str(),
   S3_BUCKET: str({ default: '' }),
   S3_ENDPOINT: url(),
@@ -59,7 +55,6 @@ if (env.NEARLAKE_ENDPOINT) {
 }
 
 const config: Config = {
-  cacheExpiry: 5 * 60, // cache expiry time in seconds (5 min)
   dataSource: env.BASE_DATA_SOURCE,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
@@ -71,7 +66,7 @@ const config: Config = {
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
   genesisTimestamp,
-  insertLimit: 1_000, // records to insert into the db at a time
+  insertLimit: 2_500, // records to insert into the db at a time
   nearlakeAccessKey: env.NEARLAKE_ACCESS_KEY,
   nearlakeBucketName,
   nearlakeEndpoint,
@@ -79,10 +74,6 @@ const config: Config = {
   nearlakeSecretKey: env.NEARLAKE_SECRET_KEY,
   network: env.NETWORK,
   preloadSize: 100, // blocks to preload in nearlake
-  redisPassword: env.REDIS_PASSWORD,
-  redisSentinelName: env.REDIS_SENTINEL_NAME,
-  redisSentinelUrls: env.REDIS_SENTINEL_URLS,
-  redisUrl: env.REDIS_URL,
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,
   s3Endpoint: env.S3_ENDPOINT,
