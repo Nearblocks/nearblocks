@@ -12,6 +12,7 @@ import logger from '#libs/logger';
 import sentry from '#libs/sentry';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import routes from '#routes/index';
+import routesV2 from '#routes/v2/index';
 
 const file = fileURLToPath(import.meta.url);
 const dir = path.dirname(file);
@@ -24,6 +25,8 @@ app.set('query parser', (str: string) =>
     parseNumbers: true,
     types: {
       account: 'string',
+      after_timestamp: 'string',
+      before_timestamp: 'string',
       cursor: 'string',
       hash: 'string',
       keyword: 'string',
@@ -43,6 +46,7 @@ app.set('trust proxy', 2);
 app.get('/ip', (req, res) => res.send(req.ip));
 
 app.use('/v1', routes());
+app.use('/v2', routesV2());
 
 app.get('/v1/kitwallet', (_req, res) => {
   const htmlFilePath = path.join(dir, '..', 'src', 'kitwallet', 'index.html');
