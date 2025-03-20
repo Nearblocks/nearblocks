@@ -21,8 +21,6 @@ const receipts = catchAsync(
     const afterTimestamp = req.validator.data.after_timestamp;
     const beforeTimestamp = req.validator.data.before_timestamp;
 
-    console.log({ afterTimestamp, beforeTimestamp });
-
     if (from && to && from !== account && to !== account) {
       return res.status(200).json({ txns: [] });
     }
