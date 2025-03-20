@@ -298,22 +298,6 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      header: <span>{t ? t('txns:txnFee') : 'TXN FEE'}</span>,
-      key: 'transaction_fee',
-      cell: (row: TransactionInfo) => (
-        <span>
-          {row?.outcomes_agg?.transaction_fee
-            ? yoctoToNear(row?.outcomes_agg?.transaction_fee, true)
-            : ''}{' '}
-          Ⓝ
-        </span>
-      ),
-      tdClassName:
-        'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
-      thClassName:
-        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
-    },
-    {
       header: (
         <>
           <Menu>
@@ -538,7 +522,10 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       key: 'block_timestamp',
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp timestamp={row?.block_timestamp} showAge={showAge} />
+          <TimeStamp
+            timestamp={Number(row?.block?.block_timestamp)}
+            showAge={showAge}
+          />
         </span>
       ),
       tdClassName:

@@ -281,6 +281,7 @@ export type TransactionInfo = {
   };
   block: {
     block_height: string;
+    block_timestamp: string;
   };
   block_timestamp: string;
   included_in_block_hash: string;
