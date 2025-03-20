@@ -1,12 +1,18 @@
 const baseURL = process.env.API_URL;
 const accessKey = process.env.API_ACCESS_KEY;
 
-const fetcher = async (url: string, options = {} as any) => {
+const fetcher = async (
+  url: string,
+  options = {} as any,
+  useBase: boolean = true,
+) => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const response = await fetch(`${baseURL}${url}`, {
+    const fullUrl = useBase ? `${baseURL}${url}` : url;
+
+    const response = await fetch(fullUrl, {
       ...options,
       signal: controller.signal,
       headers: {

@@ -116,10 +116,16 @@ export const getServerSideProps: GetServerSideProps<{
       api: `account/${address}/txns-only`,
       count: `account/${address}/txns-only/count`,
     },
-    receipts: {
-      api: `account/${address}/receipts`,
-      count: `account/${address}/receipts/count`,
-    },
+    receipts:
+      network === 'testnet'
+        ? {
+            api: `https://api-testnet.nearblocks.io/v2/account/${address}/receipts`,
+            count: `https://api-testnet.nearblocks.io/v2/account/${address}/receipts/count`,
+          }
+        : {
+            api: `https://api.nearblocks.io/v2/account/${address}/receipts`,
+            count: `https://api.nearblocks.io/v2/account/${address}/receipts/count`,
+          },
     tokentxns: {
       api: `account/${address}/ft-txns`,
       count: `account/${address}/ft-txns/count`,
@@ -147,7 +153,7 @@ export const getServerSideProps: GetServerSideProps<{
   const fetchCommonData = async (url: string | undefined) => {
     try {
       if (url) {
-        const response = await fetcher(url);
+        const response = await fetcher(url, {}, tab === 'receipts' && false);
         return response;
       }
       return null;
