@@ -27,7 +27,7 @@ const AccountAlertsActions = ({
   const [isLocked, setIsLocked] = useState(false);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [isContractLoading, setIsContractLoading] = useState(true);
-  const [accessKeys, setAccessKeys] = useState<[] | KeysInfo>([]);
+  const [accessKeys, setAccessKeys] = useState<null | KeysInfo[]>();
   const params = useParams<{ id: string }>();
 
   const loadSchema = useCallback(async () => {
@@ -90,15 +90,19 @@ const AccountAlertsActions = ({
           const isSame = JSON.stringify(prev) === JSON.stringify(keys?.keys);
           return isSame ? prev : keys?.keys;
         });
+      } else if (keys?.keys?.length === 0) {
+        setAccessKeys([]);
       }
     } catch (error) {
       console.error('Error loading schema:', error);
     }
-  }, [params?.id, contractCode, viewAccount, viewAccessKeys]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     loadSchema();
-  }, [loadSchema]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params?.id]);
 
   if (!isAccountLoading && !isLocked && sponsoredText) {
     return (
@@ -148,6 +152,7 @@ const AccountAlertsActions = ({
     isLocked &&
     accountData &&
     accountData?.account?.[0]?.deleted?.transaction_hash === null &&
+    accessKeys &&
     Object.keys(accessKeys)?.length === 0 &&
     contract === null &&
     !isContractLoading
@@ -168,12 +173,7 @@ const AccountAlertsActions = ({
       </>
     );
   }
-
-  if (accountData || accountView) {
-    return <AddressValidator accountData={accountData} />;
-  }
-
-  return null;
+  return <AddressValidator accountData={accountData} />;
 };
 
 export default AccountAlertsActions;
