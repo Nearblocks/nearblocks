@@ -8,7 +8,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "test": "vitest"
   },
   "devDependencies": {
     "eslint-config-custom-node": "*",
@@ -16,6 +17,7 @@
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
-    "typescript": "~5.2"
+    "typescript": "~5.2",
+    "vitest": "~3.0"
   }
 }

@@ -5,6 +5,9 @@ scrape_configs:
   - job_name: 'indexer-base'
     static_configs:
       - targets: ['host.docker.internal:3010']
+  - job_name: 'indexer-receipts'
+    static_configs:
+      - targets: ['host.docker.internal:3011']
 
 rule_files:
   - 'prometheus-rules.yml'
