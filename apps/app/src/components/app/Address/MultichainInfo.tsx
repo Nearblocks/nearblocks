@@ -5,7 +5,7 @@ const MultichainInfo = async ({ id }: { id: string }) => {
   const options: RequestInit = { next: { revalidate: 10 } };
 
   const [multiChainAccountsData] = await Promise.all([
-    getRequest(`chain-abstraction/${id}/multi-chain-accounts`, {}, options),
+    getRequest(`v1/chain-abstraction/${id}/multi-chain-accounts`, {}, options),
   ]);
   return (
     <MultichainInfoActions

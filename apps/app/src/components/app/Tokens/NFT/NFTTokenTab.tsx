@@ -24,15 +24,18 @@ export default async function NFTTokenTab({
     TabType,
     { api: string; count?: any; queryModifier?: () => void }
   > = {
-    holders: { api: `nfts/${id}/holders`, count: `nfts/${id}/holders/count` },
+    holders: {
+      api: `v1/nfts/${id}/holders`,
+      count: `v1/nfts/${id}/holders/count`,
+    },
     inventory: {
-      api: `nfts/${id}/tokens`,
-      count: `nfts/${id}/tokens/count`,
+      api: `v1/nfts/${id}/tokens`,
+      count: `v1/nfts/${id}/tokens/count`,
       queryModifier: () => {
         searchParams.per_page = '24';
       },
     },
-    transfers: { api: `nfts/${id}/txns`, count: `nfts/${id}/txns/count` },
+    transfers: { api: `v1/nfts/${id}/txns`, count: `v1/nfts/${id}/txns/count` },
   };
 
   const tabApi = tabApiUrls[tab as TabType];
@@ -44,9 +47,9 @@ export default async function NFTTokenTab({
     await Promise.all([
       getRequest(fetchUrl, searchParams, options),
       getRequest(countUrl, {}, options),
-      getRequest(`nfts/${id}`, {}, options),
-      getRequest(`sync/status`, {}, options),
-      getRequest(`nfts/${id}/holders/count`, {}, options),
+      getRequest(`v1/nfts/${id}`, {}, options),
+      getRequest(`v1/sync/status`, {}, options),
+      getRequest(`v1/nfts/${id}/holders/count`, {}, options),
     ]);
   const holder = dataResult?.holders || [];
   const holders = holdersDetails?.holders?.[0]?.count;

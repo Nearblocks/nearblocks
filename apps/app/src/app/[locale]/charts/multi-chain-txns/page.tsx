@@ -48,7 +48,7 @@ export async function generateMetadata(props: {
 }
 
 export default async function AddressesChart() {
-  const data = await getRequest('charts');
+  const data = await getRequest('v1/charts');
   const theme = (await cookies()).get('theme')?.value || 'light';
 
   return (

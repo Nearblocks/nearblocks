@@ -59,7 +59,7 @@ export default async function TxnVolumeChart(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale });
-  const data = await getRequest('charts');
+  const data = await getRequest('v1/charts');
   return (
     <section>
       <div>

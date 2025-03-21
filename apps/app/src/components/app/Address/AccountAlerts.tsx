@@ -17,7 +17,7 @@ export default async function AccountAlerts({ id }: { id: string }) {
     }
   };
 
-  const accountData = await fetchCommonData(`account/${id}`);
+  const accountData = await fetchCommonData(`v1/account/${id}`);
 
   return <AccountAlertsActions accountData={accountData} />;
 }
