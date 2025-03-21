@@ -3,7 +3,7 @@ import React from 'react';
 
 import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
-import { networkId } from '@/utils/app/config';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const Loader = ({ className, wrapperClassName }: any) => (
   <div
@@ -13,6 +13,7 @@ const Loader = ({ className, wrapperClassName }: any) => (
 
 const OverviewSkeleton = () => {
   const t = useTranslations();
+  const { networkId } = useConfig();
 
   return (
     <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
