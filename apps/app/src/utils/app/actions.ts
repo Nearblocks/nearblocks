@@ -44,7 +44,7 @@ export async function handleFilterAndKeyword(keyword: string, filter: string) {
       keyword = keyword.toLowerCase();
     }
 
-    const res = await getRequest(`search${filter}?keyword=${keyword}`);
+    const res = await getRequest(`v1/search${filter}?keyword=${keyword}`);
     if (!res) return res;
     const data: SearchResult = {
       accounts: [],

@@ -22,10 +22,13 @@ export default async function TokenTabs({
 
   const tabApiUrls: Record<TabType, { api: string; count?: string }> = {
     comments: { api: '' },
-    faq: { api: `fts/${id}` },
-    holders: { api: `fts/${id}/holders`, count: `fts/${id}/holders/count` },
-    info: { api: `fts/${id}` },
-    transfers: { api: `fts/${id}/txns`, count: `fts/${id}/txns/count` },
+    faq: { api: `v1/fts/${id}` },
+    holders: {
+      api: `v1/fts/${id}/holders`,
+      count: `v1/fts/${id}/holders/count`,
+    },
+    info: { api: `v1/fts/${id}` },
+    transfers: { api: `v1/fts/${id}/txns`, count: `v1/fts/${id}/txns/count` },
   };
 
   const tabApi = tabApiUrls[tab as TabType];
@@ -41,12 +44,12 @@ export default async function TokenTabs({
     contractResult,
   ] = await Promise.all([
     getRequest(fetchUrl, searchParams, { next: { revalidate: 10 } }),
-    getRequest(`fts/${id}/txns/count`),
-    getRequest(`fts/${id}`),
-    getRequest(`sync/status`),
-    getRequest(`fts/${id}/holders/count`),
-    getRequest(`account/${id}`),
-    getRequest(`account/${id}/contract/deployments`),
+    getRequest(`v1/fts/${id}/txns/count`),
+    getRequest(`v1/fts/${id}`),
+    getRequest(`v1/sync/status`),
+    getRequest(`v1/fts/${id}/holders/count`),
+    getRequest(`v1/account/${id}`),
+    getRequest(`v1/account/${id}/contract/deployments`),
   ]);
   const holder = dataResult?.holders || [];
   const holders = holdersDetails?.holders?.[0]?.count;

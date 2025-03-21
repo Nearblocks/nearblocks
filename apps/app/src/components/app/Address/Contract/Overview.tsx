@@ -23,9 +23,9 @@ const Overview = async ({ id, searchParams }: any) => {
   };
 
   const [data, parse, account] = await Promise.all([
-    fetchCommonData(`account/${id}/contract/deployments`, searchParams),
-    fetchCommonData(`account/${id}/contract/parse`),
-    fetchCommonData(`account/${id}`),
+    fetchCommonData(`v1/account/${id}/contract/deployments`, searchParams),
+    fetchCommonData(`v1/account/${id}/contract/parse`),
+    fetchCommonData(`v1/account/${id}`),
   ]);
 
   return (

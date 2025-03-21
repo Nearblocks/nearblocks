@@ -11,9 +11,9 @@ export default async function TransactionList(props: {
   }>;
 }) {
   const searchParams = await props.searchParams;
-  const apiUrl = `chain-abstraction/txns`;
+  const apiUrl = `v1/chain-abstraction/txns`;
   const countUrl = `${apiUrl}/count`;
-  const chartUrl = `charts`;
+  const chartUrl = `v1/charts`;
   const today = new Date();
   const beforeDate = today.toISOString().split('T')[0];
   const afterDate = new Date(today.getTime() - 24 * 60 * 60 * 1000)

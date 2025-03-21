@@ -7,8 +7,8 @@ const AccessKeys = async ({ id, searchParams }: any) => {
     next: { revalidate: 10 },
   };
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/keys`, searchParams, options),
-    getRequest(`account/${id}/keys/count`, searchParams, options),
+    getRequest(`v1/account/${id}/keys`, searchParams, options),
+    getRequest(`v1/account/${id}/keys/count`, searchParams, options),
   ]);
 
   if (data.message === 'Error') {

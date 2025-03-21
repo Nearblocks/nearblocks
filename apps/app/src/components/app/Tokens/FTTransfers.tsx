@@ -5,13 +5,13 @@ import { getRequest } from '@/utils/app/api';
 import FTTransfersActions from './FTTransfersActions';
 
 const Transfers = async ({ searchParams }: any) => {
-  const apiUrl = 'fts/txns';
+  const apiUrl = 'v1/fts/txns';
   const fetchUrl = `${apiUrl}?${QueryString.stringify(searchParams)}`;
 
   const [data, dataCount, syncDetails] = await Promise.all([
     getRequest(fetchUrl),
-    getRequest('fts/txns/count'),
-    getRequest('sync/status'),
+    getRequest('v1/fts/txns/count'),
+    getRequest('v1/sync/status'),
   ]);
 
   const status = syncDetails?.status?.indexers?.events || {

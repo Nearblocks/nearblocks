@@ -16,7 +16,7 @@ export default async function ReceiptPage(props: {
       ? `https://beta.rpc.mainnet.near.org`
       : `https://beta.rpc.testnet.near.org')`;
 
-  const resp = await getRequest(`search/receipts?keyword=${receipt}`);
+  const resp = await getRequest(`v1/search/receipts?keyword=${receipt}`);
   let txn = resp?.receipts?.[0]?.originated_from_transaction_hash;
 
   if (!txn) {

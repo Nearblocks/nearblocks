@@ -9,11 +9,11 @@ import TokenFilter from './TokenFilter';
 const Overview = async ({ id, searchParams }: any) => {
   const [statsResult, tokenResult, syncResult, transferResult, holderResult] =
     await Promise.all([
-      getRequest(`stats`),
-      getRequest(`fts/${id}`),
-      getRequest(`sync/status`),
-      getRequest(`fts/${id}/txns/count`),
-      getRequest(`fts/${id}/holders/count`),
+      getRequest(`v1/stats`),
+      getRequest(`v1/fts/${id}`),
+      getRequest(`v1/sync/status`),
+      getRequest(`v1/fts/${id}/txns/count`),
+      getRequest(`v1/fts/${id}/holders/count`),
     ]);
 
   const token: Token = tokenResult?.contracts?.[0];
@@ -27,7 +27,7 @@ const Overview = async ({ id, searchParams }: any) => {
   };
 
   const inventoryDataPromise = searchParams?.a
-    ? await getRequest(`account/${searchParams?.a}/inventory`)
+    ? await getRequest(`v1/account/${searchParams?.a}/inventory`)
     : Promise.resolve(null);
   const inventoryData = inventoryDataPromise?.inventory;
   const theme = (await cookies()).get('theme')?.value || 'light';

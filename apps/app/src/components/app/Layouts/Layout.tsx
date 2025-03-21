@@ -30,13 +30,13 @@ const Layout = async ({ children, locale }: LayoutProps) => {
 
   const getLatestStats = async () => {
     'use server';
-    const statsDetails = await getRequest(`stats`);
+    const statsDetails = await getRequest(`v1/stats`);
     return statsDetails?.stats?.[0];
   };
 
   const getSyncStatus = async () => {
     'use server';
-    const sync = await getRequest('sync/status');
+    const sync = await getRequest('v1/sync/status');
     const indexers = sync?.status?.indexers;
     return indexers;
   };

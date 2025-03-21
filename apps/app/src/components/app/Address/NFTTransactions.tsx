@@ -7,8 +7,8 @@ const NFTTransactions = async ({ id, searchParams }: any) => {
     next: { revalidate: 10 },
   };
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/nft-txns`, searchParams, options),
-    getRequest(`account/${id}/nft-txns/count`, searchParams, options),
+    getRequest(`v1/account/${id}/nft-txns`, searchParams, options),
+    getRequest(`v1/account/${id}/nft-txns/count`, searchParams, options),
   ]);
 
   if (data.message === 'Error') {

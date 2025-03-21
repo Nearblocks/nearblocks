@@ -10,10 +10,10 @@ const NFTOverview = async ({ id }: any) => {
   const options: RequestInit = { next: { revalidate: 10 } };
   const [tokenResult, syncResult, transferResult, holderResult] =
     await Promise.all([
-      getRequest(`nfts/${id}`, {}, options),
-      getRequest(`sync/status`, {}, options),
-      getRequest(`nfts/${id}/txns/count`, {}, options),
-      getRequest(`nfts/${id}/holders/count`, {}, options),
+      getRequest(`v1/nfts/${id}`, {}, options),
+      getRequest(`v1/sync/status`, {}, options),
+      getRequest(`v1/nfts/${id}/txns/count`, {}, options),
+      getRequest(`v1/nfts/${id}/holders/count`, {}, options),
     ]);
 
   const token: Token = tokenResult?.contracts?.[0];

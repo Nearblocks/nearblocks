@@ -14,9 +14,9 @@ export default async function TxnsTabs({
   searchParams: any;
 }) {
   const options: RequestInit = { next: { revalidate: 10 } };
-  const data = (await getRequest(`txns/${hash}/full`, {}, options)) || {};
-  const stats = (await getRequest(`stats`, {}, options)) || [];
-  const syncData = (await getRequest(`sync/status`, {}, options)) || [];
+  const data = (await getRequest(`v1/txns/${hash}/full`, {}, options)) || {};
+  const stats = (await getRequest(`v1/stats`, {}, options)) || [];
+  const syncData = (await getRequest(`v1/sync/status`, {}, options)) || [];
   const txn = data?.txns?.[0];
   let price: null | number = null;
   if (txn?.block_timestamp) {
@@ -27,7 +27,7 @@ export default async function TxnsTabs({
 
     if (currentDt > blockDt) {
       const priceData =
-        (await getRequest(`stats/price?date=${blockDt}`, {}, options)) || {};
+        (await getRequest(`v1/stats/price?date=${blockDt}`, {}, options)) || {};
       price = priceData?.stats?.[0]?.near_price || null;
     }
   }
@@ -35,7 +35,7 @@ export default async function TxnsTabs({
   let isContract = null;
   if (txn?.receiver_account_id) {
     const [contractResult] = await Promise.allSettled([
-      getRequest(`account/${txn?.receiver_account_id}`),
+      getRequest(`v1/account/${txn?.receiver_account_id}`),
     ]);
 
     isContract =

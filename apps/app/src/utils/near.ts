@@ -338,11 +338,13 @@ export function mainActions(rpcTxn: any) {
   const receipt = rpcTxn?.transaction_outcome?.outcome?.receipt_ids[0];
   const from = rpcTxn?.transaction?.signer_id;
   const to = rpcTxn?.transaction?.receiver_id;
-  const logs = rpcTxn?.receipts_outcome[0]?.outcome?.logs?.map((log: any) => ({
-    logs: log,
-    contract: to,
-    receiptId: receipt,
-  }));
+  const logs = rpcTxn?.receipts_outcome?.[0]?.outcome?.logs?.map(
+    (log: any) => ({
+      logs: log,
+      contract: to,
+      receiptId: receipt,
+    }),
+  );
 
   const actionsLog = rpcTxn?.transaction?.actions?.map((log: any) => {
     const actionInfo: any = mapRpcActionToAction(log);
@@ -509,7 +511,7 @@ async function processTokenMetadata(
 
     try {
       const options: RequestInit = { next: { revalidate: 10 } };
-      const response = await getRequest(`fts/${contractId}`, {}, options);
+      const response = await getRequest(`v1/fts/${contractId}`, {}, options);
 
       if (response?.contracts?.[0]) {
         const contract = response.contracts[0];

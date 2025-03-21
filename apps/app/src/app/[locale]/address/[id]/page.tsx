@@ -32,7 +32,7 @@ export default async function AddressIndex(props: {
   };
 
   const parse =
-    (await getRequest(`account/${id}/contract/parse`, {}, options)) || {};
+    (await getRequest(`v1/account/${id}/contract/parse`, {}, options)) || {};
 
   return (
     <>

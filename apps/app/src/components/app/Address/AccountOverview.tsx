@@ -19,11 +19,11 @@ export default async function AccountOverview({ id }: any) {
 
   const [accountData, statsData, tokenDetails, inventoryData, syncData] =
     await Promise.all([
-      fetchCommonData(`account/${id}`),
-      fetchCommonData('stats'),
-      fetchCommonData(`fts/${id}`),
-      fetchCommonData(`account/${id}/inventory`),
-      fetchCommonData(`sync/status`),
+      fetchCommonData(`v1/account/${id}`),
+      fetchCommonData('v1/stats'),
+      fetchCommonData(`v1/fts/${id}`),
+      fetchCommonData(`v1/account/${id}/inventory`),
+      fetchCommonData(`v1/sync/status`),
     ]);
 
   const spamList: SpamToken = await fetch(

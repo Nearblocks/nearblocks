@@ -3,8 +3,8 @@ import { getRequest } from '@/utils/app/api';
 import Overview from '../Transactions/Overview';
 
 export default async function HomeOverview({ theme }: { theme: any }) {
-  const statsDetails = await getRequest('stats', {});
-  const charts = await getRequest('charts/latest');
+  const statsDetails = await getRequest('v1/stats', {});
+  const charts = await getRequest('v1/charts/latest');
   const stats = statsDetails?.stats?.[0];
 
   if (

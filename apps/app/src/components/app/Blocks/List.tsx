@@ -3,8 +3,8 @@ import { getRequest } from '@/utils/app/api';
 import ListActions from './ListActions';
 
 const List = async ({ cursor }: { cursor: string }) => {
-  const data = await getRequest('blocks', { cursor });
-  const dataCount = await getRequest('blocks/count');
+  const data = await getRequest('v1/blocks', { cursor });
+  const dataCount = await getRequest('v1/blocks/count');
   if (data.message === 'Error') {
     throw new Error(`Server Error : ${data.error}`);
   }

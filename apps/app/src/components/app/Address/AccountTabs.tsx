@@ -26,7 +26,7 @@ export default async function AccountTabs({
   };
 
   const parse =
-    (await getRequest(`account/${id}/contract/parse`, {}, options)) || {};
+    (await getRequest(`v1/account/${id}/contract/parse`, {}, options)) || {};
 
   const fallbackError = (
     <>

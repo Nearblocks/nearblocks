@@ -3,7 +3,7 @@ import { getRequest } from '@/utils/app/api';
 import LatestTransactions from '../Transactions/Latest';
 
 export default async function HomeLatestTxns() {
-  const txnsDetails = await getRequest('txns/latest');
+  const txnsDetails = await getRequest('v1/txns/latest');
 
   const txns = txnsDetails?.txns || [];
 

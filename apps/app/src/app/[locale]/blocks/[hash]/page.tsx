@@ -68,12 +68,12 @@ async function fetchHashAndPriceData(hash: string) {
 }
 
 async function fetchHashData(hash: string) {
-  return getRequest(`blocks/${hash}`);
+  return getRequest(`v1/blocks/${hash}`);
 }
 
 async function fetchPriceData(timestamp: any) {
   const formattedTimestamp = formatTimestamp(timestamp);
-  return getRequest(`stats/price?date=${formattedTimestamp}`);
+  return getRequest(`v1/stats/price?date=${formattedTimestamp}`);
 }
 
 function formatTimestamp(timestamp: any) {

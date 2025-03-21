@@ -19,11 +19,11 @@ export default async function AccountMoreInfo({ id }: any) {
 
   const [accountData, tokenDetails, deploymentData, nftTokenData, syncData] =
     await Promise.all([
-      fetchCommonData(`account/${id}`),
-      fetchCommonData(`fts/${id}`),
-      fetchCommonData(`account/${id}/contract/deployments`),
-      fetchCommonData(`nfts/${id}`),
-      fetchCommonData(`sync/status`),
+      fetchCommonData(`v1/account/${id}`),
+      fetchCommonData(`v1/fts/${id}`),
+      fetchCommonData(`v1/account/${id}/contract/deployments`),
+      fetchCommonData(`v1/nfts/${id}`),
+      fetchCommonData(`v1/sync/status`),
     ]);
 
   const balanceIndexerStatus =
