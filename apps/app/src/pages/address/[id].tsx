@@ -150,14 +150,13 @@ export const getServerSideProps: GetServerSideProps<{
     return { notFound: true };
   }
 
-  const fetchCommonData = async (url: string | undefined) => {
+  const fetchCommonData = async (
+    url: string | undefined,
+    useBase?: boolean,
+  ) => {
     try {
       if (url && tab) {
-        const response = await fetcher(
-          url,
-          {},
-          tab === 'receipts' ? false : true,
-        );
+        const response = await fetcher(url, {}, useBase);
         return response;
       }
       return null;
@@ -189,7 +188,6 @@ export const getServerSideProps: GetServerSideProps<{
   ]);
 
   const { statsDetails, latestBlocks } = await fetchData();
-
   const getResult = (result: PromiseSettledResult<any>) =>
     result.status === 'fulfilled' ? result.value : null;
 
@@ -205,8 +203,8 @@ export const getServerSideProps: GetServerSideProps<{
 
   // Fetch data in parallel but limit the number of calls
   const tabResults = await Promise.allSettled([
-    fetchCommonData(fetchUrl),
-    fetchCommonData(countUrl),
+    fetchCommonData(fetchUrl, tab === 'receipts' ? false : true),
+    fetchCommonData(countUrl, tab === 'receipts' ? false : true),
   ]);
 
   dataResult = getResult(tabResults[0]);
