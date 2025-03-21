@@ -17,23 +17,28 @@ import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
-export const storeReceipts = async (knex: Knex, message: Message) => {
+export const storeReceipts = async (knex: Knex, messages: Message[]) => {
   const start = performance.now();
   let receiptData: Receipt[] = [];
   let receiptActionsData: ActionReceiptAction[] = [];
   let receiptInputData: ActionReceiptInputData[] = [];
   let receiptOutputData: ActionReceiptOutputData[] = [];
-  const chunks = message.shards.flatMap((shard) => shard.chunk || []);
+  const shardChunks = messages.flatMap((message) =>
+    message.shards.flatMap((shard) => ({
+      chunk: shard.chunk,
+      header: message.block.header,
+    })),
+  );
 
   await Promise.all(
-    chunks.map(async (chunk) => {
-      if (chunk.receipts.length) {
+    shardChunks.map(async (shardChunk) => {
+      if (shardChunk.chunk && shardChunk.chunk.receipts.length) {
         const receipts = await storeChunkReceipts(
           knex,
-          chunk.header.chunkHash,
-          message.block.header.hash,
-          message.block.header.timestampNanosec,
-          chunk.receipts,
+          shardChunk.chunk.header.chunkHash,
+          shardChunk.header.hash,
+          shardChunk.header.timestampNanosec,
+          shardChunk.chunk.receipts,
         );
 
         receiptData = receiptData.concat(receipts.receiptData);
@@ -234,11 +239,7 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
   }
 
   logger.warn(
-    {
-      block: blockHash,
-      receiptOrDataIds: receiptOrDataIds,
-      txnHashes: [...txnHashes.keys()],
-    },
+    { block: blockHash },
     'missing parent txn hash(es) in cache... checking in db...',
   );
 
@@ -340,7 +341,11 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
 
   throw new Error(
     `missing parent txn hash(es) in db...${JSON.stringify({
+      outcomeReceipts,
+      receiptInputs,
       receiptOrDataIds: difference(receiptOrDataIds, [...txnHashes.keys()]),
+      receiptOutputs,
+      transactions,
     })}`,
   );
 };

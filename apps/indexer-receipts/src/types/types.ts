@@ -8,6 +8,7 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbUrlRead: string;
+  delta: number;
   insertLimit: number;
   network: Network;
   s3AccessKey: string;

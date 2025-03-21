@@ -3,8 +3,10 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { dbRead, dbWrite, streamConfig } from '#libs/knex';
+import { lru } from '#libs/lru';
 import { cacheHistogram } from '#libs/prom';
 import sentry from '#libs/sentry';
+import { getBatchSize } from '#libs/utils';
 import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
@@ -26,7 +28,7 @@ export const syncData = async () => {
   let startBlockHeight = config.startBlockHeight;
 
   if (!startBlockHeight && latestBlock) {
-    startBlockHeight = +latestBlock;
+    startBlockHeight = +latestBlock - config.delta;
   }
 
   const startBlock = startBlockHeight || 0;
@@ -40,8 +42,16 @@ export const syncData = async () => {
     start: startBlock,
   });
 
-  for await (const message of stream) {
-    await onMessage(message);
+  let blocks: Message[] = [];
+
+  for await (const message of stream as AsyncIterable<Message>) {
+    blocks.push(message);
+    const size = getBatchSize(message.block.header.timestampNanosec);
+
+    if (blocks.length >= size) {
+      await onMessage(blocks);
+      blocks = [];
+    }
   }
 
   stream.on('end', () => {
@@ -54,25 +64,27 @@ export const syncData = async () => {
   });
 };
 
-export const onMessage = async (message: Message) => {
+export const onMessage = async (messages: Message[]) => {
   try {
     let start = performance.now();
 
-    await prepareCache(message);
+    prepareCache(messages);
 
     const cache = performance.now() - start;
     cacheHistogram.labels(config.network).observe(cache);
     start = performance.now();
 
     await Promise.all([
-      storeReceipts(dbWrite, message),
-      storeExecutionOutcomes(dbWrite, message),
+      storeReceipts(dbWrite, messages),
+      storeExecutionOutcomes(dbWrite, messages),
     ]);
 
     const time = performance.now() - start;
 
     logger.info({
-      block: message.block.header.height,
+      block: `${messages[0].block.header.height} - ${
+        messages[messages.length - 1].block.header.height
+      }`,
       cache: `${cache} ms`,
       db: `${time} ms`,
     });
@@ -80,15 +92,19 @@ export const onMessage = async (message: Message) => {
     await dbWrite('settings')
       .insert({
         key: indexerKey,
-        value: { sync: message.block.header.height },
+        value: { sync: messages[messages.length - 1].block.header.height },
       })
       .onConflict('key')
       .merge();
   } catch (error) {
+    logger.warn([...lru.entries()]);
     logger.error(
-      `aborting... block ${message.block.header.height} ${message.block.header.hash}`,
+      `aborting... block ${messages[messages.length - 1].block.header.height} ${
+        messages[messages.length - 1].block.header.hash
+      }`,
     );
     logger.error(error);
     sentry.captureException(error);
+    process.exit();
   }
 };
