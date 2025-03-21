@@ -25,6 +25,17 @@ const CursorPaginator = (props: PaginatorProps) => {
     }
   };
 
+  const handlePrevPage = () => {
+    if (cursor) {
+      const currentUrl = new URL(window?.location.href);
+      const params = new URLSearchParams(currentUrl?.search);
+      params.set('page', String(Number(page) - 1));
+      params.set('cursor', `${cursor}`);
+      const newUrl = `${pathname}?${params?.toString()}`;
+      intlRouter.push(newUrl, { scroll: false });
+    }
+  };
+
   const onFirst = () => {
     const currentUrl = new URL(window.location.href);
     const params = new URLSearchParams(currentUrl.search);
@@ -55,6 +66,18 @@ const CursorPaginator = (props: PaginatorProps) => {
               type="button"
             >
               First
+            </button>
+            <button
+              className={`relative inline-flex items-center px-2 ml-1 md:px-3 py-2  text-xs font-medium rounded-md ${
+                page === '1' || isLoading
+                  ? 'text-gray-500 dark:text-neargray-10'
+                  : 'text-green-400 dark:text-green-250 hover:bg-green-400 dark:hover:bg-green-250 hover:text-white dark:hover:text-black'
+              } bg-gray-100 dark:bg-black-200 dark:text-green-250`}
+              disabled={page === '1' || isLoading}
+              onClick={handlePrevPage}
+              type="button"
+            >
+              Back
             </button>
             <button
               className="relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium text-gray-500  rounded-md  bg-gray-100 dark:bg-black-200 dark:text-neargray-10"
