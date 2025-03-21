@@ -152,8 +152,12 @@ export const getServerSideProps: GetServerSideProps<{
 
   const fetchCommonData = async (url: string | undefined) => {
     try {
-      if (url) {
-        const response = await fetcher(url, {}, tab === 'receipts' && false);
+      if (url && tab) {
+        const response = await fetcher(
+          url,
+          {},
+          tab === 'receipts' ? false : true,
+        );
         return response;
       }
       return null;
