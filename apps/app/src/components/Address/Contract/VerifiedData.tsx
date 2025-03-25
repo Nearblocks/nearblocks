@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
-
 import ErrorMessage from '@/components/common/ErrorMessage';
-
 import FaCode from '@/components/Icons/FaCode';
-
 import FaInbox from '@/components/Icons/FaInbox';
-
 import { verifierConfig } from '@/utils/config';
 import { ContractMetadata, VerifierData } from '@/utils/types';
-
 import CodeViewer from '@/components/Address/Contract/CodeViewer';
+import { useRpcStore } from '@/stores/rpc';
 
 type VerifiedDataProps = {
   base64Code: string;
   contractMetadata: ContractMetadata | null;
   selectedVerifier: string;
   verifierData: VerifierData;
+  contractId?: string;
 };
 
 const VerifiedData: React.FC<VerifiedDataProps> = ({
@@ -23,13 +20,14 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
   contractMetadata,
   selectedVerifier,
   verifierData,
+  contractId,
 }) => {
   const [fileData, setFileData] = useState<{ content: string; name: string }[]>(
     [],
   );
   const [fileDataLoading, setFileDataLoading] = useState(true);
   const [fileDataError, setFileDataError] = useState<null | string>(null);
-
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
   useEffect(() => {
     const fetchCode = async () => {
       try {
@@ -41,6 +39,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         );
         setFileData(files);
       } catch (error) {
+        switchRpc();
         setFileDataError('Failed to fetch files.');
       } finally {
         setFileDataLoading(false);
@@ -52,7 +51,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataError(null);
       setFileDataLoading(false);
     }
-  }, [selectedVerifier, verifierData, contractMetadata]);
+  }, [selectedVerifier, verifierData, contractMetadata, switchRpc]);
 
   const fetchFilesData = async (
     selectedVerifier: string,
@@ -109,6 +108,34 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     }
   };
 
+  const downloadContractWasm = () => {
+    try {
+      const binaryString = window.atob(base64Code);
+      const bytes = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      const blob = new Blob([bytes], { type: 'application/wasm' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      const filename = contractId ? `${contractId}.wasm` : 'contract.wasm';
+      console.log({ filename });
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading contract WASM:', error);
+      alert('Failed to download contract WASM file. Please try again.');
+    }
+  };
+
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
@@ -122,13 +149,24 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       <div className="h-full bg-white dark:bg-black-600 text-sm text-gray-500 dark:text-neargray-10 divide-y dark:divide-black-200">
         <div className="flex flex-wrap p-4">
           <div className="w-full">
-            <div className="flex items-center pb-3">
-              <FaCode className="mr-2 text-black-600 dark:text-neargray-10" />
-              <span className="font-bold">
-                {verifierData
-                  ? 'Contract Source Code'
-                  : 'Base64 Encoded Contract Code'}
-              </span>
+            <div className="flex items-center justify-between pb-3">
+              <div className="flex items-center">
+                <FaCode className="mr-2 text-black-600 dark:text-neargray-10" />
+                <span className="font-bold">
+                  {verifierData
+                    ? 'Contract Source Code'
+                    : 'Base64 Encoded Contract Code'}
+                </span>
+              </div>
+
+              {!verifierData && base64Code && (
+                <button
+                  onClick={downloadContractWasm}
+                  className="flex items-center text-sm text-white my-1 text-center font-normal px-2 py-1 dark:bg-green-250 bg-green-500 rounded-md"
+                >
+                  <span className="mr-1">Download</span>
+                </button>
+              )}
             </div>
 
             {fileDataLoading ? (
@@ -151,18 +189,20 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     />
                   ))
                 ) : (
-                  <textarea
-                    className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"
-                    readOnly
-                    rows={4}
-                    style={{
-                      height: '300px',
-                      overflowX: 'hidden',
-                      whiteSpace: 'pre-wrap',
-                      wordWrap: 'break-word',
-                    }}
-                    value={base64Code}
-                  ></textarea>
+                  <div>
+                    <textarea
+                      className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
+                      readOnly
+                      rows={4}
+                      style={{
+                        height: '300px',
+                        overflowX: 'hidden',
+                        whiteSpace: 'pre-wrap',
+                        wordWrap: 'break-word',
+                      }}
+                      value={base64Code}
+                    ></textarea>
+                  </div>
                 )}
               </>
             )}
