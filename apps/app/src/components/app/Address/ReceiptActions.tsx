@@ -143,7 +143,7 @@ const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
     {
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus showLabel={false} status={row.outcomes.status} />
+          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
         </>
       ),
       header: <span></span>,
@@ -284,22 +284,6 @@ const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
       thClassName:
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
-    },
-    {
-      cell: (row: TransactionInfo) => (
-        <span>
-          {row.outcomes_agg?.transaction_fee
-            ? yoctoToNear(row.outcomes_agg?.transaction_fee, true)
-            : ''}{' '}
-          Ⓝ
-        </span>
-      ),
-      header: <span>{t('txnFee') || 'TXN FEE'}</span>,
-      key: 'transaction_fee',
-      tdClassName:
-        'px-6 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
-      thClassName:
-        'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
       cell: (row: TransactionInfo) => (
@@ -493,7 +477,10 @@ const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <TimeStamp
+            timestamp={Number(row?.block?.block_timestamp)}
+            showAge={showAge}
+          />
         </span>
       ),
       header: (

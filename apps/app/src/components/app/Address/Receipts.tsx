@@ -7,8 +7,8 @@ const Receipts = async ({ id, searchParams }: any) => {
     next: { revalidate: 10 },
   };
   const [data, count] = await Promise.all([
-    getRequest(`v1/account/${id}/receipts`, searchParams, options),
-    getRequest(`v1/account/${id}/receipts/count`, searchParams, options),
+    getRequest(`v2/account/${id}/receipts`, searchParams, options),
+    getRequest(`v2/account/${id}/receipts/count`, searchParams, options),
   ]);
 
   if (data.message === 'Error') {
