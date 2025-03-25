@@ -19,7 +19,7 @@ export async function generateMetadata(props: {
 
   const t = await getTranslations({ locale });
 
-  const hashData = await getRequest(`blocks/${hash}`);
+  const hashData = await getRequest(`v1/blocks/${hash}`);
   const blockHeight = hashData?.blocks[0]?.block_height;
 
   const metaTitle = t('block.metaTitle', { block: hash });

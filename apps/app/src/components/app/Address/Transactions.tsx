@@ -8,8 +8,8 @@ const Transactions = async ({ id, searchParams }: any) => {
   };
 
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/txns-only`, searchParams, options),
-    getRequest(`account/${id}/txns-only/count`, searchParams, options),
+    getRequest(`v1/account/${id}/txns-only`, searchParams, options),
+    getRequest(`v1/account/${id}/txns-only/count`, searchParams, options),
   ]);
 
   if (data.message === 'Error') {

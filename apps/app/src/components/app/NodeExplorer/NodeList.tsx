@@ -5,10 +5,10 @@ import NodeListActions from './NodeListActions';
 
 export default async function NodeList({ searchParams }: any) {
   const data = await getRequest(
-    `validators?${QueryString.stringify(searchParams)}`,
+    `v1/validators?${QueryString.stringify(searchParams)}`,
   );
-  const statsDetails = await getRequest('stats');
-  const latestBlock = await getRequest('blocks/latest?limit=1');
+  const statsDetails = await getRequest('v1/stats');
+  const latestBlock = await getRequest('v1/blocks/latest?limit=1');
 
   if (data.message === 'Error') {
     throw new Error(`Server Error : ${data.error}`);

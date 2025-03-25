@@ -7,8 +7,8 @@ const MultiChainTransactions = async ({ id, searchParams }: any) => {
     next: { revalidate: 10 },
   };
   const [data, count] = await Promise.all([
-    getRequest(`chain-abstraction/${id}/txns`, searchParams, options),
-    getRequest(`chain-abstraction/${id}/txns/count`, searchParams, options),
+    getRequest(`v1/chain-abstraction/${id}/txns`, searchParams, options),
+    getRequest(`v1/chain-abstraction/${id}/txns/count`, searchParams, options),
   ]);
 
   if (data.message === 'Error') {

@@ -16,7 +16,7 @@ export async function generateMetadata(props: {
   const headersList = await headers();
   const host = headersList.get('host') || '';
   const baseUrl = `https://${host}/`;
-  const tokenDetails = await getRequest(`nfts/${id}`);
+  const tokenDetails = await getRequest(`v1/nfts/${id}`);
 
   const token: Token = tokenDetails?.contracts?.[0];
 

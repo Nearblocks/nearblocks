@@ -52,7 +52,7 @@ export async function generateMetadata(props: {
 }
 
 export default async function Tps() {
-  const data = await getRequest('charts/tps');
+  const data = await getRequest('v1/charts/tps');
   const theme = (await cookies()).get('theme')?.value || 'light';
   return (
     <section>

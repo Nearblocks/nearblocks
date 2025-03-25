@@ -6,20 +6,20 @@ import { getRequest } from '@/utils/app/api';
 export default async function Tokens(props: any) {
   const searchParams = await props.searchParams;
   const dataResult = await getRequest(
-    `fts?per_page=50&${QueryString.stringify(searchParams)}`,
+    `v1/fts?per_page=50&${QueryString.stringify(searchParams)}`,
   );
 
   const countResult = await getRequest(
-    `fts/count?${QueryString.stringify(searchParams)}`,
+    `v1/fts/count?${QueryString.stringify(searchParams)}`,
   );
 
-  const statsDetails = await getRequest('stats', {});
+  const statsDetails = await getRequest('v1/stats', {});
 
   const stats = statsDetails?.stats?.[0];
 
   const handleSearch = async (keyword: string) => {
     'use server';
-    const res = await getRequest(`fts?search=${keyword}&per_page=5`);
+    const res = await getRequest(`v1/fts?search=${keyword}&per_page=5`);
     return res.tokens;
   };
 

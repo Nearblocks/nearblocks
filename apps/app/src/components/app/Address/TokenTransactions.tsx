@@ -7,8 +7,8 @@ const TokenTransactions = async ({ id, searchParams }: any) => {
     next: { revalidate: 10 },
   };
   const [data, count] = await Promise.all([
-    getRequest(`account/${id}/ft-txns`, searchParams, options),
-    getRequest(`account/${id}/ft-txns/count`, searchParams, options),
+    getRequest(`v1/account/${id}/ft-txns`, searchParams, options),
+    getRequest(`v1/account/${id}/ft-txns/count`, searchParams, options),
   ]);
 
   if (data.message === 'Error') {

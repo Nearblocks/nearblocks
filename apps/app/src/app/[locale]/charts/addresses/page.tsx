@@ -58,7 +58,7 @@ export default async function AddressesChart(props: {
   const { locale } = params;
 
   const t = await getTranslations({ locale });
-  const data = await getRequest('charts');
+  const data = await getRequest('v1/charts');
   const theme = (await cookies()).get('theme')?.value || 'light';
   return (
     <section>
