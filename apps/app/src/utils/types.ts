@@ -292,6 +292,7 @@ export type TransactionInfo = {
   affected_account_id: string;
   block: {
     block_height: string;
+    block_timestamp: string;
   };
   block_timestamp: string;
   cause: string;
