@@ -11,6 +11,7 @@ import Details from '@/components/Blocks/Detail';
 import { fetchData } from '@/utils/fetchData';
 import useRpc from '@/hooks/useRpc';
 import { BlocksInfo } from '@/utils/types';
+import { useRpcStore } from '@/stores/rpc';
 
 const ogUrl = env('NEXT_PUBLIC_OG_URL');
 const network = env('NEXT_PUBLIC_NETWORK_ID');
@@ -102,6 +103,7 @@ const Block = ({
   const [rpcData, setRpcData] = useState<BlockData | null>(null);
   const [rpcError, setRpcError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   useEffect(() => {
     const fetchBlockData = async () => {
@@ -134,6 +136,8 @@ const Block = ({
             };
 
             setRpcData(rpcBlockData as unknown as BlockData);
+          } else {
+            switchRpc();
           }
         } catch (err) {
           setRpcError(true);
@@ -148,7 +152,7 @@ const Block = ({
 
     fetchBlockData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockInfo, error, hash]);
+  }, [blockInfo, error, hash, switchRpc]);
 
   const blockHeight = !blockInfo?.blocks[0]?.block_height
     ? Number(rpcData?.blocks[0]?.block_height)
