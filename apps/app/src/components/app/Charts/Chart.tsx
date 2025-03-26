@@ -409,6 +409,18 @@ const Chart = (props: Props) => {
       yAxis: {
         gridLineColor: theme === 'dark' ? '#1F2228' : '#e6e6e6',
         labels: {
+          formatter: function () {
+            const label = this.axis.defaultLabelFormatter.call(this);
+            return label.replace(
+              /([\d\s]+\.?\d*)([KMG]?)/,
+              (_, num, suffix) => {
+                return (
+                  num.replace(/\s/g, ',') +
+                  (suffix === 'G' ? 'B' : suffix || '')
+                );
+              },
+            );
+          },
           style: {
             color: theme === 'dark' ? '#e0e0e0' : '#333333',
           },
