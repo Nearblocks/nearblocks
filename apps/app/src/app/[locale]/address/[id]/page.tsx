@@ -33,11 +33,28 @@ export default async function AddressIndex(props: {
 
   const parse =
     (await getRequest(`v1/account/${id}/contract/parse`, {}, options)) || {};
+  const deploymentInfo =
+    (await getRequest(`v1/account/${id}/contract/deployments`, {}, options)) ||
+    {};
+  const tokenDetails = (await getRequest(`v1/fts/${id}`, {}, options)) || {};
+  const nftTokenData = (await getRequest(`v1/nfts/${id}`, {}, options)) || {};
+
+  const tokenTracker =
+    (tokenDetails?.contracts?.[0]?.name ? 'token' : null) ||
+    (nftTokenData?.contracts?.[0]?.name ? 'nft' : null);
 
   return (
     <>
-      <Suspense fallback={<BalanceSkeleton />}>
-        <Balance id={id} />
+      <Suspense
+        fallback={
+          <BalanceSkeleton
+            parse={parse}
+            deploymentInfo={deploymentInfo?.deployments?.[0]}
+            tokenTracker={tokenTracker}
+          />
+        }
+      >
+        <Balance id={id} parse={parse} />
       </Suspense>
 
       <div className="py-2"></div>

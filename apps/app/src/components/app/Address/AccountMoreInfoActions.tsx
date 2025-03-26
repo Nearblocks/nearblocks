@@ -20,19 +20,22 @@ import {
 
 import TokenImage from '../common/TokenImage';
 import { useParams } from 'next/navigation';
+import Skeleton from '../skeleton/common/Skeleton';
 const AccountMoreInfoActions = ({
   accountData: account,
   deploymentData,
   nftTokenData,
   tokenData,
   status,
+  parse,
 }: any) => {
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [accountData, setAccountData] = useState<AccountContractInfo>(account);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
-  const [isLocked, setIsLocked] = useState(false);
+  const [contractLoading, setContractLoading] = useState(true);
+  const [isLocked, setIsLocked] = useState<boolean>();
   const t = useTranslations();
   const params = useParams<{ id: string }>();
 
@@ -53,6 +56,11 @@ const AccountMoreInfoActions = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountView, status]);
+
+  const isContract =
+    parse?.contract?.[0]?.contract &&
+    Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
+    parse.contract[0].contract.methodNames.length > 0;
 
   useEffect(() => {
     const loadSchema = async () => {
@@ -94,25 +102,33 @@ const AccountMoreInfoActions = ({
         setIsLocked(locked);
       } catch (error) {
         console.error('Error loading schema:', error);
+      } finally {
+        setContractLoading(false);
       }
     };
-    loadSchema();
+    if (isContract || !parse?.contract) {
+      loadSchema();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.id]);
+  }, [params?.id, parse?.contract]);
 
   useEffect(() => {
     const getAccountDetails = async () => {
-      const [account]: any = await Promise.all([
-        viewAccount(params?.id).catch(() => {
-          return null;
-        }),
-      ]);
-
-      if (account) {
-        setAccountView(account);
-        setIsAccountLoading(false);
-      } else {
+      try {
+        const [account]: any = await Promise.all([
+          viewAccount(params?.id).catch(() => {
+            return null;
+          }),
+        ]);
+        if (account) {
+          setAccountView(account);
+        } else {
+          setAccountView(null);
+        }
+      } catch (error) {
+        console.error('Error loading account details:', error);
         setAccountView(null);
+      } finally {
         setIsAccountLoading(false);
       }
     };
@@ -122,18 +138,6 @@ const AccountMoreInfoActions = ({
 
   const accountInfo = status ? accountData : accountView;
   const stakedBalace = status ? accountData?.locked : accountView?.locked;
-
-  let genesis =
-    accountView !== null &&
-    accountView?.block_hash === undefined &&
-    accountData?.deleted?.transaction_hash
-      ? false
-      : accountData?.created?.transaction_hash
-      ? false
-      : accountData?.code_hash
-      ? true
-      : false;
-
   const tokenTracker = tokenData?.name || nftTokenData?.name;
   const storageUsed = status
     ? accountData?.storage_usage
@@ -145,244 +149,338 @@ const AccountMoreInfoActions = ({
           {t('moreInfo') || 'Account information'}
         </h2>
         <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
-          <div className="flex flex-wrap justify-between w-full py-3">
-            <div>
-              <div className="flex-1 xl:flex-nowrap flex-wrap items-center pb-2">
-                <div className="mb-0">Staked {t('balance') || 'Balance'}:</div>
-                <div className="flex whitespace-nowrap">
-                  {!status && isAccountLoading && <div className="h-5"></div>}
-                  {stakedBalace
-                    ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
-                    : stakedBalace ?? ''}
-                </div>
+          <div className="flex flex-wrap xl:flex-nowrap xl:w-[94.2%] lg:w-[95.3%] w-[93.5%] py-4 justify-between items-center">
+            <div className="xl:flex xl:w-1/2 w-max items-center gap-x-5">
+              <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                Staked {t('balance') || 'Balance'}:
+              </div>
+              <div>
+                {!status && isAccountLoading && <div className="h-5"></div>}
+                {stakedBalace
+                  ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
+                  : stakedBalace ?? ''}
               </div>
             </div>
-            <div className="pr-[1.4rem]">
-              <div className="flex-1 xl:flex-nowrap flex-wrap items-center">
-                <div className="mb-0 whitespace-nowrap">
-                  {t('storageUsed') || 'Storage used'}:
-                </div>
-                <div className="flex whitespace-nowrap">
-                  {storageUsed ? weight(storageUsed) : storageUsed ?? ''}
-                </div>
+            <div className="xl:flex xl:w-1/2 w-max items-center gap-x-7">
+              <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                {t('storageUsed') || 'Storage used'}:
+              </div>
+              <div className="w-20 h-5">
+                {isAccountLoading ? (
+                  <Skeleton className="h-4 w-16" />
+                ) : storageUsed != null ? (
+                  weight(storageUsed)
+                ) : (
+                  ''
+                )}
               </div>
             </div>
           </div>
           {(deploymentData?.receipt_predecessor_account_id ||
             (contract && contract?.hash)) && (
             <div
-              className={`flex justify-between w-full flex-wrap py-3  ${
+              className={`flex justify-between w-full py-4  ${
                 deploymentData?.receipt_predecessor_account_id
                   ? 'visible'
                   : 'hidden'
               }`}
             >
-              <div>
+              <div className="flex justify-between xl:w-[85.5%] lg:w-[100%] w-[100%] ">
                 {deploymentData?.receipt_predecessor_account_id && (
-                  <div className="flex-1 pb-2 mb-4 sm:!mb-0">
-                    <div className="mb-0  whitespace-nowrap">
+                  <div className="xl:flex w-max items-center gap-x-2.5">
+                    <div className="whitespace-nowrap xl:mb-0 mb-1.5">
                       Contract Creator:
                     </div>
-                    <div className="flex lg:w-80 w-full pr-3 lg:whitespace-nowrap flex-wrap">
+                    <div className="flex flex-wrap xl:flex-nowrap">
                       <span className="flex mr-1">
                         <Link
-                          className="text-green-500 truncate max-w-[120px] dark:text-green-250 hover:no-underline"
+                          className="text-green-500 truncate max-w-[100px] dark:text-green-250 hover:no-underline"
                           href={`/address/${deploymentData.receipt_predecessor_account_id}`}
                         >
                           {deploymentData.receipt_predecessor_account_id ?? ''}
                         </Link>
                       </span>
-                      <span className="flex">
-                        <span className="mr-1 whitespace-nowrap">at txn</span>
-                        <Link
-                          className="truncate max-w-[120px] text-green-500 dark:text-green-250 hover:no-underline"
-                          href={`/txns/${deploymentData.transaction_hash}`}
-                        >
-                          {deploymentData.transaction_hash ?? ''}
-                        </Link>
-                      </span>
+                      <span className="mr-1 whitespace-nowrap">at txn</span>
+                      <Link
+                        className="truncate max-w-[120px] text-green-500 dark:text-green-250 hover:no-underline"
+                        href={`/txns/${deploymentData.transaction_hash}`}
+                      >
+                        {deploymentData.transaction_hash ?? ''}
+                      </Link>
                     </div>
                   </div>
                 )}
-              </div>
-              {!genesis && (
                 <div>
-                  {contract && contract?.hash ? (
-                    <div className="flex-1 md:w-full">
-                      <div className="  whitespace-nowrap mb-0">
+                  {(contract && contract?.hash) || isContract ? (
+                    <div className="xl:flex xl:w-full justify-between w-max items-center gap-x-2">
+                      <div className="whitespace-nowrap xl:mb-0 mb-1.5 flex">
                         Contract Locked:
                       </div>
-                      <div className="w-full break-words">
-                        {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
+                      <div className="break-words flex w-6 h-5">
+                        {contractLoading ? (
+                          <Skeleton className="h-4 w-16" />
+                        ) : contract?.code_base64 && isLocked ? (
+                          'Yes'
+                        ) : (
+                          'No'
+                        )}
                       </div>
                     </div>
                   ) : (
                     <></>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           )}
-          <div className="flex flex-wrap md:flex-nowrap justify-between w-full py-4">
-            {tokenTracker && (
-              <div className="flex pb-2 pr-5">
-                {tokenData?.name && (
-                  <div className="flex-1 flex-nowrap">
-                    <div className="flex md:w-1/4 mb-1 whitespace-nowrap">
-                      Token Tracker:
-                    </div>
-                    <div className="flex">
-                      <span className="sm:flex flex-1 flex-nowrap lg:whitespace-nowrap w-full">
-                        <span className="flex">
-                          <TokenImage
-                            alt={tokenData?.name}
-                            className="w-4 h-4 mr-2"
-                            src={tokenData?.icon}
-                          />
-                          <Link
-                            className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                            href={`/token/${params.id}`}
-                          >
-                            <span className="inline-block truncate max-w-[110px] mr-1">
-                              {tokenData.name}
-                            </span>
-                            (
-                            <span className="inline-block truncate max-w-[80px]">
-                              {tokenData.symbol}
-                            </span>
-                            )
-                          </Link>
-                        </span>
-                        {tokenData.price && (
-                          <span className="flex whitespace-nowrap text-nearblue-600 dark:text-neargray-10 lg:ml-0 sm:ml-5">
-                            (@ ${localFormat(tokenData.price)})
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                )}
-                {nftTokenData?.name && (
-                  <div className="flex-1 flex-nowrap">
-                    <div className="flex md:w-1/4 mb-1 whitespace-nowrap">
-                      NFT Token Tracker:
-                    </div>
-                    <div className="flex">
-                      <span className="sm:flex flex-1 flex-nowrap lg:whitespace-nowrap w-full">
-                        <span className="flex">
-                          <TokenImage
-                            alt={nftTokenData?.name}
-                            className="w-4 h-4 mr-2"
-                            src={nftTokenData?.icon}
-                          />
-                          <Link
-                            className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                            href={`/nft-token/${params.id}`}
-                          >
-                            <span className="inline-block truncate max-w-[110px] mr-1">
-                              {nftTokenData?.name}
-                            </span>
-                            (
-                            <span className="inline-block truncate max-w-[80px]">
-                              {nftTokenData?.symbol}
-                            </span>
-                            )
-                          </Link>
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="flex justify-between w-full py-2">
             <div
-              className={`flex ${
-                nftTokenData?.name ? 'pr-[1.3rem]' : 'pr-[0.9rem]'
+              className={`flex flex-wrap justify-between ${
+                tokenTracker
+                  ? tokenData?.name
+                    ? deploymentData?.receipt_predecessor_account_id
+                      ? 'xl:w-[93.7%] lg:w-[92%] md:w-[89%] w-[90.1%]'
+                      : 'xl:w-[87.8%] w-[100%]'
+                    : deploymentData?.receipt_predecessor_account_id
+                    ? 'xl:w-[95.8%] lg:w-[94%] md:w-[92%] w-[93%]'
+                    : 'xl:w-[87.8%] w-[100%]'
+                  : 'xl:w-[87.8%] w-[100%]'
               }`}
             >
-              <div className="flex-1 w-full break-words">
-                <div className="flex  whitespace-nowrap mb-0">
+              {tokenTracker &&
+                isContract &&
+                deploymentData?.receipt_predecessor_account_id && (
+                  <div className="flex py-2">
+                    {tokenData?.name && (
+                      <div className="xl:flex items-center gap-x-8">
+                        <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                          Token Tracker:
+                        </div>
+                        <div className="flex">
+                          <span className="flex flex-wrap break-words">
+                            <span className="flex items-center">
+                              <TokenImage
+                                alt={tokenData?.name}
+                                className="w-4 h-4 mr-1"
+                                src={tokenData?.icon}
+                              />
+                              <Link
+                                className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                                href={`/token/${params.id}`}
+                              >
+                                <span className="inline-block truncate max-w-[80px] mr-1">
+                                  {tokenData.name}
+                                </span>
+                                (
+                                <span className="inline-block truncate max-w-[80px]">
+                                  {tokenData.symbol}
+                                </span>
+                                )
+                              </Link>
+                            </span>
+                            {tokenData.price && (
+                              <span className="flex text-nearblue-600 dark:text-neargray-10">
+                                (@ ${localFormat(tokenData.price)})
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {nftTokenData?.name && (
+                      <div className="xl:flex items-center gap-x-2">
+                        <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                          NFT Token Tracker:
+                        </div>
+                        <div className="flex">
+                          <span className="flex flex-wrap break-words w-full">
+                            <span className="flex items-center">
+                              <TokenImage
+                                alt={nftTokenData?.name}
+                                className="w-4 h-4 mr-1"
+                                src={nftTokenData?.icon}
+                              />
+                              <Link
+                                className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                                href={`/nft-token/${params.id}`}
+                              >
+                                <span className="inline-block truncate max-w-[80px] mr-1">
+                                  {nftTokenData?.name}
+                                </span>
+                                (
+                                <span className="inline-block truncate max-w-[80px]">
+                                  {nftTokenData?.symbol}
+                                </span>
+                                )
+                              </Link>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              <div>
+                <div className="xl:flex w-full break-words gap-x-11 py-2">
+                  <div className="flex  whitespace-nowrap xl:mb-0 mb-1.5">
+                    {accountView !== null &&
+                    accountView?.block_hash === undefined &&
+                    accountData?.deleted?.transaction_hash
+                      ? 'Deleted At'
+                      : 'Created At'}
+                    :
+                  </div>
                   {accountView !== null &&
                   accountView?.block_hash === undefined &&
-                  accountData?.deleted?.transaction_hash
-                    ? 'Deleted At'
-                    : 'Created At'}
-                  :
+                  accountData?.deleted?.transaction_hash ? (
+                    <div className="flex whitespace-nowrap">
+                      <span className="mr-1">
+                        {getTimeAgoString(
+                          nanoToMilli(accountData.deleted.block_timestamp),
+                        )}
+                      </span>
+                      {!deploymentData?.receipt_predecessor_account_id && (
+                        <span>
+                          {` at txn`}
+                          <Link
+                            className="text-green-500 dark:text-green-250 hover:no-underline px-1"
+                            href={`/txns/${accountData?.deleted?.transaction_hash}`}
+                          >
+                            {truncateString(
+                              accountData?.deleted?.transaction_hash,
+                              15,
+                              '...',
+                            )}
+                          </Link>
+                        </span>
+                      )}
+                    </div>
+                  ) : accountData?.created?.transaction_hash ? (
+                    <div className="flex whitespace-nowrap">
+                      <span className="xl:ml-1">
+                        {getTimeAgoString(
+                          nanoToMilli(accountData.created.block_timestamp),
+                        )}
+                      </span>
+                      {!deploymentData?.receipt_predecessor_account_id && (
+                        <span className="ml-1">
+                          {` at txn`}
+                          <Link
+                            className="text-green-500 dark:text-green-250 hover:no-underline px-1"
+                            href={`/txns/${accountData?.created?.transaction_hash}`}
+                          >
+                            {truncateString(
+                              accountData?.created?.transaction_hash,
+                              15,
+                              '...',
+                            )}
+                          </Link>
+                        </span>
+                      )}
+                    </div>
+                  ) : accountInfo?.code_hash ? (
+                    <span className="xl:ml-1.5">Genesis</span>
+                  ) : isAccountLoading ? (
+                    <div className="h-5"></div>
+                  ) : (
+                    'N/A'
+                  )}
                 </div>
-                {accountView !== null &&
-                accountView?.block_hash === undefined &&
-                accountData?.deleted?.transaction_hash ? (
-                  <div className="flex whitespace-nowrap">
-                    <span className="mr-1">
-                      {getTimeAgoString(
-                        nanoToMilli(accountData.deleted.block_timestamp),
-                      )}
-                    </span>
-                    {!deploymentData?.receipt_predecessor_account_id && (
-                      <span>
-                        {` at txn`}
-                        <Link
-                          className="text-green-500 dark:text-green-250 hover:no-underline px-1"
-                          href={`/txns/${accountData?.deleted?.transaction_hash}`}
-                        >
-                          {truncateString(
-                            accountData?.deleted?.transaction_hash,
-                            15,
-                            '...',
-                          )}
-                        </Link>
-                      </span>
-                    )}
-                  </div>
-                ) : accountData?.created?.transaction_hash ? (
-                  <div className="flex whitespace-nowrap">
-                    <span className="mr-1">
-                      {getTimeAgoString(
-                        nanoToMilli(accountData.created.block_timestamp),
-                      )}
-                    </span>
-                    {!deploymentData?.receipt_predecessor_account_id && (
-                      <span>
-                        {` at txn`}
-                        <Link
-                          className="text-green-500 dark:text-green-250 hover:no-underline px-1"
-                          href={`/txns/${accountData?.created?.transaction_hash}`}
-                        >
-                          {truncateString(
-                            accountData?.created?.transaction_hash,
-                            15,
-                            '...',
-                          )}
-                        </Link>
-                      </span>
-                    )}
-                  </div>
-                ) : accountInfo?.code_hash ? (
-                  'Genesis'
-                ) : isAccountLoading ? (
-                  <div className="h-5"></div>
-                ) : (
-                  'N/A'
-                )}
               </div>
-            </div>
-            {genesis && (
-              <div>
-                {contract && contract?.hash ? (
-                  <div className="flex-1 md:w-full">
-                    <div className="whitespace-nowrap mb-0">
+              {isContract &&
+                !deploymentData?.receipt_predecessor_account_id && (
+                  <div className="xl:flex xl:w-full justify-between w-max items-center gap-x-5 py-2">
+                    <div className="whitespace-nowrap xl:mb-0 mb-1.5 flex">
                       Contract Locked:
                     </div>
-                    <div className="w-full break-words">
-                      {contract?.code_base64 && isLocked ? 'Yes' : 'No'}
+                    <div className="break-words flex w-6 h-5">
+                      {contractLoading ? (
+                        <Skeleton className="h-4 w-16" />
+                      ) : contract?.code_base64 && isLocked ? (
+                        'Yes'
+                      ) : (
+                        'No'
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <></>
                 )}
+            </div>
+          </div>
+          {tokenTracker &&
+            isContract &&
+            !deploymentData?.receipt_predecessor_account_id && (
+              <div className="flex justify-between w-full py-4">
+                <div className="flex">
+                  {tokenData?.name && (
+                    <div className="xl:flex items-center gap-x-8">
+                      <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                        Token Tracker:
+                      </div>
+                      <div className="flex">
+                        <span className="flex flex-wrap break-words">
+                          <span className="flex items-center">
+                            <TokenImage
+                              alt={tokenData?.name}
+                              className="w-4 h-4 mr-1"
+                              src={tokenData?.icon}
+                            />
+                            <Link
+                              className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                              href={`/token/${params.id}`}
+                            >
+                              <span className="inline-block truncate max-w-[80px] mr-1">
+                                {tokenData.name}
+                              </span>
+                              (
+                              <span className="inline-block truncate max-w-[80px]">
+                                {tokenData.symbol}
+                              </span>
+                              )
+                            </Link>
+                          </span>
+                          {tokenData.price && (
+                            <span className="flex text-nearblue-600 dark:text-neargray-10">
+                              (@ ${localFormat(tokenData.price)})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {nftTokenData?.name && (
+                    <div className="xl:flex items-center gap-x-2">
+                      <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                        NFT Token Tracker:
+                      </div>
+                      <div className="flex">
+                        <span className="flex flex-wrap break-words w-full">
+                          <span className="flex items-center">
+                            <TokenImage
+                              alt={nftTokenData?.name}
+                              className="w-4 h-4 mr-1"
+                              src={nftTokenData?.icon}
+                            />
+                            <Link
+                              className="flex text-green-500 dark:text-green-250 hover:no-underline"
+                              href={`/nft-token/${params.id}`}
+                            >
+                              <span className="inline-block truncate max-w-[80px] mr-1">
+                                {nftTokenData?.name}
+                              </span>
+                              (
+                              <span className="inline-block truncate max-w-[80px]">
+                                {nftTokenData?.symbol}
+                              </span>
+                              )
+                            </Link>
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-          </div>
         </div>
       </div>
     </div>

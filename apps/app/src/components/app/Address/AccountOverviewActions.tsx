@@ -193,22 +193,22 @@ const AccountOverviewActions = ({
           )}
         </div>
         <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
-          <div className="flex-1 flex-wrap py-4">
-            <div className="w-full md:w-1/4 mb-0">
+          <div className="xl:flex flex-wrap xl:flex-nowrap py-4">
+            <div className="w-36 xl:mb-0 mb-1.5">
               {t('balance') || 'Balance'}:
             </div>
 
-            <div className="w-full md:w-3/4 break-words">
+            <div className="w-full break-words">
               {balance ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
             </div>
           </div>
           {networkId === 'mainnet' && (
-            <div className="flex-1 flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
-              <div className="w-full md:w-1/4 mb-2 md:mb-0">
+            <div className="xl:flex flex-wrap xl:flex-nowrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
+              <div className="w-36 xl:mb-0 mb-1.5">
                 {t('value') || 'Value:'}
               </div>
 
-              <div className="w-full md:w-3/4 break-words flex items-center">
+              <div className="w-full break-words flex items-center">
                 {accountInfo?.amount && statsData?.near_price && (
                   <>
                     <span>
@@ -233,11 +233,11 @@ const AccountOverviewActions = ({
               </div>
             </div>
           )}
-          <div className="flex-1 flex-wrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
-            <div className="w-full md:w-1/4 mb-2">
+          <div className="xl:flex flex-wrap xl:flex-nowrap py-4 text-sm text-nearblue-600 dark:text-neargray-10 w-full">
+            <div className="w-36 xl:mb-0 mb-1.5">
               {t('tokens') || 'Tokens:'}
             </div>
-            <div className="w-full break-words -my-1 z-10">
+            <div className="break-words -my-1 z-10 flex w-full">
               <TokenHoldings
                 data={inventoryData}
                 ft={ft}
