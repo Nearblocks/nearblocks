@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 import { verifierConfig } from '@/utils/app/config';
 import { ContractMetadata, VerifierData } from '@/utils/types';
-
 import ErrorMessage from '../../common/ErrorMessage';
 import FaCode from '../../Icons/FaCode';
 import FaInbox from '../../Icons/FaInbox';
 import CodeViewer from './CodeViewer';
+import { toast } from 'react-toastify';
+import { useParams } from 'next/navigation';
+import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 
 type VerifiedDataProps = {
   base64Code: string;
@@ -26,6 +28,24 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
   );
   const [fileDataLoading, setFileDataLoading] = useState(true);
   const [fileDataError, setFileDataError] = useState<null | string>(null);
+  const params = useParams<{ id: string }>();
+  const contractId = params?.id;
+  const initializedRef = useRef(false);
+
+  const useRpcStoreWithProviders = () => {
+    const setProviders = useRpcStore((state) => state.setProviders);
+    const { RpcProviders } = useRpcProvider();
+    useEffect(() => {
+      if (!initializedRef.current) {
+        initializedRef.current = true;
+        setProviders(RpcProviders);
+      }
+    }, [RpcProviders, setProviders]);
+
+    return useRpcStore((state) => state);
+  };
+
+  const { switchRpc } = useRpcStoreWithProviders();
 
   useEffect(() => {
     const fetchCode = async () => {
@@ -38,6 +58,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         );
         setFileData(files);
       } catch (error) {
+        switchRpc();
         setFileDataError('Failed to fetch files.');
       } finally {
         setFileDataLoading(false);
@@ -49,7 +70,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataError(null);
       setFileDataLoading(false);
     }
-  }, [selectedVerifier, verifierData, contractMetadata]);
+  }, [selectedVerifier, verifierData, contractMetadata, switchRpc]);
 
   const fetchFilesData = async (
     selectedVerifier: string,
@@ -106,6 +127,38 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     }
   };
 
+  const downloadContractWasm = () => {
+    try {
+      const binaryString = window.atob(base64Code);
+      const bytes = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      const blob = new Blob([bytes], { type: 'application/wasm' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      const filename = contractId ? `${contractId}.wasm` : 'contract.wasm';
+      console.log({ filename });
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading contract WASM:', error);
+      toast.error(
+        <div className="whitespace-nowrap text-sm">
+          Failed to download. Please try again.
+        </div>,
+      );
+    }
+  };
+
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (
       <div
@@ -119,13 +172,27 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       <div className="h-full bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 divide-y dark:divide-black-200">
         <div className="flex flex-wrap py-4 px-1.5">
           <div className="w-full">
-            <div className={`flex items-center  ${verifierData ? 'pb-5' : ''}`}>
-              <FaCode className="mr-2" />
-              <span className="font-bold">
-                {verifierData
-                  ? 'Contract Source Code'
-                  : 'Base64 Encoded Contract Code'}
-              </span>
+            <div
+              className={`flex items-center justify-between  ${
+                verifierData ? 'pb-5' : ''
+              }`}
+            >
+              <div className="flex items-center">
+                <FaCode className="mr-2" />
+                <span className="font-bold">
+                  {verifierData
+                    ? 'Contract Source Code'
+                    : 'Base64 Encoded Contract Code'}
+                </span>
+              </div>
+              {!verifierData && base64Code && (
+                <button
+                  onClick={downloadContractWasm}
+                  className="flex items-center text-xs sm:!text-sm text-white my-1 text-center font-normal px-2 py-1 dark:bg-green-250 bg-green-500 rounded-md"
+                >
+                  <span className="mr-1">Download Contract WASM</span>
+                </button>
+              )}
             </div>
 
             {fileDataLoading ? (
