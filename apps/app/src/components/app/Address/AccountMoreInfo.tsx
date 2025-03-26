@@ -1,7 +1,7 @@
 import { getRequest } from '@/utils/app/api';
 import AccountMoreInfoActions from './AccountMoreInfoActions';
 
-export default async function AccountMoreInfo({ id }: any) {
+export default async function AccountMoreInfo({ id, parse }: any) {
   const options: RequestInit = { next: { revalidate: 10 } };
 
   const fetchCommonData = async (url?: string | undefined) => {
@@ -35,6 +35,7 @@ export default async function AccountMoreInfo({ id }: any) {
       nftTokenData={nftTokenData?.contracts?.[0]}
       tokenData={tokenDetails?.contracts?.[0]}
       status={balanceIndexerStatus}
+      parse={parse}
     />
   );
 }
