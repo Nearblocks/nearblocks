@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import dayjs from '#libs/dayjs';
 import { ActionKind } from '#types/enums';
 
 const receipts = z.object({
@@ -25,10 +26,22 @@ const receiptsCount = z.object({
   to: z.string().optional(),
 });
 
+const receiptsExport = z.object({
+  account: z.string(),
+  end: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+    message: 'Invalid date',
+  }),
+  start: z.string().refine((val) => dayjs(val, 'YYYY-MM-DD', true).isValid(), {
+    message: 'Invalid date',
+  }),
+});
+
 export type Receipts = z.infer<typeof receipts>;
 export type ReceiptsCount = z.infer<typeof receiptsCount>;
+export type ReceiptsExport = z.infer<typeof receiptsExport>;
 
 export default {
   receipts,
   receiptsCount,
+  receiptsExport,
 };

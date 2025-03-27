@@ -1,11 +1,18 @@
-import { Response } from 'express';
+import { stringify } from 'csv-stringify';
+import { NextFunction, Response } from 'express';
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import dayjs from '#libs/dayjs';
 import db from '#libs/db';
 import sql from '#libs/postgres';
-import { Receipts, ReceiptsCount } from '#libs/schema/v2/account';
-import { keyBinder } from '#libs/utils';
+import {
+  Receipts,
+  ReceiptsCount,
+  ReceiptsExport,
+} from '#libs/schema/v2/account';
+import { keyBinder, msToNsTime, nsToMsTime, yoctoToNear } from '#libs/utils';
+import { ActionKind } from '#types/enums';
 import { RawQueryParams, RequestValidator } from '#types/types';
 
 const receipts = catchAsync(
@@ -304,7 +311,153 @@ const receiptsCount = catchAsync(
   },
 );
 
+const receiptsExport = catchAsync(
+  async (
+    req: RequestValidator<ReceiptsExport>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const account = req.validator.data.account;
+    const start = msToNsTime(
+      dayjs(req.validator.data.start, 'YYYY-MM-DD', true)
+        .startOf('day')
+        .valueOf(),
+    );
+    const end = msToNsTime(
+      dayjs(req.validator.data.end, 'YYYY-MM-DD', true)
+        .startOf('day')
+        .valueOf(),
+    );
+
+    const receipts = await sql`
+      SELECT
+        receipts.receipt_id,
+        receipts.originated_from_transaction_hash,
+        receipts.predecessor_account_id,
+        receipts.receiver_account_id,
+        ROW_TO_JSON(block) AS block,
+        ROW_TO_JSON(outcome) AS outcome,
+        actions.actions AS actions,
+        ROW_TO_JSON(actions_agg) AS actions_agg
+      FROM
+        receipts
+        INNER JOIN (
+          SELECT
+            r.receipt_id
+          FROM
+            receipts r
+          WHERE
+            r.receipt_kind = 'ACTION'
+            AND (
+              r.predecessor_account_id = ${account}
+              OR r.receiver_account_id = ${account}
+            )
+            AND r.included_in_block_timestamp BETWEEN ${start} AND ${end}
+          ORDER BY
+            r.id ASC
+          LIMIT
+            5000
+        ) AS tmp using (receipt_id)
+        LEFT JOIN LATERAL (
+          SELECT
+            block_height,
+            block_timestamp::TEXT
+          FROM
+            blocks
+          WHERE
+            block_hash = receipts.included_in_block_hash
+        ) block ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT
+            CASE
+              WHEN status = 'SUCCESS_RECEIPT_ID'
+              OR status = 'SUCCESS_VALUE' THEN TRUE
+              ELSE FALSE
+            END AS status
+          FROM
+            execution_outcomes
+          WHERE
+            receipt_id = receipts.receipt_id
+        ) outcome ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'action',
+                action_receipt_actions.action_kind,
+                'method',
+                action_receipt_actions.args ->> 'method_name'
+              )
+            ) AS actions
+          FROM
+            action_receipt_actions
+            JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
+          WHERE
+            action_receipt_actions.receipt_id = receipts.receipt_id
+        ) actions ON TRUE
+        LEFT JOIN LATERAL (
+          SELECT
+            COALESCE(SUM((args ->> 'deposit')::NUMERIC), 0)::TEXT AS deposit
+          FROM
+            action_receipt_actions
+          WHERE
+            action_receipt_actions.receipt_id = receipts.receipt_id
+        ) actions_agg ON TRUE
+      ORDER BY
+        receipts.id ASC
+    `;
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=txns.csv');
+
+    const stringifier = stringify({
+      columns: [
+        { header: 'Status', key: 'status' },
+        { header: 'Receipt', key: 'receipt' },
+        { header: 'Txn Hash', key: 'hash' },
+        { header: 'Method', key: 'method' },
+        { header: 'Deposit Value', key: 'deposit' },
+        { header: 'From', key: 'from' },
+        { header: 'To', key: 'to' },
+        { header: 'Block', key: 'block' },
+        { header: 'Time', key: 'timestamp' },
+      ],
+      header: true,
+    });
+
+    stringifier.on('error', (error) => {
+      next(error);
+    });
+
+    stringifier.pipe(res);
+
+    receipts.forEach((receipt) => {
+      const status = receipt.outcome.status;
+      const action = receipt.actions?.[0]?.action;
+      const method = receipt.actions?.[0]?.method ?? 'Unknown';
+
+      stringifier.write({
+        block: receipt.block.block_height,
+        deposit: yoctoToNear(receipt.actions_agg.deposit),
+        from: receipt.predecessor_account_id || 'system',
+        hash: receipt.originated_from_transaction_hash,
+        method:
+          !action || action === ActionKind.FUNCTION_CALL ? method : action,
+        receipt: receipt.receipt_id,
+        status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
+        timestamp: dayjs(+nsToMsTime(receipt.block.block_timestamp)).format(
+          'YYYY-MM-DD HH:mm:ss',
+        ),
+        to: receipt.receiver_account_id || 'system',
+      });
+    });
+
+    stringifier.end();
+  },
+);
+
 export default {
   receipts,
   receiptsCount,
+  receiptsExport,
 };
