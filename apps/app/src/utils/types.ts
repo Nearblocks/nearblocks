@@ -273,6 +273,12 @@ export type TransactionInfo = {
     deposit: string;
     gas_attached: string;
   };
+  outcome: {
+    gas_burnt: string;
+    tokens_burnt: string;
+    executor_account_id: string;
+    status: boolean;
+  };
   receipt_outcome: {
     gas_burnt: string;
     tokens_burnt: string;

@@ -163,7 +163,7 @@ const Receipts = ({ txns, count, error, cursor, tab }: TxnsProps) => {
       key: '',
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus status={row?.receipt_outcome?.status} showLabel={false} />
+          <TxnStatus status={row?.outcome?.status} showLabel={false} />
         </>
       ),
       tdClassName:
