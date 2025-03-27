@@ -345,7 +345,8 @@ const Txn = ({
       <div className="container relative px-3 mx-auto">
         {/* <RpcMenu /> */}
         <Fragment key="hash">
-          {rpcError && (error || allRpcProviderError) ? (
+          {(rpcError && (error || allRpcProviderError)) ||
+          rpcTxn?.final_execution_status === 'NONE' ? (
             <div className="pb-1 bg-white dark:bg-black-600 soft-shadow rounded-xl">
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
                 <ErrorMessage
