@@ -50,7 +50,10 @@ request.interceptors.response.use(undefined, async (error) => {
   return request.get(config.url, { attempt: config.attempt, retries });
 });
 
-export const fetcher = (url: string, options: AxiosRequestConfig = {}) => {
+export const fetcher = (
+  url: string,
+  options: AxiosRequestConfig & { baseURL?: string } = {},
+) => {
   return request
     .get(url, {
       headers: {
@@ -58,6 +61,7 @@ export const fetcher = (url: string, options: AxiosRequestConfig = {}) => {
         ...(options?.headers || {}),
       },
       attempt: 1,
+      baseURL: options.baseURL ? options.baseURL : baseURL,
       ...options,
     })
     .then((res) => res.data)

@@ -2,6 +2,7 @@ import { fetcher } from '@/hooks/useFetch';
 import { Tooltip } from '@reach/tooltip';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { env } from 'next-runtime-env';
 
 interface Props {
   id: string | any;
@@ -24,6 +25,7 @@ const initial = {
   start: formattedStart,
   end: formattedEnd,
 };
+const network = env('NEXT_PUBLIC_NETWORK_ID');
 
 const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
   const [loading, setLoading] = useState(false);
@@ -71,7 +73,15 @@ const Export: React.FC<Props> = ({ id, onHandleDowload, exportType }) => {
   const onDownload = async () => {
     try {
       setLoading(true);
-      const resp = await fetcher(exportInfo.apiUrl, { responseType: 'blob' });
+      const resp = await fetcher(exportInfo.apiUrl, {
+        responseType: 'blob',
+        ...(exportType === 'receipts' && {
+          baseURL:
+            network === 'testnet'
+              ? 'https://api-testnet.nearblocks.io/v2/'
+              : 'https://api.nearblocks.io/v2/',
+        }),
+      });
       const href = URL.createObjectURL(resp);
 
       onHandleDowload(href, exportInfo.file);
