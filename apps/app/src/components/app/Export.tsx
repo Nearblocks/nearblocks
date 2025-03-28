@@ -1,10 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { useFetch } from '@/hooks/app/useFetch';
-
 import Tooltip from './common/Tooltip';
+import { handleExport } from '@/utils/app/actions';
 
 interface Props {
   exportType: string;
@@ -30,50 +30,14 @@ const initial = {
 };
 
 const Export: React.FC<Props> = ({ exportType, id }) => {
-  const { fetcher } = useFetch();
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(initial.start);
   const [endDate, setEndDate] = useState(initial.end);
   const [exportInfo, setExportInfo] = useState<{
-    apiUrl: string;
-    file: string;
-    tittle: string;
-  }>({} as { apiUrl: string; file: string; tittle: string });
+    title: string;
+  }>({ title: '' });
 
-  useEffect(() => {
-    let url = '';
-    let text = '';
-    let file = '';
-    switch (exportType) {
-      case 'transactions':
-        url = `account/${id}/txns-only/export?start=${startDate}&end=${endDate}`;
-        text = 'Transactions';
-        file = `${id}_transactions_${startDate}_${endDate}.csv`;
-        break;
-      case 'receipts':
-        url = `account/${id}/receipts/export?start=${startDate}&end=${endDate}`;
-        text = 'Receipts';
-        file = `${id}_receipts_${startDate}_${endDate}.csv`;
-        break;
-      case 'tokentransactions':
-        url = `account/${id}/ft-txns/export?start=${startDate}&end=${endDate}`;
-        text = 'Token Transactions';
-        file = `${id}_ft_transactions_${startDate}_${endDate}.csv`;
-        break;
-      case 'nfttokentransactions':
-        url = `account/${id}/nft-txns/export?start=${startDate}&end=${endDate}`;
-        text = 'NFT Token Transactions';
-        file = `${id}_nft_transactions_${startDate}_${endDate}.csv`;
-        break;
-      default:
-    }
-
-    setExportInfo({ apiUrl: url, file: file, tittle: text });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exportType, id, startDate, endDate]);
-
-  const onHandleDowload = (blobUrl: string, file: string): void => {
+  const onHandleDownload = (blobUrl: string, file: string): void => {
     const a: HTMLAnchorElement = document.createElement('a');
     a.href = blobUrl;
     a.target = '_blank';
@@ -86,11 +50,19 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
   const onDownload = async () => {
     try {
       setLoading(true);
-      const resp = await fetcher(exportInfo.apiUrl, { responseType: 'blob' });
-      const href = URL.createObjectURL(resp);
-      onHandleDowload(href, exportInfo.file);
+      const { blob, filename, title } = await handleExport({
+        exportType,
+        id: id.toString(),
+        startDate,
+        endDate,
+      });
+
+      const href = URL.createObjectURL(blob);
+      onHandleDownload(href, filename);
+
+      setExportInfo({ title });
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message || 'Failed to export data');
     } finally {
       setLoading(false);
     }
@@ -115,13 +87,13 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
   return (
     <div className="bg-neargray-25 dark:bg-black-300 py-16 flex flex-col items-center text-center">
       <h2 className="text-nearblue-600 dark:text-neargray-10 text-2xl font-medium">
-        Download Data ({exportInfo.tittle})
+        Download Data {exportInfo.title ? `(${exportInfo.title})` : ''}
       </h2>
       <div className="text-sm text-neargray-600 dark:text-neargray-10 py-2 max-w-lg md:mx-12 mx-4">
         <p className="text-center">
           The information you requested can be downloaded from this page.
         </p>
-        {exportInfo.tittle === 'Receipts' && (
+        {exportType === 'receipts' && (
           <p className="text-center">
             In CSV Export you will get all the receipts of the transactions.
           </p>
