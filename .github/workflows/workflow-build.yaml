@@ -59,6 +59,8 @@ jobs:
             ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
+          build-args: |
+            GITHUB_SHA=${{ github.sha }}
 
       - name: Get new image digest
         run: |

@@ -19,6 +19,8 @@ RUN yarn turbo run build --filter=app...
 
 FROM base AS runner
 WORKDIR /app
+ARG GITHUB_SHA
+ENV GITHUB_SHA=$GITHUB_SHA
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
