@@ -5,21 +5,13 @@ import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
-import {
-  blockGauge,
-  blocksHistogram,
-  cacheHistogram,
-  dataSourceGauge,
-} from '#libs/prom';
+import { blockGauge, blocksHistogram, dataSourceGauge } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { checkFastnear } from '#libs/utils';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
-import { prepareCache } from '#services/cache';
 import { storeChunks } from '#services/chunk';
-import { storeExecutionOutcomes } from '#services/executionOutcome';
-import { storeReceipts } from '#services/receipt';
 import { uploadJson } from '#services/s3';
 import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
@@ -60,7 +52,7 @@ export const syncData = async () => {
   while (true) {
     try {
       dataSourceGauge
-        .labels(config.network, source)
+        .labels(config.network)
         .set(source === DataSource.FAST_NEAR ? 1 : 0);
       logger.info({ data_source: source });
 
@@ -125,21 +117,13 @@ export const syncData = async () => {
 
 export const onMessage = async (message: Message) => {
   try {
-    let start = performance.now();
-
-    await prepareCache(message);
-
-    const cache = performance.now() - start;
-    cacheHistogram.labels(config.network).observe(cache);
-    start = performance.now();
+    const start = performance.now();
 
     await Promise.race([
       Promise.all([
         storeBlock(knex, message),
         storeChunks(knex, message),
         storeTransactions(knex, message),
-        storeReceipts(knex, message),
-        storeExecutionOutcomes(knex, message),
         storeAccounts(knex, message),
         storeAccessKeys(knex, message),
         uploadJson(message),
@@ -156,11 +140,7 @@ export const onMessage = async (message: Message) => {
     blockGauge.labels(config.network).set(message.block.header.height);
     blocksHistogram.labels(config.network).observe(time);
 
-    logger.info({
-      block: message.block.header.height,
-      cache: `${cache} ms`,
-      db: `${time} ms`,
-    });
+    logger.info({ block: message.block.header.height, db: `${time} ms` });
   } catch (error) {
     logger.error(
       `aborting... block ${message.block.header.height} ${message.block.header.hash}`,

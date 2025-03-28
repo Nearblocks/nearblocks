@@ -9,6 +9,15 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     env_file: mainnet.indexer.env
+  indexer-receipts:
+    container_name: mainnet-indexer-receipts
+    build:
+      context: .
+      dockerfile: ./apps/indexer-receipts/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: mainnet.indexer.env
   indexer-balance:
     container_name: mainnet-indexer-balance
     build:

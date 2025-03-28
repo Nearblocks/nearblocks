@@ -1,10 +1,8 @@
 import { types } from '@near-lake/framework';
 
-import { Action } from 'nb-neardata';
-import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
+import { AccessKeyPermissionKind, Network } from 'nb-types';
 
 export interface Config {
-  cacheExpiry: number;
   dataSource: string;
   dbCa: string;
   dbCert: string;
@@ -24,10 +22,6 @@ export interface Config {
   nearlakeSecretKey: string;
   network: Network;
   preloadSize: number;
-  redisPassword: string;
-  redisSentinelName: string;
-  redisSentinelUrls: string;
-  redisUrl: string;
   s3AccessKey: string;
   s3Bucket: string;
   s3Endpoint: string;
@@ -37,35 +31,6 @@ export interface Config {
   startBlockHeight: number;
 }
 
-export type ActionReceipt = {
-  Action: {
-    actions: Action[];
-    gasPrice: string;
-    inputDataIds: string[];
-    outputDataReceivers: DataReceiver[];
-    signerId: string;
-    signerPublicKey: string;
-  };
-};
-
-export type DataReceiver = {
-  dataId: string;
-  receiverId: string;
-};
-
-export type DataReceipt = {
-  Data: {
-    data: string;
-    dataId: string;
-  };
-};
-
-export type ReceiptAction = {
-  args: string;
-  kind: ActionKind;
-  rlpHash: null | string;
-};
-
 export type AccessKeyPermission = {
   permission_details?: {
     allowance: string;
@@ -73,8 +38,4 @@ export type AccessKeyPermission = {
     receiver_id: string;
   };
   permission_kind: AccessKeyPermissionKind;
-};
-
-export type RlpJson = {
-  tx_bytes_b64: string;
 };

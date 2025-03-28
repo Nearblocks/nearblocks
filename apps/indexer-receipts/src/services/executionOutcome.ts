@@ -1,5 +1,5 @@
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
 
@@ -9,13 +9,16 @@ import { jsonStringify, mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
-export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
+export const storeExecutionOutcomes = async (
+  knex: Knex,
+  messages: Message[],
+) => {
   const start = performance.now();
   let outcomes: ExecutionOutcome[] = [];
   let outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
-  await Promise.all(
-    message.shards.map(async (shard) => {
+  messages.forEach((message) =>
+    message.shards.forEach(async (shard) => {
       const executions = storeChunkExecutionOutcomes(
         shard.shardId,
         message.block.header.timestampNanosec,
