@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 
 import {
   ActionKind,
+  ContractEventType,
   DexEventType,
   EventCause,
   ExecutionOutcomeStatus,
@@ -21,6 +22,8 @@ export interface TTables {
   balance_events: BalanceEvent;
   blocks: Block;
   chunks: Chunk;
+  contract_code_events: ContractCodeEvent;
+  contract_data_events: ContractDataEvent;
   daily_stats: DailyStats;
   deployed_contracts: DeployedContracts;
   dex_events: DexEvents;
@@ -121,6 +124,30 @@ export type Chunk = {
   included_in_block_hash: string;
   included_in_block_timestamp: string;
   shard_id: number;
+};
+
+export type ContractCodeEvent = {
+  block_height: number;
+  block_timestamp: string;
+  code_base64: null | string;
+  code_hash: null | string;
+  contract_account_id: string;
+  event_index: string;
+  event_type: ContractEventType;
+  receipt_id: string;
+  status: EventStatus;
+};
+
+export type ContractDataEvent = {
+  block_height: number;
+  block_timestamp: string;
+  contract_account_id: string;
+  event_index: string;
+  event_type: ContractEventType;
+  key_base64: string;
+  receipt_id: string;
+  status: EventStatus;
+  value_base64: null | string;
 };
 
 export type DailyStats = {
