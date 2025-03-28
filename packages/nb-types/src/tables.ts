@@ -7,6 +7,7 @@ import {
   EventCause,
   ExecutionOutcomeStatus,
   ReceiptKind,
+  StakingEventType,
   StateChangeCause,
   StateChangeDirection,
 } from './enums.js';
@@ -37,6 +38,7 @@ export interface TTables {
   nft_token_meta: NFTTokenMeta;
   receipts: Receipt;
   settings: Setting;
+  staking_events: StakingEvent;
   stats: Stats;
   tps: TPS;
   transactions: Transaction;
@@ -346,6 +348,23 @@ export type Receipt = {
 export type Setting = {
   key: string;
   value: JsonObject;
+};
+
+export type StakingEvent = {
+  absolute_shares: null | string;
+  absolute_unstaked_amount: null | string;
+  account: null | string;
+  amount: null | string;
+  block_height: number;
+  block_timestamp: string;
+  contract: string;
+  contract_shares: null | string;
+  contract_staked: null | string;
+  delta_shares: null | string;
+  epoch_id: string;
+  event_index: string;
+  receipt_id: string;
+  type: StakingEventType;
 };
 
 export type Stats = {
