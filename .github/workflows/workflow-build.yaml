@@ -26,10 +26,6 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-      - name: Set BUILD_ID for Next.js
-        if: matrix.service == 'app'
-        run: |
-          echo "BUILD_ID=${{ github.sha }}" >> $GITHUB_SHA
       - uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/amd64
