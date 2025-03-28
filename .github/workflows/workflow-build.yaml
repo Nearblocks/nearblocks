@@ -26,10 +26,6 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-      - name: Set BUILD_ID for Next.js
-        if: matrix.service == 'app'
-        run: |
-          echo "BUILD_ID=${{ github.sha }}" >> $GITHUB_SHA
       - uses: docker/setup-qemu-action@v3
         with:
           platforms: linux/amd64
@@ -59,6 +55,8 @@ jobs:
             ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
           cache-to: type=inline
+          build-args: |
+            GITHUB_SHA=${{ github.sha }}
 
       - name: Get new image digest
         run: |
