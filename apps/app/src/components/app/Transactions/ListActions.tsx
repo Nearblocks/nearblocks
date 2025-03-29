@@ -481,12 +481,15 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className={'max-w-[200px] whitespace-nowrap top-6 -ml-4'}
+            className={`max-w-[200px] -ml-3 whitespace-nowrap`}
             position="bottom"
             tooltip={
-              showAge
-                ? 'Click to show Datetime Format'
-                : 'Click to show Age Format'
+              <span className="flex flex-wrap">
+                <span className="whitespace-nowrap">Click to show</span>{' '}
+                <span className="whitespace-nowrap">
+                  {showAge ? 'Datetime' : 'Age'} Format
+                </span>
+              </span>
             }
           >
             <button

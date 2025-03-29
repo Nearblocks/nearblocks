@@ -2,7 +2,9 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
+import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
+import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -48,11 +50,11 @@ export async function generateMetadata(props: {
 
 export default async function TxnsLayout(props: {
   children: React.ReactNode;
-  params: Promise<any>;
+  params: Promise<{ hash: string; locale: string }>;
 }) {
   const params = await props.params;
 
-  const { locale } = params;
+  const { hash, locale } = params;
 
   const { children } = props;
 
@@ -65,9 +67,24 @@ export default async function TxnsLayout(props: {
           <h1 className="py-4 space-x-2 text-lg leading-8 font-medium dark:text-neargray-10 text-nearblue-600">
             {t ? t('txnDetails.heading') : 'Transaction Details'}
           </h1>
-
-          <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs">
+          <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs gap-x-2">
             <RpcMenu positionClass="right-0" />
+            <ActionMenuPopover positionClass="right-0">
+              <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2 flex h-full w-full">
+                <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center text-xs">
+                  <a
+                    className={`inline-flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
+                    href={`https://lite.nearblocks.io/txns/${hash}?network=${networkId}`}
+                    target="_blank"
+                  >
+                    Validate Transaction
+                    <span className="w-4 ml-3 dark:text-green-250 inline-flex">
+                      <FaCheckCircle />
+                    </span>
+                  </a>
+                </span>
+              </li>
+            </ActionMenuPopover>
           </ul>
         </div>
       </div>

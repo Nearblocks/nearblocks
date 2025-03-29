@@ -112,11 +112,11 @@ const Execution = (props: Props) => {
             <div className="flex flex-col w-full mx-auto divide-y dark:divide-black-200">
               <div className="flex justify-end w-full p-4 items-center">
                 <div
-                  className="cursor-pointer mx-1 flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-1 border border-neargray-700 dark:border-black-200 px-1 rounded-md bg-whit select-none"
+                  className="cursor-pointer mx-1 flex items-center text-nearblue-600 dark:text-neargray-10 font-medium py-1 border border-neargray-700 dark:border-black-200 px-1.5 rounded-md bg-whit select-none"
                   onClick={() => expandAllReceipts()}
                 >
                   <span>
-                    <span className="mr-1.5">
+                    <span className="mr-1.5 text-[13px]">
                       {expandAll ? 'Collapse All' : 'Expand All'}
                     </span>
                     {expandAll ? '-' : '+'}

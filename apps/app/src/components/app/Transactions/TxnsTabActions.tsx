@@ -29,9 +29,6 @@ import Execution from './Execution';
 import Receipt from './Receipt';
 import ReceiptSummary from './ReceiptSummary';
 import Tree from './Tree';
-import FaCheckCircle from '../Icons/FaCheckCircle';
-import { useConfig } from '@/hooks/app/useConfig';
-import ActionMenuPopover from '../common/ActionMenuPopover';
 
 export type RpcProvider = {
   name: string;
@@ -57,8 +54,6 @@ const TxnsTabActions = ({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const { networkId } = useConfig();
-
   const [receipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
   const lastBlockHash = useRef<null | string>(null);
   const [block, setBlock] = useState<{ height: string }>({ height: '' });
@@ -303,7 +298,7 @@ const TxnsTabActions = ({
     <>
       <div className="container-xxl mx-auto px-5 -z">
         {rpcError && (!txn || allRpcProviderError) ? (
-          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
               <ErrorMessage
                 icons={<FileSlash />}
@@ -340,26 +335,6 @@ const TxnsTabActions = ({
                       </Link>
                     );
                   })}
-                  <div className="flex h-full w-full justify-end">
-                    <ActionMenuPopover positionClass="right-0">
-                      <ul>
-                        <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2">
-                          <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center text-xs">
-                            <a
-                              className={`inline-flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                              href={`https://lite.nearblocks.io/txns/${hash}?network=${networkId}`}
-                              target="_blank"
-                            >
-                              Validate Transaction
-                              <span className="w-4 ml-3 dark:text-green-250 inline-flex">
-                                <FaCheckCircle />
-                              </span>
-                            </a>
-                          </span>
-                        </li>
-                      </ul>
-                    </ActionMenuPopover>
-                  </div>
                 </div>
               </div>
             </div>

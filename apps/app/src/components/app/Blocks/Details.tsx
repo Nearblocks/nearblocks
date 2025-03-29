@@ -157,7 +157,7 @@ export default function Details(props: Props) {
             ) : null}
           </h1>
         )}
-        <ActionMenuPopover>
+        <ActionMenuPopover positionClass="right-0">
           <ul>
             <li className="hover:bg-gray-100 dark:hover:bg-black-200 px-2 py-1 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250">
               <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center">
