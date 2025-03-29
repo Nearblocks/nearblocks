@@ -1,11 +1,10 @@
 'use client';
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
 import { AccountDataInfo, FtInfo, TokenListInfo } from '@/utils/types';
@@ -27,43 +26,15 @@ const AccountOverviewActions = ({
   const t = useTranslations();
   const { networkId } = useConfig();
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
-  const initializedRef = useRef(false);
-  const [rpcError, setRpcError] = useState(false);
-  const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
   const params = useParams<{ id: string }>();
 
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
-
-  useEffect(() => {
-    if (rpcError) {
-      try {
-        switchRpc();
-      } catch (error) {
-        setRpcError(true);
-        setAllRpcProviderError(true);
-        console.error('Failed to switch RPC:', error);
-      }
-    }
-  }, [rpcError, switchRpc]);
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
 
   useEffect(() => {
     const fetchAccountData = async () => {
       try {
         const [account]: any = await Promise.all([
-          viewAccount(params?.id).catch(() => setRpcError(true)),
+          viewAccount(params?.id),
         ]);
         if (account) {
           setAccountView((prev) => {
@@ -76,13 +47,13 @@ const AccountOverviewActions = ({
           setAccountView(null);
         }
       } catch (error) {
-        setRpcError(true);
-        console.log('Error loading schema:', error);
+        console.error('Error loading schema:', error);
       }
     };
 
     fetchAccountData();
-  }, [accountData, params?.id, viewAccount, rpcUrl, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountData, params?.id, rpcUrl, status]);
 
   const accountInfo = accountData || accountView;
   const balance = accountData?.amount
@@ -112,7 +83,7 @@ const AccountOverviewActions = ({
                 : Big(0);
             }
           } catch (error) {
-            console.log({ error });
+            console.error(error);
           }
 
           if (ft?.ft_meta?.price) {
@@ -164,10 +135,10 @@ const AccountOverviewActions = ({
       });
     };
 
-    loadBalances().catch(console.log);
+    loadBalances();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, params?.id]);
+  }, [inventoryData?.fts, params?.id, rpcUrl]);
 
   return (
     <div className="w-full">

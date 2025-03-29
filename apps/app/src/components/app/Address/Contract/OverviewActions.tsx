@@ -1,11 +1,10 @@
 'use client';
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { AccordionRoot } from '@/components/ui/accordion';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
 import { verifierConfig } from '@/utils/app/config';
 import {
@@ -66,22 +65,7 @@ const OverviewActions = (props: Props) => {
     Record<string, VerificationData>
   >({});
   const [rpcError, setRpcError] = useState(false);
-  const initializedRef = useRef(false);
-
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { switchRpc } = useRpcStoreWithProviders();
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   useEffect(() => {
     if (rpcError) {

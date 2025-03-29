@@ -1,15 +1,14 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { Link } from '@/i18n/routing';
-import { useRpcStore } from '@/stores/app/rpc';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';
 import { ContractCodeInfo, DeploymentsInfo } from '@/utils/types';
 
 import Tooltip from '../../common/Tooltip';
 import Question from '../../Icons/Question';
+import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {
   data: { deployments: DeploymentsInfo[] };
@@ -22,23 +21,8 @@ const Info = (props: Props) => {
   const [rpcError, setRpcError] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const { contractCode, viewAccessKeys } = useRpc();
-
-  const initializedRef = useRef(false);
-
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-  const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
-
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
+  const switchRpc = useRpcStore((state) => state.switchRpc);
   const { data, id } = props;
   const deployments = data?.deployments;
 
@@ -99,7 +83,8 @@ const Info = (props: Props) => {
     if (rpcError) {
       switchRpc();
     }
-  }, [rpcError, switchRpc]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcError]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (

@@ -1,28 +1,11 @@
 import { baseDecode } from 'borsh';
 import { providers } from 'near-api-js';
-import { useEffect, useRef } from 'react';
-
 import { useRpcStore } from '@/stores/app/rpc';
 import { decodeArgs, encodeArgs } from '@/utils/app/near';
 import { AccessInfo } from '@/utils/types';
 
-import { useRpcProvider } from './useRpcProvider';
-
 const useRpc = () => {
-  const initializedRef = useRef(false);
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-  const { rpc: rpcUrl } = useRpcStoreWithProviders();
+  const rpcUrl = useRpcStore((state) => state.rpc);
   const jsonProviders = [new providers.JsonRpcProvider({ url: rpcUrl })];
 
   const provider = new providers.FailoverRpcProvider(jsonProviders);
@@ -37,60 +20,26 @@ const useRpc = () => {
     }
   };
 
-  const contractCode = async (address: string) => {
-    return provider
-      ?.query({
-        account_id: address,
-        finality: 'final',
-        request_type: 'view_code',
-      })
-      .then((result) => {
-        console.log(`Successfully fetched contract code for ${address}`);
-        return result;
-      })
-      .catch((error: any) => {
-        if (
-          error.message?.includes('Server error') &&
-          error.message?.includes('Contract code for contract ID') &&
-          error.message?.includes('has never been observed on the node')
-        ) {
-          console.warn(`No contract code found for address ${address}.`);
-          return null;
-        }
+  const contractCode = async (address: string) =>
+    provider.query({
+      request_type: 'view_code',
+      finality: 'final',
+      account_id: address,
+    });
 
-        console.warn(
-          `Error fetching contract code for address ${address}:`,
-          error.message || error,
-        );
-        return null;
-      });
-  };
+  const viewAccessKeys = async (address: string) =>
+    provider.query({
+      request_type: 'view_access_key_list',
+      finality: 'final',
+      account_id: address,
+    });
 
-  const viewAccessKeys = async (address: string) => {
-    try {
-      const result = await provider.query({
-        account_id: address,
-        finality: 'final',
-        request_type: 'view_access_key_list',
-      });
-      return result;
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const viewAccount = async (accountId: string) => {
-    try {
-      const result = await provider.query({
-        account_id: accountId,
-        finality: 'final',
-        request_type: 'view_account',
-      });
-      return result;
-    } catch (error) {
-      return null;
-    }
-  };
+  const viewAccount = async (accountId: string) =>
+    provider.query({
+      account_id: accountId,
+      finality: 'final',
+      request_type: 'view_account',
+    });
 
   const ftBalanceOf = async (
     contract: string,
@@ -98,11 +47,11 @@ const useRpc = () => {
   ) => {
     try {
       const resp = await provider.query({
-        account_id: contract,
-        args_base64: encodeArgs({ account_id }),
-        finality: 'final',
-        method_name: 'ft_balance_of',
         request_type: 'call_function',
+        finality: 'final',
+        account_id: contract,
+        method_name: 'ft_balance_of',
+        args_base64: encodeArgs({ account_id }),
       });
       const result = (resp as any).result;
 
