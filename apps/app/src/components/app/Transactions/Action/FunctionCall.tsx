@@ -25,7 +25,7 @@ const FunctionCall = (props: ActionPropsInfo) => {
         Call
         <span className="font-normal pl-1">
           <Tooltip
-            className={'left-32 max-w-[200px] w-36'}
+            className={'left-1/2 ml-5 max-w-max'}
             position="bottom"
             tooltip={props.action.args.method_name}
           >

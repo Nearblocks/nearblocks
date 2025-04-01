@@ -352,6 +352,7 @@ const Search = ({ disabled, header = false }: any) => {
           id="searchInput"
           onChange={handleChange}
           onFocus={() => setIsOpen(true)}
+          autoComplete="off"
           placeholder={
             t('search.placeholder') || 'Search by Account ID / Txn Hash / Block'
           }

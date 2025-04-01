@@ -89,7 +89,7 @@ export function AddressOrTxnsLink({
   const textToCopy = txnHash ? txnHash : currentAddress;
 
   return (
-    <div className="flex items-center">
+    <div className="inline-flex items-center">
       <Link
         href={linkHref}
         className={`

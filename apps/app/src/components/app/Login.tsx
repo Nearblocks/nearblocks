@@ -85,15 +85,26 @@ const Login = ({ id, interval, turnstileSiteAuth }: Props) => {
 
   useEffect(() => {
     const updateCookies = async () => {
-      if (id) {
+      const token = Cookies.get('token');
+      const userData: UserToken | null = getUserDataFromToken(token);
+
+      if (!id || !interval) {
+        return resetStripePlan();
+      }
+
+      if (userData?.role) {
+        return userData.role === 'publisher'
+          ? router.replace('/user/overview')
+          : subscribePlan(id, interval);
+      }
+      if (userData?.role == null) {
         Cookies.set('stripe-plan-id', id as string, { expires: 1 / 24 });
         Cookies.set('interval', interval as string, { expires: 1 / 24 });
-      } else {
-        resetStripePlan();
       }
     };
 
     updateCookies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, interval]);
 
   useEffect(() => {

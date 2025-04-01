@@ -8,9 +8,6 @@ import OverviewSkeleton from './Overview';
 import ReceiptSkeleton from './Receipt';
 import Summary from './Summary';
 import Tree from './Tree';
-import FaCheckCircle from '../../Icons/FaCheckCircle';
-import { useConfig } from '@/hooks/app/useConfig';
-import ActionMenuPopover from '../../common/ActionMenuPopover';
 
 const tabs = [
   { label: 'Overview', message: 'txn.tabs.overview', name: 'overview' },
@@ -25,7 +22,6 @@ const tabs = [
 ];
 
 function TxnsTabsSkeleton({ hash, tab }: { hash: string; tab: string }) {
-  const { networkId } = useConfig();
   const getClassName = (selected: boolean) =>
     classNames(
       'text-xs leading-4 font-medium inline-block whitespace-nowrap cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
@@ -65,26 +61,6 @@ function TxnsTabsSkeleton({ hash, tab }: { hash: string; tab: string }) {
                     </Link>
                   );
                 })}
-                <div className="flex h-full w-full justify-end">
-                  <ActionMenuPopover positionClass="right-0">
-                    <ul>
-                      <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2">
-                        <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center text-xs">
-                          <a
-                            className={`inline-flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                            href={`https://lite.nearblocks.io/txns/${hash}?network=${networkId}`}
-                            target="_blank"
-                          >
-                            Validate Transaction
-                            <span className="w-4 ml-3 dark:text-green-250 inline-flex">
-                              <FaCheckCircle />
-                            </span>
-                          </a>
-                        </span>
-                      </li>
-                    </ul>
-                  </ActionMenuPopover>
-                </div>
               </div>
             </div>
           </div>
