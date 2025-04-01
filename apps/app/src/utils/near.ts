@@ -5,6 +5,7 @@ import {
   ActionError,
   ActionInfo,
   ActionType,
+  ApiTransaction,
   ExecutionOutcomeWithIdView,
   ExecutionStatusView,
   FailedToFindReceipt,
@@ -335,7 +336,7 @@ function displayArgs(args: any) {
 export function mainActions(rpcTxn: any) {
   const txActions = [];
   const transaction = rpcTxn?.transaction?.actions || [];
-  const receipt = rpcTxn?.transaction_outcome?.outcome?.receipt_ids[0];
+  const receipt = rpcTxn?.transaction_outcome?.outcome?.receipt_ids?.[0];
   const from = rpcTxn?.transaction?.signer_id;
   const to = rpcTxn?.transaction?.receiver_id;
   const logs = rpcTxn?.receipts_outcome?.[0]?.outcome?.logs?.map(
@@ -401,7 +402,27 @@ export function apiRemainingLogs(
   return allRemainingLogs;
 }
 
-export function apiSubActions(apiTxn: any): ActionInfo[] {
+export function apiTxnActionLogs(txn: ApiTransaction): TransactionLog[] {
+  let txLogs: TransactionLog[] = [];
+
+  const outcomes = txn?.receipts || [];
+
+  for (let i = 0; i < outcomes?.length; i++) {
+    const outcome = outcomes[i];
+    let logs = outcome?.outcome?.logs || [];
+    if (logs?.length > 0) {
+      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
+        contract: outcome?.outcome?.executor_account_id || '',
+        logs: parseEventJson(log),
+        receiptId: outcome?.receipt_id,
+      }));
+      txLogs = [...txLogs, ...mappedLogs];
+    }
+  }
+  return txLogs;
+}
+
+export function apiSubActions(apiTxn: ApiTransaction): ActionInfo[] {
   const txActions: ActionInfo[] = [];
   const transaction = apiTxn?.actions || [];
   const from = apiTxn?.signer_account_id;
@@ -441,7 +462,7 @@ export function apiSubActions(apiTxn: any): ActionInfo[] {
   return txActions;
 }
 
-export function apiMainActions(apiTxn: any): ActionInfo[] {
+export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
   const txActions: ActionInfo[] = [];
 
   const transaction = apiTxn?.actions || [];
@@ -590,19 +611,28 @@ async function processTokenMetadata(
   return processedTokens;
 }
 
-export async function processTransactionWithTokens(apiTxn: any) {
+export async function processTransactionWithTokens(apiTxn: ApiTransaction) {
   const logs = apiTxnLogs(apiTxn);
-  const actions = apiMainActions(apiTxn);
+  const apiActions = apiMainTxnsActions(apiTxn);
   const subActions = apiSubActions(apiTxn);
+  const apiActionLogs = apiTxnActionLogs(apiTxn);
+
   const allLogs = (
-    actions && actions[0] && actions[0].logs ? actions[0].logs : []
+    apiActions && apiActions?.[0] && apiActions?.[0]?.logs
+      ? apiActions?.[0]?.logs
+      : []
   ).concat(
-    subActions && subActions[0] && subActions[0].logs ? subActions[0].logs : [],
+    subActions && subActions?.[0] && subActions?.[0]?.logs
+      ? subActions?.[0]?.logs
+      : [],
   );
+
   const tokenMetadata = await processTokenMetadata(allLogs || []);
+
   return {
     logs,
-    actions,
+    apiActionLogs,
+    apiActions,
     subActions,
     tokenMetadata,
   };

@@ -60,20 +60,6 @@ const TxnsTabActions = ({
   const { networkId } = useConfig();
 
   const [receipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
-  const lastBlockHash = useRef<null | string>(null);
-  const [block, setBlock] = useState<{ height: string }>({ height: '' });
-
-  useEffect(() => {
-    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
-      lastBlockHash.current = receipt.block_hash;
-
-      getBlockDetails(receipt?.block_hash)
-        .then((resp: any) => {
-          setBlock(resp?.header);
-        })
-        .catch(() => {});
-    }
-  }, [receipt?.block_hash, getBlockDetails]);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
@@ -84,12 +70,12 @@ const TxnsTabActions = ({
 
     if (
       receipts?.length === 0 ||
-      receipts[0]?.receipt_id !== receiptsOutcome[0]?.id
+      receipts?.[0]?.receipt_id !== receiptsOutcome?.[0]?.id
     ) {
       receipts?.unshift({
         predecessor_id: txn?.transaction?.signer_id,
         receipt: actions,
-        receipt_id: receiptsOutcome[0]?.id,
+        receipt_id: receiptsOutcome?.[0]?.id,
         receiver_id: txn?.transaction?.receiver_id,
       });
     }
@@ -107,7 +93,7 @@ const TxnsTabActions = ({
         receiptsByIdMap?.set(receiptItem?.receipt_id, {
           ...receiptItem,
           actions:
-            receiptItem?.receipt_id === receiptsOutcome[0]?.id
+            receiptItem?.receipt_id === receiptsOutcome?.[0]?.id
               ? actions
               : receiptItem?.receipt?.Action?.actions &&
                 receiptItem?.receipt?.Action?.actions.map((receipt) =>
@@ -132,7 +118,7 @@ const TxnsTabActions = ({
       };
     };
 
-    return collectReceipts(receiptsOutcome[0]?.id);
+    return collectReceipts(receiptsOutcome?.[0]?.id);
   }
 
   useEffect(() => {
@@ -247,13 +233,15 @@ const TxnsTabActions = ({
   useEffect(() => {
     const fetchTransactionStatus = async () => {
       if (!txn) return;
-
       try {
         setRpcError(false);
         const res = await transactionStatus(
           txn.transaction_hash,
           txn.signer_account_id,
         );
+        if (res?.final_execution_status === 'NONE') {
+          setRpcError(true);
+        }
         setRpcTxn(res);
       } catch {
         setRpcError(true);
@@ -302,7 +290,8 @@ const TxnsTabActions = ({
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
-        {rpcError && (!txn || allRpcProviderError) ? (
+        {(rpcError && (!txn || allRpcProviderError)) ||
+        rpcTxn?.final_execution_status === 'NONE' ? (
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
               <ErrorMessage
@@ -380,7 +369,6 @@ const TxnsTabActions = ({
                 )}
                 {tab === 'execution' && (
                   <Receipt
-                    block={block}
                     hash={hash}
                     receipt={receipt}
                     rpcTxn={rpcTxn}
