@@ -18,9 +18,9 @@ import { CopyButton } from '../../common/CopyButton';
 import { AddressOrTxnsLink } from '../../common/HoverContextProvider';
 import FaMinimize from '../../Icons/FaMinimize';
 import FaExpand from '../../Icons/FaExpand';
+import useRpc from '@/hooks/app/useRpc';
 
 interface Props {
-  block: { height: string };
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
   statsData: {
@@ -31,7 +31,7 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { block, borderFlag, receipt, statsData } = props;
+  const { borderFlag, receipt, statsData } = props;
   const t = useTranslations();
   const [pageHash] = useHash();
   const loading = false;
@@ -41,6 +41,9 @@ const ReceiptRow = (props: Props) => {
   const { networkId } = useConfig();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
+  const lastBlockHash = useRef<null | string>(null);
+  const [block, setBlock] = useState<{ height: string }>({ height: '' });
+  const { getBlockDetails } = useRpc();
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -68,6 +71,18 @@ const ReceiptRow = (props: Props) => {
       });
     }
   };
+
+  useEffect(() => {
+    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
+      lastBlockHash.current = receipt.block_hash;
+
+      getBlockDetails(receipt?.block_hash)
+        .then((resp: any) => {
+          setBlock(resp?.header);
+        })
+        .catch(() => {});
+    }
+  }, [receipt?.block_hash, getBlockDetails]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -458,12 +473,7 @@ const ReceiptRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
             <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
               <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow
-                  block={block}
-                  borderFlag
-                  receipt={rcpt}
-                  statsData={statsData}
-                />
+                <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
               </div>
             </div>
           ))}

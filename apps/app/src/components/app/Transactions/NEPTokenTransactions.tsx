@@ -1,18 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseEventLogs } from '@/utils/near';
 import FaRight from '../Icons/FaRight';
-import { TransactionLog } from '@/utils/types';
+import { ProcessedTokenMeta, TransactionLog } from '@/utils/types';
 import ArrowDownDouble from '../Icons/ArrowDownDouble';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import TokenInfo from '../common/TokenInfo';
 import { localFormat } from '@/utils/app/libs';
+import { isString } from 'lodash';
 
 interface ParsedEventListProps {
   events: TransactionLog[];
   totalTokenIdsCount?: number;
+  tokenMetadata: ProcessedTokenMeta[];
 }
 
-const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
+const RenderAllTransfers: React.FC<ParsedEventListProps> = ({
+  events,
+  tokenMetadata,
+}) => {
   const allTransferRef = useRef<HTMLDivElement>(null);
   const [isActionScrollable, setIsActionScrollable] = useState(false);
 
@@ -22,7 +27,6 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
       setIsActionScrollable(height >= 182);
     }
   }, [events]);
-
   return (
     <>
       <div className="mostly-customized-scrollbar">
@@ -32,14 +36,19 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
         >
           {events &&
             events?.map((event: any, index: number) => {
-              const parsedEvent: any = parseEventLogs(event);
+              const parsedEvent: any =
+                isString(event?.logs) && parseEventLogs(event);
               if (
-                parsedEvent?.standard === 'nep245' &&
-                Array.isArray(parsedEvent?.data)
+                (parsedEvent?.standard === 'nep245' &&
+                  Array.isArray(parsedEvent?.data)) ||
+                event?.logs?.standard === 'nep245'
               ) {
-                const eventData = parsedEvent;
+                const eventData = !isString(event?.logs)
+                  ? event?.logs
+                  : parsedEvent;
 
                 return eventData?.data?.flatMap((data: any, j: number) => {
+                  console.log({ data });
                   const contracts = Array.isArray(data?.token_ids)
                     ? data?.token_ids.map(
                         (tokenId: string) => tokenId?.split(':')[1],
@@ -55,96 +64,120 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
                     : ['0'];
 
                   return contracts?.map(
-                    (contract: string, tokenIndex: number) => (
-                      <div
-                        key={`${index}-${j}-${tokenIndex}`}
-                        className="flex items-center flex-wrap break-all leading-7"
-                      >
-                        <FaRight className="inline-flex text-gray-400 text-xs mt-1 sm:!mt-0" />
-                        {['mt_mint'].includes(parsedEvent?.event) ? (
-                          <>
-                            <div className="font-semibold text-gray px-1 flex items-center">
-                              From
-                              {'old_owner_id' in data && data?.old_owner_id ? (
-                                <AddressOrTxnsLink
-                                  className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline h-6 flex items-center"
-                                  currentAddress={data?.old_owner_id}
-                                />
-                              ) : (
-                                <span className="font-normal pl-1">system</span>
-                              )}
-                            </div>
-                            <div className="font-semibold text-gray flex items-center">
-                              To
-                              {'owner_id' in data && data?.owner_id ? (
-                                <AddressOrTxnsLink
-                                  className="text-green-500 dark:text-green-250 font-normal pl-1 h-6 flex items-center"
-                                  currentAddress={data?.owner_id}
-                                />
-                              ) : (
-                                <span className="font-normal pl-1">system</span>
-                              )}
-                            </div>
-                          </>
-                        ) : ['mt_burn'].includes(parsedEvent?.event) ? (
-                          <>
-                            <div className="font-semibold text-gray px-1 flex items-center">
-                              From{' '}
-                              {'owner_id' in data && data?.owner_id ? (
-                                <AddressOrTxnsLink
-                                  className="text-green-500 dark:text-green-250 font-normal ml-0.5 hover:no-underline h-6 flex items-center"
-                                  currentAddress={data?.owner_id}
-                                />
-                              ) : (
-                                <span className="font-normal pl-1">system</span>
-                              )}
-                            </div>
-                            <div className="font-semibold text-gray">
-                              To{' '}
-                              {'old_owner_id' in data && data?.old_owner_id ? (
-                                <AddressOrTxnsLink
-                                  className="text-green-500 dark:text-green-250 font-normal pl-1 h-6 flex items-center"
-                                  currentAddress={data?.old_owner_id}
-                                />
-                              ) : (
-                                <span className="font-normal pl-1">system</span>
-                              )}
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="font-semibold text-gray px-1 flex items-center">
-                              From
-                              {'old_owner_id' in data && data?.old_owner_id ? (
-                                <AddressOrTxnsLink
-                                  className="text-green-500 dark:text-green-250 font-normal ml-0.5 hover:no-underline h-6 flex items-center"
-                                  currentAddress={data?.old_owner_id}
-                                />
-                              ) : (
-                                <span className="font-normal pl-1">system</span>
-                              )}
-                            </div>
-                            <div className="font-semibold text-gray flex items-center">
-                              To
-                              {'new_owner_id' in data && data?.new_owner_id ? (
-                                <AddressOrTxnsLink
-                                  className="text-green-500 dark:text-green-250 font-normal ml-0.5 h-6 flex items-center"
-                                  currentAddress={data?.new_owner_id}
-                                />
-                              ) : (
-                                <span className="font-normal pl-1">system</span>
-                              )}
-                            </div>
-                          </>
-                        )}
-                        <div className="font-bold pl-1">For</div>
-                        <TokenInfo
-                          contract={contract}
-                          amount={amounts[tokenIndex] || '0'}
-                          isShowText={true}
-                        />
-                      </div>
-                    ),
+                    (contract: string, tokenIndex: number) => {
+                      const meta = tokenMetadata?.filter(
+                        (meta: any) => meta?.contractId === contract,
+                      );
+                      return (
+                        <div
+                          key={`${index}-${j}-${tokenIndex}`}
+                          className="flex items-center flex-wrap break-all leading-7"
+                        >
+                          <FaRight className="inline-flex text-gray-400 text-xs mt-1 sm:!mt-0" />
+                          {['mt_mint'].includes(parsedEvent?.event) ? (
+                            <>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From
+                                {'old_owner_id' in data &&
+                                data?.old_owner_id ? (
+                                  <AddressOrTxnsLink
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1 hover:no-underline h-6 flex items-center"
+                                    currentAddress={data?.old_owner_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray flex items-center">
+                                To
+                                {'owner_id' in data && data?.owner_id ? (
+                                  <AddressOrTxnsLink
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1 h-6 flex items-center"
+                                    currentAddress={data?.owner_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          ) : ['mt_burn'].includes(parsedEvent?.event) ? (
+                            <>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From{' '}
+                                {'owner_id' in data && data?.owner_id ? (
+                                  <AddressOrTxnsLink
+                                    className="text-green-500 dark:text-green-250 font-normal ml-0.5 hover:no-underline h-6 flex items-center"
+                                    currentAddress={data?.owner_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray">
+                                To{' '}
+                                {'old_owner_id' in data &&
+                                data?.old_owner_id ? (
+                                  <AddressOrTxnsLink
+                                    className="text-green-500 dark:text-green-250 font-normal pl-1 h-6 flex items-center"
+                                    currentAddress={data?.old_owner_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From
+                                {'old_owner_id' in data &&
+                                data?.old_owner_id ? (
+                                  <AddressOrTxnsLink
+                                    className="text-green-500 dark:text-green-250 font-normal ml-0.5 hover:no-underline h-6 flex items-center"
+                                    currentAddress={data?.old_owner_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray flex items-center">
+                                To
+                                {'new_owner_id' in data ||
+                                'owner_id' in data ? (
+                                  <AddressOrTxnsLink
+                                    className="text-green-500 dark:text-green-250 font-normal ml-0.5 h-6 flex items-center"
+                                    currentAddress={
+                                      data?.new_owner_id || data?.owner_id
+                                    }
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          )}
+                          <div className="font-bold pl-1">For</div>
+                          <TokenInfo
+                            contract={contract}
+                            amount={amounts[tokenIndex] || '0'}
+                            isShowText={true}
+                            metaInfo={meta}
+                          />
+                        </div>
+                      );
+                    },
                   );
                 });
               }
@@ -162,18 +195,24 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
   );
 };
 
-const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
+const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
+  events,
+  tokenMetadata,
+}) => {
   const netTransferRef = useRef<HTMLDivElement>(null);
   const [isScrollable, setIsScrollable] = useState(false);
 
   const combinedTransactions = events
     ?.map((event: any) => {
-      const parsedEvent: any = parseEventLogs(event);
+      const parsedEvent: any = isString(event?.logs) && parseEventLogs(event);
       if (
-        parsedEvent?.standard === 'nep245' &&
-        Array.isArray(parsedEvent?.data)
+        (parsedEvent?.standard === 'nep245' &&
+          Array.isArray(parsedEvent?.data)) ||
+        event?.logs?.standard === 'nep245'
       ) {
-        return parsedEvent?.data?.reduce((acc: any[], transfer: any) => {
+        const eventData = !isString(event?.logs) ? event?.logs : parsedEvent;
+
+        return eventData?.data?.reduce((acc: any[], transfer: any) => {
           if (Array.isArray(transfer?.amounts)) {
             const amounts = transfer?.amounts;
             const tokenIds = transfer?.token_ids;
@@ -210,13 +249,13 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
               });
             } else {
               acc.push({
-                address: transfer?.old_owner_id,
+                address: transfer?.old_owner_id || 'system',
                 type: 'sent',
                 amount: amounts[0],
                 token: tokenIds[0],
               });
               acc.push({
-                address: transfer?.new_owner_id,
+                address: transfer?.owner_id || transfer?.new_owner_id,
                 type: 'received',
                 amount: amounts[0],
                 token: tokenIds[0],
@@ -229,7 +268,6 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
       return [];
     })
     ?.flat();
-
   const groupTransactions = (transactions: any[]) => {
     const grouped: Record<string, any> = {};
 
@@ -253,21 +291,20 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
         amount: transaction.amount.toString(),
       }))
       .sort((a: any, b: any) => {
-        if (a.address === b.address) {
-          if (a.type === 'sent' && b.type !== 'sent') return -1;
-          if (a.type !== 'sent' && b.type === 'sent') return 1;
+        if (a?.address === b?.address) {
+          if (a?.type === 'sent' && b?.type !== 'sent') return -1;
+          if (a?.type !== 'sent' && b?.type === 'sent') return 1;
 
-          return a.type.localeCompare(b.type);
+          return a?.type?.localeCompare(b?.type);
         }
 
-        return a.address.localeCompare(b.address);
+        return a?.address?.localeCompare(b?.address);
       });
 
     return groupedArray;
   };
 
   const transactions = groupTransactions(combinedTransactions);
-
   useEffect(() => {
     if (netTransferRef?.current) {
       const height = netTransferRef?.current?.offsetHeight;
@@ -283,6 +320,11 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
           ref={netTransferRef}
         >
           {transactions?.map((item: any, tokenIndex: number) => {
+            const contract = item?.token?.split(':')[1];
+
+            const meta = tokenMetadata?.filter(
+              (meta: any) => meta.contractId === contract,
+            );
             return (
               <div
                 key={`${tokenIndex}`}
@@ -300,9 +342,10 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
                 </div>
                 <div className="font-bold pl-1">{item?.type}</div>
                 <TokenInfo
-                  contract={item?.token?.split(':')[1]}
+                  contract={contract}
                   amount={item?.amount || '0'}
                   isShowText={true}
+                  metaInfo={meta}
                 />
               </div>
             );
@@ -322,6 +365,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
 const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
   events,
   totalTokenIdsCount,
+  tokenMetadata,
 }: ParsedEventListProps) => {
   const [tabIndex, setTabIndex] = useState(1);
 
@@ -356,10 +400,10 @@ const NEPTokenTransactions: React.FC<ParsedEventListProps> = ({
         </button>
       </div>
       <div className={`${tabIndex === 1 ? '' : 'hidden'} `}>
-        <RenderAllTransfers events={events} />
+        <RenderAllTransfers events={events} tokenMetadata={tokenMetadata} />
       </div>
       <div className={`${tabIndex === 2 ? '' : 'hidden'}`}>
-        <RenderNetTransfers events={events} />
+        <RenderNetTransfers events={events} tokenMetadata={tokenMetadata} />
       </div>
     </div>
   );

@@ -104,7 +104,8 @@ const Details = (props: Props) => {
 
   const {
     logs: apiLogs,
-    actions: apiActions,
+    apiActionLogs,
+    apiActions,
     tokenMetadata,
   } = apiTxnActionsData;
   const { fts, nfts } = useMemo(() => {
@@ -181,7 +182,7 @@ const Details = (props: Props) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rpcTxn]);
 
-  const allEvents = useMemo(() => {
+  const rpcAllEvents = useMemo(() => {
     if (
       actionLogs?.some(
         (log: TransactionLog) => parseEventLogs(log)?.standard === 'nep245',
@@ -199,6 +200,11 @@ const Details = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionLogs]);
 
+  const apiAllEvents = apiActionLogs?.filter(
+    (log: TransactionLog) => log?.logs?.standard === 'nep245',
+  );
+
+  const allEvents = apiAllEvents?.length > 0 ? apiAllEvents : rpcAllEvents;
   const showRow = allEvents && allEvents?.length > 0;
 
   useEffect(() => {
@@ -332,7 +338,7 @@ const Details = (props: Props) => {
   const updatedMainTxnsActions =
     apiMainTxnsActions?.length > 0 ? apiMainTxnsActions : rpcMainTxnsActions;
 
-  const totalTokenIdsCount = actionLogs?.reduce(
+  const rpcTokenIdsCount = actionLogs?.reduce(
     (totalCount: number, item: any) => {
       try {
         const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
@@ -359,6 +365,33 @@ const Details = (props: Props) => {
     },
     0,
   );
+  const apiTokenIdsCount = apiActionLogs?.reduce(
+    (totalCount: number, item: any) => {
+      try {
+        if (item?.logs?.standard === 'nep245') {
+          const eventTokenIdsCount = item?.logs?.data?.reduce(
+            (count: number, entry: any) => {
+              return (
+                count +
+                (entry?.token_ids?.length > 0 ? entry?.token_ids?.length : 0)
+              );
+            },
+            0,
+          );
+          return totalCount + eventTokenIdsCount;
+        }
+        return totalCount;
+      } catch (error) {
+        console.log('Error parsing log:', error);
+        return totalCount;
+      }
+    },
+    0,
+  );
+
+  const totalTokenIdsCount = apiTokenIdsCount
+    ? apiTokenIdsCount
+    : rpcTokenIdsCount;
 
   useEffect(() => {
     if (actionColumnRef?.current) {
@@ -1094,6 +1127,7 @@ const Details = (props: Props) => {
                     <NEPTokenTransactions
                       events={allEvents}
                       totalTokenIdsCount={totalTokenIdsCount}
+                      tokenMetadata={tokenMetadata}
                     />
                   </div>
                 )}
