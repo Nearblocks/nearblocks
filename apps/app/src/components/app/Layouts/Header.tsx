@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link, routing, usePathname } from '@/i18n/routing';
-import { getUserDataFromToken, nanoToMilli } from '@/utils/app/libs';
+import { nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
 
 import ActiveLink from '../ActiveLink';
@@ -17,7 +17,6 @@ import ArrowDown from '../Icons/ArrowDown';
 import Menu from '../Icons/Menu';
 import UserMenu from './UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
-import { UserToken } from '@/utils/types';
 
 const menus = [
   {
@@ -155,7 +154,7 @@ const languages = [
 const Header = ({
   stats: initialStats,
   sync: initialSync,
-  token: tokenCookie,
+  accountId,
   theme: cookieTheme,
   getLatestStats,
   getSyncStatus,
@@ -164,39 +163,6 @@ const Header = ({
   const [syncStatus, setSyncStatus] = useState(true);
   const [stats, setStats] = useState(initialStats);
   const [sync, setSync] = useState<string>(initialSync?.base?.timestamp);
-  const [token, setToken] = useState<string | undefined>(tokenCookie);
-
-  useEffect(() => {
-    const check = () => {
-      const t = Cookies.get('token');
-      if (t !== token) setToken(t);
-    };
-    check();
-    const interval = setInterval(check, 500);
-    return () => clearInterval(interval);
-  }, [token]);
-
-  const userData: UserToken | null = getUserDataFromToken(token);
-  const role = userData?.role;
-  const user = userData?.username;
-  const profile = [
-    {
-      id: 1,
-      link: '/user/overview',
-      title: 'My Profile',
-    },
-    {
-      id: 2,
-      link: '/user/settings',
-      title: 'Settings',
-    },
-    {
-      id: 3,
-      link: role === 'publisher' ? '/publisher/keys' : '/user/keys',
-      title: 'API Keys',
-    },
-  ];
-
   const setLatestStats = useStatsStore((state) => state.setLatestStats);
   const setSyncStat = useStatsStore((state) => state.setSyncStatus);
   useEffect(() => {
@@ -661,7 +627,7 @@ const Header = ({
                     </span>
                   </li>
                   <li>
-                    <UserMenu profile={profile} user={user} />
+                    <UserMenu AccountId={accountId} />
                   </li>
                 </ul>
                 <ul className="md:flex justify-end dark:text-neargray-10 text-nearblue-600 pb-2 md:pb-0">

@@ -25,7 +25,7 @@ interface LayoutProps {
 const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();
   const theme = (await cookies()).get('theme')?.value || 'light';
-  const token = await getCookie('token');
+  const signedAccountId = await getCookie('signedAccountId');
   const network = networkId;
 
   const getLatestStats = async () => {
@@ -101,9 +101,9 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                 <ToastContainer />
                 <LayoutActions
                   theme={theme}
-                  token={token}
                   stats={stats}
                   sync={indexers}
+                  accountId={signedAccountId}
                   getLatestStats={getLatestStats}
                   getSyncStatus={getSyncStatus}
                 >
