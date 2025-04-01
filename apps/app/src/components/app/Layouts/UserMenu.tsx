@@ -1,31 +1,36 @@
-import { Link } from '@/i18n/routing';
-
-import ActiveLink from '../ActiveLink';
+import { useContext } from 'react';
 import Collapse from '../Collapse';
 import ArrowDown from '../Icons/ArrowDown';
 import User from '../Icons/FaUserAlt ';
-import { signOut } from '@/utils/app/actions';
+import { NearContext } from '../wallet/near-context';
 
 interface Props {
-  profile: any;
-  user: any;
+  AccountId?: string;
 }
 
-const UserMenu = ({ profile, user }: Props) => {
+const UserMenu = ({ AccountId: signedAccountId }: Props) => {
+  let { wallet } = useContext(NearContext);
   return (
     <>
       <Collapse
-        trigger={({ onClick, show }) => (
-          <span
+        trigger={({ show, onClick }) => (
+          <button
             className="flex md:!hidden items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4"
-            onClick={onClick}
+            onClick={(event: any) => {
+              event.preventDefault();
+              if (!signedAccountId) {
+                wallet?.signIn();
+              } else {
+                onClick(event);
+              }
+            }}
           >
             <div className="w-full">
-              {user ? (
+              {signedAccountId ? (
                 <div className="flex justify-between">
                   <div className="flex items-center">
                     <span className="truncate max-w-[110px] font-medium text-sm dark:text-neargray-10 text-nearblue-600">
-                      {user}
+                      {signedAccountId}
                     </span>
                   </div>
                   <ArrowDown
@@ -36,35 +41,22 @@ const UserMenu = ({ profile, user }: Props) => {
                 </div>
               ) : (
                 <div>
-                  <Link
-                    className="w-full flex items-center font-medium text-sm dark:text-neargray-10 text-nearblue-600"
-                    href={`/login`}
-                  >
+                  <div className="w-full flex items-center font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                     <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
                     Sign In
-                  </Link>
+                  </div>
                 </div>
               )}
             </div>
-          </span>
+          </button>
         )}
       >
-        {user && (
-          <ul className="border-l-2 border-green-500 md:hidden ml-4 -z-20">
-            {profile.map((menu: any) => (
-              <li key={menu.id}>
-                <ActiveLink href={menu.link}>
-                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 font-medium text-sm dark:text-neargray-10 text-nearblue-600 py-2 px-4">
-                    {menu.title}
-                  </div>
-                </ActiveLink>
-              </li>
-            ))}
-            <li className="border-t my-3"></li>
+        {signedAccountId && (
+          <ul className="border-l-2 border-green-500 md:hidden ml-4 my-2 -z-20">
             <li className="px-4 pb-1">
               <button
+                onClick={wallet?.signOut}
                 className="bg-green-500 w-full rounded-md text-white text-xs text-center py-1 whitespace-nowrap dark:bg-green-250 dark:text-neargray-10"
-                onClick={() => signOut()}
               >
                 Sign Out
               </button>
@@ -72,53 +64,43 @@ const UserMenu = ({ profile, user }: Props) => {
           </ul>
         )}
       </Collapse>
-      <span className="group hidden md:flex h-full w-full relative">
-        <div
+      <div className="group hidden md:flex h-full w-full relative">
+        <button
           className={`hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 `}
+          onClick={() => !signedAccountId && wallet?.signIn()}
         >
-          {user ? (
+          {signedAccountId ? (
             <>
               <User className="mx-1 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
               <span className="truncate max-w-[110px] font-medium text-sm dark:text-neargray-10 text-nearblue-600">
-                {user}
+                {signedAccountId}
               </span>
               <ArrowDown className="fill-current w-4 h-4 ml-2" />
             </>
           ) : (
-            <div className="flex items-center">
-              <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
-              <Link
-                className="flex font-medium text-sm dark:text-neargray-10 text-nearblue-600"
-                href={`/login`}
-              >
-                Sign In
-              </Link>
+            <div>
+              <div className="flex items-center font-medium text-sm dark:text-neargray-10 text-nearblue-600">
+                <>
+                  <User className="mx-1 mr-2 text-sm bg-gray-500 rounded-full p-0.5 text-white" />
+                  Sign In
+                </>
+              </div>
             </div>
           )}
-        </div>
-        {user && (
+        </button>
+        {signedAccountId && (
           <ul className="bg-white dark:bg-black-600 soft-shadow hidden  absolute top-full rounded-b-lg !border-t-2 !border-t-green-500 group-hover:!block py-2 px-4 z-20">
-            {profile.map((menu: any) => (
-              <li key={menu.id}>
-                <ActiveLink href={menu.link}>
-                  <div className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600">
-                    {menu.title}
-                  </div>
-                </ActiveLink>
-              </li>
-            ))}
-            <li className="border-t my-3"></li>
-            <li className="px-4 pb-1">
+            <li className="px-8 py-1">
               <button
+                onClick={wallet?.signOut}
                 className="hover:bg-green-400 bg-green-500 dark:text-neargray-10 rounded-md text-white text-xs text-center py-1 px-4 whitespace-nowrap"
-                onClick={() => signOut()}
               >
                 Sign Out
               </button>
             </li>
           </ul>
         )}
-      </span>
+      </div>
     </>
   );
 };

@@ -1,26 +1,19 @@
 'use client';
-import Cookies from 'js-cookie';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-
-import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
-import useAuth, { request } from '@/hooks/app/useAuth';
 import { docsUrl } from '@/utils/app/config';
-import { getUserDataFromToken, localFormat } from '@/utils/app/libs';
+import { localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 
 import LoadingCircular from '../common/LoadingCircular';
-import ConfirmPlan from '../Dashboard/ConfirmPlan';
 import Arrow from '../Icons/Arrow';
 import FaCheckCircle from '../Icons/FaCheckCircle';
 import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
 import Skeleton from '../skeleton/common/Skeleton';
 import SwitchButton from '../SwitchButton';
-import { useConfig } from '@/hooks/app/useConfig';
-import { UserToken } from '@/utils/types';
 
 const ApiActions = ({
   getContactDetails,
@@ -40,52 +33,7 @@ const ApiActions = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
-  const [currentItem, setCurrentItem] = useState<any>();
-  const token = Cookies.get('token');
-  const { data: userData } = useAuth(token ? '/users/me' : '', {}, true);
-  const { userApiURL: baseURL } = useConfig();
-  const currentPlan = userData?.user?.plan?.price_monthly ?? 0;
-
   const router = useRouter();
-
-  const resetStripePlan = async () => {
-    Cookies.remove('stripe-plan-id');
-    Cookies.remove('interval');
-    return;
-  };
-
-  const subscribePlan = async (stripePlanId: string, interval: string) => {
-    try {
-      const res = await request(baseURL).post('advertiser/subscribe', {
-        interval,
-        plan_id: stripePlanId,
-      });
-
-      const redirectUrl = res?.data['url '];
-      if (redirectUrl) {
-        resetStripePlan();
-        router.push(redirectUrl);
-        return;
-      }
-
-      const status = res?.data?.message;
-      if (status) {
-        resetStripePlan();
-        router.push(`/user/plan?status=${status}`);
-        return;
-      }
-      resetStripePlan();
-      router.push('/user/plan');
-    } catch (error) {
-      const statusCode = get(error, 'response.status') || null;
-      resetStripePlan();
-      if (statusCode === 422) {
-        router.push('/user/plan?status=exists');
-      } else if (statusCode === 400) {
-        router.push('/user/plan?status=invalid');
-      }
-    }
-  };
 
   const submitForm = async (event: any) => {
     event.preventDefault();
@@ -132,40 +80,11 @@ const ApiActions = ({
 
   const onGetStarted = async (plan: any) => {
     if (plan) {
-      if (token) {
-        if (plan?.id) {
-          const userData: UserToken | null = getUserDataFromToken(token);
-          const role = userData?.role;
-          if (role === 'publisher') {
-            toast.warning('Unauthorized Access!');
-          } else if (role === 'advertiser') {
-            Cookies.set('stripe-plan-id', plan?.id as string, {
-              expires: 1 / 24,
-            });
-            Cookies.set('interval', !interval ? 'month' : ('year' as string), {
-              expires: 1 / 24,
-            });
-            const stripePlanId = Cookies.get('stripe-plan-id');
-            const planInterval =
-              Cookies.get('interval') === 'year' ? 'year' : 'month';
-            if (stripePlanId && planInterval) {
-              subscribePlan(stripePlanId, planInterval);
-            }
-          } else {
-            toast.warning('please login to continue...');
-          }
-        } else {
-          router.replace('/user/overview');
-        }
-      } else {
-        Cookies.set('stripe-plan-id', plan?.id as string, { expires: 1 / 24 });
-        Cookies.set('interval', !interval ? 'month' : ('year' as string), {
-          expires: 1 / 24,
-        });
-        router.push(
-          `/login?id=${plan?.id}&interval=${interval ? 'year' : 'month'}`,
-        );
-      }
+      router.push(
+        `https://dash.nearblocks.io/login?id=${plan?.id}&interval=${
+          interval ? 'year' : 'month'
+        }`,
+      );
     }
   };
 
@@ -202,7 +121,11 @@ const ApiActions = ({
             >
               API Pricing Plans
             </button>
-            <Link href="/login" rel="noreferrer nofollow noopener">
+            <Link
+              href="https://dash.nearblocks.io/login"
+              rel="noreferrer nofollow noopener"
+              target="_blank"
+            >
               <span className=" flex ml-2 text-sm text-white font-thin px-4 py-3 dark:bg-green-250 bg-green-500 rounded w-fit">
                 User Dashboard
                 <Arrow className="-rotate-45 -mt-0 h-4 w-4 dark:text-neargray-10" />
@@ -359,32 +282,12 @@ const ApiActions = ({
                         ? 'Personal Use'
                         : 'Commercial Use'}
                     </h3>
-                    {item?.price_annually === 0 &&
-                    item?.price_monthly === 0 &&
-                    token &&
-                    currentPlan > 0 ? (
-                      <DialogRoot placement={'center'} size="xs">
-                        <DialogTrigger asChild>
-                          <button
-                            className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => setCurrentItem(item)}
-                          >
-                            Get started now
-                          </button>
-                        </DialogTrigger>
-                        <ConfirmPlan
-                          onContinue={onGetStarted}
-                          plan={currentItem}
-                        />
-                      </DialogRoot>
-                    ) : (
-                      <button
-                        className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        onClick={() => onGetStarted(item)}
-                      >
-                        Get started now
-                      </button>
-                    )}
+                    <button
+                      className="text-sm hover:bg-green-400 text-white font-thin px-7 py-3 mt-4 dark:bg-green-250 bg-green-500 rounded w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 hover:shadow-md hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => onGetStarted(item)}
+                    >
+                      Get started now
+                    </button>
                   </div>
                 </div>
               ))

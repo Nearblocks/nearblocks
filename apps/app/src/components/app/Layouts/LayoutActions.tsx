@@ -19,6 +19,7 @@ import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
+import Cookies from 'js-cookie';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,9 +27,7 @@ interface LayoutProps {
   theme: string;
   stats: StatusInfo;
   sync: string;
-  token?: string;
-  user?: string;
-  role?: string;
+  accountId?: string;
   getLatestStats: () => Promise<StatusInfo>;
   getSyncStatus: () => Promise<string>;
 }
@@ -37,7 +36,7 @@ const LayoutActions = ({
   children,
   notice,
   theme,
-  token,
+  accountId,
   stats,
   sync,
   getLatestStats,
@@ -51,11 +50,34 @@ const LayoutActions = ({
   const router = useIntlRouter();
   const query = searchParams?.get('q');
   const { getSearchResults, setSearchResults } = useSearchHistory();
-
+  const [accountName, setAccountName] = useState<undefined | string>(accountId);
+  const [isLoading, setIsLoading] = useState(true);
   const initializedRef = useRef(false);
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);
     const { RpcProviders } = useRpcProvider();
+
+    useEffect(() => {
+      const manageAccountSession = () => {
+        if (signedAccountId && signedAccountId.length > 0) {
+          const currentCookie = Cookies.get('signedAccountId');
+          if (currentCookie !== signedAccountId) {
+            Cookies.set('signedAccountId', signedAccountId);
+            setAccountName(signedAccountId);
+          }
+          return;
+        }
+        if (!isLoading && (!signedAccountId || signedAccountId.length === 0)) {
+          Cookies.remove('signedAccountId');
+          setAccountName(undefined);
+        }
+      };
+      manageAccountSession();
+      const interval = setInterval(manageAccountSession, 500);
+
+      return () => clearInterval(interval);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [signedAccountId, isLoading]);
 
     useEffect(() => {
       if (!initializedRef.current) {
@@ -71,9 +93,12 @@ const LayoutActions = ({
 
   useEffect(() => {
     if (wallet) {
-      wallet.startUp(setSignedAccountId).catch((error) => {
-        console.error('Error during wallet startup:', error);
-      });
+      wallet
+        .startUp(setSignedAccountId)
+        .catch((error) => {
+          console.error('Error during wallet startup:', error);
+        })
+        .finally(() => setIsLoading(false));
     }
   }, [wallet]);
 
@@ -139,7 +164,7 @@ const LayoutActions = ({
             stats={stats}
             sync={sync}
             theme={theme}
-            token={token}
+            accountId={accountName}
             getLatestStats={getLatestStats}
             getSyncStatus={getSyncStatus}
           />
