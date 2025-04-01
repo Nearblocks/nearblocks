@@ -27,7 +27,7 @@ const ErrorMessage = ({ icons, message, mutedText, reset }: Props) => {
 
       {reset && (
         <button
-          className="mx-3 px-3 mr-1 bg-green dark:bg-green-250 dark:text-neargray-10 py-1 text-xs font-medium rounded-md text-white"
+          className="mx-3 px-3.5 mr-1 bg-green dark:bg-green-250 dark:text-neargray-10 py-1.5 text-xs font-medium rounded-md text-white"
           onClick={() => resetBoundary()}
         >
           Retry

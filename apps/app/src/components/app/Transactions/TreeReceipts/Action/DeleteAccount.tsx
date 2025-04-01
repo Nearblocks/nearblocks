@@ -30,6 +30,7 @@ const DeleteAccount = (props: TransactionActionInfo) => {
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
           href={`/address/${props.args.beneficiary_id}`}
         >
+          {' '}
           {shortenAddress(props.args.beneficiary_id)}
         </Link>
       </div>

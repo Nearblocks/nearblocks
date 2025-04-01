@@ -481,7 +481,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
-            className={'max-w-[200px] whitespace-nowrap top-6 -ml-4'}
+            className={'max-w-[200px] whitespace-nowrap -ml-3'}
             position="bottom"
             tooltip={
               showAge
