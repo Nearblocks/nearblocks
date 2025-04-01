@@ -1,7 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
@@ -17,32 +16,15 @@ const RpcMenu = ({ positionClass }: { positionClass?: string }) => {
   const [isClient, setIsClient] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const { RpcProviders } = useRpcProvider();
-  const initializedRef = useRef(false);
-  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { rpc: rpcUrl, setRpc } = useRpcStoreWithProviders();
+  const { rpc: rpcUrl, setRpc } = useRpcStore();
 
   const handleSelect = (url: string) => {
     setRpc(url);
-    router.refresh();
   };
 
   return (

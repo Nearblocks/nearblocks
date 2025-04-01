@@ -9,6 +9,7 @@ import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
 
 import FaAddressBook from '../../Icons/FaAddressBook';
 import Skeleton from '../../skeleton/common/Skeleton';
+import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {
   id: string;
@@ -19,7 +20,8 @@ interface Props {
 export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const { ftBalanceOf } = useRpc();
-  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const [inventoryLoading, setInventoryLoading] = useState(true);
+  const { rpc: rpcUrl } = useRpcStore();
 
   useEffect(() => {
     function loadBalances() {
@@ -28,8 +30,8 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
         inventoryData?.fts &&
         inventoryData?.fts.filter((f) => id == f.contract);
 
-      if (!fts?.length) {
-        if (fts?.length === 0) setInventoryLoading(false);
+      if (fts?.length === 0) {
+        setInventoryLoading(false);
         return;
       }
 
@@ -41,8 +43,8 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
 
       Promise.all(
         fts.map(async (ft: FtsInfo) => {
-          const rslt = await ftBalanceOf(ft.contract, tokenFilter);
-          return { ...ft, amount: rslt };
+          const rslt = await ftBalanceOf(rpcUrl, ft.contract, tokenFilter);
+          return { ...ft, amount: rslt.data };
         }),
       )
         .then((results: any) => {
@@ -82,10 +84,11 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
             amount: total.toString(),
             tokens: [...pricedTokens, ...tokens],
           });
-
-          setInventoryLoading(false);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => console.error(error))
+        .finally(() => {
+          setInventoryLoading(false);
+        });
     }
 
     loadBalances();
@@ -127,7 +130,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
                 </p>
 
                 {inventoryLoading ? (
-                  <Skeleton className="w-40" />
+                  <Skeleton className="h-4 w-16" />
                 ) : (
                   <p className="text-sm my-1 text-nearblue-600 dark:text-neargray-10">
                     {Number(filterToken?.rpcAmount)
@@ -141,7 +144,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
                   VALUE
                 </p>
                 {inventoryLoading ? (
-                  <Skeleton className="w-40" />
+                  <Skeleton className="h-4 w-16" />
                 ) : (
                   <div className="text-sm my-1 flex text-nearblue-600 dark:text-neargray-10">
                     {ftAmount ? '$' + dollarFormat(ftAmount) : ''}
