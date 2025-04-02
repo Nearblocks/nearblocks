@@ -44,26 +44,47 @@ const FunctionCall = (props: TransactionActionInfo) => {
 
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
-
+    
     let decoded;
-    try {
-      decoded = Buffer.from(args, 'base64');
-    } catch (e) {
-      return '';
+    let decodedStr = '';
+
+    // Handle different input formats
+    if (typeof args === 'string') {
+      // Base64 encoded string
+      try {
+        decoded = Buffer.from(args, 'base64');
+        decodedStr = decoded.toString();
+      } catch (e) {
+        decodedStr = args;
+      }
+    } else if (typeof args === 'object') {
+      // API response format with nested structure
+      if (args.signed && Array.isArray(args.signed)) {
+        // Handle array of signed objects
+        return JSON.stringify(args, null, 2);
+      } else if (args.payload) {
+        // Handle object with payload
+        try {
+          const payload = atob(args.payload);
+          return JSON.stringify(JSON.parse(payload), null, 2);
+        } catch (e) {
+          return JSON.stringify(args, null, 2);
+        }
+      } else {
+        // Fallback to stringify for unknown object structure
+        return JSON.stringify(args, null, 2);
+      }
     }
 
     let pretty = '';
-    const decodedStr = decoded.toString();
-
     if (isValidJson(decodedStr)) {
       try {
         const parsed = JSON.parse(decodedStr);
-
         const parsedWithNestedJSON = parseNestedJSON(parsed);
-
         pretty = JSON.stringify(parsedWithNestedJSON, null, 2);
       } catch (err) {
-        return '';
+        // If JSON parsing fails, use hex representation
+        pretty = hexy(decoded, { format: 'twos' });
       }
     } else {
       pretty = hexy(decoded, { format: 'twos' });

@@ -57,6 +57,7 @@ const TxnsTabActions = ({
   const [receipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
+    console.log({ TXN_STRING: txn });
     const actions: any =
       txn?.transaction?.actions &&
       txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
@@ -118,6 +119,7 @@ const TxnsTabActions = ({
 
   useEffect(() => {
     if (!isEmpty(rpcTxn)) {
+      console.log({ rpcTxn });
       setReceipt(transactionReceipts(rpcTxn));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -345,7 +347,7 @@ const TxnsTabActions = ({
                 {tab === 'execution' && (
                   <Receipt
                     hash={hash}
-                    receipt={receipt}
+                    receipt={apiTxnActionsData?.receiptData}
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}

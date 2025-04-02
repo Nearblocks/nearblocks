@@ -507,6 +507,275 @@ export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
   return txActions;
 }
 
+function createTransactionReceipts(apiResponse: ApiTransaction) {
+  // Extract the first transaction from the response
+
+  // Create a map for receipts and their outcomes
+  const receiptsMap = new Map();
+  const receiptsOutcomeMap = new Map();
+
+  // Process receipts to build the internal data structures
+  apiResponse.receipts.forEach((receipt) => {
+    const receiptId = receipt.receipt_id;
+
+    // Create receipt entry
+    receiptsMap.set(receiptId, {
+      predecessor_id: receipt.predecessor_account_id,
+      priority: 0, // Default priority
+      receipt: {},
+      receipt_id: receiptId,
+      receiver_id: receipt.receiver_account_id,
+    });
+
+    // Create receipt outcome entry
+    receiptsOutcomeMap.set(receiptId, {
+      block_hash: receipt.block.block_hash,
+      id: receiptId,
+      outcome: {
+        executor_id: receipt?.outcome?.executor_account_id,
+        gas_burnt: receipt?.outcome?.gas_burnt,
+        logs: receipt?.outcome?.logs,
+        status: receipt?.outcome?.status ? 'SuccessValue' : 'Failure',
+        tokens_burnt: receipt?.outcome?.tokens_burnt,
+      },
+      proof: [],
+    });
+  });
+
+  // Map actions to the format needed
+  const actions = apiResponse.actions.map((action) => {
+    return {
+      args: action.args_full?.args_json || {},
+      deposit: action.args_full?.deposit || '0',
+      gas: action.args_full?.gas || 0,
+      method_name: action.args_full?.method_name || action.method,
+    };
+  });
+
+  // Construct the transaction data structure
+  const txnData = {
+    TXN_STRING: {
+      final_execution_status: 'FINAL',
+      receipts: Array.from(receiptsMap.values()),
+      receipts_outcome: Array.from(receiptsOutcomeMap.values()),
+      status: {
+        successValue: apiResponse.outcomes.status ? '' : null,
+      },
+      transaction: {
+        actions: actions,
+        hash: apiResponse.transaction_hash,
+        nonce: parseInt(apiResponse.block_timestamp) || 0,
+        priority_fee: 0,
+        public_key:
+          apiResponse.actions[0]?.args_full?.args_json?.signed?.[0]
+            ?.public_key || '',
+        receiver_id: apiResponse.receiver_account_id,
+        signature:
+          apiResponse.actions[0]?.args_full?.args_json?.signed?.[0]
+            ?.signature || '',
+        signer_id: apiResponse.signer_account_id,
+      },
+    },
+  };
+
+  // Use the collectReceipts logic from the original function
+  const collectReceipts = (receiptHash) => {
+    const receipt = receiptsMap.get(receiptHash);
+    const receiptOutcome = receiptsOutcomeMap.get(receiptHash);
+
+    if (!receipt || !receiptOutcome) {
+      return null;
+    }
+
+    // Find outgoing receipts by checking which receipts have this receipt as predecessor
+    const outgoingReceiptIds = [];
+    receiptsMap?.forEach((r, id) => {
+      if (r.predecessor_id === receipt.receiver_id) {
+        outgoingReceiptIds.push(id);
+      }
+    });
+
+    return {
+      ...receipt,
+      ...receiptOutcome,
+      outcome: {
+        ...receiptOutcome.outcome,
+        outgoing_receipts: outgoingReceiptIds
+          .map(collectReceipts)
+          .filter(Boolean),
+      },
+    };
+  };
+
+  // Find the first receipt_id (usually from the main transaction)
+  const firstReceiptId = apiResponse?.receipts[0]?.receipt_id;
+
+  return firstReceiptId ? collectReceipts(firstReceiptId) : null;
+}
+
+function transactionReceiptsFromApi(txn: any) {
+  // Assuming the first transaction in the txns array
+
+  console.log({ API_TXN_STRING: txn });
+
+  // Map actions from the API transaction
+  const actions: any[] = txn.actions?.map(mapApiActionToActions) || [];
+
+  // Create receipt maps for efficient lookup
+  const receiptOutcomesByIdMap = new Map();
+  const receiptsByIdMap = new Map();
+
+  // Populate receipt outcomes map
+  txn.receipts?.forEach((receiptItem) => {
+    receiptsByIdMap.set(receiptItem.receipt_id, {
+      ...receiptItem,
+      actions: receiptItem.receipt_kind === 'ACTION' ? actions : [],
+    });
+
+    // Include outcome if available
+    if (receiptItem.outcome) {
+      receiptOutcomesByIdMap.set(receiptItem.receipt_id, receiptItem.outcome);
+    }
+  });
+
+  // Recursive function to collect receipt details
+  const collectReceipts = (receiptId: string) => {
+    const receipt = receiptsByIdMap.get(receiptId);
+    const receiptOutcome = receiptOutcomesByIdMap.get(receiptId);
+
+    return {
+      ...receipt,
+      outcome: {
+        ...receiptOutcome,
+        // You might want to add additional processing for outgoing receipts if needed
+        outgoing_receipts: [],
+      },
+    };
+  };
+
+  // Return the processed receipt (using the first receipt)
+  return collectReceipts(txn.receipts?.[0]?.receipt_id);
+}
+
+// Helper function to map API actions to a consistent format
+function mapApiActionToActions(action: any) {
+  return {
+    action_kind: action.action,
+    method_name: action.method,
+    args: action.args_full?.args_json || action.args,
+    gas: action.args_full?.gas,
+    deposit: action.args_full?.deposit,
+  };
+}
+
+function apiTransactionReceipts(transaction: ApiTransaction) {
+  // Extract the transaction from the API response
+
+  if (!transaction) return null;
+  console.log({ transaction });
+  const receiptOutcomesByIdMap = new Map();
+  const receiptsByIdMap = new Map();
+
+  // Process all receipts from the API response
+  transaction.receipts?.forEach((receipt) => {
+    // Map receipt to the structure expected in the result
+    receiptsByIdMap.set(receipt.receipt_id, {
+      predecessor_id: receipt.predecessor_account_id,
+      receipt_id: receipt.receipt_id,
+      receiver_id: receipt.receiver_account_id,
+      actions:
+        receipt.receipt_kind === 'ACTION' &&
+        receipt.receipt_id === transaction.receipts[0].receipt_id
+          ? transaction.actions?.map((action) => mapApiActionToAction(action))
+          : [],
+    });
+
+    // Map receipt outcome to the structure expected in the result
+    receiptOutcomesByIdMap.set(receipt.receipt_id, {
+      id: receipt.receipt_id,
+      block_hash: receipt.block?.block_hash,
+      outcome: {
+        executor_id: receipt.outcome?.executor_account_id,
+        gas_burnt: receipt.outcome?.gas_burnt,
+        logs: receipt.outcome?.logs || [],
+        receipt_ids: getOutgoingReceiptIds(
+          receipt.receipt_id,
+          transaction.receipts,
+        ),
+        status: receipt.outcome?.status
+          ? { SuccessValue: '' }
+          : { Failure: receipt.outcome?.status },
+        tokens_burnt: receipt.outcome?.tokens_burnt?.toString(),
+      },
+    });
+  });
+
+  // Add the main transaction to the receipts map if it doesn't exist
+  if (!receiptsByIdMap.has(transaction.receipts[0].receipt_id)) {
+    receiptsByIdMap.set(transaction.receipts[0].receipt_id, {
+      predecessor_id: transaction.signer_account_id,
+      receipt_id: transaction.receipts[0].receipt_id,
+      receiver_id: transaction.receiver_account_id,
+      actions: transaction.actions?.map((action) =>
+        mapApiActionToAction(action),
+      ),
+    });
+  }
+
+  // Helper function to determine which receipt IDs are outgoing from a given receipt
+  function getOutgoingReceiptIds(
+    currentReceiptId: string,
+    allReceipts: any[],
+  ): string[] {
+    // In a real implementation, you would need to know the dependency chain
+    // For now, we'll use a simple heuristic based on the order of receipts in the array
+    const currentIndex = allReceipts.findIndex(
+      (r) => r.receipt_id === currentReceiptId,
+    );
+    if (currentIndex === allReceipts.length - 1) return []; // Last receipt has no outgoing receipts
+
+    return [allReceipts[currentIndex + 1].receipt_id];
+  }
+
+  // Recursive function to collect receipts, similar to the original implementation
+  const collectReceipts = (receiptHash: string) => {
+    const receipt = receiptsByIdMap.get(receiptHash);
+    const receiptOutcome = receiptOutcomesByIdMap.get(receiptHash);
+
+    if (!receipt || !receiptOutcome) return null;
+
+    return {
+      ...receipt,
+      ...receiptOutcome,
+      outcome: {
+        ...receiptOutcome.outcome,
+        outgoing_receipts:
+          receiptOutcome.outcome.receipt_ids
+            ?.map(collectReceipts)
+            .filter(Boolean) || [],
+      },
+    };
+  };
+
+  // Start with the first receipt in the transaction
+  return collectReceipts(transaction.receipts[0].receipt_id);
+}
+
+// Helper function to map API action to the format expected by the existing code
+function mapApiActionToAction(action: any) {
+  if (!action) return null;
+
+  return {
+    action_kind: action.action || action.action_kind,
+    args: action.args_full || {
+      method_name: action.method,
+      args: action.args,
+      gas: action.actions_agg?.gas_attached,
+      deposit: action.actions_agg?.deposit,
+    },
+  };
+}
+
 function processApiAction(action: any, args?: any) {
   if (!action) return {};
   return {
@@ -616,7 +885,10 @@ export async function processTransactionWithTokens(apiTxn: ApiTransaction) {
   const apiActions = apiMainTxnsActions(apiTxn);
   const subActions = apiSubActions(apiTxn);
   const apiActionLogs = apiTxnActionLogs(apiTxn);
-
+  const receiptData = apiTransactionReceipts(apiTxn);
+  const receiptData2 = transactionReceiptsFromApi(apiTxn);
+  console.log({ receiptData2 });
+  console.log({ receiptData });
   const allLogs = (
     apiActions && apiActions?.[0] && apiActions?.[0]?.logs
       ? apiActions?.[0]?.logs
@@ -634,6 +906,8 @@ export async function processTransactionWithTokens(apiTxn: ApiTransaction) {
     apiActionLogs,
     apiActions,
     subActions,
+    receiptData,
+    receiptData2,
     tokenMetadata,
   };
 }

@@ -47,6 +47,7 @@ export default async function TxnsTabs({
   const balanceIndexerStatus =
     syncData && syncData?.status?.indexers?.base?.sync;
   const txnData: ApiTxnData = await processTransactionWithTokens(txn);
+  console.log({ txn });
   return (
     <TxnsTabActions
       hash={hash}

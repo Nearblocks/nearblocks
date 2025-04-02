@@ -159,7 +159,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.receipt.text.0') : 'Receipt'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -183,7 +183,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.status.text.0') : 'Status'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-16 max-w-xl" />
             </div>
@@ -207,7 +207,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
           </div>
-          {!block?.height || loading ? (
+          {!block?.height ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
@@ -242,7 +242,7 @@ const ReceiptRow = (props: Props) => {
               </Tooltip>
               {t ? t('txnDetails.receipts.from.text.0') : 'From'}
             </div>
-            {!receipt || loading ? (
+            {!receipt ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-sm" />
               </div>
@@ -269,7 +269,7 @@ const ReceiptRow = (props: Props) => {
               </Tooltip>
               {t ? t('txnDetails.receipts.to.text.0') : 'To'}
             </div>
-            {!receipt || loading ? (
+            {!receipt ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-xs" />
               </div>
@@ -296,7 +296,7 @@ const ReceiptRow = (props: Props) => {
               ? t('txnDetails.receipts.burnt.text.0')
               : 'Burnt Gas & Tokens by Receipt'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
@@ -330,7 +330,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
@@ -362,7 +362,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             Value
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
@@ -391,7 +391,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
@@ -413,7 +413,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full !h-20" />
             </div>
