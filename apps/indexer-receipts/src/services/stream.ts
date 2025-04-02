@@ -105,6 +105,6 @@ export const onMessage = async (messages: Message[]) => {
     );
     logger.error(error);
     sentry.captureException(error);
-    // process.exit();
+    process.exit();
   }
 };
