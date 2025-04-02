@@ -147,7 +147,7 @@ export const onMessage = async (message: Message) => {
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error('Block processing timed out after 10s')),
-          10_000,
+          30_000,
         ),
       ),
     ]);
