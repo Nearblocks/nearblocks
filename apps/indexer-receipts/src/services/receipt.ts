@@ -1,13 +1,6 @@
-import { difference, uniq } from 'lodash-es';
-
+import { Action, DataReceiver, Receipt as JReceipt, Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
-import {
-  Action,
-  DataReceiver,
-  Receipt as JReceipt,
-  Message,
-} from 'nb-neardata';
 import {
   ActionReceiptAction,
   ActionReceiptInputData,
@@ -18,29 +11,34 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { isDelegateAction } from '#libs/guards';
+import { lru } from '#libs/lru';
 import { receiptHistogram } from '#libs/prom';
-import redis, { redisClient } from '#libs/redis';
-import { mapActionKind, mapReceiptKind } from '#libs/utils';
+import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
-export const storeReceipts = async (knex: Knex, message: Message) => {
+export const storeReceipts = async (knex: Knex, messages: Message[]) => {
   const start = performance.now();
   let receiptData: Receipt[] = [];
   let receiptActionsData: ActionReceiptAction[] = [];
   let receiptInputData: ActionReceiptInputData[] = [];
   let receiptOutputData: ActionReceiptOutputData[] = [];
-  const chunks = message.shards.flatMap((shard) => shard.chunk || []);
+  const shardChunks = messages.flatMap((message) =>
+    message.shards.flatMap((shard) => ({
+      chunk: shard.chunk,
+      header: message.block.header,
+    })),
+  );
 
   await Promise.all(
-    chunks.map(async (chunk) => {
-      if (chunk.receipts.length) {
+    shardChunks.map(async (shardChunk) => {
+      if (shardChunk.chunk && shardChunk.chunk.receipts.length) {
         const receipts = await storeChunkReceipts(
           knex,
-          chunk.header.chunkHash,
-          message.block.header.hash,
-          message.block.header.timestampNanosec,
-          chunk.receipts,
+          shardChunk.chunk.header.chunkHash,
+          shardChunk.header.hash,
+          shardChunk.header.timestampNanosec,
+          shardChunk.chunk.receipts,
         );
 
         receiptData = receiptData.concat(receipts.receiptData);
@@ -233,21 +231,15 @@ const storeChunkReceipts = async (
 };
 
 const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
-  const receiptOrDataIds = uniq(ids);
-  let txnHashes = await retry(async () => {
-    return await fetchTxnHashesFromCache(receiptOrDataIds);
-  });
+  const receiptOrDataIds = [...new Set(ids)];
+  let txnHashes = fetchTxnHashesFromCache(receiptOrDataIds);
 
   if (txnHashes.size === receiptOrDataIds.length) {
     return txnHashes;
   }
 
   logger.warn(
-    {
-      block: blockHash,
-      receiptOrDataIds: receiptOrDataIds,
-      txnHashes: [...txnHashes.keys()],
-    },
+    { block: blockHash },
     'missing parent txn hash(es) in cache... checking in db...',
   );
 
@@ -258,11 +250,12 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
   return txnHashes;
 };
 
-const fetchTxnHashesFromCache = async (receiptOrDataIds: string[]) => {
+const fetchTxnHashesFromCache = (receiptOrDataIds: string[]) => {
   const txnHashes: Map<string, string> = new Map();
-  const hashes = await redisClient.mget(redis.prefixedKeys(receiptOrDataIds));
 
-  hashes.forEach((hash, i) => {
+  receiptOrDataIds.forEach((receiptOrDataId, i) => {
+    const hash = lru.peek(receiptOrDataId);
+
     if (hash) txnHashes.set(receiptOrDataIds[i], hash);
   });
 
@@ -348,7 +341,11 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
 
   throw new Error(
     `missing parent txn hash(es) in db...${JSON.stringify({
+      outcomeReceipts,
+      receiptInputs,
       receiptOrDataIds: difference(receiptOrDataIds, [...txnHashes.keys()]),
+      receiptOutputs,
+      transactions,
     })}`,
   );
 };
