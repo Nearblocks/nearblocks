@@ -21,6 +21,7 @@ import {
 import TokenImage from '../common/TokenImage';
 import { useParams } from 'next/navigation';
 import Skeleton from '../skeleton/common/Skeleton';
+import { useRpcStore } from '@/stores/app/rpc';
 const AccountMoreInfoActions = ({
   accountData: account,
   deploymentData,
@@ -36,8 +37,11 @@ const AccountMoreInfoActions = ({
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [contractLoading, setContractLoading] = useState(true);
   const [isLocked, setIsLocked] = useState<boolean>();
+  const [rpcError, setRpcError] = useState(false);
   const t = useTranslations();
-  const params = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
+  const rpcUrl: string = useRpcStore((state) => state.rpc);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   useEffect(() => {
     if (
@@ -57,6 +61,18 @@ const AccountMoreInfoActions = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountView, status]);
 
+  useEffect(() => {
+    if (rpcError) {
+      try {
+        switchRpc();
+      } catch (error) {
+        setRpcError(true);
+        console.error('Failed to switch RPC:', error);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcError]);
+
   const isContract =
     parse?.contract?.[0]?.contract &&
     Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
@@ -65,19 +81,31 @@ const AccountMoreInfoActions = ({
   useEffect(() => {
     const loadSchema = async () => {
       try {
-        const [code, keys]: any = await Promise.all([
-          contractCode(params?.id).catch((error: any) => {
-            console.log(
-              `Error fetching contract code for ${params?.id}:`,
-              error,
-            );
+        setRpcError(false);
+        setContractLoading(true);
+        let hasError = false;
+        const [code, keys, account]: any = await Promise.all([
+          contractCode(id as string).catch((error: any) => {
+            console.error(`Error fetching contract code for ${id}:`, error);
             return null;
           }),
-          viewAccessKeys(params?.id).catch((error: any) => {
-            console.log(`Error fetching access keys for ${params?.id}:`, error);
+          viewAccessKeys(id).catch((error: any) => {
+            console.log(`Error fetching access keys for ${id}:`, error);
+            hasError = true;
+            return null;
+          }),
+          viewAccount(id).catch((error: any) => {
+            console.log(`Error fetching account for ${id}:`, error);
+            hasError = true;
             return null;
           }),
         ]);
+
+        if (hasError) setRpcError(true);
+
+        if (account) {
+          setAccountView(account);
+        }
 
         if (code && code?.code_base64) {
           setContract({
@@ -89,6 +117,7 @@ const AccountMoreInfoActions = ({
         } else {
           setContract(null);
         }
+
         const locked = (keys?.keys || []).every(
           (key: {
             access_key: {
@@ -104,37 +133,12 @@ const AccountMoreInfoActions = ({
         console.error('Error loading schema:', error);
       } finally {
         setContractLoading(false);
-      }
-    };
-    if (isContract || !parse?.contract) {
-      loadSchema();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.id, parse?.contract]);
-
-  useEffect(() => {
-    const getAccountDetails = async () => {
-      try {
-        const [account]: any = await Promise.all([
-          viewAccount(params?.id).catch(() => {
-            return null;
-          }),
-        ]);
-        if (account) {
-          setAccountView(account);
-        } else {
-          setAccountView(null);
-        }
-      } catch (error) {
-        console.error('Error loading account details:', error);
-        setAccountView(null);
-      } finally {
         setIsAccountLoading(false);
       }
     };
-    getAccountDetails();
+    loadSchema();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  }, [id, status, rpcUrl]);
 
   const accountInfo = status ? accountData : accountView;
   const stakedBalace = status ? accountData?.locked : accountView?.locked;
@@ -266,7 +270,7 @@ const AccountMoreInfoActions = ({
                               />
                               <Link
                                 className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                                href={`/token/${params.id}`}
+                                href={`/token/${id}`}
                               >
                                 <span className="inline-block truncate max-w-[80px] mr-1">
                                   {tokenData.name}
@@ -302,7 +306,7 @@ const AccountMoreInfoActions = ({
                               />
                               <Link
                                 className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                                href={`/nft-token/${params.id}`}
+                                href={`/nft-token/${id}`}
                               >
                                 <span className="inline-block truncate max-w-[80px] mr-1">
                                   {nftTokenData?.name}
@@ -426,7 +430,7 @@ const AccountMoreInfoActions = ({
                             />
                             <Link
                               className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                              href={`/token/${params.id}`}
+                              href={`/token/${id}`}
                             >
                               <span className="inline-block truncate max-w-[80px] mr-1">
                                 {tokenData.name}
@@ -462,7 +466,7 @@ const AccountMoreInfoActions = ({
                             />
                             <Link
                               className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                              href={`/nft-token/${params.id}`}
+                              href={`/nft-token/${id}`}
                             >
                               <span className="inline-block truncate max-w-[80px] mr-1">
                                 {nftTokenData?.name}

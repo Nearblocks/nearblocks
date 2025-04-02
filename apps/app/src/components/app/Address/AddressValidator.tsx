@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import useRpc from '@/hooks/app/useRpc';
 import SponsoredText from '../SponsoredText';
 import { AccountDataInfo, TextAdData } from '@/utils/types';
 import { useParams } from 'next/navigation';
 import { useRpcStore } from '@/stores/app/rpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 
 interface AddressValidatorProps {
   sponsoredText?: TextAdData;
@@ -22,22 +21,10 @@ const AddressValidator = ({
   const [accountValid, setAccountValid] = useState<boolean>(
     () => accountId === params?.id,
   );
-  const initializedRef = useRef(false);
-
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-  const { switchRpc } = useRpcStoreWithProviders();
   const { viewAccount } = useRpc();
+
+  const rpcUrl: any = useRpcStore((state) => state.rpc);
+  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   useEffect(() => {
     if (accountId == null) {
@@ -49,7 +36,7 @@ const AddressValidator = ({
         });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.id, accountData]);
+  }, [params?.id, accountData, rpcUrl]);
 
   if (accountValid === null) {
     return null;

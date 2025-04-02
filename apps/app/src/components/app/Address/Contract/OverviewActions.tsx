@@ -1,12 +1,10 @@
 'use client';
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { AccordionRoot } from '@/components/ui/accordion';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { useRpcStore } from '@/stores/app/rpc';
 import { verifierConfig } from '@/utils/app/config';
 import {
   ContractCodeInfo,
@@ -65,34 +63,10 @@ const OverviewActions = (props: Props) => {
   const [verificationData, setVerificationData] = useState<
     Record<string, VerificationData>
   >({});
-  const [rpcError, setRpcError] = useState(false);
-  const initializedRef = useRef(false);
-
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { switchRpc } = useRpcStoreWithProviders();
-
-  useEffect(() => {
-    if (rpcError) {
-      switchRpc();
-    }
-  }, [rpcError, switchRpc]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setRpcError(false);
         setStatusLoading(true);
         setError(null);
 
@@ -113,7 +87,6 @@ const OverviewActions = (props: Props) => {
           onChainCodeHash: onChainHash,
         });
       } catch (error) {
-        setRpcError(true);
         console.error('Error fetching data:', error);
         setError('Failed to fetch contract data');
       }
