@@ -70,6 +70,6 @@ export const onMessage = async (message: Message) => {
     );
     logger.error(error);
     sentry.captureException(error);
-    // process.exit();
+    process.exit();
   }
 };
