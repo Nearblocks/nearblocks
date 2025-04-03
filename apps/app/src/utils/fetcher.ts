@@ -8,7 +8,7 @@ const fetcher = async (
 ) => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
     const fullUrl = useBase ? `${baseURL}${url}` : url;
 
