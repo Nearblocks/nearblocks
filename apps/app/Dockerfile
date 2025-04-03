@@ -1,4 +1,4 @@
-FROM node:22-alpine as base
+FROM node:22-alpine AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
@@ -7,8 +7,10 @@ COPY . .
 RUN turbo prune app --docker
 
 FROM --platform=$BUILDPLATFORM base AS installer
-RUN apk add git
+RUN apk add --no-cache git python3 py3-pip make g++
 WORKDIR /app
+ARG GITHUB_SHA
+ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_TELEMETRY_DISABLED 1
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
@@ -19,8 +21,6 @@ RUN yarn turbo run build --filter=app...
 
 FROM base AS runner
 WORKDIR /app
-ARG GITHUB_SHA
-ENV GITHUB_SHA=$GITHUB_SHA
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs

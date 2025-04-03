@@ -127,78 +127,72 @@ const receipts = catchAsync(
 
     const txns = await sql`
       SELECT
-        receipts.id,
-        receipts.receipt_id,
-        receipts.originated_from_transaction_hash AS transaction_hash,
-        receipts.predecessor_account_id,
-        receipts.receiver_account_id,
-        ROW_TO_JSON(block) AS block,
-        ROW_TO_JSON(outcome) AS outcome,
+        r.id,
+        r.receipt_id,
+        r.originated_from_transaction_hash AS transaction_hash,
+        r.predecessor_account_id,
+        r.receiver_account_id,
+        TO_JSONB(block) AS block,
+        TO_JSONB(outcome) AS outcome,
         actions.actions AS actions,
-        ROW_TO_JSON(actions_agg) AS actions_agg
+        TO_JSONB(actions_agg) AS actions_agg
       FROM
-        receipts
+        receipts r
         INNER JOIN (${from || to ? intersect : union}) AS tmp using (receipt_id)
         LEFT JOIN LATERAL (
           SELECT
-            block_hash,
-            block_height,
-            block_timestamp::TEXT
+            b.block_hash,
+            b.block_height,
+            b.block_timestamp::TEXT
           FROM
-            blocks
+            blocks b
           WHERE
-            block_hash = receipts.included_in_block_hash
+            b.block_hash = r.included_in_block_hash
         ) block ON TRUE
         LEFT JOIN LATERAL (
           SELECT
-            gas_burnt::TEXT,
-            tokens_burnt::TEXT,
-            executor_account_id,
+            eo.gas_burnt::TEXT,
+            eo.tokens_burnt::TEXT,
+            eo.executor_account_id,
             CASE
-              WHEN status = 'SUCCESS_RECEIPT_ID'
-              OR status = 'SUCCESS_VALUE' THEN TRUE
+              WHEN eo.status = 'SUCCESS_RECEIPT_ID'
+              OR eo.status = 'SUCCESS_VALUE' THEN TRUE
               ELSE FALSE
             END AS status
           FROM
-            execution_outcomes
+            execution_outcomes eo
           WHERE
-            receipt_id = receipts.receipt_id
+            eo.receipt_id = r.receipt_id
         ) outcome ON TRUE
         LEFT JOIN LATERAL (
           SELECT
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
+            JSONB_AGG(
+              JSONB_BUILD_OBJECT(
                 'action',
-                action_receipt_actions.action_kind,
+                ara.action_kind,
                 'method',
-                action_receipt_actions.args ->> 'method_name',
+                ara.args ->> 'method_name',
                 'deposit',
-                COALESCE(
-                  (action_receipt_actions.args ->> 'deposit')::NUMERIC,
-                  0
-                )::TEXT,
-                'fee',
-                COALESCE(execution_outcomes.tokens_burnt, 0)::TEXT,
+                COALESCE((ara.args ->> 'deposit')::NUMERIC, 0)::TEXT,
                 'args',
-                action_receipt_actions.args ->> 'args_json'
+                ara.args ->> 'args_json'
               )
             ) AS actions
           FROM
-            action_receipt_actions
-            JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
+            action_receipt_actions ara
           WHERE
-            action_receipt_actions.receipt_id = receipts.receipt_id
+            ara.receipt_id = r.receipt_id
         ) actions ON TRUE
         LEFT JOIN LATERAL (
           SELECT
-            COALESCE(SUM((args ->> 'deposit')::NUMERIC), 0)::TEXT AS deposit
+            COALESCE(SUM((ara.args ->> 'deposit')::NUMERIC), 0)::TEXT AS deposit
           FROM
-            action_receipt_actions
+            action_receipt_actions ara
           WHERE
-            action_receipt_actions.receipt_id = receipts.receipt_id
+            ara.receipt_id = r.receipt_id
         ) actions_agg ON TRUE
       ORDER BY
-        receipts.id ${sort}
+        r.id ${sort}
     `;
 
     let nextCursor = txns?.[txns?.length - 1]?.id;
@@ -331,16 +325,16 @@ const receiptsExport = catchAsync(
 
     const receipts = await sql`
       SELECT
-        receipts.receipt_id,
-        receipts.originated_from_transaction_hash,
-        receipts.predecessor_account_id,
-        receipts.receiver_account_id,
-        ROW_TO_JSON(block) AS block,
-        ROW_TO_JSON(outcome) AS outcome,
+        r.receipt_id,
+        r.originated_from_transaction_hash,
+        r.predecessor_account_id,
+        r.receiver_account_id,
+        TO_JSONB(block) AS block,
+        TO_JSONB(outcome) AS outcome,
         actions.actions AS actions,
-        ROW_TO_JSON(actions_agg) AS actions_agg
+        TO_JSONB(actions_agg) AS actions_agg
       FROM
-        receipts
+        receipts r
         INNER JOIN (
           SELECT
             r.receipt_id
@@ -360,51 +354,50 @@ const receiptsExport = catchAsync(
         ) AS tmp using (receipt_id)
         LEFT JOIN LATERAL (
           SELECT
-            block_height,
-            block_timestamp::TEXT
+            b.block_height,
+            b.block_timestamp::TEXT
           FROM
-            blocks
+            blocks b
           WHERE
-            block_hash = receipts.included_in_block_hash
+            b.block_hash = r.included_in_block_hash
         ) block ON TRUE
         LEFT JOIN LATERAL (
           SELECT
             CASE
-              WHEN status = 'SUCCESS_RECEIPT_ID'
-              OR status = 'SUCCESS_VALUE' THEN TRUE
+              WHEN eo.status = 'SUCCESS_RECEIPT_ID'
+              OR eo.status = 'SUCCESS_VALUE' THEN TRUE
               ELSE FALSE
             END AS status
           FROM
-            execution_outcomes
+            execution_outcomes eo
           WHERE
-            receipt_id = receipts.receipt_id
+            eo.receipt_id = r.receipt_id
         ) outcome ON TRUE
         LEFT JOIN LATERAL (
           SELECT
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
+            JSONB_AGG(
+              JSONB_BUILD_OBJECT(
                 'action',
-                action_receipt_actions.action_kind,
+                ara.action_kind,
                 'method',
-                action_receipt_actions.args ->> 'method_name'
+                ara.args ->> 'method_name'
               )
             ) AS actions
           FROM
-            action_receipt_actions
-            JOIN execution_outcomes ON execution_outcomes.receipt_id = action_receipt_actions.receipt_id
+            action_receipt_actions ara
           WHERE
-            action_receipt_actions.receipt_id = receipts.receipt_id
+            ara.receipt_id = r.receipt_id
         ) actions ON TRUE
         LEFT JOIN LATERAL (
           SELECT
-            COALESCE(SUM((args ->> 'deposit')::NUMERIC), 0)::TEXT AS deposit
+            COALESCE(SUM((ara.args ->> 'deposit')::NUMERIC), 0)::TEXT AS deposit
           FROM
-            action_receipt_actions
+            action_receipt_actions ara
           WHERE
-            action_receipt_actions.receipt_id = receipts.receipt_id
+            ara.receipt_id = r.receipt_id
         ) actions_agg ON TRUE
       ORDER BY
-        receipts.id ASC
+        r.id ASC
     `;
 
     res.setHeader('Content-Type', 'text/csv');
