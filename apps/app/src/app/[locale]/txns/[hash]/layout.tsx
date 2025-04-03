@@ -74,7 +74,7 @@ export default async function TxnsLayout(props: {
                 <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center text-xs">
                   <a
                     className={`inline-flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                    href={`https://lite.nearblocks.io/txns/${hash}?network=${networkId}`}
+                    href={`https://nearvalidate.org/txns/${hash}?network=${networkId}`}
                     target="_blank"
                   >
                     Validate Transaction

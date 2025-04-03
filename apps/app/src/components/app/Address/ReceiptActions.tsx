@@ -366,7 +366,7 @@ const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
           <span className="uppercase rounded w-10 py-2 h-6 flex items-center justify-center bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
             {t('txnSelf') || 'SELF'}
           </span>
-        ) : params?.id === row.predecessor_account_id ? (
+        ) : params?.id?.toLowerCase() === row.predecessor_account_id ? (
           <span className="uppercase rounded w-10 h-6 flex items-center justify-center bg-yellow-100 dark:bg-yellow-400/[0.10] dark:text-nearyellow-400 dark:border dark:border-yellow-400/60 text-yellow-700 text-xs font-semibold">
             {t('txnOut') || 'OUT'}
           </span>

@@ -121,7 +121,7 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
                     <Link href="/apis">{t('footer.links.api')}</Link>
                   </li>
                   <li>
-                    <Link href="https://lite.nearblocks.io/">
+                    <Link href="https://nearvalidate.org/">
                       <span className="flex">
                         NEAR Validate
                         <span>

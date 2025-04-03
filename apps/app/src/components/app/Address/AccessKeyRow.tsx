@@ -115,7 +115,7 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
         <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10">
           {txn?.transaction_hash ? (
             <Tooltip
-              className={'left-1/4 ml-2 max-w-[200px] w-[150px]'}
+              className={'left-1/2 ml-2 max-w-[200px] w-[150px]'}
               position="top"
               tooltip={txn?.transaction_hash}
             >

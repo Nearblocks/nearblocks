@@ -23,7 +23,8 @@ export default async function AddressIndex(props: {
   const searchParams = await props.searchParams;
   const params = await props.params;
 
-  const { id } = params;
+  const { id: address } = params;
+  const id = address?.toLowerCase();
 
   const { cursor, page, ...rest } = searchParams;
 

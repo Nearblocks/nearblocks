@@ -19,7 +19,7 @@ const AddressValidator = ({
   const params = useParams<{ id: string }>();
   const accountId = accountData?.account?.[0]?.account_id;
   const [accountValid, setAccountValid] = useState<boolean>(
-    () => accountId === params?.id,
+    () => accountId === params?.id?.toLowerCase(),
   );
   const { viewAccount } = useRpc();
 

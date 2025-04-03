@@ -24,19 +24,19 @@ const useRpc = () => {
     provider.query({
       request_type: 'view_code',
       finality: 'final',
-      account_id: address,
+      account_id: address?.toLowerCase(),
     });
 
   const viewAccessKeys = async (address: string) =>
     provider.query({
       request_type: 'view_access_key_list',
       finality: 'final',
-      account_id: address,
+      account_id: address?.toLowerCase(),
     });
 
   const viewAccount = async (accountId: string) =>
     provider.query({
-      account_id: accountId,
+      account_id: accountId?.toLowerCase(),
       finality: 'final',
       request_type: 'view_account',
     });
@@ -58,7 +58,7 @@ const useRpc = () => {
           finality: 'final',
           account_id: contract,
           method_name: 'ft_balance_of',
-          args_base64: encodeArgs({ account_id }),
+          args_base64: encodeArgs({ account_id: account_id?.toLowerCase() }),
         },
       }),
     });
