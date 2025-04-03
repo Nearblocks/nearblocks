@@ -101,7 +101,7 @@ const TokenHoldings = (props: Props) => {
                       >
                         <Link
                           className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
-                          href={`/token/${token?.contract}?a=${props.id}`}
+                          href={`/token/${token?.contract}?a=${props.id?.toLowerCase()}`}
                         >
                           <div key={index}>
                             <div className="flex items-center p-1">

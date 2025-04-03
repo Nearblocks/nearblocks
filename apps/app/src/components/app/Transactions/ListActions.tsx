@@ -523,13 +523,19 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
             className="leading-7 pl-6 text-sm text-nearblue-600 dark:text-neargray-10"
             suppressHydrationWarning={true}
           >
-            {count &&
-              txns?.length > 0 &&
-              `${
-                t('txnsListing', {
-                  count: localFormat ? localFormat(count.toString()) : '',
-                }) || `More than > ${count} transactions found`
-              }`}
+            {modifiedFilter && Object.keys(modifiedFilter).length > 0
+              ? count &&
+                txns?.length > 0 &&
+                `${`A total of ${localFormat(
+                  count.toString(),
+                )} transactions found`}`
+              : count &&
+                txns?.length > 0 &&
+                `${
+                  t('txnsListing', {
+                    count: localFormat ? localFormat(count.toString()) : '',
+                  }) || `More than > ${count} transactions found`
+                }`}
           </p>
         </div>
         {modifiedFilter && Object.keys(modifiedFilter).length > 0 && (

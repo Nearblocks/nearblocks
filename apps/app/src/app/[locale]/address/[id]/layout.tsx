@@ -80,7 +80,7 @@ export default async function AddressLayout(props: {
                             </span>
                             <a
                               className="text-xs"
-                              href={`https://lite.nearblocks.io/address/${id}?network=${networkId}`}
+                              href={`https://lite.nearblocks.io/address/${id?.toLowerCase()}?network=${networkId}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

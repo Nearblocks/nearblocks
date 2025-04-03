@@ -29,7 +29,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
   const [fileDataLoading, setFileDataLoading] = useState(true);
   const [fileDataError, setFileDataError] = useState<null | string>(null);
   const params = useParams<{ id: string }>();
-  const contractId = params?.id;
+  const contractId = params?.id?.toLowerCase();
   const initializedRef = useRef(false);
 
   const useRpcStoreWithProviders = () => {

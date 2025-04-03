@@ -99,22 +99,22 @@ export async function handleExport({
 
     switch (exportType) {
       case 'transactions':
-        url = `v1/account/${id}/txns-only/export?start=${startDate}&end=${endDate}`;
+        url = `v1/account/${id?.toLowerCase()}/txns-only/export?start=${startDate}&end=${endDate}`;
         text = 'Transactions';
         file = `${id}_transactions_${startDate}_${endDate}.csv`;
         break;
       case 'receipts':
-        url = `v2/account/${id}/receipts/export?start=${startDate}&end=${endDate}`;
+        url = `v2/account/${id?.toLowerCase()}/receipts/export?start=${startDate}&end=${endDate}`;
         text = 'Receipts';
         file = `${id}_receipts_${startDate}_${endDate}.csv`;
         break;
       case 'tokentransactions':
-        url = `v1/account/${id}/ft-txns/export?start=${startDate}&end=${endDate}`;
+        url = `v1/account/${id?.toLowerCase()}/ft-txns/export?start=${startDate}&end=${endDate}`;
         text = 'Token Transactions';
         file = `${id}_ft_transactions_${startDate}_${endDate}.csv`;
         break;
       case 'nfttokentransactions':
-        url = `v1/account/${id}/nft-txns/export?start=${startDate}&end=${endDate}`;
+        url = `v1/account/${id?.toLowerCase()}/nft-txns/export?start=${startDate}&end=${endDate}`;
         text = 'NFT Token Transactions';
         file = `${id}_nft_transactions_${startDate}_${endDate}.csv`;
         break;

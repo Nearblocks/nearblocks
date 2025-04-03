@@ -241,7 +241,7 @@ const OverviewActions = (props: Props) => {
             >
               {contractInfo?.methodNames?.map((method: any, index: number) => (
                 <ViewOrChange
-                  id={params?.id}
+                  id={params?.id?.toLowerCase()}
                   index={index}
                   key={index}
                   method={method}
@@ -298,7 +298,7 @@ const OverviewActions = (props: Props) => {
           >
             {schema?.body?.functions?.map((func: any, index: number) => (
               <ViewOrChangeAbi
-                id={params?.id}
+                id={params?.id?.toLowerCase()}
                 index={index}
                 key={index}
                 method={func}
