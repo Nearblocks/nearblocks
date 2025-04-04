@@ -61,7 +61,14 @@ const receiptRpc =
     ? `https://beta.rpc.mainnet.near.org`
     : `https://beta.rpc.testnet.near.org')`;
 
-export const rpcSearch = async (rpcUrl: string, keyword: string) => {
+type SearchResponse =
+  | { data: SearchResult; keyword: string; loading: boolean }
+  | { data: null; loading: boolean };
+
+export const rpcSearch = async (
+  rpcUrl: string,
+  keyword: string,
+): Promise<SearchResponse> => {
   const data: SearchResult = {
     accounts: [],
     blocks: [],
@@ -114,7 +121,13 @@ export const rpcSearch = async (rpcUrl: string, keyword: string) => {
       },
     ];
   }
-  return data;
+  const hasValidData = Object.values(data).some(
+    (value) => Array.isArray(value) && value.length > 0,
+  );
+
+  return hasValidData
+    ? { data, keyword, loading: false }
+    : { data: null, loading: false };
 };
 
 export const getAccount = async (rpc: string, accountId: string) => {
