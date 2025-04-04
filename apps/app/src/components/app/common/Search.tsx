@@ -43,23 +43,26 @@ export const SearchToast = (networkId: NetworkId) => {
 };
 
 export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
-  if (!res) return null;
-  if (res.blocks?.length) {
+  if (res.blocks?.[0]?.block_hash) {
     return { path: res.blocks[0].block_hash, type: 'block' };
   }
-  if (res.txns?.length) {
+
+  if (res.txns?.[0]?.transaction_hash) {
     return { path: res.txns[0].transaction_hash, type: 'txn' };
   }
-  if (res.receipts?.length) {
+
+  if (res.receipts?.[0]?.originated_from_transaction_hash) {
     return {
       path: res.receipts[0].originated_from_transaction_hash,
       type: 'txn',
     };
   }
-  if (res.accounts?.length) {
+
+  if (res.accounts?.[0]?.account_id) {
     return { path: res.accounts[0].account_id, type: 'address' };
   }
-  if (res.tokens?.length) {
+
+  if (res.tokens?.[0]?.contract) {
     return { path: res.tokens[0].contract, type: 'token' };
   }
   return null;
@@ -153,48 +156,35 @@ const Search = ({ disabled, header = false }: any) => {
 
       try {
         const cachedResults = await getSearchResults(keyword, filter);
-
         if (cachedResults) {
           setResult(cachedResults);
-          return;
         }
-
         const data = await handleFilterAndKeyword(keyword, filter);
-
-        if (
-          data &&
-          Object.values(data).some(
-            (value) => Array.isArray(value) && value.length > 0,
-          )
-        ) {
-          setResult(data);
-          setSearchResults(keyword, filter, data);
+        setResult(data?.data ?? {});
+        if (data?.data) {
+          setSearchResults(data?.keyword, filter, data?.data);
         } else {
           if (indexers?.base && !indexers?.base?.sync) {
             const rpcData = await rpcSearch(rpcUrl, keyword);
-
-            if (
-              rpcData &&
-              Object.values(rpcData).some(
-                (arr) => arr.length > 0 && filter !== '/tokens',
-              )
-            ) {
-              setResult(rpcData || {});
-              setSearchResults(keyword, filter, rpcData);
-              return;
+            if (filter !== '/tokens') {
+              setResult(rpcData?.data ?? {});
+              if (rpcData?.data) {
+                setSearchResults(rpcData?.keyword, filter, rpcData?.data);
+                setSearchResults(rpcData?.keyword, filter, rpcData?.data);
+              }
             }
-          }
-
-          const fallbackRpcData = await rpcSearch(rpcUrl, keyword);
-
-          if (
-            fallbackRpcData &&
-            Object.values(fallbackRpcData).some(
-              (arr) => arr.length > 0 && filter !== '/tokens',
-            )
-          ) {
-            setResult(fallbackRpcData || {});
-            setSearchResults(keyword, filter, fallbackRpcData);
+          } else {
+            const fallbackRpcData = await rpcSearch(rpcUrl, keyword);
+            if (filter !== '/tokens') {
+              setResult(fallbackRpcData?.data ?? {});
+              if (fallbackRpcData?.data) {
+                setSearchResults(
+                  fallbackRpcData.keyword,
+                  filter,
+                  fallbackRpcData.data,
+                );
+              }
+            }
           }
         }
       } catch (error) {
@@ -264,22 +254,23 @@ const Search = ({ disabled, header = false }: any) => {
       return toast.error(SearchToast(networkId));
     }
 
-    const cachedResults = await getSearchResults(keyword, filter);
+    const cachedResults = await getSearchResults(query, filter);
 
     if (cachedResults) {
       return redirect(getSearchRoute(cachedResults));
     } else {
       const data = await handleFilterAndKeyword(query, filter);
-      const route = getSearchRoute(data);
-
+      const route = data?.data && getSearchRoute(data?.data);
       if (route) {
-        setSearchResults(keyword, filter, data);
+        setSearchResults(data?.keyword, filter, data?.data);
         return redirect(route);
       } else {
+        setIsLoading(true);
         const rpcData = await rpcSearch(rpcUrl, query);
-        const rpcRoute = getSearchRoute(rpcData);
+        const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
+        setIsLoading(rpcData?.loading);
         if (rpcRoute) {
-          setSearchResults(keyword, filter, rpcData);
+          setSearchResults(rpcData?.keyword, filter, rpcData?.data);
           return redirect(rpcRoute);
         } else {
           return toast.error(SearchToast(networkId));

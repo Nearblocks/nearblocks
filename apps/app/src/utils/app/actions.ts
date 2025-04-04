@@ -43,7 +43,12 @@ export async function getUserRole(userRole?: 'publisher' | 'advertiser') {
   return role;
 }
 
-export async function handleFilterAndKeyword(keyword: string, filter: string) {
+type SearchResponse = { data: SearchResult; keyword: string } | { data: null };
+
+export async function handleFilterAndKeyword(
+  keyword: string,
+  filter: string,
+): Promise<SearchResponse> {
   'use server';
 
   try {
@@ -80,9 +85,12 @@ export async function handleFilterAndKeyword(keyword: string, filter: string) {
     if (res?.tokens?.length) {
       data.tokens = res.tokens;
     }
-    return data;
+    const hasValidData = Object.values(data).some(
+      (value) => Array.isArray(value) && value.length > 0,
+    );
+    return hasValidData ? { data, keyword } : { data: null };
   } catch (error) {
-    return null;
+    return { data: null };
   }
 }
 

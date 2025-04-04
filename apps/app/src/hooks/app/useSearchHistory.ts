@@ -12,13 +12,10 @@ const useSearchHistory = () => {
     results: SearchResult,
   ): Promise<void> => {
     if (!results || Object.keys(results).length === 0) return;
+    if (!query.trim()) return;
     const cacheKey = `${filter}:${query}`;
     const cache = await caches.open('search-cache');
-    const cacheData = {
-      query,
-      filter,
-      results,
-    };
+    const cacheData = { query, filter, results };
     if (isClient) {
       const url = new URL(cacheKey, baseUrl);
       const request = new Request(url.toString());
@@ -31,6 +28,7 @@ const useSearchHistory = () => {
     query: string,
     filter: string,
   ): Promise<SearchResult | null> => {
+    if (!query.trim()) return null;
     const cacheKey = `${filter}:${query}`;
     const cache = await caches.open('search-cache');
     if (isClient) {

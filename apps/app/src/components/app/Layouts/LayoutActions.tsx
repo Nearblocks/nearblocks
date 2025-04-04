@@ -124,15 +124,15 @@ const LayoutActions = ({
         return redirect(getSearchRoute(cachedResults));
       } else {
         const data = await handleFilterAndKeyword(keyword, '');
-        const route = getSearchRoute(data);
+        const route = data?.data && getSearchRoute(data?.data);
         if (route) {
-          setSearchResults(keyword, '', data);
+          setSearchResults(data?.keyword, '', data?.data);
           return redirect(route);
         } else {
           const rpcData = await rpcSearch(rpcUrl, keyword);
-          const rpcRoute = getSearchRoute(rpcData);
+          const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
           if (rpcRoute) {
-            setSearchResults(keyword, '', rpcData);
+            setSearchResults(rpcData?.keyword, '', rpcData?.data);
             return redirect(rpcRoute);
           } else {
             return toast.error(SearchToast(networkId));
