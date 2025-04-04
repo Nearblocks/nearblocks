@@ -1,7 +1,5 @@
 import { cleanEnv, str } from 'envalid';
 
-import { Network } from 'nb-types';
-
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
@@ -10,9 +8,6 @@ const env = cleanEnv(process.env, {
   DATABASE_URL: str(),
   JWT_SECRET: str(),
   LOGO_URL: str({ default: '' }),
-  NETWORK: str({
-    choices: [Network.MAINNET, Network.TESTNET],
-  }),
   REDIS_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_NAME: str({ default: '' }),
   REDIS_SENTINEL_PASSWORD: str({ default: '' }),
@@ -31,7 +26,6 @@ const config: Config = {
   dbUrl: env.DATABASE_URL,
   jwtSecret: env.JWT_SECRET,
   logoUrl: env.LOGO_URL,
-  network: env.NETWORK,
   port: 3008,
   redisPassword: env.REDIS_PASSWORD,
   redisSentinelName: env.REDIS_SENTINEL_NAME,
