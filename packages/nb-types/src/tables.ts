@@ -197,6 +197,7 @@ export type ExecutionOutcome = {
   index_in_chunk: number;
   logs: JsonValue;
   receipt_id: string;
+  result: JsonValue;
   shard_id: number;
   status: ExecutionOutcomeStatus;
   tokens_burnt: string;
