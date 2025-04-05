@@ -76,18 +76,17 @@ export const mapActionKind = (action: Action): ReceiptAction => {
 
   if (isFunctionCallAction(action)) {
     let jsonArgs = null;
-    let base64Args = null;
 
     try {
       jsonArgs = decodeArgs(action.FunctionCall.args);
       rlpHash = getRlpHash(action.FunctionCall.methodName, jsonArgs);
     } catch (error) {
-      base64Args = action.FunctionCall.args;
+      //
     }
 
     kind = ActionKind.FUNCTION_CALL;
     args = {
-      args_base64: base64Args,
+      args_base64: jsonArgs === null ? action.FunctionCall.args : null,
       args_json: jsonArgs,
       deposit: action.FunctionCall.deposit,
       gas: action.FunctionCall.gas,
@@ -208,4 +207,8 @@ export const getBatchSize = (timestamp: string): number => {
   const msTime = +timestamp / 1e6;
 
   return Date.now() - msTime > msLimit ? 5 : 1;
+};
+
+export const getExecutionResult = (status: ExecutionStatus) => {
+  return jsonStringify(Object.values(status)[0]);
 };

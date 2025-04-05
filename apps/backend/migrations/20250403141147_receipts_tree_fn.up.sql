@@ -3,7 +3,7 @@ OR REPLACE FUNCTION jsonb_to_text (j JSONB) RETURNS JSONB LANGUAGE plpgsql IMMUT
 DECLARE
   result JSONB;
 BEGIN
-  CASE jsonb_typeof(j)
+  CASE JSONB_TYPEOF(j)
     WHEN 'object' THEN
       SELECT JSONB_OBJECT_AGG(key, jsonb_to_text(value))
       INTO result
@@ -13,7 +13,7 @@ BEGIN
       INTO result
       FROM JSONB_ARRAY_ELEMENTS(j) AS value;
     WHEN 'number' THEN
-      result := to_jsonb(j::TEXT);
+      result := TO_JSONB(j::TEXT);
     ELSE
       result := j;
   END CASE;
@@ -44,7 +44,7 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT) RETURNS JSONB LANGUAGE SQL 
         'block_height', b.block_height,
         'block_timestamp', b.block_timestamp::TEXT
       ),
-      'outome', JSONB_BUILD_OBJECT(
+      'outcome', JSONB_BUILD_OBJECT(
         'gas_burnt', eo.gas_burnt::TEXT,
         'tokens_burnt', eo.tokens_burnt::TEXT,
         'executor_account_id', eo.executor_account_id,
