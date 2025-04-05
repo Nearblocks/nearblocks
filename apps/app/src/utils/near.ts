@@ -19,7 +19,9 @@ import {
   ParsedReceipt,
   ParseOutcomeInfo,
   ProcessedTokenMeta,
+  ReceiptApiResponse,
   ReceiptsInfo,
+  ReceiptTree,
   ReceiptView,
   RPCCompilationError,
   RPCFunctionCallError,
@@ -27,6 +29,7 @@ import {
   RPCNewReceiptValidationError,
   RPCTransactionInfo,
   TransactionLog,
+  TransformedReceipt,
   TxExecutionError,
 } from '@/utils/types';
 import { intentsAddressList, supportedNetworks } from './app/config';
@@ -507,6 +510,70 @@ export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
   return txActions;
 }
 
+export const transformReceiptData = (
+  apiData: ReceiptApiResponse | null,
+): TransformedReceipt | null => {
+  if (!apiData || !apiData.receipts || !apiData.receipts.length) {
+    return null;
+  }
+
+  const transformReceipt = (
+    receiptTree: ReceiptTree | undefined,
+  ): TransformedReceipt | null => {
+    if (!receiptTree) return null;
+
+    const outgoingReceipts = receiptTree.receipts
+      ? receiptTree.receipts
+          .map((childReceipt) => transformReceipt(childReceipt))
+          .filter((receipt): receipt is TransformedReceipt => receipt !== null)
+      : [];
+
+    const receipt: TransformedReceipt = {
+      receipt_id: receiptTree.receipt_id,
+      predecessor_id: receiptTree.predecessor_account_id,
+      receiver_id: receiptTree.receiver_account_id,
+      block_hash: receiptTree.block?.block_hash,
+      actions: receiptTree.actions?.map((action) => ({
+        ...action,
+        args: {
+          ...action.args,
+          deposit: action.args?.deposit || '0',
+        },
+      })),
+      outcome: {
+        logs: receiptTree.outcome?.logs || [],
+        status: convertStatus(receiptTree.outcome?.status),
+        gas_burnt: receiptTree.outcome?.gas_burnt,
+        tokens_burnt: receiptTree.outcome?.tokens_burnt,
+        executor_account_id: receiptTree.outcome?.executor_account_id,
+        outgoing_receipts: outgoingReceipts,
+      },
+      public_key: receiptTree.public_key,
+    };
+
+    return receipt;
+  };
+
+  const convertStatus = (
+    status: any,
+  ): {
+    SuccessValue?: string;
+    SuccessReceiptId?: string;
+    Failure?: { error_message: string };
+  } => {
+    if (status === true) {
+      return { SuccessValue: '' };
+    } else if (status === false) {
+      return { Failure: { error_message: 'Transaction failed' } };
+    } else {
+      return status;
+    }
+  };
+
+  const rootReceipt = apiData.receipts[0].receipt_tree;
+  return transformReceipt(rootReceipt);
+};
+
 function processApiAction(action: any, args?: any) {
   if (!action) return {};
   return {
@@ -611,12 +678,15 @@ async function processTokenMetadata(
   return processedTokens;
 }
 
-export async function processTransactionWithTokens(apiTxn: ApiTransaction) {
+export async function processTransactionWithTokens(
+  apiTxn: ApiTransaction,
+  receipt: ReceiptApiResponse,
+) {
   const logs = apiTxnLogs(apiTxn);
   const apiActions = apiMainTxnsActions(apiTxn);
   const subActions = apiSubActions(apiTxn);
   const apiActionLogs = apiTxnActionLogs(apiTxn);
-
+  const receiptData = transformReceiptData(receipt);
   const allLogs = (
     apiActions && apiActions?.[0] && apiActions?.[0]?.logs
       ? apiActions?.[0]?.logs
@@ -634,6 +704,7 @@ export async function processTransactionWithTokens(apiTxn: ApiTransaction) {
     apiActionLogs,
     apiActions,
     subActions,
+    receiptData,
     tokenMetadata,
   };
 }

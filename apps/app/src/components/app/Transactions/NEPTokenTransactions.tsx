@@ -48,7 +48,6 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({
                   : parsedEvent;
 
                 return eventData?.data?.flatMap((data: any, j: number) => {
-                  console.log({ data });
                   const contracts = Array.isArray(data?.token_ids)
                     ? data?.token_ids.map(
                         (tokenId: string) => tokenId?.split(':')[1],
@@ -323,7 +322,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
             const contract = item?.token?.split(':')[1];
 
             const meta = tokenMetadata?.filter(
-              (meta: any) => meta.contractId === contract,
+              (meta: any) => meta?.contractId === contract,
             );
             return (
               <div
@@ -331,7 +330,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
                 className="flex flex-wrap break-all leading-7"
               >
                 <div className="cursor-pointer flex items-center">
-                  {item.address !== 'system' ? (
+                  {item?.address !== 'system' ? (
                     <AddressOrTxnsLink
                       className="text-green-500 dark:text-green-250 font-normal pl-1 h-6 flex items-center"
                       currentAddress={item?.address}
