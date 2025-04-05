@@ -46,24 +46,38 @@ const FunctionCall = (props: TransactionActionInfo) => {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
 
     let decoded;
-    try {
-      decoded = Buffer.from(args, 'base64');
-    } catch (e) {
-      return '';
+    let decodedStr = '';
+    if (typeof args === 'string') {
+      try {
+        decoded = Buffer.from(args, 'base64');
+        decodedStr = decoded.toString();
+      } catch (e) {
+        decodedStr = args;
+      }
+    } else if (typeof args === 'object') {
+      if (args.signed && Array.isArray(args.signed)) {
+        return JSON.stringify(args, null, 2);
+      } else if (args.payload) {
+        try {
+          const payload = atob(args.payload);
+          return JSON.stringify(JSON.parse(payload), null, 2);
+        } catch (e) {
+          return JSON.stringify(args, null, 2);
+        }
+      } else {
+        return JSON.stringify(args, null, 2);
+      }
     }
 
     let pretty = '';
-    const decodedStr = decoded.toString();
-
     if (isValidJson(decodedStr)) {
       try {
         const parsed = JSON.parse(decodedStr);
-
         const parsedWithNestedJSON = parseNestedJSON(parsed);
-
         pretty = JSON.stringify(parsedWithNestedJSON, null, 2);
       } catch (err) {
-        return '';
+        // If JSON parsing fails, use hex representation
+        pretty = hexy(decoded, { format: 'twos' });
       }
     } else {
       pretty = hexy(decoded, { format: 'twos' });
@@ -77,10 +91,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
       ? { tx_bytes_b64: args.args_base64 || args.args }
       : args.args_base64 || args.args;
 
-  const decodedData = args?.args_base64 || args?.args;
+  const decodedData = args?.args_base64 || args?.args || args?.args_json;
   const jsonStringifiedData = displayArgs(decodedData);
   const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
-
   return (
     <div className="py-1">
       <FaCode className="inline-flex text-yellow-500 mr-1" />
@@ -140,7 +153,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
                 !isExpanded ? 'h-[8rem]' : ''
               }`}
             >
-              {actionLogData}
+              {typeof actionLogData === 'object'
+                ? JSON.stringify(actionLogData)
+                : actionLogData}
             </div>
           </div>
         </>

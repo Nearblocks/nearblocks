@@ -349,6 +349,7 @@ const TxnsTabActions = ({
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}
+                    apiTxnActionsData={apiTxnActionsData}
                   />
                 )}
                 {tab === 'enhanced' && (
