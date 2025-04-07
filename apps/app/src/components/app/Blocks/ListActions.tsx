@@ -105,7 +105,7 @@ const ListActions = ({
           </Link>
         </span>
       ),
-      header: <span>{'TXN'}</span>,
+      header: <span>{t('block.txns') || 'TXNS'}</span>,
       key: 'count',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
@@ -120,7 +120,7 @@ const ListActions = ({
             : row?.receipts_agg?.count ?? ''}
         </span>
       ),
-      header: <span>{t('block.receipt') || 'RECEIPT'}</span>,
+      header: <span>{t('block.receipts') || 'RECEIPTS'}</span>,
       key: 'count',
       tdClassName:
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
