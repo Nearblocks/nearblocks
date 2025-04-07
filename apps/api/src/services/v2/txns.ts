@@ -270,7 +270,7 @@ const txnReceipts = catchAsync(
           ara.nep518_rlp_hash = ${hash}
         LIMIT
           1
-      `;
+      `.values();
 
       return res.status(200).json({ receipts });
     }
@@ -279,9 +279,9 @@ const txnReceipts = catchAsync(
       ${txnQuery}
       WHERE
         t.transaction_hash = ${hash}
-    `;
+    `.values();
 
-    return res.status(200).json({ receipts });
+    return res.status(200).json({ receipts: receipts?.[0] || [] });
   },
 );
 
