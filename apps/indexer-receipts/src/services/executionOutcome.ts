@@ -5,7 +5,11 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { outcomeHistogram } from '#libs/prom';
-import { jsonStringify, mapExecutionStatus } from '#libs/utils';
+import {
+  getExecutionResult,
+  jsonStringify,
+  mapExecutionStatus,
+} from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
@@ -117,6 +121,7 @@ const getExecutionOutcomeData = (
   index_in_chunk: indexInChunk,
   logs: jsonStringify(outcome.executionOutcome.outcome.logs),
   receipt_id: outcome.executionOutcome.id,
+  result: getExecutionResult(outcome.executionOutcome.outcome.status),
   shard_id: shardId,
   status: mapExecutionStatus(outcome.executionOutcome.outcome.status),
   tokens_burnt: outcome.executionOutcome.outcome.tokensBurnt,

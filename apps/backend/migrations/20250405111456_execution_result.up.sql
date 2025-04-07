@@ -1,0 +1,2 @@
+ALTER TABLE execution_outcomes
+ADD COLUMN IF NOT EXISTS result JSONB NULL;
