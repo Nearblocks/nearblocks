@@ -13,7 +13,7 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  RECEIPTS_START_BLOCK: num({ default: 0 }),
+  RECEIPTS_RESYNC_START_BLOCK: num({ default: 0 }),
   S3_ACCESS_KEY: str(),
   S3_BUCKET: str({ default: '' }),
   S3_ENDPOINT: url(),
@@ -38,7 +38,7 @@ const config: Config = {
   s3Region: env.S3_REGION,
   s3SecretKey: env.S3_SECRET_KEY,
   sentryDsn: env.SENTRY_DSN,
-  startBlockHeight: env.RECEIPTS_START_BLOCK,
+  startBlockHeight: env.RECEIPTS_RESYNC_START_BLOCK,
 };
 
 export default config;

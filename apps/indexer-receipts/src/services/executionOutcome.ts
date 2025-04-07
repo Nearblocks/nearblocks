@@ -45,7 +45,7 @@ export const storeExecutionOutcomes = async (
           await knex('execution_outcomes')
             .insert(batch)
             .onConflict(['receipt_id'])
-            .ignore();
+            .merge();
         }),
       );
     }

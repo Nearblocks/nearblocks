@@ -79,7 +79,7 @@ export const storeReceipts = async (knex: Knex, messages: Message[]) => {
           await knex('action_receipt_actions')
             .insert(batch)
             .onConflict(['receipt_id', 'index_in_action_receipt'])
-            .ignore();
+            .merge();
         }),
       );
     }

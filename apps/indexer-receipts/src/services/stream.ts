@@ -11,7 +11,7 @@ import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 
-const indexerKey = 'receipts';
+const indexerKey = 'receipts-resync';
 const s3Config = {
   credentials: {
     accessKeyId: config.s3AccessKey,
