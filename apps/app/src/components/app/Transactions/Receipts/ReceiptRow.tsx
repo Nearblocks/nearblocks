@@ -23,6 +23,7 @@ import useRpc from '@/hooks/app/useRpc';
 interface Props {
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
+  rpcReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -31,7 +32,7 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData } = props;
+  const { borderFlag, receipt, statsData, rpcReceipt } = props;
 
   const t = useTranslations();
   const [pageHash] = useHash();
@@ -45,7 +46,7 @@ const ReceiptRow = (props: Props) => {
   const [block, setBlock] = useState<{ height: string }>({ height: '' });
   const { getBlockDetails } = useRpc();
 
-  const status = receipt?.outcome?.status;
+  const status = rpcReceipt?.outcome?.status;
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
@@ -181,7 +182,7 @@ const ReceiptRow = (props: Props) => {
             ? ''
             : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
         }
-        id={`${receipt?.receipt_id}`}
+        id={`${receipt?.receipt_id}-${rpcReceipt?.receipt_id}`}
       >
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -392,19 +393,19 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt ? (
+          {!rpcReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
             </div>
-          ) : receipt?.actions ? (
+          ) : rpcReceipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {receipt &&
-                receipt?.actions?.map((action: any, i: number) => (
+              {rpcReceipt &&
+                rpcReceipt?.actions?.map((action: any, i: number) => (
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={receipt?.receiver_id}
+                    receiver={rpcReceipt?.receiver_id}
                   />
                 ))}
             </div>
@@ -453,13 +454,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt ? (
+          {!rpcReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt ? <ReceiptStatus receipt={receipt} /> : ''}
+              {rpcReceipt ? <ReceiptStatus receipt={rpcReceipt} /> : ''}
             </div>
           )}
         </div>
@@ -532,13 +533,24 @@ const ReceiptRow = (props: Props) => {
       </div>
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <div className="pb-4">
-          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
-            <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
-              <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
+          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
+            const matchingRpcReceipt =
+              rpcReceipt?.outcome?.outgoing_receipts?.find(
+                (rpcRcpt: any) => rpcRcpt?.receipt_id === rcpt?.receipt_id,
+              );
+            return (
+              <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
+                <div className="mx-4 border-l-4 border-l-gray-200">
+                  <ReceiptRow
+                    borderFlag
+                    receipt={rcpt}
+                    statsData={statsData}
+                    rpcReceipt={matchingRpcReceipt || null}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -63,7 +63,11 @@ const Receipt = (props: Props) => {
               </div>
             </div>
           ) : (
-            <ReceiptRow receipt={receipt} statsData={statsData} />
+            <ReceiptRow
+              receipt={receipt}
+              statsData={statsData}
+              rpcReceipt={rpcReceipt}
+            />
           )}
         </div>
       )}
