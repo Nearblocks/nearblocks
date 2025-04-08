@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useConfig } from '@/hooks/app/useConfig';
 import useHash from '@/hooks/app/useHash';
 import { Link } from '@/i18n/routing';
-import { fiatValue } from '@/utils/app/libs';
+import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
@@ -23,6 +23,7 @@ import useRpc from '@/hooks/app/useRpc';
 interface Props {
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
+  rpcReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -31,10 +32,10 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData } = props;
+  const { borderFlag, receipt, statsData, rpcReceipt } = props;
+
   const t = useTranslations();
   const [pageHash] = useHash();
-  const loading = false;
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
   const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
   const rowRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +46,7 @@ const ReceiptRow = (props: Props) => {
   const [block, setBlock] = useState<{ height: string }>({ height: '' });
   const { getBlockDetails } = useRpc();
 
-  const status = receipt?.outcome?.status;
+  const status = rpcReceipt?.outcome?.status;
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
@@ -100,7 +101,6 @@ const ReceiptRow = (props: Props) => {
     receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
       ? receipt.outcome.logs.filter(Boolean)
       : [];
-
   const receiptLog =
     viewMode === 'raw'
       ? logs
@@ -119,16 +119,53 @@ const ReceiptRow = (props: Props) => {
       : logs
           .map((log: any) => {
             if (typeof log === 'string') {
-              const match = log.match(/EVENT_JSON:({.*})/);
-              if (match) {
+              if (log.includes('EVENT_JSON:')) {
                 try {
-                  const parsed = JSON.parse(match[1]);
+                  const jsonPart = log.substring(
+                    log.indexOf('EVENT_JSON:') + 'EVENT_JSON:'.length,
+                  );
+
+                  try {
+                    const parsed = JSON.parse(jsonPart);
+                    return JSON.stringify(parsed, null, 2);
+                  } catch (directParseError) {
+                    const normalized = jsonPart
+                      .replace(/\\\\/g, '\\')
+                      .replace(/\\"/g, '"')
+                      .replace(/^"|"$/g, '');
+
+                    try {
+                      const parsed = JSON.parse(normalized);
+                      return JSON.stringify(parsed, null, 2);
+                    } catch (normalizeError) {
+                      const possibleJson = jsonPart.match(/\{.*\}/);
+                      if (possibleJson) {
+                        try {
+                          const parsed = JSON.parse(possibleJson[0]);
+                          return JSON.stringify(parsed, null, 2);
+                        } catch (matchError) {
+                          console.error(
+                            'All parsing attempts failed:',
+                            matchError,
+                          );
+                          return `${log}`;
+                        }
+                      }
+                      return `${log}`;
+                    }
+                  }
+                } catch (error) {
+                  console.error('Failed to process EVENT_JSON:', error);
+                  return `${log}`;
+                }
+              } else {
+                try {
+                  const parsed = JSON.parse(log);
                   return JSON.stringify(parsed, null, 2);
                 } catch (error) {
                   return `${log}`;
                 }
               }
-              return log;
             }
             return `${log}`;
           })
@@ -145,7 +182,7 @@ const ReceiptRow = (props: Props) => {
             ? ''
             : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
         }
-        id={`${receipt?.receipt_id}`}
+        id={`${receipt?.receipt_id}-${rpcReceipt?.receipt_id}`}
       >
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -159,7 +196,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.receipt.text.0') : 'Receipt'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -183,7 +220,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.status.text.0') : 'Status'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-16 max-w-xl" />
             </div>
@@ -207,7 +244,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
           </div>
-          {!block?.height || loading ? (
+          {!block?.height ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
@@ -242,7 +279,7 @@ const ReceiptRow = (props: Props) => {
               </Tooltip>
               {t ? t('txnDetails.receipts.from.text.0') : 'From'}
             </div>
-            {!receipt || loading ? (
+            {!receipt ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-sm" />
               </div>
@@ -252,6 +289,32 @@ const ReceiptRow = (props: Props) => {
                   copy
                   currentAddress={receipt?.predecessor_id}
                 />
+                {(receipt?.receipt?.Action?.signer_public_key &&
+                  receipt?.receipt?.Action?.signer_id) ||
+                  (receipt?.predecessor_id && receipt?.public_key && (
+                    <Tooltip
+                      tooltip={'Access key used for this receipt'}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    >
+                      <span>
+                        &nbsp;
+                        <Link
+                          href={`/address/${
+                            receipt?.predecessor_id ||
+                            receipt?.receipt?.Action?.signer_id
+                          }?tab=accesskeys`}
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
+                        >
+                          (
+                          {shortenAddress(
+                            receipt?.public_key ||
+                              receipt?.receipt?.Action?.signer_public_key,
+                          )}
+                          )
+                        </Link>
+                      </span>
+                    </Tooltip>
+                  ))}
               </div>
             ) : (
               ''
@@ -269,7 +332,7 @@ const ReceiptRow = (props: Props) => {
               </Tooltip>
               {t ? t('txnDetails.receipts.to.text.0') : 'To'}
             </div>
-            {!receipt || loading ? (
+            {!receipt ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-xs" />
               </div>
@@ -296,7 +359,7 @@ const ReceiptRow = (props: Props) => {
               ? t('txnDetails.receipts.burnt.text.0')
               : 'Burnt Gas & Tokens by Receipt'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
@@ -330,19 +393,19 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt || loading ? (
+          {!rpcReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
             </div>
-          ) : receipt?.actions ? (
+          ) : rpcReceipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {receipt &&
-                receipt?.actions?.map((action: any, i: number) => (
+              {rpcReceipt &&
+                rpcReceipt?.actions?.map((action: any, i: number) => (
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={receipt?.receiver_id}
+                    receiver={rpcReceipt?.receiver_id}
                   />
                 ))}
             </div>
@@ -362,7 +425,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             Value
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
@@ -391,13 +454,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt || loading ? (
+          {!rpcReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt ? <ReceiptStatus receipt={receipt} /> : ''}
+              {rpcReceipt ? <ReceiptStatus receipt={rpcReceipt} /> : ''}
             </div>
           )}
         </div>
@@ -413,7 +476,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full !h-20" />
             </div>
@@ -470,13 +533,24 @@ const ReceiptRow = (props: Props) => {
       </div>
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <div className="pb-4">
-          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
-            <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
-              <div className="mx-4 border-l-4 border-l-gray-200">
-                <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
+          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
+            const matchingRpcReceipt =
+              rpcReceipt?.outcome?.outgoing_receipts?.find(
+                (rpcRcpt: any) => rpcRcpt?.receipt_id === rcpt?.receipt_id,
+              );
+            return (
+              <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
+                <div className="mx-4 border-l-4 border-l-gray-200">
+                  <ReceiptRow
+                    borderFlag
+                    receipt={rcpt}
+                    statsData={statsData}
+                    rpcReceipt={matchingRpcReceipt || null}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

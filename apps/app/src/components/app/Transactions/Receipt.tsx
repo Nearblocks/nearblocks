@@ -1,6 +1,6 @@
 'use client';
 
-import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
@@ -18,10 +18,20 @@ interface Props {
     }>;
   };
   txn: TransactionInfo;
+  apiTxnActionsData: ApiTxnData;
 }
 
 const Receipt = (props: Props) => {
-  const { hash, receipt, statsData, txn } = props;
+  const {
+    hash,
+    receipt: rpcReceipt,
+    statsData,
+    txn,
+    apiTxnActionsData,
+  } = props;
+  const receipt = !apiTxnActionsData?.receiptData
+    ? rpcReceipt
+    : apiTxnActionsData?.receiptData;
 
   const txnsPending = txn?.outcomes?.status === null;
 
@@ -53,7 +63,11 @@ const Receipt = (props: Props) => {
               </div>
             </div>
           ) : (
-            <ReceiptRow receipt={receipt} statsData={statsData} />
+            <ReceiptRow
+              receipt={receipt}
+              statsData={statsData}
+              rpcReceipt={rpcReceipt}
+            />
           )}
         </div>
       )}
