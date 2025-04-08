@@ -574,6 +574,15 @@ export type ArgsPropsInfo = {
   args: string;
   args_base64: string;
   beneficiary_id: string;
+  args_json: {
+    holding_account_id?: string;
+    steps_batch?: any[];
+    amounts?: any[];
+    amount?: string;
+    fee?: string;
+    fee_account_id?: string;
+    receiver_id?: string;
+  };
   delegate_action: {
     actions: {
       FunctionCall: {
@@ -593,6 +602,7 @@ export type ArgsPropsInfo = {
   method_name: string;
   public_key: string;
   stake: string;
+  sender_id: string;
 };
 
 export type TransactionActionInfo = {
@@ -1908,6 +1918,7 @@ export type ApiTxnData = {
   apiActions: ActionInfo[];
   subActions: ActionInfo[];
   tokenMetadata: ProcessedTokenMeta[];
+  receiptData: TransformedReceipt | null;
 };
 
 export type TransactionData = {
@@ -1977,4 +1988,85 @@ export type ApiReceipt = {
   };
   fts: any[];
   nfts: any[];
+};
+
+export type ReceiptTree = {
+  receipt_id: string;
+  predecessor_account_id: string;
+  receiver_account_id: string;
+  public_key: string;
+
+  block?: {
+    block_hash: string;
+    block_height: number;
+    block_timestamp: string;
+  };
+
+  actions?: Array<{
+    action_kind: string;
+    args: {
+      gas?: string;
+      deposit?: string;
+      method_name?: string;
+      args_json?: any;
+      args_base64?: string | null;
+    };
+    rlp_hash: string | null;
+  }>;
+
+  outcome?: {
+    logs: string[] | null;
+    status:
+      | boolean
+      | {
+          SuccessValue?: string;
+          SuccessReceiptId?: string;
+          Failure?: { error_message: string };
+        };
+    gas_burnt: string;
+    tokens_burnt: string;
+    executor_account_id: string;
+  };
+
+  receipts?: ReceiptTree[];
+};
+
+export type TransformedReceipt = {
+  receipt_id: string;
+  predecessor_id: string;
+  receiver_id: string;
+  block_hash?: string;
+
+  actions?: Array<{
+    action_kind: string;
+    args: {
+      gas?: string;
+      deposit: string;
+      method_name?: string;
+      args_json?: any;
+      args_base64?: string | null;
+    };
+    rlp_hash: string | null;
+  }>;
+
+  outcome: {
+    logs: string[];
+    status: {
+      SuccessValue?: string;
+      SuccessReceiptId?: string;
+      Failure?: { error_message: string };
+    };
+    gas_burnt?: string;
+    tokens_burnt?: string;
+    executor_account_id?: string;
+    outgoing_receipts: TransformedReceipt[];
+  };
+
+  public_key?: string;
+};
+
+export type ReceiptApiResponse = {
+  receipts: Array<{
+    receipt_tree: ReceiptTree;
+  }>;
 };

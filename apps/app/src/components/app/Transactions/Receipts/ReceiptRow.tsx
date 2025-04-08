@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useConfig } from '@/hooks/app/useConfig';
 import useHash from '@/hooks/app/useHash';
 import { Link } from '@/i18n/routing';
-import { fiatValue } from '@/utils/app/libs';
+import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
@@ -32,9 +32,9 @@ interface Props {
 
 const ReceiptRow = (props: Props) => {
   const { borderFlag, receipt, statsData } = props;
+
   const t = useTranslations();
   const [pageHash] = useHash();
-  const loading = false;
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
   const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
   const rowRef = useRef<HTMLDivElement | null>(null);
@@ -100,7 +100,6 @@ const ReceiptRow = (props: Props) => {
     receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
       ? receipt.outcome.logs.filter(Boolean)
       : [];
-
   const receiptLog =
     viewMode === 'raw'
       ? logs
@@ -119,16 +118,53 @@ const ReceiptRow = (props: Props) => {
       : logs
           .map((log: any) => {
             if (typeof log === 'string') {
-              const match = log.match(/EVENT_JSON:({.*})/);
-              if (match) {
+              if (log.includes('EVENT_JSON:')) {
                 try {
-                  const parsed = JSON.parse(match[1]);
+                  const jsonPart = log.substring(
+                    log.indexOf('EVENT_JSON:') + 'EVENT_JSON:'.length,
+                  );
+
+                  try {
+                    const parsed = JSON.parse(jsonPart);
+                    return JSON.stringify(parsed, null, 2);
+                  } catch (directParseError) {
+                    const normalized = jsonPart
+                      .replace(/\\\\/g, '\\')
+                      .replace(/\\"/g, '"')
+                      .replace(/^"|"$/g, '');
+
+                    try {
+                      const parsed = JSON.parse(normalized);
+                      return JSON.stringify(parsed, null, 2);
+                    } catch (normalizeError) {
+                      const possibleJson = jsonPart.match(/\{.*\}/);
+                      if (possibleJson) {
+                        try {
+                          const parsed = JSON.parse(possibleJson[0]);
+                          return JSON.stringify(parsed, null, 2);
+                        } catch (matchError) {
+                          console.error(
+                            'All parsing attempts failed:',
+                            matchError,
+                          );
+                          return `${log}`;
+                        }
+                      }
+                      return `${log}`;
+                    }
+                  }
+                } catch (error) {
+                  console.error('Failed to process EVENT_JSON:', error);
+                  return `${log}`;
+                }
+              } else {
+                try {
+                  const parsed = JSON.parse(log);
                   return JSON.stringify(parsed, null, 2);
                 } catch (error) {
                   return `${log}`;
                 }
               }
-              return log;
             }
             return `${log}`;
           })
@@ -159,7 +195,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.receipt.text.0') : 'Receipt'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full max-w-xs" />
             </div>
@@ -183,7 +219,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.status.text.0') : 'Status'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-16 max-w-xl" />
             </div>
@@ -207,7 +243,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
           </div>
-          {!block?.height || loading ? (
+          {!block?.height ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
@@ -242,7 +278,7 @@ const ReceiptRow = (props: Props) => {
               </Tooltip>
               {t ? t('txnDetails.receipts.from.text.0') : 'From'}
             </div>
-            {!receipt || loading ? (
+            {!receipt ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-sm" />
               </div>
@@ -252,6 +288,32 @@ const ReceiptRow = (props: Props) => {
                   copy
                   currentAddress={receipt?.predecessor_id}
                 />
+                {(receipt?.receipt?.Action?.signer_public_key &&
+                  receipt?.receipt?.Action?.signer_id) ||
+                  (receipt?.predecessor_id && receipt?.public_key && (
+                    <Tooltip
+                      tooltip={'Access key used for this receipt'}
+                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                    >
+                      <span>
+                        &nbsp;
+                        <Link
+                          href={`/address/${
+                            receipt?.predecessor_id ||
+                            receipt?.receipt?.Action?.signer_id
+                          }?tab=accesskeys`}
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
+                        >
+                          (
+                          {shortenAddress(
+                            receipt?.public_key ||
+                              receipt?.receipt?.Action?.signer_public_key,
+                          )}
+                          )
+                        </Link>
+                      </span>
+                    </Tooltip>
+                  ))}
               </div>
             ) : (
               ''
@@ -269,7 +331,7 @@ const ReceiptRow = (props: Props) => {
               </Tooltip>
               {t ? t('txnDetails.receipts.to.text.0') : 'To'}
             </div>
-            {!receipt || loading ? (
+            {!receipt ? (
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-xs" />
               </div>
@@ -296,7 +358,7 @@ const ReceiptRow = (props: Props) => {
               ? t('txnDetails.receipts.burnt.text.0')
               : 'Burnt Gas & Tokens by Receipt'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
@@ -330,7 +392,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
@@ -362,7 +424,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             Value
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
@@ -391,7 +453,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
@@ -413,7 +475,7 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt || loading ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full !h-20" />
             </div>

@@ -24,7 +24,7 @@ const ReceiptStatus = (props: ReceiptStatsProps) => {
     return pretty;
   }
 
-  const status = receipt.outcome.status;
+  const status = receipt?.outcome?.status;
   if (status && 'SuccessValue' in status) {
     const { SuccessValue } = status;
 
