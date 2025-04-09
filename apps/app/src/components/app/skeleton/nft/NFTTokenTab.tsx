@@ -1,11 +1,11 @@
 import classNames from 'classnames';
-import React, { forwardRef, Ref } from 'react';
-
+import React from 'react';
 import { Link } from '@/i18n/routing';
-
-import Skeleton from '../common/Skeleton';
 import InventorySkeleton from './NFTInventory';
 import TransferSkeleton from './NFTTransfers';
+import ErrorMessage from '../../common/ErrorMessage';
+import FaInbox from '../../Icons/FaInbox';
+import Holders from '../ft/Holders';
 
 interface Props {
   className?: string;
@@ -13,150 +13,70 @@ interface Props {
   id: string;
   tab: string;
 }
-const NFTTokenTabSkeletion = forwardRef(
-  ({ className, error, id, tab }: Props, ref: Ref<HTMLDivElement>) => {
-    const getClassName = (selected: boolean) =>
-      classNames(
-        'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
-        {
-          'bg-green-600 dark:bg-green-250 text-white': selected,
-          'hover:bg-neargray-800 dark:hover:bg-black-100 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
-            !selected,
-        },
-      );
+const NFTTokenTabSkeletion = ({ className, error, id, tab }: Props) => {
+  const getClassName = (selected: boolean) =>
+    classNames(
+      'text-xs leading-4 font-medium overflow-hidden inline-block cursor-pointer p-2 mb-3 mr-2 focus:outline-none rounded-lg',
+      {
+        'bg-green-600 dark:bg-green-250 text-white': selected,
+        'hover:bg-neargray-800 dark:hover:bg-black-100 bg-neargray-700 dark:bg-black-200 hover:text-nearblue-600 text-nearblue-600 dark:text-neargray-10':
+          !selected,
+      },
+    );
 
-    const tabs = [
-      { label: 'Transfers', message: 'fts.ft.transfers', name: 'transfers' },
-      { label: 'Holders', message: 'fts.ft.holders', name: 'holders' },
-      { label: 'Inventory', message: 'fts.ft.info', name: 'inventory' },
-    ];
-    return (
-      <div className={`w-full z-50 ${className}`} ref={ref}>
-        {!error && (
-          <div className="flex items-center justify-between flex-wrap">
-            <div className="w-80 max-w-xs py-4 px-1 bg-neargray-25 dark:bg-black-300">
-              <Skeleton className="h-6 flex mt-3 mb-1.5" />
-            </div>{' '}
-          </div>
-        )}
-        <div>
-          {!error && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 -mb-0.5">
-              <div className="w-full">
-                <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-                  <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
-                    <div className="py-.5 text-sm font-semibold">
-                      <Skeleton className="h-5 w-28" />
-                    </div>
-                  </div>
-                  <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
-                    <div className="flex flex-wrap py-4">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-5 w-28" />
-                      </div>
-
-                      <Skeleton className="h-4 w-40" />
-                    </div>
-
-                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-5 w-28" />
-                      </div>
-
-                      <Skeleton className="h-4 w-40" />
-                    </div>
-
-                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-3.5 w-28" />
-                      </div>
-                      <div className="w-full md:w-3/4 break-words">
-                        <Skeleton className="h-3.5 w-40" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="w-full">
-                <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1">
-                  <div className="flex justify-between border-b dark:border-black-200 p-3 text-gray-600">
-                    <div className="py-.5 text-sm font-semibold">
-                      <Skeleton className="h-5 w-28" />
-                    </div>
-                  </div>
-
-                  <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600">
-                    <div className="flex flex-wrap py-4">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-5 w-28" />
-                      </div>
-
-                      <Skeleton className="h-4 w-40" />
-                    </div>
-
-                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-5 w-28" />
-                      </div>
-
-                      <Skeleton className="h-4 w-40" />
-                    </div>
-
-                    <div className="flex flex-wrap py-4 text-sm text-gray-600">
-                      <div className="w-full md:w-1/4 mb-2 md:mb-0">
-                        <Skeleton className="h-3.5 w-28" />
-                      </div>
-                      <div className="w-full md:w-3/4 break-words">
-                        <Skeleton className="h-3.5 w-40" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="py-6"></div>
-          <div className="block lg:flex lg:space-x-2 mb-4 sm:mt-1 -mt-0.5">
-            <div className="w-full">
-              <div className=" flex">
-                {tabs?.map(({ label, name }) => {
-                  return (
-                    <Link
-                      className={getClassName(name === tab)}
-                      href={
-                        name === 'transfers'
-                          ? `/nft-token/${id}`
-                          : `/nft-token/${id}?tab=${name}`
-                      }
-                      key={name}
-                    >
-                      <h2>{label}</h2>
-                    </Link>
-                  );
-                })}
-              </div>
-              <div className="relative">
-                <div
-                  className={`bg-white dark:bg-black-600 border soft-shadow rounded-xl overflow-hidden`}
+  const tabs = [
+    { label: 'Transfers', message: 'fts.ft.transfers', name: 'transfers' },
+    { label: 'Holders', message: 'fts.ft.holders', name: 'holders' },
+    { label: 'Inventory', message: 'fts.ft.info', name: 'inventory' },
+  ];
+  return (
+    <div className={`w-full z-50 ${className}`}>
+      <div className="block lg:flex lg:space-x-2 mb-4">
+        <div className="w-full">
+          <div className="flex">
+            {tabs?.map(({ label, name }) => {
+              return (
+                <Link
+                  className={getClassName(name === tab)}
+                  href={
+                    name === 'transfers'
+                      ? `/nft-token/${id}`
+                      : `/nft-token/${id}?tab=${name}`
+                  }
+                  key={name}
                 >
-                  {tab === 'transfers' ? (
-                    <TransferSkeleton error={error} />
-                  ) : null}
-                  {tab === 'holders' ? (
-                    <TransferSkeleton error={error} />
-                  ) : null}
-                  {tab === 'inventory' ? (
-                    <InventorySkeleton error={error} />
-                  ) : null}
+                  <h2>{label}</h2>
+                </Link>
+              );
+            })}
+          </div>
+          <div className="relative">
+            <div
+              className={`bg-white dark:bg-black-600 border soft-shadow rounded-xl overflow-hidden`}
+            >
+              {error ? (
+                <div className="w-full">
+                  <ErrorMessage
+                    icons={<FaInbox />}
+                    message={''}
+                    mutedText="Please try again later"
+                    reset
+                  />
                 </div>
-              </div>
+              ) : (
+                <>
+                  {tab === 'transfers' && <TransferSkeleton />}
+                  {tab === 'holders' && <Holders nft />}
+                  {tab === 'inventory' && <InventorySkeleton />}
+                </>
+              )}
             </div>
           </div>
         </div>
-        <div className="py-8"></div>
       </div>
-    );
-  },
-);
+      <div className="py-8"></div>
+    </div>
+  );
+};
 NFTTokenTabSkeletion.displayName = 'Overview';
 export default NFTTokenTabSkeletion;

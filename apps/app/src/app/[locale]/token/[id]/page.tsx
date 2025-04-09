@@ -27,9 +27,20 @@ export default async function TokenIndex(props: {
           <Overview id={id} searchParams={searchParams} />
         </Suspense>
       </ErrorBoundary>
-
-      <ErrorBoundary fallback={<TokenTabSkeleton error />}>
-        <Suspense fallback={<TokenTabSkeleton />}>
+      <ErrorBoundary
+        fallback={
+          <TokenTabSkeleton
+            error
+            tab={searchParams?.tab || 'transfers'}
+            id={id}
+          />
+        }
+      >
+        <Suspense
+          fallback={
+            <TokenTabSkeleton tab={searchParams?.tab || 'transfers'} id={id} />
+          }
+        >
           <TokenTabs id={id} searchParams={searchParams} />
         </Suspense>
       </ErrorBoundary>

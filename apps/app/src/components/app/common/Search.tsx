@@ -170,7 +170,6 @@ const Search = ({ disabled, header = false }: any) => {
               setResult(rpcData?.data ?? {});
               if (rpcData?.data) {
                 setSearchResults(rpcData?.keyword, filter, rpcData?.data);
-                setSearchResults(rpcData?.keyword, filter, rpcData?.data);
               }
             }
           } else {

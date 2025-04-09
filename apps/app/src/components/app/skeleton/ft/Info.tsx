@@ -41,7 +41,7 @@ const Info = () => {
               <Skeleton className="w-full h-4" />
             </div>
           </div>
-          <div className="flex flex-wrap lg:w-1/2 pt-6 text-gray-400 dark:text-neargray-10 text-xs">
+          <div className="flex flex-wrap lg:w-1/2 pt-6 pb-1 text-gray-400 dark:text-neargray-10 text-xs">
             <div className="w-full md:w-1/4 mb-2 md:mb-0">
               Market Data Source:
             </div>

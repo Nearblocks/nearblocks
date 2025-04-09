@@ -25,6 +25,9 @@ const NFTOverview = async ({ id }: any) => {
     sync: true,
     timestamp: '',
   };
+  if (tokenResult.message === 'Error') {
+    throw new Error(`Server Error : ${tokenResult.error}`);
+  }
   return (
     <>
       <NFTOverviewActions

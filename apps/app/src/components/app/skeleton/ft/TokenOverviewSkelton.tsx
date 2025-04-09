@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 import ErrorMessage from '../../common/ErrorMessage';
 import FaInbox from '../../Icons/FaInbox';
@@ -11,7 +11,7 @@ interface Props {
   error?: boolean;
   pageTab?: string;
 }
-const TokenTabSkeleton = forwardRef(({ error }: Props) => {
+const TokenTabSkeleton = ({ error }: Props) => {
   return (
     <>
       <div className="flex items-center justify-between flex-wrap">
@@ -21,7 +21,7 @@ const TokenTabSkeleton = forwardRef(({ error }: Props) => {
       </div>
       <div>
         {!error ? (
-          <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
+          <div className="mt-1.5 grid grid-cols-1 lg:grid-cols-2 gap-4 mb-2 md:mb-2">
             <div className="w-full">
               <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
                 <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
@@ -98,7 +98,7 @@ const TokenTabSkeleton = forwardRef(({ error }: Props) => {
                 </h2>
                 <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                   <div className="flex flex-wrap items-center justify-between py-4">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                    <div className="w-full md:w-1/4 mb-2 md:mb-0 pt-0.5">
                       Contract:
                     </div>
 
@@ -109,7 +109,7 @@ const TokenTabSkeleton = forwardRef(({ error }: Props) => {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center justify-between py-4">
-                    <div className="w-full md:w-1/4 mb-2 md:mb-0 ">
+                    <div className="w-full md:w-1/4 mb-2 md:mb-0 pt-1">
                       Decimals:
                     </div>
                     <div className="w-full md:w-3/4 break-words">
@@ -158,6 +158,6 @@ const TokenTabSkeleton = forwardRef(({ error }: Props) => {
       </div>
     </>
   );
-});
+};
 TokenTabSkeleton.displayName = 'Overview';
 export default TokenTabSkeleton;
