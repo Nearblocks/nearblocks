@@ -10,6 +10,7 @@ import charts from '#routes/charts';
 import dex from '#routes/dex';
 import exports from '#routes/exports';
 import fts from '#routes/fts';
+import health from '#routes/health';
 import keys from '#routes/keys';
 import kitwallet from '#routes/kitwallet';
 import legacy from '#routes/legacy';
@@ -31,6 +32,7 @@ const routes = () => {
   dex(app);
   exports(app);
   fts(app);
+  health(app);
   keys(app);
   kitwallet(app);
   legacy(app);
