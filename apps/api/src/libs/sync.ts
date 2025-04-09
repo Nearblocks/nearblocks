@@ -1,4 +1,4 @@
-import { Block, Receipt, Setting } from 'nb-types';
+import { Block, Setting } from 'nb-types';
 
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
@@ -28,18 +28,20 @@ export const getLatestBlock = async (): Promise<
 };
 
 export const getLatestReceipt = async (): Promise<
-  Pick<Receipt, 'included_in_block_timestamp'>[]
+  Pick<Block, 'block_height' | 'block_timestamp'>[]
 > => {
   return redis.cache(
     'sync:receipt',
     async () => {
       return sql`
         SELECT
-          included_in_block_timestamp
+          b.block_height,
+          b.block_timestamp
         FROM
-          receipts
+          receipts r
+          JOIN blocks b ON r.included_in_block_hash = b.block_hash
         ORDER BY
-          included_in_block_timestamp DESC
+          r.included_in_block_timestamp DESC
         LIMIT
           1
       `;
