@@ -1,11 +1,11 @@
-import React from 'react';
 import Skeleton from '../common/Skeleton';
+import React from 'react';
 
-export default function TransferSkeleton() {
+const Holders = ({ nft }: { nft?: boolean }) => {
   return (
     <>
       <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 dark:text-neargray-10 px-3 py-2">
-        <div className="max-w-xs pl-3 w-72 py-3.5">
+        <div className="max-w- pl-3 w-72 py-3.5 ">
           <Skeleton className=" h-4" />
         </div>
       </div>
@@ -14,31 +14,23 @@ export default function TransferSkeleton() {
           <thead className="bg-gray-100 dark:bg-black-200 h-[48px]">
             <tr>
               <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[18%]"
+                className="px-3 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[5%]"
                 scope="col"
               >
                 <Skeleton className="h-4" />
               </th>
+              {!nft && (
+                <th
+                  className="px-3 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[29%]"
+                  scope="col"
+                >
+                  <Skeleton className="h-4" />
+                </th>
+              )}
               <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[12%]"
-                scope="col"
-              >
-                <Skeleton className="h-4" />
-              </th>
-              <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[17%]"
-                scope="col"
-              >
-                <Skeleton className="h-4" />
-              </th>
-              <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top"
-                scope="col"
-              >
-                <Skeleton className="h-4" />
-              </th>
-              <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[11%]"
+                className={`px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top ${
+                  nft ? 'w-[57%]' : 'w-[24%]'
+                }`}
                 scope="col"
               >
                 <Skeleton className="h-4" />
@@ -60,18 +52,14 @@ export default function TransferSkeleton() {
           <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
             {[...Array(25)].map((_, i) => (
               <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
+                <td className="px-3 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
                   <Skeleton className="h-4" />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
-                  <Skeleton className="h-4" />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
-                  <Skeleton className="h-4" />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
-                  <Skeleton className="h-4" />
-                </td>
+                {!nft && (
+                  <td className="px-3 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
+                    <Skeleton className="h-4" />
+                  </td>
+                )}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-center">
                   <Skeleton className="h-4" />
                 </td>
@@ -94,4 +82,6 @@ export default function TransferSkeleton() {
       </div>
     </>
   );
-}
+};
+
+export default Holders;

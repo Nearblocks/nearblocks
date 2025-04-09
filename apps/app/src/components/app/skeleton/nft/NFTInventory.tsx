@@ -1,16 +1,13 @@
 import React from 'react';
-
-import ErrorMessage from '../../common/ErrorMessage';
-import FaInbox from '../../Icons/FaInbox';
 import Skeleton from '../common/Skeleton';
 
-export default function InventorySkeleton({ error }: { error?: boolean }) {
+export default function InventorySkeleton() {
   return (
     <>
       <div className="pl-6 max-w-lg w-full py-5 ">
-        {!error ? <Skeleton className=" h-4" /> : ''}
+        <Skeleton className=" h-4" />
       </div>
-      {!error ? (
+      {
         <div className="flex flex-wrap sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 m-6">
           {[...Array(24)].map((_, i) => (
             <div
@@ -34,16 +31,7 @@ export default function InventorySkeleton({ error }: { error?: boolean }) {
             </div>
           ))}
         </div>
-      ) : (
-        <div className="w-full">
-          <ErrorMessage
-            icons={<FaInbox />}
-            message={''}
-            mutedText="Please try again later"
-            reset
-          />
-        </div>
-      )}
+      }
     </>
   );
 }

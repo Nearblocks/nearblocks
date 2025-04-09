@@ -23,7 +23,8 @@ import WarningIcon from '../../Icons/WarningIcon';
 import Skeleton from '../../skeleton/common/Skeleton';
 import MarketCap from './MarketCap';
 import TokenPrice from './TokenPrice';
-import ActionMenuPopover from '../../common/ActionMenuPopover';
+import { CopyButton } from '../../common/CopyButton';
+import { shortenAddress } from '@/utils/app/libs';
 
 interface Props {
   holders: string;
@@ -126,31 +127,6 @@ const OverviewActions = ({
                 {token?.name}
               </span>
             </h1>
-            <div className="relative md:pt-0 pt-2 text-gray-500 text-xs ml-auto">
-              <span className="group flex w-full h-full">
-                <ActionMenuPopover disabled={!token}>
-                  <ul>
-                    <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2">
-                      <button
-                        className="flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250 w-full text-xs"
-                        id="add-to-metamask-btn"
-                        onClick={addToMetaMask}
-                      >
-                        <span className="w-4 dark:text-green-250">
-                          <Image
-                            alt="Metamask"
-                            height={10}
-                            src={'/images/metamask.svg'}
-                            width={10}
-                          />
-                        </span>
-                        Add Token to MetaMask (Web3)
-                      </button>
-                    </li>
-                  </ul>
-                </ActionMenuPopover>
-              </span>
-            </div>
           </div>
         )}
       </div>
@@ -332,26 +308,51 @@ const OverviewActions = ({
                 Profile Summary
               </h2>
               <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
-                <div className="flex flex-wrap items-center justify-between py-4">
-                  <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Contract:</div>
-                  {!token ? (
-                    <div className="w-full md:w-3/4 break-words">
-                      <div className="w-32">
-                        <Skeleton className="h-4" />
-                      </div>
+                <div className="flex xl:flex-nowrap md:!flex-nowrap sm:flex-nowrap flex-wrap items-center justify-between sm:divide-x sm:dark:divide-black-200 pt-4 pb-4 gap-y-2">
+                  <div className="flex md:items-center xl:gap-x-24 lg:gap-x-12 md:gap-x-28 mr-3 lg:flex-wrap xl:flex-nowrap md:!flex-nowrap sm:flex-wrap flex-wrap w-[43%] justify-between">
+                    <div className="w-full mb-1 md:mb-0">Contract:</div>
+                    <div className=" items-center text-center flex lg:ml-[3px]">
+                      {!token ? (
+                        <div className="w-full break-words">
+                          <div className="w-32">
+                            <Skeleton className="h-4" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full text-green-500 dark:text-green-250 whitespace-nowrap flex">
+                          <Link
+                            className="text-green-500 dark:text-green-250 font-medium"
+                            href={`/address/${token?.contract}`}
+                          >
+                            {shortenAddress(token?.contract)}
+                          </Link>
+                          <span className="mx-0.5">
+                            <CopyButton textToCopy={token?.contract} />
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="w-full text-green-500 dark:text-green-250 md:w-3/4 break-words">
-                      <Link
-                        className="text-green-500 dark:text-green-250 font-medium"
-                        href={`/address/${token?.contract}`}
-                      >
-                        {token?.contract}
-                      </Link>
-                    </div>
-                  )}
+                  </div>
+
+                  <div className="sm:!pl-3.5 pl-1">
+                    <button
+                      className="flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250 text-xs  border dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-black-200 rounded-md px-1.5 py-1"
+                      id="add-to-metamask-btn"
+                      onClick={addToMetaMask}
+                    >
+                      <span className="w-4 mr-1 dark:text-green-250">
+                        <Image
+                          alt="Metamask"
+                          height={10}
+                          src={'/images/metamask.svg'}
+                          width={10}
+                        />
+                      </span>
+                      Add to MetaMask
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-between py-4">
+                <div className="flex flex-wrap items-center justify-between py-4 w-full">
                   <div className="w-full md:w-1/4 mb-2 md:mb-0 ">Decimals:</div>
                   <div className="w-full md:w-3/4 break-words">
                     {!token ? (

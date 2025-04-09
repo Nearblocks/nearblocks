@@ -1,10 +1,10 @@
 import React from 'react';
 import Skeleton from '../common/Skeleton';
 
-export default function TransferSkeleton() {
+const TokenTxnsTab = () => {
   return (
     <>
-      <div className=" flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 dark:text-neargray-10 px-3 py-2">
+      <div className="flex flex-row items-center justify-between text-left text-sm  text-nearblue-600 dark:text-neargray-10 px-3 py-2">
         <div className="max-w-xs pl-3 w-72 py-3.5">
           <Skeleton className=" h-4" />
         </div>
@@ -26,7 +26,7 @@ export default function TransferSkeleton() {
                 <Skeleton className="h-4" />
               </th>
               <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[17%]"
+                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[10%]"
                 scope="col"
               >
                 <Skeleton className="h-4" />
@@ -38,7 +38,7 @@ export default function TransferSkeleton() {
                 <Skeleton className="h-4" />
               </th>
               <th
-                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[11%]"
+                className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 align-top w-[18%]"
                 scope="col"
               >
                 <Skeleton className="h-4" />
@@ -94,4 +94,6 @@ export default function TransferSkeleton() {
       </div>
     </>
   );
-}
+};
+
+export default TokenTxnsTab;
