@@ -5,92 +5,23 @@ import { Setting } from 'nb-types';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import logger from '#libs/logger';
-import sql from '#libs/postgres';
-import redis from '#libs/redis';
+import {
+  getBlock,
+  getLatestBlock,
+  getLatestStats,
+  getSettings,
+} from '#libs/sync';
 
-const EXPIRY = 5; // 5s
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m
 const EVENT_RANGE = 600; // 10m
 
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
-const isEventInSync = (latest: string, current: string) =>
+const isEventInSync = (latest: number, current: number) =>
   +latest - +current <= EVENT_RANGE;
 const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
-
-const getLatestBlock = async () => {
-  return redis.cache(
-    'sync:block',
-    async () => {
-      return sql`
-        SELECT
-          block_height,
-          block_timestamp
-        FROM
-          blocks
-        ORDER BY
-          block_height DESC
-        LIMIT
-          1
-      `;
-    },
-    EXPIRY,
-  );
-};
-
-const getBlock = (block: number) => {
-  return redis.cache(
-    `sync:block:${block}`,
-    async () => {
-      return sql`
-        SELECT
-          block_height,
-          block_timestamp
-        FROM
-          blocks
-        WHERE
-          block_height IN ${sql([block, +block - 1, +block - 2])}
-      `;
-    },
-    EXPIRY,
-  );
-};
-
-const getSettings = async () => {
-  return redis.cache(
-    'sync:settings',
-    async () => {
-      return sql`
-        SELECT
-          *
-        FROM
-          settings
-      `;
-    },
-    EXPIRY,
-  );
-};
-
-const getLatestStats = async () => {
-  return redis.cache(
-    `sync:stats`,
-    async () => {
-      return sql`
-        SELECT
-          date
-        FROM
-          daily_stats_new
-        ORDER BY
-          date DESC
-        LIMIT
-          1
-      `;
-    },
-    EXPIRY,
-  );
-};
 
 const getBaseStatus = async () => {
   const latestBlock = await getLatestBlock();
@@ -111,7 +42,7 @@ const getBalanceStatus = async () => {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const syncedBlock = await getBlock(balanceHeight);
+  const syncedBlock = await getBlock(+balanceHeight);
 
   if (!syncedBlock?.[0]) {
     logger.warn({ syncedBlock });
@@ -134,7 +65,7 @@ const getEventStatus = async () => {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const syncedBlock = await getBlock(eventHeight);
+  const syncedBlock = await getBlock(+eventHeight);
 
   if (!syncedBlock?.[0]) {
     logger.warn({ syncedBlock });
@@ -156,13 +87,13 @@ const getFTHoldersStatus = async () => {
     (item: Setting) => item.key === 'ft_holders_new',
   )?.value?.sync;
 
-  if (!ftHoldersHeight) {
+  if (!ftHoldersHeight || !eventsHeight) {
     return { height: null, sync: false, timestamp: null };
   }
 
   const [syncedBlock, latestEvent] = await Promise.all([
-    getBlock(ftHoldersHeight),
-    getBlock(eventsHeight),
+    getBlock(+ftHoldersHeight),
+    getBlock(+eventsHeight),
   ]);
 
   if (!syncedBlock?.[0] || !latestEvent?.[0]) {
@@ -176,7 +107,7 @@ const getFTHoldersStatus = async () => {
 
   return {
     height,
-    sync: isInSync(timestamp) || isEventInSync(latestHeight, ftHoldersHeight),
+    sync: isInSync(timestamp) || isEventInSync(latestHeight, +ftHoldersHeight),
     timestamp,
   };
 };
@@ -193,7 +124,7 @@ const getNFTHoldersStatus = async () => {
   }
 
   const [syncedBlock, latestBlock] = await Promise.all([
-    getBlock(nftHoldersHeight),
+    getBlock(+nftHoldersHeight),
     getLatestBlock(),
   ]);
 
@@ -208,7 +139,7 @@ const getNFTHoldersStatus = async () => {
 
   return {
     height,
-    sync: isInSync(timestamp) || isEventInSync(latestHeight, nftHoldersHeight),
+    sync: isInSync(timestamp) || isEventInSync(latestHeight, +nftHoldersHeight),
     timestamp,
   };
 };

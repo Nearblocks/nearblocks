@@ -9,6 +9,7 @@ const route = Router();
 const routes = (app: Router) => {
   app.use('/health', bearerAuth, rateLimiter, route);
 
+  route.get('/indexer-base', health.base);
   route.get('/indexer-receipts', health.receipts);
 };
 
