@@ -144,7 +144,16 @@ const storeChunkReceipts = async (
     const txnHash = txnHashes.get(receiptOrDataId);
 
     if (!txnHash) {
-      throw new Error(`no parent transaction for receipt: ${receiptOrDataId}`);
+      // Temporarily skip missing parent txn (testnet block 192892555)
+      logger.warn(
+        { 
+          receiptOrDataId,
+          blockHash,
+          chunkHash 
+        },
+        'Skipping receipt with no parent transaction hash'
+      );
+      return;
     }
 
     let publicKey = null;
