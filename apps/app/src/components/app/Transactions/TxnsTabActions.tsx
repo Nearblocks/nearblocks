@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { usePathname } from '@/i18n/routing';
 import { Link } from '@/i18n/routing';
 import { useRpcStore } from '@/stores/app/rpc';
 import {
@@ -53,7 +52,6 @@ const TxnsTabActions = ({
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
-  const pathname = usePathname();
   const [receipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
@@ -140,10 +138,10 @@ const TxnsTabActions = ({
   const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
 
   useEffect(() => {
-    if (txn === null || !txn) {
+    if (txn != null && txn?.outcomes?.status === null) {
       const delay = Math.min(1000 * 2 ** retryCount.current, 150000);
       timeoutRef.current = setTimeout(() => {
-        router.replace(pathname);
+        router.refresh();
         retryCount.current += 1;
       }, delay);
     }
@@ -154,7 +152,7 @@ const TxnsTabActions = ({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, router, retryCount, rpcUrl]);
+  }, [txn, router, retryCount]);
 
   useEffect(() => {
     if (rpcError) {
