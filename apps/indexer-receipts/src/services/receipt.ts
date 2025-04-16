@@ -16,6 +16,7 @@ import { receiptHistogram } from '#libs/prom';
 import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
+const receiptKinds = ['Action', 'Data'];
 
 export const storeReceipts = async (knex: Knex, messages: Message[]) => {
   const start = performance.now();
@@ -38,7 +39,9 @@ export const storeReceipts = async (knex: Knex, messages: Message[]) => {
           shardChunk.chunk.header.chunkHash,
           shardChunk.header.hash,
           shardChunk.header.timestampNanosec,
-          shardChunk.chunk.receipts,
+          shardChunk.chunk.receipts.filter((receipt) =>
+            receiptKinds.includes(Object.keys(receipt.receipt)[0]),
+          ),
         );
 
         receiptData = receiptData.concat(receipts.receiptData);
