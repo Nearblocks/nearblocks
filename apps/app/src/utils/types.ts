@@ -1536,7 +1536,9 @@ export type ParseOutcomeInfo = {
 
 export type TransactionReceiptInfo = {
   receipt: any;
+  rpcReceipt: any;
   fellowOutgoingReceipts: any;
+  rpcFellowOutgoingReceipts?: any;
   expandAll: any;
   convertionReceipt: any;
   className: string;
@@ -1550,6 +1552,7 @@ export type TransactionReceiptInfo = {
 
 export type ReceiptKindInfo = {
   action: any;
+  rpcAction: any;
   isTxTypeActive: boolean;
   onClick?: any;
   receipt?: any;

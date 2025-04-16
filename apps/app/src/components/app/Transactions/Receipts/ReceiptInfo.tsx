@@ -24,6 +24,7 @@ import { networkId } from '@/utils/app/config';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
+  rpcReceipt: ReceiptsPropsInfo | any;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -32,7 +33,7 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
-const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
+const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
@@ -76,15 +77,15 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
 
   let statusInfo;
 
-  if (receipt?.outcome?.status?.type === 'successValue') {
-    if (receipt?.outcome?.status?.value.length === 0) {
+  if (rpcReceipt?.outcome?.status?.type === 'successValue') {
+    if (rpcReceipt?.outcome?.status?.value.length === 0) {
       statusInfo = (
         <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 whitespace-nowrap">
           Empty result
         </div>
       );
     } else {
-      const args = receipt?.outcome?.status.value;
+      const args = rpcReceipt?.outcome?.status.value;
       const decodedArgs = Buffer.from(args, 'base64');
 
       let prettyArgs: object | string;
@@ -126,19 +127,19 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
           </div>
         );
     }
-  } else if (receipt?.outcome?.status?.type === 'failure') {
+  } else if (rpcReceipt?.outcome?.status?.type === 'failure') {
     statusInfo = (
       <textarea
         readOnly
         rows={4}
-        defaultValue={JSON.stringify(receipt.outcome.status.error, null, 2)}
+        defaultValue={JSON.stringify(rpcReceipt.outcome.status.error, null, 2)}
         className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
       ></textarea>
     );
-  } else if (receipt?.outcome?.status?.type === 'successReceiptId') {
+  } else if (rpcReceipt?.outcome?.status?.type === 'successReceiptId') {
     statusInfo = (
       <div className="bg-gray-100 dark:bg-black-200 rounded-md my-3 p-5 font-medium overflow-auto">
-        <pre>{receipt?.outcome?.status?.receiptId}</pre>
+        <pre>{rpcReceipt?.outcome?.status?.receiptId}</pre>
       </div>
     );
   }
