@@ -13,23 +13,35 @@ import FaExpand from '../../Icons/FaExpand';
 
 const backgroundColorClasses: Record<string, string> = {
   addKey: 'bg-indigo-50 dark:bg-indigo-900',
+  ADD_KEY: 'bg-indigo-50 dark:bg-indigo-900',
   createAccount: 'bg-fuchsia-100 dark:bg-fuchsia-900',
+  CREATE_ACCOUNT: 'bg-fuchsia-100 dark:bg-fuchsia-900',
   delegateAction: 'bg-blue-50 dark:bg-black-200',
+  DELEGATE_ACTION: 'bg-blue-50 dark:bg-black-200',
   deleteAccount: 'bg-red-50 dark:bg-red-900',
+  DELETE_ACCOUNT: 'bg-red-50 dark:bg-red-900',
   deleteKey: 'bg-red-50 dark:bg-red-900',
+  DELETE_KEY: 'bg-red-50 dark:bg-red-900',
   deployContract: 'bg-orange-50 dark:bg-orange-900',
+  DEPLOY_CONTRACT: 'bg-orange-50 dark:bg-orange-900',
   functionCall: 'bg-blue-50 dark:bg-black-200',
+  FUNCTION_CALL: 'bg-blue-50 dark:bg-black-200',
   stake: 'bg-cyan-50 dark:bg-cyan-900',
+  STAKE: 'bg-cyan-50 dark:bg-cyan-900',
   transfer: 'bg-green-50 dark:bg-green-200',
+  TRANSFER: 'bg-green-50 dark:bg-green-200',
 };
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
-  const { action, isTxTypeActive, onClick, receipt, receiver } = props;
+  const { action, rpcAction, isTxTypeActive, onClick, receipt, receiver } =
+    props;
+
   const t = useTranslations();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const args = action?.args?.args;
+  const args = rpcAction?.args?.args;
+
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')
       ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
@@ -93,11 +105,12 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
   const decodedData = args;
   const jsonStringifiedData = displayArgs(decodedData);
   const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
-
   const status = receipt?.outcome?.status;
   const isSuccess =
     status &&
-    (status.type === 'successValue' || status.type === 'successReceiptId');
+    (status.type === 'successValue' ||
+      status.type === 'successReceiptId' ||
+      'SuccessValue' in status);
 
   return (
     <div className="pb-3">
@@ -107,20 +120,31 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         ${
           !isSuccess
             ? 'bg-red-50 dark:bg-black-200'
-            : backgroundColorClasses[action.kind] || ''
+            : backgroundColorClasses[action.action_kind] ||
+              backgroundColorClasses[action?.kind] ||
+              ''
         }`}
         onClick={onClick}
         role="button"
         tabIndex={0}
       >
-        {action?.kind !== 'functionCall' &&
-          action?.kind !== 'delegateAction' &&
-          t(`${action?.kind}`)}
-        {action?.kind === 'delegateAction' ? (
+        {action?.kind &&
+        action?.kind !== 'functionCall' &&
+        action?.kind !== 'delegateAction'
+          ? t(`${action?.kind}`)
+          : null}
+        {action?.action_kind !== 'FUNCTION_CALL' &&
+          action?.action_kind !== 'DELEGATE_ACTION' &&
+          action?.action_kind}
+        {action?.kind === 'delegateAction' ||
+        action?.action_kind === 'DELEGATE_ACTION' ? (
           <div className="inline-flex text-sm">{`Delegate`}</div>
         ) : null}
-        {action?.kind === 'functionCall' ? (
-          <div className="inline-flex text-sm">{`'${action?.args?.methodName}'`}</div>
+        {action?.kind === 'functionCall' ||
+        action?.action_kind === 'FUNCTION_CALL' ? (
+          <div className="inline-flex text-sm">{`'${
+            action?.args?.method_name || action?.args?.methodName
+          }'`}</div>
         ) : null}
         {onClick ? (
           <div className="ml-2">{isTxTypeActive ? '-' : '+'}</div>
@@ -131,7 +155,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
           </div>
         )}
       </div>
-      {action?.kind === 'transfer' ? (
+      {action?.action_kind === 'TRANSFER' || action?.kind === 'transfer' ? (
         <div className="inline-flex justify-center">
           <span className="text-xs whitespace-nowrap">
             {action?.args?.deposit
@@ -143,12 +167,15 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         </div>
       ) : null}
       {isTxTypeActive ? (
-        action?.kind === 'functionCall' ? (
+        action?.kind === 'functionCall' ||
+        action?.action_kind === 'FUNCTION_CALL' ? (
           action?.args?.methodName === 'rlp_execute' ||
-          (action?.args?.methodName === 'submit' &&
+          action?.args?.method_name === 'rlp_execute' ||
+          action?.args?.methodName === 'submit' ||
+          (action?.args?.method_name === 'submit' &&
             receiver.includes('aurora')) ? (
             <RlpTransaction
-              method={action?.args?.methodName}
+              method={action?.args?.method_name || action?.args?.methodName}
               pretty={modifiedData}
               receiver={receiver}
             />
@@ -197,22 +224,26 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
               </div>
             </>
           )
-        ) : action?.kind === 'delegateAction' ? (
+        ) : action?.kind === 'delegateAction' ||
+          action?.action_kind === 'DELEGATE_ACTION' ? (
           <div className="pt-2">
-            {[...action.args.actions]
+            {[...rpcAction?.args?.actions]
               .sort(
                 (actionA, actionB) =>
                   actionA.delegateIndex - actionB.delegateIndex,
               )
-              .map((subaction) => (
-                <ReceiptKind
-                  action={subaction}
-                  isTxTypeActive={true}
-                  key={subaction.delegateIndex}
-                  receipt={receipt}
-                  receiver={receiver}
-                />
-              ))}
+              .map((subaction) => {
+                return (
+                  <ReceiptKind
+                    action={subaction}
+                    rpcAction={subaction}
+                    isTxTypeActive={true}
+                    key={subaction.delegateIndex}
+                    receipt={receipt}
+                    receiver={receiver}
+                  />
+                );
+              })}
           </div>
         ) : null
       ) : null}
