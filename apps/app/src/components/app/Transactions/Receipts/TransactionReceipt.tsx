@@ -25,11 +25,18 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const remainingFellowOutgoingReceipts = fellowOutgoingReceipts.slice(0, -1);
   const lastFellowOutgoingReceipt = fellowOutgoingReceipts.at(-1);
   const filterRefundNestedReceipts =
-    receipt?.outcome?.nestedReceipts &&
-    receipt?.outcome.nestedReceipts.filter(
+    (receipt?.outcome?.nestedReceipts &&
+      receipt?.outcome?.nestedReceipts.filter(
+        (nestedReceipt: any) =>
+          'outcome' in nestedReceipt &&
+          nestedReceipt.predecessorId !== 'system',
+      )) ||
+    receipt?.outcome?.outgoing_receipts.filter(
       (nestedReceipt: any) =>
-        'outcome' in nestedReceipt && nestedReceipt.predecessorId !== 'system',
+        'outcome' in nestedReceipt &&
+        nestedReceipt?.predecessor_id !== 'system',
     );
+
   const nonRefundNestedReceipts =
     filterRefundNestedReceipts && filterRefundNestedReceipts.slice(0, -1);
   const lastNonRefundNestedReceipt =
@@ -48,7 +55,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           <div className="flex flex-row mb-2.5">
             <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
             <div className="text-green-500 dark:text-green-250 text-sm">
-              {receipt?.predecessorId}
+              {receipt?.predecessor_id || receipt?.predecessorId}
             </div>
           </div>
         ) : null}
@@ -67,11 +74,11 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
           {receipt?.actions?.map((action: any, index: number) => (
             <ReceiptKind
-              key={`${action.kind}_${index}`}
+              key={`${action.action_kind || action.kind}_${index}`}
               action={action}
               onClick={switchActiveTxType}
               isTxTypeActive={isTxTypeActive}
-              receiver={receipt.receiverId}
+              receiver={receipt.receiver_id || receipt.receiverId}
               receipt={receipt}
             />
           ))}
@@ -91,7 +98,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           />
           <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
           <div className="text-green-500 dark:text-green-250 text-sm ">
-            {receipt?.receiverId}
+            {receipt.receiver_id || receipt.receiverId}
           </div>
         </div>
       </div>

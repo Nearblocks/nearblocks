@@ -60,8 +60,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   useEffect(() => {
     function fetchBlocks() {
       setLoading(true);
-      if (receipt?.outcome?.blockHash) {
-        getBlockDetails(receipt?.outcome.blockHash)
+      if (receipt?.block_hash || receipt?.outcome?.blockHash) {
+        getBlockDetails(receipt?.block_hash || receipt?.outcome.blockHash)
           .then((resp: any) => {
             setBlock(resp?.header);
             setLoading(false);
@@ -72,7 +72,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
 
     fetchBlocks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receipt?.outcome?.blockHash]);
+  }, [receipt?.outcome?.blockHash, receipt?.block_hash]);
 
   let statusInfo;
 
@@ -177,7 +177,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   const getRefund = (receipts: any[]): string =>
     receipts
       .filter(
-        (receipt) => 'outcome' in receipt && receipt.predecessorId === 'system',
+        (receipt) =>
+          ('outcome' in receipt && receipt.predecessorId === 'system') ||
+          receipt.predecessor_id === 'system',
       )
       .reduce(
         (acc, receipt) =>
@@ -188,17 +190,22 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
       );
 
   const getPreCharged = (receipt: any) =>
-    Big(receipt?.outcome?.tokensBurnt || '0')
-      .plus(getRefund(receipt?.outcome?.nestedReceipts))
+    Big(receipt?.outcome?.tokens_burnt || receipt?.outcome?.tokensBurnt || '0')
+      .plus(
+        getRefund(
+          receipt?.outcome?.nestedReceipts
+            ? receipt?.outcome?.nestedReceipts
+            : receipt?.outcome?.outgoing_receipts,
+        ),
+      )
       .toString();
 
-  const status = receipt?.outcome?.status.type;
+  const status = receipt?.outcome?.status;
   const isSuccess =
-    (status &&
-      status === 'successValue' &&
-      status !== null &&
-      status !== undefined) ||
-    status === 'successReceiptId';
+    status &&
+    (status.type === 'successValue' ||
+      status.type === 'successReceiptId' ||
+      'SuccessValue' in status);
 
   useEffect(() => {
     if (rpcTxn && rpcTxn?.receipts?.length > 0) {
@@ -240,16 +247,53 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
       : logs
           .map((log: any) => {
             if (typeof log === 'string') {
-              const match = log.match(/EVENT_JSON:({.*})/);
-              if (match) {
+              if (log.includes('EVENT_JSON:')) {
                 try {
-                  const parsed = JSON.parse(match[1]);
+                  const jsonPart = log.substring(
+                    log.indexOf('EVENT_JSON:') + 'EVENT_JSON:'.length,
+                  );
+
+                  try {
+                    const parsed = JSON.parse(jsonPart);
+                    return JSON.stringify(parsed, null, 2);
+                  } catch (directParseError) {
+                    const normalized = jsonPart
+                      .replace(/\\\\/g, '\\')
+                      .replace(/\\"/g, '"')
+                      .replace(/^"|"$/g, '');
+
+                    try {
+                      const parsed = JSON.parse(normalized);
+                      return JSON.stringify(parsed, null, 2);
+                    } catch (normalizeError) {
+                      const possibleJson = jsonPart.match(/\{.*\}/);
+                      if (possibleJson) {
+                        try {
+                          const parsed = JSON.parse(possibleJson[0]);
+                          return JSON.stringify(parsed, null, 2);
+                        } catch (matchError) {
+                          console.error(
+                            'All parsing attempts failed:',
+                            matchError,
+                          );
+                          return `${log}`;
+                        }
+                      }
+                      return `${log}`;
+                    }
+                  }
+                } catch (error) {
+                  console.error('Failed to process EVENT_JSON:', error);
+                  return `${log}`;
+                }
+              } else {
+                try {
+                  const parsed = JSON.parse(log);
                   return JSON.stringify(parsed, null, 2);
                 } catch (error) {
                   return `${log}`;
                 }
               }
-              return log;
             }
             return `${log}`;
           })
@@ -380,7 +424,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                     </Tooltip>
                     Receipt
                   </td>
-                  <td className="font-semibold py-2 pl-4">{receipt?.id}</td>
+                  <td className="font-semibold py-2 pl-4">
+                    {receipt?.receipt_id || receipt?.id}
+                  </td>
                 </tr>
                 <tr>
                   <td className="flex items-center py-2 pr-4">
@@ -447,33 +493,39 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                     <div className="flex items-center">
                       <Link
                         className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
-                        href={`/address/${receipt?.predecessorId}`}
+                        href={`/address/${
+                          receipt?.predecessor_id || receipt?.predecessorId
+                        }`}
                       >
-                        {receipt?.predecessorId}
+                        {receipt?.predecessor_id || receipt?.predecessorId}
                       </Link>
-                      {!loading &&
-                        receiptKey &&
-                        receiptKey?.receipt?.Action?.signer_public_key &&
-                        receiptKey?.receipt?.Action?.signer_id && (
+                      {(receiptKey?.receipt?.Action?.signer_public_key &&
+                        receiptKey?.receipt?.Action?.signer_id) ||
+                        (receipt?.predecessor_id && receipt?.public_key && (
                           <Tooltip
                             tooltip={'Access key used for this receipt'}
                             className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                           >
                             <span>
-                              &nbsp;(
+                              &nbsp;
                               <Link
-                                href={`/address/${receiptKey?.receipt?.Action?.signer_id}?tab=accesskeys`}
+                                href={`/address/${
+                                  receipt?.predecessor_id ||
+                                  receiptKey?.receipt?.Action?.signer_id
+                                }?tab=accesskeys`}
                                 className="text-green-500 dark:text-green-250 hover:no-underline"
                               >
+                                (
                                 {shortenAddress(
-                                  receiptKey?.receipt?.Action
-                                    ?.signer_public_key,
+                                  receipt?.public_key ||
+                                    receiptKey?.receipt?.Action
+                                      ?.signer_public_key,
                                 )}
+                                )
                               </Link>
-                              )
                             </span>
                           </Tooltip>
-                        )}
+                        ))}
                     </div>
                   </td>
                 </tr>
@@ -492,9 +544,11 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                   <td className="py-2 pl-4">
                     <Link
                       className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
-                      href={`/address/${receipt?.receiverId}`}
+                      href={`/address/${
+                        receipt?.receiver_id || receipt?.receiverId
+                      }`}
                     >
-                      {receipt?.receiverId}
+                      {receipt?.receiver_id || receipt?.receiverId}
                     </Link>
                   </td>
                 </tr>
@@ -552,9 +606,15 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                     <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
                       <span className="text-xs mr-2">🔥 </span>
                       {`${
-                        !loading && receipt?.outcome?.gasBurnt
-                          ? convertToMetricPrefix(receipt?.outcome?.gasBurnt)
-                          : receipt?.outcome?.gasBurnt ?? ''
+                        (!loading && receipt?.outcome?.gasBurnt) ||
+                        receipt?.outcome?.gas_burnt
+                          ? convertToMetricPrefix(
+                              receipt?.outcome?.gas_burnt ||
+                                receipt?.outcome?.gasBurnt,
+                            )
+                          : (receipt?.outcome?.gas_burnt ||
+                              receipt?.outcome?.gasBurnt) ??
+                            ''
                       }gas`}
                     </span>
                   </td>
@@ -574,9 +634,16 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                   <td className="text-xs py-2 pl-4">
                     <span className="bg-orange-50 dark:bg-black-200 rounded-md px-2 py-1">
                       <span className="text-xs mr-2">🔥 </span>
-                      {!loading && receipt?.outcome?.tokensBurnt
-                        ? yoctoToNear(receipt?.outcome?.tokensBurnt, true)
-                        : receipt?.outcome?.tokensBurnt ?? ''}
+                      {(!loading && receipt?.outcome?.tokensBurnt) ||
+                      receipt?.outcome?.tokens_burnt
+                        ? yoctoToNear(
+                            receipt?.outcome?.tokens_burnt ||
+                              receipt?.outcome?.tokensBurnt,
+                            true,
+                          )
+                        : (receipt?.outcome?.tokens_burnt ||
+                            receipt?.outcome?.tokensBurnt) ??
+                          ''}
                       Ⓝ
                     </span>
                   </td>
@@ -595,10 +662,14 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                     Refund
                   </td>
                   <td className="py-2 pl-4">
-                    {!loading &&
-                      receipt?.outcome?.nestedReceipts &&
+                    {((!loading && receipt?.outcome?.nestedReceipts) ||
+                      receipt?.outcome?.outgoing_receipts) &&
                       yoctoToNear(
-                        getRefund(receipt?.outcome?.nestedReceipts) || '0',
+                        getRefund(
+                          receipt?.outcome?.nestedReceipts
+                            ? receipt?.outcome?.nestedReceipts
+                            : receipt?.outcome?.outgoing_receipts,
+                        ) || '0',
                         true,
                       )}
                     Ⓝ

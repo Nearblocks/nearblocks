@@ -356,6 +356,7 @@ const TxnsTabActions = ({
                     rpcTxn={rpcTxn}
                     txn={txn ? txn : rpcData}
                     statsData={stats}
+                    apiTxnActionsData={apiTxnActionsData}
                   />
                 )}
                 {tab === 'tree' && (
