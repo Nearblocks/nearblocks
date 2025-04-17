@@ -16,7 +16,7 @@ import { receiptHistogram } from '#libs/prom';
 import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
 
 const batchSize = config.insertLimit;
-const receiptKinds = ['Action', 'Data'];
+const receiptKinds = ['Action', 'Data']; // Skip GlobalContractDistribution (missing parent txn)
 
 export const storeReceipts = async (knex: Knex, messages: Message[]) => {
   const start = performance.now();

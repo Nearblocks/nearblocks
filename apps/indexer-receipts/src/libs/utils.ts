@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { decodeBase64, hexlify, Transaction } from 'ethers';
+import { decodeBase64, encodeBase58, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
 
 import { Action, ExecutionStatus, ReceiptEnum } from 'nb-blocks';
@@ -19,9 +19,13 @@ import {
   isDeleteAccountAction,
   isDeleteKeyAction,
   isDeployContractAction,
+  isDeployGlobalContractAction,
+  isDeployGlobalContractByAccountIdAction,
   isFunctionCallAction,
   isStakeAction,
   isTransferAction,
+  isUseGlobalContractAction,
+  isUseGlobalContractByAccountIdAction,
 } from '#libs/guards';
 import sentry from '#libs/sentry';
 import { AccessKeyPermission, ReceiptAction, RlpJson } from '#types/types';
@@ -49,29 +53,76 @@ export const mapReceiptKind = (receipt: ReceiptEnum): ReceiptKind => {
   return ReceiptKind[key];
 };
 
+const getCodeHash = (codeBase64: string) => {
+  let code: null | string = null;
+
+  try {
+    code = encodeBase58(decodeBase64(codeBase64));
+  } catch (error) {
+    //
+  }
+
+  return code === null ? { code } : { code_hash: code };
+};
+
 export const mapActionKind = (action: Action): ReceiptAction => {
-  let kind = ActionKind.UNKNOWN;
-  let args = {};
+  const kind = ActionKind.UNKNOWN;
+  const args = {};
   let rlpHash = null;
 
   if (
     action === 'CreateAccount' ||
     (action && Object.keys(action)?.[0] === 'CreateAccount')
   ) {
-    kind = ActionKind.CREATE_ACCOUNT;
+    return {
+      args: jsonStringify(args),
+      kind: ActionKind.CREATE_ACCOUNT,
+      rlpHash,
+    };
   }
 
   if (isDeployContractAction(action)) {
-    let code = '';
+    return {
+      args: jsonStringify(getCodeHash(action.DeployContract.code)),
+      kind: ActionKind.DEPLOY_CONTRACT,
+      rlpHash,
+    };
+  }
 
-    try {
-      code = Buffer.from(action.DeployContract.code, 'base64').toString('hex');
-    } catch (error) {
-      //
-    }
+  if (isDeployGlobalContractAction(action)) {
+    return {
+      args: jsonStringify(getCodeHash(action.DeployGlobalContract.code)),
+      kind: ActionKind.DEPLOY_GLOBAL_CONTRACT,
+      rlpHash,
+    };
+  }
 
-    kind = ActionKind.DEPLOY_CONTRACT;
-    args = { code_sha256: code };
+  if (isDeployGlobalContractByAccountIdAction(action)) {
+    return {
+      args: jsonStringify(
+        getCodeHash(action.DeployGlobalContractByAccountId.code),
+      ),
+      kind: ActionKind.DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID,
+      rlpHash,
+    };
+  }
+
+  if (isUseGlobalContractAction(action)) {
+    return {
+      args: jsonStringify({ code_hash: action.UseGlobalContract.codeHash }),
+      kind: ActionKind.USE_GLOBAL_CONTRACT,
+      rlpHash,
+    };
+  }
+
+  if (isUseGlobalContractByAccountIdAction(action)) {
+    return {
+      args: jsonStringify({
+        account_id: action.UseGlobalContractByAccountId.accountId,
+      }),
+      kind: ActionKind.USE_GLOBAL_CONTRACT_BY_ACCOUNT_ID,
+      rlpHash,
+    };
   }
 
   if (isFunctionCallAction(action)) {
@@ -84,26 +135,35 @@ export const mapActionKind = (action: Action): ReceiptAction => {
       //
     }
 
-    kind = ActionKind.FUNCTION_CALL;
-    args = {
-      args_base64: jsonArgs === null ? action.FunctionCall.args : null,
-      args_json: jsonArgs,
-      deposit: action.FunctionCall.deposit,
-      gas: action.FunctionCall.gas,
-      method_name: action.FunctionCall.methodName,
+    return {
+      args: jsonStringify({
+        args_base64: jsonArgs === null ? action.FunctionCall.args : null,
+        args_json: jsonArgs,
+        deposit: action.FunctionCall.deposit,
+        gas: action.FunctionCall.gas,
+        method_name: action.FunctionCall.methodName,
+      }),
+      kind: ActionKind.FUNCTION_CALL,
+      rlpHash,
     };
   }
 
   if (isTransferAction(action)) {
-    kind = ActionKind.TRANSFER;
-    args = { deposit: action.Transfer.deposit };
+    return {
+      args: jsonStringify({ deposit: action.Transfer.deposit }),
+      kind: ActionKind.TRANSFER,
+      rlpHash,
+    };
   }
 
   if (isStakeAction(action)) {
-    kind = ActionKind.STAKE;
-    args = {
-      public_key: action.Stake.publicKey,
-      stake: action.Stake.stake,
+    return {
+      args: jsonStringify({
+        public_key: action.Stake.publicKey,
+        stake: action.Stake.stake,
+      }),
+      kind: ActionKind.STAKE,
+      rlpHash,
     };
   }
 
@@ -122,41 +182,54 @@ export const mapActionKind = (action: Action): ReceiptAction => {
       };
     }
 
-    kind = ActionKind.ADD_KEY;
-    args = {
-      access_key: {
-        nonce: 0,
-        permission,
-      },
-      public_key: action.AddKey.publicKey,
+    return {
+      args: jsonStringify({
+        access_key: {
+          nonce: 0,
+          permission,
+        },
+        public_key: action.AddKey.publicKey,
+      }),
+      kind: ActionKind.ADD_KEY,
+      rlpHash,
     };
   }
 
   if (isDeleteKeyAction(action)) {
-    kind = ActionKind.DELETE_KEY;
-    args = {
-      public_key: action.DeleteKey.publicKey,
+    return {
+      args: jsonStringify({
+        public_key: action.DeleteKey.publicKey,
+      }),
+      kind: ActionKind.DELETE_KEY,
+      rlpHash,
     };
   }
 
   if (isDeleteAccountAction(action)) {
-    kind = ActionKind.DELETE_ACCOUNT;
-    args = {
-      beneficiary_id: action.DeleteAccount.beneficiaryId,
+    return {
+      args: jsonStringify({
+        beneficiary_id: action.DeleteAccount.beneficiaryId,
+      }),
+      kind: ActionKind.DELETE_ACCOUNT,
+      rlpHash,
     };
   }
 
   if (isDelegateAction(action)) {
     const delegateAction = action.Delegate.delegateAction;
-    args = {
-      max_block_height: delegateAction.maxBlockHeight,
-      nonce: delegateAction.nonce,
-      public_key: delegateAction.publicKey,
-      receiver_id: delegateAction.receiverId,
-      sender_id: delegateAction.senderId,
-      signature: action.signature,
+
+    return {
+      args: jsonStringify({
+        max_block_height: delegateAction.maxBlockHeight,
+        nonce: delegateAction.nonce,
+        public_key: delegateAction.publicKey,
+        receiver_id: delegateAction.receiverId,
+        sender_id: delegateAction.senderId,
+        signature: action.signature,
+      }),
+      kind: ActionKind.DELEGATE_ACTION,
+      rlpHash,
     };
-    kind = ActionKind.DELEGATE_ACTION;
   }
 
   return {
