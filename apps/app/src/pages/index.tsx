@@ -8,7 +8,7 @@ import { env } from 'next-runtime-env';
 // import Banner from '@/components/Banner';
 // import SponserdText from '@/components/SponserdText';
 import LatestBlocks from '@/components/Blocks/Latest';
-import Search, { redirect, SearchToast } from '@/components/common/Search';
+import Search, { SearchToast } from '@/components/common/Search';
 import fetcher from '@/utils/fetcher';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Overview from '@/components/Transactions/Overview';
@@ -16,7 +16,7 @@ import LatestTransactions from '@/components/Transactions/Latest';
 import { fetchData } from '@/utils/fetchData';
 import { toast } from 'react-toastify';
 import search, { rpcSearch } from '@/utils/search';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { getCookieFromRequest } from '@/utils/libs';
 import { useRpcStore } from '@/stores/rpc';
 
@@ -95,6 +95,23 @@ const HomePage = ({
   const txns = txnsDetails?.txns || [];
   const thumbnail = `${ogUrl}/thumbnail/home?brand=near`;
   const rpcUrl: string = useRpcStore((state) => state.rpc);
+
+  const redirect = (route: any) => {
+    switch (route?.type) {
+      case 'block':
+        return Router.push(`/blocks/${route?.path}`);
+      case 'txn':
+        return Router.push(`/txns/${route?.path}`);
+      case 'receipt':
+        return Router.push(`/txns/${route?.path}`);
+      case 'address':
+        return Router.push(`/address/${route?.path}`);
+      case 'token':
+        return Router.push(`/token/${route?.path}`);
+      default:
+        return toast.error(SearchToast);
+    }
+  };
 
   useEffect(() => {
     const loadResults = async (keyword: string) => {
