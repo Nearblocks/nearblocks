@@ -8,7 +8,6 @@ import { cacheHistogram } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { getBatchSize } from '#libs/utils';
 import { prepareCache } from '#services/cache';
-import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 
 const indexerKey = 'receipts';
@@ -74,10 +73,7 @@ export const onMessage = async (messages: Message[]) => {
     cacheHistogram.labels(config.network).observe(cache);
     start = performance.now();
 
-    await Promise.all([
-      storeReceipts(dbWrite, messages),
-      storeExecutionOutcomes(dbWrite, messages),
-    ]);
+    await storeReceipts(dbWrite, messages);
 
     const time = performance.now() - start;
 
