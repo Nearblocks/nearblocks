@@ -98,22 +98,39 @@ export type Receipt = {
 };
 
 export type ReceiptEnum =
-  | {
-      Action: {
-        actions: Action[];
-        gasPrice: string;
-        inputDataIds: string[];
-        outputDataReceivers: DataReceiver[];
-        signerId: string;
-        signerPublicKey: string;
-      };
-    }
-  | {
-      Data: {
-        data: string;
-        dataId: string;
-      };
+  | ActionReceipt
+  | DataReceipt
+  | GlobalContractDistributionReceipt;
+
+export type ActionReceipt = {
+  Action: {
+    actions: Action[];
+    gasPrice: string;
+    inputDataIds: string[];
+    outputDataReceivers: DataReceiver[];
+    signerId: string;
+    signerPublicKey: string;
+  };
+};
+
+export type DataReceipt = {
+  Data: {
+    data: string;
+    dataId: string;
+  };
+};
+
+export type GlobalContractDistributionReceipt = {
+  GlobalContractDistribution: {
+    alreadyDeliveredShards: number[];
+    code: string;
+    id: {
+      AccountId: string;
     };
+    targetShard: number;
+  };
+};
+
 export type Action =
   | 'CreateAccount'
   | AddKeyAction
@@ -121,9 +138,13 @@ export type Action =
   | DeleteAccountAction
   | DeleteKeyAction
   | DeployContractAction
+  | DeployGlobalContractAction
+  | DeployGlobalContractByAccountIdAction
   | FunctionCallAction
   | StakeAction
-  | TransferAction;
+  | TransferAction
+  | UseGlobalContractAction
+  | UseGlobalContractByAccountIdAction;
 
 export type NonDelegateAction =
   | 'CreateAccount'
@@ -131,9 +152,13 @@ export type NonDelegateAction =
   | DeleteAccountAction
   | DeleteKeyAction
   | DeployContractAction
+  | DeployGlobalContractAction
+  | DeployGlobalContractByAccountIdAction
   | FunctionCallAction
   | StakeAction
-  | TransferAction;
+  | TransferAction
+  | UseGlobalContractAction
+  | UseGlobalContractByAccountIdAction;
 
 export type AddKeyAction = {
   AddKey: {
@@ -174,6 +199,18 @@ export type DeployContractAction = {
   };
 };
 
+export type DeployGlobalContractAction = {
+  DeployGlobalContract: {
+    code: string;
+  };
+};
+
+export type DeployGlobalContractByAccountIdAction = {
+  DeployGlobalContractByAccountId: {
+    code: string;
+  };
+};
+
 export type FunctionCallAction = {
   FunctionCall: {
     args: string;
@@ -193,6 +230,18 @@ export type StakeAction = {
 export type TransferAction = {
   Transfer: {
     deposit: string;
+  };
+};
+
+export type UseGlobalContractAction = {
+  UseGlobalContract: {
+    codeHash: string;
+  };
+};
+
+export type UseGlobalContractByAccountIdAction = {
+  UseGlobalContractByAccountId: {
+    accountId: string;
   };
 };
 

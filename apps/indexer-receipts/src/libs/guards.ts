@@ -6,9 +6,13 @@ import {
   DeleteAccountAction,
   DeleteKeyAction,
   DeployContractAction,
+  DeployGlobalContractAction,
+  DeployGlobalContractByAccountIdAction,
   FunctionCallAction,
   StakeAction,
   TransferAction,
+  UseGlobalContractAction,
+  UseGlobalContractByAccountIdAction,
 } from 'nb-blocks';
 
 export const isFunctionCallAction = (
@@ -20,6 +24,28 @@ export const isDeployContractAction = (
   action: Action,
 ): action is DeployContractAction =>
   (action as DeployContractAction).DeployContract !== undefined;
+
+export const isDeployGlobalContractAction = (
+  action: Action,
+): action is DeployGlobalContractAction =>
+  (action as DeployGlobalContractAction).DeployGlobalContract !== undefined;
+
+export const isDeployGlobalContractByAccountIdAction = (
+  action: Action,
+): action is DeployGlobalContractByAccountIdAction =>
+  (action as DeployGlobalContractByAccountIdAction)
+    .DeployGlobalContractByAccountId !== undefined;
+
+export const isUseGlobalContractAction = (
+  action: Action,
+): action is UseGlobalContractAction =>
+  (action as UseGlobalContractAction).UseGlobalContract !== undefined;
+
+export const isUseGlobalContractByAccountIdAction = (
+  action: Action,
+): action is UseGlobalContractByAccountIdAction =>
+  (action as UseGlobalContractByAccountIdAction)
+    .UseGlobalContractByAccountId !== undefined;
 
 export const isTransferAction = (action: Action): action is TransferAction =>
   (action as TransferAction).Transfer !== undefined;

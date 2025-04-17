@@ -1,11 +1,11 @@
 {
   "name": "nb-blocks",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "src/index.ts",
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint ./ --fix"
