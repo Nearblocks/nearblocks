@@ -11,6 +11,10 @@ import DeployContract from './Action/DeployContract';
 import FunctionCall from './Action/FunctionCall';
 import Stake from './Action/Stake';
 import Transfer from './Action/Transfer';
+import DeployGlobalContract from './Action/DeployGlobalContract';
+import DeployGlobalContractByAccountId from './Action/DeployGlobalContractByAccountId';
+import UseGlobalContract from './Action/UseGlobalContract';
+import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId';
 
 const Actions = (props: ActionPropsInfo) => {
   const showAction = () => {
@@ -33,6 +37,18 @@ const Actions = (props: ActionPropsInfo) => {
       case 'DeployContract':
       case 'DEPLOY_CONTRACT':
         return <DeployContract action={props?.action} />;
+      case 'DEPLOY_GLOBAL_CONTRACT':
+      case 'DeployGlobalContract':
+        return <DeployGlobalContract action={props?.action} />;
+      case 'DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID':
+      case 'DeployGlobalContractByAccountId':
+        return <DeployGlobalContractByAccountId action={props?.action} />;
+      case 'USE_GLOBAL_CONTRACT':
+      case 'UseGlobalContract':
+        return <UseGlobalContract action={props?.action} />;
+      case 'USE_GLOBAL_CONTRACT_BY_ACCOUNT_ID':
+      case 'UseGlobalContractByAccountId':
+        return <UseGlobalContractByAccountId action={props?.action} />;
       case 'FunctionCall':
       case 'FUNCTION_CALL':
         return <FunctionCall action={props?.action} />;
