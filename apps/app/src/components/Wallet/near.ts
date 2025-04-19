@@ -1,5 +1,10 @@
 // wallet selector
-import { NetworkId, setupWalletSelector } from '@near-wallet-selector/core';
+import {
+  BrowserWallet,
+  NetworkId,
+  setupWalletSelector,
+  WalletModuleFactory,
+} from '@near-wallet-selector/core';
 import { setupBitteWallet } from '@near-wallet-selector/bitte-wallet';
 import { setupCoin98Wallet } from '@near-wallet-selector/coin98-wallet';
 import { setupLedger } from '@near-wallet-selector/ledger';
@@ -121,14 +126,14 @@ export class Wallet {
     // Initialize the wallet selector
     this.selector = setupWalletSelector({
       modules: [
-        setupBitteWallet(),
+        setupBitteWallet() as WalletModuleFactory<BrowserWallet>,
         setupCoin98Wallet(),
         setupEthereumWallets({
           wagmiConfig: wagmiAdapter.wagmiConfig as any,
           web3Modal: web3Modal as any,
         }),
         setupLedger(),
-        setupMintbaseWallet(),
+        setupMintbaseWallet() as WalletModuleFactory<BrowserWallet>,
         setupMeteorWallet(),
         setupNearFi(),
         setupNearMobileWallet(),
