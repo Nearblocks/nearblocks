@@ -16,6 +16,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  DISABLE_AUTO_SWITCH: bool({ default: false }),
   DISABLE_S3_UPLOAD: bool({ default: false }),
   FASTNEAR_ENDPOINT: str({ default: undefined }),
   NEARLAKE_ACCESS_KEY: str(),
@@ -61,6 +62,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   delta: 10, // start from blocks earlier on sync interuption
+  disableAutoSwitch: env.DISABLE_AUTO_SWITCH,
   disableS3Upload: env.DISABLE_S3_UPLOAD,
   fastnearEndpoint: env.FASTNEAR_ENDPOINT,
   genesisFile: genesisFile, // url to download genesis data
