@@ -15,6 +15,10 @@ import FunctionCall from './Action/FunctionCall';
 import Stake from './Action/Stake';
 import Transfer from './Action/Transfer';
 import TreeNode from './TreeNode';
+import DeployGlobalContract from './Action/DeployGlobalContract';
+import DeployGlobalContractByAccountId from './Action/DeployGlobalContractByAccountId';
+import UseGlobalContract from './Action/UseGlobalContract';
+import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId';
 
 const TreeTxnsActions = (props: TransActionProps) => {
   const { action, receiver } = props;
@@ -45,6 +49,43 @@ const TreeTxnsActions = (props: TransActionProps) => {
           action={action}
           args={action.args}
           receiver={receiver}
+        />
+      );
+
+    case 'DEPLOY_GLOBAL_CONTRACT':
+    case 'DeployGlobalContract':
+      return (
+        <DeployGlobalContract
+          action={props?.action}
+          receiver={receiver}
+          args={action.args}
+        />
+      );
+    case 'DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID':
+    case 'DeployGlobalContractByAccountId':
+      return (
+        <DeployGlobalContractByAccountId
+          action={props?.action}
+          receiver={receiver}
+          args={action.args}
+        />
+      );
+    case 'USE_GLOBAL_CONTRACT':
+    case 'UseGlobalContract':
+      return (
+        <UseGlobalContract
+          action={props?.action}
+          receiver={receiver}
+          args={action.args}
+        />
+      );
+    case 'USE_GLOBAL_CONTRACT_BY_ACCOUNT_ID':
+    case 'UseGlobalContractByAccountId':
+      return (
+        <UseGlobalContractByAccountId
+          action={props?.action}
+          receiver={receiver}
+          args={action.args}
         />
       );
     case 'FUNCTION_CALL':

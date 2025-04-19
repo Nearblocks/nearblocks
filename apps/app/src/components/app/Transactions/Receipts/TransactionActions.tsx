@@ -18,6 +18,10 @@ import { Delegate } from '../../Icons/Delegate';
 import Link from 'next/link';
 import { shortenAddress } from '@/utils/app/libs';
 import Tooltip from '../../common/Tooltip';
+import DeployGlobalContract from './Action/DeployGlobalContract';
+import DeployGlobalContractByAccountId from './Action/DeployGlobalContractByAccountId';
+import UseGlobalContract from './Action/UseGlobalContract';
+import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId';
 
 const TransactionActions = (props: TransActionProps) => {
   const { action, receiver } = props;
@@ -37,6 +41,25 @@ const TransactionActions = (props: TransActionProps) => {
     case 'DEPLOY_CONTRACT':
     case 'DeployContract':
       return <DeployContract args={action.args} receiver={receiver} />;
+    case 'DEPLOY_GLOBAL_CONTRACT':
+    case 'DeployGlobalContract':
+      return <DeployGlobalContract args={action.args} receiver={receiver} />;
+    case 'DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID':
+    case 'DeployGlobalContractByAccountId':
+      return (
+        <DeployGlobalContractByAccountId
+          args={action.args}
+          receiver={receiver}
+        />
+      );
+    case 'USE_GLOBAL_CONTRACT':
+    case 'UseGlobalContract':
+      return <UseGlobalContract args={action.args} receiver={receiver} />;
+    case 'USE_GLOBAL_CONTRACT_BY_ACCOUNT_ID':
+    case 'UseGlobalContractByAccountId':
+      return (
+        <UseGlobalContractByAccountId args={action.args} receiver={receiver} />
+      );
     case 'FUNCTION_CALL':
     case 'FunctionCall':
       return <FunctionCall args={action.args} receiver={receiver} />;
