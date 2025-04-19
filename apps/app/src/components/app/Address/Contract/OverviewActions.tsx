@@ -5,7 +5,6 @@ import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { AccordionRoot } from '@/components/ui/accordion';
 import useRpc from '@/hooks/app/useRpc';
-import { verifierConfig } from '@/utils/app/config';
 import {
   ContractCodeInfo,
   ContractData,
@@ -23,6 +22,7 @@ import ViewOrChange from './ViewOrChange';
 import ViewOrChangeAbi from './ViewOrChangeAbi';
 import { shortenAddress } from '@/utils/libs';
 import { useParams } from 'next/navigation';
+import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
   accountId?: string;
@@ -40,12 +40,12 @@ type OnChainResponse = {
   hash?: string;
 };
 
-const verifiers = verifierConfig.map((config) => config.accountId);
-
 const OverviewActions = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
   const { accountId, contractInfo, deployments, isLocked, schema } = props;
   const params = useParams<{ id: string }>();
+  const { verifierConfig } = useConfig();
+  const verifiers = verifierConfig.map((config) => config.accountId);
 
   const [tab, setTab] = useState(0);
 
@@ -67,7 +67,6 @@ const OverviewActions = (props: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setStatusLoading(true);
         setError(null);
 
         const onChainResponse = await contractCode(accountId as string);
@@ -98,8 +97,6 @@ const OverviewActions = (props: Props) => {
 
   useEffect(() => {
     const fetchVerifierData = async () => {
-      setStatusLoading(true);
-
       try {
         const verifierDataPromises = verifiers.map((verifierAccountId) =>
           getVerifierData(accountId as string, verifierAccountId),

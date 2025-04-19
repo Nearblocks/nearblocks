@@ -4,8 +4,9 @@ import { Network, NetworkId } from '@/utils/types';
 
 interface VerifierConfig {
   accountId: string;
-  fileStructureApiUrl: (cid: string) => string;
+  fileStructureApiUrl: (cid: string, path: string) => string;
   sourceCodeApiUrl: (cid: string, fileName: string) => string;
+  ipfsUrl: (cid: string) => string;
   verifierApiUrl: string;
 }
 
@@ -64,20 +65,22 @@ export const useConfig = () => {
       ? [
           {
             accountId: 'v2-verifier.sourcescan.near',
-            fileStructureApiUrl: (cid) =>
-              `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
+            fileStructureApiUrl: (cid, path: string = '') =>
+              `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=${path}`,
             sourceCodeApiUrl: (cid, fileName) =>
-              `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
+              `https://api.sourcescan.dev/ipfs/${cid}/${fileName}`,
+            ipfsUrl: (cid: string) => `https://api.sourcescan.dev/ipfs/${cid}`,
             verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
           },
         ]
       : [
           {
             accountId: 'v2-verifier.sourcescan.testnet',
-            fileStructureApiUrl: (cid) =>
-              `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=src`,
+            fileStructureApiUrl: (cid: string, path: string = '') =>
+              `https://api.sourcescan.dev/api/ipfs/structure?cid=${cid}&path=${path}`,
             sourceCodeApiUrl: (cid, fileName) =>
-              `https://api.sourcescan.dev/ipfs/${cid}/src/${fileName}`,
+              `https://api.sourcescan.dev/ipfs/${cid}/${fileName}`,
+            ipfsUrl: (cid: string) => `https://api.sourcescan.dev/ipfs/${cid}`,
             verifierApiUrl: 'https://api-v2.sourcescan.dev/api/verify/rust',
           },
         ];

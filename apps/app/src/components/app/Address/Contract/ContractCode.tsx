@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 
 import { Link } from '@/i18n/routing';
-import { verifierConfig } from '@/utils/app/config';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractData, VerificationData, VerifierData } from '@/utils/types';
 
@@ -12,6 +11,7 @@ import FaInbox from '../../Icons/FaInbox';
 import Question from '../../Icons/Question';
 import VerificationStatus from './VerificationStatus';
 import VerifiedData from './VerifiedData';
+import { useConfig } from '@/hooks/app/useConfig';
 
 type ContractCodeProps = {
   accountId: string;
@@ -21,8 +21,6 @@ type ContractCodeProps = {
   verificationData: Record<string, VerificationData>;
 };
 
-const verifiers = verifierConfig.map((config) => config.accountId);
-
 const ContractCode: React.FC<ContractCodeProps> = ({
   accountId,
   contractData,
@@ -30,6 +28,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   statusLoading,
   verificationData,
 }) => {
+  const { verifierConfig } = useConfig();
+  const verifiers = verifierConfig.map((config) => config.accountId);
   const [selectedVerifier, setSelectedVerifier] = useState<string>(
     verifiers[0],
   );
@@ -45,6 +45,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     } else {
       setIpfsUrl('');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVerifier, verificationData]);
 
   const parseBuildEnvironment = (buildEnvironment: string) => {
