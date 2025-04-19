@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { verifierConfig } from '@/utils/app/config';
 import { ContractMetadata, VerifierData } from '@/utils/types';
 import ErrorMessage from '../../common/ErrorMessage';
 import FaCode from '../../Icons/FaCode';
@@ -9,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useParams } from 'next/navigation';
 import { useRpcStore } from '@/stores/app/rpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
+import { useConfig } from '@/hooks/app/useConfig';
 
 type VerifiedDataProps = {
   base64Code: string;
@@ -31,6 +31,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
   const params = useParams<{ id: string }>();
   const contractId = params?.id?.toLowerCase();
   const initializedRef = useRef(false);
+  const { verifierConfig } = useConfig();
 
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);
@@ -56,7 +57,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
           verifierData,
           contractMetadata,
         );
-        setFileData(files);
+        if (files) setFileData(files);
       } catch (error) {
         switchRpc();
         setFileDataError('Failed to fetch files.');
@@ -70,6 +71,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataError(null);
       setFileDataLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVerifier, verifierData, contractMetadata, switchRpc]);
 
   const fetchFilesData = async (
@@ -77,53 +79,45 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
     verifierData: VerifierData,
     contractMetadata: ContractMetadata | null,
   ) => {
+    const verifier = verifierConfig.find(
+      (c) => c.accountId === selectedVerifier,
+    );
+    const cid = verifierData?.cid;
+    const path = contractMetadata?.build_info?.contract_path || 'src';
     try {
-      const verifier = verifierConfig.find(
-        (config: { accountId: string }) =>
-          config.accountId === selectedVerifier,
-      );
-
-      if (!verifier) throw new Error('Verifier configuration not found.');
-      const cid = verifierData?.cid;
-      if (!cid) throw new Error('CID not found.');
-
-      const fetchStructure = async (path = '') => {
-        const response = await fetch(verifier.fileStructureApiUrl(cid, path));
-        if (!response.ok)
+      if (!cid || !verifier) return;
+      const fetchStructure = async (path: string) => {
+        const res = await fetch(verifier.fileStructureApiUrl(cid, path));
+        if (!res.ok)
           throw new Error(`Failed to fetch structure at path: ${path}`);
-        return await response.json();
+        return await res.json();
       };
 
       const getFiles = async (path = ''): Promise<string[]> => {
         const data = await fetchStructure(path);
         const files: string[] = [];
         for (const item of data?.structure || []) {
-          if (item.type === 'file') {
-            files.push(`${path}${path ? '/' : ''}${item.name}`);
-          } else if (item.type === 'dir') {
-            files.push(...(await getFiles(`${path}/${item.name}`)));
-          }
+          const fullPath = `${path}${path ? '/' : ''}${item.name}`;
+          if (item.type === 'file') files.push(fullPath);
+          else if (item.type === 'dir')
+            files.push(...(await getFiles(fullPath)));
         }
         return files;
       };
 
-      const path = contractMetadata?.build_info?.contract_path || 'src';
       const files = await getFiles(path);
-
       const fileContents = await Promise.all(
-        files.map(async (filePath: string) => {
-          const sourceCodeUrl = verifier.sourceCodeApiUrl(cid, filePath);
-          const response = await fetch(sourceCodeUrl);
-          if (!response.ok)
+        files.map(async (filePath) => {
+          const res = await fetch(verifier.sourceCodeApiUrl(cid, filePath));
+          if (!res.ok)
             throw new Error(`Failed to fetch content for ${filePath}`);
-          return { content: await response.text(), name: filePath };
+          return { content: await res.text(), name: filePath };
         }),
       );
-
       return fileContents.filter((file) => file.content !== null);
     } catch (error) {
-      console.error('Error fetching files data:', error);
-      throw error;
+      setFileDataError('Failed to fetch files.');
+      return;
     }
   };
 
@@ -141,7 +135,6 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       const link = document.createElement('a');
 
       const filename = contractId ? `${contractId}.wasm` : 'contract.wasm';
-      console.log({ filename });
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
