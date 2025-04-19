@@ -36,16 +36,18 @@ if (config.nearlakeEndpoint) {
   lakeConfig.s3Endpoint = config.nearlakeEndpoint;
 }
 
-setInterval(async () => {
-  if (source === DataSource.NEAR_LAKE) {
-    try {
-      await checkFastnear();
-      shouldSwitchSource = true;
-    } catch (error) {
-      logger.error(error);
+if (!config.disableAutoSwitch) {
+  setInterval(async () => {
+    if (source === DataSource.NEAR_LAKE) {
+      try {
+        await checkFastnear();
+        shouldSwitchSource = true;
+      } catch (error) {
+        logger.error(error);
+      }
     }
-  }
-}, ONE_HOUR_IN_MS);
+  }, ONE_HOUR_IN_MS);
+}
 
 export const syncData = async () => {
   // eslint-disable-next-line no-constant-condition
@@ -107,10 +109,13 @@ export const syncData = async () => {
       }
     } catch (error) {
       logger.error(error);
-      source =
-        source === DataSource.FAST_NEAR
-          ? DataSource.NEAR_LAKE
-          : DataSource.FAST_NEAR;
+
+      if (!config.disableAutoSwitch) {
+        source =
+          source === DataSource.FAST_NEAR
+            ? DataSource.NEAR_LAKE
+            : DataSource.FAST_NEAR;
+      }
     }
   }
 };
@@ -130,7 +135,7 @@ export const onMessage = async (message: Message) => {
       ]),
       new Promise((_, reject) =>
         setTimeout(
-          () => reject(new Error('Block processing timed out after 10s')),
+          () => reject(new Error('Block processing timed out after 20s')),
           20_000,
         ),
       ),
