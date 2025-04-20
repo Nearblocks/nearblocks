@@ -25,4 +25,5 @@ S3_REGION=
 S3_BUCKET=
 SENTRY_DSN=
 DISABLE_S3_UPLOAD= # true | false
+DISABLE_AUTO_SWITCH= # true | false
 ```
