@@ -143,7 +143,7 @@ const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
     {
       cell: (row: TransactionInfo) => (
         <>
-          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
+          <TxnStatus showLabel={false} status={row?.outcome?.status} />
         </>
       ),
       header: <span></span>,

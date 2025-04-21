@@ -46,7 +46,8 @@ const ReceiptRow = (props: Props) => {
   const [block, setBlock] = useState<{ height: string }>({ height: '' });
   const { getBlockDetails } = useRpc();
 
-  const status = rpcReceipt?.outcome?.status;
+  const status = receipt?.outcome?.status;
+
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
