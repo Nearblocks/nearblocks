@@ -29,8 +29,8 @@ export const appUrl =
 
 export const docsUrl: string =
   networkId === 'mainnet'
-    ? 'https://api3.nearblocks.io/api-docs'
-    : 'https://api3-testnet.nearblocks.io/api-docs';
+    ? 'https://api.nearblocks.io/api-docs'
+    : 'https://api-testnet.nearblocks.io/api-docs';
 
 export const aurorablocksUrl: string =
   networkId === 'mainnet'

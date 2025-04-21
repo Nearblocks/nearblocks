@@ -51,8 +51,8 @@ export const useConfig = () => {
 
   const docsUrl =
     networkId === 'mainnet'
-      ? 'https://api3.nearblocks.io/api-docs'
-      : 'https://api3-testnet.nearblocks.io/api-docs';
+      ? 'https://api.nearblocks.io/api-docs'
+      : 'https://api-testnet.nearblocks.io/api-docs';
 
   const aurorablocksUrl =
     networkId === 'mainnet'

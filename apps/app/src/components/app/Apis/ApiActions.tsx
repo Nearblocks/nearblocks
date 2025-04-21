@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { docsUrl } from '@/utils/app/config';
+import { useConfig } from 'app/src/hooks/app/useConfig';
 import { localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 
@@ -34,6 +34,8 @@ const ApiActions = ({
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
   const router = useRouter();
+
+  const { docsUrl } = useConfig();
 
   const submitForm = async (event: any) => {
     event.preventDefault();
