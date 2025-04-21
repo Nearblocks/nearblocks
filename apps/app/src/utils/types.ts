@@ -304,6 +304,9 @@ export type TransactionInfo = {
   outcomes: {
     status: boolean;
   };
+  outcome: {
+    status: boolean;
+  };
   outcomes_agg: {
     gas_used: string;
     transaction_fee: string;
