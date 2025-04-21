@@ -17,6 +17,7 @@ import Tooltip from '../common/Tooltip';
 import Question from '../Icons/Question';
 import Skeleton from '../skeleton/common/Skeleton';
 import SwitchButton from '../SwitchButton';
+import ChartToggle from '../common/ChartToggle';
 
 interface Props {
   chartsData?: {
@@ -64,7 +65,7 @@ const CHART_TYPE_MAPPINGS = {
   }),
   'txn-fee': (stat: ChartStat) => ({
     date: stat.date,
-    fee: stat.txn_fee,
+    fee: Number(stat.txn_fee),
     x: new Date(stat.date).valueOf(),
     y: Number(stat.txn_fee_usd),
   }),
@@ -88,7 +89,7 @@ const CHART_INFO_CONFIG = {
     title: 'Near Market Capitalization Chart',
     yLabel: 'Near Market Cap (USD)',
     description:
-      'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization and price.',
+      'Near Market Capitalization chart shows the historical breakdown of Near daily market capitalization price and Near daily  price',
   },
   txns: {
     title: 'Near Daily Transactions Chart',
@@ -117,14 +118,20 @@ const CHART_INFO_CONFIG = {
   'txn-fee': {
     title: 'Transaction Fee Chart',
     yLabel: 'Transaction Fee (USD)',
-    description:
-      'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+    description: {
+      USD: 'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+      Near: 'The chart shows the daily amount in Near Price spent per transaction on Near blockchain',
+    },
   },
   'txn-volume': {
     title: 'Transaction Volume Chart',
     yLabel: 'Transaction Volume (USD)',
     description:
-      'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+      // 'The chart shows the daily amount in USD spent per transaction on Near blockchain.'
+      {
+        USD: 'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+        Near: 'The chart shows the daily amount in Near Price spent per transaction on Near blockchain',
+      },
   },
   'near-price': {
     title: 'Near Daily Price (USD) Chart',
@@ -146,6 +153,7 @@ const CHART_INFO_CONFIG = {
 
 const Chart = (props: Props) => {
   const { chartsData, chartTypes, theme: cookieTheme } = props;
+
   const t = useTranslations();
   let { theme } = useTheme();
   const [chartInfo, setChartInfo] = useState<ChartTypeInfo>({
@@ -153,6 +161,8 @@ const Chart = (props: Props) => {
     title: '',
   });
   const [logView, setLogView] = useState(false);
+  const [priceViewTxnFee, setPriceViewTxnFee] = useState(false);
+  const [txnVolumeView, setTxnVolumeView] = useState(false);
   const [chartOptions, setChartOptions] = useState<Highcharts.Options | null>(
     null,
   );
@@ -165,6 +175,14 @@ const Chart = (props: Props) => {
   const handleToggle = useCallback(() => {
     setLogView((prev) => !prev);
   }, []);
+
+  const handleTxnFeeToggle = () => {
+    setPriceViewTxnFee((prev) => !prev);
+  };
+
+  const handleTxn_volume = () => {
+    setTxnVolumeView((prev) => !prev);
+  };
 
   const data = chartsData?.charts as ChartStat[];
 
@@ -264,25 +282,40 @@ const Chart = (props: Props) => {
     return logView
       ? chartData.map((item) => ({
           ...item,
+          x: item.x,
           y: item.y === 0 ? null : item.y,
         }))
       : chartData;
   }, [chartData, logView]);
 
-  const createTooltipFormatter = useCallback((chartType: string) => {
-    return function (this: Highcharts.TooltipFormatterContextObject) {
-      const point = this.point;
-      const date = dayjs(point.x).format('dddd, MMMM DD, YYYY');
+  const finalChartData =
+    chartTypes === 'market-cap'
+      ? processedChartData.map((item) => ({
+          x: item.x,
+          y: item.y,
+          price: (item as any).price ?? 0,
+          marketCap: item.y,
+        }))
+      : processedChartData;
 
-      switch (chartType) {
-        case 'market-cap':
-          return `
+  const createTooltipFormatter = useCallback(
+    (chartType: string) => {
+      return function (this: Highcharts.TooltipFormatterContextObject) {
+        const point = this.point;
+
+        const date = dayjs(point.x).format('dddd, MMMM DD, YYYY');
+
+        switch (chartType) {
+          case 'market-cap':
+            return `
             ${date}<br/>
             Market Cap: <strong>$${dollarFormat(Number(point.y))}</strong><br/>
-            Near Price: <strong>$${dollarFormat((point as any).price)}</strong>
-          `;
-        case 'txns':
-          return `
+            Near Price: <strong>Ⓝ${dollarFormat(
+              Number((point as any).price),
+            )}</strong>
+            `;
+          case 'txns':
+            return `
             ${date}<br/>
             Total Transactions: <strong>${dollarFormat(
               Number(point.y),
@@ -294,27 +327,77 @@ const Chart = (props: Props) => {
               (point as any).addresses,
             )}</strong>
           `;
-        case 'near-supply':
-          return `
+          case 'near-supply':
+            return `
             ${date}<br/>
             Total Supply: <strong>${dollarFormat(Number(point.y))} Ⓝ</strong>
           `;
-        default:
-          return `
+          case 'txn-fee':
+            if (priceViewTxnFee) {
+              return `
+                ${date}<br/>
+                Txn Fee (Ⓝ): <strong>${yoctoToNear(
+                  (point as any).fee,
+                  true,
+                )} Ⓝ</strong><br/>
+                  `;
+            }
+            return `
+              ${date}<br/>
+              Txn Fee : <strong>$${dollarFormat(Number(point.y))},
+              </strong>
+            `;
+
+          case 'txn-volume':
+            if (txnVolumeView) {
+              return `
+              ${date}<br/>
+             Txn Fee (Ⓝ): <strong> ${yoctoToNear(
+               (point as any).volume,
+               true,
+             )} Ⓝ</strong><br/>
+              `;
+            }
+            return `
+              ${date}<br/>
+              Txn Fee: <strong>$${dollarFormat(Number(point.y))}</strong><br/>
+            `;
+
+          default:
+            return `
             ${date}<br/>
             Value: <strong>${dollarFormat(Number(point.y))}</strong>
           `;
-      }
-    };
-  }, []);
+        }
+      };
+    },
+    [priceViewTxnFee, txnVolumeView],
+  );
 
   useEffect(() => {
     if (!chartTypes || chartData.length === 0) return;
 
+    const rawConfig =
+      CHART_INFO_CONFIG[chartTypes as keyof typeof CHART_INFO_CONFIG] ||
+      CHART_INFO_CONFIG.default;
+
+    const description =
+      chartTypes === 'txn-fee' && typeof rawConfig.description === 'object'
+        ? priceViewTxnFee
+          ? rawConfig.description.Near
+          : rawConfig.description.USD
+        : chartTypes === 'txn-volume' &&
+          typeof rawConfig.description === 'object'
+        ? txnVolumeView
+          ? rawConfig.description.Near
+          : rawConfig.description.USD
+        : (rawConfig.description as string);
+
     const config =
       CHART_INFO_CONFIG[chartTypes as keyof typeof CHART_INFO_CONFIG] ||
       CHART_INFO_CONFIG.default;
-    setChartInfo({ description: config.description, title: config.title });
+
+    setChartInfo({ description, title: config.title });
 
     const options: Highcharts.Options = {
       accessibility: {
@@ -379,8 +462,7 @@ const Chart = (props: Props) => {
       series: [
         {
           color: 'rgba(3, 63, 64, 1)',
-          data: processedChartData,
-          name: config.title,
+          data: finalChartData,
           showInLegend: false,
           type: 'area',
         },
@@ -427,7 +509,18 @@ const Chart = (props: Props) => {
         },
         lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
         title: { text: config.yLabel },
-        type: logView ? 'logarithmic' : 'linear',
+        type:
+          chartTypes === 'txn-fee' && priceViewTxnFee
+            ? logView
+              ? 'logarithmic'
+              : 'linear'
+            : chartTypes === 'txn-volume' && txnVolumeView
+            ? logView
+              ? 'logarithmic'
+              : 'linear'
+            : logView
+            ? 'logarithmic'
+            : 'linear',
       },
     };
 
@@ -440,6 +533,9 @@ const Chart = (props: Props) => {
     logView,
     createTooltipFormatter,
     chartData,
+    priceViewTxnFee,
+    txnVolumeView,
+    finalChartData,
   ]);
 
   return (
@@ -452,30 +548,51 @@ const Chart = (props: Props) => {
           >
             <div className="border-b dark:border-black-200 py-4 px-4 flex justify-between items-center">
               {chartOptions && chartData?.length > 0 ? (
-                <div className="w-full flex sm:justify-between gap-2 flex-wrap">
+                <div className="w-full flex sm:justify-between  flex-wrap">
                   <p className="leading-7 text-sm text-nearblue-600 dark:text-neargray-10">
                     {chartInfo?.description}
                   </p>
-                  <span className="items-center text-nearblue-600 dark:text-neargray-10 inline-flex">
-                    <Tooltip
-                      className={'sm:left-1/2 left-20 max-w-[200px] w-40'}
-                      position="bottom"
-                      tooltip="Toggle between Log View and Normal View. Log View uses logarithmic scale."
-                    >
-                      <span>
-                        <Question className="w-4 h-4 fill-current mr-2" />
-                      </span>
-                    </Tooltip>
-                    <div className="flex">
-                      <SwitchButton
-                        onChange={handleToggle}
-                        selected={logView}
+
+                  <div className="flex justify-between px-4 gap-2">
+                    {chartTypes === 'txn-fee' && (
+                      <ChartToggle
+                        tooltip="Toggle to show Near Price"
+                        selected={priceViewTxnFee}
+                        onChange={handleTxnFeeToggle}
+                        label={priceViewTxnFee ? 'Near' : 'USD'}
                       />
-                    </div>
-                    <label className="text-nearblue-600 dark:text-neargray-10 text-sm leading-none px-2">
-                      {'Log View'}
-                    </label>
-                  </span>
+                    )}
+
+                    {chartTypes === 'txn-volume' && (
+                      <ChartToggle
+                        tooltip="Toggle to show Near Price"
+                        selected={txnVolumeView}
+                        onChange={handleTxn_volume}
+                        label={txnVolumeView ? 'Near' : 'USD'}
+                      />
+                    )}
+
+                    <span className="items-center text-nearblue-600 dark:text-neargray-10 inline-flex">
+                      <Tooltip
+                        className={'sm:left-1/2 left-20 max-w-[200px] w-40'}
+                        position="bottom"
+                        tooltip="Toggle between Log View and Normal View. Log View uses logarithmic scale."
+                      >
+                        <span>
+                          <Question className="w-4 h-4 fill-current mr-2" />
+                        </span>
+                      </Tooltip>
+                      <div className="flex">
+                        <SwitchButton
+                          onChange={handleToggle}
+                          selected={logView}
+                        />
+                      </div>
+                      <label className="text-nearblue-600 dark:text-neargray-10 text-sm leading-none px-2">
+                        {'Log View'}
+                      </label>
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <div className="py-1 my-0.5 pr-5">
