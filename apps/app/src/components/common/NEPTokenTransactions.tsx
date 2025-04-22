@@ -265,21 +265,20 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({ events }) => {
         amount: transaction.amount.toString(),
       }))
       .sort((a: any, b: any) => {
-        if (a.address === b.address) {
-          if (a.type === 'sent' && b.type !== 'sent') return -1;
-          if (a.type !== 'sent' && b.type === 'sent') return 1;
+        if (a?.address === b?.address) {
+          if (a?.type === 'sent' && b?.type !== 'sent') return -1;
+          if (a?.type !== 'sent' && b?.type === 'sent') return 1;
 
-          return a.type.localeCompare(b.type);
+          return a?.type?.localeCompare(b?.type);
         }
 
-        return a.address.localeCompare(b.address);
+        return a?.address?.localeCompare(b?.address);
       });
 
     return groupedArray;
   };
 
   const transactions = groupTransactions(combinedTransactions);
-
   useEffect(() => {
     if (netTransferRef?.current) {
       const height = netTransferRef?.current?.offsetHeight;
