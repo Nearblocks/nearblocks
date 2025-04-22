@@ -126,12 +126,10 @@ const CHART_INFO_CONFIG = {
   'txn-volume': {
     title: 'Transaction Volume Chart',
     yLabel: 'Transaction Volume (USD)',
-    description:
-      // 'The chart shows the daily amount in USD spent per transaction on Near blockchain.'
-      {
-        USD: 'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
-        Near: 'The chart shows the daily amount in Near Price spent per transaction on Near blockchain',
-      },
+    description: {
+      USD: 'The chart shows the daily amount in USD spent per transaction on Near blockchain.',
+      Near: 'The chart shows the daily amount in Near Price spent per transaction on Near blockchain',
+    },
   },
   'near-price': {
     title: 'Near Daily Price (USD) Chart',
@@ -285,18 +283,12 @@ const Chart = (props: Props) => {
           x: item.x,
           y: item.y === 0 ? null : item.y,
         }))
-      : chartData;
-  }, [chartData, logView]);
-
-  const finalChartData =
-    chartTypes === 'market-cap'
-      ? processedChartData.map((item) => ({
+      : chartData.map((item) => ({
+          ...item,
           x: item.x,
           y: item.y,
-          price: (item as any).price ?? 0,
-          marketCap: item.y,
-        }))
-      : processedChartData;
+        }));
+  }, [chartData, logView]);
 
   const createTooltipFormatter = useCallback(
     (chartType: string) => {
@@ -310,9 +302,7 @@ const Chart = (props: Props) => {
             return `
             ${date}<br/>
             Market Cap: <strong>$${dollarFormat(Number(point.y))}</strong><br/>
-            Near Price: <strong>Ⓝ${dollarFormat(
-              Number((point as any).price),
-            )}</strong>
+            Near Price: <strong>Ⓝ${dollarFormat((point as any).price)}</strong>
             `;
           case 'txns':
             return `
@@ -337,14 +327,13 @@ const Chart = (props: Props) => {
               return `
                 ${date}<br/>
                 Txn Fee (Ⓝ): <strong>${yoctoToNear(
-                  (point as any).fee,
+                  (point as any).fee ?? 0,
                   true,
-                )} Ⓝ</strong><br/>
-                  `;
+                )} Ⓝ</strong><br/>`;
             }
             return `
               ${date}<br/>
-              Txn Fee : <strong>$${dollarFormat(Number(point.y))},
+              Txn Fee : <strong>$${dollarFormat(Number(point.y))}
               </strong>
             `;
 
@@ -353,7 +342,7 @@ const Chart = (props: Props) => {
               return `
               ${date}<br/>
              Txn Fee (Ⓝ): <strong> ${yoctoToNear(
-               (point as any).volume,
+               (point as any).volume ?? 0,
                true,
              )} Ⓝ</strong><br/>
               `;
@@ -462,7 +451,7 @@ const Chart = (props: Props) => {
       series: [
         {
           color: 'rgba(3, 63, 64, 1)',
-          data: finalChartData,
+          data: processedChartData,
           showInLegend: false,
           type: 'area',
         },
@@ -526,17 +515,7 @@ const Chart = (props: Props) => {
 
     setChartOptions(options);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    chartTypes,
-    processedChartData,
-    theme,
-    logView,
-    createTooltipFormatter,
-    chartData,
-    priceViewTxnFee,
-    txnVolumeView,
-    finalChartData,
-  ]);
+  }, [chartTypes, theme, logView, chartData, priceViewTxnFee, txnVolumeView]);
 
   return (
     <div>
@@ -548,15 +527,17 @@ const Chart = (props: Props) => {
           >
             <div className="border-b dark:border-black-200 py-4 px-4 flex justify-between items-center">
               {chartOptions && chartData?.length > 0 ? (
-                <div className="w-full flex sm:justify-between  flex-wrap">
+                <div className="w-full flex sm:justify-between flex-wrap gap-y-2">
                   <p className="leading-7 text-sm text-nearblue-600 dark:text-neargray-10">
                     {chartInfo?.description}
                   </p>
 
-                  <div className="flex justify-between px-4 gap-2">
+                  <div className="flex justify-between gap-2">
                     {chartTypes === 'txn-fee' && (
                       <ChartToggle
-                        tooltip="Toggle to show Near Price"
+                        tooltip={`Toggle to show ${
+                          priceViewTxnFee ? 'USD' : 'Near Price'
+                        }`}
                         selected={priceViewTxnFee}
                         onChange={handleTxnFeeToggle}
                         label={priceViewTxnFee ? 'Near' : 'USD'}
@@ -565,7 +546,9 @@ const Chart = (props: Props) => {
 
                     {chartTypes === 'txn-volume' && (
                       <ChartToggle
-                        tooltip="Toggle to show Near Price"
+                        tooltip={`Toggle to show ${
+                          txnVolumeView ? 'USD' : 'Near Price'
+                        }`}
                         selected={txnVolumeView}
                         onChange={handleTxn_volume}
                         label={txnVolumeView ? 'Near' : 'USD'}

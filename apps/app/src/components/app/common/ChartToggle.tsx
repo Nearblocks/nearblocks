@@ -18,7 +18,7 @@ const ChartToggle = ({
   return (
     <span className="text-nearblue-600 dark:text-neargray-10 inline-flex items-center">
       <Tooltip
-        className="sm:left-1/2 left-20 max-w-[200px] w-40"
+        className="sm:left-1/2 left-20 max-w-[200px] w-max"
         position="bottom"
         tooltip={tooltip}
       >
