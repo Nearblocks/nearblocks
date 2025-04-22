@@ -4,7 +4,7 @@ import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import { getLatestBlock, getLatestReceipt } from '#libs/sync';
 
-const TIME_RANGE = 30; // 30s
+const TIME_RANGE = 300; // 5m
 
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= TIME_RANGE;
