@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 import Tooltip from './common/Tooltip';
 import { handleExport } from '@/utils/app/actions';
+import DateInput from './common/DateInput';
 
 interface Props {
   exportType: string;
@@ -68,20 +69,12 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
     }
   };
 
-  const handleStartDateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
-    const selectedStartDate = event?.target?.value;
-
-    setStartDate(selectedStartDate);
+  const handleStartDateChange = (newDate: string) => {
+    setStartDate(newDate);
   };
 
-  const handleEndDateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ): void => {
-    const selectedEndDate = event?.target?.value;
-
-    setEndDate(selectedEndDate);
+  const handleEndDateChange = (newDate: string) => {
+    setEndDate(newDate);
   };
 
   return (
@@ -99,41 +92,37 @@ const Export: React.FC<Props> = ({ exportType, id }) => {
           </p>
         )}
         <div className="bg-white dark:bg-black-600 dark:border-black-200 border rounded-md shadow-md w-full px-4 py-4 my-10">
-          <p className="text-nearblue-600 dark:text-neargray-10 my-3 mx-2">
+          <p className="text-nearblue-600 dark:text-neargray-10 my-4 mx-2">
             Export the earliest 5000 records starting from
           </p>
 
-          <div className="lg:flex justify-between items-center text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 sm:flex gap-y-3 justify-between items-center text-center">
             <Tooltip
               className={'ml-4 max-w-[200px] whitespace-nowrap'}
               position="top"
               tooltip={'Select Start Date'}
             >
-              <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
-                <input
-                  className="border flex items-center  border-gray-300 dark:border-black-200 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
-                  defaultValue={initial?.start}
+              <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center">
+                <DateInput
+                  value={startDate}
+                  onChange={handleStartDateChange}
                   id="startdate"
                   name="startdate"
-                  onChange={handleStartDateChange}
-                  type="date"
                 />
               </div>
             </Tooltip>
-            <p className="text-center">To</p>
+            <div className="flex mx-auto">To</div>
             <Tooltip
               className={'ml-5 max-w-[200px] whitespace-nowrap'}
               position="top"
               tooltip={'Select End Date'}
             >
-              <div className="flex items-center  border-gray-300 dark:border-black-200 rounded-md text-center px-2 py-2 w-11/12 mx-2">
-                <input
-                  className="border flex items-center  border-gray-300 rounded-md px-2 py-2 w-11/12 mx-2 focus:outline-none text-center"
-                  defaultValue={initial?.end}
+              <div className="flex items-center border-gray-300 dark:border-black-200 rounded-md text-center">
+                <DateInput
+                  value={endDate}
+                  onChange={handleEndDateChange}
                   id="enddate"
                   name="enddate"
-                  onChange={handleEndDateChange}
-                  type="date"
                 />
               </div>
             </Tooltip>
