@@ -22,8 +22,7 @@ import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId'
 
 const TreeTxnsActions = (props: TransActionProps) => {
   const { action, receiver } = props;
-
-  switch (action.action_kind) {
+  switch (action?.action_kind) {
     case 'ADD_KEY':
     case 'AddKey':
       return <AddKey action={action} args={action.args} receiver={receiver} />;
@@ -134,7 +133,7 @@ const TreeTxnsActions = (props: TransActionProps) => {
       );
 
     default:
-      return <div>{action.action_kind}</div>;
+      return <div>{action?.action_kind}</div>;
   }
 };
 

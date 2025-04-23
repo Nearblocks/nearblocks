@@ -8,12 +8,13 @@ import TreeTxnsActions from './TreeTxnsActions';
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;
+  rpcReceipt: any | ReceiptsPropsInfo;
   show: any | string;
   txn: TransactionInfo;
 }
 
 const TreeReceiptDetails = (props: Props) => {
-  const { receipt, show, txn } = props;
+  const { receipt, show, txn, rpcReceipt } = props;
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -45,68 +46,71 @@ const TreeReceiptDetails = (props: Props) => {
           ) : receipt?.actions ? (
             <>
               {receipt &&
-                receipt?.actions?.map((action: any, i: number) => (
-                  <Fragment key={i}>
-                    <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
-                      Receipt
-                    </div>
-                    <div className="w-full pl-3 py-2 flex items-center">
-                      Status:
-                      {!receipt ? (
-                        <div className="w-full md:w-3/4">
-                          <Loader wrapperClassName="flex w-full max-w-xl" />
-                        </div>
-                      ) : (
-                        <div className="w-full md:w-3/4 break-words ml-2">
-                          {receipt?.outcome?.status !== undefined && (
-                            <TxnsReceiptStatus showLabel status={isSuccess} />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <div className="w-full pl-3 py-2 flex items-center">
-                      <span className="flex-shrink-0">From:</span>
-                      <div className="flex-1 min-w-0 ml-2">
-                        <Tooltip
-                          className="left-1/2 max-w-[200px]"
-                          position="top"
-                          tooltip={receipt.predecessor_id}
-                        >
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-medium block truncate"
-                            href={`/address/${receipt?.predecessor_id}`}
-                          >
-                            {receipt.predecessor_id}
-                          </Link>
-                        </Tooltip>
+                receipt?.actions?.map((_: any, i: number) => {
+                  const rpcAction = rpcReceipt?.actions?.[i];
+                  return (
+                    <Fragment key={i}>
+                      <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
+                        Receipt
                       </div>
-                    </div>
-                    <div className="w-full pl-3 py-2 flex items-center">
-                      <span className="flex-shrink-0">To:</span>
-                      <div className="flex-1 min-w-0 ml-2">
-                        <Tooltip
-                          className="left-1/2 max-w-[200px]"
-                          position="top"
-                          tooltip={receipt.receiver_id}
-                        >
-                          <Link
-                            className="text-green-500 dark:text-green-250 font-medium block truncate"
-                            href={`/address/${receipt?.receiver_id}`}
-                          >
-                            {receipt.receiver_id}
-                          </Link>
-                        </Tooltip>
+                      <div className="w-full pl-3 py-2 flex items-center">
+                        Status:
+                        {!receipt ? (
+                          <div className="w-full md:w-3/4">
+                            <Loader wrapperClassName="flex w-full max-w-xl" />
+                          </div>
+                        ) : (
+                          <div className="w-full md:w-3/4 break-words ml-2">
+                            {receipt?.outcome?.status !== undefined && (
+                              <TxnsReceiptStatus showLabel status={isSuccess} />
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <div className="w-full pl-3 word-break space-y-4">
-                      <TreeTxnsActions
-                        action={action}
-                        key={i}
-                        receiver={receipt?.receiver_id}
-                      />
-                    </div>
-                  </Fragment>
-                ))}
+                      <div className="w-full pl-3 py-2 flex items-center">
+                        <span className="flex-shrink-0">From:</span>
+                        <div className="flex-1 min-w-0 ml-2">
+                          <Tooltip
+                            className="left-1/2 max-w-[200px]"
+                            position="top"
+                            tooltip={receipt.predecessor_id}
+                          >
+                            <Link
+                              className="text-green-500 dark:text-green-250 font-medium block truncate"
+                              href={`/address/${receipt?.predecessor_id}`}
+                            >
+                              {receipt.predecessor_id}
+                            </Link>
+                          </Tooltip>
+                        </div>
+                      </div>
+                      <div className="w-full pl-3 py-2 flex items-center">
+                        <span className="flex-shrink-0">To:</span>
+                        <div className="flex-1 min-w-0 ml-2">
+                          <Tooltip
+                            className="left-1/2 max-w-[200px]"
+                            position="top"
+                            tooltip={receipt.receiver_id}
+                          >
+                            <Link
+                              className="text-green-500 dark:text-green-250 font-medium block truncate"
+                              href={`/address/${receipt?.receiver_id}`}
+                            >
+                              {receipt.receiver_id}
+                            </Link>
+                          </Tooltip>
+                        </div>
+                      </div>
+                      <div className="w-full pl-3 word-break space-y-4">
+                        <TreeTxnsActions
+                          action={rpcAction}
+                          key={i}
+                          receiver={receipt?.receiver_id}
+                        />
+                      </div>
+                    </Fragment>
+                  );
+                })}
               <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                 Execution Outcomes
               </div>
@@ -142,11 +146,23 @@ const TreeReceiptDetails = (props: Props) => {
       )}
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <>
-          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
-            <Fragment key={rcpt?.receipt_id}>
-              <TreeReceiptDetails receipt={rcpt} show={show} txn={txn} />
-            </Fragment>
-          ))}
+          {receipt?.outcome?.outgoing_receipts?.map(
+            (rcpt: any, index: number) => {
+              const childRpcReceipt =
+                rpcReceipt?.outcome?.outgoing_receipts?.[index] || null;
+
+              return (
+                <Fragment key={rcpt?.receipt_id}>
+                  <TreeReceiptDetails
+                    receipt={rcpt}
+                    show={show}
+                    txn={txn}
+                    rpcReceipt={childRpcReceipt}
+                  />
+                </Fragment>
+              );
+            },
+          )}
         </>
       )}
     </>

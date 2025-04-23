@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { mapRpcActionToAction } from '@/utils/near';
-import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import FaHourglassStart from '../Icons/FaHourglassStart';
@@ -16,13 +16,19 @@ interface Props {
   hash: string;
   rpcTxn: RPCTransactionInfo;
   txn: TransactionInfo;
+  apiTxnActionsData: ApiTxnData;
 }
 
 const Tree = (props: Props) => {
-  const { hash, rpcTxn, txn } = props;
+  const { hash, rpcTxn, txn, apiTxnActionsData } = props;
 
-  const [receipt, setReceipt] = useState<any>(null);
+  const [rpcReceipt, setRpcReceipt] = useState<any>(null);
   const [show, setShow] = useState<any>(null);
+
+  const receipt = apiTxnActionsData?.receiptData
+    ? apiTxnActionsData?.receiptData
+    : rpcReceipt;
+
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
       txn?.transaction?.actions &&
@@ -86,11 +92,11 @@ const Tree = (props: Props) => {
   useEffect(() => {
     if (!isEmpty(rpcTxn)) {
       const receipt = transactionReceipts(rpcTxn);
-      setReceipt(receipt);
+      setRpcReceipt(receipt);
       setShow(receipt?.receipt_id || null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rpcTxn]);
+  }, [rpcTxn, apiTxnActionsData?.receiptData]);
 
   const txnsPending = txn?.outcomes?.status === null;
   return (
@@ -121,9 +127,13 @@ const Tree = (props: Props) => {
               </div>
             </div>
           ) : (
-            <div className={`w-full ${!receipt?.id && 'h-96'}`}>
+            <div
+              className={`w-full ${
+                !receipt?.id || (!receipt?.receipt_id && 'h-96')
+              }`}
+            >
               <div className="p-4 md:px-8">
-                {!receipt?.id ? (
+                {!receipt?.id && !receipt?.receipt_id ? (
                   <div className="md:flex justify-center w-full lg:h-[36vh]">
                     <div className="w-full md:w-7/12 lg:w-2/3 xl:w-3/4 ">
                       <div className="py-2">
@@ -180,6 +190,7 @@ const Tree = (props: Props) => {
                     <div className="w-full md:w-5/12 lg:w-1/3 xl:w-1/4">
                       <TreeReceiptDetails
                         receipt={receipt}
+                        rpcReceipt={rpcReceipt}
                         show={show}
                         txn={txn}
                       />
