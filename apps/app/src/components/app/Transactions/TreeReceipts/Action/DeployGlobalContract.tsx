@@ -18,7 +18,7 @@ const DeployGlobalContract = (props: TransactionActionInfo) => {
         >
           {shortenAddress(receiver)}
         </Link>
-        ) {'invoked'}
+        ) {'deployed'}
       </div>
       <div className="mt-3 bg-gray-100 dark:bg-black-200 overflow-auto py-3 rounded-lg">
         <TreeNode node={action} path="root" />
