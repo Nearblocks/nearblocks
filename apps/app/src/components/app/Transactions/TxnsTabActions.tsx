@@ -360,7 +360,12 @@ const TxnsTabActions = ({
                   />
                 )}
                 {tab === 'tree' && (
-                  <Tree hash={hash} rpcTxn={rpcTxn} txn={txn ? txn : rpcData} />
+                  <Tree
+                    hash={hash}
+                    rpcTxn={rpcTxn}
+                    txn={txn ? txn : rpcData}
+                    apiTxnActionsData={apiTxnActionsData}
+                  />
                 )}
                 {tab === 'summary' && (
                   <ReceiptSummary
