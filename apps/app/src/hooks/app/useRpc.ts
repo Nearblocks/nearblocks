@@ -226,6 +226,29 @@ const useRpc = () => {
     }
   };
 
+  const getProtocolConfig = async (rpc: string) => {
+    try {
+      const res = await fetch(rpc, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: 'dontcare',
+          jsonrpc: '2.0',
+          method: 'EXPERIMENTAL_protocol_config',
+          params: {
+            finality: 'final',
+          },
+        }),
+      });
+
+      const data = await res.json();
+      return data.result;
+    } catch (error) {
+      console.error('Error fetching protocol_config', error);
+      throw error;
+    }
+  };
+
   const transactionStatus = async (hash: any, signer: any) => {
     const decodedHash = baseDecode(hash);
     const uint8ArrayHash = new Uint8Array(decodedHash);
@@ -284,6 +307,7 @@ const useRpc = () => {
     viewAccessKey,
     viewAccessKeys,
     viewAccount,
+    getProtocolConfig,
   };
 };
 export default useRpc;

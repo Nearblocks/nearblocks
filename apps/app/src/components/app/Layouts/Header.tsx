@@ -176,7 +176,7 @@ const Header = ({
   useEffect(() => {
     const fetchSyncStats = async () => {
       try {
-        const indexers = await getSyncStatus();
+        const { indexers } = await getSyncStatus();
         const syncTimestamp = indexers?.base?.timestamp;
         if (typeof syncTimestamp === 'string') {
           setSync(syncTimestamp);

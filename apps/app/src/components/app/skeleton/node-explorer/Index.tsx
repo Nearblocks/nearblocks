@@ -23,10 +23,10 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             </div>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
                   Current Validators
                 </div>
-                <div className="w-full md:w-3/4 break-words">
+                <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
                   ) : (
@@ -35,8 +35,8 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">Total Staked</div>
-                <div className="w-full md:w-3/4 break-words">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">Total Staked</div>
+                <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
                   ) : (
@@ -45,20 +45,53 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">Total Supply</div>
+                <div className="w-full lg:w-3/4 break-words">
+                  {props?.error ? (
+                    ''
+                  ) : (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2">
+          <div className="h-full bg-white  dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+            <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
+              Validator Information
+            </h2>
+            <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
+                  Protocol Version
+                </div>
+                <div className="w-full lg:w-3/4 break-words">
+                  {props?.error ? (
+                    ''
+                  ) : (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
+                  Next Seat Price
+                </div>
+                <div className="w-full lg:w-3/4 break-words">
+                  {props?.error ? (
+                    ''
+                  ) : (
+                    <Skeleton className="h-4 w-16 break-words" />
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-4">
+                <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
                   Current Seat Price
                 </div>
-                <div className="w-full md:w-3/4 break-words">
-                  {props?.error ? (
-                    ''
-                  ) : (
-                    <Skeleton className="h-4 w-16 break-words" />
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">Total Supply</div>
-                <div className="w-full md:w-3/4 break-words">
+                <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
                   ) : (
@@ -76,32 +109,32 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             </h2>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
                   Epoch Elapsed Time
                 </div>
-                <div className="w-full text-green-500 md:w-3/4 break-words">
+                <div className="w-full text-green-500 lg:w-3/4 break-words">
                   {props?.error ? '' : <Skeleton className="h-4 w-32" />}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
                   Next Epoch ETA
                 </div>
-                <div className="w-full md:w-3/4 text-green-500 break-words">
+                <div className="w-full lg:w-3/4 text-green-500 break-words">
                   {props?.error ? '' : <Skeleton className="h-4 w-32" />}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
                   Last Epoch APY
                 </div>
-                <div className="w-full md:w-3/4 text-green-500 break-words">
+                <div className="w-full lg:w-3/4 text-green-500 break-words">
                   {props?.error ? '' : <Skeleton className="h-4 w-16" />}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full md:w-1/4 mb-2 md:mb-0">Progress</div>
-                <div className="w-full md:w-3/4 break-words">
+                <div className="w-full lg:w-3/4 mb-2 md:mb-0">Progress</div>
+                <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? '' : <Skeleton className="h-3 w-full" />}
                 </div>
               </div>
@@ -115,7 +148,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
       <div className="relative w-full mb-10">
         <div className="bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
           <div className="flex flex-row items-center justify-between text-left text-sm text-nearblue-600 px-3 py-2">
-            <div className="max-w-lg pl-3 w-full py-3.5">
+            <div className="max-w-lg  w-48 py-3.5">
               {props?.error ? '' : <Skeleton className="h-4" />}
             </div>
           </div>
@@ -123,10 +156,34 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
           {!props?.error ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y dark:divide-black-200 dark:border-black-200 border-t">
-                <thead className="bg-gray-100 dark:bg-black-300 h-[51px]">
+                <thead className="bg-gray-100 dark:bg-black-300 h-[52px]">
                   <tr>
                     <th
+                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top w-[12%]"
+                      scope="col"
+                    >
+                      {props?.error ? '' : <Skeleton className="h-4" />}
+                    </th>
+                    <th
+                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top w-[6%]"
+                      scope="col"
+                    >
+                      {props?.error ? '' : <Skeleton className="h-4" />}
+                    </th>
+                    <th
+                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top w-[14%]"
+                      scope="col"
+                    >
+                      {props?.error ? '' : <Skeleton className="h-4" />}
+                    </th>
+                    <th
                       className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                      scope="col"
+                    >
+                      {props?.error ? '' : <Skeleton className="h-4" />}
+                    </th>
+                    <th
+                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top w-[7%]"
                       scope="col"
                     >
                       {props?.error ? '' : <Skeleton className="h-4" />}
@@ -144,7 +201,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                       {props?.error ? '' : <Skeleton className="h-4" />}
                     </th>
                     <th
-                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top w-[11%]"
                       scope="col"
                     >
                       {props?.error ? '' : <Skeleton className="h-4" />}
@@ -156,19 +213,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                       {props?.error ? '' : <Skeleton className="h-4" />}
                     </th>
                     <th
-                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                      scope="col"
-                    >
-                      {props?.error ? '' : <Skeleton className="h-4" />}
-                    </th>
-                    <th
-                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
-                      scope="col"
-                    >
-                      {props?.error ? '' : <Skeleton className="h-4" />}
-                    </th>
-                    <th
-                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top"
+                      className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top "
                       scope="col"
                     >
                       {props?.error ? '' : <Skeleton className="h-4" />}
@@ -176,7 +221,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                   </tr>
                 </thead>
                 <tbody className="dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-                  {[...Array(25)].map((_, i) => (
+                  {[...Array(28)].map((_, i) => (
                     <tr className="hover:bg-blue-900/5 h-[53px]" key={i}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                         <Skeleton className="h-4" />
@@ -188,6 +233,12 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                         <Skeleton className="h-4" />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-tiny align-top">
+                        <Skeleton className="h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
+                        <Skeleton className="h-4" />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">
                         <Skeleton className="h-4" />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 align-top">

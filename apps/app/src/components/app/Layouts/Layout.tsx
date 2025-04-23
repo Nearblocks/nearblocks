@@ -37,12 +37,12 @@ const Layout = async ({ children, locale }: LayoutProps) => {
   const getSyncStatus = async () => {
     'use server';
     const sync = await getRequest('v1/sync/status');
-    const indexers = sync?.status?.indexers;
-    return indexers;
+    const syncStatus = sync?.status;
+    return syncStatus;
   };
 
   const stats = await getLatestStats();
-  const indexers = await getSyncStatus();
+  const syncStatus = await getSyncStatus();
 
   return (
     <html
@@ -102,7 +102,7 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                 <LayoutActions
                   theme={theme}
                   stats={stats}
-                  sync={indexers}
+                  sync={syncStatus}
                   accountId={signedAccountId}
                   getLatestStats={getLatestStats}
                   getSyncStatus={getSyncStatus}
