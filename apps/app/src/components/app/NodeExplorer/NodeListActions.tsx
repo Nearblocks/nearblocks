@@ -23,13 +23,65 @@ import Tooltip from '../common/Tooltip';
 import ArrowDown from '../Icons/ArrowDown';
 import FaInbox from '../Icons/FaInbox';
 import Question from '../Icons/Question';
+import nearApi from 'near-api-js';
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcStore } from '@/stores/app/rpc';
+import Skeleton from '../skeleton/common/Skeleton';
 
 const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const { theme } = useTheme();
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);
+  const { rpc: rpcUrl } = useRpcStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [nodeStatus, SetNodeStatus] = useState<{
+    protocolVersion: number;
+    nextSeatPrice: string;
+  }>();
   const errorMessage = 'No validator data!';
+
+  const { getValidators, getProtocolConfig } = useRpc();
+  useEffect(() => {
+    const fetchProtocolConfig = async () => {
+      setIsLoading(true);
+      try {
+        const [protocolConfig, validators] = await Promise.all([
+          getProtocolConfig(rpcUrl),
+          getValidators(),
+        ]);
+
+        if (!protocolConfig || !validators) return;
+
+        const totalSeats: number =
+          protocolConfig.num_block_producer_seats +
+          (
+            protocolConfig.avg_hidden_validator_seats_per_shard as number[]
+          ).reduce((a, b) => a + b, 0);
+
+        const pNext = nearApi.validators.findSeatPrice(
+          validators.next_validators,
+          totalSeats,
+          protocolConfig.minimum_stake_ratio,
+        );
+
+        const rawPrice = yoctoToNear(pNext.toString(), false);
+        const nextSeatPrice = Math.round(Number(rawPrice)).toLocaleString();
+
+        SetNodeStatus({
+          protocolVersion: protocolConfig.protocol_version,
+          nextSeatPrice: nextSeatPrice,
+        });
+      } catch (error) {
+        console.error('Failed to fetch protocol config:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProtocolConfig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcUrl]);
 
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
@@ -866,23 +918,6 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 </div>
                 <div className="flex items-center justify-between py-4">
                   <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
-                    Current Seat Price
-                  </div>
-                  <div className="w-full lg:w-3/4 break-words">
-                    {
-                      <>
-                        {data?.epochStatsCheck
-                          ? convertAmountToReadableString(
-                              data?.epochStatsCheck,
-                              'seatPriceAmount',
-                            ) + ' Ⓝ'
-                          : ''}
-                      </>
-                    }
-                  </div>
-                </div>
-                <div className="flex items-center justify-between py-4">
-                  <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
                     Total Supply
                   </div>
                   <div className="w-full lg:w-3/4 break-words">
@@ -900,6 +935,64 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                           </button>
                         </Tooltip>
                       </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="w-full md:w-1/2">
+            <div className="h-full bg-white  dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
+              <h2 className="border-b dark:border-black-200 p-3 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold">
+                Validator Information
+              </h2>
+              <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
+                <div className="flex items-center justify-between py-4">
+                  <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
+                    Protocol Version
+                  </div>
+                  <div className="w-full lg:w-3/4 break-words">
+                    {isLoading ? (
+                      <Skeleton className="h-4 w-16" />
+                    ) : (
+                      <div className="relative">
+                        {nodeStatus && nodeStatus?.protocolVersion
+                          ? formatNumber(nodeStatus?.protocolVersion.toString())
+                          : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-4">
+                  <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
+                    Next Seat Price
+                  </div>
+                  <div className="w-full lg:w-3/4 break-words">
+                    {isLoading ? (
+                      <Skeleton className="h-4 w-16" />
+                    ) : (
+                      <div className="relative">
+                        {nodeStatus && nodeStatus?.nextSeatPrice
+                          ? nodeStatus?.nextSeatPrice + ' Ⓝ'
+                          : ''}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-4">
+                  <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
+                    Current Seat Price
+                  </div>
+                  <div className="w-full lg:w-3/4 break-words">
+                    {
+                      <>
+                        {data?.epochStatsCheck
+                          ? convertAmountToReadableString(
+                              data?.epochStatsCheck,
+                              'seatPriceAmount',
+                            ) + ' Ⓝ'
+                          : ''}
+                      </>
                     }
                   </div>
                 </div>

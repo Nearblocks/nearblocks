@@ -9,7 +9,7 @@ import useWallet from '@/hooks/app/useWallet';
 import { NearContext } from '../wallet/near-context';
 import Header from './Header';
 import Footer from './Footer';
-import { StatusInfo } from '@/utils/types';
+import { Status, StatusInfo } from '@/utils/types';
 import { toast } from 'react-toastify';
 import { getSearchRoute, SearchToast } from '../common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
@@ -20,21 +20,21 @@ import { useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
 import Cookies from 'js-cookie';
+import Notice from '../common/Notice';
 
 interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
   theme: string;
   stats: StatusInfo;
-  sync: string;
+  sync: Status;
   accountId?: string;
   getLatestStats: () => Promise<StatusInfo>;
-  getSyncStatus: () => Promise<string>;
+  getSyncStatus: () => Promise<Status>;
 }
 
 const LayoutActions = ({
   children,
-  notice,
   theme,
   accountId,
   stats,
@@ -150,19 +150,28 @@ const LayoutActions = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
+  const isChart =
+    pathname?.startsWith('/chart') || pathname?.startsWith('/charts/');
   const className =
     pathname === '/404'
       ? 'bg-white dark:bg-black-300'
       : 'bg-neargray-25 dark:bg-black-300 ';
 
+  const { indexers, jobs } = sync;
+
   return (
     <div className={className}>
       <NearContext.Provider value={{ signedAccountId, wallet }}>
-        {notice}
+        {isChart ? (
+          <Notice
+            getSyncStatus={getSyncStatus}
+            sync={jobs?.daily_stats?.sync}
+          />
+        ) : null}
         <Provider>
           <Header
             stats={stats}
-            sync={sync}
+            sync={indexers}
             theme={theme}
             accountId={accountName}
             getLatestStats={getLatestStats}

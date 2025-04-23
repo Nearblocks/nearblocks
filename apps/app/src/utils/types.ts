@@ -1650,6 +1650,12 @@ export type SchemaInfo = {
 export type FieldValueTypes = boolean | null | number | string;
 
 export type Status = {
+  jobs: {
+    daily_stats: {
+      date: string;
+      sync: boolean;
+    };
+  };
   aggregates: {
     ft_holders: { height: number; sync: boolean; timestamp: string };
     nft_holders: { height: number; sync: boolean; timestamp: string };
