@@ -270,17 +270,24 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
   const groupTransactions = (transactions: any[]) => {
     const grouped: Record<string, any> = {};
 
-    transactions?.forEach(({ address, type, amount, token }: any) => {
-      const key = `${address}_${type}_${token}`;
-      if (!grouped[key]) {
-        grouped[key] = {
-          address,
-          type,
-          token,
-          amount: BigInt(amount),
-        };
-      } else {
-        grouped[key].amount += BigInt(amount);
+    transactions?.forEach((transaction: any) => {
+      const address = transaction?.address;
+      const type = transaction?.type;
+      const amount = transaction?.amount;
+      const token = transaction?.token;
+
+      if (address && type && amount !== undefined && token !== undefined) {
+        const key = `${address}_${type}_${token}`;
+        if (!grouped[key]) {
+          grouped[key] = {
+            address,
+            type,
+            token,
+            amount: BigInt(amount),
+          };
+        } else {
+          grouped[key].amount += BigInt(amount);
+        }
       }
     });
 
@@ -294,10 +301,10 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
           if (a?.type === 'sent' && b?.type !== 'sent') return -1;
           if (a?.type !== 'sent' && b?.type === 'sent') return 1;
 
-          return a?.type?.localeCompare(b?.type);
+          return (a?.type ?? '').localeCompare(b?.type ?? '');
         }
 
-        return a?.address?.localeCompare(b?.address);
+        return (a?.address ?? '').localeCompare(b?.address ?? '');
       });
 
     return groupedArray;
