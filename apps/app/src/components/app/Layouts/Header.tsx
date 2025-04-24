@@ -17,6 +17,7 @@ import ArrowDown from '../Icons/ArrowDown';
 import Menu from '../Icons/Menu';
 import UserMenu from './UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
+import { getLatestStats, getSyncStatus } from '@/utils/app/actions';
 
 const menus = [
   {
@@ -156,8 +157,6 @@ const Header = ({
   sync: initialSync,
   accountId,
   theme: cookieTheme,
-  getLatestStats,
-  getSyncStatus,
 }: any) => {
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
@@ -176,12 +175,14 @@ const Header = ({
   useEffect(() => {
     const fetchSyncStats = async () => {
       try {
-        const { indexers } = await getSyncStatus();
-        const syncTimestamp = indexers?.base?.timestamp;
+        const resp = await getSyncStatus();
+        const syncTimestamp = resp?.indexers?.base?.timestamp;
         if (typeof syncTimestamp === 'string') {
           setSync(syncTimestamp);
         }
-        setSyncStat(indexers);
+        if (resp?.indexers) {
+          setSyncStat(resp?.indexers);
+        }
       } catch (error) {
         console.error('Error fetching syncStats:', error);
       }

@@ -29,8 +29,6 @@ interface LayoutProps {
   stats: StatusInfo;
   sync: Status;
   accountId?: string;
-  getLatestStats: () => Promise<StatusInfo>;
-  getSyncStatus: () => Promise<Status>;
 }
 
 const LayoutActions = ({
@@ -39,8 +37,6 @@ const LayoutActions = ({
   accountId,
   stats,
   sync,
-  getLatestStats,
-  getSyncStatus,
 }: LayoutProps) => {
   const pathname = usePathname();
   const [signedAccountId, setSignedAccountId] = useState('');
@@ -162,20 +158,13 @@ const LayoutActions = ({
   return (
     <div className={className}>
       <NearContext.Provider value={{ signedAccountId, wallet }}>
-        {isChart ? (
-          <Notice
-            getSyncStatus={getSyncStatus}
-            sync={jobs?.daily_stats?.sync}
-          />
-        ) : null}
+        {isChart ? <Notice sync={jobs?.daily_stats?.sync} /> : null}
         <Provider>
           <Header
             stats={stats}
             sync={indexers}
             theme={theme}
             accountId={accountName}
-            getLatestStats={getLatestStats}
-            getSyncStatus={getSyncStatus}
           />
           <main>{children}</main>
         </Provider>

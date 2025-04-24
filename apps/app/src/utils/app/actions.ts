@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { notFound, redirect, RedirectType } from 'next/navigation';
-import { SearchResult, UserToken } from '../types';
+import { SearchResult, Status, StatusInfo, UserToken } from '../types';
 import { getUserDataFromToken } from './libs';
 import { getRequest } from './api';
 
@@ -159,3 +159,16 @@ export async function handleExport({
     throw error;
   }
 }
+
+export const getLatestStats = async (): Promise<StatusInfo> => {
+  'use server';
+  const statsDetails = await getRequest(`v1/stats`);
+  return statsDetails?.stats?.[0];
+};
+
+export const getSyncStatus = async (): Promise<Status> => {
+  'use server';
+  const sync = await getRequest('v1/sync/status');
+  const syncStatus = sync?.status;
+  return syncStatus;
+};

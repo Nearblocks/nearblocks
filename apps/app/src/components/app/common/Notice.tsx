@@ -1,20 +1,14 @@
 'use client';
-import { Status } from '@/utils/types';
+import { getSyncStatus } from '@/utils/app/actions';
 import { useEffect, useState } from 'react';
 
-const Notice = ({
-  getSyncStatus,
-  sync,
-}: {
-  getSyncStatus: () => Promise<Status>;
-  sync: boolean;
-}) => {
+const Notice = ({ sync }: { sync: boolean }) => {
   const [isSynced, setIsSynced] = useState(sync ?? true);
   useEffect(() => {
     const fetchSyncStatus = async () => {
       try {
-        const { jobs } = await getSyncStatus();
-        const syncStatus = jobs?.daily_stats?.sync;
+        const resp = await getSyncStatus();
+        const syncStatus = resp?.jobs?.daily_stats?.sync;
         if (syncStatus != undefined) {
           setIsSynced(syncStatus);
         }

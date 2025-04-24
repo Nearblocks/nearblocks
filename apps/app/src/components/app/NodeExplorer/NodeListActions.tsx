@@ -23,7 +23,7 @@ import Tooltip from '../common/Tooltip';
 import ArrowDown from '../Icons/ArrowDown';
 import FaInbox from '../Icons/FaInbox';
 import Question from '../Icons/Question';
-import nearApi from 'near-api-js';
+import { validators } from 'near-api-js';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcStore } from '@/stores/app/rpc';
 import Skeleton from '../skeleton/common/Skeleton';
@@ -33,7 +33,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);
-  const { rpc: rpcUrl } = useRpcStore();
+  const { rpc: rpcUrl, switchRpc } = useRpcStore();
   const [isLoading, setIsLoading] = useState(true);
   const [nodeStatus, SetNodeStatus] = useState<{
     protocolVersion: number;
@@ -46,12 +46,12 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
     const fetchProtocolConfig = async () => {
       setIsLoading(true);
       try {
-        const [protocolConfig, validators] = await Promise.all([
+        const [protocolConfig, validatorsInfo] = await Promise.all([
           getProtocolConfig(rpcUrl),
           getValidators(),
         ]);
 
-        if (!protocolConfig || !validators) return;
+        if (!protocolConfig || !validatorsInfo) return;
 
         const totalSeats: number =
           protocolConfig.num_block_producer_seats +
@@ -59,8 +59,8 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
             protocolConfig.avg_hidden_validator_seats_per_shard as number[]
           ).reduce((a, b) => a + b, 0);
 
-        const pNext = nearApi.validators.findSeatPrice(
-          validators.next_validators,
+        const pNext = validators.findSeatPrice(
+          validatorsInfo.next_validators,
           totalSeats,
           protocolConfig.minimum_stake_ratio,
         );
@@ -73,7 +73,8 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
           nextSeatPrice: nextSeatPrice,
         });
       } catch (error) {
-        console.error('Failed to fetch protocol config:', error);
+        console.error('Failed to fetch validator info:', error);
+        switchRpc();
       } finally {
         setIsLoading(false);
       }
