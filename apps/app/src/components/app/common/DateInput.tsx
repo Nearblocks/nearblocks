@@ -39,12 +39,12 @@ const DateInput: React.FC<DateInputProps> = ({ id, name, value, onChange }) => {
       <div className="flex items-center border w-full border-gray-300 dark:border-gray-700 rounded-md focus:outline-none text-center px-4 py-2">
         <input
           type="text"
-          className={`w-full focus:outline-none`}
+          className={`w-full focus:outline-none bg-white dark:bg-black-600`}
           value={formattedDate}
           readOnly
           onClick={() => document.getElementById(id || '')?.click()}
         />
-        <CalenderIcon className="w-4" />
+        <CalenderIcon className="w-4 text-nearblue-600 dark:text-neargray-10" />
       </div>
     </div>
   );

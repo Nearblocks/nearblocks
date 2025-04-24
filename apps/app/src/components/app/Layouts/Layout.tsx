@@ -12,9 +12,8 @@ import { gTag, networkId } from '@/utils/app/config';
 
 import LayoutActions from './LayoutActions';
 import ThemeInitializer from './ThemeInitializer';
-import { getRequest } from '@/utils/app/api';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
-import { getCookie } from '@/utils/app/actions';
+import { getCookie, getLatestStats, getSyncStatus } from '@/utils/app/actions';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -27,20 +26,6 @@ const Layout = async ({ children, locale }: LayoutProps) => {
   const theme = (await cookies()).get('theme')?.value || 'light';
   const signedAccountId = await getCookie('signedAccountId');
   const network = networkId;
-
-  const getLatestStats = async () => {
-    'use server';
-    const statsDetails = await getRequest(`v1/stats`);
-    return statsDetails?.stats?.[0];
-  };
-
-  const getSyncStatus = async () => {
-    'use server';
-    const sync = await getRequest('v1/sync/status');
-    const syncStatus = sync?.status;
-    return syncStatus;
-  };
-
   const stats = await getLatestStats();
   const syncStatus = await getSyncStatus();
 
@@ -104,8 +89,6 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                   stats={stats}
                   sync={syncStatus}
                   accountId={signedAccountId}
-                  getLatestStats={getLatestStats}
-                  getSyncStatus={getSyncStatus}
                 >
                   {children}
                 </LayoutActions>
