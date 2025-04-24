@@ -243,7 +243,10 @@ const addressData = async (start: string, end: string) => {
       )
       SELECT
         action_receipt_actions.receipt_receiver_account_id as contract,
-        action_receipt_actions.args->>'code_sha256' as code_sha256,
+        COALESCE(
+          action_receipt_actions.args->>'code_sha256',
+          action_receipt_actions.args->>'code_hash'
+        ) AS code_sha256,
         action_receipt_actions.receipt_id as receipt_id,
         execution_outcomes.executed_in_block_hash as block_hash,
         execution_outcomes.executed_in_block_timestamp as block_timestamp
