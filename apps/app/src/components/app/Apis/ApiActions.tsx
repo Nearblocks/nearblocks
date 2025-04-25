@@ -293,7 +293,7 @@ const ApiActions = ({
                   </div>
                 </div>
               ))
-            : Array.from({ length: 5 }).map((_, index: number) => (
+            : Array.from({ length: 4 }).map((_, index: number) => (
                 <div
                   className={`bg-white dark:bg-black-200 rounded-md px-4 py-4 text-center sm:w-full w-[264px] shadow-xl hover:shadow-2xl  ${
                     index === 2 && 'border-2 border-neargreen-200'

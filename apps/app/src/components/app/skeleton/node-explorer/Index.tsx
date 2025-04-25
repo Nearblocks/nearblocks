@@ -23,9 +23,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             </div>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
-                  Current Validators
-                </div>
+                <div className="w-full lg:w-3/4">Current Validators</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
@@ -35,7 +33,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">Total Staked</div>
+                <div className="w-full lg:w-3/4">Total Staked</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
@@ -45,7 +43,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">Total Supply</div>
+                <div className="w-full lg:w-3/4">Total Supply</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
@@ -64,9 +62,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             </h2>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
-                  Protocol Version
-                </div>
+                <div className="w-full lg:w-1/4">Protocol Version</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
@@ -76,9 +72,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
-                  Next Seat Price
-                </div>
+                <div className="w-full lg:w-1/4">Next Seat Price</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
@@ -88,9 +82,7 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-1/4 mb-2 md:mb-0 ">
-                  Current Seat Price
-                </div>
+                <div className="w-full lg:w-1/4">Current Seat Price</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? (
                     ''
@@ -109,31 +101,25 @@ const ExplorerIndex = forwardRef((props: Props, ref: Ref<HTMLDivElement>) => {
             </h2>
             <div className="px-3 divide-y dark:divide-black-200 text-sm text-gray-600 dark:text-neargray-10">
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
-                  Epoch Elapsed Time
-                </div>
+                <div className="w-full lg:w-3/4">Epoch Elapsed Time</div>
                 <div className="w-full text-green-500 lg:w-3/4 break-words">
                   {props?.error ? '' : <Skeleton className="h-4 w-32" />}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
-                  Next Epoch ETA
-                </div>
+                <div className="w-full lg:w-3/4">Next Epoch ETA</div>
                 <div className="w-full lg:w-3/4 text-green-500 break-words">
                   {props?.error ? '' : <Skeleton className="h-4 w-32" />}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">
-                  Last Epoch APY
-                </div>
+                <div className="w-full lg:w-3/4">Last Epoch APY</div>
                 <div className="w-full lg:w-3/4 text-green-500 break-words">
                   {props?.error ? '' : <Skeleton className="h-4 w-16" />}
                 </div>
               </div>
               <div className="flex items-center justify-between py-4">
-                <div className="w-full lg:w-3/4 mb-2 md:mb-0">Progress</div>
+                <div className="w-full lg:w-3/4">Progress</div>
                 <div className="w-full lg:w-3/4 break-words">
                   {props?.error ? '' : <Skeleton className="h-3 w-full" />}
                 </div>

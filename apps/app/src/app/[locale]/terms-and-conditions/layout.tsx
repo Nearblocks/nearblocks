@@ -42,15 +42,5 @@ export default async function TermsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <div className="h-72"></div>
-      <div className="md:px-14 flex flex-col items-start md:py-16 -mt-80 mx-2">
-        <h1 className="mb-2 pt-8 sm:!text-2xl text-center text-xl dark:text-white">
-          Terms of Service
-        </h1>
-        {children}
-      </div>
-    </>
-  );
+  return [children];
 }

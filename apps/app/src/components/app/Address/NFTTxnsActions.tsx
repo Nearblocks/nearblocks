@@ -1,6 +1,5 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
 import {
   useParams,
   usePathname,
@@ -34,6 +33,7 @@ import SortIcon from '../Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import { CopyButton } from '../common/CopyButton';
+import TimeStamp from '../common/TimeStamp';
 
 interface NftTokenTxnsProps {
   count: string;
@@ -41,8 +41,6 @@ interface NftTokenTxnsProps {
   error: boolean;
   txns: TransactionInfo[];
 }
-
-const TimeStamp = dynamic(() => import('../common/TimeStamp'), { ssr: false });
 
 const NFTTransactionActions = ({
   count,
