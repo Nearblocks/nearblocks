@@ -243,6 +243,7 @@ const ReceiptSummary = (props: Props) => {
                       <ReceiptSummaryRow
                         price={price}
                         receipt={receipt}
+                        rpcReceipt={rpcReceipt}
                         statsData={statsData}
                         txn={txn}
                       />
