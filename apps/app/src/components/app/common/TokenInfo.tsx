@@ -28,17 +28,16 @@ const TokenInfo = (props: TokenInfoProps) => {
       setLoading(true);
       ftMetadata(contract)
         .then((data) => {
-          setMeta(data);
-          setLoading(false);
           if (isEmpty(data)) {
-            setLoading(true);
             switchRpc();
           }
+          setMeta(data);
+          setLoading(false);
         })
         .catch((error) => {
           console.error(error);
-          setLoading(true);
           switchRpc();
+          setLoading(false);
         });
     }
 
@@ -57,9 +56,11 @@ const TokenInfo = (props: TokenInfoProps) => {
     ></div>
   );
 
-  return loading ? (
-    <Loader wrapperClassName="flex !w-52 max-w-xs" />
-  ) : (
+  if (loading || (!apiMeta && isEmpty(meta))) {
+    return <Loader wrapperClassName="flex !w-52 max-w-xs" />;
+  }
+
+  return (
     <>
       <span className="font-normal pl-1">{rpcAmount}</span>
       <Link

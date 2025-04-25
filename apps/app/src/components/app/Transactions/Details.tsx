@@ -469,12 +469,12 @@ const Details = (props: Props) => {
               </div>
               {loading ? (
                 <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-24 max-w-xl" />
+                  <Loader wrapperClassName="flex w-14" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
                   {txn?.outcomes?.status !== undefined && (
-                    <>
+                    <div className="flex items-center flex-wrap gap-2">
                       {!status ? (
                         <RpcTxnStatus
                           showLabel
@@ -488,11 +488,16 @@ const Details = (props: Props) => {
                           showReceipt={<FailedReceipts data={rpcTxn} />}
                         />
                       )}
-                    </>
-                  )}
-                  {errorMessage && (
-                    <div className="text-xs bg-orange-50 dark:bg-black-200 dark:text-nearyellow-400 my-2 rounded text-left px-2 py-1">
-                      {errorMessage}
+                      <div className="w-full max-w-xl">
+                        {txn?.outcomes?.status === false &&
+                        errorMessage === undefined ? (
+                          <Loader wrapperClassName="flex w-full " />
+                        ) : errorMessage ? (
+                          <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
+                            {errorMessage}
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
                   )}
                 </div>
