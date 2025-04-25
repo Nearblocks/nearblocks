@@ -80,13 +80,13 @@ const ReceiptSummaryRow = (props: Props) => {
               <Tooltip
                 className={'left-1/2 max-w-[200px]'}
                 position="top"
-                tooltip={receipt.id}
+                tooltip={receipt.receipt_id || receipt.id}
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
-                  href={`?tab=execution#${receipt.id}`}
+                  href={`?tab=execution#${receipt.receipt_id || receipt.id}`}
                 >
-                  {receipt.id}
+                  {receipt.receipt_id || receipt.id}
                 </Link>
               </Tooltip>
             </td>
