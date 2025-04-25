@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { mapRpcActionToAction } from '@/utils/near';
-import { RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '../common/ErrorMessage';
 import FaHourglassStart from '../Icons/FaHourglassStart';
@@ -24,13 +24,20 @@ interface Props {
     }>;
   };
   txn: TransactionInfo;
+  apiTxnActionsData: ApiTxnData;
 }
 
 const ReceiptSummary = (props: Props) => {
-  const { hash, loading, price, rpcTxn, statsData, txn } = props;
+  const { hash, loading, price, rpcTxn, statsData, txn, apiTxnActionsData } =
+    props;
 
   const t = useTranslations();
-  const [receipt, setReceipt] = useState<any>(null);
+  const [rpcReceipt, setRpcReceipt] = useState<any>(null);
+
+  const receipt = apiTxnActionsData?.receiptData
+    ? apiTxnActionsData?.receiptData
+    : rpcReceipt;
+
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
       txn?.transaction?.actions &&
@@ -93,7 +100,7 @@ const ReceiptSummary = (props: Props) => {
 
   useEffect(() => {
     if (!isEmpty(rpcTxn)) {
-      setReceipt(transactionReceipts(rpcTxn));
+      setRpcReceipt(transactionReceipts(rpcTxn));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,7 +193,7 @@ const ReceiptSummary = (props: Props) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-                    {(!receipt?.id || loading) &&
+                    {((!receipt?.id && !receipt?.receipt_id) || loading) &&
                       [...Array(10)].map((_, i) => (
                         <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
                           <td className="px-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">
@@ -232,10 +239,11 @@ const ReceiptSummary = (props: Props) => {
                         </td>
                       </tr>
                     )}
-                    {receipt?.id && (
+                    {(receipt?.id || receipt?.receipt_id) && (
                       <ReceiptSummaryRow
                         price={price}
                         receipt={receipt}
+                        rpcReceipt={rpcReceipt}
                         statsData={statsData}
                         txn={txn}
                       />

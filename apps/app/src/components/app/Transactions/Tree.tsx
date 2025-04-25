@@ -23,11 +23,12 @@ const Tree = (props: Props) => {
   const { hash, rpcTxn, txn, apiTxnActionsData } = props;
 
   const [rpcReceipt, setRpcReceipt] = useState<any>(null);
-  const [show, setShow] = useState<any>(null);
 
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData
     : rpcReceipt;
+
+  const [show, setShow] = useState<any>(receipt?.receipt_id);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
     const actions: any =
