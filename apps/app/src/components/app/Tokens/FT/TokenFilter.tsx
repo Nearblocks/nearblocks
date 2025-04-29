@@ -43,7 +43,11 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
 
       Promise.all(
         fts.map(async (ft: FtsInfo) => {
-          const rslt = await ftBalanceOf(rpcUrl, ft.contract, tokenFilter);
+          const rslt = await ftBalanceOf(
+            rpcUrl,
+            ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
+            tokenFilter,
+          );
           return { ...ft, amount: rslt.data };
         }),
       )
