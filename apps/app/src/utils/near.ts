@@ -159,7 +159,7 @@ export function apiTxnLogs(txn: any): TransactionLog[] {
 
   const outcomes = txn?.receipts || [];
 
-  for (let i = 1; i < outcomes?.length; i++) {
+  for (let i = 0; i < outcomes?.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
 

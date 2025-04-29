@@ -314,7 +314,10 @@ const Details = (props: Props) => {
   const apiMainTxnsActions = apiActions?.map((txn: any) => {
     const filteredApiNepLogs = apiLogs?.filter((log: any) => {
       try {
-        if (log?.logs?.standard === 'nep245') {
+        if (
+          log?.logs?.standard === 'nep245' ||
+          log?.logs?.standard === 'dip4'
+        ) {
           return log;
         }
         return false;
