@@ -88,7 +88,7 @@ const AccountOverviewActions = ({
 
           const amount = await ftBalanceOf(
             rpcUrl,
-            ft.contract,
+            ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
             params?.id as string,
           ).catch(() => {
             setRpcError(true);
