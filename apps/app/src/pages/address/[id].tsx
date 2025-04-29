@@ -412,7 +412,10 @@ const Address = ({
           let rpcAmount = Big(0);
           try {
             setRpcError(false);
-            let amount = await ftBalanceOf(ft.contract, id as string);
+            let amount = await ftBalanceOf(
+              ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
+              id as string,
+            );
             if (amount) {
               rpcAmount = ft?.ft_meta?.decimals
                 ? Big(amount).div(Big(10).pow(+ft.ft_meta.decimals))
