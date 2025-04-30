@@ -21,18 +21,19 @@ interface TokenPriceData {
 }
 
 const TokenPrice = ({ isShowMargin, nearPrice, token, tokenPrice }: Props) => {
+  const modifiedToken = token === 'eth.bridge.near' ? 'aurora' : token;
   const { data, error } = useFetch(
     'https://indexer.ref.finance/list-token-price',
   );
   const [price, setPrice] = useState<null | TokenPriceData>(null);
 
   useEffect(() => {
-    if (data && token in data) {
-      setPrice(data[token]);
+    if (data && modifiedToken in data) {
+      setPrice(data[modifiedToken]);
     } else {
       setPrice(null);
     }
-  }, [data, token]);
+  }, [data, modifiedToken]);
 
   if (error) return null;
 
