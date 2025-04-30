@@ -19,16 +19,19 @@ interface MarketCapProps {
 }
 
 const MarketCap = ({ onToggle, showMarketCap, token }: MarketCapProps) => {
+  const modifiedToken =
+    token?.contract === 'eth.bridge.near' ? 'aurora' : token;
+
   const { data } = useFetch('https://indexer.ref.finance/list-token-price');
   const [price, setPrice] = useState<null | string>(null);
 
   useEffect(() => {
-    if (token && token.contract && !token.price && data) {
-      setPrice(data[token.contract]?.price || null);
+    if (token && modifiedToken && !token.price && data) {
+      setPrice(data[`${modifiedToken}`]?.price || null);
     } else {
       setPrice(token?.price || null);
     }
-  }, [data, token]);
+  }, [data, token, modifiedToken]);
 
   if (!token) {
     return (

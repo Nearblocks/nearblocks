@@ -14,6 +14,7 @@ interface Props {
 }
 
 export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
+  const modifiedId = id === 'eth.bridge.near' ? 'aurora' : id;
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const { ftBalanceOf } = useRpc();
   const [inventoryLoading, setInventoryLoading] = useState(false);
@@ -23,7 +24,7 @@ export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
       setInventoryLoading(true);
       const fts =
         inventoryData?.fts &&
-        inventoryData?.fts.filter((f) => id == f.contract);
+        inventoryData?.fts.filter((f) => modifiedId == f.contract);
 
       if (!fts?.length) {
         if (fts?.length === 0) setInventoryLoading(false);
@@ -91,7 +92,7 @@ export default function TokenFilter({ id, tokenFilter, inventoryData }: Props) {
     loadBalances();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, id, tokenFilter]);
+  }, [inventoryData?.fts, modifiedId, tokenFilter]);
 
   const filterToken: TokenListInfo = ft?.tokens?.length
     ? ft?.tokens[0]
