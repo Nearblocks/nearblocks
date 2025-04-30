@@ -28,7 +28,10 @@ export default async function TokenTabs({
       count: `v1/fts/${id}/holders/count`,
     },
     info: { api: `v1/fts/${id}` },
-    transfers: { api: `v1/fts/${id}/txns`, count: `v1/fts/${id}/txns/count` },
+    transfers: {
+      api: `v1/fts/${id}/txns`,
+      count: `v1/fts/${id}/txns/count?account=${searchParams?.a}`,
+    },
   };
 
   const tabApi = tabApiUrls[tab as TabType];
@@ -44,7 +47,7 @@ export default async function TokenTabs({
     contractResult,
   ] = await Promise.all([
     getRequest(fetchUrl, searchParams, { next: { revalidate: 10 } }),
-    getRequest(`v1/fts/${id}/txns/count`),
+    getRequest(`v1/fts/${id}/txns/count?account=${searchParams?.a}`),
     getRequest(`v1/fts/${id}`),
     getRequest(`v1/sync/status`),
     getRequest(`v1/fts/${id}/holders/count`),
