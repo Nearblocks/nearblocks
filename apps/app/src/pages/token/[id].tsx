@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       account: id && `account/${id}`,
       tokenFilter: a && `account/${a}/inventory`,
       latestBlocks: `blocks/latest?limit=1`,
-      transfersCount: id && `fts/${id}/txns/count`,
+      transfersCount: id && `fts/${id}/txns/count?account=${a}`,
       holdersCount: id && `fts/${id}/holders/count`,
     };
 
