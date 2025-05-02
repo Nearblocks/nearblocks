@@ -1,6 +1,6 @@
-import { pino } from 'pino';
+import { LoggerOptions, pino } from 'pino';
 
-const options =
+const options: LoggerOptions =
   process.env.NODE_ENV === 'production'
     ? {}
     : {
