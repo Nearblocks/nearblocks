@@ -197,8 +197,12 @@ const Txn = ({
           txn.transaction_hash,
           txn.signer_account_id,
         );
-        setRpcTxn(res);
-      } catch {
+        if (res?.final_execution_status === 'NONE') {
+          setRpcError(true);
+        } else {
+          setRpcTxn(res);
+        }
+      } catch (error) {
         setRpcError(true);
       }
     };
@@ -345,8 +349,7 @@ const Txn = ({
       <div className="container relative px-3 mx-auto">
         {/* <RpcMenu /> */}
         <Fragment key="hash">
-          {(rpcError && (error || allRpcProviderError)) ||
-          rpcTxn?.final_execution_status === 'NONE' ? (
+          {!txn && allRpcProviderError ? (
             <div className="pb-1 bg-white dark:bg-black-600 soft-shadow rounded-xl">
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
                 <ErrorMessage
