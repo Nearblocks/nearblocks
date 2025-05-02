@@ -283,8 +283,7 @@ const TxnsTabActions = ({
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
-        {(rpcError && !txn && allRpcProviderError) ||
-        rpcTxn?.final_execution_status === 'NONE' ? (
+        {rpcError && !txn && allRpcProviderError ? (
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
               <ErrorMessage
