@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer';
+
 import {
   AccessKeyPermissionKind,
   ActionKind,
@@ -29,7 +31,7 @@ export interface TTables {
   execution_outcomes: ExecutionOutcome;
   ft_events: FTEvent;
   ft_meta: FTMeta;
-  multichain_accounts: MultichainAccount;
+  multichain_signatures: MultichainSignature;
   multichain_transactions: MultichainTransaction;
   nft_events: NFTEvent;
   nft_meta: NFTMeta;
@@ -254,26 +256,27 @@ export type FTMeta = {
   website: null | string;
 };
 
-export type MultichainAccount = {
+export type MultichainSignature = {
   account_id: string;
-  block_height: number;
   block_timestamp: string;
-  chain: string;
-  derived_address: string;
   path: string;
-  public_key: string;
+  r: Buffer | null;
+  s: Buffer | null;
+  scheme?: string;
+  signature: Buffer | null;
+  transaction_hash: string;
+  v: null | number;
 };
 
 export type MultichainTransaction = {
-  account_id: string;
-  block_height: number;
-  block_timestamp: string;
+  address: string;
   chain: string;
-  derived_address: string;
-  derived_transaction: null | string;
-  path: string;
-  public_key: string;
-  receipt_id: string;
+  r: Buffer | null;
+  s: Buffer | null;
+  signature: Buffer | null;
+  timestamp: string;
+  transaction: string;
+  v: null | number;
 };
 
 export type NFTEvent = {

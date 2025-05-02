@@ -4,9 +4,9 @@ import { logger } from 'nb-logger';
 import config from '#config';
 import { dbRead, dbWrite, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { storeMultichainData } from '#services/multichain';
+import { storeSignature } from '#services/signature';
 
-const indexerKey = 'multichain';
+const indexerKey = 'signature';
 const s3Config = {
   credentials: {
     accessKeyId: config.s3AccessKey,
@@ -53,7 +53,7 @@ export const onMessage = async (message: Message) => {
   try {
     logger.info(`syncing block: ${message.block.header.height}`);
 
-    await storeMultichainData(message);
+    await storeSignature(message);
 
     await dbWrite('settings')
       .insert({

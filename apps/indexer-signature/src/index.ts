@@ -4,13 +4,13 @@ import config from '#config';
 import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { migrationCheck } from '#libs/utils';
-import { syncData } from '#services/multichain';
+import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info(
       { network: config.network },
-      'initializing multichain indexer...',
+      'initializing signature indexer...',
     );
     await migrationCheck();
     await syncData();

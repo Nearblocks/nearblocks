@@ -1,6 +1,6 @@
 {
   "name": "nb-logger",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -11,12 +11,12 @@
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
   "dependencies": {
-    "pino": "8.16.0"
+    "pino": "9.6.0"
   },
   "devDependencies": {
     "eslint-config-custom-node": "*",
     "nb-tsconfig": "*",
-    "pino-pretty": "~10.2",
-    "typescript": "~5.2"
+    "pino-pretty": "~13.0",
+    "typescript": "~5.8"
   }
 }
