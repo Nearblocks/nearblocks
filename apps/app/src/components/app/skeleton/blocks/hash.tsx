@@ -18,7 +18,7 @@ export default function HashLoading() {
       <div className="bg-white text-sm text-nearblue-600 dark:text-neargray-10 dark:bg-black-600 dark:divide-black-200 divide-solid divide-gray-200 divide-y soft-shadow rounded-xl">
         {networkId === 'testnet' && (
           <div className="flex flex-wrap p-4 text-red-500">
-            {t('testnetNotice') || '[ This is a Testnet block only ]'}
+            {t('testnetBlockNotice') || '[ This is a Testnet block only ]'}
           </div>
         )}
         <div className="flex flex-wrap p-4">
