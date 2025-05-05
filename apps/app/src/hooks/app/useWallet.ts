@@ -17,7 +17,7 @@ const useWallet = (): null | Wallet => {
     };
 
     initializeWallet();
-  }, []);
+  }, [networkId]);
 
   return wallet; // Returns Wallet or null
 };
