@@ -14,7 +14,7 @@ CREATE TABLE multichain_signatures (
 SELECT
   create_hypertable (
     'multichain_signatures',
-    by_range ('block_timestamp', BIGINT '2592000'), -- 30d
+    by_range ('block_timestamp', BIGINT '2592000000000000'), -- 30d in ns
     create_default_indexes => false
   );
 
@@ -43,7 +43,7 @@ CREATE TABLE multichain_transactions (
 SELECT
   create_hypertable (
     'multichain_transactions',
-    by_range ('timestamp', BIGINT '2592000'), -- 30d
+    by_range ('timestamp', BIGINT '2592000000000000'), -- 30d in ns
     create_default_indexes => false
   );
 
