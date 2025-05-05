@@ -13,7 +13,6 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  DATABASE_URL_READ: str({ default: '' }),
   ETHEREUM_RPC_URL: str({ default: '' }),
   GNOSIS_RPC_URL: str({ default: '' }),
   NETWORK: str({
@@ -77,7 +76,6 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  dbUrlRead: env.DATABASE_URL_READ,
   insertLimit: 2500,
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,

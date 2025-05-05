@@ -13,8 +13,7 @@
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./",
-    "migrate": "NODE_ENV=production knex migrate:latest"
+    "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
     "@scure/base": "1.2.5",
@@ -26,7 +25,6 @@
   "devDependencies": {
     "@types/node": "22",
     "eslint-config-custom-node": "*",
-    "knex-migrate-sql-file": "~2.0",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-tsconfig": "*",

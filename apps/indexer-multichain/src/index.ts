@@ -1,9 +1,8 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { dbRead, dbWrite } from '#libs/knex';
+import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { migrationCheck } from '#libs/utils';
 import { syncData } from '#services/multichain';
 
 (async () => {
@@ -12,7 +11,6 @@ import { syncData } from '#services/multichain';
       { network: config.network },
       'initializing multichain indexer...',
     );
-    await migrationCheck();
     await syncData();
   } catch (error) {
     logger.error('aborting...');
@@ -24,11 +22,7 @@ import { syncData } from '#services/multichain';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([
-      dbRead.destroy(),
-      dbWrite.destroy(),
-      sentry.close(1_000),
-    ]);
+    await Promise.all([db.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }

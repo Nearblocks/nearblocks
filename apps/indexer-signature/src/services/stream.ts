@@ -2,7 +2,7 @@ import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { dbRead, dbWrite, streamConfig } from '#libs/knex';
+import { db, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeSignature } from '#services/signature';
 
@@ -18,7 +18,7 @@ const s3Config = {
 };
 
 export const syncData = async () => {
-  const settings = await dbRead('settings').where({ key: indexerKey }).first();
+  const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
   let startBlockHeight = config.startBlockHeight;
 
@@ -55,7 +55,7 @@ export const onMessage = async (message: Message) => {
 
     await storeSignature(message);
 
-    await dbWrite('settings')
+    await db('settings')
       .insert({
         key: indexerKey,
         value: { sync: message.block.header.height },

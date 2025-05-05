@@ -14,7 +14,6 @@ export interface Config {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  dbUrlRead: string;
   insertLimit: number;
   network: Network;
   sentryDsn?: string;

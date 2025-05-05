@@ -2,7 +2,7 @@ import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
 import { RetryFailedError } from '#libs/errors';
-import { dbRead, dbWrite } from '#libs/knex';
+import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { Chains } from '#types/enum';
 import {
@@ -21,7 +21,7 @@ export const getKey = (chain: Chains) => {
 };
 
 export const getStartBlock = async (chain: Chains, start: number) => {
-  const settings = await dbRead('settings')
+  const settings = await db('settings')
     .where({ key: getKey(chain) })
     .first();
 
@@ -39,7 +39,7 @@ export const getStartBlock = async (chain: Chains, start: number) => {
 };
 
 export const updateProgress = async (chain: Chains, block: number) => {
-  await dbWrite('settings')
+  await db('settings')
     .insert({
       key: getKey(chain),
       value: { sync: block },
@@ -81,32 +81,4 @@ export const retry = async <A>(
 
 export const secToNs = (timestamp: number) => {
   return (BigInt(timestamp) * 1_000_000_000n).toString();
-};
-
-export const migrationCheck = async (): Promise<void> => {
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const exists = await dbRead
-      .select(
-        dbRead.raw(
-          `
-            EXISTS (
-              SELECT
-                1
-              FROM
-                information_schema.tables
-              WHERE
-                table_schema = 'public'
-                AND table_name = 'multichain_transactions'
-            ) AS exists
-          `,
-        ),
-      )
-      .first();
-
-    if (exists?.exists) return;
-
-    logger.warn(`waiting for migration, checking again in 60s.`);
-    await sleep(60_000); // 60s
-  }
 };
