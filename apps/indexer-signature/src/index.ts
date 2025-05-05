@@ -1,7 +1,7 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { dbRead, dbWrite } from '#libs/knex';
+import { db, dbBase } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { migrationCheck } from '#libs/utils';
 import { syncData } from '#services/stream';
@@ -24,11 +24,7 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([
-      dbRead.destroy(),
-      dbWrite.destroy(),
-      sentry.close(1_000),
-    ]);
+    await Promise.all([db.destroy(), dbBase.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }

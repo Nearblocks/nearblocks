@@ -6,7 +6,7 @@ import { sleep } from 'nb-utils';
 
 import config from '#config';
 import { NotFoundError } from '#libs/errors';
-import { dbWrite } from '#libs/knex';
+import { db } from '#libs/knex';
 import { getBlock, getLatestSlot } from '#libs/solana';
 import {
   getStartBlock,
@@ -111,7 +111,7 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     for (let i = 0; i < txns.length; i += INSERT_LIMIT) {
       const batch = txns.slice(i, i + INSERT_LIMIT);
       const runBatch = async () => {
-        await dbWrite('multichain_transactions')
+        await db('multichain_transactions')
           .insert(batch)
           .onConflict(['chain', 'transaction', 'timestamp'])
           .ignore();

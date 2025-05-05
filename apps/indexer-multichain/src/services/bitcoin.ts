@@ -11,7 +11,7 @@ import {
   pubKeyToP2WPKH,
 } from '#libs/bitcoin';
 import { NotFoundError } from '#libs/errors';
-import { dbWrite } from '#libs/knex';
+import { db } from '#libs/knex';
 import {
   getStartBlock,
   retry,
@@ -125,7 +125,7 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     for (let i = 0; i < txns.length; i += INSERT_LIMIT) {
       const batch = txns.slice(i, i + INSERT_LIMIT);
       const runBatch = async () => {
-        await dbWrite('multichain_transactions')
+        await db('multichain_transactions')
           .insert(batch)
           .onConflict(['chain', 'transaction', 'timestamp'])
           .ignore();

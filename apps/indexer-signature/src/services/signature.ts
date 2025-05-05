@@ -4,7 +4,7 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { isEcdsa, isEddsa, isFunctionCallAction } from '#libs/guards';
-import { dbRead, dbWrite } from '#libs/knex';
+import { db, dbBase } from '#libs/knex';
 import { decodeArgs, isExecutionSuccess } from '#libs/utils';
 import { MSFinal, MSInitial, MSReceipt, MSSignature, Sign } from '#types/types';
 
@@ -38,7 +38,7 @@ export const storeSignature = async (message: Message) => {
   const sReceiptIds = chunkSignatures.map((signature) => signature.receipt_id);
 
   const [rTxns, sTxns] = await Promise.all([
-    dbRead<Pick<Transaction, 'block_timestamp' | 'transaction_hash'>>(
+    dbBase<Pick<Transaction, 'block_timestamp' | 'transaction_hash'>>(
       'receipts as r',
     )
       .join(
@@ -48,7 +48,7 @@ export const storeSignature = async (message: Message) => {
       )
       .select('t.transaction_hash', 't.block_timestamp', 'r.receipt_id')
       .whereIn('receipt_id', rReceiptIds) as Promise<TxnInfo[]>,
-    dbRead<Pick<Transaction, 'block_timestamp' | 'transaction_hash'>>(
+    dbBase<Pick<Transaction, 'block_timestamp' | 'transaction_hash'>>(
       'receipts as r',
     )
       .join(
@@ -105,7 +105,7 @@ export const storeSignature = async (message: Message) => {
 
       promises.push(
         retry(async () => {
-          await dbWrite('multichain_signatures')
+          await db('multichain_signatures')
             .insert(batch)
             .onConflict(['transaction_hash', 'block_timestamp'])
             .ignore();
@@ -120,7 +120,7 @@ export const storeSignature = async (message: Message) => {
 
       promises.push(
         retry(async () => {
-          await dbWrite('multichain_signatures')
+          await db('multichain_signatures')
             .insert(batch)
             .onConflict(['transaction_hash', 'block_timestamp'])
             .merge(['scheme', 'signature', 'r', 's', 'v']);

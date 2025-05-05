@@ -4,7 +4,7 @@ import { ExecutionStatus } from 'nb-blocks';
 import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
-import { dbRead } from '#libs/knex';
+import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
 
 const require = createRequire(import.meta.url);
@@ -33,9 +33,9 @@ export const isExecutionSuccess = (status: ExecutionStatus) => {
 export const migrationCheck = async (): Promise<void> => {
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const exists = await dbRead
+    const exists = await db
       .select(
-        dbRead.raw(
+        db.raw(
           `
             EXISTS (
               SELECT

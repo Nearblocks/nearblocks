@@ -5,7 +5,7 @@ export interface Config {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  dbUrlRead: string;
+  dbUrlBase: string;
   delta: number;
   insertLimit: number;
   network: Network;
