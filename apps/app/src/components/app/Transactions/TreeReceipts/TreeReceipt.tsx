@@ -22,8 +22,8 @@ const TreeReceipt = (props: Props) => {
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
-      status.SuccessValue !== null &&
-      status.SuccessValue !== undefined) ||
+      status?.SuccessValue !== null &&
+      status?.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
 
   return (
@@ -31,12 +31,12 @@ const TreeReceipt = (props: Props) => {
       {receipt?.actions && (
         <div
           className={`relative ${
-            show === receipt.receipt_id
+            show === receipt?.receipt_id
               ? '!text-white bg-green-500 dark:bg-green-900'
               : 'text-green-500 '
           } !border-2 !border-solid !border-green-600 dark:!border-green-250 dark:text-green-250 !rounded-lg cursor-pointer`}
           onClick={() => {
-            setShow(receipt.receipt_id);
+            setShow(receipt?.receipt_id);
           }}
         >
           {!isSuccess && (
@@ -51,7 +51,7 @@ const TreeReceipt = (props: Props) => {
             >
               {formatActionKind(action.action_kind)}
               <br />
-              {action.args?.method_name && ` (${action.args?.method_name})`}
+              {action.args?.method_name && ` (${action?.args?.method_name})`}
             </p>
           ))}
         </div>
