@@ -1,4 +1,3 @@
-import Big from 'big.js';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -13,6 +12,7 @@ import { InventoryInfo, TokenListInfo } from '@/utils/types';
 
 import ArrowDown from '../Icons/ArrowDown';
 import Skeleton from '../skeleton/common/Skeleton';
+import { priceFormat } from '@/utils/app/libs';
 
 interface Props {
   appUrl?: string;
@@ -162,8 +162,7 @@ const TokenHoldings = (props: Props) => {
                                 </div>
                                 <div className="text-gray-400">
                                   {token?.ft_meta?.price
-                                    ? '@' +
-                                      Big(token?.ft_meta?.price).toString()
+                                    ? '@' + priceFormat(token?.ft_meta?.price)
                                     : '@' + (token?.ft_meta?.price ?? '')}
                                 </div>
                               </div>

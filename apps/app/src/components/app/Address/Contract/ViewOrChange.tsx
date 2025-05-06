@@ -190,13 +190,13 @@ const ViewOrChange = (props: Props) => {
 
   return (
     <AccordionItem
-      className="flex flex-col text-gray-600 text-sm mb-3"
+      className="flex flex-col text-gray-600 text-sm mb-3 border rounded dark:border-black-200"
       key={index}
       value={index.toString()}
     >
       <AccordionItemTrigger
         buttonColor="fill-gray-600"
-        className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10"
+        className="bg-gray-50 dark:bg-black-200/50 flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10"
       >
         <span>
           <span className="text-gray-400 dark:text-neargray-10">
@@ -205,7 +205,7 @@ const ViewOrChange = (props: Props) => {
           {toSnakeCase(method ?? '')}
         </span>
       </AccordionItemTrigger>
-      <AccordionItemContent className="border dark:border-black-200 p-4 rounded">
+      <AccordionItemContent className="p-4">
         <div className="max-w-xl justify-between mb-3 sm:flex flex-nowrap">
           <div className="flex items-center dark:text-neargray-10 mb-2">
             Arguments
@@ -248,14 +248,14 @@ const ViewOrChange = (props: Props) => {
           <div className="flex max-w-xl items-center" key={field.id}>
             <div className="sm:grid grid-cols-9 gap-2">
               <input
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-3 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
                 name="name"
                 onChange={onChange(field.id)}
                 placeholder="Argument name"
                 value={field.name}
               />
               <select
-                className="col-span-2 bg-white block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-2 bg-white dark:bg-black-600 dark:text-neargray-10 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none"
                 name="type"
                 onChange={onChange(field.id)}
                 value={field.type}
@@ -270,7 +270,7 @@ const ViewOrChange = (props: Props) => {
                 ))}
               </select>
               <input
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-4 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
                 name="value"
                 value={field.value}
                 onChange={onChange(field.id)}
@@ -284,7 +284,7 @@ const ViewOrChange = (props: Props) => {
               />
             </div>
             <button
-              className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
+              className="ml-3 p-1 mr-1 bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
               onClick={onRemove(field.id)}
             >
               <CloseCircle className="text-white fill-white w-4 h-4" />
@@ -308,9 +308,11 @@ const ViewOrChange = (props: Props) => {
         <div className="slide-down disclosure">
           <div className="max-w-xl sm:grid grid-cols-2 gap-2">
             <label>
-              <span className="text-gray-400 text-xs">Attached deposit</span>
+              <span className="text-gray-400 dark:text-neargray-10 text-xs">
+                Attached deposit
+              </span>
               <input
-                className="block border rounded my-1 h-9 px-3 w-full outline-none"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
                 name="attachedDeposit"
                 onChange={onOptionChange('attachedDeposit')}
                 placeholder="Attached Deposit"
@@ -318,9 +320,11 @@ const ViewOrChange = (props: Props) => {
               />
             </label>
             <label>
-              <span className="text-gray-400 text-xs">Gas</span>
+              <span className="text-gray-400 dark:text-neargray-10 text-xs">
+                Gas
+              </span>
               <input
-                className="block border rounded my-1 h-9 px-3 w-full outline-none"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
                 name="gas"
                 onChange={onOptionChange('gas')}
                 placeholder="Gas"
@@ -340,7 +344,7 @@ const ViewOrChange = (props: Props) => {
             </button>
           )}
           {!hideQuery && (
-            <div className="flex items-center mx-4 text-gray-400">
+            <div className="flex items-center mx-4 text-gray-400 dark:text-neargray-10">
               OR{' '}
               <Tooltip
                 className={'left-1/2 max-w-[200px] w-56 mb-3'}
@@ -363,7 +367,7 @@ const ViewOrChange = (props: Props) => {
         </div>
         {error && (
           <textarea
-            className="block appearance-none outline-none w-full border rounded-lg bg-red-50 border-red-100 p-3 mt-3 resize-y"
+            className="block appearance-none outline-none w-full border rounded-lg bg-red-50 dark:bg-red-950 dark:bg-opacity-40 dark:text-neargray-10 border-red-100 p-3 mt-3 resize-y"
             readOnly
             rows={6}
             value={error}
@@ -385,7 +389,7 @@ const ViewOrChange = (props: Props) => {
         )}
         {result && (
           <textarea
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3 resize-y"
+            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-900 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
             readOnly
             rows={6}
             value={result}
