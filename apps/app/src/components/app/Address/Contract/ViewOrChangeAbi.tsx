@@ -163,13 +163,13 @@ const ViewOrChangeAbi = (props: Props) => {
 
   return (
     <AccordionItem
-      className="flex flex-col text-gray-600 text-sm mb-3"
+      className="flex flex-col text-gray-600 text-sm mb-3 border rounded dark:border-black-200"
       key={index}
       value={index.toString()}
     >
       <AccordionItemTrigger
         buttonColor="fill-gray-600"
-        className="bg-gray-50 dark:bg-black-200/50 dark:border-black-200 border rounded flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10"
+        className="bg-gray-50 dark:bg-black-200/50 flex items-center justify-between px-4 py-2 w-full dark:text-neargray-10"
       >
         <span>
           <span className="text-gray-400 dark:text-neargray-10">
@@ -178,8 +178,8 @@ const ViewOrChangeAbi = (props: Props) => {
           {toSnakeCase(method.name ?? '')}
         </span>
       </AccordionItemTrigger>
-      <AccordionItemContent className="border dark:border-black-200 p-4 rounded">
-        <div className="flex max-w-xl justify-between mb-3">
+      <AccordionItemContent className="p-4">
+        <div className="flex max-w-xl justify-between mb-3 sm:flex flex-nowrap">
           <div className="flex items-center dark:text-neargray-10">
             Arguments
             <Tooltip
@@ -199,7 +199,7 @@ const ViewOrChangeAbi = (props: Props) => {
           <div className="flex max-w-xl items-center" key={field.id}>
             <div className="sm:grid grid-cols-9 gap-2">
               <input
-                className="col-span-3 block border rounded mb-3 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                className="col-span-3 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
                 name="name"
                 onChange={onChange(field.id)}
                 placeholder="Argument name"
@@ -221,7 +221,7 @@ const ViewOrChangeAbi = (props: Props) => {
                 ))}
               </select>
               <input
-                className="col-span-4 block border rounded mb-3 h-9 px-3 w-full outline-none"
+                className="col-span-4 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
                 name="value"
                 onChange={onChange(field.id)}
                 placeholder={field.placeholder || 'Argument value'}
@@ -229,7 +229,7 @@ const ViewOrChangeAbi = (props: Props) => {
               />
             </div>
             <button
-              className="ml-3 p-1 mr-1 bg-red-300 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
+              className="ml-3 p-1 mr-1 bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
               onClick={onRemove(field.id)}
             >
               <CloseCircle className="text-white fill-white w-4 h-4" />
@@ -253,9 +253,11 @@ const ViewOrChangeAbi = (props: Props) => {
         <div className="slide-down disclosure">
           <div className="max-w-xl sm:grid grid-cols-2 gap-2">
             <label>
-              <span className="text-gray-400 text-xs ">Attached deposit</span>
+              <span className="text-gray-400 dark:text-neargray-10 text-xs ">
+                Attached deposit
+              </span>
               <input
-                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
                 name="attachedDeposit"
                 onChange={onOptionChange('attachedDeposit')}
                 placeholder="Attached Deposit"
@@ -263,9 +265,11 @@ const ViewOrChangeAbi = (props: Props) => {
               />
             </label>
             <label>
-              <span className="text-gray-400 text-xs">Gas</span>
+              <span className="text-gray-400 dark:text-neargray-10 text-xs">
+                Gas
+              </span>
               <input
-                className="block border rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
                 name="gas"
                 onChange={onOptionChange('gas')}
                 placeholder="Gas"
@@ -277,7 +281,7 @@ const ViewOrChangeAbi = (props: Props) => {
         <div className="flex items-center mt-5">
           {!hideQuery && method?.kind === 'view' && (
             <button
-              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              className="bg-green-500 dark:bg-green-250 hover:bg-green-400 dark:text-neargray-10 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={loading}
               onClick={onRead}
               type="submit"
@@ -287,7 +291,7 @@ const ViewOrChangeAbi = (props: Props) => {
           )}
           {method?.kind === 'call' && (
             <button
-              className="bg-green-500 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
+              className="bg-green-500 dark:bg-green-250 hover:bg-green-400 dark:text-neargray-10 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={loading || !signedAccountId}
               onClick={onWrite}
               type="submit"
@@ -298,7 +302,7 @@ const ViewOrChangeAbi = (props: Props) => {
         </div>
         {error && (
           <textarea
-            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-200 dark:text-black-200 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
+            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-950 dark:bg-opacity-40 dark:text-neargray-10 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
             readOnly
             rows={6}
             value={error}
@@ -320,7 +324,7 @@ const ViewOrChangeAbi = (props: Props) => {
         )}
         {result && (
           <textarea
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-100 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
+            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-900 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
             readOnly
             rows={6}
             value={result}

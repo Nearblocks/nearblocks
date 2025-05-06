@@ -166,11 +166,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       <div className="h-full bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 divide-y dark:divide-black-200">
         <div className="flex flex-wrap py-4 px-1.5">
           <div className="w-full">
-            <div
-              className={`flex items-center justify-between  ${
-                verifierData ? 'pb-5' : ''
-              }`}
-            >
+            <div className="flex items-center justify-between">
               {!fileDataLoading && (
                 <div className="flex items-center">
                   <FaCode className="mr-2" />
@@ -184,9 +180,9 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
               {isEmpty(fileData) && !fileDataLoading && (
                 <button
                   onClick={downloadContractWasm}
-                  className="flex items-center text-xs sm:!text-sm text-white my-1 text-center font-normal px-2 py-1 dark:bg-green-250 bg-green-500 rounded-md"
+                  className="flex items-center lg:!text-sm text-xs text-white my-1 text-center font-normal pl-2 pr-1 py-[5px] whitespace-nowrap dark:bg-green-250 bg-green-500 rounded-md"
                 >
-                  <span className="mr-1">Download Contract WASM</span>
+                  <span className="mr-1">Download .wasm</span>
                 </button>
               )}
             </div>
@@ -202,14 +198,16 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                     mutedText="Please try again later"
                   />
                 ) : fileData && fileData.length > 0 ? (
-                  fileData.map((file) => (
-                    <CodeViewer
-                      content={file.content}
-                      key={file.name}
-                      language="rust"
-                      name={file.name}
-                    />
-                  ))
+                  <div className="pt-4">
+                    {fileData.map((file) => (
+                      <CodeViewer
+                        content={file.content}
+                        key={file.name}
+                        language="rust"
+                        name={file.name}
+                      />
+                    ))}
+                  </div>
                 ) : (
                   <textarea
                     className="block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200  p-3 mt-3 resize-y"

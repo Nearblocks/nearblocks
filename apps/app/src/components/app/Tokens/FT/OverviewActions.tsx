@@ -309,7 +309,7 @@ const OverviewActions = ({
               </h2>
               <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
                 <div className="flex xl:flex-nowrap md:!flex-nowrap sm:flex-nowrap flex-wrap items-center justify-between sm:divide-x sm:dark:divide-black-200 pt-4 pb-4 gap-y-2">
-                  <div className="flex md:items-center xl:gap-x-24 lg:gap-x-12 md:gap-x-28 mr-3 lg:flex-wrap xl:flex-nowrap md:!flex-nowrap sm:flex-wrap flex-wrap w-[43%] justify-between">
+                  <div className="flex md:items-center xl:gap-x-24 lg:gap-x-12 md:gap-x-28 mr-3 lg:flex-wrap xl:flex-nowrap md:!flex-nowrap sm:flex-wrap flex-wrap justify-between">
                     <div className="w-full mb-1 md:mb-0">Contract:</div>
                     <div className=" items-center text-center flex lg:ml-[3px]">
                       {!token ? (
