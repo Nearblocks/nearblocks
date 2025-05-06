@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import { useRpcStore } from '@/stores/app/rpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useConfig } from '@/hooks/app/useConfig';
+import { isEmpty } from 'lodash';
 
 type VerifiedDataProps = {
   base64Code: string;
@@ -170,15 +171,17 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
                 verifierData ? 'pb-5' : ''
               }`}
             >
-              <div className="flex items-center">
-                <FaCode className="mr-2" />
-                <span className="font-bold">
-                  {verifierData
-                    ? 'Contract Source Code'
-                    : 'Base64 Encoded Contract Code'}
-                </span>
-              </div>
-              {!verifierData && base64Code && (
+              {!fileDataLoading && (
+                <div className="flex items-center">
+                  <FaCode className="mr-2" />
+                  <span className="font-bold">
+                    {!isEmpty(fileData) && !fileDataLoading
+                      ? 'Contract Source Code'
+                      : 'Base64 Encoded Contract Code'}
+                  </span>
+                </div>
+              )}
+              {isEmpty(fileData) && !fileDataLoading && (
                 <button
                   onClick={downloadContractWasm}
                   className="flex items-center text-xs sm:!text-sm text-white my-1 text-center font-normal px-2 py-1 dark:bg-green-250 bg-green-500 rounded-md"
@@ -192,7 +195,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
               <Loader wrapperClassName="w-full md:w-full" />
             ) : (
               <>
-                {fileDataError ? (
+                {fileDataError && !base64Code ? (
                   <ErrorMessage
                     icons={<FaInbox />}
                     message={fileDataError}
