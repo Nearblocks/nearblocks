@@ -18,7 +18,7 @@ SELECT
     create_default_indexes => false
   );
 
-CREATE UNIQUE INDEX ms_transaction_uidx ON multichain_signatures (transaction_hash, block_timestamp);
+CREATE UNIQUE INDEX ms_transaction_uidx ON multichain_signatures (transaction_hash, block_timestamp DESC);
 
 CREATE INDEX ms_block_timestamp_idx ON multichain_signatures (block_timestamp DESC);
 
@@ -30,7 +30,7 @@ CREATE INDEX ms_r_s_idx ON multichain_signatures (r, s);
 
 CREATE TABLE multichain_transactions (
   id BIGINT GENERATED ALWAYS AS IDENTITY,
-  TIMESTAMP BIGINT,
+  "timestamp" BIGINT,
   chain TEXT NOT NULL,
   transaction TEXT NOT NULL,
   address TEXT NOT NULL,
@@ -47,13 +47,13 @@ SELECT
     create_default_indexes => false
   );
 
-CREATE UNIQUE INDEX mt_transaction_chain_uidx ON multichain_transactions (transaction, chain, TIMESTAMP);
+CREATE UNIQUE INDEX mt_transaction_chain_uidx ON multichain_transactions (transaction, chain, "timestamp" DESC);
 
-CREATE INDEX mt_timestamp_idx ON multichain_transactions (TIMESTAMP DESC);
+CREATE INDEX mt_timestamp_idx ON multichain_transactions ("timestamp" DESC);
 
-CREATE INDEX mt_signature_idx ON multichain_transactions (signature, TIMESTAMP);
+CREATE INDEX mt_signature_idx ON multichain_transactions (signature, "timestamp" DESC);
 
-CREATE INDEX mt_r_s_idx ON multichain_transactions (r, s, TIMESTAMP);
+CREATE INDEX mt_r_s_idx ON multichain_transactions (r, s, "timestamp" DESC);
 
 CREATE TABLE settings (
   key TEXT NOT NULL,
