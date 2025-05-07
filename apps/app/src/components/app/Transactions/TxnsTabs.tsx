@@ -14,7 +14,12 @@ export default async function TxnsTabs({
   searchParams: any;
 }) {
   const options: RequestInit = { next: { revalidate: 10 } };
-  const data = (await getRequest(`v1/txns/${hash}/full`)) || {};
+  const requestOptions: RequestInit = {
+    cache: 'force-cache',
+    next: { tags: [`txn-${hash}`] },
+  };
+  const data =
+    (await getRequest(`v1/txns/${hash}/full`, {}, requestOptions)) || {};
   const stats = (await getRequest(`v1/stats`, {}, options)) || [];
   const syncData = (await getRequest(`v1/sync/status`, {}, options)) || [];
   const receipt =

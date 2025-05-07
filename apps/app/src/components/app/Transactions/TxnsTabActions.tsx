@@ -28,6 +28,7 @@ import Execution from './Execution';
 import Receipt from './Receipt';
 import ReceiptSummary from './ReceiptSummary';
 import Tree from './Tree';
+import { revalidateTxn } from '@/utils/app/actions';
 
 export type RpcProvider = {
   name: string;
@@ -141,7 +142,7 @@ const TxnsTabActions = ({
     if (txn != null && txn?.outcomes?.status === null) {
       const delay = Math.min(1000 * 2 ** retryCount.current, 150000);
       timeoutRef.current = setTimeout(() => {
-        router.refresh();
+        revalidateTxn(hash);
         retryCount.current += 1;
       }, delay);
     }
