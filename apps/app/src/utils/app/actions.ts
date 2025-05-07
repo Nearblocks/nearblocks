@@ -5,6 +5,7 @@ import { notFound, redirect, RedirectType } from 'next/navigation';
 import { SearchResult, Status, StatusInfo, UserToken } from '../types';
 import { getUserDataFromToken } from './libs';
 import { getRequest } from './api';
+import { revalidateTag } from 'next/cache';
 
 interface ExportParams {
   exportType: string;
@@ -171,4 +172,8 @@ export const getSyncStatus = async (): Promise<Status> => {
   const sync = await getRequest('v1/sync/status');
   const syncStatus = sync?.status;
   return syncStatus;
+};
+
+export const revalidateTxn = async (hash: string) => {
+  revalidateTag(`txn-${hash}`);
 };
