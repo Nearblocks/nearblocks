@@ -46,6 +46,9 @@ const nextConfig = {
       },
     ];
   },
+  generateBuildId: async () => {
+    return process.env.GITHUB_SHA || 'nearblocks';
+  },
 };
 
 export default withNextIntl(nextConfig);
