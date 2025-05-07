@@ -13,26 +13,21 @@ import {
 
 const batchSize = config.insertLimit;
 
-export const storeExecutionOutcomes = async (
-  knex: Knex,
-  messages: Message[],
-) => {
+export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
   const start = performance.now();
   let outcomes: ExecutionOutcome[] = [];
   let outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
-  messages.forEach((message) =>
-    message.shards.forEach(async (shard) => {
-      const executions = storeChunkExecutionOutcomes(
-        shard.shardId,
-        message.block.header.timestampNanosec,
-        shard.receiptExecutionOutcomes,
-      );
+  message.shards.forEach(async (shard) => {
+    const executions = storeChunkExecutionOutcomes(
+      shard.shardId,
+      message.block.header.timestampNanosec,
+      shard.receiptExecutionOutcomes,
+    );
 
-      outcomes = outcomes.concat(executions.outcomes);
-      outcomeReceipts = outcomeReceipts.concat(executions.outcomeReceipts);
-    }),
-  );
+    outcomes = outcomes.concat(executions.outcomes);
+    outcomeReceipts = outcomeReceipts.concat(executions.outcomeReceipts);
+  });
 
   const promises = [];
 

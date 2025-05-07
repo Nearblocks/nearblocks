@@ -1,11 +1,7 @@
 import { Readable } from 'stream';
 
-import {
-  GetObjectCommand,
-  GetObjectCommandOutput,
-  S3Client,
-  S3ClientConfig,
-} from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
 
 import { createKnex, Knex, KnexConfig } from 'nb-knex';
 import { logger } from 'nb-logger';
@@ -23,6 +19,25 @@ export type BlockStreamConfig = {
 };
 
 const retries = 5;
+const retryConfig: S3ClientConfig = {
+  logger: {
+    debug: () => {},
+    error: console.error,
+    info: () => {},
+    warn: console.warn,
+  },
+  maxAttempts: 1,
+  requestHandler: new NodeHttpHandler({
+    connectionTimeout: 5000,
+    logger: {
+      debug: () => {},
+      error: console.error,
+      info: () => {},
+      warn: console.warn,
+    },
+    requestTimeout: 10000,
+  }),
+};
 
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
@@ -47,15 +62,9 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
 const fetchJson = (s3: S3Client, bucket: string, block: number) => {
   return retry(
     async () => {
-      const response = await Promise.race([
-        s3.send(new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` })),
-        new Promise<GetObjectCommandOutput>((_, reject) =>
-          setTimeout(
-            () => reject(new Error('S3 request timed out after 10s')),
-            10_000,
-          ),
-        ),
-      ]);
+      const response = await s3.send(
+        new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` }),
+      );
 
       const chunks: Buffer[] = [];
 
@@ -71,7 +80,7 @@ const fetchJson = (s3: S3Client, bucket: string, block: number) => {
 
 export const streamBlock = (config: BlockStreamConfig) => {
   const knex: Knex = createKnex(config.dbConfig);
-  const s3 = new S3Client(config.s3Config);
+  const s3 = new S3Client({ ...config.s3Config, ...retryConfig });
   let start = config.start;
   let isFetching = false;
   const limit = 20;
