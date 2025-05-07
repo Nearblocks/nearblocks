@@ -24,19 +24,19 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
     setTxTypeActive(expandAll);
   }, [expandAll]);
 
-  const remainingFellowOutgoingReceipts = fellowOutgoingReceipts.slice(0, -1);
+  const remainingFellowOutgoingReceipts = fellowOutgoingReceipts?.slice(0, -1);
   const rpcRemainingFellowOutgoingReceipts = rpcFellowOutgoingReceipts?.slice(
     0,
     -1,
   );
-  const lastFellowOutgoingReceipt = fellowOutgoingReceipts.at(-1);
+  const lastFellowOutgoingReceipt = fellowOutgoingReceipts?.at(-1);
   const rpcLastFellowOutgoingReceipt = rpcFellowOutgoingReceipts?.at(-1);
   const filterRefundNestedReceipts =
     (receipt?.outcome?.nestedReceipts &&
-      receipt?.outcome?.nestedReceipts.filter(
+      receipt?.outcome?.nestedReceipts?.filter(
         (nestedReceipt: any) =>
           'outcome' in nestedReceipt &&
-          nestedReceipt.predecessorId !== 'system',
+          nestedReceipt?.predecessorId !== 'system',
       )) ||
     receipt?.outcome?.outgoing_receipts.filter(
       (nestedReceipt: any) =>
@@ -45,20 +45,21 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
     );
   const rpcFilterRefundNestedReceipts =
     rpcReceipt?.outcome?.nestedReceipts &&
-    rpcReceipt?.outcome?.nestedReceipts.filter(
+    rpcReceipt?.outcome?.nestedReceipts?.filter(
       (nestedReceipt: any) =>
-        'outcome' in nestedReceipt && nestedReceipt.predecessorId !== 'system',
+        'outcome' in nestedReceipt && nestedReceipt?.predecessorId !== 'system',
     );
 
   const nonRefundNestedReceipts =
-    filterRefundNestedReceipts && filterRefundNestedReceipts.slice(0, -1);
+    filterRefundNestedReceipts && filterRefundNestedReceipts?.slice(0, -1);
   const lastNonRefundNestedReceipt =
-    filterRefundNestedReceipts && filterRefundNestedReceipts.at(-1);
+    filterRefundNestedReceipts && filterRefundNestedReceipts?.at(-1);
 
   const rpcNonRefundNestedReceipts =
-    rpcFilterRefundNestedReceipts && rpcFilterRefundNestedReceipts.slice(0, -1);
+    rpcFilterRefundNestedReceipts &&
+    rpcFilterRefundNestedReceipts?.slice(0, -1);
   const rpcLastNonRefundNestedReceipt =
-    rpcFilterRefundNestedReceipts && rpcFilterRefundNestedReceipts.at(-1);
+    rpcFilterRefundNestedReceipts && rpcFilterRefundNestedReceipts?.at(-1);
   return (
     <>
       <div
@@ -97,12 +98,12 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
             );
             return (
               <ReceiptKind
-                key={`${action.action_kind || action.kind}_${index}`}
+                key={`${action?.action_kind || action?.kind}_${index}`}
                 action={action}
                 rpcAction={matchingAction}
                 onClick={switchActiveTxType}
                 isTxTypeActive={isTxTypeActive}
-                receiver={receipt.receiver_id || receipt.receiverId}
+                receiver={receipt?.receiver_id || receipt?.receiverId}
                 receipt={receipt}
               />
             );
@@ -124,7 +125,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           />
           <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
           <div className="text-green-500 dark:text-green-250 text-sm ">
-            {receipt.receiver_id || receipt.receiverId}
+            {receipt?.receiver_id || receipt?.receiverId}
           </div>
         </div>
       </div>

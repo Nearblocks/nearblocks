@@ -20,8 +20,8 @@ const TreeReceiptDetails = (props: Props) => {
   const isSuccess =
     status &&
     (('SuccessValue' in status &&
-      status.SuccessValue !== null &&
-      status.SuccessValue !== undefined) ||
+      status?.SuccessValue !== null &&
+      status?.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {

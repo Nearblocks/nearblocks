@@ -521,34 +521,33 @@ export const transformReceiptData = (
     receiptTree: ReceiptTree | undefined,
   ): TransformedReceipt | null => {
     if (!receiptTree) return null;
-
-    const outgoingReceipts = receiptTree.receipts
-      ? receiptTree.receipts
+    const outgoingReceipts = receiptTree?.receipts
+      ? receiptTree?.receipts
           .map((childReceipt) => transformReceipt(childReceipt))
           .filter((receipt): receipt is TransformedReceipt => receipt !== null)
       : [];
 
     const receipt: TransformedReceipt = {
-      receipt_id: receiptTree.receipt_id,
-      predecessor_id: receiptTree.predecessor_account_id,
-      receiver_id: receiptTree.receiver_account_id,
-      block_hash: receiptTree.block?.block_hash,
-      actions: receiptTree.actions?.map((action) => ({
+      receipt_id: receiptTree?.receipt_id,
+      predecessor_id: receiptTree?.predecessor_account_id,
+      receiver_id: receiptTree?.receiver_account_id,
+      block_hash: receiptTree?.block?.block_hash,
+      actions: receiptTree?.actions?.map((action) => ({
         ...action,
         args: {
-          ...action.args,
-          deposit: action.args?.deposit || '0',
+          ...action?.args,
+          deposit: action?.args?.deposit || '0',
         },
       })),
       outcome: {
-        logs: receiptTree.outcome?.logs || [],
-        status: convertStatus(receiptTree.outcome?.status),
-        gas_burnt: receiptTree.outcome?.gas_burnt,
-        tokens_burnt: receiptTree.outcome?.tokens_burnt,
-        executor_account_id: receiptTree.outcome?.executor_account_id,
+        logs: receiptTree?.outcome?.logs || [],
+        status: convertStatus(receiptTree?.outcome?.status),
+        gas_burnt: receiptTree?.outcome?.gas_burnt,
+        tokens_burnt: receiptTree?.outcome?.tokens_burnt,
+        executor_account_id: receiptTree?.outcome?.executor_account_id,
         outgoing_receipts: outgoingReceipts,
       },
-      public_key: receiptTree.public_key,
+      public_key: receiptTree?.public_key,
     };
 
     return receipt;
@@ -570,17 +569,17 @@ export const transformReceiptData = (
     }
   };
 
-  const rootReceipt = apiData.receipts[0].receipt_tree;
+  const rootReceipt = apiData?.receipts?.[0].receipt_tree;
   return transformReceipt(rootReceipt);
 };
 
 function processApiAction(action: any, args?: any) {
   if (!action) return {};
   return {
-    action_kind: action.action,
+    action_kind: action?.action,
     args: {
-      method_name: action.method,
-      args: action.args,
+      method_name: action?.method,
+      args: action?.args,
       deposit: args?.deposit || 0,
       gas: args?.gas_attached || 0,
       ...action?.args_full,
