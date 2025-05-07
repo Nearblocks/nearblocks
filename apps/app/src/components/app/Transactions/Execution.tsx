@@ -85,7 +85,7 @@ const Execution = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, receipt?.block_hash]);
 
-  const txnsPending = txn?.outcomes?.status === null;
+  const txnsPending = txn?.outcomes?.status === null && !rpcTxn?.status;
   return (
     <>
       {!txn ? (
