@@ -47,12 +47,12 @@ const CHART_TYPE_MAPPINGS = {
     x: new Date(stat.date).valueOf(),
     y: Number(stat.market_cap),
   }),
-  /*  'multi-chain-txns': (stat: ChartStat) => ({
+  'multi-chain-txns': (stat: ChartStat) => ({
     date: stat.date,
     multiChainTxns: stat.multichain_txns,
     x: new Date(stat.date).valueOf(),
     y: Number(stat.multichain_txns),
-  }), */
+  }),
   'near-price': (stat: ChartStat) => ({
     date: stat.date,
     x: new Date(stat.date).valueOf(),
@@ -137,11 +137,12 @@ const CHART_INFO_CONFIG = {
     description:
       'Near Daily Price (USD) chart shows the daily historical price for Near in USD.',
   },
-  /*  'multi-chain-txns': {
+  'multi-chain-txns': {
     title: 'Multi Chain Transactions Chart',
     yLabel: 'Multichain Transactions per Day',
-    description: 'The chart highlights the total number of multichain transactions on Near blockchain.',
-  }, */
+    description:
+      'The chart highlights the total number of multichain transactions on Near blockchain.',
+  },
   default: {
     title: 'Near Blockchain Chart',
     yLabel: 'Value',
@@ -253,13 +254,15 @@ const Chart = (props: Props) => {
         link: '/charts/tps',
         text: 'Near Transactions per Second Chart',
       },
-      /* {
-      exclude: false,
-      image: `/images/charts/multi-chain-txns.svg`,
-      image_dark: `/images/charts/multi-chain-txns_dark.svg`,
-      link: '/charts/multi-chain-txns',
-      text: t ? t('multichainTxns.heading') : 'Multi Chain Transactions Chart',
-    }, */
+      {
+        exclude: false,
+        image: `/images/charts/multi-chain-txns.svg`,
+        image_dark: `/images/charts/multi-chain-txns_dark.svg`,
+        link: '/charts/multi-chain-txns',
+        text: t
+          ? t('multichainTxns.heading')
+          : 'Multi Chain Transactions Chart',
+      },
     ],
     [networkId, t],
   );

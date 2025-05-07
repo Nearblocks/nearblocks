@@ -176,20 +176,16 @@ const AccountOverviewActions = ({
           )}
         </div>
         <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
-          <div className="xl:flex flex-wrap xl:flex-nowrap py-4">
-            <div className="w-36 xl:mb-0 mb-1.5">
-              {t('balance') || 'Balance'}:
-            </div>
+          <div className="flex-1 flex-wrap xl:flex-nowrap py-4">
+            <div className="w-36 mb-1.5">{t('balance') || 'Balance'}:</div>
 
-            <div className="w-full break-words">
+            <div className="w-full break-words h-5">
               {balance ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
             </div>
           </div>
           {networkId === 'mainnet' && (
-            <div className="xl:flex flex-wrap xl:flex-nowrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
-              <div className="w-36 xl:mb-0 mb-1.5">
-                {t('value') || 'Value:'}
-              </div>
+            <div className="flex-1 flex-wrap xl:flex-nowrap py-4 text-sm text-nearblue-600 dark:text-neargray-10">
+              <div className="w-36 mb-1.5">{t('value') || 'Value:'}</div>
 
               <div className="w-full break-words flex items-center">
                 {accountInfo?.amount && statsData?.near_price && (
@@ -216,11 +212,9 @@ const AccountOverviewActions = ({
               </div>
             </div>
           )}
-          <div className="xl:flex flex-wrap xl:flex-nowrap py-4 text-sm text-nearblue-600 dark:text-neargray-10 w-full">
-            <div className="w-36 xl:mb-0 mb-1.5">
-              {t('tokens') || 'Tokens:'}
-            </div>
-            <div className="break-words -my-1 z-10 flex w-full">
+          <div className="flex-1 flex-wrap xl:flex-nowrap py-4 text-sm text-nearblue-600 dark:text-neargray-10 w-full">
+            <div className="w-36 mb-1.5">{t('tokens') || 'Tokens:'}</div>
+            <div className="break-words flex w-full">
               <TokenHoldings
                 data={inventoryData}
                 ft={ft}

@@ -55,11 +55,11 @@ const menus = [
         link: '/node-explorer',
         title: 'header.menu.nodeExplorer',
       },
-      /*  {
+      {
         fallbackText: 'Multichain Txns',
         id: 6,
         link: '/multi-chain-txns',
-      }, */
+      },
     ],
     title: 'header.menu.blockchain',
   },

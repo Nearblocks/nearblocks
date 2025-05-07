@@ -1,10 +1,9 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
-import AccountAlerts from './AccountAlerts';
 import AccountMoreInfo from './AccountMoreInfo';
 import AccountOverview from './AccountOverview';
-/* import MultichainInfo from './MultichainInfo'; */
+import MultichainInfo from './MultichainInfo';
 
 export default async function Balance({
   id,
@@ -28,10 +27,7 @@ export default async function Balance({
 
   return (
     <>
-      <ErrorBoundary fallback={<div />}>
-        <AccountAlerts id={id} />
-      </ErrorBoundary>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ErrorBoundary fallback={errorBoundaryFallback}>
           <AccountOverview id={id} />
         </ErrorBoundary>
@@ -40,9 +36,9 @@ export default async function Balance({
           <AccountMoreInfo id={id} parse={parse} />
         </ErrorBoundary>
 
-        {/*  <ErrorBoundary fallback={errorBoundaryFallback}>
+        <ErrorBoundary fallback={errorBoundaryFallback}>
           <MultichainInfo id={id} />
-        </ErrorBoundary> */}
+        </ErrorBoundary>
       </div>
     </>
   );
