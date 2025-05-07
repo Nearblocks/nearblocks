@@ -275,13 +275,6 @@ export const difference = <T>(arr1: T[], arr2: T[]): T[] => {
   return arr1.filter((item) => !set2.has(item));
 };
 
-export const getBatchSize = (timestamp: string): number => {
-  const msLimit = 10_000; // 10s
-  const msTime = +timestamp / 1e6;
-
-  return Date.now() - msTime > msLimit ? 5 : 1;
-};
-
 export const getExecutionResult = (status: ExecutionStatus) => {
   return jsonStringify(Object.values(status)[0]);
 };

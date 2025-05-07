@@ -6,7 +6,6 @@ import { dbRead, dbWrite, streamConfig } from '#libs/knex';
 import { lru } from '#libs/lru';
 import { cacheHistogram } from '#libs/prom';
 import sentry from '#libs/sentry';
-import { getBatchSize } from '#libs/utils';
 import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
@@ -42,16 +41,8 @@ export const syncData = async () => {
     start: startBlock,
   });
 
-  let blocks: Message[] = [];
-
   for await (const message of stream as AsyncIterable<Message>) {
-    blocks.push(message);
-    const size = getBatchSize(message.block.header.timestampNanosec);
-
-    if (blocks.length >= size) {
-      await onMessage(blocks);
-      blocks = [];
-    }
+    await onMessage(message);
   }
 
   stream.on('end', () => {
@@ -64,27 +55,25 @@ export const syncData = async () => {
   });
 };
 
-export const onMessage = async (messages: Message[]) => {
+export const onMessage = async (message: Message) => {
   try {
     let start = performance.now();
 
-    prepareCache(messages);
+    prepareCache(message);
 
     const cache = performance.now() - start;
     cacheHistogram.labels(config.network).observe(cache);
     start = performance.now();
 
     await Promise.all([
-      storeReceipts(dbWrite, messages),
-      storeExecutionOutcomes(dbWrite, messages),
+      storeReceipts(dbWrite, message),
+      storeExecutionOutcomes(dbWrite, message),
     ]);
 
     const time = performance.now() - start;
 
     logger.info({
-      block: `${messages[0].block.header.height} - ${
-        messages[messages.length - 1].block.header.height
-      }`,
+      block: message.block.header.height,
       cache: `${cache} ms`,
       db: `${time} ms`,
     });
@@ -92,17 +81,13 @@ export const onMessage = async (messages: Message[]) => {
     await dbWrite('settings')
       .insert({
         key: indexerKey,
-        value: { sync: messages[messages.length - 1].block.header.height },
+        value: { sync: message.block.header.height },
       })
       .onConflict('key')
       .merge();
   } catch (error) {
     logger.warn([...lru.entries()]);
-    logger.error(
-      `aborting... block ${messages[messages.length - 1].block.header.height} ${
-        messages[messages.length - 1].block.header.hash
-      }`,
-    );
+    logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
     process.exit();

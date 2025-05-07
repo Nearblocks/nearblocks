@@ -18,18 +18,16 @@ import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
 const batchSize = config.insertLimit;
 const receiptKinds = ['Action', 'Data']; // Skip GlobalContractDistribution (missing parent txn)
 
-export const storeReceipts = async (knex: Knex, messages: Message[]) => {
+export const storeReceipts = async (knex: Knex, message: Message) => {
   const start = performance.now();
   let receiptData: Receipt[] = [];
   let receiptActionsData: ActionReceiptAction[] = [];
   let receiptInputData: ActionReceiptInputData[] = [];
   let receiptOutputData: ActionReceiptOutputData[] = [];
-  const shardChunks = messages.flatMap((message) =>
-    message.shards.flatMap((shard) => ({
-      chunk: shard.chunk,
-      header: message.block.header,
-    })),
-  );
+  const shardChunks = message.shards.flatMap((shard) => ({
+    chunk: shard.chunk,
+    header: message.block.header,
+  }));
 
   await Promise.all(
     shardChunks.map(async (shardChunk) => {
