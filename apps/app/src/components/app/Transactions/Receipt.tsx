@@ -27,13 +27,14 @@ const Receipt = (props: Props) => {
     receipt: rpcReceipt,
     statsData,
     txn,
+    rpcTxn,
     apiTxnActionsData,
   } = props;
   const receipt = !apiTxnActionsData?.receiptData
     ? rpcReceipt
     : apiTxnActionsData?.receiptData;
 
-  const txnsPending = txn?.outcomes?.status === null;
+  const txnsPending = txn?.outcomes?.status === null && !rpcTxn?.status;
 
   return (
     <>
