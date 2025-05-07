@@ -268,13 +268,34 @@ const Chart = (props: Props) => {
     if (!data || !chartTypes) return [];
 
     try {
-      const mappingFunction =
-        CHART_TYPE_MAPPINGS[chartTypes as keyof typeof CHART_TYPE_MAPPINGS];
-      return mappingFunction ? data.map(mappingFunction) : [];
+      switch (chartTypes) {
+        case 'txn-fee':
+          return data.map((stat) => ({
+            date: stat.date,
+            fee: Number(stat.txn_fee),
+            x: new Date(stat.date).valueOf(),
+            y: priceViewTxnFee
+              ? Number(stat.txn_fee) / 1e24
+              : Number(stat.txn_fee_usd),
+          }));
+        case 'txn-volume':
+          return data.map((stat) => ({
+            date: stat.date,
+            volume: stat.txn_volume,
+            x: new Date(stat.date).valueOf(),
+            y: txnVolumeView
+              ? Number(stat.txn_volume) / 1e24
+              : Number(stat.txn_volume_usd),
+          }));
+        default:
+          const mappingFunction =
+            CHART_TYPE_MAPPINGS[chartTypes as keyof typeof CHART_TYPE_MAPPINGS];
+          return mappingFunction ? data.map(mappingFunction) : [];
+      }
     } catch (error) {
       return [];
     }
-  }, [data, chartTypes]);
+  }, [data, chartTypes, priceViewTxnFee, txnVolumeView]);
 
   const processedChartData = useMemo(() => {
     return logView
@@ -497,7 +518,19 @@ const Chart = (props: Props) => {
           },
         },
         lineColor: theme === 'dark' ? '#e0e0e0' : '#333333',
-        title: { text: config.yLabel },
+        // title: { text: config.yLabel },
+        title: {
+          text:
+            chartTypes === 'txn-fee'
+              ? priceViewTxnFee
+                ? 'Transaction Fee Ⓝ'
+                : 'Transaction Fee (USD)'
+              : chartTypes === 'txn-volume'
+              ? txnVolumeView
+                ? 'Transaction Volume Ⓝ'
+                : 'Transaction Volume (USD)'
+              : config.yLabel,
+        },
         type:
           chartTypes === 'txn-fee' && priceViewTxnFee
             ? logView
@@ -515,7 +548,15 @@ const Chart = (props: Props) => {
 
     setChartOptions(options);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartTypes, theme, logView, chartData, priceViewTxnFee, txnVolumeView]);
+  }, [
+    chartTypes,
+    theme,
+    logView,
+    chartData,
+    priceViewTxnFee,
+    txnVolumeView,
+    processedChartData,
+  ]);
 
   return (
     <div>
