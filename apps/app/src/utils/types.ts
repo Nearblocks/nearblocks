@@ -2048,7 +2048,7 @@ export type TransformedReceipt = {
   predecessor_id: string;
   receiver_id: string;
   block_hash?: string;
-
+  block_height: number | null;
   actions?: Array<{
     action_kind: string;
     args: {

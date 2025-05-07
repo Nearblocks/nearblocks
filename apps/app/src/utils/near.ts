@@ -532,6 +532,7 @@ export const transformReceiptData = (
       predecessor_id: receiptTree?.predecessor_account_id,
       receiver_id: receiptTree?.receiver_account_id,
       block_hash: receiptTree?.block?.block_hash,
+      block_height: receiptTree?.block?.block_height || null,
       actions: receiptTree?.actions?.map((action) => ({
         ...action,
         args: {

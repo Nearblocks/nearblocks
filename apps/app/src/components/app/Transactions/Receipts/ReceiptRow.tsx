@@ -75,7 +75,11 @@ const ReceiptRow = (props: Props) => {
   };
 
   useEffect(() => {
-    if (receipt?.block_hash && receipt.block_hash !== lastBlockHash.current) {
+    if (
+      receipt?.block_hash &&
+      receipt.block_hash !== lastBlockHash.current &&
+      !receipt?.block_height
+    ) {
       lastBlockHash.current = receipt.block_hash;
 
       getBlockDetails(receipt?.block_hash)
@@ -84,7 +88,7 @@ const ReceiptRow = (props: Props) => {
         })
         .catch(() => {});
     }
-  }, [receipt?.block_hash, getBlockDetails]);
+  }, [receipt?.block_hash, receipt?.block_height, getBlockDetails]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -245,21 +249,23 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.block.text.0') : 'Block'}
           </div>
-          {!block?.height ? (
+          {!block?.height && !receipt?.block_height ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-28 max-w-xs" />
             </div>
-          ) : block?.height ? (
+          ) : receipt?.block_height || block?.height ? (
             <div className="w-full md:w-3/4 word-break font-semibold">
               <Link
                 className="text-green-500 dark:text-green-250 hover:no-underline"
                 href={`/blocks/${receipt.block_hash}`}
               >
-                {localFormat(block?.height)}
+                {localFormat(receipt?.block_height || block?.height)}
               </Link>
-              {block?.height && (
+              {(receipt?.block_height || block?.height) && (
                 <span className="mx-0.5">
-                  <CopyButton textToCopy={block?.height} />
+                  <CopyButton
+                    textToCopy={receipt?.block_height || block?.height}
+                  />
                 </span>
               )}
             </div>
