@@ -6,10 +6,10 @@ Balance indexer collects the info about native NEAR token balance changes 📊 (
 
 ```
 DATABASE_URL=
+DATABASE_URL_BASE=
 NETWORK=mainnet
 
 # Optional
-DATABASE_URL_READ=
 DATABASE_CA=
 DATABASE_CERT=
 DATABASE_KEY=

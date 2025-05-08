@@ -85,19 +85,17 @@ export type ActionReceiptOutputData = {
 };
 
 export type BalanceEvent = {
-  absolute_nonstaked_amount: string;
-  absolute_staked_amount: string;
   affected_account_id: string;
   block_height: number;
   block_timestamp: string;
   cause: StateChangeCause;
-  delta_nonstaked_amount: null | string;
-  delta_staked_amount: null | string;
   direction: StateChangeDirection;
-  event_index: string;
+  index_in_chunk: number;
   involved_account_id: null | string;
+  nonstaked_amount: string;
   receipt_id: null | string;
-  status: EventStatus;
+  shard_id: number;
+  staked_amount: string;
   transaction_hash: null | string;
 };
 

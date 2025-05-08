@@ -14,7 +14,7 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const writeConfig = {
+const dbConfig = {
   client: 'pg',
   connection: {
     application_name: 'indexer-balance',
@@ -25,23 +25,23 @@ const writeConfig = {
   pool: { max: 10, min: 1 },
 };
 
-export const readConfig = {
-  ...writeConfig,
+export const baseConfig = {
+  ...dbConfig,
   connection: {
-    ...writeConfig.connection,
-    application_name: 'indexer-balance-read',
-    connectionString: config.dbUrlRead || config.dbUrl,
+    ...dbConfig.connection,
+    application_name: 'indexer-balance-base',
+    connectionString: config.dbUrlBase,
   },
 };
 
 export const streamConfig = {
-  ...readConfig,
+  ...baseConfig,
   connection: {
-    ...readConfig.connection,
+    ...baseConfig.connection,
     application_name: 'indexer-balance-stream',
   },
 };
 
-export const dbWrite: Knex = createKnex(writeConfig);
+export const db: Knex = createKnex(dbConfig);
 
-export const dbRead: Knex = createKnex(readConfig);
+export const dbBase: Knex = createKnex(baseConfig);

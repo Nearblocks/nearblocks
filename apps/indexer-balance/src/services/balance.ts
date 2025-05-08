@@ -9,15 +9,15 @@ import {
 import { Knex } from 'nb-knex';
 import {
   BalanceEvent,
-  EventStatus,
   StateChangeCause,
   StateChangeCauseView,
   StateChangeDirection,
 } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import { isAccountDelete, isAccountUpdate } from '#libs/guards';
-import { mapStateChangeStatus } from '#libs/utils';
+import { isExecutionSuccess } from '#libs/utils';
 import {
   AccountBalance,
   ActionReceiptGasReward,
@@ -32,8 +32,6 @@ type BalanceChanges = {
   transactions: Map<string, AccountBalance>;
   validators: AccountBalance[];
 };
-
-const batchSize = 1000;
 
 export const storeBalance = async (knex: Knex, message: Message) => {
   await Promise.all(
@@ -78,21 +76,18 @@ export const storeChunkBalance = async (
 
   if (!changesLength) return;
 
-  const startIndex =
-    BigInt(block.timestamp) * 100_000_000n * 100_000_000n +
-    BigInt(shard.shardId) * 10_000_000n;
-
   for (let index = 0; index < changesLength; index++) {
-    changes[index].event_index = String(startIndex + BigInt(index));
+    changes[index].shard_id = shard.shardId;
+    changes[index].index_in_chunk = index;
   }
 
   await retry(async () => {
-    for (let i = 0; i < changes.length; i += batchSize) {
-      const batch = changes.slice(i, i + batchSize);
+    for (let i = 0; i < changes.length; i += config.insertLimit) {
+      const batch = changes.slice(i, i + config.insertLimit);
 
       await knex('balance_events')
         .insert(batch)
-        .onConflict(['event_index'])
+        .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
         .merge();
     }
   });
@@ -215,19 +210,17 @@ const getValidatorChanges = async (
 
   for (const currentBalance of balanceChanges) {
     result.push({
-      absolute_nonstaked_amount: currentBalance.balance.nonStaked,
-      absolute_staked_amount: currentBalance.balance.staked,
       affected_account_id: currentBalance.accountId,
       block_height: block.height,
       block_timestamp: block.timestampNanosec,
       cause: StateChangeCause.ValidatorsReward,
-      delta_nonstaked_amount: null,
-      delta_staked_amount: null,
       direction: StateChangeDirection.Inbound,
-      event_index: '0',
+      index_in_chunk: 0,
       involved_account_id: null,
+      nonstaked_amount: currentBalance.balance.nonStaked,
       receipt_id: null,
-      status: EventStatus.SUCCESS,
+      shard_id: 0,
+      staked_amount: currentBalance.balance.staked,
       transaction_hash: null,
     });
   }
@@ -261,24 +254,22 @@ const getTxnChanges = async (
 
       balanceChanges.delete(txnHash);
 
-      result.push({
-        absolute_nonstaked_amount: changesAfterTxn.balance.nonStaked,
-        absolute_staked_amount: changesAfterTxn.balance.staked,
-        affected_account_id: affectedAccount,
-        block_height: block.height,
-        block_timestamp: block.timestampNanosec,
-        cause: StateChangeCause.Transaction,
-        delta_nonstaked_amount: null,
-        delta_staked_amount: null,
-        direction: StateChangeDirection.Outbound,
-        event_index: '0',
-        involved_account_id: involvedAccount,
-        receipt_id: null,
-        status: mapStateChangeStatus(
-          txn.outcome.executionOutcome.outcome.status,
-        ),
-        transaction_hash: txnHash,
-      });
+      if (isExecutionSuccess(txn.outcome.executionOutcome.outcome.status)) {
+        result.push({
+          affected_account_id: affectedAccount,
+          block_height: block.height,
+          block_timestamp: block.timestampNanosec,
+          cause: StateChangeCause.Transaction,
+          direction: StateChangeDirection.Outbound,
+          index_in_chunk: 0,
+          involved_account_id: involvedAccount,
+          nonstaked_amount: changesAfterTxn.balance.nonStaked,
+          receipt_id: null,
+          shard_id: 0,
+          staked_amount: changesAfterTxn.balance.staked,
+          transaction_hash: txnHash,
+        });
+      }
     }
   }
 
@@ -326,22 +317,22 @@ const getReceiptRewardChanges = async (
 
       receipts.delete(receiptId);
 
-      result.push({
-        absolute_nonstaked_amount: changesAfterReceipt.balance.nonStaked,
-        absolute_staked_amount: changesAfterReceipt.balance.staked,
-        affected_account_id: affectedAccount,
-        block_height: block.height,
-        block_timestamp: block.timestampNanosec,
-        cause: StateChangeCause.Receipt,
-        delta_nonstaked_amount: null,
-        delta_staked_amount: null,
-        direction: StateChangeDirection.Inbound,
-        event_index: '0',
-        involved_account_id: involvedAccount,
-        receipt_id: receiptId,
-        status: mapStateChangeStatus(outcome.executionOutcome.outcome.status),
-        transaction_hash: null,
-      });
+      if (isExecutionSuccess(outcome.executionOutcome.outcome.status)) {
+        result.push({
+          affected_account_id: affectedAccount,
+          block_height: block.height,
+          block_timestamp: block.timestampNanosec,
+          cause: StateChangeCause.Receipt,
+          direction: StateChangeDirection.Inbound,
+          index_in_chunk: 0,
+          involved_account_id: involvedAccount,
+          nonstaked_amount: changesAfterReceipt.balance.nonStaked,
+          receipt_id: receiptId,
+          shard_id: 0,
+          staked_amount: changesAfterReceipt.balance.staked,
+          transaction_hash: null,
+        });
+      }
     }
 
     const changesAfterReward = rewards.get(receiptId);
@@ -355,22 +346,22 @@ const getReceiptRewardChanges = async (
 
       rewards.delete(receiptId);
 
-      result.push({
-        absolute_nonstaked_amount: changesAfterReward.balance.nonStaked,
-        absolute_staked_amount: changesAfterReward.balance.staked,
-        affected_account_id: affectedAccount,
-        block_height: block.height,
-        block_timestamp: block.timestampNanosec,
-        cause: StateChangeCause.ContractReward,
-        delta_nonstaked_amount: null,
-        delta_staked_amount: null,
-        direction: StateChangeDirection.Inbound,
-        event_index: '0',
-        involved_account_id: involvedAccount,
-        receipt_id: receiptId,
-        status: mapStateChangeStatus(outcome.executionOutcome.outcome.status),
-        transaction_hash: null,
-      });
+      if (isExecutionSuccess(outcome.executionOutcome.outcome.status)) {
+        result.push({
+          affected_account_id: affectedAccount,
+          block_height: block.height,
+          block_timestamp: block.timestampNanosec,
+          cause: StateChangeCause.ContractReward,
+          direction: StateChangeDirection.Inbound,
+          index_in_chunk: 0,
+          involved_account_id: involvedAccount,
+          nonstaked_amount: changesAfterReward.balance.nonStaked,
+          receipt_id: receiptId,
+          shard_id: 0,
+          staked_amount: changesAfterReward.balance.staked,
+          transaction_hash: null,
+        });
+      }
     }
   }
 
