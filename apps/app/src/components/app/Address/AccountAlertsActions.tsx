@@ -43,7 +43,7 @@ const AccountAlertsActions = ({
           return null;
         }),
         viewAccount(params?.id).catch(() => {
-          throw new Error('rpc error');
+          return null;
         }),
       ]);
 
