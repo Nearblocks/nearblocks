@@ -29,17 +29,17 @@ interface Props {
 
 const TokenHoldings = (props: Props) => {
   /* eslint-disable @next/next/no-img-element */
-
+  const ft = props?.ft?.tokens?.filter((token) => token?.contract !== 'aurora');
   const nfts = props?.data?.nfts || [];
 
-  if (!props?.ft?.tokens?.length && !nfts?.length) {
+  if (!ft?.length && !nfts?.length) {
     return (
       <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
         <option>N/A</option>
       </select>
     );
   }
-  const ftAmount = props.ft?.amount ?? 0;
+  const ftAmount = props?.ft?.amount ?? 0;
 
   function isTokenSpam(tokenName: string) {
     if (props?.spamTokens) {
@@ -52,7 +52,6 @@ const TokenHoldings = (props: Props) => {
     }
     return false;
   }
-
   return (
     <PopoverRoot positioning={{ sameWidth: true }}>
       <PopoverTrigger
@@ -61,11 +60,11 @@ const TokenHoldings = (props: Props) => {
       >
         <button>
           <span>
-            {ftAmount && (props.ft?.tokens?.length || nfts?.length) ? (
+            {ftAmount && (ft?.length || nfts?.length) ? (
               <>
                 {'$' + dollarFormat(ftAmount)}
                 <span className="bg-green-500 dark:bg-green-250 text-xs text-white rounded ml-2 px-1 p-0.5">
-                  {(props.ft?.tokens?.length || 0) + (nfts?.length || 0)}
+                  {(ft?.length || 0) + (nfts?.length || 0)}
                 </span>
               </>
             ) : (
@@ -85,16 +84,13 @@ const TokenHoldings = (props: Props) => {
         <div className="dark:bg-black">
           <PerfectScrollbar>
             <div className="max-h-60 dark:bg-black lg:overflow-visible overflow-y-scroll">
-              {props.ft?.tokens?.length > 0 && (
+              {ft?.length > 0 && (
                 <>
                   <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10 font-semibold pr-2 pl-1.5 py-2 mx-2 mt-1 rounded-lg">
-                    Tokens{' '}
-                    <span className="font-normal">
-                      ({props.ft?.tokens?.length})
-                    </span>
+                    Tokens <span className="font-normal">({ft?.length})</span>
                   </div>
                   <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
-                    {props.ft?.tokens?.map((token, index) => (
+                    {ft?.map((token, index) => (
                       <div
                         className="dark:bg-black px-2 py-1"
                         key={token?.contract}
@@ -117,11 +113,13 @@ const TokenHoldings = (props: Props) => {
                                   }}
                                   src={
                                     token?.ft_meta?.icon
-                                      ? token.ft_meta.icon.startsWith('http') ||
-                                        token.ft_meta.icon.startsWith(
+                                      ? token?.ft_meta?.icon.startsWith(
+                                          'http',
+                                        ) ||
+                                        token?.ft_meta?.icon.startsWith(
                                           'data:image/',
                                         )
-                                        ? token.ft_meta.icon
+                                        ? token?.ft_meta?.icon
                                         : '/images/tokenplaceholder.svg'
                                       : '/images/tokenplaceholder.svg'
                                   }
@@ -158,7 +156,7 @@ const TokenHoldings = (props: Props) => {
                                 <div>
                                   {token?.amountUsd
                                     ? '$' + dollarFormat(token?.amountUsd)
-                                    : '$' + (token.amountUsd ?? '')}
+                                    : '$' + (token?.amountUsd ?? '')}
                                 </div>
                                 <div className="text-gray-400">
                                   {token?.ft_meta?.price

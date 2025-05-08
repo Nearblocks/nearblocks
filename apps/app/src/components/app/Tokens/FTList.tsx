@@ -65,7 +65,7 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
   const [form, setForm] = useState(initialForm);
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
 
-  const tokens = data?.tokens;
+  const tokens = data?.tokens?.filter((token) => token?.contract !== 'aurora');
   const totalCount = tokensCount?.tokens?.[0]?.count || 0;
 
   const debouncedSearch = useRef(
