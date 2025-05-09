@@ -96,6 +96,7 @@ export type BalanceEvent = {
   receipt_id: null | string;
   shard_id: number;
   staked_amount: string;
+  storage_usage: string;
   transaction_hash: null | string;
 };
 

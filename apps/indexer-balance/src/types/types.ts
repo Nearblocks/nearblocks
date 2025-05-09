@@ -44,6 +44,7 @@ export type AccountBalance = {
 export type Balance = {
   nonStaked: string;
   staked: string;
+  storage: string;
 };
 
 export type TransactionProcessing = {

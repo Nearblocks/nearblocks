@@ -185,6 +185,7 @@ const getAccount = (
       balance: {
         nonStaked: stateChange.change.amount,
         staked: stateChange.change.locked,
+        storage: stateChange.change.storageUsage,
       },
     };
   }
@@ -195,6 +196,7 @@ const getAccount = (
       balance: {
         nonStaked: '0',
         staked: '0',
+        storage: '0',
       },
     };
   }
@@ -221,6 +223,7 @@ const getValidatorChanges = async (
       receipt_id: null,
       shard_id: 0,
       staked_amount: currentBalance.balance.staked,
+      storage_usage: currentBalance.balance.storage,
       transaction_hash: null,
     });
   }
@@ -267,6 +270,7 @@ const getTxnChanges = async (
           receipt_id: null,
           shard_id: 0,
           staked_amount: changesAfterTxn.balance.staked,
+          storage_usage: changesAfterTxn.balance.storage,
           transaction_hash: txnHash,
         });
       }
@@ -330,6 +334,7 @@ const getReceiptRewardChanges = async (
           receipt_id: receiptId,
           shard_id: 0,
           staked_amount: changesAfterReceipt.balance.staked,
+          storage_usage: changesAfterReceipt.balance.storage,
           transaction_hash: null,
         });
       }
@@ -359,6 +364,7 @@ const getReceiptRewardChanges = async (
           receipt_id: receiptId,
           shard_id: 0,
           staked_amount: changesAfterReward.balance.staked,
+          storage_usage: changesAfterReward.balance.storage,
           transaction_hash: null,
         });
       }
