@@ -5,6 +5,8 @@ import Balance from '@/components/app/Address/Balance';
 import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import TabSkeletion from '@/components/app/skeleton/address/tab';
 import { getRequest } from '@/utils/app/api';
+import { ErrorBoundary } from 'react-error-boundary';
+import AccountAlerts from '@/components/app/Address/AccountAlerts';
 
 export default async function AddressIndex(props: {
   params: Promise<{ id: string; locale: string }>;
@@ -46,6 +48,9 @@ export default async function AddressIndex(props: {
 
   return (
     <>
+      <ErrorBoundary fallback={<div />}>
+        <AccountAlerts id={id} />
+      </ErrorBoundary>
       <Suspense
         fallback={
           <BalanceSkeleton

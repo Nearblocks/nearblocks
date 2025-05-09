@@ -153,30 +153,29 @@ const AccountMoreInfoActions = ({
           {t('moreInfo') || 'Account information'}
         </h2>
         <div className="px-3 divide-y dark:divide-black-200 text-sm text-nearblue-600 dark:text-neargray-10">
-          <div className="flex flex-wrap xl:flex-nowrap xl:w-[94.2%] lg:w-[95.3%] w-[93.5%] py-4 justify-between items-center">
-            <div className="xl:flex xl:w-1/2 w-max items-center gap-x-5">
-              <div className="whitespace-nowrap xl:mb-0 mb-1.5">
-                Staked {t('balance') || 'Balance'}:
-              </div>
-              <div>
-                {!status && isAccountLoading && <div className="h-5"></div>}
-                {stakedBalace
-                  ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
-                  : stakedBalace ?? ''}
+          <div className="flex flex-wrap xl:flex-nowrap xl:w-[94.9%] lg:w-[92.3%] w-[94%] py-4 justify-between items-center">
+            <div>
+              <div className="flex-1 w-full items-center">
+                <div className="whitespace-nowrap mb-1.5">
+                  Staked {t('balance') || 'Balance'}:
+                </div>
+                <div className="h-5">
+                  {stakedBalace ? yoctoToNear(stakedBalace, true) + ' Ⓝ' : ''}
+                </div>
               </div>
             </div>
-            <div className="xl:flex xl:w-1/2 w-max items-center gap-x-7">
-              <div className="whitespace-nowrap xl:mb-0 mb-1.5">
-                {t('storageUsed') || 'Storage used'}:
-              </div>
-              <div className="w-20 h-5">
-                {isAccountLoading ? (
-                  <Skeleton className="h-4 w-16" />
-                ) : storageUsed != null ? (
-                  weight(storageUsed)
-                ) : (
-                  ''
-                )}
+            <div>
+              <div className="flex-1 w-full items-center">
+                <div className="whitespace-nowrap mb-1.5">
+                  {t('storageUsed') || 'Storage used'}:
+                </div>
+                <div className="w-20 h-5">
+                  {isAccountLoading ? (
+                    <Skeleton className="h-4 w-16" />
+                  ) : storageUsed != null ? (
+                    weight(storageUsed)
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
@@ -189,10 +188,10 @@ const AccountMoreInfoActions = ({
                   : 'hidden'
               }`}
             >
-              <div className="flex justify-between xl:w-[85.5%] lg:w-[100%] w-[100%] ">
+              <div className="flex justify-between w-full">
                 {deploymentData?.receipt_predecessor_account_id && (
-                  <div className="xl:flex w-max items-center gap-x-2.5">
-                    <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                  <div className="flex-1 w-max items-center">
+                    <div className="whitespace-nowrap mb-1.5">
                       Contract Creator:
                     </div>
                     <div className="flex flex-wrap xl:flex-nowrap">
@@ -216,8 +215,8 @@ const AccountMoreInfoActions = ({
                 )}
                 <div>
                   {(contract && contract?.hash) || isContract ? (
-                    <div className="xl:flex xl:w-full justify-between w-max items-center gap-x-2">
-                      <div className="whitespace-nowrap xl:mb-0 mb-1.5 flex">
+                    <div className="flex-1 xl:w-full justify-between w-full items-center">
+                      <div className="whitespace-nowrap mb-1.5 flex">
                         Contract Locked:
                       </div>
                       <div className="break-words flex w-6 h-5">
@@ -243,12 +242,12 @@ const AccountMoreInfoActions = ({
                 tokenTracker
                   ? tokenData?.name
                     ? deploymentData?.receipt_predecessor_account_id
-                      ? 'xl:w-[93.7%] lg:w-[92%] md:w-[89%] w-[90.1%]'
-                      : 'xl:w-[87.8%] w-[100%]'
+                      ? 'xl:w-[94%] lg:w-[92%] md:w-[92.5%] w-[92%]'
+                      : 'w-[100%]'
                     : deploymentData?.receipt_predecessor_account_id
-                    ? 'xl:w-[95.8%] lg:w-[94%] md:w-[92%] w-[93%]'
-                    : 'xl:w-[87.8%] w-[100%]'
-                  : 'xl:w-[87.8%] w-[100%]'
+                    ? 'xl:w-[91.5%] lg:w-[88%] md:w-[89%] w-[90%]'
+                    : 'w-[100%]'
+                  : 'w-[100%]'
               }`}
             >
               {tokenTracker &&
@@ -256,8 +255,8 @@ const AccountMoreInfoActions = ({
                 deploymentData?.receipt_predecessor_account_id && (
                   <div className="flex py-2">
                     {tokenData?.name && (
-                      <div className="xl:flex items-center gap-x-8">
-                        <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                      <div className="flex-1 items-center">
+                        <div className="whitespace-nowrap mb-1.5">
                           Token Tracker:
                         </div>
                         <div className="flex">
@@ -292,8 +291,8 @@ const AccountMoreInfoActions = ({
                       </div>
                     )}
                     {nftTokenData?.name && (
-                      <div className="xl:flex items-center gap-x-2">
-                        <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                      <div className="flex-1 items-center">
+                        <div className="whitespace-nowrap mb-1.5">
                           NFT Token Tracker:
                         </div>
                         <div className="flex">
@@ -325,8 +324,8 @@ const AccountMoreInfoActions = ({
                   </div>
                 )}
               <div>
-                <div className="xl:flex w-full break-words gap-x-11 py-2">
-                  <div className="flex  whitespace-nowrap xl:mb-0 mb-1.5">
+                <div className="flex-1 w-full break-words py-2">
+                  <div className="flex whitespace-nowrap mb-1.5">
                     {accountView !== null &&
                     accountView?.block_hash === undefined &&
                     accountData?.deleted?.transaction_hash
@@ -361,7 +360,7 @@ const AccountMoreInfoActions = ({
                     </div>
                   ) : accountData?.created?.transaction_hash ? (
                     <div className="flex whitespace-nowrap">
-                      <span className="xl:ml-1">
+                      <span>
                         {getTimeAgoString(
                           nanoToMilli(accountData.created.block_timestamp),
                         )}
@@ -383,7 +382,7 @@ const AccountMoreInfoActions = ({
                       )}
                     </div>
                   ) : accountInfo?.code_hash ? (
-                    <span className="xl:ml-1.5">Genesis</span>
+                    <span>Genesis</span>
                   ) : isAccountLoading ? (
                     <div className="h-5"></div>
                   ) : (
@@ -393,18 +392,20 @@ const AccountMoreInfoActions = ({
               </div>
               {isContract &&
                 !deploymentData?.receipt_predecessor_account_id && (
-                  <div className="xl:flex xl:w-full justify-between w-max items-center gap-x-5 py-2">
-                    <div className="whitespace-nowrap xl:mb-0 mb-1.5 flex">
-                      Contract Locked:
-                    </div>
-                    <div className="break-words flex w-6 h-5">
-                      {contractLoading ? (
-                        <Skeleton className="h-4 w-16" />
-                      ) : contract?.code_base64 && isLocked ? (
-                        'Yes'
-                      ) : (
-                        'No'
-                      )}
+                  <div>
+                    <div className="flex-1 justify-between w-max items-center py-2">
+                      <div className="whitespace-nowrap mb-1.5 flex">
+                        Contract Locked:
+                      </div>
+                      <div className="break-words flex w-6 h-5">
+                        {contractLoading ? (
+                          <Skeleton className="h-4 w-16" />
+                        ) : contract?.code_base64 && isLocked ? (
+                          'Yes'
+                        ) : (
+                          'No'
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -416,8 +417,8 @@ const AccountMoreInfoActions = ({
               <div className="flex justify-between w-full py-4">
                 <div className="flex">
                   {tokenData?.name && (
-                    <div className="xl:flex items-center gap-x-8">
-                      <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                    <div className="flex-1 items-center">
+                      <div className="whitespace-nowrap mb-1.5">
                         Token Tracker:
                       </div>
                       <div className="flex">
@@ -452,8 +453,8 @@ const AccountMoreInfoActions = ({
                     </div>
                   )}
                   {nftTokenData?.name && (
-                    <div className="xl:flex items-center gap-x-2">
-                      <div className="whitespace-nowrap xl:mb-0 mb-1.5">
+                    <div className="flex-1 items-center">
+                      <div className="whitespace-nowrap mb-1.5">
                         NFT Token Tracker:
                       </div>
                       <div className="flex">
