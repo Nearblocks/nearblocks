@@ -5,7 +5,8 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  dbUrlRead: string;
+  dbUrlBase: string;
+  insertLimit: number;
   network: Network;
   s3AccessKey: string;
   s3Bucket: string;
@@ -43,6 +44,7 @@ export type AccountBalance = {
 export type Balance = {
   nonStaked: string;
   staked: string;
+  storage: string;
 };
 
 export type TransactionProcessing = {

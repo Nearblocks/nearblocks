@@ -1,20 +1,41 @@
-import { snakeCase, toUpper } from 'lodash-es';
-
 import { ExecutionStatus } from 'nb-blocks';
-import { EventStatus, ExecutionOutcomeStatus } from 'nb-types';
+import { logger } from 'nb-logger';
+import { sleep } from 'nb-utils';
 
-export const mapStateChangeStatus = (status: ExecutionStatus): EventStatus => {
-  const key = toUpper(
-    snakeCase(Object.keys(status)[0]),
-  ) as keyof typeof ExecutionOutcomeStatus;
+import { db } from '#libs/knex';
 
-  switch (key) {
-    case ExecutionOutcomeStatus.FAILURE:
-      return EventStatus.FAILURE;
-    case ExecutionOutcomeStatus.SUCCESS_VALUE:
-    case ExecutionOutcomeStatus.SUCCESS_RECEIPT_ID:
-      return EventStatus.SUCCESS;
-    default:
-      return EventStatus.UNKNOWN;
+export const isExecutionSuccess = (status: ExecutionStatus) => {
+  if ('SuccessValue' in status || 'SuccessReceiptId' in status) {
+    return true;
+  }
+
+  return false;
+};
+
+export const migrationCheck = async (): Promise<void> => {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const exists = await db
+      .select(
+        db.raw(
+          `
+            EXISTS (
+              SELECT
+                1
+              FROM
+                information_schema.tables
+              WHERE
+                table_schema = 'public'
+                AND table_name = 'balance_events'
+            ) AS exists
+          `,
+        ),
+      )
+      .first();
+
+    if (exists?.exists) return;
+
+    logger.warn(`waiting for migration, checking again in 60s.`);
+    await sleep(60_000); // 60s
   }
 };

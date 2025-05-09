@@ -13,7 +13,8 @@
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "lint:check": "tsc --noEmit && eslint ./",
+    "migrate": "NODE_ENV=production knex migrate:latest"
   },
   "dependencies": {
     "@sentry/node": "7.120.0",
@@ -24,6 +25,7 @@
     "@types/lodash-es": "~4.17",
     "@types/node": "~22.10",
     "eslint-config-custom-node": "*",
+    "knex-migrate-sql-file": "~2.0",
     "nb-blocks": "*",
     "nb-knex": "*",
     "nb-logger": "*",
