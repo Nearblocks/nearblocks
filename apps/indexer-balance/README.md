@@ -1,4 +1,4 @@
-## 💰 Indexer Base
+## 💰 Indexer Balance
 
 Balance indexer collects the info about native NEAR token balance changes 📊 (all the changes are validated ✔️)
 
