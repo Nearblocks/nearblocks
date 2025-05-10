@@ -30,7 +30,7 @@ export default async function TokenTabs({
     info: { api: `v1/fts/${id}` },
     transfers: {
       api: `v1/fts/${id}/txns`,
-      count: `v1/fts/${id}/txns/count?account=${searchParams?.a}`,
+      count: `v1/fts/${id}/txns/count${searchParams?.a ? `?account=${searchParams.a}` : ''}`,
     },
   };
 
