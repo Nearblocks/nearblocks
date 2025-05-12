@@ -9,7 +9,7 @@ import Holders from './Holders';
 import Info from './Info';
 import Transfers from './Transfers';
 
-type TabType = 'comments' | 'faq' | 'holders' | 'info' | 'transfers';
+type TabType = 'faq' | 'holders' | 'info' | 'transfers';
 
 export default async function TokenTabs({
   id,
@@ -19,35 +19,40 @@ export default async function TokenTabs({
   searchParams: any;
 }) {
   const tab = searchParams?.tab || 'transfers';
+  const isValidTabType = (value: string): value is TabType => {
+    return ['faq', 'holders', 'info', 'transfers'].includes(value);
+  };
+  const selectedTab: TabType = isValidTabType(tab) ? tab : 'transfers';
 
   const tabApiUrls: Record<TabType, { api: string; count?: string }> = {
-    comments: { api: '' },
     faq: { api: `v1/fts/${id}` },
     holders: {
       api: `v1/fts/${id}/holders`,
-      count: `v1/fts/${id}/holders/count`,
     },
     info: { api: `v1/fts/${id}` },
     transfers: {
       api: `v1/fts/${id}/txns`,
-      count: `v1/fts/${id}/txns/count${searchParams?.a ? `?account=${searchParams.a}` : ''}`,
     },
   };
 
-  const tabApi = tabApiUrls[tab as TabType];
-  const fetchUrl = `${tabApi.api}`;
+  const tabApi = tabApiUrls[selectedTab as TabType];
+  const fetchUrl = `${tabApi?.api}`;
 
   const [
     dataResult,
-    transferResult,
+    transferCount,
     tokenDetails,
     syncDetails,
-    holdersDetails,
+    holdersCount,
     accountDetails,
     contractResult,
   ] = await Promise.all([
     getRequest(fetchUrl, searchParams, { next: { revalidate: 10 } }),
-    getRequest(`v1/fts/${id}/txns/count?account=${searchParams?.a}`),
+    getRequest(
+      `v1/fts/${id}/txns/count${
+        searchParams?.a ? `?account=${searchParams.a}` : ''
+      }`,
+    ),
     getRequest(`v1/fts/${id}`),
     getRequest(`v1/sync/status`),
     getRequest(`v1/fts/${id}/holders/count`),
@@ -55,10 +60,10 @@ export default async function TokenTabs({
     getRequest(`v1/account/${id}/contract/deployments`),
   ]);
   const holder = dataResult?.holders || [];
-  const holders = holdersDetails?.holders?.[0]?.count;
+  const holders = holdersCount?.holders?.[0]?.count;
   const txns = dataResult?.txns || [];
   const txnCursor = dataResult?.cursor;
-  const transfers = transferResult?.txns?.[0]?.count;
+  const transfers = transferCount?.txns?.[0]?.count;
   const token: Token = tokenDetails?.contracts?.[0];
   const status = syncDetails?.status?.aggregates?.ft_holders || {
     height: '0',
@@ -95,7 +100,7 @@ export default async function TokenTabs({
           {tabs?.map(({ label, name }) => {
             return (
               <Link
-                className={getClassName(name === tab)}
+                className={getClassName(name === selectedTab)}
                 href={
                   name === 'transfers'
                     ? `/token/${id}`
@@ -109,36 +114,36 @@ export default async function TokenTabs({
           })}
         </div>
         <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 w-full">
-          {tab === 'transfers' ? (
+          {selectedTab === 'transfers' ? (
             <Transfers
               count={transfers}
               cursor={txnCursor}
               error={!txns}
-              tab={tab}
+              tab={selectedTab}
               txns={txns}
             />
           ) : null}
-          {tab === 'holders' ? (
+          {selectedTab === 'holders' ? (
             <Holders
               count={holders}
               error={!txns}
               holder={holder}
               status={status}
-              tab={tab}
+              tab={selectedTab}
               token={token}
             />
           ) : null}
-          {tab === 'info' ? (
-            <Info error={!txns} tab={tab} token={token} />
+          {selectedTab === 'info' ? (
+            <Info error={!txns} tab={selectedTab} token={token} />
           ) : null}
-          {tab === 'faq' ? (
+          {selectedTab === 'faq' ? (
             <FAQ
               account={account}
               contract={contract}
               holdersCount={holders}
               holdersData={holder}
               id={id}
-              tab={tab}
+              tab={selectedTab}
               token={token}
               transfers={transfers}
             />
