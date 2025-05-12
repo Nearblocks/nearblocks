@@ -12,7 +12,11 @@ const Overview = async ({ id, searchParams }: any) => {
       getRequest(`v1/stats`),
       getRequest(`v1/fts/${id}`),
       getRequest(`v1/sync/status`),
-      getRequest(`v1/fts/${id}/txns/count?account=${searchParams?.a}`),
+      getRequest(
+        `v1/fts/${id}/txns/count${
+          searchParams?.a ? `?account=${searchParams.a}` : ''
+        }`,
+      ),
       getRequest(`v1/fts/${id}/holders/count`),
     ]);
 

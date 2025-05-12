@@ -3,7 +3,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import TokenTabSkeleton from '@/components/app/skeleton/ft/TokenTabSkeleton';
 import Overview from '@/components/app/Tokens/FT/Overview';
-import TokenTabs from '@/components/app/Tokens/FT/TokenTab';
+import TokenTabs from '@/components/app/Tokens/FT/TokenTabs';
 import TokenOverviewSkeleton from '@/components/app/skeleton/ft/TokenOverviewSkelton';
 
 export default async function TokenIndex(props: {
