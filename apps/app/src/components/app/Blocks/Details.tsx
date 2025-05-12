@@ -38,7 +38,7 @@ interface BlockData {
 export default function Details(props: Props) {
   const t = useTranslations();
   const { data, price } = props;
-  const nearPrice = price?.stats[0]?.near_price;
+  const nearPrice = price?.stats?.[0]?.near_price;
   const { networkId } = useConfig();
   const { getBlockDetails } = useRpc();
   const [blockInfo, setBlockInfo] = useState<BlockData | null>(null);

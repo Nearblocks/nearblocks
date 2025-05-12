@@ -118,7 +118,8 @@ export function dollarFormat(number: string) {
 
   // Add comma as a thousands separator
   const parts = formattedNumber && formattedNumber?.split('.');
-  if (parts) parts[0] = parts && parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (parts)
+    parts[0] = parts && parts?.[0]?.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
   const dollarFormattedNumber = parts && `${parts.join('.')}`;
 
