@@ -65,7 +65,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       tokenFilter: a && `account/${a}/inventory`,
       latestBlocks: `blocks/latest?limit=1`,
       transfersCount: id && `fts/${id}/txns/count${a ? `?account=${a}` : ''}`,
-      holdersCount: id && `fts/${id}/holders/count`
+      holdersCount: id && `fts/${id}/holders/count`,
     };
 
     const tabApiUrls: Record<TabType, { api: string; count?: string }> = {

@@ -1,3 +1,6 @@
+// Temp batch processing
+import { forEach } from 'hwp';
+
 import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
 
@@ -23,7 +26,9 @@ export const syncData = async () => {
   let startBlockHeight = config.startBlockHeight;
 
   if (!startBlockHeight && latestBlock) {
-    startBlockHeight = +latestBlock;
+    // startBlockHeight = +latestBlock;
+    // Temp batch processing
+    startBlockHeight = +latestBlock - 50;
   }
 
   const startBlock = startBlockHeight || 0;
@@ -32,14 +37,17 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
+    limit: 100,
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlock,
   });
 
-  for await (const message of stream) {
-    await onMessage(message);
-  }
+  // for await (const message of stream) {
+  //   await onMessage(message);
+  // }
+  // Temp batch processing
+  await forEach(stream, onMessage, 50);
 
   stream.on('end', () => {
     logger.error('stream ended');
