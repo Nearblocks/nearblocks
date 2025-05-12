@@ -13,6 +13,7 @@ export * from './type.js';
 
 export type BlockStreamConfig = {
   dbConfig: KnexConfig | string;
+  limit?: number;
   s3Bucket: string;
   s3Config: S3ClientConfig;
   start: number;
@@ -83,7 +84,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
   const s3 = new S3Client({ ...config.s3Config, ...retryConfig });
   let start = config.start;
   let isFetching = false;
-  const limit = 20;
+  const limit = config.limit ?? 20;
   const highWaterMark = limit * 10;
 
   const readable = new Readable({
