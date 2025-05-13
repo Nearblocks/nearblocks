@@ -6,7 +6,7 @@ import TokenTransactions from '@/components/app/Address/TokenTransactions';
 import Transactions from '@/components/app/Address/Transactions';
 
 import AccountTabsActions from './AccountTabsActions';
-/* import MultiChainTransactions from './ChainTxns'; */
+import MultiChainTransactions from './ChainTxns';
 import TableSummary from '../common/TableSummary';
 import ErrorMessage from '../common/ErrorMessage';
 import FaInbox from '../Icons/FaInbox';
@@ -76,11 +76,11 @@ export default async function AccountTabs({
         </ErrorBoundary>
       ) : null}
 
-      {/*  {tab === 'multichaintxns' ? (
+      {tab === 'multichaintxns' ? (
         <ErrorBoundary fallback={fallbackError}>
           <MultiChainTransactions id={id} searchParams={searchParams} />
         </ErrorBoundary>
-      ) : null} */}
+      ) : null}
 
       {tab === 'accesskeys' ? (
         <ErrorBoundary fallback={fallbackError}>
