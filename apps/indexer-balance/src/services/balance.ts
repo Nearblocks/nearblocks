@@ -371,7 +371,8 @@ const getReceiptRewardChanges = async (
     }
   }
 
-  if (receipts.size) {
+  // dont throw on block 22633808 https://github.com/near/near-lake-indexer/issues/47
+  if (receipts.size && block.height !== 22633808) {
     throw new Error(
       `${
         receipts.size

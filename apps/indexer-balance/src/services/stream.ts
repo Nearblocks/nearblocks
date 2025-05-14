@@ -26,6 +26,7 @@ export const syncData = async () => {
   let startBlockHeight = config.startBlockHeight;
 
   if (!startBlockHeight && latestBlock) {
+    logger.info(`last synced block: ${latestBlock}`);
     // startBlockHeight = +latestBlock;
     // Temp batch processing
     startBlockHeight = +latestBlock - 50;
