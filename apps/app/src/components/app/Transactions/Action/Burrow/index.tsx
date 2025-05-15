@@ -30,6 +30,7 @@ const BurrowContract = (props: EventPropsInfo) => {
           <DepositToReserve
             event={parsedEvent.data}
             receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       case 'deposit':
@@ -37,6 +38,7 @@ const BurrowContract = (props: EventPropsInfo) => {
           <Deposit
             event={parsedEvent.data}
             receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       case 'withdraw_succeeded':
@@ -44,6 +46,7 @@ const BurrowContract = (props: EventPropsInfo) => {
           <WithdrawSucceeded
             event={parsedEvent.data}
             receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       case 'increase_collateral':
@@ -51,6 +54,7 @@ const BurrowContract = (props: EventPropsInfo) => {
           <IncreaseCollateral
             event={parsedEvent.data}
             receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       case 'decrease_collateral':
@@ -58,6 +62,7 @@ const BurrowContract = (props: EventPropsInfo) => {
           <DescreaseCollateral
             event={parsedEvent.data}
             receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       case 'borrow':
@@ -65,11 +70,16 @@ const BurrowContract = (props: EventPropsInfo) => {
           <Borrow
             event={parsedEvent.data}
             receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
           />
         );
       case 'repay':
         return (
-          <Repay event={parsedEvent.data} receiptId={props?.event?.receiptId} />
+          <Repay
+            event={parsedEvent.data}
+            receiptId={props?.event?.receiptId}
+            tokenMetadata={props?.tokenMetadata}
+          />
         );
       default:
         return null;

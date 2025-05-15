@@ -507,7 +507,7 @@ export function holderPercentage(supply: string, quantity: string) {
 
 export function tokenAmount(
   amount: string,
-  decimal: string,
+  decimal: string | number,
   format: boolean,
 ): string {
   if (amount === undefined || amount === null) return 'N/A';
