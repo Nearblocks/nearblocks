@@ -11,6 +11,7 @@ const CursorPaginator = (props: PaginatorProps) => {
   const router = useRouter();
   const { setPage, page, cursor } = props;
   const [loading, setLoading] = useState(false);
+  const { p } = router.query;
 
   useEffect(() => {
     const handleRouteChangeComplete = () => {
@@ -32,18 +33,16 @@ const CursorPaginator = (props: PaginatorProps) => {
   useEffect(() => {
     if (initialLoad.current) {
       initialLoad.current = false;
-      const {
-        pathname,
-        query: { cursor, p, ...updatedQuery },
-      } = router;
+      const { pathname, query } = router;
 
       if (cursor && p) {
         router.replace({
           pathname: pathname,
-          query: updatedQuery,
+          query: query,
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const handleNextPage = () => {
@@ -93,7 +92,7 @@ const CursorPaginator = (props: PaginatorProps) => {
               disabled
               className="relative inline-flex items-center px-2 ml-1 md:px-3 py-2 text-xs font-medium text-gray-500  rounded-md  bg-gray-100 dark:bg-black-200 dark:text-neargray-10"
             >
-              {`Page ${formatWithCommas(String(page))}`}
+              {`Page ${formatWithCommas(String(p ? p : 1))}`}
             </button>
             <button
               type="button"
