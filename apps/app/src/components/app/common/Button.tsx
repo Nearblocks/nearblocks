@@ -9,10 +9,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-import CopyIcon from '../Icons/CopyIcon';
-import QRCodeIcon from '../Icons/QRCodeIcon';
-import QrCode from './QrCode';
-import Tooltip from './Tooltip';
+import CopyIcon from '@/components/app/Icons/CopyIcon';
+import QRCodeIcon from '@/components/app/Icons/QRCodeIcon';
+import QrCode from '@/components/app/common/QrCode';
+import Tooltip from '@/components/app/common/Tooltip';
 
 interface Props {
   address: string;

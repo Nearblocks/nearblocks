@@ -4,8 +4,8 @@ import { useSearchParams } from 'next/navigation';
 
 import { useIntlRouter, usePathname } from '@/i18n/routing';
 
-import FaChevronLeft from '../Icons/FaChevronLeft';
-import FaChevronRight from '../Icons/FaChevronRight';
+import FaChevronLeft from '@/components/app/Icons/FaChevronLeft';
+import FaChevronRight from '@/components/app/Icons/FaChevronRight';
 interface PaginatorProps {
   count: number;
   isLoading?: boolean;

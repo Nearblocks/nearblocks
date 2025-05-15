@@ -4,7 +4,7 @@ import FaKey from '@/components/app/Icons/FaKey';
 import { shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 
-import TreeNode from '../TreeNode';
+import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
 
 const DeleteKey = (props: TransactionActionInfo) => {
   const { action, args } = props;

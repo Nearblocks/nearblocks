@@ -4,17 +4,17 @@ import { Action } from 'near-api-js/lib/transaction';
 import { mapRpcActionToAction } from '@/utils/near';
 import { ActionPropsInfo, DelegateActionView } from '@/utils/types';
 
-import AddKey from './Action/AddKey';
-import CreateAccount from './Action/CreateAccount';
-import DeleteAccount from './Action/DeleteAccount';
-import DeployContract from './Action/DeployContract';
-import FunctionCall from './Action/FunctionCall';
-import Stake from './Action/Stake';
-import Transfer from './Action/Transfer';
-import DeployGlobalContract from './Action/DeployGlobalContract';
-import DeployGlobalContractByAccountId from './Action/DeployGlobalContractByAccountId';
-import UseGlobalContract from './Action/UseGlobalContract';
-import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId';
+import AddKey from '@/components/app/Transactions/Action/AddKey';
+import CreateAccount from '@/components/app/Transactions/Action/CreateAccount';
+import DeleteAccount from '@/components/app/Transactions/Action/DeleteAccount';
+import DeployContract from '@/components/app/Transactions/Action/DeployContract';
+import FunctionCall from '@/components/app/Transactions/Action/FunctionCall';
+import Stake from '@/components/app/Transactions/Action/Stake';
+import Transfer from '@/components/app/Transactions/Action/Transfer';
+import DeployGlobalContract from '@/components/app/Transactions/Action/DeployGlobalContract';
+import DeployGlobalContractByAccountId from '@/components/app/Transactions/Action/DeployGlobalContractByAccountId';
+import UseGlobalContract from '@/components/app/Transactions/Action/UseGlobalContract';
+import UseGlobalContractByAccountId from '@/components/app/Transactions/Action/UseGlobalContractByAccountId';
 
 const Actions = (props: ActionPropsInfo) => {
   const showAction = () => {

@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import ListActions from './ListActions';
+import ListActions from '@/components/app/Transactions/ListActions';
 
 const List = async ({ searchParams }: any) => {
   const [data, count] = await Promise.all([

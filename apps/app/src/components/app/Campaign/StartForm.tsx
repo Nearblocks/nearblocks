@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { request } from '@/hooks/app/useAuth';
 import { CampaignProps } from '@/utils/types';
 
-import { Loader } from '../skeleton/common/Skeleton';
+import { Loader } from '@/components/app/skeleton/common/Skeleton';
 import { useConfig } from '@/hooks/app/useConfig';
 
 const StartForm = ({

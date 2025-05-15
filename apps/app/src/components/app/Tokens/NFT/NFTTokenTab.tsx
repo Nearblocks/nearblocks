@@ -4,9 +4,9 @@ import { Link } from '@/i18n/routing';
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
-import NFTHolders from './NFTHolders';
-import NFTInventory from './NFTInventory';
-import NFTTransfers from './NFTTransfers';
+import NFTHolders from '@/components/app/Tokens/NFT/NFTHolders';
+import NFTInventory from '@/components/app/Tokens/NFT/NFTInventory';
+import NFTTransfers from '@/components/app/Tokens/NFT/NFTTransfers';
 
 type TabType = 'holders' | 'inventory' | 'transfers';
 

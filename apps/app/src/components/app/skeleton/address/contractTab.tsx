@@ -1,7 +1,7 @@
 import React from 'react';
 import { TabList, TabPanel, Tabs } from 'react-tabs';
 
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 export default function ContractTabSleleton() {
   return (

@@ -13,8 +13,8 @@ import {
 } from '@/utils/libs';
 import { BlocksInfo } from '@/utils/types';
 
-import Tooltip from '../common/Tooltip';
-import Skeleton from '../skeleton/common/Skeleton';
+import Tooltip from '@/components/app/common/Tooltip';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface Props {
   blocks: BlocksInfo[];

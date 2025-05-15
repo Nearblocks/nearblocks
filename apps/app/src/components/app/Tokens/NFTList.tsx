@@ -9,11 +9,11 @@ import { Link, usePathname } from '@/i18n/routing';
 import { localFormat, serialNumber } from '@/utils/libs';
 import { Sorting, Token } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import Table from '../common/Table';
-import TokenImage from '../common/TokenImage';
-import FaInbox from '../Icons/FaInbox';
-import SortIcon from '../Icons/SortIcon';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Table from '@/components/app/common/Table';
+import TokenImage from '@/components/app/common/TokenImage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import SortIcon from '@/components/app/Icons/SortIcon';
 
 const initialForm = {
   search: '',

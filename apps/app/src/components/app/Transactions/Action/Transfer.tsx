@@ -4,7 +4,7 @@ import { Link } from '@/i18n/routing';
 import { yoctoToNear } from '@/utils/libs';
 import { ActionPropsInfo } from '@/utils/types';
 
-import FaRight from '../../Icons/FaRight';
+import FaRight from '@/components/app/Icons/FaRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const Transfer = (props: ActionPropsInfo) => {

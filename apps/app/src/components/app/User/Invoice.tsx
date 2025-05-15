@@ -13,8 +13,8 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import useAuth from '@/hooks/app/useAuth';
 import { centsToDollar } from '@/utils/app/libs';
 
-import Tooltip from '../common/Tooltip';
-import withAuth from '../stores/withAuth';
+import Tooltip from '@/components/app/common/Tooltip';
+import withAuth from '@/components/app/stores/withAuth';
 
 interface QueueItem {
   id: string;

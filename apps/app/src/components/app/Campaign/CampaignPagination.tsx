@@ -1,7 +1,7 @@
 import React from 'react';
 
-import FaChevronLeft from '../Icons/FaChevronLeft';
-import FaChevronRight from '../Icons/FaChevronRight';
+import FaChevronLeft from '@/components/app/Icons/FaChevronLeft';
+import FaChevronRight from '@/components/app/Icons/FaChevronRight';
 
 type Props = {
   currentPage?: number;

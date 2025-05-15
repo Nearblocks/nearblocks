@@ -1,9 +1,9 @@
-import AccessKeyTabSkeleton from './accessKeyTab';
-import MultichaintxnsSkeleton from './multichainTxnsTab';
-import NftTokenTxnsSkeleton from './nftTokenTxns';
-import OverviewActionsSkeleton from './overview';
-import TokenTxnsSkeleton from './tokenTransaction';
-import TransactionSkeleton from './transaction';
+import AccessKeyTabSkeleton from '@/components/app/skeleton/address/accessKeyTab';
+import MultichaintxnsSkeleton from '@/components/app/skeleton/address/multichainTxnsTab';
+import NftTokenTxnsSkeleton from '@/components/app/skeleton/address/nftTokenTxns';
+import OverviewActionsSkeleton from '@/components/app/skeleton/address/overview';
+import TokenTxnsSkeleton from '@/components/app/skeleton/address/tokenTransaction';
+import TransactionSkeleton from '@/components/app/skeleton/address/transaction';
 
 interface TabPanelGeneralSkeletonProps {
   tab: string;

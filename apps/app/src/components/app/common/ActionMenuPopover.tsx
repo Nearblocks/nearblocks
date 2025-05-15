@@ -5,8 +5,8 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover';
-import ListCheck from '../Icons/ListCheck';
-import ArrowDown from '../Icons/ArrowDown';
+import ListCheck from '@/components/app/Icons/ListCheck';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
 
 const ActionMenuPopover = ({
   children,

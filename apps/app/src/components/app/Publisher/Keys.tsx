@@ -8,8 +8,8 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
-import Tooltip from '../common/Tooltip';
-import CampaignPagination from '../Campaign/CampaignPagination';
+import Tooltip from '@/components/app/common/Tooltip';
+import CampaignPagination from '@/components/app/Campaign/CampaignPagination';
 import { shortenAddress } from '@/utils/app/libs';
 
 interface ApiKey {

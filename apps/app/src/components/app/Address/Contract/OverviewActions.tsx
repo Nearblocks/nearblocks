@@ -14,12 +14,12 @@ import {
   VerifierStatus,
 } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import { NearContext } from '../../wallet/near-context';
-import ContractCode from './ContractCode';
-import Info from './Info';
-import ViewOrChange from './ViewOrChange';
-import ViewOrChangeAbi from './ViewOrChangeAbi';
+import Tooltip from '@/components/app/common/Tooltip';
+import { NearContext } from '@/components/app/wallet/near-context';
+import ContractCode from '@/components/app/Address/Contract/ContractCode';
+import Info from '@/components/app/Address/Contract/Info';
+import ViewOrChange from '@/components/app/Address/Contract/ViewOrChange';
+import ViewOrChangeAbi from '@/components/app/Address/Contract/ViewOrChangeAbi';
 import { shortenAddress } from '@/utils/libs';
 import { useParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';

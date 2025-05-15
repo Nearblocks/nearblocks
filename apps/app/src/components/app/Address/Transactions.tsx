@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import TransactionActions from './TransactionActions';
+import TransactionActions from '@/components/app/Address/TransactionActions';
 
 const Transactions = async ({ id, searchParams }: any) => {
   const options: RequestInit = {

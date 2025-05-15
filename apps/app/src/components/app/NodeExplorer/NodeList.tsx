@@ -1,7 +1,7 @@
 import QueryString from 'qs';
 
 import { getRequest } from '@/utils/app/api';
-import NodeListActions from './NodeListActions';
+import NodeListActions from '@/components/app/NodeExplorer/NodeListActions';
 
 export default async function NodeList({ searchParams }: any) {
   const data = await getRequest(

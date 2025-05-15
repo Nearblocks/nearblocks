@@ -8,9 +8,9 @@ import SubscriptionStats from '@/components/app/Publisher/SubscriptionStats';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import useAuth from '@/hooks/app/useAuth';
 import { dollarFormat, localFormat } from '@/utils/app/libs';
-import Tooltip from '../common/Tooltip';
-import withAuth from '../stores/withAuth';
-import CampaignPagination from '../Campaign/CampaignPagination';
+import Tooltip from '@/components/app/common/Tooltip';
+import withAuth from '@/components/app/stores/withAuth';
+import CampaignPagination from '@/components/app/Campaign/CampaignPagination';
 
 const APISubscription = ({ role }: { role?: string }) => {
   const apiUrl = role === 'publisher' ? '/publisher/subscriptions/api?' : '';

@@ -10,9 +10,9 @@ import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 import dayjs from '@/utils/app/dayjs';
 
-import Clock from '../Icons/Clock';
-import Skeleton from '../skeleton/common/Skeleton';
-import withAuth from '../stores/withAuth';
+import Clock from '@/components/app/Icons/Clock';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import withAuth from '@/components/app/stores/withAuth';
 
 const Overview = ({ role }: { role?: string }) => {
   const { data, loading } = useAuth('/users/me', {}, true);

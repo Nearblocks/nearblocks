@@ -1,11 +1,11 @@
 import classNames from 'classnames';
 import React from 'react';
 import { Link } from '@/i18n/routing';
-import InventorySkeleton from './NFTInventory';
-import TransferSkeleton from './NFTTransfers';
-import ErrorMessage from '../../common/ErrorMessage';
-import FaInbox from '../../Icons/FaInbox';
-import Holders from '../ft/Holders';
+import InventorySkeleton from '@/components/app/skeleton/nft/NFTInventory';
+import TransferSkeleton from '@/components/app/skeleton/nft/NFTTransfers';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Holders from '@/components/app/skeleton/ft/Holders';
 
 interface Props {
   className?: string;

@@ -21,13 +21,13 @@ import {
   RPCTransactionInfo,
 } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FileSlash from '../Icons/FileSlash';
-import Details from './Details';
-import Execution from './Execution';
-import Receipt from './Receipt';
-import ReceiptSummary from './ReceiptSummary';
-import Tree from './Tree';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import Details from '@/components/app/Transactions/Details';
+import Execution from '@/components/app/Transactions/Execution';
+import Receipt from '@/components/app/Transactions/Receipt';
+import ReceiptSummary from '@/components/app/Transactions/ReceiptSummary';
+import Tree from '@/components/app/Transactions/Tree';
 import { revalidateTxn } from '@/utils/app/actions';
 
 export type RpcProvider = {

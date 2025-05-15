@@ -1,4 +1,4 @@
-import SponsoredTextActions from './SponsoredTextActions';
+import SponsoredTextActions from '@/components/app/SponsoredTextActions';
 import { TextAdData } from '@/utils/types';
 
 export default function SponsoredText({

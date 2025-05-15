@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import Overview from '../Transactions/Overview';
+import Overview from '@/components/app/Transactions/Overview';
 
 export default async function HomeOverview({ theme }: { theme: any }) {
   const statsDetails = await getRequest('v1/stats', {});

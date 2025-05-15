@@ -1,8 +1,8 @@
 import { EventPropsInfo } from '@/utils/types';
-import BurrowContract from './Burrow';
-import RefContract from './Ref';
-import WrapContract from './Wrap';
-import IntentsContract from './Intents';
+import BurrowContract from '@/components/app/Transactions/Action/Burrow';
+import RefContract from '@/components/app/Transactions/Action/Ref';
+import WrapContract from '@/components/app/Transactions/Action/Wrap';
+import IntentsContract from '@/components/app/Transactions/Action/Intents';
 
 const EventLogs = (props: EventPropsInfo) => {
   const showContract = () => {

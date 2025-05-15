@@ -1,7 +1,7 @@
 import { getRequest } from '@/utils/app/api';
 import { ContractCodeInfo } from '@/utils/types';
 
-import OverviewActions from './OverviewActions';
+import OverviewActions from '@/components/app/Address/Contract/OverviewActions';
 
 const Overview = async ({ id, searchParams }: any) => {
   const options: RequestInit = { next: { revalidate: 10 } };

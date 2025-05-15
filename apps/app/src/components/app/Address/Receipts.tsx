@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import ReceiptActions from './ReceiptActions';
+import ReceiptActions from '@/components/app/Address/ReceiptActions';
 
 const Receipts = async ({ id, searchParams }: any) => {
   const options: RequestInit = {

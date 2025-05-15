@@ -7,8 +7,8 @@ import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat } from '@/utils/libs';
 import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
 
-import FaAddressBook from '../../Icons/FaAddressBook';
-import Skeleton from '../../skeleton/common/Skeleton';
+import FaAddressBook from '@/components/app/Icons/FaAddressBook';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {

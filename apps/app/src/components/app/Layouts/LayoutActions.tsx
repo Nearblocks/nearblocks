@@ -6,12 +6,12 @@ import { useEffect, useRef, useState } from 'react';
 import Provider from '@/components/Layouts/Provider';
 import useWallet from '@/hooks/app/useWallet';
 
-import { NearContext } from '../wallet/near-context';
-import Header from './Header';
-import Footer from './Footer';
+import { NearContext } from '@/components/app/wallet/near-context';
+import Header from '@/components/app/Layouts/Header';
+import Footer from '@/components/app/Layouts/Footer';
 import { Status, StatusInfo } from '@/utils/types';
 import { toast } from 'react-toastify';
-import { getSearchRoute, SearchToast } from '../common/Search';
+import { getSearchRoute, SearchToast } from '@/components/app/common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
 import { rpcSearch } from '@/utils/app/rpc';
 import { useRpcStore } from '@/stores/app/rpc';
@@ -20,7 +20,7 @@ import { useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
 import Cookies from 'js-cookie';
-import Notice from '../common/Notice';
+import Notice from '@/components/app/common/Notice';
 
 interface LayoutProps {
   children: React.ReactNode;

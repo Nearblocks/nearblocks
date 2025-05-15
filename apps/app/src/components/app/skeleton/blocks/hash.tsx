@@ -1,7 +1,7 @@
 'use client';
 import { useConfig } from '@/hooks/app/useConfig';
 
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useTranslations } from 'next-intl';
 
 export default function HashLoading() {

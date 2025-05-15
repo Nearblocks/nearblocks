@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import { hexy } from '@/utils/app/hexy';
 import { TransactionActionInfo } from '@/utils/types';
 
-import RlpTransaction from '../RlpTransaction';
+import RlpTransaction from '@/components/app/Transactions/Receipts/RlpTransaction';
 import { isValidJson, shortenAddress } from '@/utils/app/libs';
 import { useState } from 'react';
 import FaMinimize from '@/components/app/Icons/FaMinimize';

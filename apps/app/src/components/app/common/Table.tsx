@@ -1,8 +1,8 @@
 import { Fragment, type JSX } from 'react';
 
-import Skeleton from '../skeleton/common/Skeleton';
-import CursorPaginator from './CursorPaginator';
-import Paginator from './Paginator';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import CursorPaginator from '@/components/app/common/CursorPaginator';
+import Paginator from '@/components/app/common/Paginator';
 interface column {
   cell?: (row: any, rowIndex?: number) => React.ReactNode;
   header: JSX.Element | string;

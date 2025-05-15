@@ -1,5 +1,5 @@
 import { getRequest } from '@/utils/app/api';
-import MultichainInfoActions from './MultichainInfoActions';
+import MultichainInfoActions from '@/components/app/Address/MultichainInfoActions';
 
 const MultichainInfo = async ({ id }: { id: string }) => {
   const options: RequestInit = { next: { revalidate: 10 } };

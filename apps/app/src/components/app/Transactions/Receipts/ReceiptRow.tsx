@@ -8,16 +8,16 @@ import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { convertToMetricPrefix, localFormat, yoctoToNear } from '@/utils/libs';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
-import Question from '../../Icons/Question';
-import { Loader } from '../../skeleton/common/Skeleton';
-import ReceiptStatus from './ReceiptStatus';
-import TransactionActions from './TransactionActions';
-import { CopyButton } from '../../common/CopyButton';
-import { AddressOrTxnsLink } from '../../common/HoverContextProvider';
-import FaMinimize from '../../Icons/FaMinimize';
-import FaExpand from '../../Icons/FaExpand';
+import Tooltip from '@/components/app/common/Tooltip';
+import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
+import Question from '@/components/app/Icons/Question';
+import { Loader } from '@/components/app/skeleton/common/Skeleton';
+import ReceiptStatus from '@/components/app/Transactions/Receipts/ReceiptStatus';
+import TransactionActions from '@/components/app/Transactions/Receipts/TransactionActions';
+import { CopyButton } from '@/components/app/common/CopyButton';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import FaMinimize from '@/components/app/Icons/FaMinimize';
+import FaExpand from '@/components/app/Icons/FaExpand';
 import useRpc from '@/hooks/app/useRpc';
 
 interface Props {

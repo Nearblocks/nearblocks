@@ -14,7 +14,7 @@ import {
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { parseEventLogs } from '@/utils/app/near';
-import dayjs from '../../../utils/app/dayjs';
+import dayjs from '@/utils/app/dayjs';
 import {
   convertToMetricPrefix,
   dollarFormat,
@@ -45,23 +45,23 @@ import {
   TransactionLog,
 } from '@/utils/types';
 
-import DynamicAd from '../DynamicAd';
-import ErrorMessage from '../common/ErrorMessage';
-import TxnStatus from '../common/Status';
-import TokenImage, { NFTImage } from '../common/TokenImage';
-import Tooltip from '../common/Tooltip';
-import Bolt from '../Icons/Bolt';
-import FaRight from '../Icons/FaRight';
-import FileSlash from '../Icons/FileSlash';
-import Question from '../Icons/Question';
-import EventLogs from './Action';
-import Actions from './Actions';
-import NEPTokenTransactions from './NEPTokenTransactions';
+import DynamicAd from '@/components/app/DynamicAd';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import TxnStatus from '@/components/app/common/Status';
+import TokenImage, { NFTImage } from '@/components/app/common/TokenImage';
+import Tooltip from '@/components/app/common/Tooltip';
+import Bolt from '@/components/app/Icons/Bolt';
+import FaRight from '@/components/app/Icons/FaRight';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import Question from '@/components/app/Icons/Question';
+import EventLogs from '@/components/app/Transactions/Action';
+import Actions from '@/components/app/Transactions/Actions';
+import NEPTokenTransactions from '@/components/app/Transactions/NEPTokenTransactions';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import { CopyButton } from '../common/CopyButton';
+import { CopyButton } from '@/components/app/common/CopyButton';
 import { convertTimestampToTimes } from '@/utils/app/libs';
-import ArrowDownDouble from '../Icons/ArrowDownDouble';
-import RpcTxnStatus from '../common/RpcStatus';
+import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
+import RpcTxnStatus from '@/components/app/common/RpcStatus';
 
 interface Props {
   hash: string;

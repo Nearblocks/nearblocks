@@ -7,12 +7,12 @@ import {
   oneLight,
 } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import Tooltip from '../../common/Tooltip';
-import CopyIcon from '../../Icons/CopyIcon';
-import FaExpand from '../../Icons/FaExpand';
-import FaInbox from '../../Icons/FaInbox';
-import FaMinimize from '../../Icons/FaMinimize';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Tooltip from '@/components/app/common/Tooltip';
+import CopyIcon from '@/components/app/Icons/CopyIcon';
+import FaExpand from '@/components/app/Icons/FaExpand';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import FaMinimize from '@/components/app/Icons/FaMinimize';
 
 type CodeViewerProps = {
   content: string;

@@ -8,10 +8,10 @@ import useAuth, { request } from '@/hooks/app/useAuth';
 import { catchErrors, dollarFormat } from '@/utils/app/libs';
 import { currentCampaign } from '@/utils/types';
 
-import LoadingCircular from '../common/LoadingCircular';
-import Skeleton from '../skeleton/common/Skeleton';
-import withAuth from '../stores/withAuth';
-import SwitchButton from '../SwitchButton';
+import LoadingCircular from '@/components/app/common/LoadingCircular';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import withAuth from '@/components/app/stores/withAuth';
+import SwitchButton from '@/components/app/SwitchButton';
 import { useConfig } from '@/hooks/app/useConfig';
 
 interface CampaignDetail {

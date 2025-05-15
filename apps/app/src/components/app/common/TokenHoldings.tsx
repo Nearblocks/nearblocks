@@ -10,8 +10,8 @@ import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat, truncateString } from '@/utils/libs';
 import { InventoryInfo, TokenListInfo } from '@/utils/types';
 
-import ArrowDown from '../Icons/ArrowDown';
-import Skeleton from '../skeleton/common/Skeleton';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { priceFormat } from '@/utils/app/libs';
 
 interface Props {

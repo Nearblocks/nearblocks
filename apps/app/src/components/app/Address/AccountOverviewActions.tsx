@@ -9,8 +9,8 @@ import { useRpcStore } from '@/stores/app/rpc';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
 import { AccountDataInfo, FtInfo, TokenListInfo } from '@/utils/types';
 
-import TokenHoldings from '../common/TokenHoldings';
-import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
+import TokenHoldings from '@/components/app/common/TokenHoldings';
+import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 import { useParams } from 'next/navigation';
 const AccountOverviewActions = ({
   accountData,

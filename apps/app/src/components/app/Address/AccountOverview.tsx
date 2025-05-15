@@ -1,5 +1,5 @@
 import { getRequest } from '@/utils/app/api';
-import AccountOverviewActions from './AccountOverviewActions';
+import AccountOverviewActions from '@/components/app/Address/AccountOverviewActions';
 import { SpamToken } from '@/utils/types';
 
 export default async function AccountOverview({ id }: any) {

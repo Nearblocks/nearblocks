@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react';
 import { mapRpcActionToAction } from '@/utils/near';
 import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FaHourglassStart from '../Icons/FaHourglassStart';
-import FileSlash from '../Icons/FileSlash';
-import Skeleton, { Loader } from '../skeleton/common/Skeleton';
-import TreeReceipt from './TreeReceipts/TreeReceipt';
-import TreeReceiptDetails from './TreeReceipts/TreeReceiptDetails';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import Skeleton, { Loader } from '@/components/app/skeleton/common/Skeleton';
+import TreeReceipt from '@/components/app/Transactions/TreeReceipts/TreeReceipt';
+import TreeReceiptDetails from '@/components/app/Transactions/TreeReceipts/TreeReceiptDetails';
 
 interface Props {
   hash: string;

@@ -12,10 +12,10 @@ import { Link } from '@/i18n/routing';
 import { capitalize, isJson, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import CloseCircle from '../../Icons/CloseCircle';
-import Question from '../../Icons/Question';
-import { NearContext } from '../../wallet/near-context';
+import Tooltip from '@/components/app/common/Tooltip';
+import CloseCircle from '@/components/app/Icons/CloseCircle';
+import Question from '@/components/app/Icons/Question';
+import { NearContext } from '@/components/app/wallet/near-context';
 import { stringify } from 'querystring';
 
 interface Props {

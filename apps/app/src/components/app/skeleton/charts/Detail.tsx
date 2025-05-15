@@ -4,7 +4,7 @@ import React, { forwardRef, Ref } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface Props {
   chartTypes?: string;

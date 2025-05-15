@@ -1,8 +1,8 @@
 import { useContext } from 'react';
-import Collapse from '../Collapse';
-import ArrowDown from '../Icons/ArrowDown';
-import User from '../Icons/FaUserAlt ';
-import { NearContext } from '../wallet/near-context';
+import Collapse from '@/components/app/Collapse';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import User from '@/components/app/Icons/FaUserAlt ';
+import { NearContext } from '@/components/app/wallet/near-context';
 
 interface Props {
   AccountId?: string;

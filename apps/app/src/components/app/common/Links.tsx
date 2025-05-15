@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import { urlHostName } from '@/utils/libs';
 
-import Tooltip from './Tooltip';
+import Tooltip from '@/components/app/common/Tooltip';
 
 const Links = (props: any) => {
   const { meta, theme: cookieTheme } = props;

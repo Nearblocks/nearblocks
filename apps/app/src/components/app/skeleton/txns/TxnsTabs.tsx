@@ -3,11 +3,11 @@ import classNames from 'classnames';
 
 import { Link } from '@/i18n/routing';
 
-import Execution from './Execution';
-import OverviewSkeleton from './Overview';
-import ReceiptSkeleton from './Receipt';
-import Summary from './Summary';
-import Tree from './Tree';
+import Execution from '@/components/app/skeleton/txns/Execution';
+import OverviewSkeleton from '@/components/app/skeleton/txns/Overview';
+import ReceiptSkeleton from '@/components/app/skeleton/txns/Receipt';
+import Summary from '@/components/app/skeleton/txns/Summary';
+import Tree from '@/components/app/skeleton/txns/Tree';
 
 const tabs = [
   { label: 'Overview', message: 'txn.tabs.overview', name: 'overview' },

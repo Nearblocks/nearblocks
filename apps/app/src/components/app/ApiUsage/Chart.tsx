@@ -8,9 +8,9 @@ import React, { useEffect, useState } from 'react';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 import useAuth from '@/hooks/app/useAuth';
 import dayjs from '@/utils/app/dayjs';
-import Plan from '../Icons/Plan';
-import CircularLoader from '../skeleton/common/CircularLoader';
-import withAuth from '../stores/withAuth';
+import Plan from '@/components/app/Icons/Plan';
+import CircularLoader from '@/components/app/skeleton/common/CircularLoader';
+import withAuth from '@/components/app/stores/withAuth';
 import { localFormat } from '@/utils/libs';
 import { shortenAddress } from '@/utils/app/libs';
 

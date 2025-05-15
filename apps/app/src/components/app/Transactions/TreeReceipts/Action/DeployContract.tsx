@@ -5,7 +5,7 @@ import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 
-import TreeNode from '../TreeNode';
+import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
 
 const DeployContract = (props: TransactionActionInfo) => {
   const { action, receiver } = props;

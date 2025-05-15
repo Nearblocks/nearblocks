@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { ActionPropsInfo } from '@/utils/types';
 
-import FaRight from '../../Icons/FaRight';
+import FaRight from '@/components/app/Icons/FaRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const UseGlobalContract = (props: ActionPropsInfo) => {

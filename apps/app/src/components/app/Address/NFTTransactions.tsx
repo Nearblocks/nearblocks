@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import NFTTransactionActions from './NFTTxnsActions';
+import NFTTransactionActions from '@/components/app/Address/NFTTxnsActions';
 
 const NFTTransactions = async ({ id, searchParams }: any) => {
   const options: RequestInit = {

@@ -8,12 +8,12 @@ import { useConfig } from 'app/src/hooks/app/useConfig';
 import { localFormat } from '@/utils/app/libs';
 import { dollarFormat, dollarNonCentFormat } from '@/utils/libs';
 
-import LoadingCircular from '../common/LoadingCircular';
-import Arrow from '../Icons/Arrow';
-import FaCheckCircle from '../Icons/FaCheckCircle';
-import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
-import Skeleton from '../skeleton/common/Skeleton';
-import SwitchButton from '../SwitchButton';
+import LoadingCircular from '@/components/app/common/LoadingCircular';
+import Arrow from '@/components/app/Icons/Arrow';
+import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import FaRegTimesCircle from '@/components/app/Icons/FaRegTimesCircle';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import SwitchButton from '@/components/app/SwitchButton';
 
 const ApiActions = ({
   getContactDetails,

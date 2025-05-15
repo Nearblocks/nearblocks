@@ -3,10 +3,10 @@
 import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FaHourglassStart from '../Icons/FaHourglassStart';
-import FileSlash from '../Icons/FileSlash';
-import ReceiptRow from './Receipts/ReceiptRow';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import ReceiptRow from '@/components/app/Transactions/Receipts/ReceiptRow';
 
 interface Props {
   hash: string;

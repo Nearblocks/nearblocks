@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import useRpc from '@/hooks/app/useRpc';
-import SponsoredText from '../SponsoredText';
+import SponsoredText from '@/components/app/SponsoredText';
 import { AccountDataInfo, TextAdData } from '@/utils/types';
 import { useParams } from 'next/navigation';
 import { useRpcStore } from '@/stores/app/rpc';

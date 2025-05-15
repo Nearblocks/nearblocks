@@ -17,16 +17,16 @@ import {
   yoctoToNear,
 } from '@/utils/libs';
 
-import ErrorMessage from '../common/ErrorMessage';
-import Table from '../common/Table';
-import Tooltip from '../common/Tooltip';
-import ArrowDown from '../Icons/ArrowDown';
-import FaInbox from '../Icons/FaInbox';
-import Question from '../Icons/Question';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Table from '@/components/app/common/Table';
+import Tooltip from '@/components/app/common/Tooltip';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Question from '@/components/app/Icons/Question';
 import { validators } from 'near-api-js';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcStore } from '@/stores/app/rpc';
-import Skeleton from '../skeleton/common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const { theme } = useTheme();

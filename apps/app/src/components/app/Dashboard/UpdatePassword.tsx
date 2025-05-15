@@ -6,10 +6,10 @@ import * as Yup from 'yup';
 import { request } from '@/hooks/app/useAuth';
 import { catchErrors } from '@/utils/app/libs';
 
-import LockCircle from '../Icons/LockCircle';
-import UnlockCircle from '../Icons/UnlockCircle';
-import Visibility from '../Icons/Visibility';
-import VisibilityOff from '../Icons/VisibilityOff';
+import LockCircle from '@/components/app/Icons/LockCircle';
+import UnlockCircle from '@/components/app/Icons/UnlockCircle';
+import Visibility from '@/components/app/Icons/Visibility';
+import VisibilityOff from '@/components/app/Icons/VisibilityOff';
 import { useConfig } from '@/hooks/app/useConfig';
 import { signOut } from '@/utils/app/actions';
 

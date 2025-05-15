@@ -2,7 +2,7 @@ import FaCode from '@/components/app/Icons/FaCode';
 import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 import { Link } from '@/i18n/routing';
-import TreeNode from '../TreeNode';
+import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
 
 const DeployGlobalContract = (props: TransactionActionInfo) => {
   const { action, receiver } = props;

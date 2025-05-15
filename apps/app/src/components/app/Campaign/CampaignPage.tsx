@@ -5,7 +5,7 @@ import Stats from '@/components/app/Campaign/Advertiser/Stats';
 import CampaignListing from '@/components/app/Campaign/Publisher/Listing';
 import CampaignStats from '@/components/app/Campaign/Publisher/Stats';
 import UserLayout from '@/components/app/Layouts/UserLayout';
-import withAuth from '../stores/withAuth';
+import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
 
 const CampaignPage = ({ userRole }: { userRole?: string }) => {

@@ -17,9 +17,9 @@ import { DialogRoot, DialogTrigger } from '@/components/ui/dialog';
 import useAuth from '@/hooks/app/useAuth';
 import { Link } from '@/i18n/routing';
 
-import Tooltip from '../common/Tooltip';
-import withAuth from '../stores/withAuth';
-import CampaignPagination from '../Campaign/CampaignPagination';
+import Tooltip from '@/components/app/common/Tooltip';
+import withAuth from '@/components/app/stores/withAuth';
+import CampaignPagination from '@/components/app/Campaign/CampaignPagination';
 import { get } from 'lodash';
 
 interface ApiKey {

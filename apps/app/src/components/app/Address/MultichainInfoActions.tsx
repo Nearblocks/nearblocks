@@ -12,10 +12,10 @@ import {
 import { chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { shortenHex } from '@/utils/app/libs';
 
-import ArrowDown from '../Icons/ArrowDown';
-import Bitcoin from '../Icons/Bitcoin';
-import Ethereum from '../Icons/Ethereum';
-import FaExternalLinkAlt from '../Icons/FaExternalLinkAlt';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import Bitcoin from '@/components/app/Icons/Bitcoin';
+import Ethereum from '@/components/app/Icons/Ethereum';
+import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 
 interface Props {
   multiChainAccounts: any;

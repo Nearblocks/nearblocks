@@ -9,7 +9,7 @@ import UserLayout from '@/components/app/Layouts/UserLayout';
 import CircularLoader from '@/components/app/skeleton/common/CircularLoader';
 import useAuth from '@/hooks/app/useAuth';
 
-import withAuth from '../stores/withAuth';
+import withAuth from '@/components/app/stores/withAuth';
 
 const CampaignEdit = ({
   campaignId,

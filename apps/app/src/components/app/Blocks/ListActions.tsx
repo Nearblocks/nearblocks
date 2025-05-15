@@ -7,14 +7,14 @@ import { Link } from '@/i18n/routing';
 import { convertToMetricPrefix, gasFee, localFormat } from '@/utils/app/libs';
 import { BlocksInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import Table from '../common/Table';
-import Tooltip from '../common/Tooltip';
-import Clock from '../Icons/Clock';
-import FaInbox from '../Icons/FaInbox';
-import Skeleton from '../skeleton/common/Skeleton';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Table from '@/components/app/common/Table';
+import Tooltip from '@/components/app/common/Tooltip';
+import Clock from '@/components/app/Icons/Clock';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import TimeStamp from '../common/TimeStamp';
+import TimeStamp from '@/components/app/common/TimeStamp';
 
 const ListActions = ({
   countLoading,

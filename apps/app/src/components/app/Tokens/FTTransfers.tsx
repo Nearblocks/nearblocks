@@ -2,7 +2,7 @@ import QueryString from 'qs';
 
 import { getRequest } from '@/utils/app/api';
 
-import FTTransfersActions from './FTTransfersActions';
+import FTTransfersActions from '@/components/app/Tokens/FTTransfersActions';
 
 const Transfers = async ({ searchParams }: any) => {
   const apiUrl = 'v1/fts/txns';

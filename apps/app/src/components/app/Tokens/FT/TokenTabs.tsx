@@ -4,10 +4,10 @@ import { Link } from '@/i18n/routing';
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
-import FAQ from './FAQ';
-import Holders from './Holders';
-import Info from './Info';
-import Transfers from './Transfers';
+import FAQ from '@/components/app/Tokens/FT/FAQ';
+import Holders from '@/components/app/Tokens/FT/Holders';
+import Info from '@/components/app/Tokens/FT/Info';
+import Transfers from '@/components/app/Tokens/FT/Transfers';
 
 type TabType = 'faq' | 'holders' | 'info' | 'transfers';
 

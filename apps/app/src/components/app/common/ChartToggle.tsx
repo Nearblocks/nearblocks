@@ -1,6 +1,6 @@
-import Tooltip from '../common/Tooltip';
-import Question from '../Icons/Question';
-import SwitchButton from '../SwitchButton';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
+import SwitchButton from '@/components/app/SwitchButton';
 
 interface ChartToggleProps {
   tooltip: string;

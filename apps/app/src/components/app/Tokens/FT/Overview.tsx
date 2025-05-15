@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
-import OverviewActions from './OverviewActions';
-import TokenFilter from './TokenFilter';
+import OverviewActions from '@/components/app/Tokens/FT/OverviewActions';
+import TokenFilter from '@/components/app/Tokens/FT/TokenFilter';
 
 const Overview = async ({ id, searchParams }: any) => {
   const [statsResult, tokenResult, syncResult, transferResult, holderResult] =

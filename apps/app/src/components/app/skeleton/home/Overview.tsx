@@ -8,7 +8,7 @@ import React from 'react';
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 const HomeOverview = ({ theme: cookieTheme }: { theme: string }) => {
   const { networkId } = useConfig();

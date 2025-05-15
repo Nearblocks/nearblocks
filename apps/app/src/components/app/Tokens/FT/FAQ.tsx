@@ -15,10 +15,10 @@ import {
   Token,
 } from '@/utils/types';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import FaInbox from '../../Icons/FaInbox';
-import Skeleton from '../../skeleton/common/Skeleton';
-import TokenPrice from './TokenPrice';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import TokenPrice from '@/components/app/Tokens/FT/TokenPrice';
 
 interface Props {
   account: AccountInfo;

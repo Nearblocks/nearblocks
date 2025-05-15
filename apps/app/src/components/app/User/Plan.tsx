@@ -12,9 +12,9 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import useAuth, { request } from '@/hooks/app/useAuth';
 import { localFormat } from '@/utils/libs';
 
-import FaCheckCircle from '../Icons/FaCheckCircle';
-import FaRegTimesCircle from '../Icons/FaRegTimesCircle';
-import withAuth from '../stores/withAuth';
+import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import FaRegTimesCircle from '@/components/app/Icons/FaRegTimesCircle';
+import withAuth from '@/components/app/stores/withAuth';
 import { useConfig } from '@/hooks/app/useConfig';
 
 const Plan = ({ role, status }: { role?: string; status?: string }) => {

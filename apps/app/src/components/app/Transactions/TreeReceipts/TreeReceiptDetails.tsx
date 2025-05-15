@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
 import { Link } from '@/i18n/routing';
 import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
-import Tooltip from '../../common/Tooltip';
-import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
-import TreeNode from './TreeNode';
-import TreeTxnsActions from './TreeTxnsActions';
+import Tooltip from '@/components/app/common/Tooltip';
+import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
+import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
+import TreeTxnsActions from '@/components/app/Transactions/TreeReceipts/TreeTxnsActions';
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;

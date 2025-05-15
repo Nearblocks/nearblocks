@@ -7,11 +7,11 @@ import { request } from '@/hooks/app/useAuth';
 import dayjs from '@/utils/app/dayjs';
 import { catchErrors } from '@/utils/app/libs';
 
-import Avatar from '../Icons/Avatar';
-import Clock from '../Icons/Clock';
-import EmailCircle from '../Icons/EmailCircle';
-import LoginCircle from '../Icons/LoginCircle';
-import Skeleton from '../skeleton/common/Skeleton';
+import Avatar from '@/components/app/Icons/Avatar';
+import Clock from '@/components/app/Icons/Clock';
+import EmailCircle from '@/components/app/Icons/EmailCircle';
+import LoginCircle from '@/components/app/Icons/LoginCircle';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useConfig } from '@/hooks/app/useConfig';
 import { signOut } from '@/utils/app/actions';
 

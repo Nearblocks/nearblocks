@@ -2,7 +2,7 @@ import QueryString from 'qs';
 
 import { getRequest } from '@/utils/app/api';
 
-import NFTTransfersActions from './NFTTransfersActions';
+import NFTTransfersActions from '@/components/app/Tokens/NFTTransfersActions';
 
 const TransfersList = async ({ searchParams }: any) => {
   const apiUrl = 'v1/nfts/txns';

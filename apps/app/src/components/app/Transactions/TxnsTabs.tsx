@@ -1,7 +1,7 @@
 import { getRequest } from '@/utils/app/api';
 import { nanoToMilli } from '@/utils/app/libs';
 
-import TxnsTabActions from './TxnsTabActions';
+import TxnsTabActions from '@/components/app/Transactions/TxnsTabActions';
 import { processTransactionWithTokens } from '@/utils/near';
 import { ApiTxnData } from '@/utils/types';
 

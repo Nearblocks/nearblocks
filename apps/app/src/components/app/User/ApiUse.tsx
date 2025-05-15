@@ -5,7 +5,7 @@ import Chart from '@/components/app/ApiUsage/Chart';
 import ApiUsageStats from '@/components/app/ApiUsage/Stats';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 
-import withAuth from '../stores/withAuth';
+import withAuth from '@/components/app/stores/withAuth';
 
 const ApiUse = ({ id, role }: { id?: string; role?: string }) => {
   return (

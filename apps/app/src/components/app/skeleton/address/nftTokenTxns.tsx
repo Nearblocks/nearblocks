@@ -1,5 +1,5 @@
-import Skeleton from '../common/Skeleton';
-import TableSkeleton from '../common/table';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import TableSkeleton from '@/components/app/skeleton/common/table';
 
 export default function NftTokenTxnsSkeleton() {
   return (

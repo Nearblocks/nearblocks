@@ -2,10 +2,10 @@
 import useAuth from '@/hooks/app/useAuth';
 import { dollarFormat } from '@/utils/app/libs';
 
-import Plan from '../Icons/Plan';
-import UserLayout from '../Layouts/UserLayout';
-import Skeleton from '../skeleton/common/Skeleton';
-import withAuth from '../stores/withAuth';
+import Plan from '@/components/app/Icons/Plan';
+import UserLayout from '@/components/app/Layouts/UserLayout';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import withAuth from '@/components/app/stores/withAuth';
 
 type Item = {
   id: number | string;

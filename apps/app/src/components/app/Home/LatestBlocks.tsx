@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import LatestBlocks from '../Blocks/Latest';
+import LatestBlocks from '@/components/app/Blocks/Latest';
 
 export default async function HomeLatestBlocks() {
   const blockDetails = await getRequest('v1/blocks/latest');

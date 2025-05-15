@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import FaChevronLeft from '../Icons/FaChevronLeft';
-import FaChevronRight from '../Icons/FaChevronRight';
+import FaChevronLeft from '@/components/app/Icons/FaChevronLeft';
+import FaChevronRight from '@/components/app/Icons/FaChevronRight';
 
 interface QueueItem {
   id: string;
