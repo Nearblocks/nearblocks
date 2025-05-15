@@ -6,6 +6,7 @@ import { SearchResult, Status, StatusInfo, UserToken } from '../types';
 import { getUserDataFromToken } from './libs';
 import { getRequest } from './api';
 import { revalidateTag } from 'next/cache';
+import { getMessages } from 'next-intl/server';
 
 interface ExportParams {
   exportType: string;
@@ -176,4 +177,9 @@ export const getSyncStatus = async (): Promise<Status> => {
 
 export const revalidateTxn = async (hash: string) => {
   revalidateTag(`txn-${hash}`);
+};
+export const getMessage = async (): Promise<any> => {
+  'use server';
+  const messages = await getMessages();
+  return messages;
 };
