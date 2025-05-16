@@ -35,14 +35,16 @@ const Transfer = ({ event, data, meta }: Props) => {
     (acc, { account_id, diff }) => {
       const swapData = acc[account_id] || { sent: [], received: [] };
 
-      Object.entries(diff).forEach(([token, amount]) => {
-        const bigIntAmount = BigInt(amount);
-        if (bigIntAmount > BigInt(0)) {
-          swapData?.received?.push({ token, amount });
-        } else if (bigIntAmount < BigInt(0)) {
-          swapData?.sent?.push({ token, amount: amount?.replace('-', '') });
-        }
-      });
+      if (typeof diff === 'object') {
+        Object?.entries(diff)?.forEach(([token, amount]) => {
+          const bigIntAmount = BigInt(amount);
+          if (bigIntAmount > BigInt(0)) {
+            swapData?.received?.push({ token, amount });
+          } else if (bigIntAmount < BigInt(0)) {
+            swapData?.sent?.push({ token, amount: amount?.replace('-', '') });
+          }
+        });
+      }
 
       if (swapData?.sent?.length > 0 && swapData?.received?.length > 0) {
         acc[account_id] = swapData;
