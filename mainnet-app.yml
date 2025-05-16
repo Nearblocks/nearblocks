@@ -10,9 +10,6 @@ services:
     environment:
       PORT: 3000
       NEXT_PUBLIC_NETWORK_ID: mainnet
-      NEXT_PUBLIC_BOS_NETWORK: mainnet
-      NEXT_PUBLIC_ACCOUNT_ID: nearblocksonbos.near
-      NEXT_PUBLIC_OG_URL: https://meta.exploreblocks.io/api
       NEXT_PUBLIC_MAINNET_URL: https://nearblocks.io
       NEXT_PUBLIC_TESTNET_URL: https://testnet.nearblocks.io
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
@@ -22,10 +19,8 @@ services:
       AWS_SES_TO_EMAIL: ${AWS_SES_TO_EMAIL}
       NEXT_PUBLIC_GTM_ID: GTM-P285ZPV2
       NEXT_PUBLIC_USER_API_URL: https://api.exploreblocks.io/api/
-      NEXT_PUBLIC_USER_AUTH_URL: ${NEXT_PUBLIC_USER_AUTH_URL}
       NEXT_PUBLIC_USER_DASHBOARD_URL: https://dash.nearblocks.io/
-      NEXT_PUBLIC_API_URL: https://api.nearblocks.io/v1/
-      API_URL: https://api.nearblocks.io/v1/
+      API_URL: https://api.nearblocks.io/
       API_ACCESS_KEY: ${API_ACCESS_KEY}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}

@@ -13,7 +13,6 @@ interface VerifierConfig {
 export const useConfig = () => {
   const {
     API_ACCESS_KEY,
-    NEXT_PUBLIC_BOS_NETWORK,
     NEXT_PUBLIC_MAINNET_URL,
     NEXT_PUBLIC_NETWORK_ID,
     NEXT_PUBLIC_TESTNET_URL,
@@ -24,8 +23,6 @@ export const useConfig = () => {
 
   const networkId: NetworkId =
     (NEXT_PUBLIC_NETWORK_ID as NetworkId) || 'testnet';
-  const bosNetworkId: NetworkId =
-    (NEXT_PUBLIC_BOS_NETWORK as NetworkId) || 'testnet';
 
   const networks: Record<NetworkId, Network> = {
     mainnet: { networkId: 'mainnet' },
@@ -92,7 +89,6 @@ export const useConfig = () => {
     apiUrl,
     appUrl,
     aurorablocksUrl,
-    bosNetworkId,
     docsUrl,
     network,
     networkId,
