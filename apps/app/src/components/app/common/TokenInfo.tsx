@@ -6,43 +6,62 @@ import {
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TokenImage from '@/components/app/common/TokenImage';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcStore } from '@/stores/app/rpc';
 import { isEmpty } from 'lodash';
+
+const metadataCache: Record<string, Promise<MetaInfo>> = {};
 
 const TokenInfo = (props: TokenInfoProps) => {
   const { contract, amount, decimals, isShowText, metaInfo } = props;
   const apiMeta = metaInfo && metaInfo[0]?.metadata;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const cacheRef = useRef(metadataCache);
+
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const rpcAmount = localFormat(
     tokenAmount(amount, decimals || apiMeta?.decimals || meta?.decimals, true),
   );
   useEffect(() => {
-    if (!apiMeta) {
+    if (!apiMeta && contract) {
       setLoading(true);
-      ftMetadata(contract)
-        .then((data) => {
-          if (isEmpty(data)) {
+      if (!cacheRef.current[contract]) {
+        cacheRef.current[contract] = ftMetadata(contract)
+          .then((data) => {
+            if (isEmpty(data)) {
+              switchRpc();
+            }
+            return data;
+          })
+          .catch((error) => {
+            console.error('Metadata fetch error:', error);
             switchRpc();
-          }
+            delete cacheRef.current[contract];
+
+            throw error;
+          });
+      }
+
+      cacheRef.current[contract]
+        .then((data) => {
           setMeta(data);
           setLoading(false);
         })
         .catch((error) => {
           console.error(error);
           switchRpc();
+          delete cacheRef.current[contract];
           setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract, metaInfo]);
+  }, [contract, apiMeta, ftMetadata, switchRpc]);
 
   const Loader = ({
     className = '',
