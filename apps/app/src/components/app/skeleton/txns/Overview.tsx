@@ -4,6 +4,7 @@ import React from 'react';
 import Tooltip from '@/components/app/common/Tooltip';
 import Question from '@/components/app/Icons/Question';
 import { useConfig } from '@/hooks/app/useConfig';
+import Bolt from '../../Icons/Bolt';
 
 const Loader = ({ className, wrapperClassName }: any) => (
   <div
@@ -110,7 +111,42 @@ const OverviewSkeleton = () => {
           </div>
         </div>
       </div>
-
+      <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1">
+        <div className="flex items-start flex-wrap px-4 py-2.5">
+          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
+            <Tooltip
+              className={'w-96 left-25 max-w-[200px]'}
+              tooltip={'Highlighted events of the transaction'}
+            >
+              <div>
+                <Bolt className="w-4 h-4 fill-current mr-1" />
+              </div>
+            </Tooltip>
+            Transaction Actions
+          </div>
+          <div className="w-full md:w-3/4">
+            <Loader wrapperClassName="flex w-full max-w-xl" />
+          </div>
+        </div>
+      </div>
+      <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 overflow-hidden py-1">
+        <div className="flex flex-wrap px-4 py-2">
+          <div className="flex items-start w-full md:w-1/4 mb-2 md:mb-0">
+            <Tooltip
+              className={'w-96 left-[103px] max-w-[202px]'}
+              tooltip={'Sponsored banner advertisement'}
+            >
+              <div>
+                <Question className="w-4 h-4 fill-current mr-1 !mt-[3px]" />
+              </div>
+            </Tooltip>
+            Sponsored:
+          </div>
+          <div className="w-full md:w-3/4 lg:h-[90px] h-[100px] break-all overflow-auto ">
+            <Loader wrapperClassName="flex lg:!max-w-[720px] !max-w-[300px] h-full rounded-lg" />
+          </div>
+        </div>
+      </div>
       <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -218,26 +254,6 @@ const OverviewSkeleton = () => {
           <Loader wrapperClassName="flex w-32" />
         </div>
       </div>
-
-      {/* Transaction Actions section skeleton */}
-      {/* <div className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10">
-        <div className="flex items-start flex-wrap p-4">
-          <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 leading-7">
-            <Tooltip
-              className={"w-96 left-25 max-w-[200px]"}
-              tooltip={'Highlighted events of the transaction'}
-            >
-              <div>
-                <Question className="w-4 h-4 fill-current mr-1" />
-              </div>
-            </Tooltip>
-            Transaction Actions
-          </div>
-          <div className="w-full md:w-3/4">
-            <Loader wrapperClassName="flex w-full max-w-xl" />
-          </div>
-        </div>
-      </div> */}
 
       {/* More details section skeleton */}
       {/* <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b">

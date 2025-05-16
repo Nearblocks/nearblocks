@@ -185,7 +185,7 @@ const RenderAllTransfers: React.FC<ParsedEventListProps> = ({
         </div>
       </div>
       {isActionScrollable && (
-        <div className="flex text-xs text-nearblue-600 dark:text-neargray-10">
+        <div className="flex text-xs pt-2 text-nearblue-600 dark:text-neargray-10">
           <ArrowDownDouble className="w-4 h-4 dark:invert" />
           Scroll for more
         </div>
@@ -198,9 +198,6 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
   events,
   tokenMetadata,
 }) => {
-  const netTransferRef = useRef<HTMLDivElement>(null);
-  const [isScrollable, setIsScrollable] = useState(false);
-
   const combinedTransactions = events
     ?.map((event: any) => {
       const parsedEvent: any = isString(event?.logs) && parseEventLogs(event);
@@ -311,20 +308,13 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
   };
 
   const transactions = groupTransactions(combinedTransactions);
-  useEffect(() => {
-    if (netTransferRef?.current) {
-      const height = netTransferRef?.current?.offsetHeight;
-      setIsScrollable(height >= 180);
-    }
-  }, [transactions]);
+
+  const isScrollable = Number(transactions?.length) > 5;
 
   return (
     <>
       <div className="mostly-customized-scrollbar">
-        <div
-          className="max-h-[180px] break-words space-y-2"
-          ref={netTransferRef}
-        >
+        <div className="max-h-[180px] break-words space-y-2">
           {transactions?.map((item: any, tokenIndex: number) => {
             const contract = item?.token?.split(':')[1];
 
@@ -359,7 +349,7 @@ const RenderNetTransfers: React.FC<ParsedEventListProps> = ({
         </div>
       </div>
       {isScrollable && (
-        <div className="flex text-xs text-nearblue-600 dark:text-neargray-10">
+        <div className="flex text-xs pt-2.5 text-nearblue-600 dark:text-neargray-10">
           <ArrowDownDouble className="w-4 h-4 dark:invert" />
           Scroll for more
         </div>
