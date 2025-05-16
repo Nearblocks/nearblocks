@@ -89,6 +89,7 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                   stats={stats}
                   sync={syncStatus}
                   accountId={signedAccountId}
+                  locale={locale}
                 >
                   {children}
                 </LayoutActions>

@@ -29,12 +29,14 @@ interface LayoutProps {
   stats: StatusInfo;
   sync: Status;
   accountId?: string;
+  locale: string;
 }
 
 const LayoutActions = ({
   children,
   theme,
   accountId,
+  locale,
   stats,
   sync,
 }: LayoutProps) => {
@@ -165,6 +167,7 @@ const LayoutActions = ({
             sync={indexers}
             theme={theme}
             accountId={accountName}
+            locale={locale}
           />
           <main>{children}</main>
         </Provider>
