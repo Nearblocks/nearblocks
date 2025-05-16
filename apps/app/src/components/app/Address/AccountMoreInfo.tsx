@@ -1,41 +1,22 @@
 import { getRequest } from '@/utils/app/api';
 import AccountMoreInfoActions from '@/components/app/Address/AccountMoreInfoActions';
 
-export default async function AccountMoreInfo({ id, parse }: any) {
-  const options: RequestInit = { next: { revalidate: 10 } };
+export default async function AccountMoreInfo({ id }: any) {
+  const accountData = getRequest(`v1/account/${id}`);
+  const tokenDetails = getRequest(`v1/fts/${id}`);
+  const deploymentData = getRequest(`v1/account/${id}/contract/deployments`);
+  const nftTokenData = getRequest(`v1/nfts/${id}`);
+  const syncData = getRequest(`v1/sync/status`);
+  const parse = getRequest(`v1/account/${id}/contract/parse`) || {};
 
-  const fetchCommonData = async (url?: string | undefined) => {
-    try {
-      if (url) {
-        const response = await getRequest(url, {}, options);
-        return response;
-      }
-      return null;
-    } catch (error) {
-      console.error(`Error fetching ${url}:`, error);
-      return null;
-    }
-  };
-
-  const [accountData, tokenDetails, deploymentData, nftTokenData, syncData] =
-    await Promise.all([
-      fetchCommonData(`v1/account/${id}`),
-      fetchCommonData(`v1/fts/${id}`),
-      fetchCommonData(`v1/account/${id}/contract/deployments`),
-      fetchCommonData(`v1/nfts/${id}`),
-      fetchCommonData(`v1/sync/status`),
-    ]);
-
-  const balanceIndexerStatus =
-    syncData && syncData?.status?.indexers?.balance?.sync;
   return (
     <AccountMoreInfoActions
-      accountData={accountData?.account?.[0]}
-      deploymentData={deploymentData?.deployments?.[0]}
-      nftTokenData={nftTokenData?.contracts?.[0]}
-      tokenData={tokenDetails?.contracts?.[0]}
-      status={balanceIndexerStatus}
-      parse={parse}
+      accountDataPromise={accountData}
+      deploymentDataPromise={deploymentData}
+      nftTokenDataPromise={nftTokenData}
+      tokenDataPromise={tokenDetails}
+      syncDataPromise={syncData}
+      parseDataPromise={parse}
     />
   );
 }
