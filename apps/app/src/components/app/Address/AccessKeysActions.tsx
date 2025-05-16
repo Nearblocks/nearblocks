@@ -6,7 +6,7 @@ import {
   useSearchParams,
 } from 'next/navigation';
 import QueryString from 'qs';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { AccountContractInfo, KeysInfo } from '@/utils/types';
@@ -18,13 +18,19 @@ import SortIcon from '@/components/app/Icons/SortIcon';
 import AccessKeyRow from '@/components/app/Address/AccessKeyRow';
 
 interface Props {
-  count: number;
-  error: boolean;
-  keys: AccountContractInfo[];
-  tab?: string;
+  dataPromise: Promise<any>;
+  countPromise: Promise<any>;
 }
 
-const AccessKeysActions = ({ count, error, keys }: Props) => {
+const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
+  const data = use(dataPromise);
+  const countData = use(countPromise);
+  if (data?.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+  const count = countData?.keys?.[0]?.count;
+  const error = !data || data === null;
+  const keys: AccountContractInfo[] = data?.keys;
   const router = useRouter();
   const pathname = usePathname();
   const { viewAccessKeys } = useRpc();

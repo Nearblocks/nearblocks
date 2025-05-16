@@ -6,13 +6,7 @@ import AccountMoreInfo from '@/components/app/Address/AccountMoreInfo';
 import AccountOverview from '@/components/app/Address/AccountOverview';
 /* import MultichainInfo from './MultichainInfo'; */
 
-export default async function Balance({
-  id,
-  parse,
-}: {
-  id: string;
-  parse: any;
-}) {
+export default async function Balance({ id }: { id: string }) {
   const errorBoundaryFallback = (
     <div className="w-full">
       <div className="bg-white soft-shadow rounded-xl dark:bg-black-600">
@@ -37,7 +31,7 @@ export default async function Balance({
         </ErrorBoundary>
 
         <ErrorBoundary fallback={errorBoundaryFallback}>
-          <AccountMoreInfo id={id} parse={parse} />
+          <AccountMoreInfo id={id} />
         </ErrorBoundary>
 
         {/*  <ErrorBoundary fallback={errorBoundaryFallback}>

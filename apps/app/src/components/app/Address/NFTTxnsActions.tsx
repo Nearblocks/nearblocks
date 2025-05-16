@@ -7,7 +7,7 @@ import {
   useSearchParams,
 } from 'next/navigation';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 import {
   PopoverContent,
@@ -36,18 +36,23 @@ import { CopyButton } from '@/components/app/common/CopyButton';
 import TimeStamp from '@/components/app/common/TimeStamp';
 
 interface NftTokenTxnsProps {
-  count: string;
-  cursor: string;
-  error: boolean;
-  txns: TransactionInfo[];
+  dataPromise: Promise<any>;
+  countPromise: Promise<any>;
 }
 
 const NFTTransactionActions = ({
-  count,
-  cursor,
-  error,
-  txns,
+  dataPromise,
+  countPromise,
 }: NftTokenTxnsProps) => {
+  const data = use(dataPromise);
+  const countData = use(countPromise);
+  if (data?.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+  const count = countData?.txns?.[0]?.count;
+  const cursor = data?.cursor;
+  const error = !data || data === null;
+  const txns = data?.txns;
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ id: string }>();

@@ -28,40 +28,31 @@ export default async function AddressIndex(props: {
 
   const { cursor, page, ...rest } = searchParams;
 
-  const options: RequestInit = {
-    cache: 'force-cache',
-  };
-
-  const parse =
-    (await getRequest(`v1/account/${id}/contract/parse`, {}, options)) || {};
+  const parse = getRequest(`v1/account/${id}/contract/parse`) || {};
   const deploymentInfo =
-    (await getRequest(`v1/account/${id}/contract/deployments`, {}, options)) ||
-    {};
-  const tokenDetails = (await getRequest(`v1/fts/${id}`, {}, options)) || {};
-  const nftTokenData = (await getRequest(`v1/nfts/${id}`, {}, options)) || {};
-
-  const tokenTracker =
-    (tokenDetails?.contracts?.[0]?.name ? 'token' : null) ||
-    (nftTokenData?.contracts?.[0]?.name ? 'nft' : null);
+    getRequest(`v1/account/${id}/contract/deployments`) || {};
+  const tokenDetails = getRequest(`v1/fts/${id}`) || {};
+  const nftTokenData = getRequest(`v1/nfts/${id}`) || {};
 
   return (
     <>
       <Suspense
         fallback={
           <BalanceSkeleton
-            parse={parse}
-            deploymentInfo={deploymentInfo?.deployments?.[0]}
-            tokenTracker={tokenTracker}
+            parsePromise={parse}
+            deploymentPromise={deploymentInfo}
+            ftPromise={tokenDetails}
+            nftPromise={nftTokenData}
           />
         }
       >
-        <Balance id={id} parse={parse} />
+        <Balance id={id} />
       </Suspense>
 
       <div className="py-2"></div>
 
       <Suspense
-        fallback={<TabSkeletion parse={parse} />}
+        fallback={<TabSkeletion parsePromise={parse} />}
         key={JSON.stringify(rest)}
       >
         <AccountTabs id={id} searchParams={searchParams} />
