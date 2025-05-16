@@ -6,19 +6,19 @@ import {
   TransActionProps,
 } from '@/utils/types';
 
-import AddKey from './Action/AddKey';
-import CreateAccount from './Action/CreateAccount';
-import DeleteAccount from './Action/DeleteAccount';
-import DeleteKey from './Action/DeleteKey';
-import DeployContract from './Action/DeployContract';
-import FunctionCall from './Action/FunctionCall';
-import Stake from './Action/Stake';
-import Transfer from './Action/Transfer';
-import TreeNode from './TreeNode';
-import DeployGlobalContract from './Action/DeployGlobalContract';
-import DeployGlobalContractByAccountId from './Action/DeployGlobalContractByAccountId';
-import UseGlobalContract from './Action/UseGlobalContract';
-import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId';
+import AddKey from '@/components/app/Transactions/TreeReceipts/Action/AddKey';
+import CreateAccount from '@/components/app/Transactions/TreeReceipts/Action/CreateAccount';
+import DeleteAccount from '@/components/app/Transactions/TreeReceipts/Action/DeleteAccount';
+import DeleteKey from '@/components/app/Transactions/TreeReceipts/Action/DeleteKey';
+import DeployContract from '@/components/app/Transactions/TreeReceipts/Action/DeployContract';
+import FunctionCall from '@/components/app/Transactions/TreeReceipts/Action/FunctionCall';
+import Stake from '@/components/app/Transactions/TreeReceipts/Action/Stake';
+import Transfer from '@/components/app/Transactions/TreeReceipts/Action/Transfer';
+import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
+import DeployGlobalContract from '@/components/app/Transactions/TreeReceipts/Action/DeployGlobalContract';
+import DeployGlobalContractByAccountId from '@/components/app/Transactions/TreeReceipts/Action/DeployGlobalContractByAccountId';
+import UseGlobalContract from '@/components/app/Transactions/TreeReceipts/Action/UseGlobalContract';
+import UseGlobalContractByAccountId from '@/components/app/Transactions/TreeReceipts/Action/UseGlobalContractByAccountId';
 
 const TreeTxnsActions = (props: TransActionProps) => {
   const { action, receiver } = props;

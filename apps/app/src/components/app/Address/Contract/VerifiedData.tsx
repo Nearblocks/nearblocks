@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ContractMetadata, VerifierData } from '@/utils/types';
-import ErrorMessage from '../../common/ErrorMessage';
-import FaCode from '../../Icons/FaCode';
-import FaInbox from '../../Icons/FaInbox';
-import CodeViewer from './CodeViewer';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaCode from '@/components/app/Icons/FaCode';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import CodeViewer from '@/components/app/Address/Contract/CodeViewer';
 import { toast } from 'react-toastify';
 import { useParams } from 'next/navigation';
 import { useRpcStore } from '@/stores/app/rpc';

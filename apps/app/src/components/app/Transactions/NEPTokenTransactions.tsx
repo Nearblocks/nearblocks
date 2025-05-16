@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { parseEventLogs } from '@/utils/near';
-import FaRight from '../Icons/FaRight';
+import FaRight from '@/components/app/Icons/FaRight';
 import { ProcessedTokenMeta, TransactionLog } from '@/utils/types';
-import ArrowDownDouble from '../Icons/ArrowDownDouble';
+import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import TokenInfo from '../common/TokenInfo';
+import TokenInfo from '@/components/app/common/TokenInfo';
 import { localFormat } from '@/utils/app/libs';
 import { isString } from 'lodash';
 

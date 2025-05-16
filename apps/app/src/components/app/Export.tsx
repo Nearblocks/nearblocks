@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import Tooltip from './common/Tooltip';
+import Tooltip from '@/components/app/common/Tooltip';
 import { handleExport } from '@/utils/app/actions';
-import DateInput from './common/DateInput';
+import DateInput from '@/components/app/common/DateInput';
 
 interface Props {
   exportType: string;

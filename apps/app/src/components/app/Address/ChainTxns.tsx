@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import MultiChainTxns from '../ChainAbstraction/MultiChainTxns';
+import MultiChainTxns from '@/components/app/ChainAbstraction/MultiChainTxns';
 
 const MultiChainTransactions = async ({ id, searchParams }: any) => {
   const options: RequestInit = {

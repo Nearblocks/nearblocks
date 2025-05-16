@@ -10,8 +10,8 @@ import withAuth from '@/components/app/stores/withAuth';
 import useAuth from '@/hooks/app/useAuth';
 import { dollarFormat, shortenAddress } from '@/utils/app/libs';
 
-import Tooltip from '../common/Tooltip';
-import CampaignPagination from '../Campaign/CampaignPagination';
+import Tooltip from '@/components/app/common/Tooltip';
+import CampaignPagination from '@/components/app/Campaign/CampaignPagination';
 
 const AdSubscription = ({ role }: { role?: string }) => {
   const apiUrl =

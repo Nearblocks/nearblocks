@@ -1,5 +1,5 @@
 import { signOut } from '@/utils/app/actions';
-import Logout from '../Icons/Logout';
+import Logout from '@/components/app/Icons/Logout';
 
 const UserLogout = () => {
   return (

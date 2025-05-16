@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
-import Check from '../Icons/Check';
-import Rpc from '../Icons/Rpc';
+import Check from '@/components/app/Icons/Check';
+import Rpc from '@/components/app/Icons/Rpc';
 import {
   PopoverContent,
   PopoverRoot,

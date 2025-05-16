@@ -1,6 +1,6 @@
-import FaCheckCircle from './FaCheckCircle';
-import FaHourglassStart from './FaHourglassStart';
-import FaTimesCircle from './FaTimesCircle';
+import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
+import FaTimesCircle from '@/components/app/Icons/FaTimesCircle';
 
 interface Props {
   showLabel: boolean;

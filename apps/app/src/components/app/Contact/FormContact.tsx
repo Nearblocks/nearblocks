@@ -9,8 +9,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { useConfig } from '@/hooks/app/useConfig';
 
-import LoadingCircular from '../common/LoadingCircular';
-import ArrowDown from '../Icons/ArrowDown';
+import LoadingCircular from '@/components/app/common/LoadingCircular';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
 
 interface Props {
   getContactDetails: any;

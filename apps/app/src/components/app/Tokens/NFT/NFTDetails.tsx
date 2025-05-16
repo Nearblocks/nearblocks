@@ -12,11 +12,11 @@ import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/libs';
 import { SpamToken, Token, TransactionInfo } from '@/utils/types';
 
-import TokenImage, { NFTImage } from '../../common/TokenImage';
-import Tooltip from '../../common/Tooltip';
-import Question from '../../Icons/Question';
-import WarningIcon from '../../Icons/WarningIcon';
-import TokenTransfers from './TokenTransfers';
+import TokenImage, { NFTImage } from '@/components/app/common/TokenImage';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
+import WarningIcon from '@/components/app/Icons/WarningIcon';
+import TokenTransfers from '@/components/app/Tokens/NFT/TokenTransfers';
 import { convertTimestampToTimes } from '@/utils/app/libs';
 import { useParams } from 'next/navigation';
 interface Props {

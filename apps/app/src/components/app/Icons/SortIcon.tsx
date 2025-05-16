@@ -1,4 +1,4 @@
-import ArrowUp from './ArrowUp';
+import ArrowUp from '@/components/app/Icons/ArrowUp';
 
 interface Props {
   order: string;

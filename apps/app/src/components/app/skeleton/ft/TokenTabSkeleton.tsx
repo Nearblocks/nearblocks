@@ -4,12 +4,12 @@ import React from 'react';
 
 import { Link } from '@/i18n/routing';
 
-import FAQ from './FAQ';
-import Info from './Info';
-import TokenTxnsTab from './TokenTxnsTab';
-import Holders from './Holders';
-import ErrorMessage from '../../common/ErrorMessage';
-import FaInbox from '../../Icons/FaInbox';
+import FAQ from '@/components/app/skeleton/ft/FAQ';
+import Info from '@/components/app/skeleton/ft/Info';
+import TokenTxnsTab from '@/components/app/skeleton/ft/TokenTxnsTab';
+import Holders from '@/components/app/skeleton/ft/Holders';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
 interface Props {
   className?: string;
   error?: boolean;

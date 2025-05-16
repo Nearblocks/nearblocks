@@ -19,17 +19,17 @@ import { txnMethod } from '@/utils/app/near';
 import { yoctoToNear } from '@/utils/libs';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import Filters from '../common/Filters';
-import TxnStatus from '../common/Status';
-import Table from '../common/Table';
-import TimeStamp from '../common/TimeStamp';
-import Tooltip from '../common/Tooltip';
-import Clock from '../Icons/Clock';
-import FaInbox from '../Icons/FaInbox';
-import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
-import Filter from '../Icons/Filter';
-import SortIcon from '../Icons/SortIcon';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Filters from '@/components/app/common/Filters';
+import TxnStatus from '@/components/app/common/Status';
+import Table from '@/components/app/common/Table';
+import TimeStamp from '@/components/app/common/TimeStamp';
+import Tooltip from '@/components/app/common/Tooltip';
+import Clock from '@/components/app/Icons/Clock';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
+import Filter from '@/components/app/Icons/Filter';
+import SortIcon from '@/components/app/Icons/SortIcon';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {

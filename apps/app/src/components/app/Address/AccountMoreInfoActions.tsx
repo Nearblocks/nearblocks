@@ -18,9 +18,9 @@ import {
   ContractCodeInfo,
 } from '@/utils/types';
 
-import TokenImage from '../common/TokenImage';
+import TokenImage from '@/components/app/common/TokenImage';
 import { useParams } from 'next/navigation';
-import Skeleton from '../skeleton/common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useRpcStore } from '@/stores/app/rpc';
 const AccountMoreInfoActions = ({
   accountData: account,

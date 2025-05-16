@@ -1,5 +1,5 @@
 import { capitalize, stripEmpty } from '@/utils/libs';
-import CloseCircle from '../Icons/CloseCircle';
+import CloseCircle from '@/components/app/Icons/CloseCircle';
 interface FiltersProps {
   filters: { [key: string]: any };
   onClear?: () => void;

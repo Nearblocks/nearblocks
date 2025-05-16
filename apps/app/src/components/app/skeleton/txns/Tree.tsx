@@ -1,4 +1,4 @@
-import Skeleton, { Loader } from '../common/Skeleton';
+import Skeleton, { Loader } from '@/components/app/skeleton/common/Skeleton';
 const Tree = () => {
   return (
     <>

@@ -13,7 +13,7 @@ import { setupNearMobileWallet } from '@near-wallet-selector/near-mobile-wallet'
 import { setupNearFi } from '@near-wallet-selector/nearfi';
 import { providers } from 'near-api-js';
 
-import { wagmiAdapter, web3Modal } from './web3modal';
+import { wagmiAdapter, web3Modal } from '@/components/app/wallet/web3modal';
 
 const THIRTY_TGAS = '30000000000000';
 const NO_DEPOSIT = '0';

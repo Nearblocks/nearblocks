@@ -1,9 +1,9 @@
 import { dollarNonCentFormat, localFormat } from '@/utils/libs';
 import { Token } from '@/utils/types';
 
-import CoinGecko from '../../Icons/CoinGecko';
-import CoinMarketcap from '../../Icons/CoinMarketcap';
-import Skeleton from '../../skeleton/common/Skeleton';
+import CoinGecko from '@/components/app/Icons/CoinGecko';
+import CoinMarketcap from '@/components/app/Icons/CoinMarketcap';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface Props {
   error: boolean;

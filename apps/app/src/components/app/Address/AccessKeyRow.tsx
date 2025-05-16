@@ -6,9 +6,9 @@ import useRpc from '@/hooks/app/useRpc';
 import { capitalizeWords, nanoToMilli, yoctoToNear } from '@/utils/libs';
 import { AccessInfo, AccountContractInfo } from '@/utils/types';
 
-import Tooltip from '../common/Tooltip';
-import { AddressOrTxnsLink } from '../common/HoverContextProvider';
-import TimeStamp from '../common/TimeStamp';
+import Tooltip from '@/components/app/common/Tooltip';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import TimeStamp from '@/components/app/common/TimeStamp';
 
 interface Props {
   accessKey: AccountContractInfo;

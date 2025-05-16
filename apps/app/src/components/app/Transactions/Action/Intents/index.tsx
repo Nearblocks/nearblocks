@@ -1,7 +1,7 @@
 import { EventPropsInfo } from '@/utils/types';
-import Mint from './Mint';
-import Burn from './Burn';
-import Transfer from './Transfer';
+import Mint from '@/components/app/Transactions/Action/Intents/Mint';
+import Burn from '@/components/app/Transactions/Action/Intents/Burn';
+import Transfer from '@/components/app/Transactions/Action/Intents/Transfer';
 
 const IntentsContract = (props: EventPropsInfo) => {
   let log = props?.event?.logs;

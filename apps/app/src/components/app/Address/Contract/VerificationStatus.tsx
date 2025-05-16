@@ -3,9 +3,9 @@ import React from 'react';
 import { Link } from '@/i18n/routing';
 import { ContractMetadata, VerificationData } from '@/utils/types';
 
-import ArrowDown from '../../Icons/ArrowDown';
-import FaCheckCircle from '../../Icons/FaCheckCircle';
-import FaExclamationCircle from '../../Icons/FaExclamationCircle';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import FaExclamationCircle from '@/components/app/Icons/FaExclamationCircle';
 
 type VerificationStatusProps = {
   accountId: string | undefined;

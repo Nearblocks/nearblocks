@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 const Summary = () => {
   const t = useTranslations();

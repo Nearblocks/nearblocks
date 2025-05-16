@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import CalenderIcon from '../Icons/CalenderIcon';
+import CalenderIcon from '@/components/app/Icons/CalenderIcon';
 
 interface DateInputProps {
   id?: string;

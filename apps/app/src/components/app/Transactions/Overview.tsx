@@ -14,7 +14,7 @@ import { currency, localFormat } from '@/utils/libs';
 import { gasPrice } from '@/utils/near';
 import { ChartInfo, StatusInfo } from '@/utils/types';
 
-import Tooltip from '../common/Tooltip';
+import Tooltip from '@/components/app/common/Tooltip';
 import useStatsStore from '@/stores/app/syncStats';
 
 interface Props {

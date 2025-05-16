@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import useAuth from '@/hooks/app/useAuth';
 import { localFormat } from '@/utils/app/libs';
 
-import Skeleton from '../skeleton/common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 interface Props {
   keyId?: string | string[];
 }

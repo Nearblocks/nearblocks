@@ -9,12 +9,12 @@ import {
 } from '@/utils/libs';
 import { HoldersPropsInfo, Token } from '@/utils/types';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import Table from '../../common/Table';
-import Tooltip from '../../common/Tooltip';
-import FaInbox from '../../Icons/FaInbox';
-import Skeleton from '../../skeleton/common/Skeleton';
-import { AddressOrTxnsLink } from '../../common/HoverContextProvider';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Table from '@/components/app/common/Table';
+import Tooltip from '@/components/app/common/Tooltip';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface Props {
   count: number;

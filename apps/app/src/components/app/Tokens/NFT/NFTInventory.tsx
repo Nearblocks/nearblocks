@@ -3,11 +3,11 @@ import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
 import { Token } from '@/utils/types';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import Paginator from '../../common/Paginator';
-import { NFTImage } from '../../common/TokenImage';
-import FaInbox from '../../Icons/FaInbox';
-import Skeleton from '../../skeleton/common/Skeleton';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Paginator from '@/components/app/common/Paginator';
+import { NFTImage } from '@/components/app/common/TokenImage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface Props {
   count: number;

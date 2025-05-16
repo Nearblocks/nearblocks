@@ -6,8 +6,8 @@ import { Link } from '@/i18n/routing';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';
 import { ContractCodeInfo, DeploymentsInfo } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import Question from '../../Icons/Question';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
 import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {

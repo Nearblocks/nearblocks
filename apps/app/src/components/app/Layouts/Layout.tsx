@@ -10,8 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { manrope } from '@/fonts/font';
 import { gTag, networkId } from '@/utils/app/config';
 
-import LayoutActions from './LayoutActions';
-import ThemeInitializer from './ThemeInitializer';
+import LayoutActions from '@/components/app/Layouts/LayoutActions';
+import ThemeInitializer from '@/components/app/Layouts/ThemeInitializer';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
 import { getCookie, getLatestStats, getSyncStatus } from '@/utils/app/actions';
 

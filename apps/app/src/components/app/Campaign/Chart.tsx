@@ -6,8 +6,8 @@ import React, { useEffect, useState } from 'react';
 
 import useAuth from '@/hooks/app/useAuth';
 
-import Plan from '../Icons/Plan';
-import CircularLoader from '../skeleton/common/CircularLoader';
+import Plan from '@/components/app/Icons/Plan';
+import CircularLoader from '@/components/app/skeleton/common/CircularLoader';
 
 const Chart = ({ campaignId }: { campaignId?: string }) => {
   const [options, setOptions] = useState<any | null>(null);

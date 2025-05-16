@@ -3,8 +3,8 @@ import { useParams } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { ActionPropsInfo } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import FaRight from '../../Icons/FaRight';
+import Tooltip from '@/components/app/common/Tooltip';
+import FaRight from '@/components/app/Icons/FaRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 const FunctionCall = (props: ActionPropsInfo) => {

@@ -14,11 +14,11 @@ import {
   RPCTransactionInfo,
 } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
-import Question from '../../Icons/Question';
-import FaMinimize from '../../Icons/FaMinimize';
-import FaExpand from '../../Icons/FaExpand';
+import Tooltip from '@/components/app/common/Tooltip';
+import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
+import Question from '@/components/app/Icons/Question';
+import FaMinimize from '@/components/app/Icons/FaMinimize';
+import FaExpand from '@/components/app/Icons/FaExpand';
 import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { networkId } from '@/utils/app/config';
 

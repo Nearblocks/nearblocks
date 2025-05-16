@@ -15,11 +15,11 @@ import {
   TransactionInfo,
 } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FaHourglassStart from '../Icons/FaHourglassStart';
-import FileSlash from '../Icons/FileSlash';
-import Skeleton from '../skeleton/common/Skeleton';
-import TransactionReceipt from './Receipts/TransactionReceipt';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import TransactionReceipt from '@/components/app/Transactions/Receipts/TransactionReceipt';
 
 interface Props {
   hash: string;

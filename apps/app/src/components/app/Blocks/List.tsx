@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import ListActions from './ListActions';
+import ListActions from '@/components/app/Blocks/ListActions';
 
 const List = async ({ cursor }: { cursor: string }) => {
   const data = await getRequest('v1/blocks', { cursor });

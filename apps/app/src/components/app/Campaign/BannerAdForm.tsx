@@ -6,11 +6,11 @@ import { toast } from 'react-toastify';
 import { bannerCampaignValidation } from '@/utils/app/validationSchema';
 import { CampaignProps } from '@/utils/types';
 
-import Avatar from '../Icons/Avatar';
-import EmailCircle from '../Icons/EmailCircle';
-import LoginCircle from '../Icons/LoginCircle';
-import Skeleton from '../skeleton/common/Skeleton';
-import StartForm from './StartForm';
+import Avatar from '@/components/app/Icons/Avatar';
+import EmailCircle from '@/components/app/Icons/EmailCircle';
+import LoginCircle from '@/components/app/Icons/LoginCircle';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import StartForm from '@/components/app/Campaign/StartForm';
 import { request } from '@/hooks/app/useAuth';
 import { useConfig } from '@/hooks/app/useConfig';
 

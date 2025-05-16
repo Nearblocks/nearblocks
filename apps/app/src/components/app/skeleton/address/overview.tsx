@@ -1,8 +1,8 @@
 'use client';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
-import Tooltip from '../../common/Tooltip';
-import Question from '../../Icons/Question';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
 
 const Loader = (props: { className?: string; wrapperClassName?: string }) => {
   return (

@@ -1,7 +1,7 @@
 import { nanoToMilli } from '@/utils/libs';
 
-import dayjs from '../../../utils/app/dayjs';
-import Tooltip from './Tooltip';
+import dayjs from '@/utils/app/dayjs';
+import Tooltip from '@/components/app/common/Tooltip';
 
 const TimeStamp = ({ showAge = true, timestamp }: any) => {
   const isValidTimestamp = timestamp && !isNaN(nanoToMilli(timestamp));

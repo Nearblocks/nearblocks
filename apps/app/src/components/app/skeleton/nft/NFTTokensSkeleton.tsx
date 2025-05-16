@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 const NFTTokensSkeleton = () => {
   return (

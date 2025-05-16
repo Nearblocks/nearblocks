@@ -1,6 +1,6 @@
 import { postRequest } from '@/utils/app/api';
 
-import ContactActions from './ContactActions';
+import ContactActions from '@/components/app/Contact/ContactActions';
 
 const ContactOptions = async () => {
   const getContactDetails = async (contactDeatils: any) => {

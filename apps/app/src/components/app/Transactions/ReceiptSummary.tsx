@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react';
 import { mapRpcActionToAction } from '@/utils/near';
 import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FaHourglassStart from '../Icons/FaHourglassStart';
-import FaInbox from '../Icons/FaInbox';
-import FileSlash from '../Icons/FileSlash';
-import Skeleton from '../skeleton/common/Skeleton';
-import ReceiptSummaryRow from './Receipts/ReceiptSummaryRow';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import ReceiptSummaryRow from '@/components/app/Transactions/Receipts/ReceiptSummaryRow';
 
 interface Props {
   hash: string;

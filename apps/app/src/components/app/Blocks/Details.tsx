@@ -16,15 +16,15 @@ import {
 } from '@/utils/app/libs';
 import { gasPrice } from '@/utils/near';
 import { BlocksInfo } from '@/utils/types';
-import dayjs from '../../../utils/app/dayjs';
+import dayjs from '@/utils/app/dayjs';
 
-import ErrorMessage from '../common/ErrorMessage';
-import FileSlash from '../Icons/FileSlash';
-import Skeleton from '../skeleton/common/Skeleton';
-import Tooltip from '../common/Tooltip';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FileSlash from '@/components/app/Icons/FileSlash';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import Tooltip from '@/components/app/common/Tooltip';
 import { useParams } from 'next/navigation';
-import ActionMenuPopover from '../common/ActionMenuPopover';
-import FaDoubleCheck from '../Icons/FaDoubleCheck';
+import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
+import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
 interface Props {
   data: any;
   loading?: any;

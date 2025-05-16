@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import AccessKeysActions from './AccessKeysActions';
+import AccessKeysActions from '@/components/app/Address/AccessKeysActions';
 
 const AccessKeys = async ({ id, searchParams }: any) => {
   const options: RequestInit = {

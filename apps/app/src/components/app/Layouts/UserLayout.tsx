@@ -5,20 +5,20 @@ import useAuth from '@/hooks/app/useAuth';
 import { Link, usePathname } from '@/i18n/routing';
 import { docsUrl } from '@/utils/app/config';
 
-import ActiveLink from '../ActiveLink';
-import Arrow from '../Icons/Arrow';
-import Campaign from '../Icons/Campaign';
-import Close from '../Icons/Close';
-import Create from '../Icons/Create';
-import FaFileInvoiceDollar from '../Icons/FaFileInvoiceDollar';
-import FileSearch from '../Icons/FileSearch';
-import Home from '../Icons/Home';
-import Key from '../Icons/Key';
-import Menu from '../Icons/Menu';
-import Plan from '../Icons/Plan';
-import User from '../Icons/User';
-import Skeleton from '../skeleton/common/Skeleton';
-import UserLogout from './Logout';
+import ActiveLink from '@/components/app/ActiveLink';
+import Arrow from '@/components/app/Icons/Arrow';
+import Campaign from '@/components/app/Icons/Campaign';
+import Close from '@/components/app/Icons/Close';
+import Create from '@/components/app/Icons/Create';
+import FaFileInvoiceDollar from '@/components/app/Icons/FaFileInvoiceDollar';
+import FileSearch from '@/components/app/Icons/FileSearch';
+import Home from '@/components/app/Icons/Home';
+import Key from '@/components/app/Icons/Key';
+import Menu from '@/components/app/Icons/Menu';
+import Plan from '@/components/app/Icons/Plan';
+import User from '@/components/app/Icons/User';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import UserLogout from '@/components/app/Layouts/Logout';
 
 interface MenuItemProps {
   exact?: boolean | null;

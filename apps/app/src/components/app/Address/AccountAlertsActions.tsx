@@ -10,10 +10,10 @@ import {
   TextAdData,
 } from '@/utils/types';
 
-import WarningIcon from '../Icons/WarningIcon';
-import SponsoredText from '../SponsoredText';
+import WarningIcon from '@/components/app/Icons/WarningIcon';
+import SponsoredText from '@/components/app/SponsoredText';
 import { useParams } from 'next/navigation';
-import AddressValidator from './AddressValidator';
+import AddressValidator from '@/components/app/Address/AddressValidator';
 const AccountAlertsActions = ({
   accountData,
   sponsoredText,

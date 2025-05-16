@@ -7,15 +7,15 @@ import { Link } from '@/i18n/routing';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { TransactionInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import TxnStatus from '../common/Status';
-import Table from '../common/Table';
-import TimeStamp from '../common/TimeStamp';
-import TokenImage from '../common/TokenImage';
-import Tooltip from '../common/Tooltip';
-import Clock from '../Icons/Clock';
-import FaInbox from '../Icons/FaInbox';
-import FaLongArrowAltRight from '../Icons/FaLongArrowAltRight';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import TxnStatus from '@/components/app/common/Status';
+import Table from '@/components/app/common/Table';
+import TimeStamp from '@/components/app/common/TimeStamp';
+import TokenImage from '@/components/app/common/TokenImage';
+import Tooltip from '@/components/app/common/Tooltip';
+import Clock from '@/components/app/Icons/Clock';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface ListProps {

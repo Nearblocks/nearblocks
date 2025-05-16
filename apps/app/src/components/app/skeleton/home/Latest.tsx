@@ -1,6 +1,6 @@
-import ErrorMessage from '../../common/ErrorMessage';
-import FaInbox from '../../Icons/FaInbox';
-import Skeleton from '../common/Skeleton';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 interface Props {
   className?: string;
   error?: boolean;

@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { ChartStat } from '@/utils/types';
 
-import Skeleton from '../skeleton/common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface Props {
   chartsData?: {

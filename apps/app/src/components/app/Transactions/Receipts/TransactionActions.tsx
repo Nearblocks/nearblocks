@@ -6,22 +6,22 @@ import {
   TransActionProps,
 } from '@/utils/types';
 
-import AddKey from './Action/AddKey';
-import CreateAccount from './Action/CreateAccount';
-import DeleteAccount from './Action/DeleteAccount';
-import DeleteKey from './Action/DeleteKey';
-import DeployContract from './Action/DeployContract';
-import FunctionCall from './Action/FunctionCall';
-import Stake from './Action/Stake';
-import Transfer from './Action/Transfer';
-import { Delegate } from '../../Icons/Delegate';
+import AddKey from '@/components/app/Transactions/Receipts/Action/AddKey';
+import CreateAccount from '@/components/app/Transactions/Receipts/Action/CreateAccount';
+import DeleteAccount from '@/components/app/Transactions/Receipts/Action/DeleteAccount';
+import DeleteKey from '@/components/app/Transactions/Receipts/Action/DeleteKey';
+import DeployContract from '@/components/app/Transactions/Receipts/Action/DeployContract';
+import FunctionCall from '@/components/app/Transactions/Receipts/Action/FunctionCall';
+import Stake from '@/components/app/Transactions/Receipts/Action/Stake';
+import Transfer from '@/components/app/Transactions/Receipts/Action/Transfer';
+import { Delegate } from '@/components/app/Icons/Delegate';
 import Link from 'next/link';
 import { shortenAddress } from '@/utils/app/libs';
-import Tooltip from '../../common/Tooltip';
-import DeployGlobalContract from './Action/DeployGlobalContract';
-import DeployGlobalContractByAccountId from './Action/DeployGlobalContractByAccountId';
-import UseGlobalContract from './Action/UseGlobalContract';
-import UseGlobalContractByAccountId from './Action/UseGlobalContractByAccountId';
+import Tooltip from '@/components/app/common/Tooltip';
+import DeployGlobalContract from '@/components/app/Transactions/Receipts/Action/DeployGlobalContract';
+import DeployGlobalContractByAccountId from '@/components/app/Transactions/Receipts/Action/DeployGlobalContractByAccountId';
+import UseGlobalContract from '@/components/app/Transactions/Receipts/Action/UseGlobalContract';
+import UseGlobalContractByAccountId from '@/components/app/Transactions/Receipts/Action/UseGlobalContractByAccountId';
 
 const TransactionActions = (props: TransActionProps) => {
   const { action, receiver } = props;

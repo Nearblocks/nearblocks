@@ -11,11 +11,11 @@ import { useEffect, useState } from 'react';
 import useRpc from '@/hooks/app/useRpc';
 import { AccountContractInfo, KeysInfo } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import Paginator from '../common/Paginator';
-import FaInbox from '../Icons/FaInbox';
-import SortIcon from '../Icons/SortIcon';
-import AccessKeyRow from './AccessKeyRow';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Paginator from '@/components/app/common/Paginator';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import SortIcon from '@/components/app/Icons/SortIcon';
+import AccessKeyRow from '@/components/app/Address/AccessKeyRow';
 
 interface Props {
   count: number;

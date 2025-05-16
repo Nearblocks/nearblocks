@@ -1,8 +1,8 @@
 import { TransactionReceiptInfo } from '@/utils/types';
 import { useCallback, useEffect, useState } from 'react';
-import ReceiptKind from './ReceiptKind';
-import ReceiptInfo from './ReceiptInfo';
-import ArrowDown from '../../Icons/ArrowDown';
+import ReceiptKind from '@/components/app/Transactions/Receipts/ReceiptKind';
+import ReceiptInfo from '@/components/app/Transactions/Receipts/ReceiptInfo';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
 
 const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const {

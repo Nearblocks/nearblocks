@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Ad, IAd } from './Ad';
+import { Ad, IAd } from '@/components/app/Ad';
 import React from 'react';
 
 interface IDynamicAd extends Omit<IAd, 'unitId' | 'format'> {

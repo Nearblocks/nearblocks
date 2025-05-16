@@ -14,16 +14,16 @@ import {
 } from '@/utils/libs';
 import { Sorting, StatusInfo, Token } from '@/utils/types';
 
-import ErrorMessage from '../common/ErrorMessage';
-import Table from '../common/Table';
-import TokenImage from '../common/TokenImage';
-import Tooltip from '../common/Tooltip';
-import ArrowDown from '../Icons/ArrowDown';
-import ArrowUp from '../Icons/ArrowUp';
-import FaInbox from '../Icons/FaInbox';
-import Question from '../Icons/Question';
-import SortIcon from '../Icons/SortIcon';
-import TokenPrice from './FT/TokenPrice';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Table from '@/components/app/common/Table';
+import TokenImage from '@/components/app/common/TokenImage';
+import Tooltip from '@/components/app/common/Tooltip';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import ArrowUp from '@/components/app/Icons/ArrowUp';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Question from '@/components/app/Icons/Question';
+import SortIcon from '@/components/app/Icons/SortIcon';
+import TokenPrice from '@/components/app/Tokens/FT/TokenPrice';
 
 const initialForm = {
   search: '',

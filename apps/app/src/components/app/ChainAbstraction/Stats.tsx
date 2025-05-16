@@ -4,9 +4,9 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import { Link } from '@/i18n/routing';
 
-import MiniChart from '../Charts/MiniChart';
-import BarChart from '../Icons/BarChart';
-import Skeleton from '../skeleton/common/Skeleton';
+import MiniChart from '@/components/app/Charts/MiniChart';
+import BarChart from '@/components/app/Icons/BarChart';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface StatsProps {
   dataChart: any;

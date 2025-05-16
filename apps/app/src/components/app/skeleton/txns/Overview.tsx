@@ -1,8 +1,8 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
-import Tooltip from '../../common/Tooltip';
-import Question from '../../Icons/Question';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
 import { useConfig } from '@/hooks/app/useConfig';
 
 const Loader = ({ className, wrapperClassName }: any) => (

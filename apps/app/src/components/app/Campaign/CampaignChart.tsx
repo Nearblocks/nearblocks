@@ -4,7 +4,7 @@ import Chart from '@/components/app/Campaign/Chart';
 import CampaignStats from '@/components/app/Campaign/Publisher/Stats';
 import UserLayout from '@/components/app/Layouts/UserLayout';
 
-import withAuth from '../stores/withAuth';
+import withAuth from '@/components/app/stores/withAuth';
 
 const CampaignChart = ({
   campaignId,

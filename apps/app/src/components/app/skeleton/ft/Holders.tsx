@@ -1,4 +1,4 @@
-import Skeleton from '../common/Skeleton';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import React from 'react';
 
 const Holders = ({ nft }: { nft?: boolean }) => {

@@ -6,11 +6,11 @@ import { Link } from '@/i18n/routing';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { SpamToken, Token } from '@/utils/types';
 
-import Links from '../../common/Links';
-import TokenImage from '../../common/TokenImage';
-import Tooltip from '../../common/Tooltip';
-import WarningIcon from '../../Icons/WarningIcon';
-import Skeleton from '../../skeleton/common/Skeleton';
+import Links from '@/components/app/common/Links';
+import TokenImage from '@/components/app/common/TokenImage';
+import Tooltip from '@/components/app/common/Tooltip';
+import WarningIcon from '@/components/app/Icons/WarningIcon';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface Props {
   holders: string;

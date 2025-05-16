@@ -10,10 +10,10 @@ import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { chartDataInfo } from '@/utils/types';
 
-import Tooltip from '../common/Tooltip';
-import Question from '../Icons/Question';
-import Skeleton from '../skeleton/common/Skeleton';
-import SwitchButton from '../SwitchButton';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import SwitchButton from '@/components/app/SwitchButton';
 
 interface Props {
   chartTypes: string;

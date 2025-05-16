@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
-import NFTOverviewActions from './NFTOverviewActions';
+import NFTOverviewActions from '@/components/app/Tokens/NFT/NFTOverviewActions';
 // import TokenFilter from './TokenFilter';
 
 const NFTOverview = async ({ id }: any) => {

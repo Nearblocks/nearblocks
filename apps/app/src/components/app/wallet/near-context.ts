@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import { Wallet } from './near';
+import { Wallet } from '@/components/app/wallet/near';
 
 // Define the context type
 interface NearContextType {

@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 import { Link } from '@/i18n/routing';
 
-import Arrow from '../Icons/Arrow';
+import Arrow from '@/components/app/Icons/Arrow';
 
 const Footer = ({ theme: cookieTheme }: { theme: string }) => {
   const currentDate = new Date();

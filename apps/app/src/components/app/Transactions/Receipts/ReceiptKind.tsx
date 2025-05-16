@@ -4,12 +4,12 @@ import { hexy } from '@/utils/app/hexy';
 import { yoctoToNear } from '@/utils/libs';
 import { ReceiptKindInfo } from '@/utils/types';
 
-import FaTimesCircle from '../../Icons/FaTimesCircle';
-import RlpTransaction from './RlpTransaction';
+import FaTimesCircle from '@/components/app/Icons/FaTimesCircle';
+import RlpTransaction from '@/components/app/Transactions/Receipts/RlpTransaction';
 import { useState } from 'react';
 import { isValidJson } from '@/utils/app/libs';
-import FaMinimize from '../../Icons/FaMinimize';
-import FaExpand from '../../Icons/FaExpand';
+import FaMinimize from '@/components/app/Icons/FaMinimize';
+import FaExpand from '@/components/app/Icons/FaExpand';
 
 const backgroundColorClasses: Record<string, string> = {
   addKey: 'bg-indigo-50 dark:bg-indigo-900',

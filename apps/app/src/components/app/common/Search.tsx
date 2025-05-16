@@ -13,9 +13,9 @@ import { rpcSearch } from '@/utils/app/rpc';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import { NetworkId, SearchResult, SearchRoute } from '@/utils/types';
 
-import ArrowDown from '../Icons/ArrowDown';
-import SearchIcon from '../Icons/SearchIcon';
-import { Spinner } from './Spinner';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import SearchIcon from '@/components/app/Icons/SearchIcon';
+import { Spinner } from '@/components/app/common/Spinner';
 import useStatsStore from '@/stores/app/syncStats';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';

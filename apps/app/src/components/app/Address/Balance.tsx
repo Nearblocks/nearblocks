@@ -1,9 +1,9 @@
 import { ErrorBoundary } from 'react-error-boundary';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
-import AccountAlerts from './AccountAlerts';
-import AccountMoreInfo from './AccountMoreInfo';
-import AccountOverview from './AccountOverview';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import AccountAlerts from '@/components/app/Address/AccountAlerts';
+import AccountMoreInfo from '@/components/app/Address/AccountMoreInfo';
+import AccountOverview from '@/components/app/Address/AccountOverview';
 /* import MultichainInfo from './MultichainInfo'; */
 
 export default async function Balance({

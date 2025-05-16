@@ -1,11 +1,11 @@
 import { getTranslations } from 'next-intl/server';
 import { ErrorBoundary } from 'react-error-boundary';
-import ErrorMessage from '../common/ErrorMessage';
-import Search from '../common/Search';
-import FaInbox from '../Icons/FaInbox';
-import HomeLatestBlocks from './LatestBlocks';
-import HomeLatestTxns from './LatestTxns';
-import HomeOverview from './Overview';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Search from '@/components/app/common/Search';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import HomeLatestBlocks from '@/components/app/Home/LatestBlocks';
+import HomeLatestTxns from '@/components/app/Home/LatestTxns';
+import HomeOverview from '@/components/app/Home/Overview';
 import { networkId } from '@/utils/app/config';
 
 export default async function Home({

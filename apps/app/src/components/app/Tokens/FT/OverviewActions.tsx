@@ -15,15 +15,15 @@ import {
 } from '@/utils/libs';
 import { SpamToken, StatusInfo, Token } from '@/utils/types';
 
-import Links from '../../common/Links';
-import TokenImage from '../../common/TokenImage';
-import Tooltip from '../../common/Tooltip';
-import Question from '../../Icons/Question';
-import WarningIcon from '../../Icons/WarningIcon';
-import Skeleton from '../../skeleton/common/Skeleton';
-import MarketCap from './MarketCap';
-import TokenPrice from './TokenPrice';
-import { CopyButton } from '../../common/CopyButton';
+import Links from '@/components/app/common/Links';
+import TokenImage from '@/components/app/common/TokenImage';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
+import WarningIcon from '@/components/app/Icons/WarningIcon';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import MarketCap from '@/components/app/Tokens/FT/MarketCap';
+import TokenPrice from '@/components/app/Tokens/FT/TokenPrice';
+import { CopyButton } from '@/components/app/common/CopyButton';
 import { shortenAddress } from '@/utils/app/libs';
 
 interface Props {

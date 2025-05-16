@@ -13,11 +13,11 @@ import { dollarFormat } from '@/utils/app/libs';
 import { yoctoToNear } from '@/utils/libs';
 import { ChartStat, ChartTypeInfo } from '@/utils/types';
 
-import Tooltip from '../common/Tooltip';
-import Question from '../Icons/Question';
-import Skeleton from '../skeleton/common/Skeleton';
-import SwitchButton from '../SwitchButton';
-import ChartToggle from '../common/ChartToggle';
+import Tooltip from '@/components/app/common/Tooltip';
+import Question from '@/components/app/Icons/Question';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import SwitchButton from '@/components/app/SwitchButton';
+import ChartToggle from '@/components/app/common/ChartToggle';
 
 interface Props {
   chartsData?: {

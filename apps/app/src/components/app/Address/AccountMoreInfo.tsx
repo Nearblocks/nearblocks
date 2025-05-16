@@ -1,5 +1,5 @@
 import { getRequest } from '@/utils/app/api';
-import AccountMoreInfoActions from './AccountMoreInfoActions';
+import AccountMoreInfoActions from '@/components/app/Address/AccountMoreInfoActions';
 
 export default async function AccountMoreInfo({ id, parse }: any) {
   const options: RequestInit = { next: { revalidate: 10 } };

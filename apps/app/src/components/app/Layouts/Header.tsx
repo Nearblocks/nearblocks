@@ -10,12 +10,12 @@ import { Link, routing, usePathname } from '@/i18n/routing';
 import { nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
 
-import ActiveLink from '../ActiveLink';
-import Collapse from '../Collapse';
-import Search from '../common/Search';
-import ArrowDown from '../Icons/ArrowDown';
-import Menu from '../Icons/Menu';
-import UserMenu from './UserMenu';
+import ActiveLink from '@/components/app/ActiveLink';
+import Collapse from '@/components/app/Collapse';
+import Search from '@/components/app/common/Search';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import Menu from '@/components/app/Icons/Menu';
+import UserMenu from '@/components/app/Layouts/UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
 import { getLatestStats, getSyncStatus } from '@/utils/app/actions';
 

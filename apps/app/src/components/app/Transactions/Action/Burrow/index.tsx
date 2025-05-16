@@ -1,12 +1,12 @@
 import { EventPropsInfo } from '@/utils/types';
 
-import Borrow from './Borrow';
-import DescreaseCollateral from './DecreaseCollateral';
-import Deposit from './Deposit';
-import DepositToReserve from './DopositToReserve';
-import IncreaseCollateral from './IncreaseCollateral';
-import Repay from './Repay';
-import WithdrawSucceeded from './WithdrawSucceeded';
+import Borrow from '@/components/app/Transactions/Action/Burrow/Borrow';
+import DescreaseCollateral from '@/components/app/Transactions/Action/Burrow/DecreaseCollateral';
+import Deposit from '@/components/app/Transactions/Action/Burrow/Deposit';
+import DepositToReserve from '@/components/app/Transactions/Action/Burrow/DopositToReserve';
+import IncreaseCollateral from '@/components/app/Transactions/Action/Burrow/IncreaseCollateral';
+import Repay from '@/components/app/Transactions/Action/Burrow/Repay';
+import WithdrawSucceeded from '@/components/app/Transactions/Action/Burrow/WithdrawSucceeded';
 
 interface ParsedEvent {
   data: any;

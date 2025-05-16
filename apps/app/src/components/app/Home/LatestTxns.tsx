@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import LatestTransactions from '../Transactions/Latest';
+import LatestTransactions from '@/components/app/Transactions/Latest';
 
 export default async function HomeLatestTxns() {
   const txnsDetails = await getRequest('v1/txns/latest');

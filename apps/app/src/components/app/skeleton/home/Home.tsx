@@ -2,9 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 
-import Search from '../../common/Search';
-import Latest from './Latest';
-import HomeOverview from './Overview';
+import Search from '@/components/app/common/Search';
+import Latest from '@/components/app/skeleton/home/Latest';
+import HomeOverview from '@/components/app/skeleton/home/Overview';
 import { useConfig } from '@/hooks/app/useConfig';
 
 const HomePageSkeleton = ({

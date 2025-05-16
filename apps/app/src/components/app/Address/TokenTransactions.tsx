@@ -1,6 +1,6 @@
 import { getRequest } from '@/utils/app/api';
 
-import TokenTxnsActions from './TokenTxnsActions';
+import TokenTxnsActions from '@/components/app/Address/TokenTxnsActions';
 
 const TokenTransactions = async ({ id, searchParams }: any) => {
   const options: RequestInit = {

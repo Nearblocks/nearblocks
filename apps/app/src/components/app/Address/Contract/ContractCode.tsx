@@ -5,12 +5,12 @@ import { Link } from '@/i18n/routing';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractData, VerificationData, VerifierData } from '@/utils/types';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import Tooltip from '../../common/Tooltip';
-import FaInbox from '../../Icons/FaInbox';
-import Question from '../../Icons/Question';
-import VerificationStatus from './VerificationStatus';
-import VerifiedData from './VerifiedData';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import Tooltip from '@/components/app/common/Tooltip';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Question from '@/components/app/Icons/Question';
+import VerificationStatus from '@/components/app/Address/Contract/VerificationStatus';
+import VerifiedData from '@/components/app/Address/Contract/VerifiedData';
 import { useConfig } from '@/hooks/app/useConfig';
 
 type ContractCodeProps = {

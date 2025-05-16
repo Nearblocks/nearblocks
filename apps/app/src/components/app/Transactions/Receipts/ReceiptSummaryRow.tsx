@@ -11,9 +11,9 @@ import {
   TransactionInfo,
 } from '@/utils/types';
 
-import Tooltip from '../../common/Tooltip';
-import TxnsReceiptStatus from '../../common/TxnsReceiptStatus';
-import FaLongArrowAltRight from '../../Icons/FaLongArrowAltRight';
+import Tooltip from '@/components/app/common/Tooltip';
+import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
+import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 
 interface Props {
   borderFlag?: boolean;

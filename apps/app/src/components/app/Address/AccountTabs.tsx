@@ -5,11 +5,11 @@ import Receipts from '@/components/app/Address/Receipts';
 import TokenTransactions from '@/components/app/Address/TokenTransactions';
 import Transactions from '@/components/app/Address/Transactions';
 
-import AccountTabsActions from './AccountTabsActions';
+import AccountTabsActions from '@/components/app/Address/AccountTabsActions';
 /* import MultiChainTransactions from './ChainTxns'; */
-import TableSummary from '../common/TableSummary';
-import ErrorMessage from '../common/ErrorMessage';
-import FaInbox from '../Icons/FaInbox';
+import TableSummary from '@/components/app/common/TableSummary';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
 import { ErrorBoundary } from 'react-error-boundary';
 import { getRequest } from '@/utils/app/api';
 

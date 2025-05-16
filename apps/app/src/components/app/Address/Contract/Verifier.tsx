@@ -8,11 +8,11 @@ import { useRpcStore } from '@/stores/app/rpc';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractMetadata } from '@/utils/types';
 
-import ErrorMessage from '../../common/ErrorMessage';
-import LoadingCircular from '../../common/LoadingCircular';
-import ArrowDown from '../../Icons/ArrowDown';
-import FaInbox from '../../Icons/FaInbox';
-import FaExternalLinkAlt from '../../Icons/FaExternalLinkAlt';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import LoadingCircular from '@/components/app/common/LoadingCircular';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 
 type ContractFormProps = {
   accountId: string;

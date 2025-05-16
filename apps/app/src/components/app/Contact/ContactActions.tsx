@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/accordion';
 import { Link } from '@/i18n/routing';
 
-import ArrowDown from '../Icons/ArrowDown';
-import FormContact from './FormContact';
+import ArrowDown from '@/components/app/Icons/ArrowDown';
+import FormContact from '@/components/app/Contact/FormContact';
 
 type itemProps = {
   className?: string;

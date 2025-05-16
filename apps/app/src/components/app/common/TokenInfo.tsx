@@ -7,7 +7,7 @@ import {
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import TokenImage from './TokenImage';
+import TokenImage from '@/components/app/common/TokenImage';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcStore } from '@/stores/app/rpc';
 import { isEmpty } from 'lodash';

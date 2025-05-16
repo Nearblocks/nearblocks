@@ -6,12 +6,12 @@ import { Link } from '@/i18n/routing';
 import { localFormat } from '@/utils/app/libs';
 import { currentCampaign } from '@/utils/types';
 
-import Edit from '../../Icons/Edit';
-import Plan from '../../Icons/Plan';
-import Skeleton from '../../skeleton/common/Skeleton';
-import CampaignPagination from '../CampaignPagination';
-import ConfirmModal from './ConfirmModal';
-import Tooltip from '../../common/Tooltip';
+import Edit from '@/components/app/Icons/Edit';
+import Plan from '@/components/app/Icons/Plan';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import CampaignPagination from '@/components/app/Campaign/CampaignPagination';
+import ConfirmModal from '@/components/app/Campaign/Publisher/ConfirmModal';
+import Tooltip from '@/components/app/common/Tooltip';
 
 const CampaignListing = () => {
   const [currentCampaign, setCurrentCampaign] =
