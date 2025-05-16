@@ -157,6 +157,7 @@ const Header = ({
   sync: initialSync,
   accountId,
   theme: cookieTheme,
+  locale,
 }: any) => {
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
@@ -462,14 +463,7 @@ const Header = ({
                         <>
                           <Collapse
                             trigger={({ onClick, show }) => (
-                              <ActiveLink
-                                activeClassName="text-green-500 dark:text-green-250"
-                                hasSubmenu={true}
-                                href={menu.link || ''}
-                                submenuPaths={menu.submenu.map(
-                                  (item) => item.link,
-                                )}
-                              >
+                              <div className="text-green-500 dark:text-green-250">
                                 <div
                                   className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 text-sm font-medium dark:text-neargray-10 text-nearblue-600"
                                   onClick={(e: any) => onClick(e)}
@@ -481,7 +475,7 @@ const Header = ({
                                     }`}
                                   />
                                 </div>
-                              </ActiveLink>
+                              </div>
                             )}
                           >
                             <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4">
@@ -489,11 +483,12 @@ const Header = ({
                                 <li key={submenu?.id}>
                                   <ActiveLink
                                     activeClassName="text-green-500 dark:text-green-250"
+                                    inActiveClassName="dark:text-neargray-10 text-nearblue-600"
                                     exact={true}
                                     href={submenu?.link}
                                   >
                                     <div
-                                      className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-xs dark:text-neargray-10 text-nearblue-600"
+                                      className="block w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-xs"
                                       onClick={() => setOpen(false)}
                                     >
                                       {submenu?.title
@@ -506,20 +501,12 @@ const Header = ({
                             </ul>
                           </Collapse>
                           <span className="group hidden md:flex h-full w-full relative">
-                            <ActiveLink
-                              activeClassName="text-green-500 dark:!text-green-250"
-                              hasSubmenu={true}
-                              href={menu.link || ''}
-                              submenuPaths={menu.submenu.map(
-                                (item) => item.link,
-                              )}
-                            >
+                            <div className="text-green-500 dark:!text-green-250 cursor-pointer">
                               <div className="hidden md:flex h-full items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600">
                                 {menu.fallbackText}
                                 <ArrowDown className="fill-current w-4 h-4 ml-2 transition-transform duration-200 group-hover:rotate-180" />
                               </div>
-                            </ActiveLink>
-
+                            </div>
                             <ul
                               className="bg-white dark:bg-black-600 shadow-lg absolute top-full min-w-full rounded-b-lg border-t-2 border-t-green-500 
                      transform opacity-0 -translate-y-2 invisible transition-all duration-200 ease-out
@@ -529,10 +516,11 @@ const Header = ({
                                 <li key={submenu.id}>
                                   <ActiveLink
                                     activeClassName="text-green-500 dark:text-green-250 font-medium"
+                                    inActiveClassName="dark:text-neargray-10 text-nearblue-600"
                                     exact={true}
                                     href={submenu?.link}
                                   >
-                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 dark:text-neargray-10 text-nearblue-600">
+                                    <div className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4">
                                       {submenu.fallbackText}
                                     </div>
                                   </ActiveLink>
@@ -544,10 +532,14 @@ const Header = ({
                       ) : (
                         <ActiveLink
                           activeClassName="text-green-500 dark:text-green-250"
+                          inActiveClassName="dark:text-neargray-10 text-nearblue-600"
                           exact={true}
                           href={menu.link || ''}
                         >
-                          <div className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600">
+                          <div
+                            onClick={() => setOpen(false)}
+                            className="flex items-center w-full h-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm"
+                          >
                             {t(menu.title) || menu.fallbackText}
                           </div>
                         </ActiveLink>
@@ -558,9 +550,8 @@ const Header = ({
                     <>
                       <Collapse
                         trigger={({ onClick, show }) => (
-                          <a
+                          <div
                             className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600"
-                            href="#"
                             onClick={onClick}
                           >
                             {t('header.menu.languages')}
@@ -569,14 +560,18 @@ const Header = ({
                                 show && 'transform rotate-180'
                               }`}
                             />
-                          </a>
+                          </div>
                         )}
                       >
                         <ul className="border-l-2 border-green-500 dark:border-green-250 md:!hidden ml-4 ">
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink
-                                className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-medium text-xs dark:text-neargray-10 text-nearblue-600"
+                                className={`block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-medium text-xs ${
+                                  locale === language.locale
+                                    ? 'text-green-500 dark:text-green-250'
+                                    : 'dark:text-neargray-10 text-nearblue-600'
+                                }`}
                                 href={pathname}
                                 locale={language.locale}
                               >
@@ -587,14 +582,13 @@ const Header = ({
                         </ul>
                       </Collapse>
                       <span className="group hidden md:flex h-full w-full relative">
-                        <a
+                        <div
                           className="hidden md:flex h-full items-center justify-between w-full py-2 px-4 font-medium text-sm dark:text-neargray-10 text-nearblue-600 
-  hover:text-green-500 dark:hover:text-green-250"
-                          href="#"
+  hover:text-green-500 dark:hover:text-green-250 cursor-pointer"
                         >
                           {t('header.menu.languages') || 'Languages'}
                           <ArrowDown className="fill-current w-4 h-4 ml-2 transition-transform duration-200 group-hover:rotate-180" />
-                        </a>
+                        </div>
                         <ul
                           className="bg-white dark:bg-black-600 soft-shadow absolute top-full left-0 min-w-full rounded-b-lg !border-t-2 !border-t-green-500 
   transform opacity-0 -translate-y-2 invisible transition-all duration-200 ease-out
@@ -603,7 +597,11 @@ const Header = ({
                           {languages.map((language) => (
                             <li key={language.locale}>
                               <IntlLink
-                                className="block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-normal dark:text-neargray-10 text-nearblue-600"
+                                className={`block w-full hover:text-green-500 dark:hover:text-green-250 whitespace-nowrap py-2 px-4 font-normal ${
+                                  locale === language.locale
+                                    ? 'text-green-500 dark:text-green-250'
+                                    : 'dark:text-neargray-10 text-nearblue-600'
+                                }`}
                                 href={pathname}
                                 locale={language.locale}
                               >
@@ -636,9 +634,8 @@ const Header = ({
                     <>
                       <Collapse
                         trigger={({ onClick, show }) => (
-                          <a
+                          <div
                             className="md:!hidden flex items-center justify-between w-full hover:text-green-500 dark:hover:text-green-250 py-2 px-4 hover:no-underline"
-                            href="#"
                             onClick={onClick}
                           >
                             <Image
@@ -654,7 +651,7 @@ const Header = ({
                                 show && 'transform rotate-180'
                               }`}
                             />
-                          </a>
+                          </div>
                         )}
                       >
                         <ul className="border-l-2 border-green-500 dark:text-green-250 md:hidden ml-4">
