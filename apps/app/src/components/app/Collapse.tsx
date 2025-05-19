@@ -6,7 +6,7 @@ interface CollapseProps {
     onClick,
     show,
   }: {
-    onClick: React.MouseEventHandler<HTMLAnchorElement>;
+    onClick: React.MouseEventHandler<HTMLDivElement>;
     show: boolean;
   }) => React.ReactNode;
 }
