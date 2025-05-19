@@ -1,45 +1,35 @@
-# NearBlocks - BOS Gateway for NearBlocks Component
+# NearBlocks
 
 ## Table of Contents
 
-- [Introduction](#introduction)
 - [Local Environment Setup](#local-environment-setup)
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Deployment](#deployment)
 
-## Introduction
-
-The nearblocks is a Next.js app that serves as a NEAR BOS gateway for the NearBlocks component built on BOS.
-
 ## Local Environment Setup
 
-If modifying the BOS component in local environment, please add this environment variable `.env` file:
-
-`NEXT_PUBLIC_LOADER_URL=http://127.0.0.1:3030` (BOS Loader Url default is http://127.0.0.1:3030)
+If modifying in local environment, please add this environment variable `.env` file:
 
 ## Usage
 
-To set up and start the nearblocks Gateway, follow these steps:
+To set up and start application, follow these steps:
 
-Install dependencies using yarn:
+Install required dependencies using yarn:
 
 `yarn`
 
-Start the gateway:
+Start the Development Server
 
 `yarn dev`
 
-The gateway will be accessible at http://localhost:3000. Users can access the BOS Component NearBlocks.
+Once the server is running, the application will be accessible at http://localhost:3000.
 
 ## Configuration
 
-Configure the nearblocks Gateway by modifying the .env file. Customize settings such as ;
+To adjust the application's configuration, edit the .env file and set these variables:
 
 `NEXT_PUBLIC_NETWORK_ID=mainnet`
-`NEXT_PUBLIC_ACCOUNT_ID=nearblocksonbos.near`
-`NEXT_PUBLIC_BOS_NETWORK=mainnet`
-`NEXT_PUBLIC_OG_URL=https://meta.exploreblocks.io/api`
 `NEXT_PUBLIC_MAINNET_URL=https://nearblocks.io`
 `NEXT_PUBLIC_TESTNET_URL=https://testnet.nearblocks.io`
 `AWS_ACCESS_KEY_ID=your-aws-access-key-id`
@@ -50,17 +40,13 @@ Configure the nearblocks Gateway by modifying the .env file. Customize settings 
 
 ## Deployment
 
-For deployment we use network (testnet, mainnet) by env variable ;
+The target network for deployment (testnet or mainnet) is configured using environment variables:
 
-`NEXT_PUBLIC_NETWORK_ID`: Set the variable to the desired network for nearblocks gateway. This defines whether to redirect to mainnet or testnet URLs
-
-`NEXT_PUBLIC_BOS_NETWORK`: Set this variable to the network the BOS component is hosted on
-
-`NEXT_PUBLIC_ACCOUNT_ID`: Set this variable as account id the BOS component is created by
+`NEXT_PUBLIC_NETWORK_ID`: Set this variable to either mainnet or testnet to determine which network endpoints the application will use.
 
 There are two included docker-compose files which can be started with:
 
 ```
-docker compose -f docker-compose.mainnet.yml up -d --build
-docker compose -f docker-compose.testnet.yml up -d --build
+docker compose -f mainnet-app.yml up -d --build
+docker compose -f testnet-app.yml up -d --build
 ```
