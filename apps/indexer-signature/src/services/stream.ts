@@ -20,9 +20,10 @@ const s3Config = {
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight;
+  let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
 
   if (!startBlockHeight && latestBlock) {
+    logger.info(`last synced block: ${latestBlock}`);
     startBlockHeight = +latestBlock;
   }
 

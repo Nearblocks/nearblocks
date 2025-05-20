@@ -1,12 +1,6 @@
 import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-blocks';
 import { Knex } from 'nb-knex';
-import {
-  EventCause,
-  EventStandard,
-  EventStatus,
-  EventType,
-  FTEvent,
-} from 'nb-types';
+import { EventCause, EventStandard, EventType, FTEvent } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import {
@@ -16,7 +10,7 @@ import {
   isFunctionCallAction,
 } from '#libs/guards';
 import { decodeArgs, isExecutionSuccess } from '#libs/utils';
-import { EVENT_PATTERN, extractEvents, setEventIndex } from '#services/events';
+import { EVENT_PATTERN, extractEvents, updateFTEvents } from '#services/events';
 import {
   EventDataEvent,
   FTContractMatchAction,
@@ -39,19 +33,19 @@ export const storeFTEvents = async (
           const deltaAmount = BigInt(eventItem.amount);
 
           eventData.push({
-            absolute_amount: null,
             affected_account_id: eventItem.owner_id,
             block_height: blockHeader.height,
             block_timestamp: blockHeader.timestampNanosec,
             cause: EventCause.MINT,
             contract_account_id: data.contractId,
             delta_amount: String(deltaAmount),
-            event_index: '0',
+            event_index: 0, // will be set later
             event_memo: eventItem.memo ?? null,
+            event_type: 0, // will be set later
             involved_account_id: null,
             receipt_id: data.receiptId,
-            standard: '',
-            status: EventStatus.SUCCESS,
+            shard_id: 0, // will be set later
+            standard: '', // will be set later
           });
         }
       }
@@ -63,19 +57,19 @@ export const storeFTEvents = async (
           const deltaAmount = BigInt(eventItem.amount) * -1n;
 
           eventData.push({
-            absolute_amount: null,
             affected_account_id: eventItem.owner_id,
             block_height: blockHeader.height,
             block_timestamp: blockHeader.timestampNanosec,
             cause: EventCause.BURN,
             contract_account_id: data.contractId,
             delta_amount: String(deltaAmount),
-            event_index: '0',
+            event_index: 0, // will be set later
             event_memo: eventItem.memo ?? null,
+            event_type: 0, // will be set later
             involved_account_id: null,
             receipt_id: data.receiptId,
-            standard: '',
-            status: EventStatus.SUCCESS,
+            shard_id: 0, // will be set later
+            standard: '', // will be set later
           });
         }
       }
@@ -92,34 +86,34 @@ export const storeFTEvents = async (
           const negativeDeltaAmount = deltaAmount * -1n;
 
           eventData.push({
-            absolute_amount: null,
             affected_account_id: eventItem.old_owner_id,
             block_height: blockHeader.height,
             block_timestamp: blockHeader.timestampNanosec,
             cause: EventCause.TRANSFER,
             contract_account_id: data.contractId,
             delta_amount: String(negativeDeltaAmount),
-            event_index: '0',
+            event_index: 0, // will be set later
             event_memo: eventItem.memo ?? null,
+            event_type: 1, // will be set later
             involved_account_id: eventItem.new_owner_id,
             receipt_id: data.receiptId,
-            standard: '',
-            status: EventStatus.SUCCESS,
+            shard_id: 1, // will be set later
+            standard: '', // will be set later
           });
           eventData.push({
-            absolute_amount: null,
             affected_account_id: eventItem.new_owner_id,
             block_height: blockHeader.height,
             block_timestamp: blockHeader.timestampNanosec,
             cause: EventCause.TRANSFER,
             contract_account_id: data.contractId,
             delta_amount: String(deltaAmount),
-            event_index: '0',
+            event_index: 0, // will be set later
             event_memo: eventItem.memo ?? null,
+            event_type: 0, // will be set later
             involved_account_id: eventItem.old_owner_id,
             receipt_id: data.receiptId,
-            standard: '',
-            status: EventStatus.SUCCESS,
+            shard_id: 0, // will be set later
+            standard: '', // will be set later
           });
         }
       }
@@ -127,9 +121,8 @@ export const storeFTEvents = async (
   }
 
   if (eventData.length) {
-    eventData = setEventIndex(
+    eventData = updateFTEvents(
       shardId,
-      blockHeader.timestampNanosec,
       EventType.NEP141,
       EventStandard.FT,
       eventData,
@@ -164,19 +157,19 @@ export const getLegacyEvents = (
 
           for (const eventItem of eventItems) {
             eventData.push({
-              absolute_amount: null,
               affected_account_id: eventItem.affected,
               block_height: blockHeader.height,
               block_timestamp: blockHeader.timestampNanosec,
               cause: eventItem.cause,
               contract_account_id: contractId,
               delta_amount: eventItem.amount,
-              event_index: '0',
+              event_index: 0, // will be set later
               event_memo: eventItem.memo,
+              event_type: 0, // will be set later
               involved_account_id: eventItem.involved,
               receipt_id: receiptId,
-              standard: '',
-              status: EventStatus.SUCCESS,
+              shard_id: 0, // will be set later
+              standard: '', // will be set later
             });
           }
         }
@@ -189,7 +182,10 @@ export const getLegacyEvents = (
 
 export const saveFTData = async (knex: Knex, data: FTEvent[]) => {
   await retry(async () => {
-    await knex('ft_events').insert(data).onConflict(['event_index']).ignore();
+    await knex('ft_events')
+      .insert(data)
+      .onConflict(['block_timestamp', 'shard_id', 'event_type', 'event_index'])
+      .ignore();
   });
 };
 

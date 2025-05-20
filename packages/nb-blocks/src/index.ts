@@ -50,7 +50,7 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
     async () => {
       const blocks = await knex('blocks')
         .select('block_height')
-        .where('block_height', '>=', start)
+        .where('block_height', '>', start)
         .orderBy('block_height')
         .limit(limit);
 

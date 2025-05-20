@@ -13,8 +13,7 @@
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./",
-    "migrate": "NODE_ENV=production knex migrate:latest"
+    "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
     "@sentry/node": "7.120.0",

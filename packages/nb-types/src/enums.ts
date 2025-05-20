@@ -75,12 +75,6 @@ export enum StateChangeCause {
   ValidatorsReward = 'VALIDATORS_REWARD',
 }
 
-export enum EventStatus {
-  FAILURE = 'FAILURE',
-  SUCCESS = 'SUCCESS',
-  UNKNOWN = 'UNKNOWN',
-}
-
 export enum EventCause {
   BURN = 'BURN',
   MINT = 'MINT',
@@ -118,18 +112,17 @@ export enum NFTLogKind {
 // Used for creating DB event index
 export enum EventType {
   NEP141 = 1,
-  NEP171 = 2,
-  WRAP_NEAR = 3,
-  TKN_NEAR = 4,
-  FACTORY_BRIDGE_NEAR = 5,
-  AURORA = 6,
-  TOKEN_A11BD_NEAR = 7,
-  TOKEN_SKYWARD_NEAR = 8,
-  META_POOL_NEAR = 9,
-  META_TOKEN_NEAR = 10,
-  TOKEN_BURROW_NEAR = 11,
-  TOKEN_REF_FINANCE_NEAR = 12,
-  TOKEN_V2_REF_FINANCE_NEAR = 13,
-  L2E_NEAR = 14,
-  FUSOTAO_TOKEN = 15,
+  WRAP_NEAR = 2,
+  TKN_NEAR = 3,
+  FACTORY_BRIDGE_NEAR = 4,
+  AURORA = 5,
+  TOKEN_A11BD_NEAR = 6,
+  TOKEN_SKYWARD_NEAR = 7,
+  META_POOL_NEAR = 8,
+  META_TOKEN_NEAR = 9,
+  TOKEN_BURROW_NEAR = 10,
+  TOKEN_REF_FINANCE_NEAR = 11,
+  TOKEN_V2_REF_FINANCE_NEAR = 12,
+  L2E_NEAR = 13,
+  FUSOTAO_TOKEN = 14,
 }

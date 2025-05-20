@@ -5,7 +5,6 @@ import {
   ActionKind,
   DexEventType,
   EventCause,
-  EventStatus,
   ExecutionOutcomeStatus,
   ReceiptKind,
   StateChangeCause,
@@ -205,19 +204,19 @@ export type ExecutionOutcome = {
 };
 
 export type FTEvent = {
-  absolute_amount: null | string;
   affected_account_id: string;
   block_height: number;
   block_timestamp: string;
   cause: EventCause;
   contract_account_id: string;
   delta_amount: string;
-  event_index: string;
+  event_index: number;
   event_memo: null | string;
+  event_type: number;
   involved_account_id: null | string;
   receipt_id: string;
+  shard_id: number;
   standard: string;
-  status: EventStatus;
 };
 
 export type FTMeta = {
@@ -286,12 +285,12 @@ export type NFTEvent = {
   cause: EventCause;
   contract_account_id: string;
   delta_amount: number;
-  event_index: string;
+  event_index: number;
   event_memo: null | string;
   involved_account_id: null | string;
   receipt_id: string;
+  shard_id: number;
   standard: string;
-  status: EventStatus;
   token_id: string;
 };
 

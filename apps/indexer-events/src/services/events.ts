@@ -88,36 +88,35 @@ export const extractEvents = (outcome: ExecutionOutcomeWithReceipt) => {
   return events;
 };
 
-export function setEventIndex(
+export function updateFTEvents(
   shardId: number,
-  blockTimestamp: string,
   eventType: EventType,
   eventStandard: EventStandard,
   events: FTEvent[],
-): FTEvent[];
-export function setEventIndex(
-  shardId: number,
-  blockTimestamp: string,
-  eventType: EventType,
-  eventStandard: EventStandard,
-  events: NFTEvent[],
-): NFTEvent[];
-export function setEventIndex(
-  shardId: number,
-  blockTimestamp: string,
-  eventType: EventType,
-  eventStandard: EventStandard,
-  events: FTEvent[] | NFTEvent[],
-): FTEvent[] | NFTEvent[] {
+): FTEvent[] {
   const dataLength = events.length;
-  const startIndex =
-    BigInt(blockTimestamp) * 100_000_000n * 100_000_000n +
-    BigInt(shardId) * 10_000_000n +
-    BigInt(eventType) * 1_000_000n;
 
   for (let index = 0; index < dataLength; index++) {
+    events[index].shard_id = shardId;
+    events[index].event_type = eventType;
+    events[index].event_index = index;
     events[index].standard = eventStandard;
-    events[index].event_index = String(startIndex + BigInt(index));
+  }
+
+  return events;
+}
+
+export function updateNFTEvents(
+  shardId: number,
+  eventStandard: EventStandard,
+  events: NFTEvent[],
+): NFTEvent[] {
+  const dataLength = events.length;
+
+  for (let index = 0; index < dataLength; index++) {
+    events[index].shard_id = shardId;
+    events[index].event_index = index;
+    events[index].standard = eventStandard;
   }
 
   return events;

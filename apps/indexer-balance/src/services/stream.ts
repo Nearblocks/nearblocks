@@ -23,7 +23,7 @@ const s3Config = {
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight;
+  let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
 
   if (!startBlockHeight && latestBlock) {
     logger.info(`last synced block: ${latestBlock}`);
@@ -38,7 +38,7 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 100,
+    limit: 100, // Temp batch processing
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlock,

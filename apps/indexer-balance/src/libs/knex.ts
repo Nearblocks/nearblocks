@@ -25,23 +25,28 @@ const dbConfig = {
   pool: { max: 10, min: 1 },
 };
 
-export const baseConfig = {
+const migrationConfig = {
   ...dbConfig,
   connection: {
     ...dbConfig.connection,
-    application_name: 'indexer-balance-base',
-    connectionString: config.dbUrlBase,
+    application_name: 'indexer-balance-migration',
   },
+  migrations: {
+    directory: './apps/indexer-balance/migrations',
+    tableName: 'knex_migrations',
+  },
+  pool: { max: 1, min: 0 },
 };
 
 export const streamConfig = {
-  ...baseConfig,
+  ...dbConfig,
   connection: {
-    ...baseConfig.connection,
+    ...dbConfig.connection,
     application_name: 'indexer-balance-stream',
+    connectionString: config.dbUrlBase,
   },
 };
 
 export const db: Knex = createKnex(dbConfig);
 
-export const dbBase: Knex = createKnex(baseConfig);
+export const dbMigration: Knex = createKnex(migrationConfig);
