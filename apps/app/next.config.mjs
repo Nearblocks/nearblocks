@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs';
 import path from 'path';
 import createNextIntlPlugin from 'next-intl/plugin';
 
@@ -51,4 +52,13 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withSentryConfig(withNextIntl(nextConfig), {
+  project: 'javascript-nextjs',
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+  disableLogger: true,
+  hideSourceMaps: true,
+});
