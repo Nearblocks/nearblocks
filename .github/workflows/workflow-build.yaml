@@ -40,7 +40,7 @@ jobs:
 
       - name: Determine image tag
         run: |
-          if [ "${{ matrix.service }}" = "indexer-balance" ]; then
+          if [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ]; then
             echo "TAG=:v2" >> $GITHUB_ENV
           else
             echo "TAG=:latest" >> $GITHUB_ENV

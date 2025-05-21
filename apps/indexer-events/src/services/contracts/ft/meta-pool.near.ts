@@ -1,7 +1,7 @@
 // Only implemented token transfers
 import { EventStandard, EventType, FTEvent } from 'nb-types';
 
-import { setEventIndex } from '#services/events';
+import { updateFTEvents } from '#services/events';
 import {
   ftResolveTransfer,
   ftTransfer,
@@ -28,13 +28,7 @@ const contract: EventContract = async ({
   }
 
   if (events.length) {
-    events = setEventIndex(
-      shardId,
-      blockHeader.timestampNanosec,
-      EVENT_TYPE,
-      EVENT_STANDARD,
-      events,
-    );
+    events = updateFTEvents(shardId, EVENT_TYPE, EVENT_STANDARD, events);
 
     await saveFTData(knex, events);
   }

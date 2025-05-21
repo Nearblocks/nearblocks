@@ -1,18 +1,15 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { db, dbBase } from '#libs/knex';
+import { db, dbBase, dbMigration } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { migrationCheck } from '#libs/utils';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
-    logger.info(
-      { network: config.network },
-      'initializing signature indexer...',
-    );
-    await migrationCheck();
+    logger.info({ network: config.network }, 'initializing indexer...');
+    await dbMigration.migrate.latest();
+    await dbMigration.destroy();
     await syncData();
   } catch (error) {
     logger.error('aborting...');

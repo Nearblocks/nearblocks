@@ -14,7 +14,7 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const writeConfig = {
+const dbConfig = {
   client: 'pg',
   connection: {
     application_name: 'indexer-events',
@@ -25,23 +25,28 @@ const writeConfig = {
   pool: { max: 10, min: 1 },
 };
 
-const readConfig = {
-  ...writeConfig,
+const migrationConfig = {
+  ...dbConfig,
   connection: {
-    ...writeConfig.connection,
-    application_name: 'indexer-events-read',
-    connectionString: config.dbUrlRead || config.dbUrl,
+    ...dbConfig.connection,
+    application_name: 'indexer-events-migration',
   },
+  migrations: {
+    directory: './apps/indexer-events/migrations',
+    tableName: 'knex_migrations',
+  },
+  pool: { max: 1, min: 0 },
 };
 
 export const streamConfig = {
-  ...readConfig,
+  ...dbConfig,
   connection: {
-    ...readConfig.connection,
+    ...dbConfig.connection,
     application_name: 'indexer-events-stream',
+    connectionString: config.dbUrlBase,
   },
 };
 
-export const dbWrite: Knex = createKnex(writeConfig);
+export const db: Knex = createKnex(dbConfig);
 
-export const dbRead: Knex = createKnex(readConfig);
+export const dbMigration: Knex = createKnex(migrationConfig);

@@ -28,39 +28,15 @@ SELECT
 SELECT
   set_integer_now_func ('balance_events', 'epoch_nano_seconds');
 
-CREATE MATERIALIZED VIEW account_near_stats
-WITH
-  (timescaledb.continuous) AS
-SELECT
-  affected_account_id AS account,
-  TIME_BUCKET (86400000000000, block_timestamp) AS date,
-  LAST (nonstaked_amount, block_timestamp) AS amount,
-  LAST (staked_amount, block_timestamp) AS amount_staked,
-  LAST (storage_usage, block_timestamp) AS storage_usage
-FROM
-  balance_events
-GROUP BY
-  account,
-  date
-ORDER BY
-  account,
-  date
-WITH
-  NO DATA;
-
-SELECT
-  add_continuous_aggregate_policy (
-    'account_near_stats',
-    start_offset => NULL,
-    end_offset => BIGINT '86400000000000', -- 1d in ns
-    schedule_interval => INTERVAL '1 day'
-  );
-
 CREATE UNIQUE INDEX be_shard_index_uidx ON balance_events (
   block_timestamp DESC,
   shard_id DESC,
   index_in_chunk DESC
 );
+
+CREATE INDEX be_block_timestamp_brin_idx ON balance_events USING BRIN (block_timestamp)
+WITH
+  (pages_per_range = 32);
 
 CREATE INDEX be_account_timestamp_shard_index_idx ON balance_events (
   affected_account_id,
@@ -71,6 +47,34 @@ CREATE INDEX be_account_timestamp_shard_index_idx ON balance_events (
 
 CREATE INDEX be_account_timestamp_idx ON balance_events (affected_account_id, block_timestamp);
 
+CREATE MATERIALIZED VIEW account_near_stats
+WITH
+  (timescaledb.continuous) AS
+SELECT
+  TIME_BUCKET (86400000000000, block_timestamp) AS date, -- 1d in ns
+  affected_account_id AS account,
+  LAST (nonstaked_amount, block_timestamp) AS amount,
+  LAST (staked_amount, block_timestamp) AS amount_staked,
+  LAST (storage_usage, block_timestamp) AS storage_usage
+FROM
+  balance_events
+GROUP BY
+  date,
+  account
+ORDER BY
+  date,
+  account
+WITH
+  NO DATA;
+
+SELECT
+  add_continuous_aggregate_policy (
+    'account_near_stats',
+    start_offset => NULL,
+    end_offset => BIGINT '3600000000000', -- 1h in ns
+    schedule_interval => INTERVAL '1 hour'
+  );
+
 CREATE TABLE account_balances (
   storage_usage BIGINT NOT NULL,
   amount NUMERIC(40) NOT NULL,
@@ -78,6 +82,10 @@ CREATE TABLE account_balances (
   account TEXT NOT NULL,
   PRIMARY KEY (account)
 );
+
+ALTER TABLE account_balances
+SET
+  (fillfactor = 90);
 
 CREATE
 OR REPLACE FUNCTION update_account_balances () RETURNS TRIGGER AS $$

@@ -2,7 +2,7 @@ import * as borsh from 'borsh';
 
 import { EventCause, EventStandard, EventType, FTEvent } from 'nb-types';
 
-import { EVENT_PATTERN, setEventIndex } from '#services/events';
+import { EVENT_PATTERN, updateFTEvents } from '#services/events';
 import { ftTransfer, getLegacyEvents, saveFTData } from '#services/ft';
 import {
   EventContract,
@@ -41,13 +41,7 @@ const contract: EventContract = async ({
   }
 
   if (events.length) {
-    events = setEventIndex(
-      shardId,
-      blockHeader.timestampNanosec,
-      EVENT_TYPE,
-      EVENT_STANDARD,
-      events,
-    );
+    events = updateFTEvents(shardId, EVENT_TYPE, EVENT_STANDARD, events);
 
     await saveFTData(knex, events);
   }
