@@ -45,6 +45,7 @@ export const RpcProviders =
       ];
 
 type response = {
+  final_execution_status: string;
   receipt_id: string;
   parent_transaction_hash: string;
   transaction: {
@@ -110,7 +111,9 @@ export const rpcSearch = async (
   }
 
   if (txn) {
-    data.txns = [{ transaction_hash: txn?.transaction?.hash }];
+    if (txn?.final_execution_status !== 'NONE') {
+      data.txns = [{ transaction_hash: txn?.transaction?.hash }];
+    }
   }
 
   if (receipt) {
