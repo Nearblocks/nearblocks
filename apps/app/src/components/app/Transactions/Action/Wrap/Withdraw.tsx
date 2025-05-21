@@ -29,10 +29,13 @@ const Withdraw = (props: EventPropsInfo) => {
         />
       )}
       <span className="font-bold px-1">Burn </span>
-      <TokenInfo amount={log[1]} contract={props.event.contract} />
+      <TokenInfo
+        amount={log[1]}
+        contract={props.event.contract}
+        metaInfo={props?.tokenMetadata}
+      />
     </div>
   );
 };
 
 export default Withdraw;
-2;

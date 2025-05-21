@@ -817,6 +817,7 @@ const Details = (props: Props) => {
                               event={event}
                               allActionLog={allActions}
                               isInteracted
+                              tokenMetadata={tokenMetadata}
                             />
                           ),
                         )}

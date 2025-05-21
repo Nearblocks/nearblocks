@@ -281,6 +281,14 @@ const TxnsTabActions = ({
     return containsDelegateOrFunctionCall;
   }, [rpcTxn]);
 
+  const apiContract =
+    Array.isArray(apiTxnActionsData?.apiActions) &&
+    apiTxnActionsData?.apiActions.some(
+      (action: any) =>
+        action?.action_kind === 'FUNCTION_CALL' ||
+        action?.action_kind === 'DELEGATE',
+    );
+
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
@@ -330,7 +338,7 @@ const TxnsTabActions = ({
                 {tab === 'overview' && (
                   <Details
                     hash={hash}
-                    isContract={contract}
+                    isContract={apiContract || contract}
                     loading={false}
                     price={price ? String(price) : ''}
                     rpcTxn={rpcTxn}
