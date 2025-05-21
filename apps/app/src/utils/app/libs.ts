@@ -574,10 +574,14 @@ export function isValidJson(value: string): boolean {
 }
 
 export function convertTimestampToTimes(nanoTimestamp: string) {
-  const milliTimestamp = nanoToMilli(nanoTimestamp);
-  const utcTime = dayjs
-    .utc(milliTimestamp)
-    .format('MMMM D, YYYY HH:mm:ss +UTC');
-  const localTime = dayjs(milliTimestamp).format('MMMM D, YYYY HH:mm:ss');
-  return { utcTime, localTime };
+  if (!nanoTimestamp) {
+    return {};
+  } else {
+    const milliTimestamp = nanoToMilli(nanoTimestamp);
+    const utcTime = dayjs
+      .utc(milliTimestamp)
+      .format('MMMM D, YYYY HH:mm:ss +UTC');
+    const localTime = dayjs(milliTimestamp).format('MMMM D, YYYY HH:mm:ss');
+    return { utcTime, localTime };
+  }
 }

@@ -97,10 +97,8 @@ const Details = (props: Props) => {
   const { networkId } = useConfig();
 
   const t = useTranslations();
-  const actionColumnRef = useRef<HTMLDivElement>(null);
   const actionRef = useRef<HTMLDivElement>(null);
-  const [isScrollable, setIsScrollable] = useState(false);
-  const [isActionScrollable, setIsActionScrollable] = useState(false);
+  const [isActionScroll, setIsActionScroll] = useState(false);
 
   const {
     logs: apiLogs,
@@ -268,7 +266,7 @@ const Details = (props: Props) => {
   };
 
   const hasScrolledToken =
-    Number(fts?.length || 0) + Number(nfts?.length || 0) > 4;
+    Number(fts?.length || 0) + Number(nfts?.length || 0) > 5;
 
   const filteredLogs = actionLogs?.filter((item) => {
     try {
@@ -397,18 +395,15 @@ const Details = (props: Props) => {
     : rpcTokenIdsCount;
 
   useEffect(() => {
-    if (actionColumnRef?.current) {
-      const height = actionColumnRef?.current?.offsetHeight;
-      setIsScrollable(height >= 160);
-    }
-  }, [filteredLogs, actions]);
-
-  useEffect(() => {
     if (actionRef?.current) {
       const height = actionRef?.current?.offsetHeight;
-      setIsActionScrollable(height >= 180);
+      setIsActionScroll(height >= 180);
     }
   }, [updatedMainTxnsActions]);
+
+  const isActionScrollable =
+    Number(updatedMainTxnsActions?.length) > 6 || isActionScroll;
+  const isScrollable = Number(actions?.length) > 5;
 
   return (
     <>
@@ -641,14 +636,12 @@ const Details = (props: Props) => {
                     className="w-full md:w-3/4 align-middle"
                   >
                     <div
-                      className={`${
-                        isActionScrollable && 'mostly-customized-scrollbar'
+                      ref={actionRef}
+                      className={`max-h-[194px] ${
+                        isActionScrollable ? 'mostly-customized-scrollbar' : ''
                       }`}
                     >
-                      <div
-                        ref={actionRef}
-                        className="max-h-[194px] break-words space-y-2 align-middle"
-                      >
+                      <div className="break-words space-y-2 align-middle">
                         {updatedMainTxnsActions &&
                           updatedMainTxnsActions?.[0]?.logs?.map(
                             (event: TransactionLog, i: number) => (
@@ -720,7 +713,7 @@ const Details = (props: Props) => {
                 </div>
                 <div className="w-full md:w-3/4 lg:h-[90px] h-[100px] break-all overflow-auto ">
                   <DynamicAd
-                    className="lg:!max-w-[720px] !max-w-[300px] rounded-lg"
+                    className="lg:!max-w-[720px] !max-w-[300px] h-full rounded-lg"
                     breakpoint={1024}
                     desktopUnitId="IbT2RAk1Cdc36JPkKEfCJQ=="
                     mobileUnitId="uLZF93wBs/ew1TZnm64OxQ=="
@@ -807,7 +800,6 @@ const Details = (props: Props) => {
                     >
                       <div
                         id="action-column"
-                        ref={actionColumnRef}
                         className="max-h-[160px] break-words space-y-1 text-xs"
                       >
                         {filteredLogs?.map(
@@ -826,7 +818,7 @@ const Details = (props: Props) => {
                       </div>
                     </div>
                     {isScrollable && (
-                      <div className="flex text-xs text-nearblue-600 dark:text-neargray-10 mt-1">
+                      <div className="flex text-xs pt-2 text-nearblue-600 dark:text-neargray-10 mt-1">
                         <ArrowDownDouble className="w-4 h-4 dark:invert" />
                         Scroll for more
                       </div>
@@ -857,7 +849,7 @@ const Details = (props: Props) => {
               ) : (
                 <div className="relative w-full md:w-3/4">
                   <div className="mostly-customized-scrollbar">
-                    <div className="max-h-[160px] break-words space-y-3">
+                    <div className="max-h-[180px] break-words space-y-3">
                       {fts &&
                         fts?.map((ft: any, i: number) => (
                           <div
