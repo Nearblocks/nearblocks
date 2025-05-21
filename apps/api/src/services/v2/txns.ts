@@ -60,13 +60,11 @@ const txn = catchAsync(async (req: RequestValidator<Txn>, res: Response) => {
         SELECT
           JSONB_BUILD_OBJECT(
             'status',
-            BOOL_AND(
-              CASE
-                WHEN status = 'SUCCESS_RECEIPT_ID'
-                OR status = 'SUCCESS_VALUE' THEN TRUE
-                ELSE FALSE
-              END
-            )
+            (status IN ('SUCCESS_RECEIPT_ID', 'SUCCESS_VALUE')),
+            'logs',
+            jsonb_to_text (logs),
+            'result',
+            jsonb_to_text (result)
           )
         FROM
           execution_outcomes
@@ -132,7 +130,8 @@ const txn = catchAsync(async (req: RequestValidator<Txn>, res: Response) => {
                     OR status = 'SUCCESS_VALUE' THEN TRUE
                     ELSE FALSE
                   END AS status,
-                  logs
+                  logs,
+                  result
                 FROM
                   execution_outcomes
                 WHERE

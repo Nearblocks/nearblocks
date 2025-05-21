@@ -1,12 +1,9 @@
 import { Response } from 'express';
-import {
-  AccessKeyInfoView,
-  QueryResponseKind,
-} from 'near-api-js/lib/providers/provider.js';
+import { QueryResponseKind } from 'near-api-js/lib/providers/provider.js';
 import parser from 'near-contract-parser';
 
 import catchAsync from '#libs/async';
-import { getProvider, viewAccessKeys, viewCode } from '#libs/near';
+import { getProvider, viewCode } from '#libs/near';
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
 import {
@@ -115,21 +112,24 @@ const contract = catchAsync(
         },
         EXPIRY * 5, // 5 mins
       ),
-      redis.cache(
-        `contract:${account}:keys`,
-        async () => viewAccessKeys(provider, account),
-        EXPIRY * 5, // 5 mins
-      ),
+      sql`
+        SELECT
+          COALESCE(
+            NOT BOOL_OR(permission_kind = 'FULL_ACCESS'),
+            TRUE
+          ) AS locked
+        FROM
+          access_keys
+        WHERE
+          account_id = ${account}
+      `,
     ]);
 
-    const keys = key.keys || [];
-    const locked = keys.every((key: AccessKeyInfoView) => {
-      key.access_key.permission !== 'FullAccess';
-    });
+    if (!contract) return res.status(200).json({ contract: [] });
 
     return res
       .status(200)
-      .json({ contract: [{ ...contract, keys: keys, locked }] });
+      .json({ contract: [{ ...contract, locked: key?.[0]?.locked }] });
   },
 );
 
