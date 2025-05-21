@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import '@/styles/globals.css';
 import '../../public/common.css';
+import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
 
 export const Content = ({ reset }: any) => {
   return (
@@ -39,6 +41,9 @@ export default function GlobalError({
   reset: () => void;
 }) {
   console.log(error);
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
 
   return (
     <html>
