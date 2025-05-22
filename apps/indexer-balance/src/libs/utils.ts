@@ -1,6 +1,5 @@
 import { ExecutionStatus } from 'nb-blocks';
-import { logger } from 'nb-logger';
-import { sleep } from 'nb-utils';
+import { retry, sleep } from 'nb-utils';
 
 import { db } from '#libs/knex';
 
@@ -12,30 +11,27 @@ export const isExecutionSuccess = (status: ExecutionStatus) => {
   return false;
 };
 
-export const migrationCheck = async (): Promise<void> => {
+export const monitorProgress = async (): Promise<void> => {
+  let lastBlock: number | undefined;
+
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const exists = await db
-      .select(
-        db.raw(
-          `
-            EXISTS (
-              SELECT
-                1
-              FROM
-                information_schema.tables
-              WHERE
-                table_schema = 'public'
-                AND table_name = 'balance_events'
-            ) AS exists
-          `,
-        ),
-      )
-      .first();
+    const event = await retry(async () => {
+      return db('balance_events')
+        .select('block_height')
+        .orderBy('block_timestamp', 'desc')
+        .first();
+    });
+    const currentBlock = event?.block_height;
 
-    if (exists?.exists) return;
+    if (lastBlock && currentBlock && lastBlock === currentBlock) {
+      throw new Error('indexing stalled...');
+    }
 
-    logger.warn(`waiting for migration, checking again in 60s.`);
+    if (currentBlock) {
+      lastBlock = currentBlock;
+    }
+
     await sleep(60_000); // 60s
   }
 };
