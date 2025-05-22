@@ -5,19 +5,20 @@ import { useParams, useSearchParams } from 'next/navigation';
 
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
+import { use } from 'react';
 
 export default function TabSkeletion({
-  parse,
+  parsePromise,
 }: {
   error?: boolean;
   reset?: any;
-  parse: any;
+  parsePromise: Promise<any>;
 }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const params = useParams<{ id: string }>();
   const tab = searchParams?.get('tab') || 'txns';
-
+  const parse = use(parsePromise);
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
     { label: 'Receipts', message: 'Receipts', name: 'receipts' },

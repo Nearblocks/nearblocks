@@ -35,8 +35,7 @@ export const getRequest = async (
         signal: controller.signal,
         ...options,
       };
-
-      const response = await fetch(url, mergedOptions);
+      const response = await fetch(url, useBase ? mergedOptions : {});
       clearTimeout(timeoutId);
 
       if (response.status !== 200) {
@@ -53,13 +52,15 @@ export const getRequest = async (
 
       console.error(`Error on attempt ${attempt + 1} - ${url}:`, error);
 
-      const delay = Math.pow(2, attempt) * 1000;
+      const delay = Math.pow(2, attempt) * 300;
       await new Promise((resolve) => setTimeout(resolve, delay));
-      return {
-        message: 'Error',
-        status: 500,
-        error,
-      };
+      if (attempt === MAX_RETRIES - 1) {
+        return {
+          message: 'Error',
+          status: 500,
+          error,
+        };
+      }
     }
   }
 };

@@ -26,7 +26,7 @@ export default async function AccountTabs({
   };
 
   const parse =
-    (await getRequest(`v1/account/${id}/contract/parse`, {}, options)) || {};
+    getRequest(`v1/account/${id}/contract/parse`, {}, options) || {};
 
   const fallbackError = (
     <>
@@ -51,7 +51,7 @@ export default async function AccountTabs({
   );
 
   return (
-    <AccountTabsActions parse={parse}>
+    <AccountTabsActions parsePromise={parse}>
       {tab === 'txns' ? (
         <ErrorBoundary fallback={fallbackError}>
           <Transactions id={id} searchParams={searchParams} />

@@ -13,7 +13,6 @@ import { useRpcStore } from '@/stores/app/rpc';
 interface Props {
   data: { deployments: DeploymentsInfo[] };
   id: string;
-  isLocked: boolean;
 }
 
 const Info = (props: Props) => {

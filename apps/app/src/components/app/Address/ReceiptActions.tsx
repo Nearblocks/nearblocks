@@ -7,7 +7,7 @@ import {
   useSearchParams,
 } from 'next/navigation';
 import QueryString from 'qs';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 
 import {
   PopoverContent,
@@ -35,13 +35,20 @@ import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 
 interface TxnsProps {
-  count: string;
-  cursor: string;
-  error: boolean;
-  txns: TransactionInfo[];
+  dataPromise: Promise<any>;
+  countPromise: Promise<any>;
 }
 
-const ReceiptActions = ({ count, cursor, error, txns }: TxnsProps) => {
+const ReceiptActions = ({ dataPromise, countPromise }: TxnsProps) => {
+  const data = use(dataPromise);
+  const countData = use(countPromise);
+  if (data?.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+  const count = countData?.txns?.[0]?.count;
+  const cursor = data?.cursor;
+  const error = !data || data === null;
+  const txns: TransactionInfo[] = data?.txns;
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ id: string }>();
