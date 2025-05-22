@@ -29,14 +29,14 @@ const retryConfig: S3ClientConfig = {
   },
   maxAttempts: 1,
   requestHandler: new NodeHttpHandler({
-    connectionTimeout: 5000,
+    connectionTimeout: 5_000,
     logger: {
       debug: () => {},
       error: console.error,
       info: () => {},
       warn: console.warn,
     },
-    requestTimeout: 10000,
+    requestTimeout: 10_000,
   }),
 };
 
@@ -60,23 +60,22 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
   );
 };
 
-const fetchJson = (s3: S3Client, bucket: string, block: number) => {
-  return retry(
-    async () => {
-      const response = await s3.send(
-        new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` }),
-      );
+const fetchJson = async (s3: S3Client, bucket: string, block: number) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10_000);
 
-      const chunks: Buffer[] = [];
+  try {
+    const response = await s3.send(
+      new GetObjectCommand({ Bucket: bucket, Key: `${block}.json` }),
+      { abortSignal: controller.signal },
+    );
 
-      for await (const chunk of response.Body as Readable) {
-        chunks.push(chunk);
-      }
+    if (!response.Body) throw Error(`empty response: block: ${block}`);
 
-      return Buffer.concat(chunks).toString('utf8');
-    },
-    { exponential: true, logger: retryLogger, retries },
-  );
+    return await response.Body.transformToString('utf8');
+  } finally {
+    clearTimeout(timer);
+  }
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
@@ -84,8 +83,12 @@ export const streamBlock = (config: BlockStreamConfig) => {
   const s3 = new S3Client({ ...config.s3Config, ...retryConfig });
   let start = config.start;
   let isFetching = false;
-  const limit = config.limit ?? 20;
-  const highWaterMark = limit * 10;
+  const limit = config.limit ?? 10;
+  const highWaterMark = limit * 100;
+
+  knex.on('error', (error) => {
+    throw error;
+  });
 
   const readable = new Readable({
     highWaterMark,
