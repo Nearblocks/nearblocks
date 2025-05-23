@@ -62,7 +62,7 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
 
 const fetchJson = async (s3: S3Client, bucket: string, block: number) => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
+  const timer = setTimeout(() => controller.abort(), 30_000);
 
   try {
     const response = await s3.send(
