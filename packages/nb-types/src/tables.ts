@@ -132,21 +132,21 @@ export type ContractCodeEvent = {
   code_base64: null | string;
   code_hash: null | string;
   contract_account_id: string;
-  event_index: string;
   event_type: ContractEventType;
+  index_in_chunk: number;
   receipt_id: string;
-  status: EventStatus;
+  shard_id: number;
 };
 
 export type ContractDataEvent = {
   block_height: number;
   block_timestamp: string;
   contract_account_id: string;
-  event_index: string;
   event_type: ContractEventType;
+  index_in_chunk: number;
   key_base64: string;
   receipt_id: string;
-  status: EventStatus;
+  shard_id: number;
   value_base64: null | string;
 };
 

@@ -1,14 +1,15 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { dbRead, dbWrite } from '#libs/knex';
+import { db, dbMigration } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
-    logger.info('syncing data...');
+    await dbMigration.migrate.latest();
+    await dbMigration.destroy();
     await syncData();
   } catch (error) {
     logger.error('aborting...');
@@ -20,11 +21,7 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([
-      dbRead.destroy(),
-      dbWrite.destroy(),
-      sentry.close(1_000),
-    ]);
+    await Promise.all([db.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }

@@ -1,8 +1,11 @@
+// Temp batch processing
+import { forEach } from 'hwp';
+
 import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { dbRead, dbWrite, streamConfig } from '#libs/knex';
+import { db, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeChanges } from '#services/changes';
 
@@ -18,12 +21,15 @@ const s3Config = {
 };
 
 export const syncData = async () => {
-  const settings = await dbRead('settings').where({ key: indexerKey }).first();
+  const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight;
+  let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
 
   if (!startBlockHeight && latestBlock) {
-    startBlockHeight = +latestBlock;
+    logger.info(`last synced block: ${latestBlock}`);
+    // startBlockHeight = +latestBlock;
+    // Temp batch processing
+    startBlockHeight = +latestBlock - 50;
   }
 
   const startBlock = startBlockHeight || 0;
@@ -32,14 +38,17 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
+    limit: 50, // Temp batch processing
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlock,
   });
 
-  for await (const message of stream) {
-    await onMessage(message);
-  }
+  // for await (const message of stream) {
+  //   await onMessage(message);
+  // }
+  // Temp batch processing
+  await forEach(stream, onMessage, 50);
 
   stream.on('end', () => {
     logger.error('stream ended');
@@ -53,16 +62,11 @@ export const syncData = async () => {
 
 export const onMessage = async (message: Message) => {
   try {
-    const start = performance.now();
+    logger.info(`syncing block: ${message.block.header.height}`);
 
-    await storeChanges(dbWrite, message);
+    await storeChanges(db, message);
 
-    logger.info({
-      block: message.block.header.height,
-      time: `${performance.now() - start} ms`,
-    });
-
-    await dbWrite('settings')
+    await db('settings')
       .insert({
         key: indexerKey,
         value: { sync: message.block.header.height },
@@ -70,9 +74,7 @@ export const onMessage = async (message: Message) => {
       .onConflict('key')
       .merge();
   } catch (error) {
-    logger.error(
-      `aborting... block ${message.block.header.height} ${message.block.header.hash}`,
-    );
+    logger.error(`aborting... block ${message.block.header.height} `);
     logger.error(error);
     sentry.captureException(error);
     process.exit();

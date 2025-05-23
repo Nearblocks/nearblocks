@@ -24,7 +24,6 @@ import {
   isDataDeletion,
   isDataUpdate,
 } from '#libs/guards';
-import { mapStateChangeStatus } from '#libs/utils';
 import {
   ContractCode,
   ContractData,
@@ -67,8 +66,8 @@ export const storeChunkBalance = async (
   );
 
   await Promise.all([
-    insertCodeChanges(knex, shard.shardId, block.timestampNanosec, code),
-    insertDataChanges(knex, shard.shardId, block.timestampNanosec, data),
+    insertCodeChanges(knex, shard.shardId, code),
+    insertDataChanges(knex, shard.shardId, data),
   ]);
 };
 
@@ -172,10 +171,10 @@ const getReceiptChanges = (
         code_base64: codeChange.codeBase64,
         code_hash: codeChange.codeHash,
         contract_account_id: codeChange.accountId,
-        event_index: '0',
         event_type: codeChange.type,
+        index_in_chunk: 0, // placeholder; actual value will be set later
         receipt_id: receiptId,
-        status: mapStateChangeStatus(outcome.executionOutcome.outcome.status),
+        shard_id: 0, // placeholder; actual value will be set later
       });
     }
 
@@ -194,11 +193,11 @@ const getReceiptChanges = (
         block_height: block.height,
         block_timestamp: block.timestampNanosec,
         contract_account_id: dataChange.accountId,
-        event_index: '0',
         event_type: ContractEventType.UPDATE,
+        index_in_chunk: 0, // placeholder; actual value will be set later
         key_base64: dataChange.keyBase64,
         receipt_id: receiptId,
-        status: mapStateChangeStatus(outcome.executionOutcome.outcome.status),
+        shard_id: 0, // placeholder; actual value will be set later
         value_base64: dataChange.valueBase64,
       });
     }
@@ -244,25 +243,21 @@ const getCodeHash = (code: string) => {
 const insertCodeChanges = async (
   knex: Knex,
   shardId: number,
-  timestamp: string,
   changes: ContractCodeEvent[],
 ) => {
   const legnth = changes.length;
 
   if (!legnth) return;
 
-  const startIndex =
-    BigInt(timestamp) * 100_000_000n * 100_000_000n +
-    BigInt(shardId) * 10_000_000n;
-
   for (let index = 0; index < legnth; index++) {
-    changes[index].event_index = String(startIndex + BigInt(index));
+    changes[index].shard_id = shardId;
+    changes[index].index_in_chunk = index;
   }
 
   await retry(async () => {
     await knex('contract_code_events')
       .insert(changes)
-      .onConflict(['event_index'])
+      .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
       .ignore();
   });
 };
@@ -270,25 +265,21 @@ const insertCodeChanges = async (
 const insertDataChanges = async (
   knex: Knex,
   shardId: number,
-  timestamp: string,
   changes: ContractDataEvent[],
 ) => {
   const legnth = changes.length;
 
   if (!legnth) return;
 
-  const startIndex =
-    BigInt(timestamp) * 100_000_000n * 100_000_000n +
-    BigInt(shardId) * 10_000_000n;
-
   for (let index = 0; index < legnth; index++) {
-    changes[index].event_index = String(startIndex + BigInt(index));
+    changes[index].shard_id = shardId;
+    changes[index].index_in_chunk = index;
   }
 
   await retry(async () => {
     await knex('contract_data_events')
       .insert(changes)
-      .onConflict(['event_index'])
+      .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
       .ignore();
   });
 };

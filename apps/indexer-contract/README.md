@@ -6,7 +6,7 @@ Contract indexer collects the info about NEAR contract state changes
 
 ```
 DATABASE_URL=
-DATABASE_URL_READ=
+DATABASE_URL_BASE=
 NETWORK=mainnet
 S3_ENDPOINT=
 S3_ACCESS_KEY=
