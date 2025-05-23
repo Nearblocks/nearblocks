@@ -36,7 +36,7 @@ const retryConfig: S3ClientConfig = {
       info: () => {},
       warn: console.warn,
     },
-    requestTimeout: 10_000,
+    requestTimeout: 30_000,
   }),
 };
 
