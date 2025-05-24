@@ -29,7 +29,7 @@ export const syncData = async () => {
     logger.info(`last synced block: ${latestBlock}`);
     // startBlockHeight = +latestBlock;
     // Temp batch processing
-    startBlockHeight = +latestBlock - 50;
+    startBlockHeight = +latestBlock - 25;
   }
 
   const startBlock = startBlockHeight || 0;
@@ -38,7 +38,7 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 50, // Temp batch processing
+    limit: 25, // Temp batch processing
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlock,
@@ -48,7 +48,7 @@ export const syncData = async () => {
   //   await onMessage(message);
   // }
   // Temp batch processing
-  await forEach(stream, onMessage, 50);
+  await forEach(stream, onMessage, 25);
 
   stream.on('end', () => {
     logger.error('stream ended');
