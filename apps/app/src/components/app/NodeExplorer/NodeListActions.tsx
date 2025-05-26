@@ -23,7 +23,6 @@ import Tooltip from '@/components/app/common/Tooltip';
 import ArrowDown from '@/components/app/Icons/ArrowDown';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Question from '@/components/app/Icons/Question';
-import { validators } from 'near-api-js';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcStore } from '@/stores/app/rpc';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
@@ -33,44 +32,30 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);
-  const { rpc: rpcUrl, switchRpc } = useRpcStore();
+  const { rpc, switchRpc } = useRpcStore();
   const [isLoading, setIsLoading] = useState(true);
+  const errorMessage = 'No validator data!';
   const [nodeStatus, SetNodeStatus] = useState<{
     protocolVersion: number;
-    nextSeatPrice: string;
+    currentSeatPrice: bigint;
+    nextSeatPrice: bigint;
   }>();
-  const errorMessage = 'No validator data!';
 
-  const { getValidators, getProtocolConfig } = useRpc();
+  const { currentAndNextSeatprice, getProtocolConfig } = useRpc();
+
   useEffect(() => {
     const fetchProtocolConfig = async () => {
       setIsLoading(true);
       try {
-        const [protocolConfig, validatorsInfo] = await Promise.all([
-          getProtocolConfig(rpcUrl),
-          getValidators(),
-        ]);
+        const [protocolConfig, { currentEpochSeatPrice, nextEpochSeatPrice }] =
+          await Promise.all([getProtocolConfig(), currentAndNextSeatprice()]);
 
-        if (!protocolConfig || !validatorsInfo) return;
-
-        const totalSeats: number =
-          protocolConfig.num_block_producer_seats +
-          (
-            protocolConfig.avg_hidden_validator_seats_per_shard as number[]
-          ).reduce((a, b) => a + b, 0);
-
-        const pNext = validators.findSeatPrice(
-          validatorsInfo.next_validators,
-          totalSeats,
-          protocolConfig.minimum_stake_ratio,
-        );
-
-        const rawPrice = yoctoToNear(pNext.toString(), false);
-        const nextSeatPrice = Math.round(Number(rawPrice)).toLocaleString();
-
+        if (!protocolConfig || !currentEpochSeatPrice || !nextEpochSeatPrice)
+          return;
         SetNodeStatus({
           protocolVersion: protocolConfig.protocol_version,
-          nextSeatPrice: nextSeatPrice,
+          currentSeatPrice: currentEpochSeatPrice,
+          nextSeatPrice: nextEpochSeatPrice,
         });
       } catch (error) {
         console.error('Failed to fetch validator info:', error);
@@ -82,7 +67,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
 
     fetchProtocolConfig();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rpcUrl]);
+  }, [rpc]);
 
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
@@ -964,7 +949,10 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                     ) : (
                       <div className="relative">
                         {nodeStatus && nodeStatus?.nextSeatPrice
-                          ? nodeStatus?.nextSeatPrice + ' Ⓝ'
+                          ? convertAmountToReadableString(
+                              nodeStatus?.nextSeatPrice.toString(),
+                              'seatPriceAmount',
+                            ) + ' Ⓝ'
                           : ''}
                       </div>
                     )}
@@ -973,16 +961,18 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                 <div className="flex items-center justify-between py-4">
                   <div className="w-full lg:w-1/4">Current Seat Price</div>
                   <div className="w-full lg:w-3/4 break-words">
-                    {
-                      <>
-                        {data?.epochStatsCheck
+                    {isLoading ? (
+                      <Skeleton className="h-4 w-16" />
+                    ) : (
+                      <div className="relative">
+                        {nodeStatus && nodeStatus?.currentSeatPrice
                           ? convertAmountToReadableString(
-                              data?.epochStatsCheck,
+                              nodeStatus?.currentSeatPrice.toString(),
                               'seatPriceAmount',
                             ) + ' Ⓝ'
                           : ''}
-                      </>
-                    }
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

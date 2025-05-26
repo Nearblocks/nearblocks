@@ -14,7 +14,7 @@ export default async function TxnsLayout(props: {
     <ErrorBoundary
       fallback={
         <>
-          <div className="container-xxl mx-auto px-5">
+          <div className="container-xxl mx-auto px-5 pt-10">
             <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
                 <ErrorMessage

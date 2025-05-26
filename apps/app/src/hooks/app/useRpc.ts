@@ -1,12 +1,14 @@
 import { baseDecode } from 'borsh';
-import { providers } from 'near-api-js';
 import { useRpcStore } from '@/stores/app/rpc';
 import { decodeArgs, encodeArgs } from '@/utils/app/near';
 import { AccessInfo } from '@/utils/types';
+import { providers } from 'near-api-js';
+import { JsonRpcProvider } from '@near-js/providers';
 
 const useRpc = () => {
   const rpcUrl = useRpcStore((state) => state.rpc);
-  const jsonProviders = [new providers.JsonRpcProvider({ url: rpcUrl })];
+  const jsonProviders = [new JsonRpcProvider({ url: rpcUrl })];
+  const newProvider = new providers.JsonRpcProvider({ url: rpcUrl });
 
   const provider = new providers.FailoverRpcProvider(jsonProviders);
 
@@ -226,27 +228,25 @@ const useRpc = () => {
     }
   };
 
-  const getProtocolConfig = async (rpc: string) => {
+  const getProtocolConfig = async () => {
     try {
-      const res = await fetch(rpc, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: 'dontcare',
-          jsonrpc: '2.0',
-          method: 'EXPERIMENTAL_protocol_config',
-          params: {
-            finality: 'final',
-          },
-        }),
+      const protocolConfig = await newProvider.experimental_protocolConfig({
+        finality: 'final',
       });
-
-      const data = await res.json();
-      return data.result;
+      return protocolConfig;
     } catch (error) {
-      console.error('Error fetching protocol_config', error);
-      throw error;
+      console.error('Error fetching protocolConfig:', error);
+      return null;
     }
+  };
+
+  const currentAndNextSeatprice = async () => {
+    const currentEpochSeatPrice = await newProvider.getCurrentEpochSeatPrice();
+    const nextEpochSeatPrice = await newProvider.getNextEpochSeatPrice();
+    return {
+      currentEpochSeatPrice: currentEpochSeatPrice,
+      nextEpochSeatPrice: nextEpochSeatPrice,
+    };
   };
 
   const transactionStatus = async (hash: any, signer: any) => {
@@ -308,6 +308,7 @@ const useRpc = () => {
     viewAccessKeys,
     viewAccount,
     getProtocolConfig,
+    currentAndNextSeatprice,
   };
 };
 export default useRpc;
