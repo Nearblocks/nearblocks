@@ -1,7 +1,7 @@
 'use client';
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
@@ -12,15 +12,37 @@ import { AccountDataInfo, FtInfo, TokenListInfo } from '@/utils/types';
 import TokenHoldings from '@/components/app/common/TokenHoldings';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 import { useParams } from 'next/navigation';
+
 const AccountOverviewActions = ({
-  accountData,
-  inventoryData,
+  accountDataPromise,
+  inventoryDataPromise,
   loading = false,
-  spamTokens,
-  statsData,
-  tokenData,
-  status,
-}: any) => {
+  spamTokensPromise,
+  statsDataPromise,
+  tokenDataPromise,
+  syncDataPromise,
+}: {
+  accountDataPromise: Promise<any>;
+  inventoryDataPromise: Promise<any>;
+  loading?: boolean;
+  spamTokensPromise: Promise<any>;
+  statsDataPromise: Promise<any>;
+  tokenDataPromise: Promise<any>;
+  syncDataPromise: Promise<any>;
+}) => {
+  const account = use(accountDataPromise);
+  const stats = use(statsDataPromise);
+  const token = use(tokenDataPromise);
+  const inventory = use(inventoryDataPromise);
+  const syncData = use(syncDataPromise);
+  const spam = use(spamTokensPromise);
+  const accountData = account?.account?.[0];
+  const statsData = stats?.stats?.[0];
+  const tokenData = token?.contracts?.[0];
+  const inventoryData = inventory?.inventory;
+  const status = syncData && syncData?.status?.indexers?.balance?.sync;
+  const spamTokens = JSON.parse(spam);
+
   const { ftBalanceOf, viewAccount } = useRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
@@ -82,7 +104,7 @@ const AccountOverviewActions = ({
       const pricedTokens: TokenListInfo[] = [];
 
       await Promise.all(
-        fts.map(async (ft: TokenListInfo) => {
+        fts?.map(async (ft: TokenListInfo) => {
           let sum = Big(0);
           let rpcAmount = Big(0);
 

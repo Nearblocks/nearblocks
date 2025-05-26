@@ -3,25 +3,9 @@ import { getRequest } from '@/utils/app/api';
 import ReceiptActions from '@/components/app/Address/ReceiptActions';
 
 const Receipts = async ({ id, searchParams }: any) => {
-  const options: RequestInit = {
-    next: { revalidate: 10 },
-  };
-  const [data, count] = await Promise.all([
-    getRequest(`v2/account/${id}/receipts`, searchParams, options),
-    getRequest(`v2/account/${id}/receipts/count`, searchParams, options),
-  ]);
+  const data = getRequest(`v2/account/${id}/receipts`, searchParams);
+  const count = getRequest(`v2/account/${id}/receipts/count`, searchParams);
 
-  if (data.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
-  }
-
-  return (
-    <ReceiptActions
-      count={count?.txns?.[0]?.count}
-      cursor={data?.cursor}
-      error={!data || data === null}
-      txns={data?.txns}
-    />
-  );
+  return <ReceiptActions dataPromise={data} countPromise={count} />;
 };
 export default Receipts;

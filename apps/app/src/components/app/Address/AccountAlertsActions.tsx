@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
@@ -15,12 +15,14 @@ import SponsoredText from '@/components/app/SponsoredText';
 import { useParams } from 'next/navigation';
 import AddressValidator from '@/components/app/Address/AddressValidator';
 const AccountAlertsActions = ({
-  accountData,
+  accountDataPromise,
   sponsoredText,
 }: {
-  accountData: any;
+  accountDataPromise: Promise<any>;
   sponsoredText?: TextAdData;
 }) => {
+  const data = use(accountDataPromise);
+  const accountData = data?.message === 'Error' ? null : data;
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);

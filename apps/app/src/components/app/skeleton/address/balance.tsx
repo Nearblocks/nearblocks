@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { use } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 
@@ -8,21 +8,32 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 export default function BalanceSkeleton({
   error = false,
-  parse,
-  deploymentInfo,
-  tokenTracker,
+
+  parsePromise,
+  deploymentPromise,
+  ftPromise,
+  nftPromise,
 }: {
+  parsePromise: Promise<any>;
+  deploymentPromise: Promise<any>;
+  ftPromise: Promise<any>;
+  nftPromise: Promise<any>;
   error?: boolean;
-  parse: any;
-  deploymentInfo: any;
-  tokenTracker: any;
 }) {
+  const parse = use(parsePromise);
+  const deployment = use(deploymentPromise);
+  const deploymentInfo = deployment?.deployments?.[0];
+  const ft = use(ftPromise);
+  const nft = use(nftPromise);
+  const tokenTracker =
+    (ft?.contracts?.[0]?.name ? 'token' : null) ||
+    (nft?.contracts?.[0]?.name ? 'nft' : null);
   const t = useTranslations();
   const { networkId } = useConfig();
   const isContract =
     parse?.contract?.[0]?.contract &&
     Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
-    parse.contract[0].contract.methodNames.length > 0;
+    parse?.contract?.[0]?.contract?.methodNames?.length > 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
