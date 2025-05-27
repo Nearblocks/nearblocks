@@ -10,6 +10,28 @@ interface VerifierConfig {
   verifierApiUrl: string;
 }
 
+let dynamicNetworkId: NetworkId = 'testnet';
+
+if (typeof window !== 'undefined') {
+  try {
+    const globalData = (window as any).__next_f;
+    for (const item of globalData ?? []) {
+      if (item?.[1]?.includes('NEXT_PUBLIC_NETWORK_ID')) {
+        const match = item[1].match(/"NEXT_PUBLIC_NETWORK_ID":"([^"]+)"/);
+        if (match) {
+          dynamicNetworkId = match[1] as NetworkId;
+          break;
+        }
+      }
+    }
+  } catch (error) {
+    console.error(
+      'Failed to extract NEXT_PUBLIC_NETWORK_ID from window.__next_f',
+      error,
+    );
+  }
+}
+
 export const useConfig = () => {
   const {
     API_ACCESS_KEY,
@@ -22,7 +44,7 @@ export const useConfig = () => {
   } = useEnvContext();
 
   const networkId: NetworkId =
-    (NEXT_PUBLIC_NETWORK_ID as NetworkId) || 'testnet';
+    (NEXT_PUBLIC_NETWORK_ID as NetworkId) || dynamicNetworkId;
 
   const networks: Record<NetworkId, Network> = {
     mainnet: { networkId: 'mainnet' },

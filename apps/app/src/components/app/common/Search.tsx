@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { routing, useIntlRouter } from '@/i18n/routing';
+import { routing } from '@/i18n/routing';
 import { useRpcStore } from '@/stores/app/rpc';
 import { rpcSearch } from '@/utils/app/rpc';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
@@ -74,9 +74,12 @@ const t = (key: string, p?: any): any => {
   return simulateAbsence ? undefined : { key, p };
 };
 
-const Search = ({ disabled, header = false }: any) => {
-  const router = useIntlRouter();
-  const pathname = usePathname();
+const Search = ({
+  disabled,
+  header = false,
+  fallbackpathname: fallbackpathname,
+}: any) => {
+  const pathname = usePathname() || fallbackpathname;
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
@@ -123,18 +126,21 @@ const Search = ({ disabled, header = false }: any) => {
         ? `/token/${route?.path}`
         : null;
 
-    if (newPath === pathname) {
+    if (newPath === (pathname || fallbackpathname)) {
       return;
     }
 
     setIsLoading(true);
+
     try {
-      if (newPath) {
-        return router.push(newPath);
-      } else {
-        return toast.error(SearchToast(networkId));
+      if (!newPath) {
+        toast.error(SearchToast(networkId));
+        return;
       }
-    } catch (error: any) {
+      window.location.href = newPath;
+    } catch (error) {
+      console.error('Redirect error:', error);
+    } finally {
       setIsLoading(false);
     }
   };
