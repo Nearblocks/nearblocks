@@ -362,8 +362,9 @@ export type StakingEvent = {
   contract_staked: null | string;
   delta_shares: null | string;
   epoch_id: string;
-  event_index: string;
+  index_in_chunk: number;
   receipt_id: string;
+  shard_id: number;
   type: StakingEventType;
 };
 

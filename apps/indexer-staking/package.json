@@ -18,13 +18,14 @@
   "dependencies": {
     "@sentry/node": "7.74.1",
     "envalid": "8.0.0",
+    "hwp": "0.4.1",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "~4.17",
     "@types/node": "~20.8",
     "eslint-config-custom-node": "*",
-    "rimraf": "~5.0",
+    "knex-migrate-sql-file": "~2.0",
     "nb-blocks": "*",
     "nb-knex": "*",
     "nb-logger": "*",
@@ -32,6 +33,7 @@
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
+    "rimraf": "~5.0",
     "typescript": "~5.2"
   }
 }

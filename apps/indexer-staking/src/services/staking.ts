@@ -63,8 +63,9 @@ const storeChunkData = async (knex: Knex, shard: Shard, block: BlockHeader) => {
             contract_staked: event.contractStaked ?? null,
             delta_shares: event.shares ?? null,
             epoch_id: block.epochId,
-            event_index: '',
+            index_in_chunk: 0, // placeholder; actual value will be set later
             receipt_id: receipt,
+            shard_id: 0, // placeholder; actual value will be set later
             type: event.type,
           });
         }
@@ -75,18 +76,15 @@ const storeChunkData = async (knex: Knex, shard: Shard, block: BlockHeader) => {
   const length = events.length;
 
   if (length) {
-    const startIndex =
-      BigInt(block.timestampNanosec) * 100_000_000n * 100_000_000n +
-      BigInt(shard.shardId) * 10_000_000n;
-
     for (let index = 0; index < length; index++) {
-      events[index].event_index = String(startIndex + BigInt(index));
+      events[index].shard_id = shard.shardId;
+      events[index].index_in_chunk = index;
     }
 
     await retry(async () => {
       await knex('staking_events')
         .insert(events)
-        .onConflict(['event_index'])
+        .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
         .ignore();
     });
   }

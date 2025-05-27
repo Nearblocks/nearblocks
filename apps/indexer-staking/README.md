@@ -6,7 +6,7 @@ Staking indexer collects the info about staking changes 📊
 
 ```
 DATABASE_URL=
-DATABASE_URL_READ=
+DATABASE_URL_BASE=
 NETWORK=mainnet
 S3_ENDPOINT=
 S3_ACCESS_KEY=
