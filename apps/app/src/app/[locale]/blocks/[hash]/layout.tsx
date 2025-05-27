@@ -20,14 +20,14 @@ export async function generateMetadata(props: {
   const t = await getTranslations({ locale });
 
   const hashData = await getRequest(`v1/blocks/${hash}`);
-  const blockHeight = hashData?.blocks[0]?.block_height;
+  const blockHeight = hashData?.blocks?.[0]?.block_height;
 
   const metaTitle = t('block.metaTitle', { block: hash });
   const metaDescription = t('block.metaDescription', { block: hash });
 
-  const ogImageUrl = `${baseUrl}api/og?blockHash=true&block_height=${encodeURIComponent(
-    blockHeight,
-  )}&title=${encodeURIComponent(metaTitle)}`;
+  const ogImageUrl = `${baseUrl}api/og?blockHash=true&block_height=${
+    blockHeight ? encodeURIComponent(blockHeight) : ''
+  }&title=${encodeURIComponent(metaTitle)}`;
 
   return {
     alternates: {
