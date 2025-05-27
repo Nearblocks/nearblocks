@@ -4,18 +4,20 @@ import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/routing';
 import { useParams, useSearchParams } from 'next/navigation';
+import { use } from 'react';
 
 const AccountTabsActions = ({
   children,
-  parse,
+  parsePromise,
 }: {
   children: React.ReactNode;
-  parse: any;
+  parsePromise: Promise<any>;
 }) => {
   const t = useTranslations();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab') || 'txns';
+  const parse = use(parsePromise);
 
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },

@@ -1,12 +1,11 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { use, useContext, useEffect, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 
 import { AccordionRoot } from '@/components/ui/accordion';
 import useRpc from '@/hooks/app/useRpc';
 import {
-  ContractCodeInfo,
   ContractData,
   ContractParseInfo,
   SchemaInfo,
@@ -25,14 +24,11 @@ import { useParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
 
 interface Props {
-  accountId?: string;
-  contract: ContractCodeInfo;
-  contractInfo: ContractParseInfo;
-  deployments: any;
-  isLocked?: boolean;
-  logOut?: () => void;
-  requestSignInWithWallet?: () => void;
   schema?: SchemaInfo;
+
+  accountDataPromise: Promise<any>;
+  contractInfoPromise: Promise<any>;
+  deploymentsPromise: Promise<any>;
 }
 
 type OnChainResponse = {
@@ -41,8 +37,17 @@ type OnChainResponse = {
 };
 
 const OverviewActions = (props: Props) => {
+  const { accountDataPromise, contractInfoPromise, deploymentsPromise } = props;
+
+  const account = use(accountDataPromise);
+  const parse = use(contractInfoPromise);
+  const deployments = use(deploymentsPromise);
+
+  const accountId = account?.account?.[0]?.account_id;
+  const contractInfo: ContractParseInfo = parse?.contract?.[0]?.contract;
+  const schema = parse?.contract?.[0]?.schema;
+
   const { signedAccountId, wallet } = useContext(NearContext);
-  const { accountId, contractInfo, deployments, isLocked, schema } = props;
   const params = useParams<{ id: string }>();
   const { verifierConfig } = useConfig();
   const verifiers = verifierConfig.map((config) => config.accountId);
@@ -174,11 +179,7 @@ const OverviewActions = (props: Props) => {
         </Tab>
       </TabList>
       <TabPanel>
-        <Info
-          data={deployments}
-          id={params?.id}
-          isLocked={isLocked as boolean}
-        />
+        <Info data={deployments} id={params?.id} />
       </TabPanel>
       <TabPanel>
         <ContractCode

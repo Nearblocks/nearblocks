@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
@@ -23,16 +23,37 @@ import { useParams } from 'next/navigation';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useRpcStore } from '@/stores/app/rpc';
 const AccountMoreInfoActions = ({
-  accountData: account,
-  deploymentData,
-  nftTokenData,
-  tokenData,
-  status,
-  parse,
-}: any) => {
+  accountDataPromise,
+  deploymentDataPromise,
+  nftTokenDataPromise,
+  tokenDataPromise,
+  syncDataPromise,
+  parseDataPromise,
+}: {
+  accountDataPromise: Promise<any>;
+  deploymentDataPromise: Promise<any>;
+  nftTokenDataPromise: Promise<any>;
+  tokenDataPromise: Promise<any>;
+  syncDataPromise: Promise<any>;
+  parseDataPromise: Promise<any>;
+}) => {
+  const account = use(accountDataPromise);
+  const deployment = use(deploymentDataPromise);
+  const nftToken = use(nftTokenDataPromise);
+  const ftToken = use(tokenDataPromise);
+  const syncData = use(syncDataPromise);
+  const parse = use(parseDataPromise);
+
+  const deploymentData = deployment?.deployments?.[0];
+  const status = syncData && syncData?.status?.indexers?.balance?.sync;
+  const tokenData = ftToken?.contracts?.[0];
+  const nftTokenData = nftToken?.contracts?.[0];
+
   const { contractCode, viewAccessKeys, viewAccount } = useRpc();
   const [contract, setContract] = useState<ContractCodeInfo | null>(null);
-  const [accountData, setAccountData] = useState<AccountContractInfo>(account);
+  const [accountData, setAccountData] = useState<AccountContractInfo>(
+    account?.account?.[0],
+  );
   const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
   const [isAccountLoading, setIsAccountLoading] = useState(true);
   const [contractLoading, setContractLoading] = useState(true);

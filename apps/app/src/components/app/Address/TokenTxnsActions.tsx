@@ -7,7 +7,7 @@ import {
   useSearchParams,
 } from 'next/navigation';
 import QueryString from 'qs';
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 import {
   PopoverContent,
@@ -36,13 +36,20 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 import { CopyButton } from '@/components/app/common/CopyButton';
 
 interface TokenTxnsProps {
-  count: string;
-  cursor: string;
-  error: boolean;
-  txns: TransactionInfo[];
+  dataPromise: Promise<any>;
+  countPromise: Promise<any>;
 }
 
-const TokenTxnsActions = ({ count, cursor, error, txns }: TokenTxnsProps) => {
+const TokenTxnsActions = ({ dataPromise, countPromise }: TokenTxnsProps) => {
+  const data = use(dataPromise);
+  const countData = use(countPromise);
+  if (data?.message === 'Error') {
+    throw new Error(`Server Error : ${data.error}`);
+  }
+  const count = countData?.txns?.[0]?.count;
+  const cursor = data?.cursor;
+  const error = !data || data === null;
+  const txns = data?.txns;
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ id: string }>();
