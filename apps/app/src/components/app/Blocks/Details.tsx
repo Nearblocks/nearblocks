@@ -42,13 +42,14 @@ export default function Details(props: Props) {
   const { networkId } = useConfig();
   const { getBlockDetails } = useRpc();
   const [blockInfo, setBlockInfo] = useState<BlockData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [utc, setUtc] = useState(true);
   const params = useParams<{ hash: string }>();
 
   useEffect(() => {
     const fetchBlockData = async () => {
-      if (!data || data?.blocks?.length === 0) {
+      if (!data || data?.blocks?.length === 0 || data?.message === 'Error') {
+        setIsLoading(true);
         try {
           const res = await getBlockDetails(params?.hash);
 
@@ -107,7 +108,7 @@ export default function Details(props: Props) {
   );
 
   const block =
-    !data || data?.blocks?.length === 0
+    !data || data?.blocks?.length === 0 || data?.message === 'Error'
       ? blockInfo?.blocks?.[0]
       : data?.blocks?.[0];
 
