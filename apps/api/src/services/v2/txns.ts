@@ -61,6 +61,8 @@ const txn = catchAsync(async (req: RequestValidator<Txn>, res: Response) => {
           JSONB_BUILD_OBJECT(
             'status',
             (status IN ('SUCCESS_RECEIPT_ID', 'SUCCESS_VALUE')),
+            'status_key',
+            status,
             'logs',
             jsonb_to_text (logs),
             'result',
@@ -125,11 +127,8 @@ const txn = catchAsync(async (req: RequestValidator<Txn>, res: Response) => {
                   gas_burnt::TEXT,
                   tokens_burnt::TEXT,
                   executor_account_id,
-                  CASE
-                    WHEN status = 'SUCCESS_RECEIPT_ID'
-                    OR status = 'SUCCESS_VALUE' THEN TRUE
-                    ELSE FALSE
-                  END AS status,
+                  (status IN ('SUCCESS_RECEIPT_ID', 'SUCCESS_VALUE')) AS status,
+                  status AS status_key,
                   logs,
                   result
                 FROM
