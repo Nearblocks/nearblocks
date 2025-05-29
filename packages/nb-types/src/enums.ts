@@ -109,6 +109,15 @@ export enum NFTLogKind {
   TRANSFER = 'nft_transfer',
 }
 
+export enum StakingEventType {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
+  STAKE = 'STAKE',
+  REWARD = 'REWARD',
+  CONTRACT = 'CONTRACT',
+  UNSTAKE = 'UNSTAKE',
+}
+
 // Used for creating DB event index
 export enum EventType {
   NEP141 = 1,
