@@ -6,7 +6,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import { Link, routing, usePathname } from '@/i18n/routing';
+import { Link, routing } from '@/i18n/routing';
 import { nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
 
@@ -18,6 +18,7 @@ import Menu from '@/components/app/Icons/Menu';
 import UserMenu from '@/components/app/Layouts/UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
 import { getLatestStats, getSyncStatus } from '@/utils/app/actions';
+import useFallbackPathname from '@/hooks/app/useFallbackPathname';
 
 const menus = [
   {
@@ -158,6 +159,7 @@ const Header = ({
   accountId,
   theme: cookieTheme,
   locale,
+  ShowSearch,
 }: any) => {
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
@@ -171,7 +173,7 @@ const Header = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const pathname = usePathname();
+  const pathname = useFallbackPathname();
 
   useEffect(() => {
     const fetchSyncStats = async () => {
@@ -245,7 +247,15 @@ const Header = ({
     return setSyncStatus(true);
   }, [sync]);
 
-  const showSearch = pathname !== '/';
+  // const showSearch = pathname !== '/';
+  const showSearch = ShowSearch !== undefined ? ShowSearch : pathname !== '/';
+
+  useEffect(() => {
+    const cookieTheme = Cookies.get('theme');
+    if (cookieTheme && cookieTheme !== theme) {
+      setTheme(cookieTheme);
+    }
+  }, [theme, setTheme]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -261,6 +271,11 @@ const Header = ({
 
     return <Link {...props} />;
   };
+
+  const localeList = languages.map((lang) => lang.locale);
+  const newPathname =
+    pathname.replace(new RegExp(`^/(${localeList.join('|')})(?=/|$)`), '') ||
+    '/';
 
   return (
     <>
@@ -330,7 +345,7 @@ const Header = ({
           <div className="w-full lg:!w-2/4 flex justify-end items-center gap-3 h-10">
             {showSearch && (
               <div className="w-full md:w-[70%] flex items-center">
-                <Search header />
+                <Search header fallbackpathname={pathname} />
               </div>
             )}
             <ul className="hidden md:flex justify-end text-gray-500 pb-4 md:pb-0">
@@ -572,7 +587,7 @@ const Header = ({
                                     ? 'text-green-500 dark:text-green-250'
                                     : 'dark:text-neargray-10 text-nearblue-600'
                                 }`}
-                                href={pathname}
+                                href={newPathname}
                                 locale={language.locale}
                               >
                                 {language.title}
@@ -602,7 +617,7 @@ const Header = ({
                                     ? 'text-green-500 dark:text-green-250'
                                     : 'dark:text-neargray-10 text-nearblue-600'
                                 }`}
-                                href={pathname}
+                                href={newPathname}
                                 locale={language.locale}
                               >
                                 {language.title}
