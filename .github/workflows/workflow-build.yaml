@@ -20,6 +20,7 @@ jobs:
             indexer-dex,
             indexer-multichain,
             indexer-signature,
+            indexer-staking,
             indexer-receipts,
             indexer-s3,
             explorer-selector,
