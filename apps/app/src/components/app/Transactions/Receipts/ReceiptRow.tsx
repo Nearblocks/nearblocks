@@ -33,13 +33,21 @@ interface Props {
 
 const ReceiptRow = (props: Props) => {
   const { borderFlag, receipt, statsData, rpcReceipt } = props;
+  const { networkId } = useConfig();
+
+  // temporary use rpc data for blocks before 192373963 and api data for latest blocks - testnet
+  // temporary use rpc data for blocks before 143997621 and api data for latest blocks - mainnet
+  const polledReceiptData =
+    (receipt?.block_height > 192373963 && networkId === 'testnet') ||
+    (receipt?.block_height > 143997621 && networkId === 'mainnet')
+      ? receipt
+      : rpcReceipt;
 
   const t = useTranslations();
   const [pageHash] = useHash();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
   const deposit = receipt?.actions?.[0]?.args?.deposit ?? 0;
   const rowRef = useRef<HTMLDivElement | null>(null);
-  const { networkId } = useConfig();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
   const lastBlockHash = useRef<null | string>(null);
@@ -187,7 +195,7 @@ const ReceiptRow = (props: Props) => {
             ? ''
             : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
         }
-        id={`${receipt?.receipt_id}-${rpcReceipt?.receipt_id}`}
+        id={`${receipt?.receipt_id}-${polledReceiptData?.receipt_id}`}
       >
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -400,19 +408,19 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!rpcReceipt ? (
+          {!polledReceiptData ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
             </div>
-          ) : rpcReceipt?.actions ? (
+          ) : polledReceiptData?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {rpcReceipt &&
-                rpcReceipt?.actions?.map((action: any, i: number) => (
+              {polledReceiptData &&
+                polledReceiptData?.actions?.map((action: any, i: number) => (
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={rpcReceipt?.receiver_id}
+                    receiver={polledReceiptData?.receiver_id}
                   />
                 ))}
             </div>
@@ -461,13 +469,17 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!rpcReceipt ? (
+          {!polledReceiptData ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {rpcReceipt ? <ReceiptStatus receipt={rpcReceipt} /> : ''}
+              {polledReceiptData ? (
+                <ReceiptStatus receipt={polledReceiptData} />
+              ) : (
+                ''
+              )}
             </div>
           )}
         </div>
