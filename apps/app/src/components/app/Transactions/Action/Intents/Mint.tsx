@@ -10,6 +10,7 @@ import { chainAbstractionExplorerUrl } from '@/utils/app/config';
 import TokenInfo from '@/components/app/common/TokenInfo';
 import { useParams } from 'next/navigation';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { isValidJson } from '@/utils/app/libs';
 
 interface DataItem {
   owner_id: string;
@@ -72,12 +73,16 @@ const Mint = ({ event, data, parsedActionLogs, meta }: Props) => {
       ?.map((log) => {
         try {
           const memo = log?.parsedArgs?.memo || '';
-          const logs = JSON.parse(log?.parsedArgs?.msg || '{}');
+          const logs = JSON.parse(
+            isValidJson(log?.parsedArgs?.msg) ? log?.parsedArgs?.msg : '{}',
+          );
 
           const bridgedFromMatch = memo?.match(/BRIDGED_FROM:(\{.*\})/);
 
           if (bridgedFromMatch) {
-            const bridgedFromObject = JSON.parse(bridgedFromMatch[1]);
+            const bridgedFromObject = JSON.parse(
+              isValidJson(bridgedFromMatch[1]) ? bridgedFromMatch[1] : '{}',
+            );
             if (logs?.receiver_id === receiverId) {
               return bridgedFromObject;
             }
