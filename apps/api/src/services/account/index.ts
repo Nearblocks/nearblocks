@@ -102,7 +102,7 @@ const contract = catchAsync(
 
     const [contract, key] = await Promise.all([
       redis.cache(
-        `contract:${account}`,
+        `contract:${account}:code`,
         async () => {
           try {
             return await viewCode(provider, account);
@@ -122,6 +122,7 @@ const contract = catchAsync(
           access_keys
         WHERE
           account_id = ${account}
+          AND deleted_by_block_height IS NULL
       `,
     ]);
 
@@ -147,8 +148,14 @@ const parse = catchAsync(
           try {
             const code: QueryResponseKind & { code_base64?: string } =
               await redis.cache(
-                `contract:${account}`,
-                async () => viewCode(provider, account),
+                `contract:${account}:code`,
+                async () => {
+                  try {
+                    return await viewCode(provider, account);
+                  } catch (error) {
+                    return null;
+                  }
+                },
                 EXPIRY * 5, // 5 mins
               );
 
