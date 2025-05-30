@@ -130,7 +130,7 @@ const updateMeta = async (contract: string) => {
           updated_at: dayjs.utc().toISOString(),
         })
         .onConflict('contract')
-        .ignore();
+        .merge();
     }
   } catch (error) {
     //
