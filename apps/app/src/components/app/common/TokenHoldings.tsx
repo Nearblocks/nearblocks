@@ -29,7 +29,7 @@ interface Props {
 
 const TokenHoldings = (props: Props) => {
   /* eslint-disable @next/next/no-img-element */
-  const ft = props?.ft?.tokens?.filter((token) => token?.contract !== 'aurora');
+  const ft = props?.ft?.tokens?.filter((token) => token?.contract !== 'aurora'); // The 'aurora' token has been removed from the list of tokens due to its role as a proxy contract for the ETH bridge on the NEAR
   const nfts = props?.data?.nfts || [];
 
   if (!ft?.length && !nfts?.length) {
