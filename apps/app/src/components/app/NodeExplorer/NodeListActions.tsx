@@ -23,9 +23,9 @@ import Tooltip from '@/components/app/common/Tooltip';
 import ArrowDown from '@/components/app/Icons/ArrowDown';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Question from '@/components/app/Icons/Question';
-import useRpc from '@/hooks/app/useRpc';
 import { useRpcStore } from '@/stores/app/rpc';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import { getSeatInfo } from '@/utils/app/actions';
 
 const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const { theme } = useTheme();
@@ -34,6 +34,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const [expanded, setExpanded] = useState<number[]>([]);
   const { rpc, switchRpc } = useRpcStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [rpcError, setRpcError] = useState(false);
   const errorMessage = 'No validator data!';
   const [nodeStatus, SetNodeStatus] = useState<{
     protocolVersion: number;
@@ -41,15 +42,24 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
     nextSeatPrice: bigint;
   }>();
 
-  const { currentAndNextSeatprice, getProtocolConfig } = useRpc();
+  useEffect(() => {
+    if (rpcError) {
+      try {
+        switchRpc();
+      } catch (error) {
+        console.error('Failed to switch RPC:', error);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcError]);
 
   useEffect(() => {
     const fetchProtocolConfig = async () => {
       setIsLoading(true);
+      setRpcError(false);
       try {
-        const [protocolConfig, { currentEpochSeatPrice, nextEpochSeatPrice }] =
-          await Promise.all([getProtocolConfig(), currentAndNextSeatprice()]);
-
+        const { protocolConfig, currentEpochSeatPrice, nextEpochSeatPrice } =
+          await getSeatInfo(rpc);
         if (!protocolConfig || !currentEpochSeatPrice || !nextEpochSeatPrice)
           return;
         SetNodeStatus({
@@ -58,8 +68,8 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
           nextSeatPrice: nextEpochSeatPrice,
         });
       } catch (error) {
-        console.error('Failed to fetch validator info:', error);
-        switchRpc();
+        console.error('Failed to fetch seatPrice:', error);
+        setRpcError(true);
       } finally {
         setIsLoading(false);
       }
