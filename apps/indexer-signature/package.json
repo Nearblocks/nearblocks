@@ -24,6 +24,7 @@
     "elliptic": "6.6.0",
     "envalid": "8.0.0",
     "js-sha3": "0.9.3",
+    "hwp": "0.4.1",
     "knex-migrate-sql-file": "~2.0",
     "near-api-js": "5.0.1",
     "viem": "2.21.35"
