@@ -552,6 +552,7 @@ export type DepositPropsInfo = {
     token_id: string;
   }[];
   receiptId?: string;
+  tokenMetadata?: ProcessedTokenMeta[];
 };
 
 export type ActionPropsInfo = {
@@ -783,7 +784,6 @@ export type TransActionProps = {
 export type TokenInfoProps = {
   contract: string;
   amount: string;
-  decimals?: any;
   transferAmount?: string;
   isShowText?: boolean;
   metaInfo?: ApiMetaInfo[];

@@ -15,7 +15,7 @@ import { isEmpty } from 'lodash';
 const metadataCache: Record<string, Promise<MetaInfo>> = {};
 
 const TokenInfo = (props: TokenInfoProps) => {
-  const { contract, amount, decimals, isShowText, metaInfo } = props;
+  const { contract, amount, isShowText, metaInfo } = props;
   const apiMeta = metaInfo && metaInfo[0]?.metadata;
   const [meta, setMeta] = useState<MetaInfo>({} as MetaInfo);
   const { ftMetadata } = useRpc();
@@ -25,7 +25,7 @@ const TokenInfo = (props: TokenInfoProps) => {
   const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   const rpcAmount = localFormat(
-    tokenAmount(amount, decimals || apiMeta?.decimals || meta?.decimals, true),
+    tokenAmount(amount, apiMeta?.decimals || meta?.decimals || 18, true),
   );
   useEffect(() => {
     if (!apiMeta && contract) {

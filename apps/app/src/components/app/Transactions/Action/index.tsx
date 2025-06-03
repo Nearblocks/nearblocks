@@ -16,10 +16,20 @@ const EventLogs = (props: EventPropsInfo) => {
           />
         );
       case 'v2.ref-finance.near':
-        return <RefContract event={props.event} />;
+        return (
+          <RefContract
+            event={props.event}
+            tokenMetadata={props?.tokenMetadata}
+          />
+        );
       case 'contract.main.burrow.near':
       case 'contract.1638481328.burrow.testnet':
-        return <BurrowContract event={props.event} />;
+        return (
+          <BurrowContract
+            event={props.event}
+            tokenMetadata={props?.tokenMetadata}
+          />
+        );
       case 'intents.near':
         return (
           <IntentsContract

@@ -23,7 +23,11 @@ const IncreaseCollateral = (props: DepositPropsInfo) => {
         <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs" />
       )}
       <span className="font-bold px-1">Increase Collateral </span>
-      <TokenInfo amount={log.amount} contract={log.token_id} decimals={18} />
+      <TokenInfo
+        amount={log.amount}
+        contract={log.token_id}
+        metaInfo={props?.tokenMetadata}
+      />
       <span className="font-bold text-gray px-1 flex items-center">
         From <AddressOrTxnsLink currentAddress={log?.account_id} />
       </span>

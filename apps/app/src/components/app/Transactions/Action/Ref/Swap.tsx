@@ -17,7 +17,6 @@ const Swap = (props: EventPropsInfo) => {
   }
 
   if (log?.length === 0) return null;
-
   return (
     <div className="action flex flex-wrap items-center break-all py-0.5">
       {props?.event?.receiptId && params?.hash ? (
@@ -30,8 +29,16 @@ const Swap = (props: EventPropsInfo) => {
         <FaRight className="inline-flex text-gray-400 text-xs" />
       )}
       <span className="font-bold px-1">Swap </span>
-      <TokenInfo amount={log[1]} contract={log[2]} />
-      <TokenInfo amount={log[3]} contract={log[4].replace(/,$/, '')} />
+      <TokenInfo
+        amount={log[1]}
+        contract={log[2]}
+        metaInfo={props?.tokenMetadata}
+      />
+      <TokenInfo
+        amount={log[3]}
+        contract={log[4].replace(/,$/, '')}
+        metaInfo={props?.tokenMetadata}
+      />
       <span className="font-bold text-gray px-1 flex items-center">
         On
         <AddressOrTxnsLink
