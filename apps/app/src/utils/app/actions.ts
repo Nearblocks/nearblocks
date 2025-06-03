@@ -7,6 +7,7 @@ import { getUserDataFromToken } from './libs';
 import { getRequest } from './api';
 import { revalidateTag } from 'next/cache';
 import { getMessages } from 'next-intl/server';
+import { providers } from 'near-api-js';
 
 interface ExportParams {
   exportType: string;
@@ -183,3 +184,18 @@ export const getMessage = async (): Promise<any> => {
   const messages = await getMessages();
   return messages;
 };
+
+export async function getSeatInfo(rpcUrl: string) {
+  const newProvider = new providers.JsonRpcProvider({ url: rpcUrl });
+  const currentEpochSeatPrice = await newProvider?.getCurrentEpochSeatPrice();
+  const nextEpochSeatPrice = await newProvider?.getNextEpochSeatPrice();
+  const protocolConfig = await newProvider.experimental_protocolConfig({
+    finality: 'final',
+  });
+
+  return {
+    currentEpochSeatPrice,
+    nextEpochSeatPrice,
+    protocolConfig,
+  };
+}

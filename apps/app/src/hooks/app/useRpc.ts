@@ -8,7 +8,6 @@ import { JsonRpcProvider } from '@near-js/providers';
 const useRpc = () => {
   const rpcUrl = useRpcStore((state) => state.rpc);
   const jsonProviders = [new JsonRpcProvider({ url: rpcUrl })];
-  const newProvider = new providers.JsonRpcProvider({ url: rpcUrl });
 
   const provider = new providers.FailoverRpcProvider(jsonProviders);
 
@@ -228,27 +227,6 @@ const useRpc = () => {
     }
   };
 
-  const getProtocolConfig = async () => {
-    try {
-      const protocolConfig = await newProvider.experimental_protocolConfig({
-        finality: 'final',
-      });
-      return protocolConfig;
-    } catch (error) {
-      console.error('Error fetching protocolConfig:', error);
-      return null;
-    }
-  };
-
-  const currentAndNextSeatprice = async () => {
-    const currentEpochSeatPrice = await newProvider.getCurrentEpochSeatPrice();
-    const nextEpochSeatPrice = await newProvider.getNextEpochSeatPrice();
-    return {
-      currentEpochSeatPrice: currentEpochSeatPrice,
-      nextEpochSeatPrice: nextEpochSeatPrice,
-    };
-  };
-
   const transactionStatus = async (hash: any, signer: any) => {
     const decodedHash = baseDecode(hash);
     const uint8ArrayHash = new Uint8Array(decodedHash);
@@ -307,8 +285,6 @@ const useRpc = () => {
     viewAccessKey,
     viewAccessKeys,
     viewAccount,
-    getProtocolConfig,
-    currentAndNextSeatprice,
   };
 };
 export default useRpc;
