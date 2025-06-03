@@ -1,6 +1,3 @@
-SELECT
-  attach_tablespace ('tbs1', 'balance_events', if_not_attached => true);
-
 CREATE
 OR REPLACE PROCEDURE move_chunks (job_id INT, config JSONB) LANGUAGE PLPGSQL AS $$
   DECLARE
