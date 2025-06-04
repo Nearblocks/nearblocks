@@ -195,7 +195,7 @@ const Footer = ({ theme: cookieTheme }: { theme: string }) => {
               Price feeds aggregated by{' '}
               <Link
                 className="mx-1  flex items-center"
-                href="http://coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
+                href="https://www.coingecko.com?utm_campaign=partnership&utm_source=nearblocks&utm_medium=referral"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
               >
