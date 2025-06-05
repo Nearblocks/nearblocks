@@ -1,28 +1,40 @@
 import { Knex } from 'nb-knex';
-import { IndexerTransactionWithOutcome, Message } from 'nb-neardata';
+import {
+  BlockHeader,
+  IndexerTransactionWithOutcome,
+  Message,
+} from 'nb-neardata';
 import { Transaction } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
 import { txnHistogram } from '#libs/prom';
-import { mapExecutionStatus } from '#libs/utils';
 
 const batchSize = config.insertLimit;
 
 export const storeTransactions = async (knex: Knex, message: Message) => {
   const start = performance.now();
-  const chunks = message.shards.flatMap((shard) => shard.chunk || []);
-  const transactions = chunks.flatMap((chunk) => {
-    return chunk.transactions.map((txn, index) =>
-      getTransactionData(
-        txn,
-        chunk.header.chunkHash,
-        message.block.header.hash,
-        message.block.header.timestampNanosec,
-        index,
-      ),
-    );
-  });
+  const transactions: Transaction[] = [];
+
+  for (const shard of message.shards) {
+    if (shard.chunk) {
+      const txnsCount = shard.chunk.transactions.length;
+
+      for (let index = 0; index < txnsCount; index++) {
+        const txn = shard.chunk.transactions[index];
+
+        transactions.push(
+          getTransactionData(
+            txn,
+            shard.shardId,
+            shard.chunk.header.chunkHash,
+            message.block.header,
+            index,
+          ),
+        );
+      }
+    }
+  }
 
   if (transactions.length) {
     const promises = [];
@@ -34,7 +46,7 @@ export const storeTransactions = async (knex: Knex, message: Message) => {
         retry(async () => {
           await knex('transactions')
             .insert(batch)
-            .onConflict(['transaction_hash'])
+            .onConflict(['transaction_hash', 'block_timestamp'])
             .ignore();
         }),
       );
@@ -47,22 +59,22 @@ export const storeTransactions = async (knex: Knex, message: Message) => {
 };
 
 const getTransactionData = (
-  tx: IndexerTransactionWithOutcome,
+  txn: IndexerTransactionWithOutcome,
+  shardId: number,
   chunkHash: string,
-  blockHash: string,
-  blockTimestamp: string,
+  blockHeader: BlockHeader,
   indexInChunk: number,
 ): Transaction => ({
-  block_timestamp: blockTimestamp,
-  converted_into_receipt_id: tx.outcome.executionOutcome.outcome.receiptIds[0],
-  included_in_block_hash: blockHash,
+  block_timestamp: blockHeader.timestampNanosec,
+  converted_into_receipt_id: txn.outcome.executionOutcome.outcome.receiptIds[0],
+  included_in_block_hash: blockHeader.hash,
   included_in_chunk_hash: chunkHash,
   index_in_chunk: indexInChunk,
-  receipt_conversion_gas_burnt: tx.outcome.executionOutcome.outcome.gasBurnt,
+  receipt_conversion_gas_burnt: txn.outcome.executionOutcome.outcome.gasBurnt,
   receipt_conversion_tokens_burnt:
-    tx.outcome.executionOutcome.outcome.tokensBurnt,
-  receiver_account_id: tx.transaction.receiverId,
-  signer_account_id: tx.transaction.signerId,
-  status: mapExecutionStatus(tx.outcome.executionOutcome.outcome.status),
-  transaction_hash: tx.transaction.hash,
+    txn.outcome.executionOutcome.outcome.tokensBurnt,
+  receiver_account_id: txn.transaction.receiverId,
+  shard_id: shardId,
+  signer_account_id: txn.transaction.signerId,
+  transaction_hash: txn.transaction.hash,
 });

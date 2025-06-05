@@ -14,13 +14,12 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const knex: Knex = createKnex({
+const dbConfig = {
   client: 'pg',
   connection: {
     application_name: 'indexer-base',
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
-    statement_timeout: 60 * 1000, // 60s
   },
   pool: {
     acquireTimeoutMillis: 60000,
@@ -30,6 +29,21 @@ const knex: Knex = createKnex({
     min: 10,
     propagateCreateError: false,
   },
-});
+};
 
-export default knex;
+const migrationConfig = {
+  ...dbConfig,
+  connection: {
+    ...dbConfig.connection,
+    application_name: 'indexer-base-migration',
+  },
+  migrations: {
+    directory: './apps/indexer-base/migrations',
+    tableName: 'knex_migrations',
+  },
+  pool: { max: 1, min: 0 },
+};
+
+export const db: Knex = createKnex(dbConfig);
+
+export const dbMigration: Knex = createKnex(migrationConfig);

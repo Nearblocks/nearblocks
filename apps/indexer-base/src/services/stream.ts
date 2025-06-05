@@ -4,7 +4,7 @@ import { logger } from 'nb-logger';
 import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import knex from '#libs/knex';
+import { db } from '#libs/knex';
 import { blockGauge, blocksHistogram, dataSourceGauge } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { checkFastnear } from '#libs/utils';
@@ -59,9 +59,7 @@ export const syncData = async () => {
       logger.info({ data_source: source });
 
       let startBlockHeight = config.startBlockHeight;
-      const block = await knex('blocks')
-        .orderBy('block_height', 'desc')
-        .first();
+      const block = await db('blocks').orderBy('block_height', 'desc').first();
 
       if (source === DataSource.FAST_NEAR) {
         if (!startBlockHeight && block) {
@@ -126,11 +124,11 @@ export const onMessage = async (message: Message) => {
 
     await Promise.race([
       Promise.all([
-        storeBlock(knex, message),
-        storeChunks(knex, message),
-        storeTransactions(knex, message),
-        storeAccounts(knex, message),
-        storeAccessKeys(knex, message),
+        storeBlock(db, message),
+        storeChunks(db, message),
+        storeTransactions(db, message),
+        storeAccounts(db, message),
+        storeAccessKeys(db, message),
         uploadJson(message),
       ]),
       new Promise((_, reject) =>

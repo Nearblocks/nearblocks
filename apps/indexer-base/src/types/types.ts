@@ -1,6 +1,6 @@
 import { types } from '@near-lake/framework';
 
-import { AccessKeyPermissionKind, Network } from 'nb-types';
+import { Network } from 'nb-types';
 
 export interface Config {
   dataSource: string;
@@ -31,12 +31,3 @@ export interface Config {
   sentryDsn?: string;
   startBlockHeight: number;
 }
-
-export type AccessKeyPermission = {
-  permission_details?: {
-    allowance: string;
-    method_names: string[];
-    receiver_id: string;
-  };
-  permission_kind: AccessKeyPermissionKind;
-};

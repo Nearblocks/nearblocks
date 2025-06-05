@@ -32,6 +32,7 @@
     "@types/node": "~22.13",
     "@types/stream-json": "~1.7",
     "eslint-config-custom-node": "*",
+    "knex-migrate-sql-file": "~2.0",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-neardata": "*",

@@ -39,7 +39,7 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
         retry(async () => {
           await knex('execution_outcomes')
             .insert(batch)
-            .onConflict(['receipt_id'])
+            .onConflict(['receipt_id', 'executed_in_block_timestamp'])
             .ignore();
         }),
       );

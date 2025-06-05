@@ -3,7 +3,6 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { dbRead, dbWrite, streamConfig } from '#libs/knex';
-import { lru } from '#libs/lru';
 import { cacheHistogram } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { prepareCache } from '#services/cache';
@@ -86,7 +85,6 @@ export const onMessage = async (message: Message) => {
       .onConflict('key')
       .merge();
   } catch (error) {
-    logger.warn([...lru.entries()]);
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);

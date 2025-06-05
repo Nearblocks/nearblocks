@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
 
 import {
-  AccessKeyPermissionKind,
   ActionKind,
   DexEventType,
   EventCause,
@@ -51,7 +50,8 @@ export type AccessKey = {
   created_by_receipt_id: null | string;
   deleted_by_block_height: null | number;
   deleted_by_receipt_id: null | string;
-  permission_kind: AccessKeyPermissionKind;
+  permission: JsonValue;
+  permission_kind: string;
   public_key: string;
 };
 
@@ -67,11 +67,13 @@ export type ActionReceiptAction = {
   action_kind: ActionKind;
   args: JsonValue;
   index_in_action_receipt: number;
+  index_in_chunk: number;
   nep518_rlp_hash: null | string;
   receipt_id: string;
   receipt_included_in_block_timestamp: string;
   receipt_predecessor_account_id: string;
   receipt_receiver_account_id: string;
+  shard_id: number;
 };
 
 export type ActionReceiptInputData = {
@@ -343,6 +345,7 @@ export type Receipt = {
   receipt_id: string;
   receipt_kind: ReceiptKind;
   receiver_account_id: string;
+  shard_id: number;
 };
 
 export type Setting = {
@@ -402,8 +405,8 @@ export type Transaction = {
   receipt_conversion_gas_burnt: number;
   receipt_conversion_tokens_burnt: string;
   receiver_account_id: string;
+  shard_id: number;
   signer_account_id: string;
-  status: ExecutionOutcomeStatus;
   transaction_hash: string;
 };
 

@@ -1,22 +1,11 @@
 import { base58 } from '@scure/base';
-import { snakeCase, toUpper } from 'lodash-es';
 
 import { logger } from 'nb-logger';
 import { ExecutionStatus, Message } from 'nb-neardata';
-import { ExecutionOutcomeStatus, Network } from 'nb-types';
+import { Network } from 'nb-types';
 
 import config from '#config';
-import knex from '#libs/knex';
-
-export const mapExecutionStatus = (
-  status: ExecutionStatus,
-): ExecutionOutcomeStatus => {
-  const key = toUpper(
-    snakeCase(Object.keys(status)[0]),
-  ) as keyof typeof ExecutionOutcomeStatus;
-
-  return ExecutionOutcomeStatus[key];
-};
+import { db } from '#libs/knex';
 
 export const publicKeyFromImplicitAccount = (account: string) => {
   try {
@@ -54,7 +43,7 @@ export const checkFastnear = async () => {
     },
   );
   const latestBlock = (await latestResponse.json()) as Message;
-  const block = await knex('blocks').orderBy('block_height', 'desc').first();
+  const block = await db('blocks').orderBy('block_height', 'desc').first();
 
   logger.info({
     block: block?.block_height,
@@ -65,4 +54,12 @@ export const checkFastnear = async () => {
   if (!block) throw new Error('No block');
   if (block.block_height - latestBlock.block.header.height > 100)
     throw new Error('Not in sync');
+};
+
+export const isExecutionSuccess = (status: ExecutionStatus) => {
+  if ('SuccessValue' in status || 'SuccessReceiptId' in status) {
+    return true;
+  }
+
+  return false;
 };
