@@ -1,0 +1,22 @@
+{
+  "name": "nb-neardata",
+  "version": "0.1.2",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix"
+  },
+  "devDependencies": {
+    "axios": "1.6.2",
+    "eslint-config-custom-node": "*",
+    "nb-logger": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "typescript": "~5.2"
+  }
+}

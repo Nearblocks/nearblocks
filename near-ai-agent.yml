@@ -1,0 +1,15 @@
+services:
+  api:
+    container_name: near-ai-agent-api
+    build:
+      context: .
+      dockerfile: ./apps/near-ai-agent/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: near-ai-agent.env
+    ports:
+      - '127.0.0.1:3007:3001'
+
+volumes:
+  redis-data:

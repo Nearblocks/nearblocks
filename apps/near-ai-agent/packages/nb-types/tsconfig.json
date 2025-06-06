@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": []
+  },
+  "exclude": ["node_modules", "**/hapi__shot"],
+  "extends": "../../packages/nb-tsconfig/node.json",
+  "include": ["src"]
+}

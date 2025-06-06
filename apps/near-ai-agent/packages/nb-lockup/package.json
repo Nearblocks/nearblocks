@@ -1,0 +1,15 @@
+{
+  "name": "nb-lockup",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "index.node",
+  "scripts": {
+    "build-docker": "docker build -t nb-lockup . && docker run --name nb-lockup nb-lockup && docker cp nb-lockup:/usr/src/app/index.node ./index.node && docker rm nb-lockup",
+    "build-release": "cargo-cp-artifact -nc index.node -- cargo build --message-format=json-render-diagnostics --release"
+  },
+  "devDependencies": {
+    "cargo-cp-artifact": "~0.1"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    // "paths": {
+    //   "#nb-redis": ["../../packages/nb-redis/src/index.ts"]
+    // },
+    "rootDir": "./src",
+    "types": []
+  },
+  "exclude": ["node_modules", "**/hapi__shot"],
+  "extends": "../../packages/nb-tsconfig/node.json",
+  "include": ["src"]
+}
