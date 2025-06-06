@@ -10,6 +10,7 @@ import { isValidJson, shortenAddress } from '@/utils/app/libs';
 import { useState } from 'react';
 import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
+import { encodeArgs } from '@/utils/app/near';
 
 const FunctionCall = (props: TransactionActionInfo) => {
   const t = useTranslations();
@@ -89,7 +90,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
   const modifiedData =
     args?.method_name === 'submit' && receiver.includes('aurora')
       ? { tx_bytes_b64: args.args_base64 || args.args }
-      : args.args_base64 || args.args;
+      : args.args_base64 || args.args || encodeArgs(args?.args_json);
 
   const decodedData = args?.args_base64 || args?.args || args?.args_json;
   const jsonStringifiedData = displayArgs(decodedData);

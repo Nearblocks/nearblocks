@@ -23,7 +23,6 @@ import useRpc from '@/hooks/app/useRpc';
 interface Props {
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
-  rpcReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -32,7 +31,7 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData, rpcReceipt } = props;
+  const { borderFlag, receipt, statsData } = props;
 
   const t = useTranslations();
   const [pageHash] = useHash();
@@ -187,7 +186,7 @@ const ReceiptRow = (props: Props) => {
             ? ''
             : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
         }
-        id={`${receipt?.receipt_id}-${rpcReceipt?.receipt_id}`}
+        id={`${receipt?.receipt_id}`}
       >
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -400,19 +399,19 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!rpcReceipt ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
             </div>
-          ) : rpcReceipt?.actions ? (
+          ) : receipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {rpcReceipt &&
-                rpcReceipt?.actions?.map((action: any, i: number) => (
+              {receipt &&
+                receipt?.actions?.map((action: any, i: number) => (
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={rpcReceipt?.receiver_id}
+                    receiver={receipt?.receiver_id}
                   />
                 ))}
             </div>
@@ -461,13 +460,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!rpcReceipt ? (
+          {!receipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {rpcReceipt ? <ReceiptStatus receipt={rpcReceipt} /> : ''}
+              {receipt ? <ReceiptStatus receipt={receipt} /> : ''}
             </div>
           )}
         </div>
@@ -541,19 +540,10 @@ const ReceiptRow = (props: Props) => {
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <div className="pb-4">
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
-            const matchingRpcReceipt =
-              rpcReceipt?.outcome?.outgoing_receipts?.find(
-                (rpcRcpt: any) => rpcRcpt?.receipt_id === rcpt?.receipt_id,
-              );
             return (
               <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
                 <div className="mx-4 border-l-4 border-l-gray-200">
-                  <ReceiptRow
-                    borderFlag
-                    receipt={rcpt}
-                    statsData={statsData}
-                    rpcReceipt={matchingRpcReceipt || null}
-                  />
+                  <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
                 </div>
               </div>
             );

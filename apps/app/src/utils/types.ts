@@ -2028,8 +2028,10 @@ export type ReceiptTree = {
     rlp_hash: string | null;
   }>;
 
-  outcome?: {
+  outcome: {
     logs: string[] | null;
+    result: string;
+    status_key: string;
     status:
       | boolean
       | {
