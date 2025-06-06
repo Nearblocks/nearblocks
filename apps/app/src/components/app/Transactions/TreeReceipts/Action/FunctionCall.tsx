@@ -7,6 +7,7 @@ import { shortenAddress } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 
 import TreeNode from '../TreeNode';
+import { encodeArgs } from '@/utils/app/near';
 
 const FunctionCall = (props: TransactionActionInfo) => {
   const { action, args, receiver } = props;
@@ -14,7 +15,6 @@ const FunctionCall = (props: TransactionActionInfo) => {
 
   function displayArgs(args: any) {
     if (!args || typeof args === 'undefined') return 'The arguments are empty';
-
     let pretty: any = '';
     const decoded = Buffer.from(args, 'base64');
     try {
@@ -44,7 +44,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
     ...action,
     args: {
       ...action.args,
-      args: displayArgs(args?.args_base64 || args?.args),
+      args: displayArgs(
+        args?.args_base64 || args?.args || encodeArgs(args?.args_json),
+      ),
     },
   };
   return (

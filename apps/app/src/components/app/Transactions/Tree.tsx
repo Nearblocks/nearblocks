@@ -191,7 +191,6 @@ const Tree = (props: Props) => {
                     <div className="w-full md:w-5/12 lg:w-1/3 xl:w-1/4">
                       <TreeReceiptDetails
                         receipt={receipt}
-                        rpcReceipt={rpcReceipt}
                         show={show}
                         txn={txn}
                       />
