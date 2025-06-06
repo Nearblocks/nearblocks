@@ -1,89 +1,22 @@
 'use client';
-import { useEffect, useState } from 'react';
-
-import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { convertToUTC, nanoToMilli } from '@/utils/libs';
-import { ContractCodeInfo, DeploymentsInfo } from '@/utils/types';
+import { DeploymentsInfo } from '@/utils/types';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import Question from '@/components/app/Icons/Question';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useAddressRpc } from '../../common/AddressRpcProvider';
 
 interface Props {
   data: { deployments: DeploymentsInfo[] };
   id: string;
 }
 
-const Info = (props: Props) => {
-  const [contract, setContract] = useState<ContractCodeInfo | null>(null);
-  const [rpcError, setRpcError] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
-  const { contractCode, viewAccessKeys } = useRpc();
-  const rpcUrl: string = useRpcStore((state) => state.rpc);
-  const switchRpc = useRpcStore((state) => state.switchRpc);
-  const { data, id } = props;
+const Info = ({ data }: Props) => {
   const deployments = data?.deployments;
-
+  const { contractInfo: contract, isLocked } = useAddressRpc();
   const [createAction, updateAction] = deployments || [];
   const action = updateAction || createAction;
-
-  useEffect(() => {
-    const loadSchema = async () => {
-      if (!id) return;
-
-      try {
-        setRpcError(false);
-        const [code, keys]: any = await Promise.all([
-          contractCode(id as string).catch((error: any) => {
-            console.error(`Error fetching contract code for ${id}:`, error);
-            return null;
-          }),
-          viewAccessKeys(id as string).catch((error: any) => {
-            console.error(`Error fetching access keys for ${id}:`, error);
-            return null;
-          }),
-        ]);
-        if (code && code?.code_base64) {
-          setContract({
-            block_hash: code.block_hash,
-            block_height: code.block_height,
-            code_base64: code.code_base64,
-            hash: code.hash,
-          });
-        } else {
-          setContract(null);
-        }
-
-        const locked = (keys?.keys || []).every(
-          (key: {
-            access_key: {
-              nonce: string;
-              permission: string;
-            };
-            public_key: string;
-          }) => key?.access_key.permission !== 'FullAccess',
-        );
-
-        setIsLocked(locked);
-      } catch (error) {
-        // Handle errors appropriately
-        setRpcError(true);
-        console.error('Error loading schema:', error);
-      }
-    };
-
-    loadSchema();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, rpcUrl]);
-
-  useEffect(() => {
-    if (rpcError) {
-      switchRpc();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rpcError]);
 
   const Loader = (props: { className?: string; wrapperClassName?: string }) => {
     return (

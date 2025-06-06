@@ -8,17 +8,18 @@ import { Link } from '@/i18n/routing';
 import { use } from 'react';
 
 export default function TabSkeletion({
-  parsePromise,
+  deploymentPromise,
 }: {
   error?: boolean;
   reset?: any;
-  parsePromise: Promise<any>;
+  deploymentPromise: Promise<any>;
 }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const params = useParams<{ id: string }>();
   const tab = searchParams?.get('tab') || 'txns';
-  const parse = use(parsePromise);
+  const deployment = use(deploymentPromise);
+  const deploymentInfo = deployment?.deployments?.[0];
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
     { label: 'Receipts', message: 'Receipts', name: 'receipts' },
@@ -53,11 +54,7 @@ export default function TabSkeletion({
           <div className="w-full ">
             <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
               {tabs?.map(({ message, name }: any) => {
-                const hasContractTab =
-                  parse?.contract?.[0]?.contract &&
-                  Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
-                  parse.contract[0].contract.methodNames.length > 0;
-
+                const hasContractTab = !!deploymentInfo;
                 if (!hasContractTab && name === 'contract') return null;
                 return (
                   <Link

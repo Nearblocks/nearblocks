@@ -1,8 +1,6 @@
 import { Suspense } from 'react';
 
 import AccountTabs from '@/components/app/Address/AccountTabs';
-import Balance from '@/components/app/Address/Balance';
-import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import TabSkeletion from '@/components/app/skeleton/address/tab';
 import { getRequest } from '@/utils/app/api';
 
@@ -28,34 +26,27 @@ export default async function AddressIndex(props: {
 
   const { cursor, page, ...rest } = searchParams;
 
-  const parse = getRequest(`v1/account/${id}/contract/parse`) || {};
-  const deploymentInfo =
-    getRequest(`v1/account/${id}/contract/deployments`) || {};
-  const tokenDetails = getRequest(`v1/fts/${id}`) || {};
-  const nftTokenData = getRequest(`v1/nfts/${id}`) || {};
+  const options: RequestInit = {
+    cache: 'no-store',
+  };
+
+  const deploymentInfo = getRequest(
+    `v1/account/${id}/contract/deployments`,
+    {},
+    options,
+  );
 
   return (
     <>
       <Suspense
-        fallback={
-          <BalanceSkeleton
-            parsePromise={parse}
-            deploymentPromise={deploymentInfo}
-            ftPromise={tokenDetails}
-            nftPromise={nftTokenData}
-          />
-        }
-      >
-        <Balance id={id} />
-      </Suspense>
-
-      <div className="py-2"></div>
-
-      <Suspense
-        fallback={<TabSkeletion parsePromise={parse} />}
+        fallback={<TabSkeletion deploymentPromise={deploymentInfo} />}
         key={JSON.stringify(rest)}
       >
-        <AccountTabs id={id} searchParams={searchParams} />
+        <AccountTabs
+          id={id}
+          searchParams={searchParams}
+          deploymentPromise={deploymentInfo}
+        />
       </Suspense>
     </>
   );

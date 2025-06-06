@@ -143,9 +143,10 @@ export type BlocksInfo = {
 
 export type ContractCodeInfo = {
   block_hash: string;
-  block_height: string;
+  block_height: number;
   code_base64: string;
   hash: string;
+  locked: boolean;
 };
 
 export type KeysInfo = {
@@ -517,6 +518,7 @@ export type Obj = {
 };
 
 export type AccountContractInfo = {
+  access_key: AccessInfo;
   account_id: string;
   amount: string;
   block_hash: string;

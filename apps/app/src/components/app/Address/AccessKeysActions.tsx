@@ -1,21 +1,15 @@
 'use client';
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
-import { use, useEffect, useState } from 'react';
-
-import useRpc from '@/hooks/app/useRpc';
-import { AccountContractInfo, KeysInfo } from '@/utils/types';
+import { use, useState } from 'react';
+import { AccountContractInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Paginator from '@/components/app/common/Paginator';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import SortIcon from '@/components/app/Icons/SortIcon';
 import AccessKeyRow from '@/components/app/Address/AccessKeyRow';
+import { useAddressRpc } from '../common/AddressRpcProvider';
 
 interface Props {
   dataPromise: Promise<any>;
@@ -25,48 +19,16 @@ interface Props {
 const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
   const data = use(dataPromise);
   const countData = use(countPromise);
-  if (data?.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
-  }
   const count = countData?.keys?.[0]?.count;
-  const error = !data || data === null;
+  const error = !data || data?.message === 'Error';
   const keys: AccountContractInfo[] = data?.keys;
   const router = useRouter();
   const pathname = usePathname();
-  const { viewAccessKeys } = useRpc();
-  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');
   const [showWhen, setShowWhen] = useState(true);
   const toggleShowWhen = () => setShowWhen((s) => !s);
-  const [accessKeys, setAccessKeys] = useState<KeysInfo[]>([]);
-
-  useEffect(() => {
-    const fetchAccountData = async () => {
-      if (!keys || keys?.length === 0) {
-        try {
-          const [accessKeyInfo]: any = await Promise.all([
-            viewAccessKeys(params?.id as string).catch((error: any) => {
-              console.log(
-                `Error fetching access keys for ${params?.id}:`,
-                error,
-              );
-              return null;
-            }),
-          ]);
-
-          if (Array.isArray(accessKeyInfo?.keys)) {
-            setAccessKeys(accessKeyInfo.keys);
-          }
-        } catch (error) {
-          console.log('Error loading schema:', error);
-        }
-      }
-    };
-
-    fetchAccountData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keys, params?.id]);
+  const { accessKeys, isLoading } = useAddressRpc();
 
   const onOrder = () => {
     const currentOrder = searchParams?.get('order') || 'desc';
@@ -79,8 +41,8 @@ const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
     router.push(`${pathname}?${newQueryString}`);
   };
 
-  const accessKeysInfo = keys || accessKeys;
-  const accessKeysCount = count || Number(accessKeys?.length);
+  const accessKeysInfo = keys || (accessKeys ?? []);
+  const accessKeysCount = Number(count) || (accessKeys ?? [])?.length;
 
   return (
     <>
@@ -149,7 +111,7 @@ const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-            {(error && (
+            {accessKeysCount === 0 ? (
               <tr className="h-[57px]">
                 <td
                   className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
@@ -157,14 +119,15 @@ const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
                 >
                   <ErrorMessage
                     icons={<FaInbox />}
-                    message="An error occurred"
+                    message="No access keys"
                     mutedText="Please try again later"
                   />
                 </td>
               </tr>
-            )) ||
-              !keys ||
-              (keys?.length === 0 && (
+            ) : (
+              error &&
+              !isLoading &&
+              !accessKeysCount && (
                 <tr className="h-[57px]">
                   <td
                     className="px-6 py-4 text-nearblue-700 dark:text-gray-400 text-xs"
@@ -172,17 +135,17 @@ const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
                   >
                     <ErrorMessage
                       icons={<FaInbox />}
-                      message="No access keys"
+                      message="An error occurred"
                       mutedText="Please try again later"
                     />
                   </td>
                 </tr>
-              ))}
-
-            {!error &&
-              accessKeysInfo &&
+              )
+            )}
+            {accessKeysInfo &&
               accessKeysInfo?.map((key: any) => (
                 <AccessKeyRow
+                  error={error}
                   accessKey={key}
                   key={key?.account_id + key?.public_key}
                   showWhen={showWhen}
@@ -191,7 +154,7 @@ const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
           </tbody>
         </table>
       </div>
-      {accessKeysInfo?.length > 0 && (
+      {accessKeysCount > 0 && (
         <Paginator count={accessKeysCount} limit={25} pageLimit={200} />
       )}
     </>

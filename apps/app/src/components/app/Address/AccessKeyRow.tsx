@@ -13,11 +13,14 @@ import TimeStamp from '@/components/app/common/TimeStamp';
 interface Props {
   accessKey: AccountContractInfo;
   showWhen: boolean;
+  error: boolean;
 }
 
-const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
+const AccessKeyRow = ({ accessKey, showWhen, error }: Props) => {
   const t = useTranslations();
-  const [keyInfo, setKeyInfo] = useState<AccessInfo>({} as AccessInfo);
+  const [keyInfo, setKeyInfo] = useState<AccessInfo>(
+    error ? accessKey?.access_key : ({} as AccessInfo),
+  );
   const { viewAccessKey } = useRpc();
   const createdTime = accessKey?.created?.block_timestamp
     ? nanoToMilli(accessKey?.created?.block_timestamp)
@@ -94,17 +97,19 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
   }
 
   useEffect(() => {
-    if (
-      accessKey?.public_key &&
-      accessKey?.permission_kind === 'FUNCTION_CALL'
-    ) {
-      viewAccessKey(accessKey?.account_id, accessKey?.public_key)
-        .then((data) => {
-          if (data) {
-            setKeyInfo(data);
-          }
-        })
-        .catch(() => {});
+    if (error) {
+      if (
+        accessKey?.public_key &&
+        accessKey?.permission_kind === 'FUNCTION_CALL'
+      ) {
+        viewAccessKey(accessKey?.account_id, accessKey?.public_key)
+          .then((data) => {
+            if (data) {
+              setKeyInfo(data);
+            }
+          })
+          .catch(() => {});
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessKey]);
@@ -167,9 +172,13 @@ const AccessKeyRow = ({ accessKey, showWhen }: Props) => {
                       return <div key={method}>{showMethod(method)} </div>;
                     },
                   )
-                : accessKey?.permission_kind === 'FUNCTION_CALL'
+                : !error
+                ? accessKey?.permission_kind === 'FUNCTION_CALL'
+                  ? 'Any'
+                  : 'Full Access'
+                : keyInfo?.permission?.FunctionCall
                 ? 'Any'
-                : 'Full Access'}
+                : ''}
             </div>
           )}
         </td>

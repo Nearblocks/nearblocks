@@ -11,23 +11,17 @@ import TableSummary from '@/components/app/common/TableSummary';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import { ErrorBoundary } from 'react-error-boundary';
-import { getRequest } from '@/utils/app/api';
 
 export default async function AccountTabs({
   id,
   searchParams,
+  deploymentPromise,
 }: {
   id: string;
   searchParams: any;
+  deploymentPromise: Promise<any>;
 }) {
   const tab = searchParams?.tab || 'txns';
-  const options: RequestInit = {
-    cache: 'force-cache',
-  };
-
-  const parse =
-    getRequest(`v1/account/${id}/contract/parse`, {}, options) || {};
-
   const fallbackError = (
     <>
       <TableSummary text="" />
@@ -51,7 +45,7 @@ export default async function AccountTabs({
   );
 
   return (
-    <AccountTabsActions parsePromise={parse}>
+    <AccountTabsActions deploymentPromise={deploymentPromise}>
       {tab === 'txns' ? (
         <ErrorBoundary fallback={fallbackError}>
           <Transactions id={id} searchParams={searchParams} />
