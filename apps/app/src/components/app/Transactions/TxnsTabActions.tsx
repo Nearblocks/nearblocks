@@ -208,8 +208,8 @@ const TxnsTabActions = ({
   }, [rpcTxn]);
 
   const apiContract =
-    Array.isArray(apiTxnActionsData?.apiActions) &&
-    apiTxnActionsData?.apiActions.some(
+    Array.isArray(apiTxnActionsData?.apiMainActions) &&
+    apiTxnActionsData?.apiMainActions.some(
       (action: any) =>
         action?.action_kind === 'FUNCTION_CALL' ||
         action?.action_kind === 'DELEGATE',

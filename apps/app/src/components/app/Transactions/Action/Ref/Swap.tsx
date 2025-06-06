@@ -15,6 +15,13 @@ const Swap = (props: EventPropsInfo) => {
   if (!Array.isArray(log)) {
     return null;
   }
+  const metaInfo1 = props?.tokenMetadata?.filter(
+    (meta: any) => meta?.contractId === log[2],
+  );
+
+  const metaInfo2 = props?.tokenMetadata?.filter(
+    (meta: any) => meta?.contractId === log[4].replace(/,$/, ''),
+  );
 
   if (log?.length === 0) return null;
   return (
@@ -29,15 +36,11 @@ const Swap = (props: EventPropsInfo) => {
         <FaRight className="inline-flex text-gray-400 text-xs" />
       )}
       <span className="font-bold px-1">Swap </span>
-      <TokenInfo
-        amount={log[1]}
-        contract={log[2]}
-        metaInfo={props?.tokenMetadata}
-      />
+      <TokenInfo amount={log[1]} contract={log[2]} metaInfo={metaInfo1} />
       <TokenInfo
         amount={log[3]}
         contract={log[4].replace(/,$/, '')}
-        metaInfo={props?.tokenMetadata}
+        metaInfo={metaInfo2}
       />
       <span className="font-bold text-gray px-1 flex items-center">
         On

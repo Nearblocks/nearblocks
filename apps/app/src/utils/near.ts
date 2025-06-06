@@ -19,6 +19,7 @@ import {
   ParsedReceipt,
   ParseOutcomeInfo,
   ProcessedTokenMeta,
+  ReceiptAction,
   ReceiptApiResponse,
   ReceiptsInfo,
   ReceiptTree,
@@ -425,41 +426,44 @@ export function apiTxnActionLogs(txn: ApiTransaction): TransactionLog[] {
   return txLogs;
 }
 
-export function apiSubActions(apiTxn: ApiTransaction): ActionInfo[] {
-  const txActions: ActionInfo[] = [];
-  const transaction = apiTxn?.actions || [];
-  const from = apiTxn?.signer_account_id;
-  const to = apiTxn?.receiver_account_id;
-  const receipt = apiTxn?.receipts?.[0]?.receipt_id;
+export function processApiActions(
+  apiData: ReceiptApiResponse | null,
+  allAction: boolean = true,
+): ReceiptAction[] {
+  const txActions: any = [];
+  const receiptTree = apiData?.receipts?.[0];
 
-  const remainingLogs = apiRemainingLogs(apiTxn);
+  function processReceipt(receipt: any, isTopLevel = false) {
+    const from = receipt?.predecessor_account_id;
+    const to = receipt?.receiver_account_id;
+    const receiptId = receipt?.receipt_id;
 
-  const allLogs = [...remainingLogs];
+    if (from === 'system') return;
 
-  const actionsLog =
-    apiTxn?.actions?.map((action: any) => {
-      const actionInfo = processApiAction(action);
-      return {
-        ...actionInfo,
-        args: {
-          deposit: actionInfo?.args?.deposit || 0,
-          gas: actionInfo?.args?.gas || apiTxn?.actions_agg?.gas_attached || 0,
-          method_name: actionInfo?.args?.method_name,
-          args: actionInfo?.args?.args,
-        },
-      };
-    }) || [];
+    const actions = receipt?.actions || [];
 
-  for (let i = 0; i < transaction.length; i++) {
-    const action = processApiAction(transaction[i]);
-    txActions.push({
-      to,
-      from,
-      receiptId: receipt,
-      logs: allLogs,
-      actionsLog,
-      ...action,
-    });
+    if (!isTopLevel) {
+      for (let i = 0; i < actions?.length; i++) {
+        const action = actions[i];
+
+        txActions.push({
+          from,
+          to,
+          receiptId,
+          action_kind: action?.action_kind,
+          args: action?.args,
+        });
+      }
+    }
+
+    const nestedReceipts = receipt?.receipts || [];
+    for (let i = 0; i < nestedReceipts?.length; i++) {
+      processReceipt(nestedReceipts[i], false);
+    }
+  }
+
+  if (receiptTree && receiptTree?.receipt_tree) {
+    processReceipt(receiptTree?.receipt_tree, allAction);
   }
 
   return txActions;
@@ -497,7 +501,6 @@ export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
 
   for (let i = 0; i < transaction.length; i++) {
     const action = processApiAction(transaction[i], args);
-
     txActions.push({
       to,
       from,
@@ -580,10 +583,9 @@ function processApiAction(action: any, args?: any) {
     action_kind: action?.action,
     args: {
       method_name: action?.method,
-      args: action?.args,
       deposit: args?.deposit || 0,
       gas: args?.gas_attached || 0,
-      ...action?.args_full,
+      ...action?.args,
     },
   };
 }
@@ -682,28 +684,19 @@ export async function processTransactionWithTokens(
   apiTxn: ApiTransaction,
   receipt: ReceiptApiResponse,
 ) {
-  const logs = apiTxnLogs(apiTxn);
-  const apiActions = apiMainTxnsActions(apiTxn);
-  const subActions = apiSubActions(apiTxn);
+  const apiLogs = apiTxnLogs(apiTxn);
+  const apiMainActions = apiMainTxnsActions(apiTxn);
+  const apiSubActions = processApiActions(receipt);
+  const apiAllActions = processApiActions(receipt, false);
   const apiActionLogs = apiTxnActionLogs(apiTxn);
   const receiptData = transformReceiptData(receipt);
-  const allLogs = (
-    apiActions && apiActions?.[0] && apiActions?.[0]?.logs
-      ? apiActions?.[0]?.logs
-      : []
-  ).concat(
-    subActions && subActions?.[0] && subActions?.[0]?.logs
-      ? subActions?.[0]?.logs
-      : [],
-  );
-
-  const tokenMetadata = await processTokenMetadata(allLogs || []);
-
+  const tokenMetadata = await processTokenMetadata(apiLogs || []);
   return {
-    logs,
+    apiLogs,
     apiActionLogs,
-    apiActions,
-    subActions,
+    apiMainActions,
+    apiSubActions,
+    apiAllActions,
     receiptData,
     tokenMetadata,
   };

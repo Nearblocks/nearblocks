@@ -294,6 +294,7 @@ export type TransactionInfo = {
   block: {
     block_height: string;
     block_timestamp: string;
+    block_hash: string;
   };
   block_timestamp: string;
   cause: string;
@@ -1924,10 +1925,11 @@ export type ProcessedTokenMeta = {
 };
 
 export type ApiTxnData = {
-  logs: TransactionLog[];
+  apiLogs: TransactionLog[];
   apiActionLogs: any;
-  apiActions: ActionInfo[];
-  subActions: ActionInfo[];
+  apiMainActions: ActionInfo[];
+  apiSubActions: ReceiptAction[];
+  apiAllActions: ReceiptAction[];
   tokenMetadata: ProcessedTokenMeta[];
   receiptData: TransformedReceipt | null;
 };
@@ -2082,4 +2084,12 @@ export type ReceiptApiResponse = {
   receipts: Array<{
     receipt_tree: ReceiptTree;
   }>;
+};
+
+export type ReceiptAction = {
+  from: string;
+  to: string;
+  receiptId: string;
+  action_kind: string;
+  args: Record<string, any>;
 };

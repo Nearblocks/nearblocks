@@ -45,7 +45,6 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   };
 
   const [block, setBlock] = useState<{ height: string } | null>(null);
-
   const [loading, setLoading] = useState(false);
   const { getBlockDetails } = useRpc();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -69,8 +68,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
           .catch(() => {});
       }
     }
+    if (!receipt?.block_height) fetchBlocks();
 
-    fetchBlocks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.outcome?.blockHash, receipt?.block_hash]);
 
@@ -226,7 +225,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
     status &&
     (status.type === 'successValue' ||
       status.type === 'successReceiptId' ||
-      'SuccessValue' in status);
+      'SuccessValue' in status ||
+      'SuccessReceiptId' in status);
 
   useEffect(() => {
     if (rpcTxn && rpcTxn?.receipts?.length > 0) {
@@ -472,7 +472,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                 <tr>
                   <td
                     className={`flex items-center py-2 pr-4 ${
-                      !block ? 'whitespace-normal' : 'whitespace-nowrap'
+                      !block && receipt?.block_height
+                        ? 'whitespace-normal'
+                        : 'whitespace-nowrap'
                     }`}
                   >
                     <Tooltip
@@ -486,14 +488,14 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
                     Block
                   </td>
                   <td className="py-2 pl-4">
-                    {block && (
+                    {(receipt?.block_height || block) && (
                       <Link
                         className="text-green-500 dark:text-green-250 font-medium"
                         href={`/blocks/${receipt?.outcome?.blockHash}`}
                       >
                         {!loading &&
-                          block?.height &&
-                          localFormat(block?.height)}
+                          (receipt?.block_height || block?.height) &&
+                          localFormat(receipt?.block_height || block?.height)}
                       </Link>
                     )}
                   </td>
