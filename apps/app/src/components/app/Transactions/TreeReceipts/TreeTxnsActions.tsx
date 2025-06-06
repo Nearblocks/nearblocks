@@ -90,7 +90,7 @@ const TreeTxnsActions = (props: TransActionProps) => {
     case 'FUNCTION_CALL':
     case 'FunctionCall':
       return (
-        <FunctionCall action={action} args={action.args} receiver={receiver} />
+        <FunctionCall action={action} args={action?.args} receiver={receiver} />
       );
     case 'STAKE':
     case 'Stake':
@@ -102,6 +102,7 @@ const TreeTxnsActions = (props: TransActionProps) => {
       );
     case 'Delegate':
     case 'DELEGATE':
+    case 'DELEGATE_ACTION':
       const delegateAction: any | DelegateActionView =
         action?.args?.delegate_action?.actions &&
         action?.args?.delegate_action?.actions?.map((txn: ActionType) =>
@@ -118,8 +119,7 @@ const TreeTxnsActions = (props: TransActionProps) => {
           };
         }
       }
-      return (
-        delegateAction &&
+      return delegateAction ? (
         delegateAction.map((_subAction: Action | any, i: number) => (
           <div className="flex flex-col" key={i}>
             <p className="text-sm font-semibold">
@@ -130,6 +130,15 @@ const TreeTxnsActions = (props: TransActionProps) => {
             </div>
           </div>
         ))
+      ) : (
+        <div className="flex flex-col">
+          <p className="text-sm font-semibold">
+            Actions delegated for {receiver}
+          </p>
+          <div className="mt-3 bg-gray-100 dark:bg-black-200 p-3 overflow-auto rounded-lg">
+            <TreeNode node={filterObject(action)} path="root" />
+          </div>
+        </div>
       );
 
     default:
