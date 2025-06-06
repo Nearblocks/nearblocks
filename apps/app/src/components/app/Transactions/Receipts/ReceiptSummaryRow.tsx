@@ -19,7 +19,6 @@ interface Props {
   borderFlag?: boolean;
   price: string;
   receipt: any | ReceiptsPropsInfo;
-  rpcReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -31,7 +30,7 @@ interface Props {
 const ReceiptSummaryRow = (props: Props) => {
   const { networkId } = useConfig();
 
-  const { price, receipt, statsData, txn, rpcReceipt } = props;
+  const { price, receipt, statsData, txn } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
@@ -59,10 +58,7 @@ const ReceiptSummaryRow = (props: Props) => {
     );
   };
 
-  let gasAttached =
-    rpcReceipt?.actions && receipt?.receipt_id === rpcReceipt?.receipt_id
-      ? getGasAttached(rpcReceipt?.actions)
-      : '0';
+  let gasAttached = receipt?.actions ? getGasAttached(receipt?.actions) : '0';
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -156,24 +152,17 @@ const ReceiptSummaryRow = (props: Props) => {
 
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <>
-          {receipt?.outcome?.outgoing_receipts?.map(
-            (rcpt: any, index: number) => {
-              const childRpcReceipt =
-                rpcReceipt?.outcome?.outgoing_receipts?.[index] || null;
-              return (
-                <Fragment key={rcpt?.receipt_id}>
-                  <ReceiptSummaryRow
-                    borderFlag={true}
-                    price={price}
-                    receipt={rcpt}
-                    statsData={statsData}
-                    txn={txn}
-                    rpcReceipt={childRpcReceipt}
-                  />
-                </Fragment>
-              );
-            },
-          )}
+          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
+            <Fragment key={rcpt?.receipt_id}>
+              <ReceiptSummaryRow
+                borderFlag={true}
+                price={price}
+                receipt={rcpt}
+                statsData={statsData}
+                txn={txn}
+              />
+            </Fragment>
+          ))}
         </>
       )}
     </>
