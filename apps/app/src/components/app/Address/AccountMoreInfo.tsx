@@ -7,7 +7,6 @@ export default async function AccountMoreInfo({ id }: any) {
   const deploymentData = getRequest(`v1/account/${id}/contract/deployments`);
   const nftTokenData = getRequest(`v1/nfts/${id}`);
   const syncData = getRequest(`v1/sync/status`);
-  const parse = getRequest(`v1/account/${id}/contract/parse`) || {};
 
   return (
     <AccountMoreInfoActions
@@ -16,7 +15,6 @@ export default async function AccountMoreInfo({ id }: any) {
       nftTokenDataPromise={nftTokenData}
       tokenDataPromise={tokenDetails}
       syncDataPromise={syncData}
-      parseDataPromise={parse}
     />
   );
 }

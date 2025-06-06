@@ -1,19 +1,12 @@
 'use client';
-import { use, useCallback, useEffect, useState } from 'react';
-
-import useRpc from '@/hooks/app/useRpc';
+import { use } from 'react';
 import { convertToUTC, nanoToMilli } from '@/utils/app/libs';
-import {
-  AccountDataInfo,
-  ContractCodeInfo,
-  KeysInfo,
-  TextAdData,
-} from '@/utils/types';
+import { TextAdData } from '@/utils/types';
 
 import WarningIcon from '@/components/app/Icons/WarningIcon';
 import SponsoredText from '@/components/app/SponsoredText';
-import { useParams } from 'next/navigation';
 import AddressValidator from '@/components/app/Address/AddressValidator';
+import { useAddressRpc } from '../common/AddressRpcProvider';
 const AccountAlertsActions = ({
   accountDataPromise,
   sponsoredText,
@@ -23,90 +16,10 @@ const AccountAlertsActions = ({
 }) => {
   const data = use(accountDataPromise);
   const accountData = data?.message === 'Error' ? null : data;
-  const { contractCode, viewAccessKeys, viewAccount } = useRpc();
-  const [contract, setContract] = useState<ContractCodeInfo | null>(null);
-  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
-  const [isLocked, setIsLocked] = useState(false);
-  const [isAccountLoading, setIsAccountLoading] = useState(true);
-  const [isContractLoading, setIsContractLoading] = useState(true);
-  const [accessKeys, setAccessKeys] = useState<null | KeysInfo[]>();
-  const params = useParams<{ id: string }>();
+  const { account, contractInfo, accessKeys, isLocked, isLoading } =
+    useAddressRpc();
 
-  const loadSchema = useCallback(async () => {
-    if (!params?.id) return;
-
-    try {
-      const [code, keys, account]: any = await Promise.all([
-        contractCode(params?.id).catch(() => {
-          return null;
-        }),
-        viewAccessKeys(params?.id).catch((error: any) => {
-          console.log(`Error fetching access keys for ${params?.id}:`, error);
-          return null;
-        }),
-        viewAccount(params?.id).catch(() => {
-          return null;
-        }),
-      ]);
-
-      if (code?.code_base64) {
-        setContract((prev) => {
-          if (!prev || prev.hash !== code?.hash) {
-            return {
-              block_hash: code?.block_hash,
-              block_height: code?.block_height,
-              code_base64: code?.code_base64,
-              hash: code?.hash,
-            };
-          }
-          return prev;
-        });
-        setIsContractLoading(false);
-      } else {
-        setContract((prev) => (prev ? null : prev));
-        setIsContractLoading(false);
-      }
-
-      const locked = (account?.keys || []).every(
-        (key: { access_key: { permission: string } }) =>
-          key?.access_key?.permission !== 'FullAccess',
-      );
-
-      setIsLocked(locked);
-
-      if (account) {
-        setAccountView((prev) => {
-          if (!prev || prev.account_id !== account?.account_id) {
-            return account;
-          }
-          return prev;
-        });
-        setIsAccountLoading(false);
-      } else {
-        setAccountView((prev) => (prev ? null : prev));
-        setIsAccountLoading(false);
-      }
-
-      if (keys?.keys?.length > 0) {
-        setAccessKeys((prev) => {
-          const isSame = JSON.stringify(prev) === JSON.stringify(keys?.keys);
-          return isSame ? prev : keys?.keys;
-        });
-      } else if (keys?.keys?.length === 0) {
-        setAccessKeys([]);
-      }
-    } catch (error) {
-      console.error('Error loading schema:', error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    loadSchema();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.id]);
-
-  if (!isAccountLoading && !isLocked && sponsoredText) {
+  if (!isLoading && !isLocked && sponsoredText) {
     return (
       <div className="container-xxl text-sm dark:text-neargray-10 text-nearblue-600">
         <div>
@@ -118,11 +31,7 @@ const AccountAlertsActions = ({
     );
   }
 
-  if (
-    !accountView &&
-    accountData?.account?.[0]?.deleted?.transaction_hash &&
-    !isAccountLoading
-  ) {
+  if (accountData?.account?.[0]?.deleted?.transaction_hash) {
     return (
       <>
         <div className="block lg:flex lg:space-x-2">
@@ -150,14 +59,13 @@ const AccountAlertsActions = ({
   }
 
   if (
-    accountView !== null &&
+    account !== null &&
     isLocked &&
-    accountData &&
-    accountData?.account?.[0]?.deleted?.transaction_hash === null &&
+    accountData?.account?.[0]?.deleted?.transaction_hash == null &&
     accessKeys &&
     Object.keys(accessKeys)?.length === 0 &&
-    contract === null &&
-    !isContractLoading
+    contractInfo === null &&
+    !isLoading
   ) {
     return (
       <>

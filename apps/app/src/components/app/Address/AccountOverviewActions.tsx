@@ -4,14 +4,13 @@ import { useTranslations } from 'next-intl';
 import React, { use, useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import useRpc from '@/hooks/app/useRpc';
-import { useRpcStore } from '@/stores/app/rpc';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
-import { AccountDataInfo, FtInfo, TokenListInfo } from '@/utils/types';
-
+import { FtInfo, TokenListInfo } from '@/utils/types';
 import TokenHoldings from '@/components/app/common/TokenHoldings';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 import { useParams } from 'next/navigation';
+import { useAddressRpc } from '../common/AddressRpcProvider';
+import useRpc from '@/hooks/app/useRpc';
 
 const AccountOverviewActions = ({
   accountDataPromise,
@@ -20,7 +19,6 @@ const AccountOverviewActions = ({
   spamTokensPromise,
   statsDataPromise,
   tokenDataPromise,
-  syncDataPromise,
 }: {
   accountDataPromise: Promise<any>;
   inventoryDataPromise: Promise<any>;
@@ -34,145 +32,216 @@ const AccountOverviewActions = ({
   const stats = use(statsDataPromise);
   const token = use(tokenDataPromise);
   const inventory = use(inventoryDataPromise);
-  const syncData = use(syncDataPromise);
   const spam = use(spamTokensPromise);
   const accountData = account?.account?.[0];
   const statsData = stats?.stats?.[0];
   const tokenData = token?.contracts?.[0];
   const inventoryData = inventory?.inventory;
-  const status = syncData && syncData?.status?.indexers?.balance?.sync;
   const spamTokens = JSON.parse(spam);
-
-  const { ftBalanceOf, viewAccount } = useRpc();
+  const { account: accountView } = useAddressRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
   const { networkId } = useConfig();
-  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
+  const { ftBalanceOf } = useRpc();
   const params = useParams<{ id: string }>();
 
-  const { rpc: rpcUrl, switchRpc } = useRpcStore();
-  const [rpcError, setRpcError] = useState(false);
-  useEffect(() => {
-    if (rpcError) {
-      try {
-        switchRpc();
-      } catch (error) {
-        setRpcError(true);
-        console.error('Failed to switch RPC:', error);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rpcError]);
-
-  useEffect(() => {
-    const fetchAccountData = async () => {
-      try {
-        const [account]: any = await Promise.all([viewAccount(params?.id)]);
-        if (account) {
-          setAccountView((prev) => {
-            if (!prev || prev.account_id !== account?.account_id) {
-              return account as any;
-            }
-            return prev;
-          });
-        } else {
-          setAccountView(null);
-        }
-      } catch (error) {
-        console.error('Error loading schema:', error);
-      }
-    };
-
-    fetchAccountData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountData, params?.id, rpcUrl, status]);
-
-  const accountInfo = accountData || accountView;
   const balance = accountData?.amount
     ? accountData?.amount
     : accountView?.amount;
   const nearPrice = statsData?.near_price ?? '';
+  const RpcProviders =
+    networkId === 'mainnet'
+      ? [
+          {
+            name: 'NEAR',
+            url: 'https://rpc.mainnet.near.org',
+          },
+          {
+            name: 'FASTNEAR Free',
+            url: 'https://free.rpc.fastnear.com',
+          },
+          {
+            name: 'Lava Network',
+            url: 'https://near.lava.build',
+          },
+        ]
+      : [
+          {
+            name: 'NEAR (Archival)',
+            url: 'https://archival-rpc.testnet.near.org',
+          },
+          {
+            name: 'NEAR',
+            url: 'https://rpc.testnet.near.org',
+          },
+        ];
+  const rpcUrls: string[] = RpcProviders.map((provider) => provider.url);
 
   useEffect(() => {
     const loadBalances = async () => {
       const fts = inventoryData?.fts;
-
       let total = Big(0);
-
       const tokens: TokenListInfo[] = [];
-
       const pricedTokens: TokenListInfo[] = [];
 
-      await Promise.all(
-        fts?.map(async (ft: TokenListInfo) => {
-          let sum = Big(0);
-          let rpcAmount = Big(0);
+      if (!fts || fts.length === 0) {
+        setFT({
+          amount: total.toString(),
+          tokens: [],
+        });
+        return;
+      }
+      const distributeTokensAcrossRPCs = (
+        tokens: TokenListInfo[],
+        rpcUrls: string[],
+      ) => {
+        const rpcBuckets: { [rpcUrl: string]: TokenListInfo[] } = {};
+        rpcUrls.forEach((url) => {
+          rpcBuckets[url] = [];
+        });
+        tokens.forEach((token, index) => {
+          const rpcUrl = rpcUrls[index % rpcUrls.length];
+          rpcBuckets[rpcUrl].push(token);
+        });
 
-          const amount = await ftBalanceOf(
-            rpcUrl,
-            ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
-            params?.id as string,
-          ).catch(() => {
-            setRpcError(true);
-          });
-          if (amount?.data) {
-            rpcAmount = ft?.ft_meta?.decimals
-              ? Big(amount?.data).div(Big(10).pow(+ft.ft_meta.decimals))
-              : Big(0);
+        return rpcBuckets;
+      };
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+      const processBucket = async (
+        tokens: TokenListInfo[],
+        rpcUrl: string,
+        bucketIndex: number,
+      ) => {
+        await delay(bucketIndex * 100);
+
+        const processedTokens = await Promise.allSettled(
+          tokens.map(async (ft: TokenListInfo, tokenIndex) => {
+            if (tokenIndex > 0) {
+              await delay(50);
+            }
+
+            let sum = Big(0);
+            let rpcAmount = Big(0);
+
+            try {
+              const amount = await ftBalanceOf(
+                rpcUrl,
+                ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
+                params?.id as string,
+              );
+
+              if (amount?.data) {
+                rpcAmount = ft?.ft_meta?.decimals
+                  ? Big(amount?.data).div(Big(10).pow(+ft.ft_meta.decimals))
+                  : Big(0);
+              }
+
+              if (ft?.ft_meta?.price) {
+                sum = rpcAmount.mul(Big(ft?.ft_meta?.price));
+
+                return {
+                  type: 'priced',
+                  token: {
+                    ...ft,
+                    amountUsd: sum?.toString(),
+                    rpcAmount: rpcAmount?.toString(),
+                  },
+                  usdValue: sum,
+                };
+              } else {
+                return {
+                  type: 'unpriced',
+                  token: {
+                    ...ft,
+                    amountUsd: sum?.toString(),
+                    rpcAmount: rpcAmount?.toString(),
+                  },
+                  usdValue: Big(0),
+                };
+              }
+            } catch (error) {
+              console.error(
+                `Error fetching balance for ${ft?.contract} via ${rpcUrl}:`,
+                error,
+              );
+              return {
+                type: 'error',
+                token: {
+                  ...ft,
+                  amountUsd: '0',
+                  rpcAmount: '0',
+                },
+                usdValue: Big(0),
+              };
+            }
+          }),
+        );
+
+        return processedTokens;
+      };
+
+      try {
+        const rpcBuckets = distributeTokensAcrossRPCs(fts, rpcUrls);
+        const allBucketResults = await Promise.all(
+          Object.entries(rpcBuckets).map(([rpcUrl, bucketTokens], index) =>
+            processBucket(bucketTokens, rpcUrl, index),
+          ),
+        );
+
+        const allTokenResults = allBucketResults.flat();
+
+        allTokenResults.forEach((result) => {
+          if (result.status === 'fulfilled' && result.value) {
+            const { type, token, usdValue } = result.value;
+
+            if (type === 'priced') {
+              pricedTokens.push(token);
+              total = total.add(usdValue);
+            } else if (type === 'unpriced' || type === 'error') {
+              tokens.push(token);
+            }
+          } else if (result.status === 'rejected') {
+            console.error('Token processing rejected:', result.reason);
           }
-          if (ft?.ft_meta?.price) {
-            sum = rpcAmount.mul(Big(ft?.ft_meta?.price));
-            total = total.add(sum);
+        });
 
-            return pricedTokens.push({
-              ...ft,
-              amountUsd: sum?.toString(),
-              rpcAmount: rpcAmount?.toString(),
-            });
-          }
-
-          return tokens.push({
-            ...ft,
-            amountUsd: sum?.toString(),
-            rpcAmount: rpcAmount?.toString(),
+        if (tokens.length > 0) {
+          tokens.sort((a, b) => {
+            const first = Big(a?.rpcAmount || '0');
+            const second = Big(b?.rpcAmount || '0');
+            if (first.lt(second)) return 1;
+            if (first.gt(second)) return -1;
+            return 0;
           });
-        }),
-      );
+        }
 
-      if (tokens) {
-        tokens?.sort((a, b) => {
-          const first = Big(a?.rpcAmount);
+        if (pricedTokens.length > 0) {
+          pricedTokens.sort((a, b) => {
+            const first = Big(a?.amountUsd || '0');
+            const second = Big(b?.amountUsd || '0');
+            if (first.lt(second)) return 1;
+            if (first.gt(second)) return -1;
+            return 0;
+          });
+        }
 
-          const second = Big(b?.rpcAmount);
-
-          if (first?.lt(second)) return 1;
-          if (first?.gt(second)) return -1;
-
-          return 0;
+        setFT({
+          amount: total.toString(),
+          tokens: [...pricedTokens, ...tokens],
+        });
+      } catch (error) {
+        console.error('Error in loadBalances:', error);
+        setFT({
+          amount: '0',
+          tokens: [],
         });
       }
-
-      pricedTokens?.sort((a, b) => {
-        const first = Big(a?.amountUsd);
-
-        const second = Big(b?.amountUsd);
-
-        if (first?.lt(second)) return 1;
-        if (first?.gt(second)) return -1;
-
-        return 0;
-      });
-
-      setFT({
-        amount: total.toString(),
-        tokens: [...pricedTokens, ...tokens],
-      });
     };
 
     loadBalances();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, params?.id, rpcUrl]);
+  }, [inventoryData?.fts, params?.id]);
 
   return (
     <div className="w-full">
@@ -204,7 +273,7 @@ const AccountOverviewActions = ({
             </div>
 
             <div className="w-full break-words">
-              {balance ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
+              {balance != null ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
             </div>
           </div>
           {networkId === 'mainnet' && (
@@ -214,13 +283,13 @@ const AccountOverviewActions = ({
               </div>
 
               <div className="w-full break-words flex items-center">
-                {accountInfo?.amount && statsData?.near_price && (
+                {balance != null && statsData?.near_price && (
                   <>
                     <span>
-                      {accountInfo?.amount && statsData?.near_price
+                      {balance != null && statsData?.near_price
                         ? '$' +
                           fiatValue(
-                            yoctoToNear(accountInfo?.amount, false),
+                            yoctoToNear(balance, false),
                             statsData?.near_price,
                           ) +
                           ' '
@@ -228,7 +297,7 @@ const AccountOverviewActions = ({
                     </span>
                     <span className="text-xs">
                       (@{' '}
-                      {nearPrice
+                      {nearPrice != null
                         ? '$' + dollarFormat(statsData?.near_price)
                         : ''}{' '}
                       / Ⓝ)

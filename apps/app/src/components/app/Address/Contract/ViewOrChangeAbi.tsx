@@ -209,7 +209,7 @@ const ViewOrChangeAbi = (props: Props) => {
                 className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
                 name="type"
                 onChange={onChange(field.id)}
-                value={field.type}
+                value={typeof field.type === 'string' ? field.type : ''}
               >
                 <option disabled value="">
                   Type

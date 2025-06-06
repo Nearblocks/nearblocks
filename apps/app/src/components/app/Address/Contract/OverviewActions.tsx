@@ -22,6 +22,7 @@ import ViewOrChangeAbi from '@/components/app/Address/Contract/ViewOrChangeAbi';
 import { shortenAddress } from '@/utils/libs';
 import { useParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
+import { useAddressRpc } from '../../common/AddressRpcProvider';
 
 interface Props {
   schema?: SchemaInfo;
@@ -46,6 +47,12 @@ const OverviewActions = (props: Props) => {
   const accountId = account?.account?.[0]?.account_id;
   const contractInfo: ContractParseInfo = parse?.contract?.[0]?.contract;
   const schema = parse?.contract?.[0]?.schema;
+  const methodExist =
+    contractInfo?.methodNames?.length > 0
+      ? (contractInfo?.methodNames as string[])?.includes(
+          'contract_source_metadata',
+        )
+      : false;
 
   const { signedAccountId, wallet } = useContext(NearContext);
   const params = useParams<{ id: string }>();
@@ -55,16 +62,17 @@ const OverviewActions = (props: Props) => {
   const [tab, setTab] = useState(0);
 
   const onTabChange = (index: number) => setTab(index);
+  const { contractInfo: onChainResponse } = useAddressRpc();
 
   const [contractData, setContractData] = useState<ContractData>({
-    base64Code: '',
+    base64Code: (onChainResponse as OnChainResponse)?.code_base64 || '',
     contractMetadata: null,
-    onChainCodeHash: '',
+    onChainCodeHash: (onChainResponse as OnChainResponse)?.hash || '',
   });
 
   const [statusLoading, setStatusLoading] = useState(true);
   const [error, setError] = useState<null | string>(null);
-  const { contractCode, getContractMetadata, getVerifierData } = useRpc();
+  const { getContractMetadata, getVerifierData } = useRpc();
   const [verificationData, setVerificationData] = useState<
     Record<string, VerificationData>
   >({});
@@ -73,13 +81,13 @@ const OverviewActions = (props: Props) => {
     const fetchData = async () => {
       try {
         setError(null);
+        let contractMetadataResponse;
 
-        const onChainResponse = await contractCode(accountId as string);
-
-        const contractMetadataResponse = await getContractMetadata(
-          accountId as string,
-        );
-
+        if (methodExist) {
+          contractMetadataResponse = await getContractMetadata(
+            accountId as string,
+          );
+        }
         const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
 
         const base64Code =
@@ -144,8 +152,11 @@ const OverviewActions = (props: Props) => {
         setStatusLoading(false);
       }
     };
-    if (contractData.onChainCodeHash) fetchVerifierData();
-
+    if (contractData?.onChainCodeHash && contractData?.contractMetadata) {
+      fetchVerifierData();
+    } else {
+      setStatusLoading(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId, contractData]);
 

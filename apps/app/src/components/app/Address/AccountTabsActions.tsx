@@ -8,16 +8,17 @@ import { use } from 'react';
 
 const AccountTabsActions = ({
   children,
-  parsePromise,
+  deploymentPromise,
 }: {
   children: React.ReactNode;
-  parsePromise: Promise<any>;
+  deploymentPromise: Promise<any>;
 }) => {
   const t = useTranslations();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab') || 'txns';
-  const parse = use(parsePromise);
+  const deployment = use(deploymentPromise);
+  const deploymentInfo = deployment?.deployments?.[0];
 
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
@@ -51,10 +52,7 @@ const AccountTabsActions = ({
       <div className=" w-full">
         <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
           {tabs?.map(({ message, name }) => {
-            const hasContractTab =
-              parse?.contract?.[0]?.contract &&
-              Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
-              parse.contract[0].contract.methodNames.length > 0;
+            const hasContractTab = !!deploymentInfo;
 
             if (!hasContractTab && name === 'contract') return null;
 

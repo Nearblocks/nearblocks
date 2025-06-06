@@ -1,8 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { use, useEffect, useState } from 'react';
-
-import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import {
   getTimeAgoString,
@@ -12,57 +10,47 @@ import {
   weight,
   yoctoToNear,
 } from '@/utils/app/libs';
-import {
-  AccountContractInfo,
-  AccountDataInfo,
-  ContractCodeInfo,
-} from '@/utils/types';
+import { AccountContractInfo } from '@/utils/types';
 
 import TokenImage from '@/components/app/common/TokenImage';
 import { useParams } from 'next/navigation';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useAddressRpc } from '../common/AddressRpcProvider';
 const AccountMoreInfoActions = ({
   accountDataPromise,
   deploymentDataPromise,
   nftTokenDataPromise,
   tokenDataPromise,
   syncDataPromise,
-  parseDataPromise,
 }: {
   accountDataPromise: Promise<any>;
   deploymentDataPromise: Promise<any>;
   nftTokenDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
   syncDataPromise: Promise<any>;
-  parseDataPromise: Promise<any>;
 }) => {
   const account = use(accountDataPromise);
   const deployment = use(deploymentDataPromise);
   const nftToken = use(nftTokenDataPromise);
   const ftToken = use(tokenDataPromise);
   const syncData = use(syncDataPromise);
-  const parse = use(parseDataPromise);
 
   const deploymentData = deployment?.deployments?.[0];
   const status = syncData && syncData?.status?.indexers?.balance?.sync;
   const tokenData = ftToken?.contracts?.[0];
   const nftTokenData = nftToken?.contracts?.[0];
-
-  const { contractCode, viewAccessKeys, viewAccount } = useRpc();
-  const [contract, setContract] = useState<ContractCodeInfo | null>(null);
   const [accountData, setAccountData] = useState<AccountContractInfo>(
     account?.account?.[0],
   );
-  const [accountView, setAccountView] = useState<AccountDataInfo | null>(null);
-  const [isAccountLoading, setIsAccountLoading] = useState(true);
-  const [contractLoading, setContractLoading] = useState(true);
-  const [isLocked, setIsLocked] = useState<boolean>();
-  const [rpcError, setRpcError] = useState(false);
+
+  const {
+    account: accountView,
+    contractInfo,
+    isLocked,
+    isLoading,
+  } = useAddressRpc();
   const t = useTranslations();
   const { id } = useParams<{ id: string }>();
-  const rpcUrl: string = useRpcStore((state) => state.rpc);
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
 
   useEffect(() => {
     if (
@@ -82,85 +70,7 @@ const AccountMoreInfoActions = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountView, status]);
 
-  useEffect(() => {
-    if (rpcError) {
-      try {
-        switchRpc();
-      } catch (error) {
-        setRpcError(true);
-        console.error('Failed to switch RPC:', error);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rpcError]);
-
-  const isContract =
-    parse?.contract?.[0]?.contract &&
-    Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
-    parse.contract[0].contract.methodNames.length > 0;
-
-  useEffect(() => {
-    const loadSchema = async () => {
-      try {
-        setRpcError(false);
-        setContractLoading(true);
-        let hasError = false;
-        const [code, keys, account]: any = await Promise.all([
-          contractCode(id as string).catch((error: any) => {
-            console.error(`Error fetching contract code for ${id}:`, error);
-            return null;
-          }),
-          viewAccessKeys(id).catch((error: any) => {
-            console.log(`Error fetching access keys for ${id}:`, error);
-            hasError = true;
-            return null;
-          }),
-          viewAccount(id).catch((error: any) => {
-            console.log(`Error fetching account for ${id}:`, error);
-            hasError = true;
-            return null;
-          }),
-        ]);
-
-        if (hasError) setRpcError(true);
-
-        if (account) {
-          setAccountView(account);
-        }
-
-        if (code && code?.code_base64) {
-          setContract({
-            block_hash: code?.block_hash,
-            block_height: code?.block_height,
-            code_base64: code?.code_base64,
-            hash: code?.hash,
-          });
-        } else {
-          setContract(null);
-        }
-
-        const locked = (keys?.keys || []).every(
-          (key: {
-            access_key: {
-              nonce: string;
-              permission: string;
-            };
-            public_key: string;
-          }) => key.access_key.permission !== 'FullAccess',
-        );
-
-        setIsLocked(locked);
-      } catch (error) {
-        console.error('Error loading schema:', error);
-      } finally {
-        setContractLoading(false);
-        setIsAccountLoading(false);
-      }
-    };
-    loadSchema();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, status, rpcUrl]);
-
+  const isContract = !!deploymentData;
   const accountInfo = status ? accountData : accountView;
   const stakedBalace = status ? accountData?.locked : accountView?.locked;
   const tokenTracker = tokenData?.name || nftTokenData?.name;
@@ -180,7 +90,7 @@ const AccountMoreInfoActions = ({
                 Staked {t('balance') || 'Balance'}:
               </div>
               <div>
-                {!status && isAccountLoading && <div className="h-5"></div>}
+                {!status && isLoading && <div className="h-5"></div>}
                 {stakedBalace
                   ? yoctoToNear(stakedBalace, true) + ' Ⓝ'
                   : stakedBalace ?? ''}
@@ -191,7 +101,7 @@ const AccountMoreInfoActions = ({
                 {t('storageUsed') || 'Storage used'}:
               </div>
               <div className="w-20 h-5">
-                {isAccountLoading ? (
+                {isLoading ? (
                   <Skeleton className="h-4 w-16" />
                 ) : storageUsed != null ? (
                   weight(storageUsed)
@@ -202,7 +112,7 @@ const AccountMoreInfoActions = ({
             </div>
           </div>
           {(deploymentData?.receipt_predecessor_account_id ||
-            (contract && contract?.hash)) && (
+            (contractInfo && contractInfo?.hash)) && (
             <div
               className={`flex justify-between w-full py-4  ${
                 deploymentData?.receipt_predecessor_account_id
@@ -236,15 +146,15 @@ const AccountMoreInfoActions = ({
                   </div>
                 )}
                 <div>
-                  {(contract && contract?.hash) || isContract ? (
+                  {(contractInfo && contractInfo?.hash) || isContract ? (
                     <div className="xl:flex xl:w-full justify-between w-max items-center gap-x-2">
                       <div className="whitespace-nowrap xl:mb-0 mb-1.5 flex">
                         Contract Locked:
                       </div>
                       <div className="break-words flex w-6 h-5">
-                        {contractLoading ? (
+                        {isLocked == null ? (
                           <Skeleton className="h-4 w-16" />
-                        ) : contract?.code_base64 && isLocked ? (
+                        ) : contractInfo?.code_base64 && isLocked ? (
                           'Yes'
                         ) : (
                           'No'
@@ -405,7 +315,7 @@ const AccountMoreInfoActions = ({
                     </div>
                   ) : accountInfo?.code_hash ? (
                     <span className="xl:ml-1.5">Genesis</span>
-                  ) : isAccountLoading ? (
+                  ) : isLoading ? (
                     <div className="h-5"></div>
                   ) : (
                     'N/A'
@@ -419,9 +329,9 @@ const AccountMoreInfoActions = ({
                       Contract Locked:
                     </div>
                     <div className="break-words flex w-6 h-5">
-                      {contractLoading ? (
+                      {isLocked == null ? (
                         <Skeleton className="h-4 w-16" />
-                      ) : contract?.code_base64 && isLocked ? (
+                      ) : contractInfo?.code_base64 && isLocked ? (
                         'Yes'
                       ) : (
                         'No'

@@ -8,19 +8,15 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 export default function BalanceSkeleton({
   error = false,
-
-  parsePromise,
   deploymentPromise,
   ftPromise,
   nftPromise,
 }: {
-  parsePromise: Promise<any>;
   deploymentPromise: Promise<any>;
   ftPromise: Promise<any>;
   nftPromise: Promise<any>;
   error?: boolean;
 }) {
-  const parse = use(parsePromise);
   const deployment = use(deploymentPromise);
   const deploymentInfo = deployment?.deployments?.[0];
   const ft = use(ftPromise);
@@ -30,10 +26,7 @@ export default function BalanceSkeleton({
     (nft?.contracts?.[0]?.name ? 'nft' : null);
   const t = useTranslations();
   const { networkId } = useConfig();
-  const isContract =
-    parse?.contract?.[0]?.contract &&
-    Array.isArray(parse?.contract?.[0]?.contract?.methodNames) &&
-    parse?.contract?.[0]?.contract?.methodNames?.length > 0;
+  const isContract = !!deploymentInfo;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

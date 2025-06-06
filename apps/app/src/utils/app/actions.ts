@@ -8,6 +8,8 @@ import { getRequest } from './api';
 import { revalidateTag } from 'next/cache';
 import { getMessages } from 'next-intl/server';
 import { providers } from 'near-api-js';
+import { RpcProviders } from './rpc';
+import { JsonRpcProvider } from '@near-js/providers';
 
 interface ExportParams {
   exportType: string;
@@ -199,3 +201,31 @@ export async function getSeatInfo(rpcUrl: string) {
     protocolConfig,
   };
 }
+const jsonProviders = RpcProviders.map(
+  (p) => new JsonRpcProvider({ url: p.url }),
+);
+const provider = new providers.FailoverRpcProvider(jsonProviders);
+export const contractCode = async (address: string) => {
+  const contractCode = await provider.query({
+    request_type: 'view_code',
+    finality: 'final',
+    account_id: address.toLowerCase(),
+  });
+  return contractCode;
+};
+export const viewAccessKeys = async (address: string) => {
+  const viewAccessKeys = await provider.query({
+    request_type: 'view_access_key_list',
+    finality: 'final',
+    account_id: address.toLowerCase(),
+  });
+  return viewAccessKeys;
+};
+export const viewAccount = async (accountId: string) => {
+  const viewAccount = await provider.query({
+    request_type: 'view_account',
+    finality: 'final',
+    account_id: accountId.toLowerCase(),
+  });
+  return viewAccount;
+};
