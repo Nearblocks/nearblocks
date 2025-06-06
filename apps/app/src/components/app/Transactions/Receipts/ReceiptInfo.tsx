@@ -24,6 +24,7 @@ import { networkId } from '@/utils/app/config';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
+  polledReceipt: ReceiptsPropsInfo | any;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -32,7 +33,7 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
-const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
+const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
@@ -76,12 +77,12 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   let statusInfo;
 
   if (
-    receipt?.outcome?.status?.type === 'successValue' ||
-    'SuccessValue' in receipt?.outcome?.status
+    polledReceipt?.outcome?.status?.type === 'successValue' ||
+    'SuccessValue' in polledReceipt?.outcome?.status
   ) {
     if (
-      receipt?.outcome?.status?.value?.length === 0 ||
-      receipt?.outcome?.status?.SuccessValue?.length === 0
+      polledReceipt?.outcome?.status?.value?.length === 0 ||
+      polledReceipt?.outcome?.status?.SuccessValue?.length === 0
     ) {
       statusInfo = (
         <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 whitespace-nowrap">
@@ -90,7 +91,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
       );
     } else {
       const args =
-        receipt?.outcome?.status.value || receipt?.outcome?.status.SuccessValue;
+        polledReceipt?.outcome?.status.value ||
+        polledReceipt?.outcome?.status.SuccessValue;
       const decodedArgs = Buffer.from(args, 'base64');
 
       let prettyArgs: object | string;
@@ -133,16 +135,16 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
         );
     }
   } else if (
-    receipt?.outcome?.status?.type === 'failure' ||
-    'Failure' in receipt?.outcome?.status
+    polledReceipt?.outcome?.status?.type === 'failure' ||
+    'Failure' in polledReceipt?.outcome?.status
   ) {
     statusInfo = (
       <textarea
         readOnly
         rows={4}
         defaultValue={JSON.stringify(
-          receipt.outcome.status.error ||
-            receipt?.outcome?.status?.Failure?.error_message,
+          polledReceipt.outcome.status.error ||
+            polledReceipt?.outcome?.status?.Failure?.error_message,
           null,
           2,
         )}
@@ -150,14 +152,14 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
       ></textarea>
     );
   } else if (
-    receipt?.outcome?.status?.type === 'successReceiptId' ||
-    'SuccessReceiptId' in receipt?.outcome?.status
+    polledReceipt?.outcome?.status?.type === 'successReceiptId' ||
+    'SuccessReceiptId' in polledReceipt?.outcome?.status
   ) {
     statusInfo = (
       <div className="bg-gray-100 dark:bg-black-200 rounded-md my-3 p-5 font-medium overflow-auto">
         <pre>
-          {receipt?.outcome?.status?.receiptId ||
-            receipt?.outcome?.status?.SuccessReceiptId}
+          {polledReceipt?.outcome?.status?.receiptId ||
+            polledReceipt?.outcome?.status?.SuccessReceiptId}
         </pre>
       </div>
     );

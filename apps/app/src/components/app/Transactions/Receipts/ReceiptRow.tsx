@@ -23,6 +23,7 @@ import useRpc from '@/hooks/app/useRpc';
 interface Props {
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
+  polledReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -31,8 +32,7 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData } = props;
-
+  const { borderFlag, receipt, statsData, polledReceipt } = props;
   const t = useTranslations();
   const [pageHash] = useHash();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -102,8 +102,8 @@ const ReceiptRow = (props: Props) => {
   }, [receipt?.receipt_id, pageHash]);
 
   const logs =
-    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
-      ? receipt.outcome.logs.filter(Boolean)
+    polledReceipt?.outcome?.logs && Array.isArray(polledReceipt?.outcome?.logs)
+      ? polledReceipt.outcome.logs.filter(Boolean)
       : [];
   const receiptLog =
     viewMode === 'raw'
@@ -399,19 +399,19 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!receipt ? (
+          {!polledReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
             </div>
-          ) : receipt?.actions ? (
+          ) : polledReceipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {receipt &&
-                receipt?.actions?.map((action: any, i: number) => (
+              {polledReceipt &&
+                polledReceipt?.actions?.map((action: any, i: number) => (
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={receipt?.receiver_id}
+                    receiver={polledReceipt?.receiver_id}
                   />
                 ))}
             </div>
@@ -460,13 +460,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!receipt ? (
+          {!polledReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt ? <ReceiptStatus receipt={receipt} /> : ''}
+              {polledReceipt ? <ReceiptStatus receipt={polledReceipt} /> : ''}
             </div>
           )}
         </div>
@@ -482,13 +482,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt ? (
+          {!polledReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full !h-20" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt?.outcome?.logs?.length > 0 ? (
+              {polledReceipt?.outcome?.logs?.length > 0 ? (
                 <div className="relative w-full pt-1">
                   <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
                     <button
@@ -540,10 +540,19 @@ const ReceiptRow = (props: Props) => {
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <div className="pb-4">
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
+            const matchingRpcReceipt =
+              polledReceipt?.outcome?.outgoing_receipts?.find(
+                (rpcRcpt: any) => rpcRcpt?.receipt_id === rcpt?.receipt_id,
+              );
             return (
               <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
                 <div className="mx-4 border-l-4 border-l-gray-200">
-                  <ReceiptRow borderFlag receipt={rcpt} statsData={statsData} />
+                  <ReceiptRow
+                    borderFlag
+                    receipt={rcpt}
+                    statsData={statsData}
+                    polledReceipt={matchingRpcReceipt}
+                  />
                 </div>
               </div>
             );
