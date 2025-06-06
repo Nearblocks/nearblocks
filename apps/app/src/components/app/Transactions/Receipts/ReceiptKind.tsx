@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { isValidJson } from '@/utils/app/libs';
 import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
+import { encodeArgs } from '@/utils/app/near';
 
 const backgroundColorClasses: Record<string, string> = {
   addKey: 'bg-indigo-50 dark:bg-indigo-900',
@@ -41,14 +42,13 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
-  const { action, rpcAction, isTxTypeActive, onClick, receipt, receiver } =
-    props;
+  const { action, isTxTypeActive, onClick, receipt, receiver } = props;
 
   const t = useTranslations();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const args = rpcAction?.args?.args;
+  const args = action?.args?.args || encodeArgs(action?.args?.args_json);
 
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')
@@ -118,7 +118,8 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     status &&
     (status.type === 'successValue' ||
       status.type === 'successReceiptId' ||
-      'SuccessValue' in status);
+      'SuccessValue' in status ||
+      'SuccessReceiptId' in status);
 
   return (
     <div className="pb-3">
@@ -235,23 +236,21 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         ) : action?.kind === 'delegateAction' ||
           action?.action_kind === 'DELEGATE_ACTION' ? (
           <div className="pt-2">
-            {[...rpcAction?.args?.actions]
-              .sort(
-                (actionA, actionB) =>
-                  actionA.delegateIndex - actionB.delegateIndex,
-              )
-              .map((subaction) => {
+            {(action?.args?.actions || [])
+              .sort((actionA: any, actionB: any) => {
                 return (
-                  <ReceiptKind
-                    action={subaction}
-                    rpcAction={subaction}
-                    isTxTypeActive={true}
-                    key={subaction.delegateIndex}
-                    receipt={receipt}
-                    receiver={receiver}
-                  />
+                  (actionA?.delegateIndex || 0) - (actionB?.delegateIndex || 0)
                 );
-              })}
+              })
+              .map((subaction: any, index: number) => (
+                <ReceiptKind
+                  action={subaction}
+                  isTxTypeActive={true}
+                  key={subaction.delegateIndex || index}
+                  receipt={receipt}
+                  receiver={receiver}
+                />
+              ))}
           </div>
         ) : null
       ) : null}

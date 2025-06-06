@@ -161,7 +161,6 @@ const Execution = (props: Props) => {
                     expandAll={expandAll}
                     fellowOutgoingReceipts={[]}
                     receipt={receipt}
-                    rpcReceipt={rpcReceipt}
                     statsData={statsData}
                     rpcTxn={rpcTxn}
                   />
