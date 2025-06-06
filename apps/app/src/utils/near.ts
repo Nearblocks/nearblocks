@@ -518,7 +518,7 @@ export const transformReceiptData = (
   }
 
   const transformReceipt = (
-    receiptTree: ReceiptTree | undefined,
+    receiptTree: ReceiptTree,
   ): TransformedReceipt | null => {
     if (!receiptTree) return null;
     const outgoingReceipts = receiptTree?.receipts
@@ -542,7 +542,10 @@ export const transformReceiptData = (
       })),
       outcome: {
         logs: receiptTree?.outcome?.logs || [],
-        status: convertStatus(receiptTree?.outcome?.status),
+        status: convertStatus(
+          receiptTree?.outcome?.status_key,
+          receiptTree?.outcome?.result,
+        ),
         gas_burnt: receiptTree?.outcome?.gas_burnt,
         tokens_burnt: receiptTree?.outcome?.tokens_burnt,
         executor_account_id: receiptTree?.outcome?.executor_account_id,
@@ -554,19 +557,16 @@ export const transformReceiptData = (
     return receipt;
   };
 
-  const convertStatus = (
-    status: any,
-  ): {
-    SuccessValue?: string;
-    SuccessReceiptId?: string;
-    Failure?: { error_message: string };
-  } => {
-    if (status === true) {
-      return { SuccessValue: '' };
-    } else if (status === false) {
-      return { Failure: { error_message: 'Transaction failed' } };
-    } else {
-      return status;
+  const convertStatus = (status_key: string, result: string) => {
+    switch (status_key) {
+      case 'SUCCESS_VALUE':
+        return { SuccessValue: result || '' };
+      case 'SUCCESS_RECEIPT_ID':
+        return { SuccessReceiptId: result || '' };
+      case 'FAILURE':
+        return { Failure: { error_message: result } };
+      default:
+        return { SuccessValue: result || '' };
     }
   };
 
