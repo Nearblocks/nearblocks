@@ -24,7 +24,7 @@ import { networkId } from '@/utils/app/config';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
-  rpcReceipt: ReceiptsPropsInfo | any;
+  polledReceipt: ReceiptsPropsInfo | any;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -33,7 +33,7 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
-const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
+const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
@@ -46,7 +46,6 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
   };
 
   const [block, setBlock] = useState<{ height: string } | null>(null);
-
   const [loading, setLoading] = useState(false);
   const { getBlockDetails } = useRpc();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -70,22 +69,30 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
           .catch(() => {});
       }
     }
+    if (!receipt?.block_height) fetchBlocks();
 
-    fetchBlocks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.outcome?.blockHash, receipt?.block_hash]);
 
   let statusInfo;
 
-  if (rpcReceipt?.outcome?.status?.type === 'successValue') {
-    if (rpcReceipt?.outcome?.status?.value.length === 0) {
+  if (
+    polledReceipt?.outcome?.status?.type === 'successValue' ||
+    'SuccessValue' in polledReceipt?.outcome?.status
+  ) {
+    if (
+      polledReceipt?.outcome?.status?.value?.length === 0 ||
+      polledReceipt?.outcome?.status?.SuccessValue?.length === 0
+    ) {
       statusInfo = (
         <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 whitespace-nowrap">
           Empty result
         </div>
       );
     } else {
-      const args = rpcReceipt?.outcome?.status.value;
+      const args =
+        polledReceipt?.outcome?.status.value ||
+        polledReceipt?.outcome?.status.SuccessValue;
       const decodedArgs = Buffer.from(args, 'base64');
 
       let prettyArgs: object | string;
@@ -127,19 +134,33 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
           </div>
         );
     }
-  } else if (rpcReceipt?.outcome?.status?.type === 'failure') {
+  } else if (
+    polledReceipt?.outcome?.status?.type === 'failure' ||
+    'Failure' in polledReceipt?.outcome?.status
+  ) {
     statusInfo = (
       <textarea
         readOnly
         rows={4}
-        defaultValue={JSON.stringify(rpcReceipt.outcome.status.error, null, 2)}
+        defaultValue={JSON.stringify(
+          polledReceipt.outcome.status.error ||
+            polledReceipt?.outcome?.status?.Failure?.error_message,
+          null,
+          2,
+        )}
         className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
       ></textarea>
     );
-  } else if (rpcReceipt?.outcome?.status?.type === 'successReceiptId') {
+  } else if (
+    polledReceipt?.outcome?.status?.type === 'successReceiptId' ||
+    'SuccessReceiptId' in polledReceipt?.outcome?.status
+  ) {
     statusInfo = (
       <div className="bg-gray-100 dark:bg-black-200 rounded-md my-3 p-5 font-medium overflow-auto">
-        <pre>{rpcReceipt?.outcome?.status?.receiptId}</pre>
+        <pre>
+          {polledReceipt?.outcome?.status?.receiptId ||
+            polledReceipt?.outcome?.status?.SuccessReceiptId}
+        </pre>
       </div>
     );
   }
@@ -206,7 +227,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
     status &&
     (status.type === 'successValue' ||
       status.type === 'successReceiptId' ||
-      'SuccessValue' in status);
+      'SuccessValue' in status ||
+      'SuccessReceiptId' in status);
 
   useEffect(() => {
     if (rpcTxn && rpcTxn?.receipts?.length > 0) {
@@ -452,7 +474,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
                 <tr>
                   <td
                     className={`flex items-center py-2 pr-4 ${
-                      !block ? 'whitespace-normal' : 'whitespace-nowrap'
+                      !block && receipt?.block_height
+                        ? 'whitespace-normal'
+                        : 'whitespace-nowrap'
                     }`}
                   >
                     <Tooltip
@@ -466,14 +490,14 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, rpcReceipt }: Props) => {
                     Block
                   </td>
                   <td className="py-2 pl-4">
-                    {block && (
+                    {(receipt?.block_height || block) && (
                       <Link
                         className="text-green-500 dark:text-green-250 font-medium"
                         href={`/blocks/${receipt?.outcome?.blockHash}`}
                       >
                         {!loading &&
-                          block?.height &&
-                          localFormat(block?.height)}
+                          (receipt?.block_height || block?.height) &&
+                          localFormat(receipt?.block_height || block?.height)}
                       </Link>
                     )}
                   </td>

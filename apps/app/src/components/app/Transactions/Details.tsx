@@ -93,7 +93,9 @@ const Details = (props: Props) => {
   } = props;
   const [more, setMore] = useState(false);
   const [utc, setUtc] = useState(true);
-  const { utcTime, localTime } = convertTimestampToTimes(txn.block_timestamp);
+  const { utcTime, localTime } = convertTimestampToTimes(
+    txn?.block?.block_timestamp || txn?.block_timestamp,
+  );
   const { networkId } = useConfig();
 
   const t = useTranslations();
@@ -101,10 +103,12 @@ const Details = (props: Props) => {
   const [isActionScroll, setIsActionScroll] = useState(false);
 
   const {
-    logs: apiLogs,
+    apiLogs,
     apiActionLogs,
-    apiActions,
+    apiMainActions,
     tokenMetadata,
+    apiAllActions,
+    apiSubActions,
   } = apiTxnActionsData;
   const { fts, nfts } = useMemo(() => {
     function tokensTransfers(receipts: InventoryInfo[]) {
@@ -163,40 +167,45 @@ const Details = (props: Props) => {
   }
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
-  const [logs, actionLogs, actions, allActions, mainTxnsActions, errorMessage] =
-    useMemo(() => {
-      if (!isEmpty(rpcTxn)) {
-        return [
-          txnLogs(rpcTxn),
-          txnActionLogs(rpcTxn),
-          txnActions(rpcTxn),
-          txnAllActions(rpcTxn),
-          mainActions(rpcTxn),
-          txnErrorMessage(rpcTxn),
-        ];
-      }
-      return [[], [], undefined];
+  const [
+    rpcLogs,
+    rpcActionLogs,
+    rpcSubActions,
+    rpcAllActions,
+    rpcMainActions,
+    errorMessage,
+  ] = useMemo(() => {
+    if (!isEmpty(rpcTxn)) {
+      return [
+        txnLogs(rpcTxn),
+        txnActionLogs(rpcTxn),
+        txnActions(rpcTxn),
+        txnAllActions(rpcTxn),
+        mainActions(rpcTxn),
+        txnErrorMessage(rpcTxn),
+      ];
+    }
+    return [[], [], undefined];
 
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rpcTxn]);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcTxn]);
   const rpcAllEvents = useMemo(() => {
     if (
-      actionLogs?.some(
+      rpcActionLogs?.some(
         (log: TransactionLog) => parseEventLogs(log)?.standard === 'nep245',
       )
     ) {
-      return actionLogs ?? [];
+      return rpcActionLogs ?? [];
     }
 
     return (
-      actionLogs?.filter((log: TransactionLog) => {
+      rpcActionLogs?.filter((log: TransactionLog) => {
         const parsedLog: MtEventLogData = parseEventLogs(log);
         return parsedLog?.standard === 'nep245';
       }) ?? []
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionLogs]);
+  }, [rpcActionLogs]);
 
   const apiAllEvents = apiActionLogs?.filter(
     (log: TransactionLog) => log?.logs?.standard === 'nep245',
@@ -237,7 +246,7 @@ const Details = (props: Props) => {
         }
       }
     }
-  }, [logs, actions]);
+  }, [rpcLogs, rpcSubActions, apiLogs, apiSubActions]);
 
   const FailedReceipts = ({ data }: any) => {
     const failedReceiptCount = (data?.receipts_outcome || []).filter(
@@ -268,7 +277,7 @@ const Details = (props: Props) => {
   const hasScrolledToken =
     Number(fts?.length || 0) + Number(nfts?.length || 0) > 5;
 
-  const filteredLogs = actionLogs?.filter((item) => {
+  const rpcFilteredLogs = rpcActionLogs?.filter((item) => {
     try {
       const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
       if (logContent) {
@@ -281,10 +290,16 @@ const Details = (props: Props) => {
     }
   });
 
+  const apiFilteredLogs = apiActionLogs?.filter(
+    (item: any) => item?.logs?.standard !== 'nep245',
+  );
+  const filteredLogs =
+    apiFilteredLogs?.length > 0 ? apiFilteredLogs : rpcFilteredLogs;
+
   const rpcMainTxnsActions =
-    mainTxnsActions &&
-    mainTxnsActions?.map((txn) => {
-      const filteredNepLogs = logs?.filter((item: any) => {
+    rpcMainActions &&
+    rpcMainActions?.map((txn) => {
+      const filteredNepLogs = rpcLogs?.filter((item: any) => {
         try {
           const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
           if (logContent) {
@@ -309,7 +324,7 @@ const Details = (props: Props) => {
       }
     });
 
-  const apiMainTxnsActions = apiActions?.map((txn: any) => {
+  const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
     const filteredApiNepLogs = apiLogs?.filter((log: any) => {
       try {
         if (
@@ -339,7 +354,7 @@ const Details = (props: Props) => {
   const updatedMainTxnsActions =
     apiMainTxnsActions?.length > 0 ? apiMainTxnsActions : rpcMainTxnsActions;
 
-  const rpcTokenIdsCount = actionLogs?.reduce(
+  const rpcTokenIdsCount = rpcActionLogs?.reduce(
     (totalCount: number, item: any) => {
       try {
         const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
@@ -403,7 +418,10 @@ const Details = (props: Props) => {
 
   const isActionScrollable =
     Number(updatedMainTxnsActions?.length) > 6 || isActionScroll;
-  const isScrollable = Number(actions?.length) > 5;
+  const isScrollable =
+    Number(apiSubActions?.length || rpcSubActions?.length) > 5;
+
+  const subAction = apiSubActions?.length > 0 ? apiSubActions : rpcSubActions;
 
   return (
     <>
@@ -513,7 +531,7 @@ const Details = (props: Props) => {
                 </Tooltip>
                 {t ? t('txnDetails.block.text.0') : 'Block Height'}
               </div>
-              {!txn?.included_in_block_hash ? (
+              {!txn?.included_in_block_hash && !txn?.block?.block_hash ? (
                 <div className="w-full md:w-3/4">
                   <Loader wrapperClassName="flex w-14" />
                 </div>
@@ -521,7 +539,9 @@ const Details = (props: Props) => {
                 <div className="w-full md:w-3/4 font-semibold break-words">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/blocks/${txn?.included_in_block_hash}`}
+                    href={`/blocks/${
+                      txn?.block?.block_hash || txn?.included_in_block_hash
+                    }`}
                   >
                     {txn?.block?.block_height
                       ? localFormat(txn?.block?.block_height)
@@ -549,7 +569,7 @@ const Details = (props: Props) => {
                 </Tooltip>
                 {t ? t('txnDetails.timestamp.text.0') : 'Timestamp'}
               </div>
-              {!txn?.block_timestamp ? (
+              {!txn?.block_timestamp && !txn?.block?.block_timestamp ? (
                 <div className="w-full md:w-3/4">
                   <Loader wrapperClassName="flex w-full max-w-sm" />
                 </div>
@@ -558,10 +578,17 @@ const Details = (props: Props) => {
                   className="w-full md:w-3/4 break-words"
                   suppressHydrationWarning
                 >
-                  {txn?.block_timestamp && (
+                  {(txn?.block?.block_timestamp || txn?.block_timestamp) && (
                     <>
                       <span className="mr-1">
-                        {dayjs().to(dayjs(nanoToMilli(txn.block_timestamp)))}
+                        {dayjs().to(
+                          dayjs(
+                            nanoToMilli(
+                              txn?.block?.block_timestamp ||
+                                txn?.block_timestamp,
+                            ),
+                          ),
+                        )}
                       </span>
                       <Tooltip
                         className={'left-1/2 whitespace-nowrap max-w-[200px]'}
@@ -648,7 +675,7 @@ const Details = (props: Props) => {
                               <EventLogs
                                 key={i}
                                 event={event}
-                                allActionLog={allActions}
+                                allActionLog={apiAllActions || rpcAllActions}
                                 tokenMetadata={tokenMetadata}
                               />
                             ),
@@ -787,7 +814,11 @@ const Details = (props: Props) => {
             >
               <div className="flex items-start flex-wrap pl-4 sm:!pl-2 pb-2">
                 <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0"></div>
-                {loading || (actions?.length === 0 && logs?.length === 0) ? (
+                {loading ||
+                (rpcSubActions?.length === 0 &&
+                  apiSubActions?.length === 0 &&
+                  apiLogs?.length === 0 &&
+                  rpcLogs?.length === 0) ? (
                   <div className="w-full md:w-3/4">
                     <Loader wrapperClassName="flex w-full max-w-xl" />
                   </div>
@@ -807,13 +838,13 @@ const Details = (props: Props) => {
                             <EventLogs
                               key={i}
                               event={event}
-                              allActionLog={allActions}
+                              allActionLog={apiAllActions || rpcAllActions}
                               isInteracted
                               tokenMetadata={tokenMetadata}
                             />
                           ),
                         )}
-                        {actions?.map((action: any, i: number) => (
+                        {subAction?.map((action: any, i: number) => (
                           <Actions key={i} action={action} />
                         ))}
                       </div>
@@ -1265,8 +1296,8 @@ const Details = (props: Props) => {
                         )}
                         gas
                         {`(${gasPercentage(
-                          txn?.outcomes_agg?.gas_used ?? 0,
-                          txn?.actions_agg?.gas_attached ?? 0,
+                          Number(txn?.outcomes_agg?.gas_used) ?? 0,
+                          Number(txn?.actions_agg?.gas_attached) ?? 0,
                         )})`}
                       </div>
                     )}

@@ -75,7 +75,7 @@ const TokenInfo = (props: TokenInfoProps) => {
     ></div>
   );
 
-  if (loading || (!apiMeta && isEmpty(meta))) {
+  if (loading && !apiMeta && isEmpty(meta)) {
     return <Loader wrapperClassName="flex !w-52 max-w-xs" />;
   }
 

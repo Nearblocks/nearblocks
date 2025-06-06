@@ -23,7 +23,7 @@ import useRpc from '@/hooks/app/useRpc';
 interface Props {
   borderFlag?: boolean;
   receipt: any | ReceiptsPropsInfo;
-  rpcReceipt: any | ReceiptsPropsInfo;
+  polledReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -32,8 +32,7 @@ interface Props {
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData, rpcReceipt } = props;
-
+  const { borderFlag, receipt, statsData, polledReceipt } = props;
   const t = useTranslations();
   const [pageHash] = useHash();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -103,8 +102,8 @@ const ReceiptRow = (props: Props) => {
   }, [receipt?.receipt_id, pageHash]);
 
   const logs =
-    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
-      ? receipt.outcome.logs.filter(Boolean)
+    polledReceipt?.outcome?.logs && Array.isArray(polledReceipt?.outcome?.logs)
+      ? polledReceipt.outcome.logs.filter(Boolean)
       : [];
   const receiptLog =
     viewMode === 'raw'
@@ -187,7 +186,7 @@ const ReceiptRow = (props: Props) => {
             ? ''
             : 'border-l-4 border-green-400 dark:border-green-250 ml-8 my-2'
         }
-        id={`${receipt?.receipt_id}-${rpcReceipt?.receipt_id}`}
+        id={`${receipt?.receipt_id}`}
       >
         <div className="flex flex-wrap px-4 py-3.5">
           <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0">
@@ -400,19 +399,19 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.actions.text.0') : 'Actions'}
           </div>
-          {!rpcReceipt ? (
+          {!polledReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full !h-28" />
             </div>
-          ) : rpcReceipt?.actions ? (
+          ) : polledReceipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
-              {rpcReceipt &&
-                rpcReceipt?.actions?.map((action: any, i: number) => (
+              {polledReceipt &&
+                polledReceipt?.actions?.map((action: any, i: number) => (
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={rpcReceipt?.receiver_id}
+                    receiver={polledReceipt?.receiver_id}
                   />
                 ))}
             </div>
@@ -461,13 +460,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.result.text.0') : 'Result'}
           </div>
-          {!rpcReceipt ? (
+          {!polledReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-72" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {rpcReceipt ? <ReceiptStatus receipt={rpcReceipt} /> : ''}
+              {polledReceipt ? <ReceiptStatus receipt={polledReceipt} /> : ''}
             </div>
           )}
         </div>
@@ -483,13 +482,13 @@ const ReceiptRow = (props: Props) => {
             </Tooltip>
             {t ? t('txnDetails.receipts.logs.text.0') : 'Logs'}
           </div>
-          {!receipt ? (
+          {!polledReceipt ? (
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-full !h-20" />
             </div>
           ) : (
             <div className="w-full md:w-3/4 break-words space-y-4">
-              {receipt?.outcome?.logs?.length > 0 ? (
+              {polledReceipt?.outcome?.logs?.length > 0 ? (
                 <div className="relative w-full pt-1">
                   <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
                     <button
@@ -542,7 +541,7 @@ const ReceiptRow = (props: Props) => {
         <div className="pb-4">
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
             const matchingRpcReceipt =
-              rpcReceipt?.outcome?.outgoing_receipts?.find(
+              polledReceipt?.outcome?.outgoing_receipts?.find(
                 (rpcRcpt: any) => rpcRcpt?.receipt_id === rcpt?.receipt_id,
               );
             return (
@@ -552,7 +551,7 @@ const ReceiptRow = (props: Props) => {
                     borderFlag
                     receipt={rcpt}
                     statsData={statsData}
-                    rpcReceipt={matchingRpcReceipt || null}
+                    polledReceipt={matchingRpcReceipt}
                   />
                 </div>
               </div>

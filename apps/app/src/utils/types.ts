@@ -294,6 +294,7 @@ export type TransactionInfo = {
   block: {
     block_height: string;
     block_timestamp: string;
+    block_hash: string;
   };
   block_timestamp: string;
   cause: string;
@@ -1541,9 +1542,7 @@ export type ParseOutcomeInfo = {
 
 export type TransactionReceiptInfo = {
   receipt: any;
-  rpcReceipt: any;
   fellowOutgoingReceipts: any;
-  rpcFellowOutgoingReceipts?: any;
   expandAll: any;
   convertionReceipt: any;
   className: string;
@@ -1553,11 +1552,13 @@ export type TransactionReceiptInfo = {
     }>;
   };
   rpcTxn: RPCTransactionInfo;
+  polledReceipt: any;
+  polledFellowOutgoingReceipts?: any;
 };
 
 export type ReceiptKindInfo = {
   action: any;
-  rpcAction: any;
+  polledAction: any;
   isTxTypeActive: boolean;
   onClick?: any;
   receipt?: any;
@@ -1927,10 +1928,11 @@ export type ProcessedTokenMeta = {
 };
 
 export type ApiTxnData = {
-  logs: TransactionLog[];
+  apiLogs: TransactionLog[];
   apiActionLogs: any;
-  apiActions: ActionInfo[];
-  subActions: ActionInfo[];
+  apiMainActions: ActionInfo[];
+  apiSubActions: ReceiptAction[];
+  apiAllActions: ReceiptAction[];
   tokenMetadata: ProcessedTokenMeta[];
   receiptData: TransformedReceipt | null;
 };
@@ -2028,8 +2030,10 @@ export type ReceiptTree = {
     rlp_hash: string | null;
   }>;
 
-  outcome?: {
+  outcome: {
     logs: string[] | null;
+    result: string;
+    status_key: string;
     status:
       | boolean
       | {
@@ -2083,4 +2087,12 @@ export type ReceiptApiResponse = {
   receipts: Array<{
     receipt_tree: ReceiptTree;
   }>;
+};
+
+export type ReceiptAction = {
+  from: string;
+  to: string;
+  receiptId: string;
+  action_kind: string;
+  args: Record<string, any>;
 };

@@ -11,7 +11,7 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 const AddKey = (props: TransactionActionInfo) => {
   const params = useParams();
   const t = useTranslations();
-  if (typeof props.args.access_key?.permission !== 'object') {
+  if (typeof props?.args?.access_key?.permission !== 'object') {
     return (
       <div className="py-1 flex flex-wrap items-center">
         {props?.action?.receiptId && params?.hash ? (
@@ -24,12 +24,12 @@ const AddKey = (props: TransactionActionInfo) => {
           <FaRight className="inline-flex text-gray-400 dark:text-neargray-10 text-xs mr-1" />
         )}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
-        <span className="font-bold">{shortenHex(props.args.public_key)}</span>){' '}
-        {t ? t('txnDetails.actions.addKey.2') : 'added for'}
+        <span className="font-bold">{shortenHex(props?.args?.public_key)}</span>
+        ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
         <AddressOrTxnsLink currentAddress={props.receiver} />
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
         <span className="font-bold ml-1">
-          {props.args.access_key?.permission}
+          {props?.args?.access_key?.permission}
         </span>
       </div>
     );
