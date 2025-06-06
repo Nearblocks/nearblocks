@@ -18,16 +18,15 @@ export default async function TxnsTabs({
     cache: 'force-cache',
     next: { tags: [`txn-${hash}`] },
   };
-  const data =
-    (await getRequest(`v1/txns/${hash}/full`, {}, requestOptions)) || {};
+  const data = (await getRequest(`v2/txns/${hash}`, {}, requestOptions)) || {};
   const stats = (await getRequest(`v1/stats`, {}, options)) || [];
   const syncData = (await getRequest(`v1/sync/status`, {}, options)) || [];
   const receipt =
     (await getRequest(`v2/txns/${hash}/receipts`, {}, options)) || [];
   const txn = data?.txns?.[0];
   let price: null | number = null;
-  if (txn?.block_timestamp) {
-    const timestamp = new Date(nanoToMilli(txn.block_timestamp));
+  if (txn?.block?.block_timestamp) {
+    const timestamp = new Date(nanoToMilli(txn?.block?.block_timestamp));
     const currentDate = new Date();
     const currentDt = currentDate.toISOString().split('T')[0];
     const blockDt = timestamp.toISOString().split('T')[0];

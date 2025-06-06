@@ -8,7 +8,9 @@ import { EventPropsInfo } from '@/utils/types';
 const Withdraw = (props: EventPropsInfo) => {
   const params = useParams();
   const log = props.event.logs?.match(/^Withdraw (\d+) NEAR from ([\S]+)/);
-
+  const metaInfo = props?.tokenMetadata?.filter(
+    (meta: any) => meta?.contractId === props?.event?.contract,
+  );
   if (log?.length !== 3) return null;
 
   return (
@@ -32,7 +34,7 @@ const Withdraw = (props: EventPropsInfo) => {
       <TokenInfo
         amount={log[1]}
         contract={props.event.contract}
-        metaInfo={props?.tokenMetadata}
+        metaInfo={metaInfo}
       />
     </div>
   );

@@ -10,7 +10,9 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 const DepositToReserve = (props: DepositPropsInfo) => {
   const params = useParams();
   const log = props.event?.[0];
-
+  const metaInfo = props?.tokenMetadata?.filter(
+    (meta: any) => meta?.contractId === log?.token_id,
+  );
   if (!log?.token_id || !log?.account_id || !log?.amount) return null;
 
   return (
@@ -26,7 +28,7 @@ const DepositToReserve = (props: DepositPropsInfo) => {
       <TokenInfo
         amount={log.amount}
         contract={log.token_id}
-        metaInfo={props?.tokenMetadata}
+        metaInfo={metaInfo}
       />
       <span className="font-bold text-gray px-1">
         From <AddressOrTxnsLink currentAddress={log?.account_id} />

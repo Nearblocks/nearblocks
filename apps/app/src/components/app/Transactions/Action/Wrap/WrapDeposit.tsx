@@ -8,7 +8,9 @@ import { EventPropsInfo } from '@/utils/types';
 const WrapDeposit = (props: EventPropsInfo) => {
   const params = useParams();
   const log = props.event.logs?.match(/^Deposit (\d+) NEAR to ([\S]+)/);
-
+  const metaInfo = props?.tokenMetadata?.filter(
+    (meta: any) => meta?.contractId === props?.event?.contract,
+  );
   if (log?.length !== 3) return null;
 
   return (
@@ -26,7 +28,7 @@ const WrapDeposit = (props: EventPropsInfo) => {
       <TokenInfo
         amount={log[1]}
         contract={props.event.contract}
-        metaInfo={props?.tokenMetadata}
+        metaInfo={metaInfo}
       />
     </div>
   );

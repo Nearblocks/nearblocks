@@ -401,7 +401,7 @@ export function shortenTokenSymbol(token: string) {
   return truncateString(token, 5, '');
 }
 
-export function gasPercentage(gasUsed: string, gasAttached: string) {
+export function gasPercentage(gasUsed: number, gasAttached: number) {
   if (!gasAttached) return 'N/A';
   // @ts-ignore
   const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed(2);
