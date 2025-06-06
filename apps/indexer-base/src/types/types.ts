@@ -8,6 +8,7 @@ export interface Config {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
+  dbUrlRead: string;
   delta: number;
   disableAutoSwitch: boolean;
   disableS3Upload: boolean;

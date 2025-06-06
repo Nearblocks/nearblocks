@@ -41,16 +41,6 @@ SELECT
   );
 
 SELECT
-  attach_tablespace ('blocks-tbs1', 'blocks', if_not_attached => true);
-
-SELECT
-  attach_tablespace (
-    'execution-outcome-receipts-tbs1',
-    'execution_outcome_receipts',
-    if_not_attached => true
-  );
-
-SELECT
   attach_tablespace (
     'transactions-tbs1',
     'transactions',

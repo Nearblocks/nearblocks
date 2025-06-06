@@ -20,9 +20,15 @@ const writeConfig = {
     application_name: 'indexer-receipts',
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
-    statement_timeout: 60 * 1000,
   },
-  pool: { max: 10, min: 1 },
+  pool: {
+    acquireTimeoutMillis: 60000,
+    createTimeoutMillis: 30000,
+    idleTimeoutMillis: 30000,
+    max: 20,
+    min: 10,
+    propagateCreateError: false,
+  },
 };
 
 export const readConfig = {
