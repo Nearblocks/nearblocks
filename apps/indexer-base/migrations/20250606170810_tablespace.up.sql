@@ -47,4 +47,6 @@ SELECT
     if_not_attached => true
   );
 
-ALTER TABLE execution_outcome_receipts SET TABLESPACE execution-outcome-receipts-tbs1;
+ALTER TABLE execution_outcome_receipts
+SET
+  TABLESPACE execution - outcome - receipts - tbs1;
