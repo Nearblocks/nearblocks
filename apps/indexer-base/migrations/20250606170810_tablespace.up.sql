@@ -49,4 +49,4 @@ SELECT
 
 ALTER TABLE execution_outcome_receipts
 SET
-  TABLESPACE 'execution_outcome_receipts_tbs1';
+  TABLESPACE execution_outcome_receipts_tbs1;
