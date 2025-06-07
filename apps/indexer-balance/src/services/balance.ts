@@ -88,7 +88,7 @@ export const storeChunkBalance = async (
       await knex('balance_events')
         .insert(batch)
         .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
-        .merge();
+        .ignore();
     }
   });
 };

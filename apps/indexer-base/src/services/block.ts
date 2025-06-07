@@ -11,7 +11,10 @@ export const storeBlock = async (knex: Knex, message: Message) => {
   const data = getBlockData(message);
 
   await retry(async () => {
-    await knex('blocks').insert(data).onConflict(['block_hash']).ignore();
+    await knex('blocks')
+      .insert(data)
+      .onConflict(['block_hash', 'block_timestamp'])
+      .ignore();
   });
 
   blockHistogram.labels(config.network).observe(performance.now() - start);

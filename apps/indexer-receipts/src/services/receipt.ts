@@ -27,6 +27,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
   const shardChunks = message.shards.flatMap((shard) => ({
     chunk: shard.chunk,
     header: message.block.header,
+    shardId: shard.shardId,
   }));
 
   await Promise.all(
@@ -34,6 +35,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
       if (shardChunk.chunk && shardChunk.chunk.receipts.length) {
         const receipts = await storeChunkReceipts(
           knex,
+          shardChunk.shardId,
           shardChunk.chunk.header.chunkHash,
           shardChunk.header.hash,
           shardChunk.header.timestampNanosec,
@@ -64,7 +66,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
         retry(async () => {
           await knex('receipts')
             .insert(batch)
-            .onConflict(['receipt_id'])
+            .onConflict(['receipt_id', 'included_in_block_timestamp'])
             .ignore();
         }),
       );
@@ -79,7 +81,11 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
         retry(async () => {
           await knex('action_receipt_actions')
             .insert(batch)
-            .onConflict(['receipt_id', 'index_in_action_receipt'])
+            .onConflict([
+              'receipt_id',
+              'index_in_action_receipt',
+              'receipt_included_in_block_timestamp',
+            ])
             .ignore();
         }),
       );
@@ -122,6 +128,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
 
 const storeChunkReceipts = async (
   knex: Knex,
+  shardId: number,
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
@@ -169,8 +176,10 @@ const storeChunkReceipts = async (
         if (isDelegateAction(action)) {
           receiptActionsData.push(
             getActionReceiptActionData(
+              shardId,
               blockTimestamp,
               receiptOrDataId,
+              receiptIndex,
               actionIndex,
               action,
               receipt.predecessorId,
@@ -182,8 +191,10 @@ const storeChunkReceipts = async (
           action.Delegate.delegateAction.actions.forEach((action) => {
             receiptActionsData.push(
               getActionReceiptActionData(
+                shardId,
                 blockTimestamp,
                 receiptOrDataId,
+                receiptIndex,
                 actionIndex,
                 action,
                 receipt.predecessorId,
@@ -198,8 +209,10 @@ const storeChunkReceipts = async (
 
         receiptActionsData.push(
           getActionReceiptActionData(
+            shardId,
             blockTimestamp,
             receiptOrDataId,
+            receiptIndex,
             actionIndex,
             action,
             receipt.predecessorId,
@@ -213,6 +226,7 @@ const storeChunkReceipts = async (
     receiptData.push(
       getReceiptData(
         receipt,
+        shardId,
         chunkHash,
         blockHash,
         blockTimestamp,
@@ -353,6 +367,7 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
 
 const getReceiptData = (
   receipt: JReceipt,
+  shardId: number,
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
@@ -370,11 +385,14 @@ const getReceiptData = (
   receipt_id: receipt.receiptId,
   receipt_kind: mapReceiptKind(receipt.receipt),
   receiver_account_id: receipt.receiverId,
+  shard_id: shardId,
 });
 
 const getActionReceiptActionData = (
+  shardId: number,
   blockTimestamp: string,
   receiptId: string,
+  chunkIndex: number,
   actionIndex: number,
   action: Action,
   predecessorId: string,
@@ -386,11 +404,13 @@ const getActionReceiptActionData = (
     action_kind: kind,
     args,
     index_in_action_receipt: actionIndex,
+    index_in_chunk: chunkIndex,
     nep518_rlp_hash: rlpHash,
     receipt_id: receiptId,
     receipt_included_in_block_timestamp: blockTimestamp,
     receipt_predecessor_account_id: predecessorId,
     receipt_receiver_account_id: receiverId,
+    shard_id: shardId,
   };
 };
 

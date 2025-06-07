@@ -2,19 +2,20 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { server } from '#libs/http';
-import knex from '#libs/knex';
+import { dbMigration, dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { syncCollidedTxns } from '#services/collidedTxns';
 import { syncGenesis } from '#services/genesis';
-import { syncData } from '#services/stream';
+// import { syncData } from '#services/stream';
+// Temp stream from s3
+import { syncData } from '#services/tempStream';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing base indexer...');
+    logger.info({ network: config.network }, 'initializing indexer...');
+    await dbMigration.migrate.latest();
+    await dbMigration.destroy();
     logger.info('syncing genesis data...');
     await syncGenesis();
-    logger.info('syncing collided txn data...');
-    await syncCollidedTxns();
     logger.info('syncing blockchain data...');
     await syncData();
   } catch (error) {
@@ -27,7 +28,12 @@ import { syncData } from '#services/stream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([server.close(), knex.destroy(), sentry.close(1_000)]);
+    await Promise.all([
+      server.close(),
+      dbWrite.destroy(),
+      dbRead.destroy(),
+      sentry.close(1_000),
+    ]);
   } catch (error) {
     logger.error(error);
   }

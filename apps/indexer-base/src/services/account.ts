@@ -1,5 +1,5 @@
 import { Knex } from 'nb-knex';
-import { BlockHeader, ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
+import { BlockHeader, Message, Receipt } from 'nb-neardata';
 import { Account } from 'nb-types';
 import { retry } from 'nb-utils';
 
@@ -10,7 +10,7 @@ import {
   isTransferAction,
 } from '#libs/guards';
 import { accountHistogram } from '#libs/prom';
-import { isEthImplicit, isNearImplicit } from '#libs/utils';
+import { isEthImplicit, isExecutionSuccess, isNearImplicit } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
 
@@ -20,99 +20,23 @@ export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
   });
 };
 
-export const getGenesisAccountData = (
-  account: string,
-  blockHeight: number,
-): Account => ({
-  account_id: account,
-  created_by_block_height: blockHeight,
-  created_by_receipt_id: null,
-  deleted_by_block_height: null,
-  deleted_by_receipt_id: null,
-});
-
 export const storeAccounts = async (knex: Knex, message: Message) => {
   const start = performance.now();
-
-  await Promise.all(
-    message.shards.map(async (shard) => {
-      await storeChunkAccounts(
-        knex,
-        shard.receiptExecutionOutcomes,
-        message.block.header,
-      );
-    }),
-  );
-
-  accountHistogram.labels(config.network).observe(performance.now() - start);
-};
-
-export const storeChunkAccounts = async (
-  knex: Knex,
-  outcomes: ExecutionOutcomeWithReceipt[],
-  block: BlockHeader,
-) => {
-  if (!outcomes.length) return;
-
   const accounts: AccountMap = new Map();
   const accountsToUpdate: AccountMap = new Map();
 
-  const successfulReceipts = outcomes
-    .filter((outcome) => {
-      const keys = Object.keys(outcome.executionOutcome.outcome.status);
-
-      return keys[0] === 'SuccessValue' || keys[0] === 'SuccessReceiptId';
-    })
-    .map((outcomes) => outcomes.receipt);
-
-  for (const receipt of successfulReceipts) {
-    if (receipt?.receipt && 'Action' in receipt.receipt) {
-      for (const action of receipt.receipt.Action.actions) {
-        const receiptId = receipt.receiptId;
-        const accountId = receipt.receiverId;
-
-        if (isCreateAccountAction(action)) {
-          accounts.set(
-            accountId,
-            getAccountData(block.height, accountId, receiptId),
-          );
-          continue;
-        }
-
-        if (isDeleteAccountAction(action)) {
-          const account = accounts.get(accountId);
-
-          if (account) {
-            accounts.set(accountId, {
-              ...account,
-              deleted_by_block_height: block.height,
-              deleted_by_receipt_id: receiptId,
-            });
-            continue;
-          }
-
-          accountsToUpdate.set(
-            accountId,
-            getAccountData(
-              block.height,
-              accountId,
-              null,
-              receiptId,
-              block.height,
-            ),
-          );
-          continue;
-        }
-
-        if (
-          isTransferAction(action) &&
-          (isNearImplicit(accountId) || isEthImplicit(accountId))
-        ) {
-          accounts.set(
-            accountId,
-            getAccountData(block.height, accountId, receiptId),
-          );
-        }
+  for (const shard of message.shards) {
+    for (const outcome of shard.receiptExecutionOutcomes) {
+      if (
+        outcome.receipt &&
+        isExecutionSuccess(outcome.executionOutcome.outcome.status)
+      ) {
+        getChunkAccounts(
+          message.block.header,
+          outcome.receipt,
+          accounts,
+          accountsToUpdate,
+        );
       }
     }
   }
@@ -122,7 +46,7 @@ export const storeChunkAccounts = async (
       await knex('accounts')
         .insert([...accounts.values()])
         .onConflict(['account_id'])
-        .ignore();
+        .merge();
     });
   }
 
@@ -131,31 +55,92 @@ export const storeChunkAccounts = async (
       [...accountsToUpdate.values()].map(async (account) => {
         await retry(async () => {
           await knex('accounts')
-            .update('deleted_by_receipt_id', account.deleted_by_receipt_id)
-            .update('deleted_by_block_height', account.deleted_by_block_height)
+            .update({
+              deleted_by_block_height: account.deleted_by_block_height,
+              deleted_by_receipt_id: account.deleted_by_receipt_id,
+            })
             .where('account_id', account.account_id)
-            .where(
-              'created_by_block_height',
-              '<',
-              account.deleted_by_block_height,
-            )
             .whereNull('deleted_by_block_height');
         });
       }),
     );
   }
+
+  accountHistogram.labels(config.network).observe(performance.now() - start);
 };
 
-const getAccountData = (
-  blockHeight: number,
+const getChunkAccounts = (
+  block: BlockHeader,
+  receipt: Receipt,
+  accounts: AccountMap,
+  accountsToUpdate: AccountMap,
+) => {
+  if (receipt?.receipt && 'Action' in receipt.receipt) {
+    for (const action of receipt.receipt.Action.actions) {
+      const receiptId = receipt.receiptId;
+      const accountId = receipt.receiverId;
+
+      if (isCreateAccountAction(action)) {
+        accounts.set(
+          accountId,
+          getAccountData(accountId, block.height, receiptId),
+        );
+
+        continue;
+      }
+
+      if (isDeleteAccountAction(action)) {
+        const existingAccount = accounts.get(accountId);
+
+        if (existingAccount) {
+          accounts.set(accountId, {
+            ...existingAccount,
+            deleted_by_block_height: block.height,
+            deleted_by_receipt_id: receiptId,
+          });
+
+          continue;
+        }
+
+        accountsToUpdate.set(
+          accountId,
+          getAccountData(
+            accountId,
+            block.height,
+            receiptId,
+            block.height,
+            receiptId,
+          ),
+        );
+
+        continue;
+      }
+
+      if (
+        isTransferAction(action) &&
+        (isNearImplicit(accountId) || isEthImplicit(accountId))
+      ) {
+        accounts.set(
+          accountId,
+          getAccountData(accountId, block.height, receiptId),
+        );
+
+        continue;
+      }
+    }
+  }
+};
+
+export const getAccountData = (
   account: string,
-  receipt: null | string,
-  deletedReceipt: null | string = null,
-  deletedBlock: null | number = null,
+  blockHeight: number,
+  receiptId: null | string = null,
+  deletedBlockBlockHeight: null | number = null,
+  deletedReceiptId: null | string = null,
 ): Account => ({
   account_id: account,
   created_by_block_height: blockHeight,
-  created_by_receipt_id: receipt,
-  deleted_by_block_height: deletedBlock,
-  deleted_by_receipt_id: deletedReceipt,
+  created_by_receipt_id: receiptId,
+  deleted_by_block_height: deletedBlockBlockHeight,
+  deleted_by_receipt_id: deletedReceiptId,
 });

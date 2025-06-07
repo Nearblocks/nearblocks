@@ -10,18 +10,15 @@ import { JsonObject } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import knex from '#libs/knex';
-import {
-  getGenesisAccessKeyData,
-  storeGenesisAccessKeys,
-} from '#services/accessKey';
-import { getGenesisAccountData, storeGenesisAccounts } from '#services/account';
+import { dbRead, dbWrite } from '#libs/knex';
+import { getAccessKeyData, storeGenesisAccessKeys } from '#services/accessKey';
+import { getAccountData, storeGenesisAccounts } from '#services/account';
 
 const genesisKey = 'genesis';
 const genesisValue = { sync: true } as JsonObject;
 
 export const syncGenesis = async () => {
-  const settings = await knex('settings').where({ key: genesisKey }).first();
+  const settings = await dbRead('settings').where({ key: genesisKey }).first();
 
   const genesis = settings?.value as JsonObject;
 
@@ -37,7 +34,7 @@ export const syncGenesis = async () => {
   logger.info('inserting genesis data...');
   await insertGenesisData(path);
   await retry(async () => {
-    await knex('settings')
+    await dbWrite('settings')
       .insert({ key: genesisKey, value: genesisValue })
       .onConflict('key')
       .merge();
@@ -74,17 +71,17 @@ export const insertGenesisData = async (path: string) => {
 
   for await (const chunk of readable) {
     if (accounts.length === config.insertLimit) {
-      await storeGenesisAccounts(knex, accounts);
+      await storeGenesisAccounts(dbWrite, accounts);
       accounts = [];
     }
 
     if (accessKeys.length === config.insertLimit) {
-      await storeGenesisAccessKeys(knex, accessKeys);
+      await storeGenesisAccessKeys(dbWrite, accessKeys);
       accessKeys = [];
     }
 
     if (chunk.key === 'Account') {
-      const accountData = getGenesisAccountData(
+      const accountData = getAccountData(
         chunk.value.account_id,
         config.genesisHeight,
       );
@@ -94,10 +91,10 @@ export const insertGenesisData = async (path: string) => {
     }
 
     if (chunk.key === 'AccessKey') {
-      const accessKeyData = getGenesisAccessKeyData(
+      const accessKeyData = getAccessKeyData(
         chunk.value.account_id,
         chunk.value.public_key,
-        typeof chunk.value.access_key.permission,
+        chunk.value.access_key.permission,
         config.genesisHeight,
       );
 
@@ -106,8 +103,8 @@ export const insertGenesisData = async (path: string) => {
     }
   }
 
-  await storeGenesisAccounts(knex, accounts);
-  await storeGenesisAccessKeys(knex, accessKeys);
+  await storeGenesisAccounts(dbWrite, accounts);
+  await storeGenesisAccessKeys(dbWrite, accessKeys);
 
   logger.info(
     `inserted ${accountsCount} accounts and ${accessKeysCount} access keys...`,

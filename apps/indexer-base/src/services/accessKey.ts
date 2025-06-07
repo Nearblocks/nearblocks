@@ -2,8 +2,8 @@ import { Knex } from 'nb-knex';
 import {
   AccessKeyFunctionCallPermission,
   BlockHeader,
-  ExecutionOutcomeWithReceipt,
   Message,
+  Receipt,
 } from 'nb-neardata';
 import { AccessKey, AccessKeyPermissionKind } from 'nb-types';
 import { retry } from 'nb-utils';
@@ -16,10 +16,11 @@ import {
   isTransferAction,
 } from '#libs/guards';
 import { keyHistogram } from '#libs/prom';
-import { publicKeyFromImplicitAccount } from '#libs/utils';
+import { isExecutionSuccess, publicKeyFromImplicitAccount } from '#libs/utils';
 
 type AccessKeyMap = Map<string, AccessKey>;
-type DeletedAccountMap = Map<string, { accountId: string; receiptId: string }>;
+type DeletedAccount = { accountId: string; receiptId: string };
+type DeletedAccountMap = Map<string, DeletedAccount>;
 
 export const storeGenesisAccessKeys = async (
   knex: Knex,
@@ -33,163 +34,27 @@ export const storeGenesisAccessKeys = async (
   });
 };
 
-export const getGenesisAccessKeyData = (
-  account: string,
-  publicKey: string,
-  permission: string,
-  blockHeight: number,
-): AccessKey => {
-  const permissionKind =
-    permission === 'string'
-      ? AccessKeyPermissionKind.FULL_ACCESS
-      : AccessKeyPermissionKind.FUNCTION_CALL;
-
-  return {
-    account_id: account,
-    created_by_block_height: blockHeight,
-    created_by_receipt_id: null,
-    deleted_by_block_height: null,
-    deleted_by_receipt_id: null,
-    permission_kind: permissionKind,
-    public_key: publicKey,
-  };
-};
-
 export const storeAccessKeys = async (knex: Knex, message: Message) => {
   const start = performance.now();
-
-  await Promise.all(
-    message.shards.map(async (shard) => {
-      await storeChunkAccessKeys(
-        knex,
-        message.block.header,
-        shard.receiptExecutionOutcomes,
-      );
-    }),
-  );
-
-  keyHistogram.labels(config.network).observe(performance.now() - start);
-};
-
-export const storeChunkAccessKeys = async (
-  knex: Knex,
-  block: BlockHeader,
-  outcomes: ExecutionOutcomeWithReceipt[],
-) => {
-  if (!outcomes.length) return;
-
   const accessKeys: AccessKeyMap = new Map();
   const accessKeysToUpdate: AccessKeyMap = new Map();
   const deletedAccounts: DeletedAccountMap = new Map();
 
-  const successfulReceipts = outcomes
-    .filter((outcome) => {
-      const keys = Object.keys(outcome.executionOutcome.outcome.status);
-
-      return keys[0] === 'SuccessValue' || keys[0] === 'SuccessReceiptId';
-    })
-    .map((outcomes) => outcomes.receipt);
-
-  for (const receipt of successfulReceipts) {
-    if (receipt?.receipt && 'Action' in receipt.receipt) {
-      for (const action of receipt.receipt.Action.actions) {
-        const receiptId = receipt.receiptId;
-        const accountId = receipt.receiverId;
-
-        if (isDeleteAccountAction(action)) {
-          deletedAccounts.set(accountId, {
-            accountId,
-            receiptId,
-          });
-          accessKeys.forEach((value, key) => {
-            if (value.account_id === accountId) {
-              accessKeys.set(key, {
-                ...value,
-                deleted_by_block_height: block.height,
-                deleted_by_receipt_id: receiptId,
-              });
-            }
-          });
-          continue;
-        }
-
-        if (isAddKeyAction(action)) {
-          const { accessKey, publicKey } = action.AddKey;
-
-          accessKeys.set(
-            `${accountId}:${publicKey}`,
-            getAccessKeyData(
-              block.height,
-              accountId,
-              publicKey,
-              accessKey.permission,
-              receiptId,
-            ),
-          );
-          continue;
-        }
-
-        if (isDeleteKeyAction(action)) {
-          const { publicKey } = action.DeleteKey;
-          const accessKey = accessKeys.get(`${accountId}:${publicKey}`);
-
-          if (accessKey) {
-            accessKeys.set(`${accountId}:${publicKey}`, {
-              ...accessKey,
-              deleted_by_block_height: block.height,
-              deleted_by_receipt_id: receiptId,
-            });
-            continue;
-          }
-
-          accessKeysToUpdate.set(
-            `${accountId}:${publicKey}`,
-            getAccessKeyData(
-              block.height,
-              accountId,
-              publicKey,
-              AccessKeyPermissionKind.FULL_ACCESS,
-              null,
-              receiptId,
-              block.height,
-            ),
-          );
-          continue;
-        }
-
-        if (isTransferAction(action) && accountId.length === 64) {
-          const publicKey = publicKeyFromImplicitAccount(accountId);
-
-          if (publicKey) {
-            accessKeys.set(
-              `${accountId}:${publicKey}`,
-              getAccessKeyData(
-                block.height,
-                accountId,
-                publicKey,
-                AccessKeyPermissionKind.FULL_ACCESS,
-                receiptId,
-              ),
-            );
-          }
-        }
+  for (const shard of message.shards) {
+    for (const outcome of shard.receiptExecutionOutcomes) {
+      if (
+        outcome.receipt &&
+        isExecutionSuccess(outcome.executionOutcome.outcome.status)
+      ) {
+        getChunkAccessKeys(
+          message.block.header,
+          outcome.receipt,
+          accessKeys,
+          accessKeysToUpdate,
+          deletedAccounts,
+        );
       }
     }
-  }
-
-  if (deletedAccounts.size) {
-    await Promise.all(
-      [...deletedAccounts.values()].map(async (key) => {
-        await retry(async () => {
-          await knex('access_keys')
-            .update('deleted_by_receipt_id', key.receiptId)
-            .update('deleted_by_block_height', block.height)
-            .where('account_id', key.accountId)
-            .where('created_by_block_height', '<', block.height)
-            .whereNull('deleted_by_block_height');
-        });
-      }),
-    );
   }
 
   if (accessKeys.size) {
@@ -197,47 +62,168 @@ export const storeChunkAccessKeys = async (
       await knex('access_keys')
         .insert([...accessKeys.values()])
         .onConflict(['public_key', 'account_id'])
-        .ignore();
+        .merge();
     });
   }
 
   if (accessKeysToUpdate.size) {
     await Promise.all(
-      [...accessKeysToUpdate.values()].map(async (key) => {
+      [...accessKeysToUpdate.values()].map(async (accessKey) => {
         await retry(async () => {
           await knex('access_keys')
-            .update('deleted_by_receipt_id', key.deleted_by_receipt_id)
-            .update('deleted_by_block_height', key.deleted_by_block_height)
-            .where('account_id', key.account_id)
-            .where('public_key', key.public_key)
-            .where('created_by_block_height', '<', key.deleted_by_block_height)
+            .update({
+              deleted_by_block_height: accessKey.deleted_by_block_height,
+              deleted_by_receipt_id: accessKey.deleted_by_receipt_id,
+            })
+            .where('public_key', accessKey.public_key)
+            .where('account_id', accessKey.account_id)
             .whereNull('deleted_by_block_height');
         });
       }),
     );
   }
+
+  if (deletedAccounts.size) {
+    await Promise.all(
+      [...deletedAccounts.values()].map(async (deleted) => {
+        await retry(async () => {
+          await knex('access_keys')
+            .update({
+              deleted_by_block_height: message.block.header.height,
+              deleted_by_receipt_id: deleted.receiptId,
+            })
+            .where('account_id', deleted.accountId)
+            .whereNull('deleted_by_block_height');
+        });
+      }),
+    );
+  }
+
+  keyHistogram.labels(config.network).observe(performance.now() - start);
 };
 
-const getAccessKeyData = (
-  blockHeight: number,
+const getChunkAccessKeys = (
+  block: BlockHeader,
+  receipt: Receipt,
+  accessKeys: AccessKeyMap,
+  accessKeysToUpdate: AccessKeyMap,
+  deletedAccounts: DeletedAccountMap,
+) => {
+  if (receipt?.receipt && 'Action' in receipt.receipt) {
+    for (const action of receipt.receipt.Action.actions) {
+      const receiptId = receipt.receiptId;
+      const accountId = receipt.receiverId;
+
+      if (isDeleteAccountAction(action)) {
+        deletedAccounts.set(accountId, {
+          accountId,
+          receiptId,
+        });
+
+        continue;
+      }
+
+      if (isAddKeyAction(action)) {
+        const { accessKey, publicKey } = action.AddKey;
+        const mapKey = `${accountId}:${publicKey}`;
+        const keyToUpdate = accessKeysToUpdate.get(mapKey);
+
+        if (keyToUpdate) {
+          accessKeysToUpdate.delete(mapKey);
+        }
+
+        accessKeys.set(
+          mapKey,
+          getAccessKeyData(
+            accountId,
+            publicKey,
+            accessKey.permission,
+            block.height,
+            receiptId,
+          ),
+        );
+
+        continue;
+      }
+
+      if (isDeleteKeyAction(action)) {
+        const { publicKey } = action.DeleteKey;
+        const mapKey = `${accountId}:${publicKey}`;
+        const existingKey = accessKeys.get(mapKey);
+
+        if (existingKey) {
+          accessKeys.set(mapKey, {
+            ...existingKey,
+            deleted_by_block_height: block.height,
+            deleted_by_receipt_id: receiptId,
+          });
+
+          continue;
+        }
+
+        accessKeysToUpdate.set(
+          mapKey,
+          getAccessKeyData(
+            accountId,
+            publicKey,
+            null,
+            block.height,
+            receiptId,
+            block.height,
+            receiptId,
+          ),
+        );
+
+        continue;
+      }
+
+      if (isTransferAction(action) && accountId.length === 64) {
+        const publicKey = publicKeyFromImplicitAccount(accountId);
+        const mapKey = `${accountId}:${publicKey}`;
+
+        if (publicKey) {
+          accessKeys.set(
+            mapKey,
+            getAccessKeyData(
+              accountId,
+              publicKey,
+              AccessKeyPermissionKind.FULL_ACCESS,
+              block.height,
+              receiptId,
+            ),
+          );
+
+          continue;
+        }
+      }
+    }
+  }
+};
+
+export const getAccessKeyData = (
   account: string,
   publicKey: string,
-  permission: AccessKeyFunctionCallPermission | string,
-  receipt: null | string,
-  deletedReceipt: null | string = null,
-  deletedBlock: null | number = null,
+  permission: AccessKeyFunctionCallPermission | null | string,
+  blockHeight: number,
+  receiptId: null | string = null,
+  deletedBlockHeight: null | number = null,
+  deletedReceiptId: null | string = null,
 ): AccessKey => {
-  const permissionKind =
-    typeof permission === 'string'
-      ? AccessKeyPermissionKind.FULL_ACCESS
-      : AccessKeyPermissionKind.FUNCTION_CALL;
+  let permissions = null;
+  let permissionKind = AccessKeyPermissionKind.FULL_ACCESS;
+
+  if (permission && typeof permission !== 'string') {
+    permissions = permission.FunctionCall;
+    permissionKind = AccessKeyPermissionKind.FUNCTION_CALL;
+  }
 
   return {
     account_id: account,
     created_by_block_height: blockHeight,
-    created_by_receipt_id: receipt,
-    deleted_by_block_height: deletedBlock,
-    deleted_by_receipt_id: deletedReceipt,
+    created_by_receipt_id: receiptId,
+    deleted_by_block_height: deletedBlockHeight,
+    deleted_by_receipt_id: deletedReceiptId,
+    permission: permissions,
     permission_kind: permissionKind,
     public_key: publicKey,
   };
