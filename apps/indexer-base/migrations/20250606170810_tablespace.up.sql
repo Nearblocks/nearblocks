@@ -46,3 +46,5 @@ SELECT
     'transactions',
     if_not_attached => true
   );
+
+ALTER TABLE execution_outcome_receipts SET TABLESPACE execution-outcome-receipts-tbs1;
