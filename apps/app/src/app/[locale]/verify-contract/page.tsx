@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 
 import Verifier from '@/components/app/Address/Contract/Verifier';
 import { appUrl } from '@/utils/app/config';
+import { getRequest } from '@/utils/app/api';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet';
 
@@ -45,7 +46,16 @@ export default async function VerifyContract(props: {
 }) {
   const searchParams = await props.searchParams;
 
+  const options: RequestInit = {
+    cache: 'no-store',
+  };
+
   const { accountId, selectedVerifier } = searchParams;
+  const contractPromise = getRequest(
+    `v1/account/${accountId}/contract`,
+    {},
+    options,
+  );
 
   return (
     <>
@@ -61,6 +71,7 @@ export default async function VerifyContract(props: {
             accountId={accountId}
             network={network}
             selectedVerifier={selectedVerifier}
+            contractPromise={contractPromise}
           />
         </div>
       </div>
