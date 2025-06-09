@@ -45,6 +45,7 @@ export const streamConfig = {
   connection: {
     ...readConfig.connection,
     application_name: 'indexer-receipts-stream',
+    connectionString: config.dbUrlBase,
   },
 };
 
