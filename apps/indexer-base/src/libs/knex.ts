@@ -58,6 +58,7 @@ export const streamConfig = {
   connection: {
     ...readConfig.connection,
     application_name: 'indexer-base-stream',
+    connectionString: config.dbUrlBase,
   },
 };
 

@@ -16,6 +16,8 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  // Temp stream from s3
+  DATABASE_URL_BASE: str(),
   DATABASE_URL_READ: str({ default: '' }),
   DISABLE_AUTO_SWITCH: bool({ default: false }),
   DISABLE_S3_UPLOAD: bool({ default: false }),
@@ -62,6 +64,8 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
+  // Temp stream from s3
+  dbUrlBase: env.DATABASE_URL_BASE,
   dbUrlRead: env.DATABASE_URL_READ,
   delta: 10, // start from blocks earlier on sync interuption
   disableAutoSwitch: env.DISABLE_AUTO_SWITCH,

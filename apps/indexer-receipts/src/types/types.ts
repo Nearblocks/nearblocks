@@ -7,6 +7,8 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
+  // Temp stream from s3
+  dbUrlBase: string;
   dbUrlRead: string;
   delta: number;
   insertLimit: number;
