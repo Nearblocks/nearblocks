@@ -1,12 +1,12 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
-import { ContractMetadata } from '@/utils/types';
+import { ContractCodeInfo, ContractMetadata } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import LoadingCircular from '@/components/app/common/LoadingCircular';
@@ -14,10 +14,16 @@ import ArrowDown from '@/components/app/Icons/ArrowDown';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 
+type contractData = {
+  message: string;
+  contract: ContractCodeInfo[];
+};
+
 type ContractFormProps = {
   accountId: string;
   network: string;
   selectedVerifier: string;
+  contractPromise: Promise<contractData>;
 };
 
 type OnChainResponse = {
@@ -28,6 +34,7 @@ const Verifier: React.FC<ContractFormProps> = ({
   accountId,
   network,
   selectedVerifier,
+  contractPromise,
 }) => {
   const [loading, setLoading] = useState(false);
   const [apiLoading, setApiLoading] = useState(false);
@@ -35,11 +42,20 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [message, setMessage] = useState<null | string>(null);
   const [error, setError] = useState<null | string>(null);
   const [contractMetadata, setContractMetadata] = useState<ContractMetadata>();
-  const [onChainCodeHash, setOnChainCodeHash] = useState<null | string>(null);
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
   const initializedRef = useRef(false);
   const { verifierConfig } = useConfig();
+  const contractData = use(contractPromise);
+  const contractError =
+    contractData?.message === 'Error' || !contractData?.contract;
+  const contractOnChainHash =
+    !contractError && contractData?.contract?.[0]?.hash
+      ? contractData?.contract?.[0]?.hash
+      : null;
+  const [onChainCodeHash, setOnChainCodeHash] = useState<null | string>(
+    contractOnChainHash,
+  );
 
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);
@@ -69,17 +85,15 @@ const Verifier: React.FC<ContractFormProps> = ({
         setRpcError(false);
         setLoading(true);
         setError(null);
-
-        const onChainResponse = await contractCode(accountId as string);
-
         const contractMetadataResponse = await getContractMetadata(
           accountId as string,
         );
-
-        const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
-
-        setOnChainCodeHash(onChainHash);
         setContractMetadata(contractMetadataResponse);
+        if (!contractOnChainHash) {
+          const onChainResponse = await contractCode(accountId as string);
+          const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
+          setOnChainCodeHash(onChainHash);
+        }
       } catch (error) {
         setRpcError(true);
         console.error('Error fetching data:', error);

@@ -62,6 +62,7 @@ import { CopyButton } from '@/components/app/common/CopyButton';
 import { convertTimestampToTimes } from '@/utils/app/libs';
 import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import RpcTxnStatus from '@/components/app/common/RpcStatus';
+import useScrollToTop from '@/hooks/app/useScrollToTop';
 
 interface Props {
   hash: string;
@@ -98,7 +99,14 @@ const Details = (props: Props) => {
 
   const t = useTranslations();
   const actionRef = useRef<HTMLDivElement>(null);
+  const actionRowRef = useRef<HTMLDivElement>(null);
+  const tokensRef = useRef<HTMLDivElement>(null);
+  const { isAtBottom, scrollToTop } = useScrollToTop(actionRef);
+  const { isAtBottom: bottomTokens, scrollToTop: topTokens } =
+    useScrollToTop(tokensRef);
   const [isActionScroll, setIsActionScroll] = useState(false);
+  const [isActionRowScroll, setIsActionRowScroll] = useState(false);
+  const [isTokensScroll, setisTokensScroll] = useState(false);
 
   const {
     logs: apiLogs,
@@ -265,9 +273,6 @@ const Details = (props: Props) => {
     );
   };
 
-  const hasScrolledToken =
-    Number(fts?.length || 0) + Number(nfts?.length || 0) > 5;
-
   const filteredLogs = actionLogs?.filter((item) => {
     try {
       const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
@@ -401,9 +406,28 @@ const Details = (props: Props) => {
     }
   }, [updatedMainTxnsActions]);
 
+  useEffect(() => {
+    if (tokensRef?.current) {
+      const height = tokensRef?.current?.offsetHeight;
+      setisTokensScroll(height >= 180);
+    }
+  }, [fts, nfts]);
+
+  const totalTokens = (fts?.length || 0) + (nfts?.length || 0);
+  const hasScrolledToken = totalTokens > 5 || isTokensScroll;
+
   const isActionScrollable =
-    Number(updatedMainTxnsActions?.length) > 6 || isActionScroll;
-  const isScrollable = Number(actions?.length) > 5;
+    (updatedMainTxnsActions?.length || 0) > 6 || isActionScroll;
+
+  const totalItems = (filteredLogs?.length || 0) + (actions?.length || 0);
+  const { isAtBottom: actionRowBottom, scrollToTop: topActionRow } =
+    useScrollToTop(totalItems !== 0 ? actionRowRef : null);
+  useEffect(() => {
+    if (actionRowRef?.current) {
+      const height = actionRowRef?.current?.offsetHeight;
+      setIsActionRowScroll(height >= 160);
+    }
+  }, [actions, filteredLogs]);
 
   return (
     <>
@@ -684,12 +708,24 @@ const Details = (props: Props) => {
                           )}
                       </div>
                     </div>
-                    {isActionScrollable && (
-                      <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
-                        <ArrowDownDouble className="w-4 h-4 dark:invert" />
-                        Scroll for more
-                      </div>
-                    )}
+                    {isActionScrollable &&
+                      (isAtBottom ? (
+                        <button
+                          className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10"
+                          onClick={() => scrollToTop()}
+                        >
+                          <ArrowDownDouble
+                            className="w-4 h-4 dark:invert"
+                            style={{ transform: 'rotate(180deg)' }}
+                          />
+                          Scroll to Top
+                        </button>
+                      ) : (
+                        <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
+                          <ArrowDownDouble className="w-4 h-4 dark:invert" />
+                          Scroll for more
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
@@ -793,37 +829,52 @@ const Details = (props: Props) => {
                   </div>
                 ) : (
                   <div className="w-full md:w-3/4 pb-1">
-                    <div
-                      className={`${
-                        isScrollable && 'mostly-customized-scrollbar'
-                      } mr-4`}
-                    >
+                    {totalItems !== 0 && (
                       <div
-                        id="action-column"
-                        className="max-h-[160px] break-words space-y-1 text-xs"
+                        ref={actionRowRef}
+                        className={`max-h-[160px] mr-4 ${
+                          isActionRowScroll ? 'mostly-customized-scrollbar' : ''
+                        }`}
                       >
-                        {filteredLogs?.map(
-                          (event: TransactionLog, i: number) => (
-                            <EventLogs
-                              key={i}
-                              event={event}
-                              allActionLog={allActions}
-                              isInteracted
-                              tokenMetadata={tokenMetadata}
-                            />
-                          ),
-                        )}
-                        {actions?.map((action: any, i: number) => (
-                          <Actions key={i} action={action} />
-                        ))}
-                      </div>
-                    </div>
-                    {isScrollable && (
-                      <div className="flex text-xs pt-2 text-nearblue-600 dark:text-neargray-10 mt-1">
-                        <ArrowDownDouble className="w-4 h-4 dark:invert" />
-                        Scroll for more
+                        <div
+                          id="action-column"
+                          className="break-words space-y-1 text-xs"
+                        >
+                          {filteredLogs?.map(
+                            (event: TransactionLog, i: number) => (
+                              <EventLogs
+                                key={i}
+                                event={event}
+                                allActionLog={allActions}
+                                isInteracted
+                                tokenMetadata={tokenMetadata}
+                              />
+                            ),
+                          )}
+                          {actions?.map((action: any, i: number) => (
+                            <Actions key={i} action={action} />
+                          ))}
+                        </div>
                       </div>
                     )}
+                    {isActionRowScroll &&
+                      (actionRowBottom ? (
+                        <button
+                          className="flex text-xs pt-2 text-nearblue-600 dark:text-neargray-10 mt-1"
+                          onClick={() => topActionRow()}
+                        >
+                          <ArrowDownDouble
+                            className="w-4 h-4 dark:invert"
+                            style={{ transform: 'rotate(180deg)' }}
+                          />
+                          Scroll to Top
+                        </button>
+                      ) : (
+                        <div className="flex text-xs pt-2 text-nearblue-600 dark:text-neargray-10 mt-1">
+                          <ArrowDownDouble className="w-4 h-4 dark:invert" />
+                          Scroll for more
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
@@ -849,254 +900,265 @@ const Details = (props: Props) => {
                 </div>
               ) : (
                 <div className="relative w-full md:w-3/4">
-                  <div className="mostly-customized-scrollbar">
-                    <div className="max-h-[180px] break-words space-y-3">
-                      {fts &&
-                        fts?.map((ft: any, i: number) => (
-                          <div
-                            className="flex items-center flex-wrap break-all leading-1"
-                            key={i}
-                          >
-                            <FaRight className="inline-flex text-gray-400 text-xs" />
-                            {ft?.cause === 'MINT' ? (
-                              <>
-                                <div className="font-semibold text-gray px-1 flex items-center">
-                                  From
-                                  {ft?.involved_account_id ? (
-                                    <AddressOrTxnsLink
-                                      className="h-6 flex items-center ml-1"
-                                      currentAddress={ft?.involved_account_id}
-                                    />
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="font-semibold text-gray px-1 flex items-center">
-                                  To
-                                  {ft?.affected_account_id ? (
-                                    <AddressOrTxnsLink
-                                      className="h-6 flex items-center ml-1"
-                                      currentAddress={ft?.affected_account_id}
-                                    />
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="font-semibold text-gray px-1 flex items-center">
-                                  From
-                                  {ft?.affected_account_id ? (
-                                    <AddressOrTxnsLink
-                                      className="h-6 flex items-center ml-1"
-                                      currentAddress={ft?.affected_account_id}
-                                    />
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="font-semibold text-gray px-1 flex items-center">
-                                  To
-                                  {ft?.involved_account_id ? (
-                                    <AddressOrTxnsLink
-                                      className="h-6 flex items-center ml-1"
-                                      currentAddress={ft?.involved_account_id}
-                                    />
-                                  ) : (
-                                    <span className="font-normal pl-1">
-                                      system
-                                    </span>
-                                  )}
-                                </div>
-                              </>
-                            )}
-                            <div className="font-semibold text-gray px-1">
-                              For
-                              <span className="pl-1 font-normal">
-                                {ft?.delta_amount &&
-                                ft?.ft_meta?.decimals &&
-                                tokenAmount
-                                  ? tokenAmount(
-                                      absoluteValue(ft?.delta_amount),
-                                      ft?.ft_meta?.decimals,
-                                      true,
-                                    )
-                                  : ''}
-                              </span>
-                            </div>
-
-                            <Link
-                              className="text-green dark:text-green-250 flex items-center hover:no-underline font-semibold"
-                              href={`/token/${ft?.ft_meta?.contract}`}
-                            >
-                              <TokenImage
-                                alt={ft?.ft_meta?.name}
-                                className="w-4 h-4 mx-1"
-                                src={ft?.ft_meta?.icon}
-                              />
-                              {shortenToken(ft?.ft_meta?.name ?? '')}
-                              <span>
-                                {`(${shortenTokenSymbol(
-                                  ft?.ft_meta?.symbol ?? '',
-                                )})`}
-                              </span>
-                            </Link>
+                  <div
+                    ref={tokensRef}
+                    className="max-h-[180px] break-words mostly-customized-scrollbar space-y-2"
+                  >
+                    {fts &&
+                      fts?.map((ft: any, i: number) => (
+                        <div
+                          className="flex items-center flex-wrap break-all leading-1"
+                          key={i}
+                        >
+                          <FaRight className="inline-flex text-gray-400 text-xs" />
+                          {ft?.cause === 'MINT' ? (
+                            <>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From
+                                {ft?.involved_account_id ? (
+                                  <AddressOrTxnsLink
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.involved_account_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                To
+                                {ft?.affected_account_id ? (
+                                  <AddressOrTxnsLink
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.affected_account_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                From
+                                {ft?.affected_account_id ? (
+                                  <AddressOrTxnsLink
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.affected_account_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                              <div className="font-semibold text-gray px-1 flex items-center">
+                                To
+                                {ft?.involved_account_id ? (
+                                  <AddressOrTxnsLink
+                                    className="h-6 flex items-center ml-1"
+                                    currentAddress={ft?.involved_account_id}
+                                  />
+                                ) : (
+                                  <span className="font-normal pl-1">
+                                    system
+                                  </span>
+                                )}
+                              </div>
+                            </>
+                          )}
+                          <div className="font-semibold text-gray px-1">
+                            For
+                            <span className="pl-1 font-normal">
+                              {ft?.delta_amount &&
+                              ft?.ft_meta?.decimals &&
+                              tokenAmount
+                                ? tokenAmount(
+                                    absoluteValue(ft?.delta_amount),
+                                    ft?.ft_meta?.decimals,
+                                    true,
+                                  )
+                                : ''}
+                            </span>
                           </div>
-                        ))}
-                      {nfts &&
-                        nfts?.map((nft: any, i: number) => (
-                          <div className="flex" key={i}>
-                            <div className="flex justify-start items-start">
-                              <FaRight className="inline-flex text-gray-400 text-xs mt-1" />
-                              <div className="flex flex-wrap">
-                                <div>
-                                  <div className="sm:flex">
-                                    {nft?.cause === 'MINT' ? (
-                                      <>
-                                        <div className="font-semibold text-gray px-1 flex items-center">
-                                          From
-                                          {nft?.involved_account_id ? (
-                                            <AddressOrTxnsLink
-                                              className="h-6 flex items-center ml-1"
-                                              currentAddress={
-                                                nft?.involved_account_id
-                                              }
-                                            />
-                                          ) : (
-                                            <span className="font-normal pl-1">
-                                              system
-                                            </span>
-                                          )}
-                                        </div>
-                                        <div className="font-semibold text-gray px-1 flex items-center">
-                                          To
-                                          {nft?.affected_account_id ? (
-                                            <AddressOrTxnsLink
-                                              className="h-6 flex items-center ml-1"
-                                              currentAddress={
-                                                nft?.affected_account_id
-                                              }
-                                            />
-                                          ) : (
-                                            <span className="font-normal pl-1">
-                                              system
-                                            </span>
-                                          )}
-                                        </div>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <div className="font-semibold text-gray px-1 flex items-center">
-                                          From
-                                          {nft?.affected_account_id ? (
-                                            <AddressOrTxnsLink
-                                              className="h-6 flex items-center ml-1"
-                                              currentAddress={
-                                                nft?.affected_account_id
-                                              }
-                                            />
-                                          ) : (
-                                            <span className="font-normal pl-1">
-                                              system
-                                            </span>
-                                          )}
-                                        </div>
-                                        <div className="font-semibold text-gray px-1 flex items-center">
-                                          To
-                                          {nft?.involved_account_id ? (
-                                            <AddressOrTxnsLink
-                                              className="h-6 flex items-center ml-1"
-                                              currentAddress={
-                                                nft?.involved_account_id
-                                              }
-                                            />
-                                          ) : (
-                                            <span className="font-normal pl-1">
-                                              system
-                                            </span>
-                                          )}
-                                        </div>
-                                      </>
-                                    )}
-                                  </div>
-                                  <div className="sm:flex mt-1">
-                                    <div className="text-gray px-1">
-                                      <span className="text-gray-400">
-                                        For{' '}
-                                      </span>
-                                      <span className="pl-1 font-normal">
-                                        NFT Token ID [
-                                        <Link
-                                          className="text-green hover:no-underline dark:text-green-250"
-                                          href={`/nft-token/${nft?.nft_meta
-                                            ?.contract}/${encodeURIComponent(
-                                            nft?.token_id,
-                                          )}`}
-                                        >
-                                          {shortenToken(nft?.token_id ?? '')}
-                                        </Link>
-                                        ]
-                                      </span>
-                                    </div>
 
-                                    <Link
-                                      className="text-green flex items-center hover:no-underline dark:text-green-250"
-                                      href={`/nft-token/${nft?.nft_meta?.contract}`}
-                                    >
-                                      <TokenImage
-                                        alt={nft?.nft_meta?.name}
-                                        className="w-4 h-4 mx-1"
-                                        src={nft?.nft_meta?.icon}
-                                      />
-                                      {shortenToken(nft?.nft_meta?.name ?? '')}
-                                      <span>
-                                        &nbsp;
-                                        {`(${shortenTokenSymbol(
-                                          nft?.nft_meta?.symbol ?? '',
-                                        )})`}
-                                      </span>
-                                    </Link>
-                                  </div>
+                          <Link
+                            className="text-green dark:text-green-250 flex items-center hover:no-underline font-semibold"
+                            href={`/token/${ft?.ft_meta?.contract}`}
+                          >
+                            <TokenImage
+                              alt={ft?.ft_meta?.name}
+                              className="w-4 h-4 mx-1"
+                              src={ft?.ft_meta?.icon}
+                            />
+                            {shortenToken(ft?.ft_meta?.name ?? '')}
+                            <span>
+                              {`(${shortenTokenSymbol(
+                                ft?.ft_meta?.symbol ?? '',
+                              )})`}
+                            </span>
+                          </Link>
+                        </div>
+                      ))}
+                    {nfts &&
+                      nfts?.map((nft: any, i: number) => (
+                        <div className="flex" key={i}>
+                          <div className="flex justify-start items-start">
+                            <FaRight className="inline-flex text-gray-400 text-xs mt-1" />
+                            <div className="flex flex-wrap">
+                              <div>
+                                <div className="sm:flex">
+                                  {nft?.cause === 'MINT' ? (
+                                    <>
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        From
+                                        {nft?.involved_account_id ? (
+                                          <AddressOrTxnsLink
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.involved_account_id
+                                            }
+                                          />
+                                        ) : (
+                                          <span className="font-normal pl-1">
+                                            system
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        To
+                                        {nft?.affected_account_id ? (
+                                          <AddressOrTxnsLink
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.affected_account_id
+                                            }
+                                          />
+                                        ) : (
+                                          <span className="font-normal pl-1">
+                                            system
+                                          </span>
+                                        )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        From
+                                        {nft?.affected_account_id ? (
+                                          <AddressOrTxnsLink
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.affected_account_id
+                                            }
+                                          />
+                                        ) : (
+                                          <span className="font-normal pl-1">
+                                            system
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="font-semibold text-gray px-1 flex items-center">
+                                        To
+                                        {nft?.involved_account_id ? (
+                                          <AddressOrTxnsLink
+                                            className="h-6 flex items-center ml-1"
+                                            currentAddress={
+                                              nft?.involved_account_id
+                                            }
+                                          />
+                                        ) : (
+                                          <span className="font-normal pl-1">
+                                            system
+                                          </span>
+                                        )}
+                                      </div>
+                                    </>
+                                  )}
                                 </div>
-                                <div className="border rounded ml-2 w-11 h-11 p-1">
+                                <div className="sm:flex mt-1">
+                                  <div className="text-gray px-1">
+                                    <span className="text-gray-400">For </span>
+                                    <span className="pl-1 font-normal">
+                                      NFT Token ID [
+                                      <Link
+                                        className="text-green hover:no-underline dark:text-green-250"
+                                        href={`/nft-token/${nft?.nft_meta
+                                          ?.contract}/${encodeURIComponent(
+                                          nft?.token_id,
+                                        )}`}
+                                      >
+                                        {shortenToken(nft?.token_id ?? '')}
+                                      </Link>
+                                      ]
+                                    </span>
+                                  </div>
+
                                   <Link
-                                    className="hover:no-underline"
-                                    href={`/nft-token/${nft?.nft_meta
-                                      ?.contract}/${encodeURIComponent(
-                                      nft?.token_id,
-                                    )}`}
+                                    className="text-green flex items-center hover:no-underline dark:text-green-250"
+                                    href={`/nft-token/${nft?.nft_meta?.contract}`}
                                   >
-                                    <NFTImage
-                                      alt={nft.nft_token_meta.title}
-                                      base={nft.nft_meta.base_uri}
-                                      className="max-h-full rounded"
-                                      media={nft.nft_token_meta.media}
-                                      reference={
-                                        nft.nft_meta.reference ||
-                                        nft.nft_token_meta.reference
-                                      }
+                                    <TokenImage
+                                      alt={nft?.nft_meta?.name}
+                                      className="w-4 h-4 mx-1"
+                                      src={nft?.nft_meta?.icon}
                                     />
+                                    {shortenToken(nft?.nft_meta?.name ?? '')}
+                                    <span>
+                                      &nbsp;
+                                      {`(${shortenTokenSymbol(
+                                        nft?.nft_meta?.symbol ?? '',
+                                      )})`}
+                                    </span>
                                   </Link>
                                 </div>
                               </div>
+                              <div className="border rounded ml-2 w-11 h-11 p-1">
+                                <Link
+                                  className="hover:no-underline"
+                                  href={`/nft-token/${nft?.nft_meta
+                                    ?.contract}/${encodeURIComponent(
+                                    nft?.token_id,
+                                  )}`}
+                                >
+                                  <NFTImage
+                                    alt={nft.nft_token_meta.title}
+                                    base={nft.nft_meta.base_uri}
+                                    className="max-h-full rounded"
+                                    media={nft.nft_token_meta.media}
+                                    reference={
+                                      nft.nft_meta.reference ||
+                                      nft.nft_token_meta.reference
+                                    }
+                                  />
+                                </Link>
+                              </div>
                             </div>
                           </div>
-                        ))}
-                    </div>
+                        </div>
+                      ))}
                   </div>
-                  {hasScrolledToken && (
-                    <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
-                      <ArrowDownDouble className="w-4 h-4 dark:invert" />
-                      Scroll for more
-                    </div>
-                  )}
+                  {hasScrolledToken &&
+                    (bottomTokens ? (
+                      <button
+                        className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10"
+                        onClick={() => topTokens()}
+                      >
+                        <ArrowDownDouble
+                          className="w-4 h-4 dark:invert"
+                          style={{ transform: 'rotate(180deg)' }}
+                        />
+                        Scroll to Top
+                      </button>
+                    ) : (
+                      <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
+                        <ArrowDownDouble className="w-4 h-4 dark:invert" />
+                        Scroll for more
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
@@ -1234,7 +1296,7 @@ const Details = (props: Props) => {
             </div>
           )}
 
-          <AccordionRoot collapsible>
+          <AccordionRoot collapsible id="gas-details">
             <AccordionItem value="">
               <AccordionItemContent className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 divide-y dark:border-black-200 border-b py-0">
                 <div className="py-1">
