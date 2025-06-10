@@ -3,7 +3,6 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { dbRead, dbWrite, streamConfig } from '#libs/knex';
-import { cacheHistogram } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
@@ -40,8 +39,22 @@ export const syncData = async () => {
     start: startBlock,
   });
 
+  let messages: Message[] = [];
+
   for await (const message of stream as AsyncIterable<Message>) {
-    await onMessage(message);
+    // Temp batch processing
+    const concurrency = message.block.header.height - startBlock > 100 ? 25 : 1;
+    prepareCache(message);
+    messages.push(message);
+
+    if (messages.length >= concurrency) {
+      await Promise.all(messages.map((msg) => onMessage(msg)));
+      messages = [];
+    }
+  }
+
+  if (messages.length > 0) {
+    await Promise.all(messages.map((msg) => onMessage(msg)));
   }
 
   stream.on('end', () => {
@@ -56,13 +69,7 @@ export const syncData = async () => {
 
 export const onMessage = async (message: Message) => {
   try {
-    let start = performance.now();
-
-    prepareCache(message);
-
-    const cache = performance.now() - start;
-    cacheHistogram.labels(config.network).observe(cache);
-    start = performance.now();
+    const start = performance.now();
 
     await Promise.all([
       storeReceipts(dbWrite, message),
@@ -71,11 +78,7 @@ export const onMessage = async (message: Message) => {
 
     const time = performance.now() - start;
 
-    logger.info({
-      block: message.block.header.height,
-      cache: `${cache} ms`,
-      db: `${time} ms`,
-    });
+    logger.info({ block: message.block.header.height, db: `${time} ms` });
 
     await dbWrite('settings')
       .insert({
