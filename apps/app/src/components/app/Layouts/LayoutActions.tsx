@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Provider from '@/components/Layouts/Provider';
 import useWallet from '@/hooks/app/useWallet';
@@ -14,8 +14,6 @@ import { toast } from 'react-toastify';
 import { getSearchRoute, SearchToast } from '@/components/app/common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
 import { rpcSearch } from '@/utils/app/rpc';
-import { useRpcStore } from '@/stores/app/rpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
@@ -50,44 +48,28 @@ const LayoutActions = ({
   const { getSearchResults, setSearchResults } = useSearchHistory();
   const [accountName, setAccountName] = useState<undefined | string>(accountId);
   const [isLoading, setIsLoading] = useState(true);
-  const initializedRef = useRef(false);
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
 
-    useEffect(() => {
-      const manageAccountSession = () => {
-        if (signedAccountId && signedAccountId.length > 0) {
-          const currentCookie = Cookies.get('signedAccountId');
-          if (currentCookie !== signedAccountId) {
-            Cookies.set('signedAccountId', signedAccountId);
-            setAccountName(signedAccountId);
-          }
-          return;
+  useEffect(() => {
+    const manageAccountSession = () => {
+      if (signedAccountId && signedAccountId.length > 0) {
+        const currentCookie = Cookies.get('signedAccountId');
+        if (currentCookie !== signedAccountId) {
+          Cookies.set('signedAccountId', signedAccountId);
+          setAccountName(signedAccountId);
         }
-        if (!isLoading && (!signedAccountId || signedAccountId.length === 0)) {
-          Cookies.remove('signedAccountId');
-          setAccountName(undefined);
-        }
-      };
-      manageAccountSession();
-      const interval = setInterval(manageAccountSession, 500);
-
-      return () => clearInterval(interval);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [signedAccountId, isLoading]);
-
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
+        return;
       }
-    }, [RpcProviders, setProviders]);
+      if (!isLoading && (!signedAccountId || signedAccountId.length === 0)) {
+        Cookies.remove('signedAccountId');
+        setAccountName(undefined);
+      }
+    };
+    manageAccountSession();
+    const interval = setInterval(manageAccountSession, 500);
 
-    return useRpcStore((state) => state);
-  };
-
-  const { rpc: rpcUrl } = useRpcStoreWithProviders();
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedAccountId, isLoading]);
 
   useEffect(() => {
     if (wallet) {
@@ -127,7 +109,7 @@ const LayoutActions = ({
           setSearchResults(data?.keyword, '', data?.data);
           return redirect(route);
         } else {
-          const rpcData = await rpcSearch(rpcUrl, keyword);
+          const rpcData = await rpcSearch(keyword);
           const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
           if (rpcRoute) {
             setSearchResults(rpcData?.keyword, '', rpcData?.data);

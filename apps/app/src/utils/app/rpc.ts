@@ -1,12 +1,15 @@
+'use server';
+
 import { baseDecode } from 'borsh';
 import { providers } from 'near-api-js';
 
 import { SearchResult } from '../types';
 import { networkId } from './config';
 import { isValidAccount } from './libs';
+import { JsonRpcProvider } from '@near-js/providers';
 
-export const RpcProviders =
-  networkId === 'mainnet'
+export const getRpcProviders = async () => {
+  return networkId === 'mainnet'
     ? [
         {
           name: 'NEAR (Archival)',
@@ -43,6 +46,7 @@ export const RpcProviders =
           url: 'https://rpc.testnet.near.org',
         },
       ];
+};
 
 type response = {
   final_execution_status: string;
@@ -66,10 +70,7 @@ type SearchResponse =
   | { data: SearchResult; keyword: string; loading: boolean }
   | { data: null; loading: boolean };
 
-export const rpcSearch = async (
-  rpcUrl: string,
-  keyword: string,
-): Promise<SearchResponse> => {
+export const rpcSearch = async (keyword: string): Promise<SearchResponse> => {
   const data: SearchResult = {
     accounts: [],
     blocks: [],
@@ -82,14 +83,14 @@ export const rpcSearch = async (
 
   const [account, block, txn, receipt]: response[] = await Promise.all([
     isValidAccount(keyword.toLocaleLowerCase())
-      ? getAccount(rpcUrl, keyword.toLocaleLowerCase())
+      ? getAccount(keyword.toLocaleLowerCase())
       : undefined,
     isQueryLong
-      ? getBlock(rpcUrl, keyword)
+      ? getBlock(keyword)
       : !isNaN(+keyword)
-      ? getBlock(rpcUrl, +keyword)
+      ? getBlock(+keyword)
       : undefined,
-    isQueryLong ? getTxn(rpcUrl, keyword) : undefined,
+    isQueryLong ? getTxn(keyword) : undefined,
     isQueryLong ? getReceipt(receiptRpc, keyword) : undefined,
   ]);
 
@@ -132,13 +133,14 @@ export const rpcSearch = async (
     ? { data, keyword, loading: false }
     : { data: null, loading: false };
 };
+const RpcProviders = await getRpcProviders();
+const jsonProviders = RpcProviders.map(
+  (p) => new JsonRpcProvider({ url: p.url }),
+);
 
-export const getAccount = async (rpc: string, accountId: string) => {
+const provider = new providers.FailoverRpcProvider(jsonProviders);
+export const getAccount = async (accountId: string) => {
   try {
-    const jsonProviders = [new providers.JsonRpcProvider({ url: rpc })];
-
-    const provider = new providers.FailoverRpcProvider(jsonProviders);
-
     const data = await provider.query({
       account_id: accountId,
       finality: 'final',
@@ -147,42 +149,29 @@ export const getAccount = async (rpc: string, accountId: string) => {
 
     return data;
   } catch (error) {
-    console.log({ error });
-    return;
+    return null;
   }
 };
 
-export const getBlock = async (rpc: string, blockId: number | string) => {
+export const getBlock = async (blockId: number | string) => {
   try {
-    const jsonProviders = [new providers.JsonRpcProvider({ url: rpc })];
-
-    const provider = new providers.FailoverRpcProvider(jsonProviders);
-
     const block = await provider.block({ blockId });
-
     return block;
   } catch (error) {
-    console.log({ error });
-    return;
+    return null;
   }
 };
 
-export const getTxn = async (rpc: string, txnHash: string) => {
+export const getTxn = async (txnHash: string) => {
   try {
-    const jsonProviders = [new providers.JsonRpcProvider({ url: rpc })];
-
-    const provider = new providers.FailoverRpcProvider(jsonProviders);
-
     const data = await provider.txStatusReceipts(
       Uint8Array.from(baseDecode(txnHash)),
       'bowen',
       'NONE',
     );
-
     return data;
   } catch (error) {
-    console.log({ error });
-    return;
+    return null;
   }
 };
 
@@ -210,7 +199,6 @@ export const getReceipt = async (rpc: string, receiptId: string) => {
     const data = await response.json();
     return data?.result;
   } catch (error) {
-    console.log({ error });
-    return;
+    return null;
   }
 };
