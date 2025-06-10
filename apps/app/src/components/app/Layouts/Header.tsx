@@ -19,6 +19,7 @@ import UserMenu from '@/components/app/Layouts/UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
 import { getLatestStats, getSyncStatus } from '@/utils/app/actions';
 import useFallbackPathname from '@/hooks/app/useFallbackPathname';
+import { usePathname } from 'next/navigation';
 
 const menus = [
   {
@@ -159,7 +160,7 @@ const Header = ({
   accountId,
   theme: cookieTheme,
   locale,
-  ShowSearch,
+  globalError,
 }: any) => {
   const [open, setOpen] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState(true);
@@ -173,7 +174,10 @@ const Header = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const pathname = useFallbackPathname();
+
+  const fallbackPathname = useFallbackPathname();
+  const currentPathname = usePathname();
+  const pathname = globalError ? fallbackPathname : currentPathname;
 
   useEffect(() => {
     const fetchSyncStats = async () => {
@@ -248,7 +252,7 @@ const Header = ({
   }, [sync]);
 
   // const showSearch = pathname !== '/';
-  const showSearch = ShowSearch !== undefined ? ShowSearch : pathname !== '/';
+  const showSearch = !!globalError || pathname !== '/';
 
   useEffect(() => {
     const cookieTheme = Cookies.get('theme');
@@ -345,7 +349,11 @@ const Header = ({
           <div className="w-full lg:!w-2/4 flex justify-end items-center gap-3 h-10">
             {showSearch && (
               <div className="w-full md:w-[70%] flex items-center">
-                <Search header fallbackpathname={pathname} />
+                <Search
+                  header
+                  pathname={pathname}
+                  globalError={!!globalError}
+                />
               </div>
             )}
             <ul className="hidden md:flex justify-end text-gray-500 pb-4 md:pb-0">

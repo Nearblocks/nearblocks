@@ -8,6 +8,8 @@ import { getMessage, getCookie } from '@/utils/app/actions';
 import useWallet from '@/hooks/app/useWallet';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import ThemeInitializer from '@/components/app/Layouts/ThemeInitializer';
 import { NearContext } from '@/components/app/wallet/near-context';
@@ -88,14 +90,8 @@ export default function ErrorLayout({ reset }: { reset: () => void }) {
   const [messages, setMessages] = useState<any>(null);
 
   const [signedAccountId, setSignedAccountId] = useState<any>(null);
-  const [path, setPath] = useState<string | null>(null);
-
   const theme = Cookies.get('theme') || 'light';
   const locale = Cookies.get('NEXT_LOCALE') || 'en';
-
-  useEffect(() => {
-    setPath(window.location.pathname);
-  }, []);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -132,13 +128,12 @@ export default function ErrorLayout({ reset }: { reset: () => void }) {
       <AddressHoverProvider>
         <ThemeProvider attribute="class">
           <ThemeInitializer initialTheme={theme} />
-
+          <ToastContainer />
           <NearContext.Provider value={{ signedAccountId, wallet }}>
             <Header
               accountId={signedAccountId}
-              pathname={path}
               theme={theme}
-              ShowSearch={true}
+              globalError={true}
               locale={locale}
             />
 

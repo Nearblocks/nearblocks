@@ -30,7 +30,7 @@ export default async function ReceiptPage(props: {
         if (rpcResponseReceipt) {
           txn = rpcResponseReceipt?.parent_transaction_hash;
         } else {
-          const rpcResponseTxn = await getTxn(receiptRpc, receipt);
+          const rpcResponseTxn = await getTxn(receipt);
           if (rpcResponseTxn) {
             if (rpcResponseTxn?.final_execution_status !== 'NONE') {
               txn = rpcResponseTxn?.transaction?.hash;

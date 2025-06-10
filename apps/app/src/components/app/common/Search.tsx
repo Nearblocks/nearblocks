@@ -1,14 +1,11 @@
 'use client';
 import debounce from 'lodash/debounce';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { routing } from '@/i18n/routing';
-import { useRpcStore } from '@/stores/app/rpc';
+import { routing, useIntlRouter } from '@/i18n/routing';
 import { rpcSearch } from '@/utils/app/rpc';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import { NetworkId, SearchResult, SearchRoute } from '@/utils/types';
@@ -74,12 +71,17 @@ const t = (key: string, p?: any): any => {
   return simulateAbsence ? undefined : { key, p };
 };
 
-const Search = ({
+const BaseSearch = ({
   disabled,
   header = false,
-  fallbackpathname: fallbackpathname,
-}: any) => {
-  const pathname = usePathname() || fallbackpathname;
+  pathname,
+  onRedirect,
+}: {
+  disabled?: boolean;
+  header?: boolean;
+  pathname?: string;
+  onRedirect: (newPath: string, pathname?: string) => Promise<void>;
+}) => {
   const [keyword, setKeyword] = useState('');
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
@@ -92,23 +94,6 @@ const Search = ({
   const isLocale = (value: null | string): any => {
     return routing?.locales?.includes(value as any);
   };
-
-  const initializedRef = useRef(false);
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { rpc: rpcUrl } = useRpcStoreWithProviders();
 
   const { networkId } = useConfig();
 
@@ -126,27 +111,34 @@ const Search = ({
         ? `/token/${route?.path}`
         : null;
 
-    if (newPath === (pathname || fallbackpathname)) {
+    if (newPath === pathname) {
+      setIsLoading(false);
       return;
     }
-
     setIsLoading(true);
 
-    try {
-      if (!newPath) {
-        toast.error(SearchToast(networkId));
-        return;
-      }
-      window.location.href = newPath;
-    } catch (error) {
-      console.error('Redirect error:', error);
-    } finally {
-      setIsLoading(false);
+    if (newPath) {
+      await onRedirect(newPath, pathname);
+    } else {
+      toast.error(SearchToast(networkId));
+    }
+  };
+
+  const reset = () => {
+    setResult({});
+    setKeyword('');
+    setIsOpen(false);
+    const searchInput = document.getElementsByClassName(
+      'search',
+    )[0] as HTMLInputElement;
+    if (searchInput) {
+      searchInput.value = '';
     }
   };
 
   useEffect(() => {
     setIsLoading(false);
+    reset();
   }, [pathname]);
 
   const showResults =
@@ -159,7 +151,6 @@ const Search = ({
   useEffect(() => {
     const fetchData = async () => {
       if (!keyword) return;
-
       try {
         const cachedResults = await getSearchResults(keyword, filter);
         if (cachedResults) {
@@ -171,7 +162,7 @@ const Search = ({
           setSearchResults(data?.keyword, filter, data?.data);
         } else {
           if (indexers?.base && !indexers?.base?.sync) {
-            const rpcData = await rpcSearch(rpcUrl, keyword);
+            const rpcData = await rpcSearch(keyword);
             if (filter !== '/tokens') {
               setResult(rpcData?.data ?? {});
               if (rpcData?.data) {
@@ -179,7 +170,7 @@ const Search = ({
               }
             }
           } else {
-            const fallbackRpcData = await rpcSearch(rpcUrl, keyword);
+            const fallbackRpcData = await rpcSearch(keyword);
             if (filter !== '/tokens') {
               setResult(fallbackRpcData?.data ?? {});
               if (fallbackRpcData?.data) {
@@ -264,20 +255,20 @@ const Search = ({
     if (cachedResults) {
       return redirect(getSearchRoute(cachedResults));
     } else {
+      setIsLoading(true);
       const data = await handleFilterAndKeyword(query, filter);
       const route = data?.data && getSearchRoute(data?.data);
       if (route) {
         setSearchResults(data?.keyword, filter, data?.data);
         return redirect(route);
       } else {
-        setIsLoading(true);
-        const rpcData = await rpcSearch(rpcUrl, query);
+        const rpcData = await rpcSearch(query);
         const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
-        setIsLoading(rpcData?.loading);
         if (rpcRoute) {
           setSearchResults(rpcData?.keyword, filter, rpcData?.data);
           return redirect(rpcRoute);
         } else {
+          setIsLoading(false);
           return toast.error(SearchToast(networkId));
         }
       }
@@ -286,15 +277,7 @@ const Search = ({
 
   const handleClearHistory = async () => {
     await clearSearchHistory();
-    setResult({});
-    setKeyword('');
-    setIsOpen(false);
-    const searchInput = document.getElementsByClassName(
-      'search',
-    )[0] as HTMLInputElement;
-    if (searchInput) {
-      searchInput.value = '';
-    }
+    reset();
     toast.success(
       <div className="whitespace-nowrap text-sm">
         Search history cleared successfully
@@ -481,6 +464,82 @@ const Search = ({
         )}
       </button>
     </form>
+  );
+};
+
+export const SearchWithGlobalError = ({
+  disabled,
+  header = false,
+  pathname,
+}: {
+  disabled?: boolean;
+  header?: boolean;
+  pathname?: string;
+}) => {
+  const handleRedirect = async (newPath: string) => {
+    window.location.href = newPath;
+  };
+
+  return (
+    <BaseSearch
+      disabled={disabled}
+      header={header}
+      pathname={pathname}
+      onRedirect={handleRedirect}
+    />
+  );
+};
+
+export const SearchWithRouter = ({
+  disabled,
+  header = false,
+  pathname,
+}: {
+  disabled?: boolean;
+  header?: boolean;
+  pathname?: string;
+}) => {
+  const router = useIntlRouter();
+
+  const handleRedirect = async (newPath: string) => {
+    if (router) {
+      return router.push(newPath);
+    }
+  };
+
+  return (
+    <BaseSearch
+      disabled={disabled}
+      header={header}
+      pathname={pathname}
+      onRedirect={handleRedirect}
+    />
+  );
+};
+
+const Search = ({
+  disabled,
+  header = false,
+  pathname,
+  globalError,
+}: {
+  disabled?: boolean;
+  header?: boolean;
+  pathname?: string;
+  globalError?: boolean;
+}) => {
+  if (globalError) {
+    return (
+      <SearchWithGlobalError
+        disabled={disabled}
+        header={header}
+        pathname={pathname}
+      />
+    );
+  }
+
+  return (
+    <SearchWithRouter disabled={disabled} header={header} pathname={pathname} />
   );
 };
 

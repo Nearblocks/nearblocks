@@ -8,7 +8,7 @@ import { getRequest } from './api';
 import { revalidateTag } from 'next/cache';
 import { getMessages } from 'next-intl/server';
 import { providers } from 'near-api-js';
-import { RpcProviders } from './rpc';
+import { getRpcProviders } from './rpc';
 import { JsonRpcProvider } from '@near-js/providers';
 
 interface ExportParams {
@@ -201,6 +201,7 @@ export async function getSeatInfo(rpcUrl: string) {
     protocolConfig,
   };
 }
+const RpcProviders = await getRpcProviders();
 const jsonProviders = RpcProviders.map(
   (p) => new JsonRpcProvider({ url: p.url }),
 );
