@@ -42,13 +42,15 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
-  const { action, isTxTypeActive, onClick, receipt, receiver } = props;
+  const { action, isTxTypeActive, onClick, receipt, receiver, polledAction } =
+    props;
 
   const t = useTranslations();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const args = action?.args?.args || encodeArgs(action?.args?.args_json);
+  const args =
+    polledAction?.args?.args || encodeArgs(polledAction?.args?.args_json);
 
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')
@@ -236,7 +238,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         ) : action?.kind === 'delegateAction' ||
           action?.action_kind === 'DELEGATE_ACTION' ? (
           <div className="pt-2">
-            {(action?.args?.actions || [])
+            {(polledAction?.args?.actions || [])
               .sort((actionA: any, actionB: any) => {
                 return (
                   (actionA?.delegateIndex || 0) - (actionB?.delegateIndex || 0)
@@ -245,6 +247,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
               .map((subaction: any, index: number) => (
                 <ReceiptKind
                   action={subaction}
+                  polledAction={subaction}
                   isTxTypeActive={true}
                   key={subaction.delegateIndex || index}
                   receipt={receipt}

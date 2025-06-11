@@ -1552,10 +1552,13 @@ export type TransactionReceiptInfo = {
     }>;
   };
   rpcTxn: RPCTransactionInfo;
+  polledReceipt: any;
+  polledFellowOutgoingReceipts?: any;
 };
 
 export type ReceiptKindInfo = {
   action: any;
+  polledAction: any;
   isTxTypeActive: boolean;
   onClick?: any;
   receipt?: any;

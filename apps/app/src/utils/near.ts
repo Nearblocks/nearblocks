@@ -649,8 +649,8 @@ async function processTokenMetadata(
         }
       }
     } else if (
-      log?.logs?.standard === 'dip4' &&
-      log?.logs?.event === 'token_diff'
+      (log?.logs?.standard === 'dip4' && log?.logs?.event === 'token_diff') ||
+      (log?.logs?.standard === 'nep141' && log?.logs?.event === 'ft_transfer')
     ) {
       if (log?.contract) {
         await fetchTokenMetadata(log.contract);
@@ -673,6 +673,11 @@ async function processTokenMetadata(
         }
       }
     } else if (typeof log?.logs === 'string' && log?.contract) {
+      const logString = log?.logs?.match(
+        /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/,
+      );
+      await fetchTokenMetadata(logString?.[2]);
+      await fetchTokenMetadata(logString?.[4].replace(/,$/, ''));
       await fetchTokenMetadata(log.contract);
     }
   }

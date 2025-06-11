@@ -8,12 +8,13 @@ import TreeTxnsActions from '@/components/app/Transactions/TreeReceipts/TreeTxns
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;
+  polledReceipt: any | ReceiptsPropsInfo;
   show: any | string;
   txn: TransactionInfo;
 }
 
 const TreeReceiptDetails = (props: Props) => {
-  const { receipt, show, txn } = props;
+  const { receipt, show, txn, polledReceipt } = props;
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -33,19 +34,19 @@ const TreeReceiptDetails = (props: Props) => {
 
   return (
     <>
-      {show === receipt.receipt_id && (
+      {show === polledReceipt?.receipt_id && (
         <>
-          {!receipt ? (
+          {!polledReceipt ? (
             <div className="w-full">
               <Loader wrapperClassName="flex w-full my-1 max-w-xs" />
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
               <Loader wrapperClassName="flex w-full" />
             </div>
-          ) : receipt?.actions ? (
+          ) : polledReceipt?.actions ? (
             <>
-              {receipt &&
-                receipt?.actions?.map((action: any, i: number) => (
+              {polledReceipt &&
+                polledReceipt?.actions?.map((action: any, i: number) => (
                   <Fragment key={i}>
                     <div className="text-green-500 dark:text-green-250 text-base pt-3 pl-3">
                       Receipt
@@ -112,7 +113,7 @@ const TreeReceiptDetails = (props: Props) => {
               </div>
               <div className="pl-3 py-2">
                 <span>Logs:</span>
-                {!receipt ? (
+                {!polledReceipt ? (
                   <div className="w-full">
                     <Loader wrapperClassName="flex w-full" />
                     <Loader wrapperClassName="flex w-full" />
@@ -120,10 +121,13 @@ const TreeReceiptDetails = (props: Props) => {
                   </div>
                 ) : (
                   <div className="w-full break-words space-y-4">
-                    {receipt?.outcome?.logs?.length > 0 ? (
+                    {polledReceipt?.outcome?.logs?.length > 0 ? (
                       <>
                         <div className="mt-3 bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 overflow-auto rounded-lg">
-                          <TreeNode node={receipt?.outcome?.logs} path="root" />
+                          <TreeNode
+                            node={polledReceipt?.outcome?.logs}
+                            path="root"
+                          />
                         </div>
                       </>
                     ) : (
@@ -142,11 +146,22 @@ const TreeReceiptDetails = (props: Props) => {
       )}
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <>
-          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
-            <Fragment key={rcpt?.receipt_id}>
-              <TreeReceiptDetails receipt={rcpt} show={show} txn={txn} />
-            </Fragment>
-          ))}
+          {receipt?.outcome?.outgoing_receipts?.map(
+            (rcpt: any, index: number) => {
+              const childRpcReceipt =
+                polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
+              return (
+                <Fragment key={rcpt?.receipt_id}>
+                  <TreeReceiptDetails
+                    receipt={rcpt}
+                    show={show}
+                    txn={txn}
+                    polledReceipt={childRpcReceipt}
+                  />
+                </Fragment>
+              );
+            },
+          )}
         </>
       )}
     </>

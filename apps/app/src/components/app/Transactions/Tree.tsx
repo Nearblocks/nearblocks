@@ -17,12 +17,17 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
   txn: TransactionInfo;
   apiTxnActionsData: ApiTxnData;
+  shouldUseRpc: boolean;
 }
 
 const Tree = (props: Props) => {
-  const { hash, rpcTxn, txn, apiTxnActionsData } = props;
+  const { hash, rpcTxn, txn, apiTxnActionsData, shouldUseRpc } = props;
 
   const [rpcReceipt, setRpcReceipt] = useState<any>(null);
+
+  const polledReceipt = shouldUseRpc
+    ? rpcReceipt
+    : apiTxnActionsData?.receiptData;
 
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData
@@ -130,11 +135,11 @@ const Tree = (props: Props) => {
           ) : (
             <div
               className={`w-full ${
-                !receipt?.id || (!receipt?.receipt_id && 'h-96')
+                !polledReceipt?.id && !polledReceipt?.receipt_id && 'h-96'
               }`}
             >
               <div className="p-4 md:px-8">
-                {!receipt?.id && !receipt?.receipt_id ? (
+                {!polledReceipt?.id && !polledReceipt?.receipt_id ? (
                   <div className="md:flex justify-center w-full lg:h-[36vh]">
                     <div className="w-full md:w-7/12 lg:w-2/3 xl:w-3/4 ">
                       <div className="py-2">
@@ -193,6 +198,7 @@ const Tree = (props: Props) => {
                         receipt={receipt}
                         show={show}
                         txn={txn}
+                        polledReceipt={polledReceipt}
                       />
                     </div>
                   </div>

@@ -92,7 +92,8 @@ const FunctionCall = (props: TransactionActionInfo) => {
       ? { tx_bytes_b64: args.args_base64 || args.args }
       : args.args_base64 || args.args || encodeArgs(args?.args_json);
 
-  const decodedData = args?.args_base64 || args?.args || args?.args_json;
+  const decodedData =
+    args?.args_base64 || args?.args || encodeArgs(args?.args_json);
   const jsonStringifiedData = displayArgs(decodedData);
   const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
   return (

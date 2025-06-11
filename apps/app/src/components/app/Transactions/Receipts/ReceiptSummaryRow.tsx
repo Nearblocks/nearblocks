@@ -19,6 +19,7 @@ interface Props {
   borderFlag?: boolean;
   price: string;
   receipt: any | ReceiptsPropsInfo;
+  polledReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -30,7 +31,7 @@ interface Props {
 const ReceiptSummaryRow = (props: Props) => {
   const { networkId } = useConfig();
 
-  const { price, receipt, statsData, txn } = props;
+  const { price, receipt, statsData, txn, polledReceipt } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
@@ -58,7 +59,9 @@ const ReceiptSummaryRow = (props: Props) => {
     );
   };
 
-  let gasAttached = receipt?.actions ? getGasAttached(receipt?.actions) : '0';
+  let gasAttached = polledReceipt?.actions
+    ? getGasAttached(receipt?.actions)
+    : '0';
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -152,17 +155,24 @@ const ReceiptSummaryRow = (props: Props) => {
 
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <>
-          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
-            <Fragment key={rcpt?.receipt_id}>
-              <ReceiptSummaryRow
-                borderFlag={true}
-                price={price}
-                receipt={rcpt}
-                statsData={statsData}
-                txn={txn}
-              />
-            </Fragment>
-          ))}
+          {receipt?.outcome?.outgoing_receipts?.map(
+            (rcpt: any, index: number) => {
+              const childRpcReceipt =
+                polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
+              return (
+                <Fragment key={rcpt?.receipt_id}>
+                  <ReceiptSummaryRow
+                    borderFlag={true}
+                    price={price}
+                    receipt={rcpt}
+                    statsData={statsData}
+                    txn={txn}
+                    polledReceipt={childRpcReceipt}
+                  />
+                </Fragment>
+              );
+            },
+          )}
         </>
       )}
     </>
