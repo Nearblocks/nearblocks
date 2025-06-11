@@ -38,6 +38,7 @@ export const readConfig = {
     application_name: 'indexer-receipts-read',
     connectionString: config.dbUrlRead || config.dbUrl,
   },
+  pool: { max: 2, min: 1 },
 };
 
 export const streamConfig = {
@@ -47,6 +48,7 @@ export const streamConfig = {
     application_name: 'indexer-receipts-stream',
     connectionString: config.dbUrlBase,
   },
+  pool: { max: 1, min: 1 },
 };
 
 export const dbWrite: Knex = createKnex(writeConfig);

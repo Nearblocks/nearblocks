@@ -45,6 +45,7 @@ export const streamConfig = {
     application_name: 'indexer-balance-stream',
     connectionString: config.dbUrlBase,
   },
+  pool: { max: 1, min: 1 },
 };
 
 export const db: Knex = createKnex(dbConfig);
