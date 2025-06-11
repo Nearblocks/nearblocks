@@ -44,6 +44,7 @@ const baseConfig = {
     application_name: 'indexer-signature-base',
     connectionString: config.dbUrlBase,
   },
+  pool: { max: 2, min: 1 },
 };
 
 export const streamConfig = {
@@ -52,6 +53,7 @@ export const streamConfig = {
     ...baseConfig.connection,
     application_name: 'indexer-signature-stream',
   },
+  pool: { max: 1, min: 1 },
 };
 
 export const db: Knex = createKnex(dbConfig);
