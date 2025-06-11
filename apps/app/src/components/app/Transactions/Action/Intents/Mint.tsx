@@ -57,15 +57,20 @@ const Mint = ({ event, data, parsedActionLogs, meta }: Props) => {
     if (!parsedActionLogs || !receiverId) {
       return;
     }
-
     const relevantLog = parsedActionLogs?.find((log) => {
-      return log?.parsedArgs?.sender_id && log?.parsedArgs?.receiver_id;
+      return (
+        (log?.parsedArgs?.sender_id && log?.parsedArgs?.receiver_id) ||
+        (log?.args?.args_json?.sender_id && log?.args?.args_json?.receiver_id)
+      );
     });
-
     if (relevantLog) {
       setTransactionParties({
-        sender: relevantLog?.parsedArgs?.sender_id,
-        receiver: relevantLog?.parsedArgs?.receiver_id,
+        sender:
+          relevantLog?.args?.args_json?.sender_id ||
+          relevantLog?.parsedArgs?.sender_id,
+        receiver:
+          relevantLog?.args?.args_json?.receiver_id ||
+          relevantLog?.parsedArgs?.receiver_id,
       });
     }
 

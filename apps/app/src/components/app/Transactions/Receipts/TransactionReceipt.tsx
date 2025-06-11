@@ -7,9 +7,9 @@ import ArrowDown from '@/components/app/Icons/ArrowDown';
 const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const {
     receipt,
-    rpcReceipt,
+    polledReceipt,
     fellowOutgoingReceipts,
-    rpcFellowOutgoingReceipts,
+    polledFellowOutgoingReceipts,
     expandAll,
     convertionReceipt,
     className,
@@ -25,12 +25,12 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
   }, [expandAll]);
 
   const remainingFellowOutgoingReceipts = fellowOutgoingReceipts?.slice(0, -1);
-  const rpcRemainingFellowOutgoingReceipts = rpcFellowOutgoingReceipts?.slice(
-    0,
-    -1,
-  );
+  const polledRemainingFellowOutgoingReceipts =
+    polledFellowOutgoingReceipts?.slice(0, -1);
+
   const lastFellowOutgoingReceipt = fellowOutgoingReceipts?.at(-1);
-  const rpcLastFellowOutgoingReceipt = rpcFellowOutgoingReceipts?.at(-1);
+  const polledLastFellowOutgoingReceipt = polledFellowOutgoingReceipts?.at(-1);
+
   const filterRefundNestedReceipts =
     (receipt?.outcome?.nestedReceipts &&
       receipt?.outcome?.nestedReceipts?.filter(
@@ -43,11 +43,18 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
         'outcome' in nestedReceipt &&
         nestedReceipt?.predecessor_id !== 'system',
     );
-  const rpcFilterRefundNestedReceipts =
-    rpcReceipt?.outcome?.nestedReceipts &&
-    rpcReceipt?.outcome?.nestedReceipts?.filter(
+
+  const polledFilterRefundNestedReceipts =
+    (polledReceipt?.outcome?.nestedReceipts &&
+      polledReceipt?.outcome?.nestedReceipts?.filter(
+        (nestedReceipt: any) =>
+          'outcome' in nestedReceipt &&
+          nestedReceipt?.predecessorId !== 'system',
+      )) ||
+    polledReceipt?.outcome?.outgoing_receipts.filter(
       (nestedReceipt: any) =>
-        'outcome' in nestedReceipt && nestedReceipt?.predecessorId !== 'system',
+        'outcome' in nestedReceipt &&
+        nestedReceipt?.predecessor_id !== 'system',
     );
 
   const nonRefundNestedReceipts =
@@ -55,11 +62,12 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const lastNonRefundNestedReceipt =
     filterRefundNestedReceipts && filterRefundNestedReceipts?.at(-1);
 
-  const rpcNonRefundNestedReceipts =
-    rpcFilterRefundNestedReceipts &&
-    rpcFilterRefundNestedReceipts?.slice(0, -1);
-  const rpcLastNonRefundNestedReceipt =
-    rpcFilterRefundNestedReceipts && rpcFilterRefundNestedReceipts?.at(-1);
+  const polledNonRefundNestedReceipts =
+    polledFilterRefundNestedReceipts &&
+    polledFilterRefundNestedReceipts.slice(0, -1);
+  const polledLastNonRefundNestedReceipt =
+    polledFilterRefundNestedReceipts && polledFilterRefundNestedReceipts.at(-1);
+
   return (
     <>
       <div
@@ -78,13 +86,13 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           </div>
         ) : null}
 
-        {lastFellowOutgoingReceipt || rpcLastFellowOutgoingReceipt ? (
+        {lastFellowOutgoingReceipt || polledLastFellowOutgoingReceipt ? (
           <TransactionReceipt
             receipt={lastFellowOutgoingReceipt}
-            rpcReceipt={rpcLastFellowOutgoingReceipt}
+            polledReceipt={polledLastFellowOutgoingReceipt}
             expandAll={expandAll}
             fellowOutgoingReceipts={remainingFellowOutgoingReceipts}
-            rpcFellowOutgoingReceipts={rpcRemainingFellowOutgoingReceipts}
+            polledFellowOutgoingReceipts={polledRemainingFellowOutgoingReceipts}
             convertionReceipt={false}
             className="pb-4 !mt-0 border-l ml-2.5"
             statsData={statsData}
@@ -92,18 +100,19 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
-          {receipt?.actions?.map((action: any, index: number) => {
-            const matchingAction = rpcReceipt?.actions?.find(
-              (rpcAction: any) => rpcAction?.methodName === action?.method_name,
+          {receipt?.actions?.map((action: any, actionIndex: number) => {
+            const matchingAction = polledReceipt?.actions?.find(
+              (_: any, polledActionIndex: number) =>
+                polledActionIndex === actionIndex,
             );
             return (
               <ReceiptKind
-                key={`${action?.action_kind || action?.kind}_${index}`}
+                key={`${action.action_kind || action.kind}_${actionIndex}`}
                 action={action}
-                rpcAction={matchingAction}
+                polledAction={matchingAction}
                 onClick={switchActiveTxType}
                 isTxTypeActive={isTxTypeActive}
-                receiver={receipt?.receiver_id || receipt?.receiverId}
+                receiver={receipt.receiver_id || receipt.receiverId}
                 receipt={receipt}
               />
             );
@@ -113,7 +122,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           <div className="border-l border-green-500 dark:border-green-250 ml-2.5">
             <ReceiptInfo
               receipt={receipt}
-              rpcReceipt={rpcReceipt}
+              polledReceipt={polledReceipt}
               statsData={statsData}
               rpcTxn={rpcTxn}
             />
@@ -129,13 +138,13 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           </div>
         </div>
       </div>
-      {lastNonRefundNestedReceipt || rpcLastNonRefundNestedReceipt ? (
+      {lastNonRefundNestedReceipt || polledLastNonRefundNestedReceipt ? (
         <TransactionReceipt
           receipt={lastNonRefundNestedReceipt}
-          rpcReceipt={rpcLastNonRefundNestedReceipt}
+          polledReceipt={polledLastNonRefundNestedReceipt}
           expandAll={expandAll}
           fellowOutgoingReceipts={nonRefundNestedReceipts}
-          rpcFellowOutgoingReceipts={rpcNonRefundNestedReceipts}
+          polledFellowOutgoingReceipts={polledNonRefundNestedReceipts}
           className="!pl-0 !border-transparent"
           convertionReceipt={false}
           statsData={statsData}

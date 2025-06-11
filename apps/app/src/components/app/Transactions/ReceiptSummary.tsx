@@ -25,14 +25,27 @@ interface Props {
   };
   txn: TransactionInfo;
   apiTxnActionsData: ApiTxnData;
+  shouldUseRpc: boolean;
 }
 
 const ReceiptSummary = (props: Props) => {
-  const { hash, loading, price, rpcTxn, statsData, txn, apiTxnActionsData } =
-    props;
+  const {
+    hash,
+    loading,
+    price,
+    rpcTxn,
+    statsData,
+    txn,
+    apiTxnActionsData,
+    shouldUseRpc,
+  } = props;
 
   const t = useTranslations();
   const [rpcReceipt, setRpcReceipt] = useState<any>(null);
+
+  const polledReceipt = shouldUseRpc
+    ? rpcReceipt
+    : apiTxnActionsData?.receiptData;
 
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData
@@ -47,12 +60,12 @@ const ReceiptSummary = (props: Props) => {
 
     if (
       receipts?.length === 0 ||
-      receipts[0]?.receipt_id !== receiptsOutcome[0]?.id
+      receipts?.[0]?.receipt_id !== receiptsOutcome?.[0]?.id
     ) {
       receipts?.unshift({
         predecessor_id: txn?.transaction?.signer_id,
         receipt: actions,
-        receipt_id: receiptsOutcome[0]?.id,
+        receipt_id: receiptsOutcome?.[0]?.id,
         receiver_id: txn?.transaction?.receiver_id,
       });
     }
@@ -95,7 +108,7 @@ const ReceiptSummary = (props: Props) => {
       };
     };
 
-    return collectReceipts(receiptsOutcome[0]?.id);
+    return collectReceipts(receiptsOutcome?.[0]?.id);
   }
 
   useEffect(() => {
@@ -243,7 +256,7 @@ const ReceiptSummary = (props: Props) => {
                       <ReceiptSummaryRow
                         price={price}
                         receipt={receipt}
-                        rpcReceipt={rpcReceipt}
+                        polledReceipt={polledReceipt}
                         statsData={statsData}
                         txn={txn}
                       />

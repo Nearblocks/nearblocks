@@ -19,7 +19,7 @@ interface Props {
   borderFlag?: boolean;
   price: string;
   receipt: any | ReceiptsPropsInfo;
-  rpcReceipt: any | ReceiptsPropsInfo;
+  polledReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -31,7 +31,7 @@ interface Props {
 const ReceiptSummaryRow = (props: Props) => {
   const { networkId } = useConfig();
 
-  const { price, receipt, statsData, txn, rpcReceipt } = props;
+  const { price, receipt, statsData, txn, polledReceipt } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
@@ -59,10 +59,9 @@ const ReceiptSummaryRow = (props: Props) => {
     );
   };
 
-  let gasAttached =
-    rpcReceipt?.actions && receipt?.receipt_id === rpcReceipt?.receipt_id
-      ? getGasAttached(rpcReceipt?.actions)
-      : '0';
+  let gasAttached = polledReceipt?.actions
+    ? getGasAttached(receipt?.actions)
+    : '0';
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -159,7 +158,7 @@ const ReceiptSummaryRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map(
             (rcpt: any, index: number) => {
               const childRpcReceipt =
-                rpcReceipt?.outcome?.outgoing_receipts?.[index] || null;
+                polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
               return (
                 <Fragment key={rcpt?.receipt_id}>
                   <ReceiptSummaryRow
@@ -168,7 +167,7 @@ const ReceiptSummaryRow = (props: Props) => {
                     receipt={rcpt}
                     statsData={statsData}
                     txn={txn}
-                    rpcReceipt={childRpcReceipt}
+                    polledReceipt={childRpcReceipt}
                   />
                 </Fragment>
               );
