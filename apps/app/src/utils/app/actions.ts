@@ -230,3 +230,36 @@ export const viewAccount = async (accountId: string) => {
   });
   return viewAccount;
 };
+
+export const viewMethod = async ({
+  args = {},
+  contractId,
+  method,
+  rpcUrl,
+}: {
+  args: object;
+  contractId: string;
+  method: string;
+  rpcUrl: string;
+}): Promise<
+  { success: true; data: any } | { success: false; error: string }
+> => {
+  try {
+    const newProvider = new providers.JsonRpcProvider({ url: rpcUrl });
+    const res: any = await newProvider.query({
+      account_id: contractId,
+      args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
+      finality: 'optimistic',
+      method_name: method,
+      request_type: 'call_function',
+    });
+
+    const parsed = JSON.parse(Buffer.from(res.result).toString());
+    return { success: true, data: parsed };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error?.message || 'An unknown error occurred',
+    };
+  }
+};

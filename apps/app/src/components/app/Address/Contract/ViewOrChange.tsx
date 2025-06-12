@@ -17,6 +17,8 @@ import CloseCircle from '@/components/app/Icons/CloseCircle';
 import Question from '@/components/app/Icons/Question';
 import { NearContext } from '@/components/app/wallet/near-context';
 import { stringify } from 'querystring';
+import { viewMethod } from '@/utils/app/actions';
+import { useRpcStore } from '@/stores/app/rpc';
 
 interface Props {
   id: string;
@@ -46,10 +48,11 @@ const sortFields = (fields: FieldType[]) => {
 
 const ViewOrChange = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
+  const { rpc } = useRpcStore();
   const { fetcher } = useFetch();
   const { index, method } = props;
   const [txn, setTxn] = useState<null | string>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [fields, setFields] = useState<FieldType[]>([]);
   const [result, setResult] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
@@ -84,20 +87,23 @@ const ViewOrChange = (props: Props) => {
 
   const onRead = async () => {
     setLoading(true);
-
     try {
       const args = mapFeilds(fields);
-      if (!wallet) return;
-
-      const response = await wallet.viewMethod({
+      const response = await viewMethod({
         args,
         contractId: props?.id,
         method: toSnakeCase(method),
+        rpcUrl: rpc,
       });
-
-      setError(null);
-      setTxn(response?.transaction_outcome?.id || null);
-      setResult(JSON.stringify(response, null, 2));
+      if (response?.success) {
+        setError(null);
+        setTxn(response?.data?.transaction_outcome?.id || null);
+        setResult(JSON.stringify(response?.data, null, 2));
+      } else {
+        setTxn(null);
+        setError(response?.error);
+        setResult(null);
+      }
     } catch (error: any) {
       console.error('Error calling view method:', error);
       setTxn(null);
