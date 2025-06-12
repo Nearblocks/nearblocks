@@ -1,5 +1,5 @@
 # https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:22-alpine as base
+FROM node:22-alpine AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
@@ -15,6 +15,7 @@ COPY --from=builder /app/out/yarn.lock ./yarn.lock
 RUN apk add --no-cache git
 RUN yarn --immutable
 COPY --from=builder /app/out/full/ .
+COPY --from=builder /app/out/full/apps/api/src/sql/schemas ./schemas
 COPY turbo.json turbo.json
 RUN yarn turbo run build --filter=api...
 
@@ -23,5 +24,6 @@ ENV NODE_ENV production
 USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
+COPY --chown=node:node --from=installer /app/schemas ./apps/api/dist/sql/schemas
 
 CMD ["node", "apps/api/dist/index.js"]

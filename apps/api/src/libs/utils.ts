@@ -123,3 +123,11 @@ export const abiSchema = async (
 
   return JSON.parse(Buffer.from(decompressed).toString());
 };
+
+export const encodeCursor = <T>(data: T): string => {
+  return Buffer.from(JSON.stringify(data)).toString('base64');
+};
+
+export const decodeCursor = <T>(cursor: string): T => {
+  return JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'));
+};

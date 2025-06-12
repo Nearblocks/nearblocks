@@ -9,10 +9,10 @@ import qs from 'query-string';
 
 import apiDocumentation from '#libs/apiDocumentation';
 import logger from '#libs/logger';
-import sentry from '#libs/sentry';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import routes from '#routes/index';
 import routesV2 from '#routes/v2/index';
+import routesV3 from '#routes/v3/index';
 
 const file = fileURLToPath(import.meta.url);
 const dir = path.dirname(file);
@@ -31,11 +31,12 @@ app.set('query parser', (str: string) =>
       hash: 'string',
       keyword: 'string',
       multichain_address: 'string',
+      next_cursor: 'string',
+      prev_cursor: 'string',
     },
   }),
 );
 
-app.use(sentry.Handlers.requestHandler());
 apiDocumentation(app, dir);
 app.use(cors());
 app.use(helmet());
@@ -47,6 +48,7 @@ app.get('/ip', (req, res) => res.send(req.ip));
 
 app.use('/v1', routes());
 app.use('/v2', routesV2());
+app.use('/v3', routesV3());
 
 app.get('/v1/kitwallet', (_req, res) => {
   const htmlFilePath = path.join(dir, '..', 'src', 'kitwallet', 'index.html');
@@ -54,15 +56,13 @@ app.get('/v1/kitwallet', (_req, res) => {
 });
 
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({ message: 'Not Found' });
+  res.status(404).json({ data: null, errors: [{ message: 'Not Found' }] });
 });
-
-app.use(sentry.Handlers.errorHandler());
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   logger.error(err);
-  res.status(500).json({ message: 'Server Error' });
+  res.status(500).json({ data: null, errors: [{ message: 'Server Error' }] });
 });
 
 export default app;

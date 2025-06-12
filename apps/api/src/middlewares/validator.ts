@@ -24,4 +24,29 @@ const validator = <T extends ZodTypeAny>(schema: T) => {
   };
 };
 
+export const validatorV3 = <T extends ZodTypeAny>(schema: T) => {
+  return (
+    req: RequestValidators<typeof schema>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const result = schema.safeParse(
+      merge(req.body ?? {}, req.query ?? {}, req.params ?? {}),
+    );
+
+    if (!result.success) {
+      return res.status(422).json({
+        data: null,
+        errors: result.error.issues.map((issue) => {
+          issue.message;
+        }),
+      });
+    }
+
+    req.validator = result;
+
+    return next();
+  };
+};
+
 export default validator;
