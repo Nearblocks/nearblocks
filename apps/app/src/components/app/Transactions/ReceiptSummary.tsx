@@ -206,7 +206,8 @@ const ReceiptSummary = (props: Props) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-black-600 dark:divide-black-200 divide-y divide-gray-200">
-                    {((!receipt?.id && !receipt?.receipt_id) || loading) &&
+                    {((!polledReceipt?.id && !polledReceipt?.receipt_id) ||
+                      loading) &&
                       [...Array(10)].map((_, i) => (
                         <tr className="hover:bg-blue-900/5 h-[57px]" key={i}>
                           <td className="px-2 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10">

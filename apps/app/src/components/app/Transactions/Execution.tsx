@@ -137,7 +137,7 @@ const Execution = (props: Props) => {
                 </div>
               </div>
               <div className="p-4 md:px-8 overflow-auto">
-                {!receipt?.receipt_id && !receipt?.id ? (
+                {!polledReceipt?.receipt_id && !polledReceipt?.id ? (
                   <div>
                     <div className="flex flex-row mb-2.5">
                       <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>

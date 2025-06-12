@@ -73,8 +73,8 @@ const ReceiptSummaryRow = (props: Props) => {
 
   return (
     <>
-      {receipt &&
-        receipt?.actions?.map((action: any, i: number) => (
+      {polledReceipt &&
+        polledReceipt?.actions?.map((action: any, i: number) => (
           <tr key={i}>
             <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <TxnsReceiptStatus status={isSuccess} />
@@ -100,13 +100,13 @@ const ReceiptSummaryRow = (props: Props) => {
               {action.args?.method_name}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
-              {receipt?.predecessor_id ? (
+              {polledReceipt?.predecessor_id ? (
                 <div className="word-break">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
-                    href={`/address/${receipt?.predecessor_id}`}
+                    href={`/address/${polledReceipt?.predecessor_id}`}
                   >
-                    {receipt?.predecessor_id}
+                    {polledReceipt?.predecessor_id}
                   </Link>
                 </div>
               ) : (
@@ -119,13 +119,13 @@ const ReceiptSummaryRow = (props: Props) => {
               </div>
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
-              {receipt?.receiver_id ? (
+              {polledReceipt?.receiver_id ? (
                 <div className="word-break">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
-                    href={`/address/${receipt?.receiver_id}`}
+                    href={`/address/${polledReceipt?.receiver_id}`}
                   >
-                    {receipt?.receiver_id}
+                    {polledReceipt?.receiver_id}
                   </Link>
                 </div>
               ) : (
@@ -153,9 +153,9 @@ const ReceiptSummaryRow = (props: Props) => {
           </tr>
         ))}
 
-      {receipt?.outcome?.outgoing_receipts?.length > 0 && (
+      {polledReceipt?.outcome?.outgoing_receipts?.length > 0 && (
         <>
-          {receipt?.outcome?.outgoing_receipts?.map(
+          {polledReceipt?.outcome?.outgoing_receipts?.map(
             (rcpt: any, index: number) => {
               const childRpcReceipt =
                 polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
