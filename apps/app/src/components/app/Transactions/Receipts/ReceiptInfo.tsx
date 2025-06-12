@@ -24,7 +24,6 @@ import { networkId } from '@/utils/app/config';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
-  polledReceipt: ReceiptsPropsInfo | any;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -33,7 +32,7 @@ interface Props {
   rpcTxn: RPCTransactionInfo;
 }
 
-const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
+const ReceiptInfo = ({ receipt, statsData, rpcTxn }: Props) => {
   const hashes = ['output', 'inspect'];
   const [pageHash, setHash] = useState('output');
   const [tabIndex, setTabIndex] = useState(0);
@@ -76,95 +75,92 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
 
   let statusInfo;
 
-  if (polledReceipt) {
+  if (
+    receipt?.outcome?.status?.type === 'successValue' ||
+    'SuccessValue' in receipt?.outcome?.status
+  ) {
     if (
-      polledReceipt?.outcome?.status?.type === 'successValue' ||
-      'SuccessValue' in polledReceipt?.outcome?.status
+      receipt?.outcome?.status?.value?.length === 0 ||
+      receipt?.outcome?.status?.SuccessValue?.length === 0
     ) {
-      if (
-        polledReceipt?.outcome?.status?.value?.length === 0 ||
-        polledReceipt?.outcome?.status?.SuccessValue?.length === 0
-      ) {
-        statusInfo = (
-          <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 whitespace-nowrap">
-            Empty result
-          </div>
-        );
-      } else {
-        const args =
-          polledReceipt?.outcome?.status.value ||
-          polledReceipt?.outcome?.status.SuccessValue;
-        const decodedArgs = Buffer.from(args, 'base64');
+      statusInfo = (
+        <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3 whitespace-nowrap">
+          Empty result
+        </div>
+      );
+    } else {
+      const args =
+        receipt?.outcome?.status.value || receipt?.outcome?.status.SuccessValue;
+      const decodedArgs = Buffer.from(args, 'base64');
 
-        let prettyArgs: object | string;
-        try {
-          const parsedJSONArgs = JSON.parse(decodedArgs.toString());
-          if (parsedJSONArgs !== null) {
-            prettyArgs =
-              typeof parsedJSONArgs === 'boolean'
-                ? JSON.stringify(parsedJSONArgs)
-                : parsedJSONArgs;
-          } else {
-            prettyArgs = hexy(decodedArgs, { format: 'twos' });
-          }
-        } catch {
-          prettyArgs = Array.from(decodedArgs)
-            .map((byte: any) => byte.toString(16).padStart(2, '0'))
-            .join('');
+      let prettyArgs: object | string;
+      try {
+        const parsedJSONArgs = JSON.parse(decodedArgs.toString());
+        if (parsedJSONArgs !== null) {
+          prettyArgs =
+            typeof parsedJSONArgs === 'boolean'
+              ? JSON.stringify(parsedJSONArgs)
+              : parsedJSONArgs;
+        } else {
+          prettyArgs = hexy(decodedArgs, { format: 'twos' });
         }
+      } catch {
+        prettyArgs = Array.from(decodedArgs)
+          .map((byte: any) => byte.toString(16).padStart(2, '0'))
+          .join('');
+      }
 
-        statusInfo =
-          prettyArgs && typeof prettyArgs === 'object' ? (
-            <textarea
-              readOnly
-              rows={4}
-              defaultValue={JSON.stringify(prettyArgs)}
-              className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
-            ></textarea>
-          ) : (
-            <div>
-              <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3">
-                <div className="bg-inherit text-inherit font-inherit border-none p-0">
-                  <div className="max-h-52 overflow-auto">
-                    <div className="h-full w-full">
-                      <pre>{prettyArgs}</pre>
-                    </div>
+      statusInfo =
+        prettyArgs && typeof prettyArgs === 'object' ? (
+          <textarea
+            readOnly
+            rows={4}
+            defaultValue={JSON.stringify(prettyArgs)}
+            className="block appearance-none outline-none w-full border font-medium rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-5 my-3 resize-y"
+          ></textarea>
+        ) : (
+          <div>
+            <div className="bg-gray-100 dark:bg-black-200 rounded-md p-5 font-medium my-3">
+              <div className="bg-inherit text-inherit font-inherit border-none p-0">
+                <div className="max-h-52 overflow-auto">
+                  <div className="h-full w-full">
+                    <pre>{prettyArgs}</pre>
                   </div>
                 </div>
               </div>
             </div>
-          );
-      }
-    } else if (
-      polledReceipt?.outcome?.status?.type === 'failure' ||
-      'Failure' in polledReceipt?.outcome?.status
-    ) {
-      statusInfo = (
-        <textarea
-          readOnly
-          rows={4}
-          defaultValue={JSON.stringify(
-            polledReceipt.outcome.status.error ||
-              polledReceipt?.outcome?.status?.Failure?.error_message,
-            null,
-            2,
-          )}
-          className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
-        ></textarea>
-      );
-    } else if (
-      polledReceipt?.outcome?.status?.type === 'successReceiptId' ||
-      'SuccessReceiptId' in polledReceipt?.outcome?.status
-    ) {
-      statusInfo = (
-        <div className="bg-gray-100 dark:bg-black-200 rounded-md my-3 p-5 font-medium overflow-auto">
-          <pre>
-            {polledReceipt?.outcome?.status?.receiptId ||
-              polledReceipt?.outcome?.status?.SuccessReceiptId}
-          </pre>
-        </div>
-      );
+          </div>
+        );
     }
+  } else if (
+    receipt?.outcome?.status?.type === 'failure' ||
+    'Failure' in receipt?.outcome?.status
+  ) {
+    statusInfo = (
+      <textarea
+        readOnly
+        rows={4}
+        defaultValue={JSON.stringify(
+          receipt.outcome.status.error ||
+            receipt?.outcome?.status?.Failure?.error_message,
+          null,
+          2,
+        )}
+        className="block appearance-none outline-none w-full border dark:border-black-200 rounded-lg font-medium bg-gray-100 dark:bg-black-200 p-5 my-3 resize-y"
+      ></textarea>
+    );
+  } else if (
+    receipt?.outcome?.status?.type === 'successReceiptId' ||
+    'SuccessReceiptId' in receipt?.outcome?.status
+  ) {
+    statusInfo = (
+      <div className="bg-gray-100 dark:bg-black-200 rounded-md my-3 p-5 font-medium overflow-auto">
+        <pre>
+          {receipt?.outcome?.status?.receiptId ||
+            receipt?.outcome?.status?.SuccessReceiptId}
+        </pre>
+      </div>
+    );
   }
 
   const getDeposit = (actions: Action[]): string =>
@@ -250,8 +246,8 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
       : 0;
 
   const logs =
-    polledReceipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
-      ? polledReceipt.outcome.logs.filter(Boolean)
+    receipt?.outcome?.logs && Array.isArray(receipt?.outcome?.logs)
+      ? receipt.outcome.logs.filter(Boolean)
       : [];
 
   const receiptLog =
@@ -363,7 +359,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                 Logs
               </h2>
               <div className="bg-gray-100 dark:bg-black-200 rounded-md p-0  mt-3 overflow-x-auto">
-                {polledReceipt?.outcome?.logs?.length > 0 ? (
+                {receipt?.outcome?.logs?.length > 0 ? (
                   <div className="relative w-full">
                     <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
                       <button

@@ -78,7 +78,6 @@ interface Props {
   txn: TransactionInfo;
   status: boolean;
   apiTxnActionsData: ApiTxnData;
-  shouldUseRpc: boolean;
 }
 
 const Details = (props: Props) => {
@@ -92,7 +91,6 @@ const Details = (props: Props) => {
     txn,
     status,
     apiTxnActionsData,
-    shouldUseRpc,
   } = props;
   const [more, setMore] = useState(false);
   const [utc, setUtc] = useState(true);
@@ -301,9 +299,7 @@ const Details = (props: Props) => {
     (item: any) => item?.logs?.standard !== 'nep245',
   );
   const filteredLogs =
-    apiFilteredLogs?.length > 0 && !shouldUseRpc
-      ? apiFilteredLogs
-      : rpcFilteredLogs;
+    apiFilteredLogs?.length > 0 ? apiFilteredLogs : rpcFilteredLogs;
 
   const rpcMainTxnsActions =
     rpcMainActions &&
@@ -361,9 +357,7 @@ const Details = (props: Props) => {
   });
 
   const updatedMainTxnsActions =
-    apiMainTxnsActions?.length > 0 && !shouldUseRpc
-      ? apiMainTxnsActions
-      : rpcMainTxnsActions;
+    apiMainTxnsActions?.length > 0 ? apiMainTxnsActions : rpcMainTxnsActions;
 
   const rpcTokenIdsCount = rpcActionLogs?.reduce(
     (totalCount: number, item: any) => {
@@ -451,8 +445,7 @@ const Details = (props: Props) => {
     }
   }, [apiSubActions, rpcSubActions, filteredLogs]);
 
-  const subAction =
-    apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
+  const subAction = apiSubActions?.length > 0 ? apiSubActions : rpcSubActions;
 
   return (
     <>
@@ -684,9 +677,7 @@ const Details = (props: Props) => {
                   </Tooltip>
                   Transaction Actions
                 </div>
-                {loading ||
-                (updatedMainTxnsActions?.length === 0 &&
-                  updatedMainTxnsActions) ? (
+                {loading || updatedMainTxnsActions?.length === 0 ? (
                   <div className="w-full md:w-3/4">
                     <Loader wrapperClassName="flex w-full max-w-xl" />
                   </div>
@@ -885,9 +876,7 @@ const Details = (props: Props) => {
                               <EventLogs
                                 key={i}
                                 event={event}
-                                allActionLog={
-                                  !shouldUseRpc ? apiAllActions : rpcAllActions
-                                }
+                                allActionLog={apiAllActions || rpcAllActions}
                                 isInteracted
                                 tokenMetadata={tokenMetadata}
                               />

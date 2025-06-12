@@ -23,7 +23,6 @@ import Receipt from '@/components/app/Transactions/Receipt';
 import ReceiptSummary from '@/components/app/Transactions/ReceiptSummary';
 import Tree from '@/components/app/Transactions/Tree';
 import { revalidateTxn } from '@/utils/app/actions';
-import { useConfig } from '@/hooks/app/useConfig';
 
 export type RpcProvider = {
   name: string;
@@ -48,13 +47,6 @@ const TxnsTabActions = ({
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
-  const { networkId } = useConfig();
-
-  // temporary use rpc data for blocks before 192373963 and api data for latest blocks - testnet
-  // temporary use rpc data for blocks before 143997621 and api data for latest blocks - mainnet
-  const shouldUseRpc =
-    (networkId === 'testnet' && txn?.block?.block_height <= 192373963) ||
-    (networkId === 'mainnet' && txn?.block?.block_height <= 143997621);
 
   const useRpcStoreWithProviders = () => {
     const setProviders = useRpcStore((state) => state.setProviders);
@@ -106,12 +98,6 @@ const TxnsTabActions = ({
       if (txn === undefined || txn === null || !txn) {
         try {
           setRpcError(false);
-
-          if (!shouldUseRpc) {
-            setRpcError(true);
-            setAllRpcProviderError(true);
-            return;
-          }
           const txnExists: any = await transactionStatus(hash, 'bowen');
           const status = txnExists.status?.Failure ? false : true;
           let block: any = {};
@@ -166,12 +152,7 @@ const TxnsTabActions = ({
 
   useEffect(() => {
     const fetchTransactionStatus = async () => {
-      if (!txn || !shouldUseRpc) {
-        setRpcError(true);
-        setAllRpcProviderError(true);
-        return;
-      }
-
+      if (!txn) return;
       try {
         setRpcError(false);
         const res = await transactionStatus(
@@ -291,7 +272,6 @@ const TxnsTabActions = ({
                     txn={txn ? txn : rpcData}
                     status={status}
                     apiTxnActionsData={apiTxnActionsData}
-                    shouldUseRpc={shouldUseRpc}
                   />
                 )}
                 {tab === 'execution' && (
@@ -301,7 +281,6 @@ const TxnsTabActions = ({
                     statsData={stats}
                     txn={txn ? txn : rpcData}
                     apiTxnActionsData={apiTxnActionsData}
-                    shouldUseRpc={shouldUseRpc}
                   />
                 )}
                 {tab === 'enhanced' && (
@@ -311,7 +290,6 @@ const TxnsTabActions = ({
                     txn={txn ? txn : rpcData}
                     statsData={stats}
                     apiTxnActionsData={apiTxnActionsData}
-                    shouldUseRpc={shouldUseRpc}
                   />
                 )}
                 {tab === 'tree' && (
@@ -320,7 +298,6 @@ const TxnsTabActions = ({
                     rpcTxn={rpcTxn}
                     txn={txn ? txn : rpcData}
                     apiTxnActionsData={apiTxnActionsData}
-                    shouldUseRpc={shouldUseRpc}
                   />
                 )}
                 {tab === 'summary' && (
@@ -332,7 +309,6 @@ const TxnsTabActions = ({
                     statsData={stats}
                     txn={txn ? txn : rpcData}
                     apiTxnActionsData={apiTxnActionsData}
-                    shouldUseRpc={shouldUseRpc}
                   />
                 )}
               </>

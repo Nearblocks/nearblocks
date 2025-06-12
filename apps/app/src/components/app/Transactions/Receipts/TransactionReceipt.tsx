@@ -7,9 +7,7 @@ import ArrowDown from '@/components/app/Icons/ArrowDown';
 const TransactionReceipt = (props: TransactionReceiptInfo) => {
   const {
     receipt,
-    polledReceipt,
     fellowOutgoingReceipts,
-    polledFellowOutgoingReceipts,
     expandAll,
     convertionReceipt,
     className,
@@ -25,12 +23,8 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
   }, [expandAll]);
 
   const remainingFellowOutgoingReceipts = fellowOutgoingReceipts?.slice(0, -1);
-  const polledRemainingFellowOutgoingReceipts =
-    polledFellowOutgoingReceipts?.slice(0, -1);
 
   const lastFellowOutgoingReceipt = fellowOutgoingReceipts?.at(-1);
-  const polledLastFellowOutgoingReceipt = polledFellowOutgoingReceipts?.at(-1);
-
   const filterRefundNestedReceipts =
     (receipt?.outcome?.nestedReceipts &&
       receipt?.outcome?.nestedReceipts?.filter(
@@ -44,29 +38,10 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
         nestedReceipt?.predecessor_id !== 'system',
     );
 
-  const polledFilterRefundNestedReceipts =
-    (polledReceipt?.outcome?.nestedReceipts &&
-      polledReceipt?.outcome?.nestedReceipts?.filter(
-        (nestedReceipt: any) =>
-          'outcome' in nestedReceipt &&
-          nestedReceipt?.predecessorId !== 'system',
-      )) ||
-    polledReceipt?.outcome?.outgoing_receipts.filter(
-      (nestedReceipt: any) =>
-        'outcome' in nestedReceipt &&
-        nestedReceipt?.predecessor_id !== 'system',
-    );
-
   const nonRefundNestedReceipts =
     filterRefundNestedReceipts && filterRefundNestedReceipts?.slice(0, -1);
   const lastNonRefundNestedReceipt =
     filterRefundNestedReceipts && filterRefundNestedReceipts?.at(-1);
-
-  const polledNonRefundNestedReceipts =
-    polledFilterRefundNestedReceipts &&
-    polledFilterRefundNestedReceipts.slice(0, -1);
-  const polledLastNonRefundNestedReceipt =
-    polledFilterRefundNestedReceipts && polledFilterRefundNestedReceipts.at(-1);
 
   return (
     <>
@@ -86,13 +61,11 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           </div>
         ) : null}
 
-        {lastFellowOutgoingReceipt || polledLastFellowOutgoingReceipt ? (
+        {lastFellowOutgoingReceipt ? (
           <TransactionReceipt
             receipt={lastFellowOutgoingReceipt}
-            polledReceipt={polledLastFellowOutgoingReceipt}
             expandAll={expandAll}
             fellowOutgoingReceipts={remainingFellowOutgoingReceipts}
-            polledFellowOutgoingReceipts={polledRemainingFellowOutgoingReceipts}
             convertionReceipt={false}
             className="pb-4 !mt-0 border-l ml-2.5"
             statsData={statsData}
@@ -100,29 +73,21 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
-          {polledReceipt?.actions?.map((action: any, actionIndex: number) => {
-            const matchingAction = polledReceipt?.actions?.find(
-              (_: any, polledActionIndex: number) =>
-                polledActionIndex === actionIndex,
-            );
-            return (
-              <ReceiptKind
-                key={`${action.action_kind || action.kind}_${actionIndex}`}
-                action={action}
-                polledAction={matchingAction}
-                onClick={switchActiveTxType}
-                isTxTypeActive={isTxTypeActive}
-                receiver={receipt.receiver_id || receipt.receiverId}
-                receipt={polledReceipt}
-              />
-            );
-          })}
+          {receipt?.actions?.map((action: any, index: number) => (
+            <ReceiptKind
+              key={`${action.action_kind || action.kind}_${index}`}
+              action={action}
+              onClick={switchActiveTxType}
+              isTxTypeActive={isTxTypeActive}
+              receiver={receipt.receiver_id || receipt.receiverId}
+              receipt={receipt}
+            />
+          ))}
         </div>
         {isTxTypeActive ? (
           <div className="border-l border-green-500 dark:border-green-250 ml-2.5">
             <ReceiptInfo
               receipt={receipt}
-              polledReceipt={polledReceipt}
               statsData={statsData}
               rpcTxn={rpcTxn}
             />
@@ -138,13 +103,11 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           </div>
         </div>
       </div>
-      {lastNonRefundNestedReceipt || polledLastNonRefundNestedReceipt ? (
+      {lastNonRefundNestedReceipt ? (
         <TransactionReceipt
           receipt={lastNonRefundNestedReceipt}
-          polledReceipt={polledLastNonRefundNestedReceipt}
           expandAll={expandAll}
           fellowOutgoingReceipts={nonRefundNestedReceipts}
-          polledFellowOutgoingReceipts={polledNonRefundNestedReceipts}
           className="!pl-0 !border-transparent"
           convertionReceipt={false}
           statsData={statsData}
