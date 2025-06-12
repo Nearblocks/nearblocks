@@ -291,6 +291,7 @@ const TxnsTabActions = ({
                     txn={txn ? txn : rpcData}
                     status={status}
                     apiTxnActionsData={apiTxnActionsData}
+                    shouldUseRpc={shouldUseRpc}
                   />
                 )}
                 {tab === 'execution' && (

@@ -185,7 +185,7 @@ const Tree = (props: Props) => {
                       <ul className="hierarchy-tree">
                         <li>
                           <TreeReceipt
-                            receipt={receipt}
+                            receipt={polledReceipt}
                             setShow={setShow}
                             show={show}
                             txn={txn}

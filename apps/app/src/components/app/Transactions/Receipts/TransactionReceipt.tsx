@@ -100,7 +100,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
           />
         ) : null}
         <div className="flex flex-col relative border-l border-green-500 dark:border-green-250 py-2 pl-6 ml-2.5">
-          {receipt?.actions?.map((action: any, actionIndex: number) => {
+          {polledReceipt?.actions?.map((action: any, actionIndex: number) => {
             const matchingAction = polledReceipt?.actions?.find(
               (_: any, polledActionIndex: number) =>
                 polledActionIndex === actionIndex,
@@ -113,7 +113,7 @@ const TransactionReceipt = (props: TransactionReceiptInfo) => {
                 onClick={switchActiveTxType}
                 isTxTypeActive={isTxTypeActive}
                 receiver={receipt.receiver_id || receipt.receiverId}
-                receipt={receipt}
+                receipt={polledReceipt}
               />
             );
           })}
