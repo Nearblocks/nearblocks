@@ -324,3 +324,11 @@ a {
   background: #d1cfcf;
   border-radius: 12px;
 }
+
+.dark .mostly-customized-scrollbar::-webkit-scrollbar {
+  background-color: #1F2228;
+}
+
+.dark .mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: #555;
+}
