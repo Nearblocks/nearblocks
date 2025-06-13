@@ -47,8 +47,10 @@ const Address = ({ id, network, rpcUrl }: AddressProps) => {
   const [address, setAddress] = useState<null | RpcResultAccount>(null);
 
   const ACCOUNT_CODE_HASH = '11111111111111111111111111111111';
+  const amount = address?.amount ?? '0';
+  const amountStr = typeof amount === 'bigint' ? amount.toString() : amount;
   const value = formatNumber(
-    Big(yoctoToNear(address?.amount ?? '0'))
+    Big(yoctoToNear(amountStr))
       .mul(stats?.near_price ?? '0')
       .toString(),
     2,
@@ -121,7 +123,15 @@ const Address = ({ id, network, rpcUrl }: AddressProps) => {
           <h2 className="font-medium text-sm mb-0.5">Balance</h2>
           <Skeleton className="block h-[39px] w-32" loading={loading.address}>
             <p className="font-heading font-medium text-[26px]">
-              {formatNumber(yoctoToNear(address?.amount ?? '0'), 2)} Ⓝ
+              {formatNumber(
+                yoctoToNear(
+                  typeof address?.amount === 'bigint'
+                    ? address.amount.toString()
+                    : address?.amount ?? '0',
+                ),
+                2,
+              )}{' '}
+              Ⓝ
             </p>
           </Skeleton>
         </div>
@@ -140,7 +150,15 @@ const Address = ({ id, network, rpcUrl }: AddressProps) => {
           <h2 className="font-medium text-sm mb-0.5">Validator Stake</h2>
           <Skeleton className="block h-[39px] w-32" loading={loading.address}>
             <p className="font-heading font-medium text-[26px]">
-              {formatNumber(yoctoToNear(address?.locked ?? '0'), 2)} Ⓝ
+              {formatNumber(
+                yoctoToNear(
+                  typeof address?.amount === 'bigint'
+                    ? address.amount.toString()
+                    : address?.amount ?? '0',
+                ),
+                2,
+              )}{' '}
+              Ⓝ
             </p>
           </Skeleton>
         </div>

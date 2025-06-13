@@ -131,7 +131,11 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                     {shortenAddress(results.query.toLocaleLowerCase())}
                   </span>
                   <span className="text-text-input text-base">
-                    {numberFormat(yoctoToNear(results.account.amount), 2)} Ⓝ
+                    {numberFormat(
+                      yoctoToNear(results.account.amount.toString()),
+                      2,
+                    )}{' '}
+                    Ⓝ
                   </span>
                 </Link>
               </li>

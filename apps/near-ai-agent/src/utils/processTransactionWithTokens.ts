@@ -6,6 +6,7 @@ import {
   TransformedReceipt,
   ReceiptTree,
   ProcessedTokenMeta,
+  ReceiptAction,
 } from './types';
 import { parseEventJson } from './libs';
 import { getFTMetaByContract } from '#libs/db/fts';
@@ -135,41 +136,44 @@ export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
   return txActions;
 }
 
-export function apiSubActions(apiTxn: ApiTransaction): ActionInfo[] {
-  const txActions: ActionInfo[] = [];
-  const transaction = apiTxn?.actions || [];
-  const from = apiTxn?.signer_account_id;
-  const to = apiTxn?.receiver_account_id;
-  const receipt = apiTxn?.receipts?.[0]?.receipt_id;
+export function processApiActions(
+  apiData: ReceiptApiResponse | null,
+  allAction: boolean = true,
+): ReceiptAction[] {
+  const txActions: any = [];
+  const receiptTree = apiData?.receipts?.[0];
 
-  const remainingLogs = apiRemainingLogs(apiTxn);
+  function processReceipt(receipt: any, isTopLevel = false) {
+    const from = receipt?.predecessor_account_id;
+    const to = receipt?.receiver_account_id;
+    const receiptId = receipt?.receipt_id;
 
-  const allLogs = [...remainingLogs];
+    if (from === 'system') return;
 
-  const actionsLog =
-    apiTxn?.actions?.map((action: any) => {
-      const actionInfo = processApiAction(action);
-      return {
-        ...actionInfo,
-        args: {
-          deposit: actionInfo?.args?.deposit || 0,
-          gas: actionInfo?.args?.gas || apiTxn?.actions_agg?.gas_attached || 0,
-          method_name: actionInfo?.args?.method_name,
-          args: actionInfo?.args?.args,
-        },
-      };
-    }) || [];
+    const actions = receipt?.actions || [];
 
-  for (let i = 0; i < transaction.length; i++) {
-    const action = processApiAction(transaction[i]);
-    txActions.push({
-      to,
-      from,
-      receiptId: receipt,
-      logs: allLogs,
-      actionsLog,
-      ...action,
-    });
+    if (!isTopLevel) {
+      for (let i = 0; i < actions?.length; i++) {
+        const action = actions[i];
+
+        txActions.push({
+          from,
+          to,
+          receiptId,
+          action_kind: action?.action_kind,
+          args: action?.args,
+        });
+      }
+    }
+
+    const nestedReceipts = receipt?.receipts || [];
+    for (let i = 0; i < nestedReceipts?.length; i++) {
+      processReceipt(nestedReceipts[i], false);
+    }
+  }
+
+  if (receiptTree && receiptTree?.receipt_tree) {
+    processReceipt(receiptTree?.receipt_tree, allAction);
   }
 
   return txActions;
@@ -251,7 +255,6 @@ async function processTokenMetadata(
     try {
       //   const options =  { next: { revalidate: 10 } };
       const response = await getFTMetaByContract(contractId);
-
       if (response?.contracts?.[0]) {
         const contract = response.contracts[0];
 
@@ -333,23 +336,20 @@ export async function processTransactionWithTokens(
   apiTxn: ApiTransaction,
   receipt: ReceiptApiResponse,
 ) {
-  const logs = apiTxnLogs(apiTxn);
-  const apiActions = apiMainTxnsActions(apiTxn);
-  const subActions = apiSubActions(apiTxn);
+  const apiLogs = apiTxnLogs(apiTxn);
+  const apiMainActions = apiMainTxnsActions(apiTxn);
+  const apiSubActions = processApiActions(receipt);
+  const apiAllActions = processApiActions(receipt, false);
   const apiActionLogs = apiTxnActionLogs(apiTxn);
   const receiptData = transformReceiptData(receipt);
-
-  const allLogs = (apiActions?.[0]?.logs || []).concat(
-    subActions?.[0]?.logs || [],
-  );
-
-  const tokenMetadata = await processTokenMetadata(allLogs || []);
+  const tokenMetadata = await processTokenMetadata(apiLogs || []);
 
   return {
-    logs,
+    apiLogs,
+    apiMainActions,
+    apiSubActions,
+    apiAllActions,
     apiActionLogs,
-    apiActions,
-    subActions,
     receiptData,
     tokenMetadata,
   };

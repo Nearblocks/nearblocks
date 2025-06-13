@@ -81,6 +81,7 @@ export async function parseMint({
     type: 'mint',
     contract: 'intents.near',
     receiverId,
+    receiver,
     sender,
     tokens: data
       .map(({ token_ids, amounts }) =>

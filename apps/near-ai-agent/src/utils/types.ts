@@ -257,12 +257,20 @@ export type ProcessedTokenMeta = {
   contractId: string;
   metadata: TokenMetadata;
 };
+export type ReceiptAction = {
+  from: string;
+  to: string;
+  receiptId: string;
+  action_kind: string;
+  args: Record<string, any>;
+};
 
 export type ApiTxnData = {
-  logs: TransactionLog[];
+  apiLogs: TransactionLog[];
   apiActionLogs: any;
-  apiActions: ActionInfo[];
-  subActions: ActionInfo[];
+  apiMainActions: ActionInfo[];
+  apiSubActions: ReceiptAction[];
+  apiAllActions: ReceiptAction[];
   tokenMetadata: ProcessedTokenMeta[];
   receiptData: TransformedReceipt | null;
 };
@@ -376,3 +384,137 @@ export type UserToken = {
   sub: string;
   username: string;
 };
+
+export type FunctionCallInfo = {
+  args: string;
+  deposit: string;
+  gas: string;
+  method_name: string;
+};
+
+export type ReceiptsInfo = {
+  predecessor_id: string;
+  receipt:
+    | {
+        Action: {
+          actions: {
+            FunctionCall: FunctionCallInfo;
+          }[];
+          gas_price: string;
+          input_data_ids: [];
+          output_data_receivers: [];
+          signer_id: string;
+          signer_public_key: string;
+        };
+      }
+    | Array<any>;
+  receipt_id: string;
+  receiver_id: string;
+};
+
+export type InfoStatus = {
+  Failure: {
+    ActionError: {
+      index: number;
+      kind: {
+        FunctionCallError: {
+          ExecutionError: string;
+        };
+      };
+    };
+  };
+};
+export type GasProfileInfo = {
+  cost: string;
+  cost_category: string;
+  gas_used: string;
+};
+
+export type OutcomePropsInfo = {
+  executor_id: string;
+  gas_burnt: string;
+  logs: [];
+  metadata: {
+    gas_profile: GasProfileInfo[];
+    version: string;
+  };
+  outgoing_receipts: {
+    actions: {
+      action_kind: string;
+      args: {
+        deposit: string;
+        stake: string;
+      };
+    }[];
+    outcome: OutcomePropsInfo;
+  };
+  receipt_ids: string[];
+  status: {
+    Failure: {
+      ActionError: {
+        index: number;
+        kind: {
+          FunctionCallError: {
+            ExecutionError: string;
+          };
+        };
+      };
+    };
+  };
+  tokens_burnt: string;
+};
+
+export type OutcomeInfo = {
+  block_hash: string;
+  id: string;
+  outcome: OutcomePropsInfo;
+  proof: {
+    direction: string;
+    hash: string;
+  }[];
+};
+export type TransInfo = {
+  actions: {
+    FunctionCall: FunctionCallInfo[];
+  }[];
+  hash: string;
+  nonce: number;
+  public_key: string;
+  receiver_id: string;
+  signature: string;
+  signer_id: string;
+};
+
+export type ApiTransactionInfo = {
+  receipts: ReceiptsInfo[];
+  receipts_outcome: OutcomeInfo[];
+  status: InfoStatus;
+  transaction: TransInfo;
+  transaction_outcome: OutcomeInfo;
+};
+
+export interface ParsedAddressLink {
+  address: string;
+  short: string;
+  url: string;
+}
+
+export interface ParsedActioninfo {
+  type: string;
+  display: {
+    label: string;
+    from: ParsedAddressLink;
+    to: ParsedAddressLink;
+    methodName?: string;
+  };
+  raw: any;
+}
+
+export interface ParsedAction {
+  type: string;
+  details: Record<string, any>;
+  from?: string;
+  to?: string;
+  receiptId?: string;
+  txnHash?: string;
+}

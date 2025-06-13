@@ -10,7 +10,7 @@ export const networks: Record<NetworkId, Network> = {
 };
 
 export const networkId: NetworkId =
-  (process.env.NEXT_PUBLIC_NETWORK_ID as NetworkId) || 'testnet';
+  (process.env.NETWORK as NetworkId) || 'testnet';
 
 export const intentsAddressList: Record<string, string> = {
   'eth-0xdac17f958d2ee523a2206206994597c13d831ec7':

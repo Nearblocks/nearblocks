@@ -89,7 +89,9 @@ export async function getTxnFull(hash: string) {
     FROM
       transactions t
       JOIN blocks b ON b.block_hash = t.included_in_block_hash
-      JOIN chunks c ON c.chunk_hash = t.included_in_chunk_hash
+      LEFT JOIN chunks c ON c.chunk_hash = t.included_in_chunk_hash
+      LEFT JOIN accounts signer_acc ON signer_acc.account_id = t.signer_account_id
+      LEFT JOIN accounts receiver_acc ON receiver_acc.account_id = t.receiver_account_id
       LEFT JOIN LATERAL (
         SELECT
           COALESCE(JSONB_AGG(base_receipts), '[]') AS receipts
@@ -229,32 +231,26 @@ export async function getTxnFull(hash: string) {
       LIMIT
         1
     `;
-
     return txns;
   }
 
   const txns = await sql<ApiTransaction[]>`
     ${baseQuery}
     WHERE
-      t.transaction_hash = ${hash}
+      t.transaction_hash LIKE ${'%' + hash + '%'}
   `;
-
   return txns;
 }
 
 export async function getTxnReceipts(hash: string) {
-  const txnQuery = sql`
-    SELECT
-      receipt_tree (t.converted_into_receipt_id)
-    FROM
-      transactions t
-  `;
-
   if (hash.startsWith('0x')) {
     const receipts = await sql`
-      ${txnQuery}
-      JOIN receipts r ON r.originated_from_transaction_hash = t.transaction_hash
-      JOIN action_receipt_actions ara ON r.receipt_id = ara.receipt_id
+      SELECT
+        r.*
+      FROM
+        transactions t
+        JOIN receipts r ON r.originated_from_transaction_hash = t.transaction_hash
+        LEFT JOIN action_receipt_actions ara ON r.receipt_id = ara.receipt_id
       WHERE
         ara.nep518_rlp_hash = ${hash}
       LIMIT
@@ -264,7 +260,11 @@ export async function getTxnReceipts(hash: string) {
   }
 
   const receipts = await sql`
-    ${txnQuery}
+    SELECT
+      r.*
+    FROM
+      transactions t
+      JOIN receipts r ON r.originated_from_transaction_hash = t.transaction_hash
     WHERE
       t.transaction_hash = ${hash}
   `;

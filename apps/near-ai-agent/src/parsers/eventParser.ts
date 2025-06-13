@@ -7,11 +7,13 @@ import { parseIntents } from './parseIntents';
 export async function parseEventLogs(
   logs: any[],
   tokenMetadata: TokenMetadataMap,
+  apiAllActions?: any,
 ): Promise<ParsedEvent[]> {
   const result: ParsedEvent[] = [];
 
   for (const log of logs) {
     const contract = log.contract;
+
     switch (contract) {
       case 'wrap.near':
       case 'wrap.testnet':
@@ -25,7 +27,7 @@ export async function parseEventLogs(
         result.push(...parseBurrowEvents(log, tokenMetadata));
         break;
       case 'intents.near':
-        const parsed = await parseIntents(log, tokenMetadata);
+        const parsed = await parseIntents(log, tokenMetadata, apiAllActions);
         result.push(...parsed);
         break;
       default:

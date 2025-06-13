@@ -6,7 +6,7 @@ import { format } from 'numerable';
 
 import logger from './logger';
 import { callFunction } from './near';
-// import Sentry from '#libs/sentry';
+
 import { ValidationError } from '../types/types';
 
 type ABIResponse = {

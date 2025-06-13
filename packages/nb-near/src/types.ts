@@ -67,8 +67,32 @@ export interface RpcResultTxn extends FinalExecutionOutcome {
   transaction: Transaction;
   transaction_outcome: ExecutionOutcomeWithIdView;
 }
+
+export interface ExecutionOutcomeReceiptDetail {
+  predecessor_id: string;
+  receipt: {
+    Action: ExecutionOutcomeReceiptAction;
+  };
+  receipt_id: string;
+  receiver_id: string;
+}
+export type ReceiptAction = {
+  Transfer: {
+    deposit: string;
+  };
+};
+
+export interface ExecutionOutcomeReceiptAction {
+  actions: ReceiptAction[];
+  gas_price: string;
+  input_data_ids: string[];
+  output_data_receivers: string[];
+  signer_id: string;
+  signer_public_key: string;
+}
+
 export interface RpcResultTxnReceipt extends RpcResultTxn {
-  receipts: types.Receipt[];
+  receipts: ExecutionOutcomeReceiptDetail[];
 }
 export interface RpcResultAccessKey extends AccessKeyList {}
 export interface RpcResultReceipt {

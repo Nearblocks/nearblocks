@@ -1,3 +1,4 @@
+import Big from 'big.js';
 export function isValidJson(value: string): boolean {
   try {
     const parsed = JSON.parse(value);
@@ -29,3 +30,28 @@ export const parseEventJson = (log: string) => {
 
   return JSON.parse(jsonString);
 };
+
+export function shortenHex(address: string) {
+  return `${address && address?.substr(0, 6)}...${address?.substr(-4)}`;
+}
+
+export const shortenAddress = (address: string, length = 8): string => {
+  if (!address) return '';
+  return `${address.slice(0, length)}...${address.slice(-length)}`;
+};
+
+export function localFormat(number: string) {
+  const bigNumber = Big(number);
+  const formattedNumber = bigNumber
+    .toFixed(6)
+    .replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+  return formattedNumber.replace(/\.?0*$/, '');
+}
+
+export function yoctoToNear(yocto: string, format: boolean) {
+  const YOCTO_PER_NEAR = Big(10).pow(24)?.toString();
+
+  const near = Big(yocto)?.div(YOCTO_PER_NEAR)?.toString();
+
+  return format ? localFormat(near) : near;
+}

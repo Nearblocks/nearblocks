@@ -80,9 +80,8 @@ export type RawQueryParams = {
   select: string;
 };
 
-type ProductionNetwork = {
-  networkId: 'mainnet' | 'testnet';
-};
+export type NetworkId = 'mainnet' | 'testnet';
 
-export type NetworkId = ProductionNetwork['networkId'];
-export type Network = ProductionNetwork;
+export type Network = {
+  networkId: NetworkId;
+};
