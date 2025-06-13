@@ -5,7 +5,7 @@ import {
   Message,
   Receipt,
 } from 'nb-neardata';
-import { AccessKey, AccessKeyPermissionKind } from 'nb-types';
+import { AccessKey, AccessKeyPermissionKind, JsonValue } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
@@ -16,7 +16,11 @@ import {
   isTransferAction,
 } from '#libs/guards';
 import { keyHistogram } from '#libs/prom';
-import { isExecutionSuccess, publicKeyFromImplicitAccount } from '#libs/utils';
+import {
+  isExecutionSuccess,
+  jsonStringify,
+  publicKeyFromImplicitAccount,
+} from '#libs/utils';
 
 type AccessKeyMap = Map<string, AccessKey>;
 type DeletedAccount = { accountId: string; receiptId: string };
@@ -209,11 +213,11 @@ export const getAccessKeyData = (
   deletedBlockHeight: null | number = null,
   deletedReceiptId: null | string = null,
 ): AccessKey => {
-  let permissions = null;
+  let permissions: JsonValue | null = null;
   let permissionKind = AccessKeyPermissionKind.FULL_ACCESS;
 
   if (permission && typeof permission !== 'string') {
-    permissions = permission.FunctionCall;
+    permissions = jsonStringify(permission.FunctionCall);
     permissionKind = AccessKeyPermissionKind.FUNCTION_CALL;
   }
 
