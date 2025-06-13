@@ -305,6 +305,7 @@ export type TransactionInfo = {
   nft: Token;
   outcomes: {
     status: boolean;
+    result: any;
   };
   outcome: {
     status: boolean;

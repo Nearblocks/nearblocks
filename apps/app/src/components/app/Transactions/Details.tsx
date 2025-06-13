@@ -183,7 +183,7 @@ const Details = (props: Props) => {
     rpcSubActions,
     rpcAllActions,
     rpcMainActions,
-    errorMessage,
+    rpcErrorMessage,
   ] = useMemo(() => {
     if (!isEmpty(rpcTxn)) {
       return [
@@ -199,6 +199,11 @@ const Details = (props: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
+
+  const apiErrorMessage = txnErrorMessage(txn);
+  const errorMessage =
+    apiErrorMessage && !shouldUseRpc ? apiErrorMessage : rpcErrorMessage;
+
   const rpcAllEvents = useMemo(() => {
     if (
       rpcActionLogs?.some(
@@ -259,8 +264,14 @@ const Details = (props: Props) => {
   }, [rpcLogs, rpcSubActions, apiLogs, apiSubActions]);
 
   const FailedReceipts = ({ data }: any) => {
-    const failedReceiptCount = (data?.receipts_outcome || []).filter(
-      (receipt: any) => receipt?.outcome?.status?.Failure,
+    const failedReceiptCount = (
+      data?.receipts ||
+      data?.receipts_outcome ||
+      []
+    ).filter(
+      (receipt: any) =>
+        receipt?.outcome?.status_key === 'FAILURE' ||
+        receipt?.outcome?.status?.Failure,
     ).length;
 
     if (failedReceiptCount === 0) {
@@ -532,12 +543,11 @@ const Details = (props: Props) => {
                         <TxnStatus
                           showLabel
                           status={txn?.outcomes?.status}
-                          showReceipt={<FailedReceipts data={rpcTxn} />}
+                          showReceipt={<FailedReceipts data={txn || rpcTxn} />}
                         />
                       )}
                       <div className="w-full max-w-xl">
-                        {txn?.outcomes?.status === false &&
-                        errorMessage === undefined ? (
+                        {!rpcTxn && !txn ? (
                           <Loader wrapperClassName="flex w-full " />
                         ) : errorMessage ? (
                           <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
