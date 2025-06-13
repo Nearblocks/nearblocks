@@ -35,6 +35,7 @@
     "eslint-config-custom-node": "*",
     "knex-migrate-sql-file": "~2.0",
     "nb-blocks": "*",
+    "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-neardata": "*",

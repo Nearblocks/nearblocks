@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+
 import { base58 } from '@scure/base';
 
 import { logger } from 'nb-logger';
@@ -6,6 +8,10 @@ import { Network } from 'nb-types';
 
 import config from '#config';
 import { dbRead } from '#libs/knex';
+
+const json = createRequire(import.meta.url)('nb-json');
+
+export const jsonStringify = (args: unknown): string => json.stringify(args);
 
 export const publicKeyFromImplicitAccount = (account: string) => {
   try {
