@@ -29,6 +29,7 @@ import {
   RPCInvalidAccessKeyError,
   RPCNewReceiptValidationError,
   RPCTransactionInfo,
+  TransactionInfo,
   TransactionLog,
   TransformedReceipt,
   TxExecutionError,
@@ -729,8 +730,16 @@ export function valueFromObj(obj: Obj): string | undefined {
   return undefined;
 }
 
-export function txnErrorMessage(txn: RPCTransactionInfo) {
-  const kind = txn?.status?.Failure?.ActionError?.kind;
+export function txnErrorMessage(txn: TransactionInfo | RPCTransactionInfo) {
+  let kind: any;
+
+  if ('outcomes' in txn) {
+    kind = txn.outcomes?.result?.ActionError?.kind;
+  }
+
+  if ('status' in txn) {
+    kind = txn.status?.Failure?.ActionError?.kind;
+  }
 
   if (typeof kind === 'string') return kind;
   if (typeof kind === 'object') {
