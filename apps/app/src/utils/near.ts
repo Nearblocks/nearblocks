@@ -29,6 +29,7 @@ import {
   RPCInvalidAccessKeyError,
   RPCNewReceiptValidationError,
   RPCTransactionInfo,
+  TransactionInfo,
   TransactionLog,
   TransformedReceipt,
   TxExecutionError,
@@ -729,8 +730,16 @@ export function valueFromObj(obj: Obj): string | undefined {
   return undefined;
 }
 
-export function txnErrorMessage(txn: RPCTransactionInfo) {
-  const kind = txn?.status?.Failure?.ActionError?.kind;
+export function txnErrorMessage(txn: TransactionInfo | RPCTransactionInfo) {
+  let kind: any;
+
+  if ('outcomes' in txn) {
+    kind = txn.outcomes?.result?.ActionError?.kind;
+  }
+
+  if ('status' in txn) {
+    kind = txn.status?.Failure?.ActionError?.kind;
+  }
 
   if (typeof kind === 'string') return kind;
   if (typeof kind === 'object') {
@@ -1469,4 +1478,28 @@ export function getNetworkDetails(input: string): string {
 
 function isExplorerNetwork(value: string): value is NetworkType {
   return Object.keys(networkFullNames).includes(value);
+}
+
+export function convertNumericStringsToNumbers(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(convertNumericStringsToNumbers);
+  }
+
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [
+        key,
+        convertNumericStringsToNumbers(value),
+      ]),
+    );
+  }
+
+  if (typeof obj === 'string') {
+    if (/^\d+$/.test(obj)) {
+      const num = Number(obj);
+      return Number.isSafeInteger(num) ? num : obj;
+    }
+  }
+
+  return obj;
 }
