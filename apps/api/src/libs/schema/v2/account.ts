@@ -36,11 +36,17 @@ const receiptsExport = z.object({
   }),
 });
 
+const inventory = z.object({
+  account: z.string(),
+});
+
 export type Receipts = z.infer<typeof receipts>;
 export type ReceiptsCount = z.infer<typeof receiptsCount>;
 export type ReceiptsExport = z.infer<typeof receiptsExport>;
+export type Inventory = z.infer<typeof inventory>;
 
 export default {
+  inventory,
   receipts,
   receiptsCount,
   receiptsExport,
