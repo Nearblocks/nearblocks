@@ -126,3 +126,13 @@ export type Campaign = {
   url: string;
   user_id: number;
 };
+
+export type RPCResponse = {
+  block_hash: string;
+  block_height: number;
+  result: Uint8Array;
+};
+
+export type IntentsToken = {
+  token_id: string;
+};
