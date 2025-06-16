@@ -4,6 +4,7 @@ import schema from '#libs/schema/v2/account';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import account from '#services/v2/account/index';
 import receipts from '#services/v2/account/receipts';
 
 const route = Router();
@@ -143,6 +144,33 @@ const routes = (app: Router) => {
     '/:account/receipts/count',
     validator(schema.receiptsCount),
     receipts.receiptsCount,
+  );
+
+  /**
+   * @openapi
+   * /v2/account/{account}/inventory/intents:
+   *   get:
+   *     summary: Get account intents tokens inventory
+   *     tags:
+   *       - Account
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *         examples:
+   *           account:
+   *             value: example-account-id
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:account/inventory/intents',
+    validator(schema.inventory),
+    account.inventory,
   );
 };
 
