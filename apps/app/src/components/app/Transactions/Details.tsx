@@ -548,9 +548,7 @@ const Details = (props: Props) => {
                         />
                       )}
                       <div className="w-full max-w-xl">
-                        {!errorMessage && shouldUseRpc ? (
-                          <Loader wrapperClassName="flex w-full " />
-                        ) : errorMessage ? (
+                        {errorMessage ? (
                           <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
                             {errorMessage}
                           </div>
