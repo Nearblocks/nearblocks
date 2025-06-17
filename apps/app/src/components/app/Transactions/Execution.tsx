@@ -31,25 +31,17 @@ interface Props {
       near_price: string;
     }>;
   };
-  shouldUseRpc: boolean;
 }
 
 const Execution = (props: Props) => {
-  const { hash, rpcTxn, txn, statsData, apiTxnActionsData, shouldUseRpc } =
-    props;
+  const { hash, rpcTxn, txn, statsData, apiTxnActionsData } = props;
 
   const [rpcReceipt, setRpcReceipt] = useState<
     any | FailedToFindReceipt | NestedReceiptWithOutcome
   >(null);
-
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData
     : rpcReceipt;
-
-  const polledReceipt = shouldUseRpc
-    ? rpcReceipt
-    : apiTxnActionsData?.receiptData;
-
   const [expandAll, setExpandAll] = useState(false);
   const expandAllReceipts = useCallback(
     () => setExpandAll((x) => !x),
@@ -137,7 +129,7 @@ const Execution = (props: Props) => {
                 </div>
               </div>
               <div className="p-4 md:px-8 overflow-auto">
-                {!polledReceipt?.receipt_id && !polledReceipt?.id ? (
+                {!receipt?.receipt_id && !receipt?.id ? (
                   <div>
                     <div className="flex flex-row mb-2.5">
                       <div className="bg-gray-200 dark:bg-black-200 h-5 w-5 rounded-full mr-3"></div>
@@ -169,7 +161,6 @@ const Execution = (props: Props) => {
                     expandAll={expandAll}
                     fellowOutgoingReceipts={[]}
                     receipt={receipt}
-                    polledReceipt={polledReceipt}
                     statsData={statsData}
                     rpcTxn={rpcTxn}
                   />

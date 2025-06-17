@@ -19,7 +19,6 @@ interface Props {
   borderFlag?: boolean;
   price: string;
   receipt: any | ReceiptsPropsInfo;
-  polledReceipt: any | ReceiptsPropsInfo;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -31,7 +30,7 @@ interface Props {
 const ReceiptSummaryRow = (props: Props) => {
   const { networkId } = useConfig();
 
-  const { price, receipt, statsData, txn, polledReceipt } = props;
+  const { price, receipt, statsData, txn } = props;
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
@@ -59,9 +58,7 @@ const ReceiptSummaryRow = (props: Props) => {
     );
   };
 
-  let gasAttached = polledReceipt?.actions
-    ? getGasAttached(receipt?.actions)
-    : '0';
+  let gasAttached = receipt?.actions ? getGasAttached(receipt?.actions) : '0';
 
   const status = receipt?.outcome?.status;
   const isSuccess =
@@ -73,8 +70,8 @@ const ReceiptSummaryRow = (props: Props) => {
 
   return (
     <>
-      {polledReceipt &&
-        polledReceipt?.actions?.map((action: any, i: number) => (
+      {receipt &&
+        receipt?.actions?.map((action: any, i: number) => (
           <tr key={i}>
             <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <TxnsReceiptStatus status={isSuccess} />
@@ -100,13 +97,13 @@ const ReceiptSummaryRow = (props: Props) => {
               {action.args?.method_name}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
-              {polledReceipt?.predecessor_id ? (
+              {receipt?.predecessor_id ? (
                 <div className="word-break">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
-                    href={`/address/${polledReceipt?.predecessor_id}`}
+                    href={`/address/${receipt?.predecessor_id}`}
                   >
-                    {polledReceipt?.predecessor_id}
+                    {receipt?.predecessor_id}
                   </Link>
                 </div>
               ) : (
@@ -119,13 +116,13 @@ const ReceiptSummaryRow = (props: Props) => {
               </div>
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
-              {polledReceipt?.receiver_id ? (
+              {receipt?.receiver_id ? (
                 <div className="word-break">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
-                    href={`/address/${polledReceipt?.receiver_id}`}
+                    href={`/address/${receipt?.receiver_id}`}
                   >
-                    {polledReceipt?.receiver_id}
+                    {receipt?.receiver_id}
                   </Link>
                 </div>
               ) : (
@@ -153,26 +150,19 @@ const ReceiptSummaryRow = (props: Props) => {
           </tr>
         ))}
 
-      {polledReceipt?.outcome?.outgoing_receipts?.length > 0 && (
+      {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <>
-          {polledReceipt?.outcome?.outgoing_receipts?.map(
-            (rcpt: any, index: number) => {
-              const childRpcReceipt =
-                polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
-              return (
-                <Fragment key={rcpt?.receipt_id}>
-                  <ReceiptSummaryRow
-                    borderFlag={true}
-                    price={price}
-                    receipt={rcpt}
-                    statsData={statsData}
-                    txn={txn}
-                    polledReceipt={childRpcReceipt}
-                  />
-                </Fragment>
-              );
-            },
-          )}
+          {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => (
+            <Fragment key={rcpt?.receipt_id}>
+              <ReceiptSummaryRow
+                borderFlag={true}
+                price={price}
+                receipt={rcpt}
+                statsData={statsData}
+                txn={txn}
+              />
+            </Fragment>
+          ))}
         </>
       )}
     </>
