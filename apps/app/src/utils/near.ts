@@ -160,20 +160,114 @@ export function apiTxnLogs(txn: any): TransactionLog[] {
   let txLogs: TransactionLog[] = [];
 
   const outcomes = txn?.receipts || [];
+  // Sorting mt token transfer from logs until metadata becomes available
+  const isValidTokenId = (tokenId: string): boolean => {
+    return tokenId.startsWith('nep141:') || tokenId.startsWith('nep171:');
+  };
 
   for (let i = 0; i < outcomes?.length; i++) {
     const outcome = outcomes[i];
     let logs = outcome?.outcome?.logs || [];
 
     if (logs?.length > 0) {
-      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
-        contract: outcome?.outcome?.executor_account_id || '',
-        logs: parseEventJson(log),
-        receiptId: outcome?.receipt_id,
-      }));
-      txLogs = [...txLogs, ...mappedLogs];
+      const mappedLogs: TransactionLog[] = logs?.map((log: string) => {
+        const parsedLog = parseEventJson(log);
+
+        if (typeof parsedLog === 'string' || !parsedLog?.data) {
+          return {
+            contract: outcome?.outcome?.executor_account_id || '',
+            logs: parsedLog,
+            receiptId: outcome?.receipt_id,
+          };
+        }
+
+        let filteredData = parsedLog?.data;
+
+        if (parsedLog?.data) {
+          if (Array.isArray(parsedLog.data)) {
+            filteredData = parsedLog.data
+              .map((item: any) => {
+                if (item?.diff && typeof item.diff === 'object') {
+                  const filteredDiff: any = {};
+                  Object.entries(item.diff).forEach(([key, value]) => {
+                    if (isValidTokenId(key)) {
+                      filteredDiff[key] = value;
+                    }
+                  });
+                  return { ...item, diff: filteredDiff };
+                } else if (item?.token_ids && Array.isArray(item.token_ids)) {
+                  const filteredTokenIds = item.token_ids.filter(
+                    (tokenId: string) => isValidTokenId(tokenId),
+                  );
+                  return { ...item, token_ids: filteredTokenIds };
+                }
+                return item;
+              })
+              .filter((item: any) => {
+                if (item?.diff && typeof item.diff === 'object') {
+                  return Object.keys(item.diff).length > 0;
+                } else if (item?.token_ids && Array.isArray(item.token_ids)) {
+                  return item.token_ids.length > 0;
+                }
+                return true;
+              });
+          } else if (typeof parsedLog.data === 'object') {
+            if (parsedLog.data.diff) {
+              const filteredDiff: any = {};
+              Object.entries(parsedLog.data.diff).forEach(([key, value]) => {
+                if (isValidTokenId(key)) {
+                  filteredDiff[key] = value;
+                }
+              });
+              if (Object.keys(filteredDiff).length === 0) {
+                filteredData = null;
+              } else {
+                filteredData = { ...parsedLog.data, diff: filteredDiff };
+              }
+            } else if (
+              parsedLog.data.token_ids &&
+              Array.isArray(parsedLog.data.token_ids)
+            ) {
+              const filteredTokenIds = parsedLog.data.token_ids.filter(
+                (tokenId: string) => isValidTokenId(tokenId),
+              );
+              if (filteredTokenIds.length === 0) {
+                filteredData = null;
+              } else {
+                filteredData = {
+                  ...parsedLog.data,
+                  token_ids: filteredTokenIds,
+                };
+              }
+            }
+          }
+        }
+
+        return {
+          contract: outcome?.outcome?.executor_account_id || '',
+          logs: {
+            ...parsedLog,
+            data: filteredData,
+          },
+          receiptId: outcome?.receipt_id,
+        };
+      });
+
+      const validLogs = mappedLogs.filter((log) => {
+        if (typeof log.logs === 'string' || !log.logs?.data) {
+          return true;
+        }
+
+        if (Array.isArray(log.logs?.data)) {
+          return log.logs.data.length > 0;
+        }
+        return log.logs?.data !== null;
+      });
+
+      txLogs = [...txLogs, ...validLogs];
     }
   }
+
   return txLogs;
 }
 

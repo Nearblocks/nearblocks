@@ -115,7 +115,6 @@ const Details = (props: Props) => {
 
   const {
     apiLogs,
-    apiActionLogs,
     apiMainActions,
     tokenMetadata,
     apiAllActions,
@@ -227,7 +226,7 @@ const Details = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcActionLogs]);
 
-  const apiAllEvents = apiActionLogs?.filter(
+  const apiAllEvents = apiLogs?.filter(
     (log: TransactionLog) => log?.logs?.standard === 'nep245',
   );
 
@@ -313,7 +312,7 @@ const Details = (props: Props) => {
     }
   });
 
-  const apiFilteredLogs = apiActionLogs?.filter(
+  const apiFilteredLogs = apiLogs?.filter(
     (item: any) => item?.logs?.standard !== 'nep245',
   );
   const filteredLogs =
@@ -408,29 +407,26 @@ const Details = (props: Props) => {
     },
     0,
   );
-  const apiTokenIdsCount = apiActionLogs?.reduce(
-    (totalCount: number, item: any) => {
-      try {
-        if (item?.logs?.standard === 'nep245') {
-          const eventTokenIdsCount = item?.logs?.data?.reduce(
-            (count: number, entry: any) => {
-              return (
-                count +
-                (entry?.token_ids?.length > 0 ? entry?.token_ids?.length : 0)
-              );
-            },
-            0,
-          );
-          return totalCount + eventTokenIdsCount;
-        }
-        return totalCount;
-      } catch (error) {
-        console.log('Error parsing log:', error);
-        return totalCount;
+  const apiTokenIdsCount = apiLogs?.reduce((totalCount: number, item: any) => {
+    try {
+      if (item?.logs?.standard === 'nep245') {
+        const eventTokenIdsCount = item?.logs?.data?.reduce(
+          (count: number, entry: any) => {
+            return (
+              count +
+              (entry?.token_ids?.length > 0 ? entry?.token_ids?.length : 0)
+            );
+          },
+          0,
+        );
+        return totalCount + eventTokenIdsCount;
       }
-    },
-    0,
-  );
+      return totalCount;
+    } catch (error) {
+      console.log('Error parsing log:', error);
+      return totalCount;
+    }
+  }, 0);
 
   const totalTokenIdsCount = apiTokenIdsCount
     ? apiTokenIdsCount
@@ -552,9 +548,7 @@ const Details = (props: Props) => {
                         />
                       )}
                       <div className="w-full max-w-xl">
-                        {!errorMessage && shouldUseRpc ? (
-                          <Loader wrapperClassName="flex w-full " />
-                        ) : errorMessage ? (
+                        {errorMessage ? (
                           <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
                             {errorMessage}
                           </div>
