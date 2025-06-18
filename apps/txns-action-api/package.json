@@ -1,0 +1,32 @@
+{
+  "name": "txns-action-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "big.js": "^7.0.1",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.5.0",
+    "envalid": "^8.0.0",
+    "express": "^5.1.0",
+    "pino": "^9.7.0",
+    "query-string": "^9.2.0",
+    "zod": "^3.25.42"
+  },
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.26",
+    "nb-types": "*",
+    "pino-pretty": "^13.0.0",
+    "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.8.3"
+  }
+}
