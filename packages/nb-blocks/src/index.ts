@@ -1,3 +1,4 @@
+import { Agent } from 'https';
 import { Readable } from 'stream';
 
 import { GetObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
@@ -20,6 +21,7 @@ export type BlockStreamConfig = {
 };
 
 const retries = 5;
+const agent = new Agent({ keepAlive: true, timeout: 5_000 });
 const retryConfig: S3ClientConfig = {
   logger: {
     debug: () => {},
@@ -30,6 +32,8 @@ const retryConfig: S3ClientConfig = {
   maxAttempts: 1,
   requestHandler: new NodeHttpHandler({
     connectionTimeout: 5_000,
+    httpAgent: agent,
+    httpsAgent: agent,
     logger: {
       debug: () => {},
       error: console.error,
@@ -62,7 +66,7 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
 
 const fetchJson = async (s3: S3Client, bucket: string, block: number) => {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 30_000);
+  const timer = setTimeout(() => controller.abort(), 60_000);
 
   try {
     const response = await s3.send(
