@@ -50,7 +50,9 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const args =
-    polledAction?.args?.args || encodeArgs(polledAction?.args?.args_json);
+    polledAction?.args?.args ||
+    encodeArgs(polledAction?.args?.args_json) ||
+    polledAction.args.args_base64;
 
   const modifiedData =
     action?.args?.methodName === 'submit' && receiver.includes('aurora')

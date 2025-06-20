@@ -37,6 +37,7 @@ import {
 import { intentsAddressList, supportedNetworks } from './app/config';
 import { isValidJson, parseEventJson } from './libs';
 import { getRequest } from './app/api';
+import { cleanNestedObject } from './app/libs';
 
 export function localFormat(number: string) {
   const bigNumber = Big(number);
@@ -531,21 +532,22 @@ export const transformReceiptData = (
           .filter((receipt): receipt is TransformedReceipt => receipt !== null)
       : [];
 
+    const actions = receiptTree?.actions?.map((action) => ({
+      ...action,
+      args: {
+        ...action?.args,
+        deposit: action?.args?.deposit || '0',
+      },
+    }));
     const receipt: TransformedReceipt = {
       receipt_id: receiptTree?.receipt_id,
       predecessor_id: receiptTree?.predecessor_account_id,
       receiver_id: receiptTree?.receiver_account_id,
       block_hash: receiptTree?.block?.block_hash,
       block_height: receiptTree?.block?.block_height || null,
-      actions: receiptTree?.actions?.map((action) => ({
-        ...action,
-        args: {
-          ...action?.args,
-          deposit: action?.args?.deposit || '0',
-        },
-      })),
+      actions: cleanNestedObject(actions),
       outcome: {
-        logs: receiptTree?.outcome?.logs || [],
+        logs: cleanNestedObject(receiptTree?.outcome?.logs) || [],
         status: convertStatus(
           receiptTree?.outcome?.status_key,
           receiptTree?.outcome?.result,
