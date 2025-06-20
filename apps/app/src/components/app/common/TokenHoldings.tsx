@@ -1,4 +1,3 @@
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import {
@@ -32,7 +31,7 @@ const TokenHoldings = (props: Props) => {
   const ft = props?.ft?.tokens?.filter((token) => token?.contract !== 'aurora'); // The 'aurora' token has been removed from the list of tokens due to its role as a proxy contract for the ETH bridge on the NEAR
   const nfts = props?.data?.nfts || [];
 
-  if (!ft?.length && !nfts?.length) {
+  if (ft?.length === 0 && nfts?.length === 0) {
     return (
       <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
         <option>N/A</option>
@@ -71,172 +70,164 @@ const TokenHoldings = (props: Props) => {
               <Skeleton className="h-4 w-20" />
             )}
           </span>
-          <ArrowDown className="w-4 h-4 fill-current text-gray-500 pointer-events-none" />
+          <ArrowDown className="w-4 h-4 fill-current text-nearblue-600 pointer-events-none" />
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="bg-white w-full -mt-1.5 !rounded-lg shadow border z-10 pb-1  dark:border-black-200 dark:bg-black overflow-hidden focus:outline-none"
+        className="bg-white w-full -mt-2 shadow border z-10 pb-1 dark:border-black-200 dark:bg-black overflow-hidden focus:outline-none"
         roundedBottom={'lg'}
-        roundedTop={'none'}
+        roundedTop={'xs'}
         position="absolute"
         suppressHydrationWarning
       >
-        <div className="dark:bg-black">
-          <PerfectScrollbar>
-            <div className="max-h-60 dark:bg-black lg:overflow-visible overflow-y-scroll">
-              {ft?.length > 0 && (
-                <>
-                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10 font-semibold pr-2 pl-1.5 py-2 mx-2 mt-1 rounded-lg">
-                    Tokens <span className="font-normal">({ft?.length})</span>
-                  </div>
-                  <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
-                    {ft?.map((token, index) => (
-                      <div
-                        className="dark:bg-black px-2 py-1"
-                        key={token?.contract}
+        <div className="dark:bg-black max-h-60 mostly-customized-scrollbar">
+          <div className="dark:bg-black lg:overflow-visible">
+            {ft?.length > 0 && (
+              <>
+                <div className="bg-neargray-700 !bg-opacity-60 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 font-semibold pr-2 pl-2.5 py-2">
+                  Tokens <span className="font-normal">({ft?.length})</span>
+                </div>
+                <div className="text-nearblue-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
+                  {ft?.map((token, index) => (
+                    <div
+                      className="dark:bg-black px-1 py-1"
+                      key={token?.contract}
+                    >
+                      <Link
+                        className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
+                        href={`/token/${token?.contract}?a=${props.id?.toLowerCase()}`}
                       >
-                        <Link
-                          className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
-                          href={`/token/${token?.contract}?a=${props.id?.toLowerCase()}`}
-                        >
-                          <div key={index}>
-                            <div className="flex items-center p-1">
-                              <div className="flex mr-1">
-                                <img
-                                  alt={token?.ft_meta?.name ?? 'Token Icon'}
-                                  className="w-4 h-4"
-                                  height={16}
-                                  onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src =
-                                      '/images/tokenplaceholder.svg';
-                                  }}
-                                  src={
-                                    token?.ft_meta?.icon
-                                      ? token?.ft_meta?.icon.startsWith(
-                                          'http',
-                                        ) ||
-                                        token?.ft_meta?.icon.startsWith(
-                                          'data:image/',
-                                        )
-                                        ? token?.ft_meta?.icon
-                                        : '/images/tokenplaceholder.svg'
+                        <div key={index}>
+                          <div className="flex items-center p-1">
+                            <div className="flex mr-1">
+                              <img
+                                alt={token?.ft_meta?.name ?? 'Token Icon'}
+                                className="w-4 h-4"
+                                height={16}
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src =
+                                    '/images/tokenplaceholder.svg';
+                                }}
+                                src={
+                                  token?.ft_meta?.icon
+                                    ? token?.ft_meta?.icon.startsWith('http') ||
+                                      token?.ft_meta?.icon.startsWith(
+                                        'data:image/',
+                                      )
+                                      ? token?.ft_meta?.icon
                                       : '/images/tokenplaceholder.svg'
-                                  }
-                                  width={16}
-                                />
-                              </div>
-                              <span>
-                                {token?.ft_meta?.name
-                                  ? truncateString(
-                                      token?.ft_meta?.name,
-                                      15,
-                                      '...',
-                                    )
-                                  : ''}
-                                (
-                                {truncateString(
-                                  token?.ft_meta?.symbol,
-                                  15,
-                                  '...',
-                                )}
-                                )
-                              </span>
+                                    : '/images/tokenplaceholder.svg'
+                                }
+                                width={16}
+                              />
                             </div>
-                            <div className="text-gray-400 flex items-center my-0.5 mr-2.5 ml-1">
-                              {token?.rpcAmount
-                                ? localFormat(token?.rpcAmount)
-                                : token?.rpcAmount ?? ''}
-                            </div>
+                            <span>
+                              {token?.ft_meta?.name
+                                ? truncateString(
+                                    token?.ft_meta?.name,
+                                    13,
+                                    '...',
+                                  )
+                                : ''}
+                              (
+                              {truncateString(
+                                token?.ft_meta?.symbol,
+                                15,
+                                '...',
+                              )}
+                              )
+                            </span>
                           </div>
+                          <div className="text-nearblue-600 dark:text-neargray-10 flex items-center my-0.5 mr-2.5 ml-1">
+                            {token?.rpcAmount
+                              ? localFormat(token?.rpcAmount)
+                              : token?.rpcAmount ?? ''}
+                          </div>
+                        </div>
 
-                          {!isTokenSpam(token?.contract) ? (
-                            token?.ft_meta?.price && (
-                              <div className="text-right p-0.5">
-                                <div>
-                                  {token?.amountUsd
-                                    ? '$' + dollarFormat(token?.amountUsd)
-                                    : '$' + (token?.amountUsd ?? '')}
-                                </div>
-                                <div className="text-gray-400">
-                                  {token?.ft_meta?.price
-                                    ? '@' + priceFormat(token?.ft_meta?.price)
-                                    : '@' + (token?.ft_meta?.price ?? '')}
-                                </div>
+                        {!isTokenSpam(token?.contract) ? (
+                          token?.ft_meta?.price && (
+                            <div className="text-right p-0.5 pt-1">
+                              <div>
+                                {token?.amountUsd
+                                  ? '$' + dollarFormat(token?.amountUsd)
+                                  : '$' + (token?.amountUsd ?? '')}
                               </div>
-                            )
-                          ) : (
-                            <div className="text-gray-400 p-0.5">[Spam]</div>
-                          )}
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-              {nfts?.length > 0 && (
-                <>
-                  <div className="bg-gray-50 dark:bg-black-200 text-gray-600 dark:text-neargray-10  font-semibold px-3 pr-2 pl-1 py-2 mx-2 mt-1 rounded-lg">
-                    NFT Tokens
-                    <span className="font-normal">({nfts?.length})</span>
-                  </div>
-                  <div className="text-gray-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">
-                    {nfts.map((nft) => (
-                      <div
-                        className="dark:bg-black px-2 py-1"
-                        key={nft?.contract}
+                              <div className="text-gray-500 dark:text-gray-400">
+                                {token?.ft_meta?.price
+                                  ? '@' + priceFormat(token?.ft_meta?.price)
+                                  : '@' + (token?.ft_meta?.price ?? '')}
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <div className="text-gray-500 p-0.5">[Spam]</div>
+                        )}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {nfts?.length > 0 && (
+              <>
+                <div className="bg-neargray-700 !bg-opacity-70 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 font-semibold pr-2 pl-2.5 py-2">
+                  NFT Tokens
+                  <span className="font-normal">({nfts?.length})</span>
+                </div>
+                <div className="text-nearblue-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none dark:bg-black">
+                  {nfts.map((nft) => (
+                    <div
+                      className="dark:bg-black px-1 py-1"
+                      key={nft?.contract}
+                    >
+                      <Link
+                        className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
+                        href={`/nft-token/${nft?.contract}`}
                       >
-                        <Link
-                          className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
-                          href={`/nft-token/${nft?.contract}`}
-                        >
-                          <div>
-                            <div className="flex items-center p-1">
-                              <div className="flex mr-1">
-                                <img
-                                  alt={nft?.nft_meta?.name}
-                                  className="w-4 h-4"
-                                  height={16}
-                                  onError={(e) => {
-                                    e.currentTarget.src =
-                                      '/images/tokenplaceholder.svg';
-                                    /* eslint-disable @next/next/no-img-element */
-                                  }}
-                                  src={
-                                    nft?.nft_meta?.icon ??
-                                    '/images/tokenplaceholder.svg'
-                                  }
-                                  width={16}
-                                />
-                              </div>
-                              <span>
-                                {nft?.nft_meta?.name
-                                  ? truncateString(
-                                      nft?.nft_meta?.name,
-                                      15,
-                                      '...',
-                                    )
-                                  : nft?.nft_meta?.name ?? ''}
-                                ({nft?.nft_meta?.symbol})
-                              </span>
+                        <div>
+                          <div className="flex items-center p-1">
+                            <div className="flex mr-1">
+                              <img
+                                alt={nft?.nft_meta?.name}
+                                className="w-4 h-4"
+                                height={16}
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    '/images/tokenplaceholder.svg';
+                                  /* eslint-disable @next/next/no-img-element */
+                                }}
+                                src={
+                                  nft?.nft_meta?.icon ??
+                                  '/images/tokenplaceholder.svg'
+                                }
+                                width={16}
+                              />
                             </div>
-                            <div className="text-gray-400 flex items-center my-0.5 mr-2.5 ml-1.5">
-                              {nft?.quantity
-                                ? localFormat(nft?.quantity)
-                                : nft?.quantity ?? ''}
-                            </div>
+                            <span>
+                              {nft?.nft_meta?.name
+                                ? truncateString(nft?.nft_meta?.name, 15, '...')
+                                : nft?.nft_meta?.name ?? ''}
+                              ({nft?.nft_meta?.symbol})
+                            </span>
                           </div>
-                          {isTokenSpam(nft?.contract) && (
-                            <div className="text-gray-400 p-0.5">[Spam]</div>
-                          )}
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </PerfectScrollbar>
+                          <div className="text-nearblue-600 dark:text-neargray-10 flex items-center my-0.5 mr-2.5 ml-1.5">
+                            {nft?.quantity
+                              ? localFormat(nft?.quantity)
+                              : nft?.quantity ?? ''}
+                          </div>
+                        </div>
+                        {isTokenSpam(nft?.contract) && (
+                          <div className="text-nearblue-600 p-0.5">[Spam]</div>
+                        )}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </PopoverContent>
     </PopoverRoot>
