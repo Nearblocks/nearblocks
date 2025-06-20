@@ -17,6 +17,9 @@ import CloseCircle from '@/components/app/Icons/CloseCircle';
 import Question from '@/components/app/Icons/Question';
 import { NearContext } from '@/components/app/wallet/near-context';
 import { stringify } from 'querystring';
+import { viewMethod } from '@/utils/app/actions';
+import { useRpcStore } from '@/stores/app/rpc';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   id: string;
@@ -46,10 +49,12 @@ const sortFields = (fields: FieldType[]) => {
 
 const ViewOrChange = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
+  const { rpc } = useRpcStore();
+  const t = useTranslations();
   const { fetcher } = useFetch();
   const { index, method } = props;
   const [txn, setTxn] = useState<null | string>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [fields, setFields] = useState<FieldType[]>([]);
   const [result, setResult] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
@@ -83,26 +88,44 @@ const ViewOrChange = (props: Props) => {
     setOptions((optns) => ({ ...optns, [key]: e.target.value }));
 
   const onRead = async () => {
-    setLoading(true);
+    const resetState = (
+      txn: string | null = null,
+      error: string | null = null,
+      result: string | null = null,
+    ): void => {
+      setTxn(txn);
+      setError(error);
+      setResult(result);
+    };
 
+    setLoading(true);
     try {
       const args = mapFeilds(fields);
-      if (!wallet) return;
-
-      const response = await wallet.viewMethod({
+      const response = await viewMethod({
         args,
         contractId: props?.id,
         method: toSnakeCase(method),
+        rpcUrl: rpc,
       });
-
-      setError(null);
-      setTxn(response?.transaction_outcome?.id || null);
-      setResult(JSON.stringify(response, null, 2));
-    } catch (error: any) {
-      console.error('Error calling view method:', error);
-      setTxn(null);
-      setError(error?.message || 'An unknown error occurred');
-      setResult(null);
+      if (response?.success) {
+        resetState(
+          response?.data?.transaction_outcome?.id || null,
+          null,
+          JSON.stringify(response?.data, null, 2),
+        );
+      } else if ([429, 408].includes(response?.statusCode)) {
+        resetState(
+          null,
+          t('rpcRateLimitError', {
+            rpcUrl: rpc,
+            icon: '📡',
+          }),
+        );
+      } else {
+        resetState(null, response?.error);
+      }
+    } catch (error) {
+      resetState(null, 'An unknown error occurred');
     } finally {
       setLoading(false);
     }
@@ -370,7 +393,9 @@ const ViewOrChange = (props: Props) => {
             className="block appearance-none outline-none w-full border rounded-lg bg-red-50 dark:bg-red-950 dark:bg-opacity-40 dark:text-neargray-10 border-red-100 p-3 mt-3 resize-y"
             readOnly
             rows={6}
-            value={error}
+            value={
+              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
+            }
           />
         )}
         {txn && (
