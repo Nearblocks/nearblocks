@@ -77,6 +77,61 @@ const AccountMoreInfoActions = ({
   const storageUsed = status
     ? accountData?.storage_usage
     : accountView?.storage_usage;
+
+  interface TokenTrackerRowProps {
+    label: string;
+    data: {
+      name: string;
+      symbol: string;
+      icon?: string;
+      price?: string;
+    };
+    href: string;
+    className?: string;
+  }
+
+  const TokenTrackerRow: React.FC<TokenTrackerRowProps> = ({
+    label,
+    data,
+    href,
+    className,
+  }) => (
+    <div
+      className={`xl:flex items-center ${className ? className : 'gap-x-8'}`}
+    >
+      <div className="whitespace-nowrap xl:mb-0 mb-1.5">{label}</div>
+      <div className="flex">
+        <span className="flex flex-wrap break-words">
+          <span className="flex items-center">
+            <TokenImage
+              alt={data.name}
+              className="w-4 h-4 mr-1"
+              src={data.icon}
+            />
+            <Link
+              className="flex text-green-500 dark:text-green-250 hover:no-underline"
+              href={href}
+            >
+              <span className="inline-block truncate max-w-[80px] mr-1">
+                {data.name}
+              </span>
+              (
+              <span className="inline-block truncate max-w-[80px]">
+                {data.symbol}
+              </span>
+              )
+            </Link>
+          </span>
+          {data?.price && (
+            <span className="flex text-nearblue-600 dark:text-neargray-10">
+              (@ ${localFormat(data.price)})
+            </span>
+          )}
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full">
       <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden">
@@ -185,74 +240,35 @@ const AccountMoreInfoActions = ({
               {tokenTracker &&
                 isContract &&
                 deploymentData?.receipt_predecessor_account_id && (
-                  <div className="flex py-2">
-                    {tokenData?.name && (
-                      <div className="xl:flex items-center gap-x-8">
-                        <div className="whitespace-nowrap xl:mb-0 mb-1.5">
-                          Token Tracker:
-                        </div>
-                        <div className="flex">
-                          <span className="flex flex-wrap break-words">
-                            <span className="flex items-center">
-                              <TokenImage
-                                alt={tokenData?.name}
-                                className="w-4 h-4 mr-1"
-                                src={tokenData?.icon}
-                              />
-                              <Link
-                                className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                                href={`/token/${id}`}
-                              >
-                                <span className="inline-block truncate max-w-[80px] mr-1">
-                                  {tokenData.name}
-                                </span>
-                                (
-                                <span className="inline-block truncate max-w-[80px]">
-                                  {tokenData.symbol}
-                                </span>
-                                )
-                              </Link>
-                            </span>
-                            {tokenData.price && (
-                              <span className="flex text-nearblue-600 dark:text-neargray-10">
-                                (@ ${localFormat(tokenData.price)})
-                              </span>
-                            )}
-                          </span>
-                        </div>
+                  <div className="flex py-2 flex-col gap-2">
+                    {tokenData?.name && nftTokenData?.name ? (
+                      <div className="flex-1">
+                        <TokenTrackerRow
+                          label="Token Tracker:"
+                          data={tokenData}
+                          href={`/token/${id}`}
+                        />
+                        <TokenTrackerRow
+                          label="NFT Token Tracker:"
+                          data={nftTokenData}
+                          href={`/nft-token/${id}`}
+                          className="mt-2 ml-0.5 gap-x-1"
+                        />
                       </div>
-                    )}
-                    {nftTokenData?.name && (
-                      <div className="xl:flex items-center gap-x-2">
-                        <div className="whitespace-nowrap xl:mb-0 mb-1.5">
-                          NFT Token Tracker:
-                        </div>
-                        <div className="flex">
-                          <span className="flex flex-wrap break-words w-full">
-                            <span className="flex items-center">
-                              <TokenImage
-                                alt={nftTokenData?.name}
-                                className="w-4 h-4 mr-1"
-                                src={nftTokenData?.icon}
-                              />
-                              <Link
-                                className="flex text-green-500 dark:text-green-250 hover:no-underline"
-                                href={`/nft-token/${id}`}
-                              >
-                                <span className="inline-block truncate max-w-[80px] mr-1">
-                                  {nftTokenData?.name}
-                                </span>
-                                (
-                                <span className="inline-block truncate max-w-[80px]">
-                                  {nftTokenData?.symbol}
-                                </span>
-                                )
-                              </Link>
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                    ) : tokenData?.name ? (
+                      <TokenTrackerRow
+                        label="Token Tracker:"
+                        data={tokenData}
+                        href={`/token/${id}`}
+                      />
+                    ) : nftTokenData?.name ? (
+                      <TokenTrackerRow
+                        label="NFT Token Tracker:"
+                        data={nftTokenData}
+                        href={`/nft-token/${id}`}
+                        className="gap-x-2"
+                      />
+                    ) : null}
                   </div>
                 )}
               <div>

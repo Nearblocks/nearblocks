@@ -194,36 +194,6 @@ export class Wallet {
   };
 
   /**
-   * Makes a read-only call to a contract
-   * @param {Object} options - the options for the call
-   * @param {string} options.contractId - the contract's account id
-   * @param {string} options.method - the method to call
-   * @param {Object} options.args - the arguments to pass to the method
-   * @returns {Promise<JSON.value>} - the result of the method call
-   */
-  viewMethod = async ({
-    args = {},
-    contractId,
-    method,
-  }: {
-    args: object;
-    contractId: string;
-    method: string;
-  }) => {
-    const url = `https://rpc.${this.networkId}.near.org`;
-    const provider = new providers.JsonRpcProvider({ url });
-    // eslint-disable-next-line
-    const res: any = await provider.query({
-      account_id: contractId,
-      args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
-      finality: 'optimistic',
-      method_name: method,
-      request_type: 'call_function',
-    });
-    return JSON.parse(Buffer.from(res.result).toString());
-  };
-
-  /**
    * @constructor
    * @param {Object} options - the options for the wallet
    * @param {string} options.networkId - the network id to connect to
