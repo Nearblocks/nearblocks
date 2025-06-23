@@ -14,6 +14,7 @@ type RpcState = {
   setProviders: (providers: RpcProvider[]) => void;
   setRpc: (rpc: string) => void;
   switchRpc: () => void;
+  initializeRpc: (defaultProviders: RpcProvider[]) => void;
 };
 
 export const useRpcStore = create<RpcState>((set, get) => ({
@@ -23,6 +24,16 @@ export const useRpcStore = create<RpcState>((set, get) => ({
     set({ errorCount: 0 });
   },
   rpc: Cookies.get('rpcUrl') || '',
+  initializeRpc: (defaultProviders: RpcProvider[]) => {
+    const currentRpc = Cookies.get('rpcUrl');
+    if (!currentRpc && defaultProviders.length > 0) {
+      const defaultRpc = defaultProviders[0].url;
+      Cookies.set('rpcUrl', defaultRpc, { expires: 365, path: '/' });
+      set({ rpc: defaultRpc, providers: defaultProviders });
+    } else {
+      set({ providers: defaultProviders });
+    }
+  },
   setProviders: (providers) => {
     set({ providers });
     const { rpc } = get();

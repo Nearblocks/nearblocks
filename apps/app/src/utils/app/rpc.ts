@@ -6,7 +6,6 @@ import { providers } from 'near-api-js';
 import { SearchResult } from '../types';
 import { networkId } from './config';
 import { isValidAccount } from './libs';
-import { JsonRpcProvider } from '@near-js/providers';
 
 export const getRpcProviders = async () => {
   return networkId === 'mainnet'
@@ -135,7 +134,7 @@ export const rpcSearch = async (keyword: string): Promise<SearchResponse> => {
 };
 const RpcProviders = await getRpcProviders();
 const jsonProviders = RpcProviders.map(
-  (p) => new JsonRpcProvider({ url: p.url }),
+  (p) => new providers.JsonRpcProvider({ url: p.url }),
 );
 
 const provider = new providers.FailoverRpcProvider(jsonProviders);
