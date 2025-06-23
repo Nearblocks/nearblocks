@@ -9,7 +9,7 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 
 const Borrow = (props: DepositPropsInfo) => {
   const params = useParams();
-  const log = props.event?.[0];
+  const log = props?.event?.[0];
   const metaInfo = props?.tokenMetadata?.filter(
     (meta: any) => meta?.contractId === log?.token_id,
   );
