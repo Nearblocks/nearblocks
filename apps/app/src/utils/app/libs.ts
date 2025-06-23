@@ -585,3 +585,45 @@ export function convertTimestampToTimes(nanoTimestamp: string) {
     return { utcTime, localTime };
   }
 }
+
+export const cleanJsonString = (str: string): string => {
+  if (typeof str !== 'string') return str;
+
+  return str
+    .replace(/\\+/g, '')
+    .replace(/"{2,}/g, '"')
+    .replace(/,(\s*[}\]])/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+export const cleanNestedObject = (obj: any): any => {
+  if (typeof obj === 'string') {
+    const cleaned = cleanJsonString(obj);
+    if (
+      (cleaned.startsWith('{') && cleaned.endsWith('}')) ||
+      (cleaned.startsWith('[') && cleaned.endsWith(']'))
+    ) {
+      try {
+        return JSON.parse(cleaned);
+      } catch {
+        return cleaned;
+      }
+    }
+    return cleaned;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => cleanNestedObject(item));
+  }
+
+  if (typeof obj === 'object' && obj !== null) {
+    const result: any = {};
+    for (const key in obj) {
+      result[key] = cleanNestedObject(obj[key]);
+    }
+    return result;
+  }
+
+  return obj;
+};
