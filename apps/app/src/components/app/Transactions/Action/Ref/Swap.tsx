@@ -9,18 +9,20 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 
 const Swap = (props: EventPropsInfo) => {
   const params = useParams();
-  const log = props.event.logs?.match(
-    /^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/,
-  );
+  let log: RegExpMatchArray | null = null;
+
+  if (typeof props?.event?.logs === 'string') {
+    log = props?.event?.logs?.match(/^Swapped (\d+) ([\S]+) for (\d+) ([\S]+)/);
+  }
   if (!Array.isArray(log)) {
     return null;
   }
   const metaInfo1 = props?.tokenMetadata?.filter(
-    (meta: any) => meta?.contractId === log[2],
+    (meta: any) => meta?.contractId === log?.[2],
   );
 
   const metaInfo2 = props?.tokenMetadata?.filter(
-    (meta: any) => meta?.contractId === log[4].replace(/,$/, ''),
+    (meta: any) => meta?.contractId === log?.[4].replace(/,$/, ''),
   );
 
   if (log?.length === 0) return null;
