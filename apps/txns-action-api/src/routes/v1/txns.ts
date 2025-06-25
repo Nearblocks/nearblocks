@@ -7,7 +7,7 @@ import txns from '../../services/v1/txns';
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/txns', route);
+  app.use('/txnsaction', route);
 
   route.post('/:hash', validator(schema.txn), txns.parsedTxn);
 };

@@ -190,7 +190,7 @@ export type parsedWrap = {
 
 export type ParsedRef =
   | {
-      type: 'wrap_deposit' | 'wrap_withdraw';
+      type: 'ref_deposit' | 'ref_withdraw';
       amount: string;
       recipient?: string;
       sender?: string;

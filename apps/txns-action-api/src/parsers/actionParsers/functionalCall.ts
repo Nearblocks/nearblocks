@@ -18,7 +18,7 @@ export const FunctionCallParser = {
     return {
       type: 'FUNCTION_CALL',
       details: {
-        label: `Call ${methodName}`,
+        label: `Call`,
         methodName,
         from: {
           address: from,

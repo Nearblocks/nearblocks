@@ -20,14 +20,22 @@ export async function parseIntents(
   meta: any,
   apiAllActions?: any,
 ): Promise<ParsedEvent[]> {
-  const logsArr = Array.isArray(event.logs) ? event.logs : [];
+  console.log('meta from event intents', meta);
+
+  const logsArr = Array.isArray(event.logs) ? event.logs : [event.logs];
+
   const firstLog = logsArr[0] || {};
 
   const kind = firstLog?.standard?.toLowerCase();
+
   const eventType = firstLog?.event;
+
   const data = firstLog?.data;
+
   const parsedActionLogs = apiAllActions?.map((action: any) => {
-    const parsedArgs = decodeArgs(action?.args?.args);
+    const parsedArgs = action?.args?.args_base64
+      ? decodeArgs(action.args.args_base64)
+      : action?.args?.args_json ?? null;
     return {
       ...action,
       parsedArgs,

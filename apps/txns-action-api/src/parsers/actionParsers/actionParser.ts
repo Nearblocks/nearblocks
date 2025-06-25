@@ -23,7 +23,7 @@ interface ActionData {
 export function parseAction(action: ActionData): ParsedAction | ParsedAction[] {
   switch (action.action_kind) {
     case 'ADD_KEY':
-      return AddKeyParser.parse({ ...action, args: action.args?.args ?? {} });
+      return AddKeyParser.parse({ ...action, args: action.args ?? {} });
 
     case 'CREATE_ACCOUNT':
       return CreateAccountParser.parse(action);

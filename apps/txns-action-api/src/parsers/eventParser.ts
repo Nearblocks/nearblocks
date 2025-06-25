@@ -11,19 +11,19 @@ export async function parseEventLogs(
 ): Promise<ParsedEvent[]> {
   const result: ParsedEvent[] = [];
 
+  console.log('tokenmetadata from event parser', tokenMetadata);
+
   for (const log of logs) {
     const contract = log.contract;
 
     switch (contract) {
       case 'wrap.near':
-      case 'wrap.testnet':
         result.push(...parsewrap(log, tokenMetadata));
         break;
       case 'v2.ref-finance.near':
         result.push(...parseRef(log, tokenMetadata));
         break;
       case 'contract.main.burrow.near':
-      case 'contract.1638481328.burrow.testnet':
         result.push(...parseBurrowEvents(log, tokenMetadata));
         break;
       case 'intents.near':

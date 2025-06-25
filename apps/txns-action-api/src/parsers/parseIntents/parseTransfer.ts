@@ -13,11 +13,12 @@ interface TransferInput {
 }
 
 export async function parseTransfer({ event, data, meta }: TransferInput) {
+  console.log('meta from parsetransfer', meta);
   const normalizedData = Array.isArray(data) ? data : [data];
   const swaps = normalizedData.reduce(
     (acc, { account_id, diff }) => {
       const existing = acc[account_id] || { sent: [], received: [] };
-      for (const [token, amount] of Object.entries(diff)) {
+      for (const [token, amount] of Object.entries(diff || {})) {
         const amt = BigInt(amount);
         const tokenId = token.split(':')[1] || token;
         if (amt > 0n) {
@@ -44,13 +45,17 @@ export async function parseTransfer({ event, data, meta }: TransferInput) {
       accountId,
       sent: sent.map((s) => ({
         ...s,
-        meta: meta.find((m: any) => m.contractId === s.token) || null,
+        meta: meta[s.token] || [],
       })),
       received: received.map((r) => ({
         ...r,
-        meta: meta.find((m: any) => m.contractId === r.token) || null,
+        meta: meta[r.token] || [],
       })),
     })),
+    roles: {
+      senderLabel: 'for',
+      receiverLabel: 'on',
+    },
     receiptId: event.receiptId ?? '',
   };
 }

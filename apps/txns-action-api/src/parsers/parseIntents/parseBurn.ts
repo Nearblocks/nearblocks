@@ -13,10 +13,16 @@ interface BurnInput {
 }
 
 export function parseBurn({ event, data, meta }: BurnInput) {
+  console.log('meta in burn', meta);
   return {
+    label: 'Withdraw',
     type: 'burn',
     contract: 'intents.near',
-    receiverId: data[0]?.owner_id || '',
+    receiver: data[0]?.owner_id || '',
+    roles: {
+      senderLabel: 'from',
+      receiverLabel: '',
+    },
     tokens: data
       .map((item) => {
         return item.token_ids.map((tokenId, idx) => {
@@ -24,7 +30,7 @@ export function parseBurn({ event, data, meta }: BurnInput) {
           return {
             token: contract,
             amount: item.amounts[idx],
-            meta: meta.find((m: any) => m.contractId === contract) || null,
+            meta: meta?.[contract] || null,
           };
         });
       })
