@@ -4,21 +4,14 @@ import { useTranslations } from 'next-intl';
 
 import { Link } from '@/i18n/routing';
 import { useParams, useSearchParams } from 'next/navigation';
-import { use } from 'react';
+import { useAddressRpc } from '@/components/app/common/AddressRpcProvider';
 
-const AccountTabsActions = ({
-  children,
-  deploymentPromise,
-}: {
-  children: React.ReactNode;
-  deploymentPromise: Promise<any>;
-}) => {
+const AccountTabsActions = ({ children }: { children: React.ReactNode }) => {
+  const { contractInfo } = useAddressRpc();
   const t = useTranslations();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab') || 'txns';
-  const deployment = use(deploymentPromise);
-  const deploymentInfo = deployment?.deployments?.[0];
 
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
@@ -52,7 +45,7 @@ const AccountTabsActions = ({
       <div className=" w-full">
         <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
           {tabs?.map(({ message, name }) => {
-            const hasContractTab = !!deploymentInfo;
+            const hasContractTab = !!contractInfo;
 
             if (!hasContractTab && name === 'contract') return null;
 

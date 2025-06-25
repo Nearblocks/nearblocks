@@ -5,21 +5,14 @@ import { useParams, useSearchParams } from 'next/navigation';
 
 import TabPanelGeneralSkeleton from '@/components/app/skeleton/address/dynamicTab';
 import { Link } from '@/i18n/routing';
-import { use } from 'react';
+import { useAddressRpc } from '@/components/app/common/AddressRpcProvider';
 
-export default function TabSkeletion({
-  deploymentPromise,
-}: {
-  error?: boolean;
-  reset?: any;
-  deploymentPromise: Promise<any>;
-}) {
+export default function TabSkeletion() {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const params = useParams<{ id: string }>();
   const tab = searchParams?.get('tab') || 'txns';
-  const deployment = use(deploymentPromise);
-  const deploymentInfo = deployment?.deployments?.[0];
+  const { contractInfo } = useAddressRpc();
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
     { label: 'Receipts', message: 'Receipts', name: 'receipts' },
@@ -54,7 +47,7 @@ export default function TabSkeletion({
           <div className="w-full ">
             <div className="flex overflow-x-auto min-w-full min-h-fit pt-2">
               {tabs?.map(({ message, name }: any) => {
-                const hasContractTab = !!deploymentInfo;
+                const hasContractTab = !!contractInfo;
                 if (!hasContractTab && name === 'contract') return null;
                 return (
                   <Link

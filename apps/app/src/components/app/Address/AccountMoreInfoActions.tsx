@@ -70,7 +70,7 @@ const AccountMoreInfoActions = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountView, status]);
 
-  const isContract = !!deploymentData;
+  const isContract = !!contractInfo;
   const accountInfo = status ? accountData : accountView;
   const stakedBalace = status ? accountData?.locked : accountView?.locked;
   const tokenTracker = tokenData?.name || nftTokenData?.name;

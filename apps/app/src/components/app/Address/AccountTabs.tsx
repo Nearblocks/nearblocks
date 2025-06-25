@@ -15,11 +15,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 export default async function AccountTabs({
   id,
   searchParams,
-  deploymentPromise,
 }: {
   id: string;
   searchParams: any;
-  deploymentPromise: Promise<any>;
 }) {
   const tab = searchParams?.tab || 'txns';
   const fallbackError = (
@@ -45,7 +43,7 @@ export default async function AccountTabs({
   );
 
   return (
-    <AccountTabsActions deploymentPromise={deploymentPromise}>
+    <AccountTabsActions>
       {tab === 'txns' ? (
         <ErrorBoundary fallback={fallbackError}>
           <Transactions id={id} searchParams={searchParams} />

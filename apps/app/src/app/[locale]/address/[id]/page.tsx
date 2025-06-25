@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 
 import AccountTabs from '@/components/app/Address/AccountTabs';
 import TabSkeletion from '@/components/app/skeleton/address/tab';
-import { getRequest } from '@/utils/app/api';
 
 export default async function AddressIndex(props: {
   params: Promise<{ id: string; locale: string }>;
@@ -26,27 +25,10 @@ export default async function AddressIndex(props: {
 
   const { cursor, page, ...rest } = searchParams;
 
-  const options: RequestInit = {
-    cache: 'no-store',
-  };
-
-  const deploymentInfo = getRequest(
-    `v1/account/${id}/contract/deployments`,
-    {},
-    options,
-  );
-
   return (
     <>
-      <Suspense
-        fallback={<TabSkeletion deploymentPromise={deploymentInfo} />}
-        key={JSON.stringify(rest)}
-      >
-        <AccountTabs
-          id={id}
-          searchParams={searchParams}
-          deploymentPromise={deploymentInfo}
-        />
+      <Suspense fallback={<TabSkeletion />} key={JSON.stringify(rest)}>
+        <AccountTabs id={id} searchParams={searchParams} />
       </Suspense>
     </>
   );
