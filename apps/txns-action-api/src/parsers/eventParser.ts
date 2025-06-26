@@ -11,8 +11,6 @@ export async function parseEventLogs(
 ): Promise<ParsedEvent[]> {
   const result: ParsedEvent[] = [];
 
-  console.log('tokenmetadata from event parser', tokenMetadata);
-
   for (const log of logs) {
     const contract = log.contract;
 

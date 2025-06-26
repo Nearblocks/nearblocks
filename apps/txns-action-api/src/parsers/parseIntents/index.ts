@@ -20,8 +20,6 @@ export async function parseIntents(
   meta: any,
   apiAllActions?: any,
 ): Promise<ParsedEvent[]> {
-  console.log('meta from event intents', meta);
-
   const logsArr = Array.isArray(event.logs) ? event.logs : [event.logs];
 
   const firstLog = logsArr[0] || {};

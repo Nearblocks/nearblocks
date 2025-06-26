@@ -13,7 +13,6 @@ interface BurnInput {
 }
 
 export function parseBurn({ event, data, meta }: BurnInput) {
-  console.log('meta in burn', meta);
   return {
     label: 'Withdraw',
     type: 'burn',

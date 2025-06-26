@@ -12,15 +12,9 @@ const parsedTxn = catchAsync(
   async (req: RequestValidator<Txn>, res: Response) => {
     const { txnData } = req.body;
 
-    console.log('txnData', txnData);
-
     const apiTxnActionsData: ApiTxnData = txnData;
     const { apiLogs, apiMainActions, tokenMetadata, apiAllActions } =
       apiTxnActionsData;
-
-    console.log('tokenMetadata', tokenMetadata);
-
-    // console.log('apiTxnActionsData', apiTxnActionsData);
 
     const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
       const filteredApiNepLogs = apiLogs?.filter((log: any) => {
@@ -49,17 +43,10 @@ const parsedTxn = catchAsync(
       }
     });
 
-    // console.log('apiMainTxnsActions', apiMainTxnsActions);
-
     const updatedMainTxnsActions =
       apiMainTxnsActions?.length > 0 ? apiMainTxnsActions : null;
 
-    // console.log('updatedMainTxnsActions', updatedMainTxnsActions);
-
     const logsDetails = updatedMainTxnsActions?.[0]?.logs || [];
-
-    // console.log('logsDetails', logsDetails);
-
     const NonNEP245 = (() => {
       try {
         return logsDetails?.every((log: any) => {
@@ -90,8 +77,6 @@ const parsedTxn = catchAsync(
     const tokenMetadataMap = Array.isArray(tokenMetadata)
       ? toTokenMetadataMap(tokenMetadata)
       : tokenMetadata;
-
-    console.log('tokenMetadataMap from txns', tokenMetadataMap);
 
     const response = await parseEventLogs(
       logsDetails,

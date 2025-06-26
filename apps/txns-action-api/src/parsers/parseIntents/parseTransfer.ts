@@ -13,7 +13,6 @@ interface TransferInput {
 }
 
 export async function parseTransfer({ event, data, meta }: TransferInput) {
-  console.log('meta from parsetransfer', meta);
   const normalizedData = Array.isArray(data) ? data : [data];
   const swaps = normalizedData.reduce(
     (acc, { account_id, diff }) => {

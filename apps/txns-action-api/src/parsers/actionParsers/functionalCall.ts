@@ -10,7 +10,6 @@ export const FunctionCallParser = {
       action?.method_name ||
       action?.actionsLog?.[0]?.method_name ||
       '';
-    console.log('methodName', methodName);
     const from = action?.from || '';
     const to = action?.to || '';
     const receiptId = action?.receiptId || null;
