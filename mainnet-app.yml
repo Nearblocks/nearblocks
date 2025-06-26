@@ -7,6 +7,8 @@ services:
     restart: always
     ports:
       - '127.0.0.1:3005:3000'
+    env_file:
+      - .env.docker
     environment:
       PORT: 3000
       NEXT_PUBLIC_NETWORK_ID: mainnet
@@ -21,7 +23,7 @@ services:
       NEXT_PUBLIC_USER_API_URL: https://api.exploreblocks.io/api/
       NEXT_PUBLIC_USER_DASHBOARD_URL: https://dash.nearblocks.io/
       API_URL: https://api.nearblocks.io/
-      API_ACCESS_KEY: ${API_ACCESS_KEY}
+      API_ACCESS_KEY: 69447c5cc69447c5cc
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
       NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN}

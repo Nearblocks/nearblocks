@@ -574,6 +574,28 @@ export type ActionPropsInfo = {
   };
   receiver?: string;
 };
+export interface ParsedActionDetails {
+  label: string;
+  methodName: string;
+  from: {
+    address: string;
+    short: string;
+  };
+  to: {
+    address: string;
+    short: string;
+  };
+}
+
+export interface ParsedAction {
+  type: string;
+  methodName: string;
+  from: string;
+  to: string;
+  receiptId: string;
+  details: ParsedActionDetails;
+}
+
 export type ArgsPropsInfo = {
   access_key: {
     permission: {

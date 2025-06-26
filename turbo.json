@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["PORT", "NODE_ENV", "GITHUB_SHA"],
+  "globalEnv": ["PORT", "NODE_ENV", "GITHUB_SHA", "NEXT_PUBLIC_TXN_API_URL"],
   "pipeline": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
@@ -34,7 +34,8 @@
         "CI",
         "NEXT_PUBLIC_REOWN_PROJECT_ID",
         "OTEL_EXPORTER_OTLP_ENDPOINT",
-        "OTEL_EXPORTER_OTLP_HEADERS"
+        "OTEL_EXPORTER_OTLP_HEADERS",
+        "NEXT_PUBLIC_TXN_API_URL"
       ]
     },
     "pages:build": {
@@ -65,7 +66,8 @@
         "TURNSTILE_SECRET_KEY",
         "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_RUNTIME",
-        "CI"
+        "CI",
+        "NEXT_PUBLIC_TXN_API_URL"
       ]
     },
     "lint": {

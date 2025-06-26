@@ -28,7 +28,7 @@ import {
   yoctoToNear,
 } from '@/utils/libs';
 import {
-  convertNumericStringsToNumbers,
+  // convertNumericStringsToNumbers,
   mainActions,
   txnActionLogs,
   txnActions,
@@ -56,7 +56,6 @@ import FaRight from '@/components/app/Icons/FaRight';
 import FileSlash from '@/components/app/Icons/FileSlash';
 import Question from '@/components/app/Icons/Question';
 import EventLogs from '@/components/app/Transactions/Action';
-import Actions from '@/components/app/Transactions/Actions';
 import NEPTokenTransactions from '@/components/app/Transactions/NEPTokenTransactions';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import { CopyButton } from '@/components/app/common/CopyButton';
@@ -64,6 +63,8 @@ import { convertTimestampToTimes } from '@/utils/app/libs';
 import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import RpcTxnStatus from '@/components/app/common/RpcStatus';
 import useScrollToTop from '@/hooks/app/useScrollToTop';
+import ContractEvents from './TreeReceipts/ContractEvents';
+import ActionEvents from './TreeReceipts/ActionEvents';
 
 interface Props {
   hash: string;
@@ -80,6 +81,7 @@ interface Props {
   status: boolean;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
+  actionparsed: any;
 }
 
 const Details = (props: Props) => {
@@ -94,7 +96,9 @@ const Details = (props: Props) => {
     status,
     apiTxnActionsData,
     shouldUseRpc,
+    actionparsed,
   } = props;
+  console.log('action parsed', actionparsed);
   const [more, setMore] = useState(false);
   const [utc, setUtc] = useState(true);
   const { utcTime, localTime } = convertTimestampToTimes(
@@ -116,7 +120,7 @@ const Details = (props: Props) => {
   const {
     apiLogs,
     apiActionLogs,
-    apiMainActions,
+    // apiMainActions,
     tokenMetadata,
     apiAllActions,
     apiSubActions,
@@ -183,8 +187,8 @@ const Details = (props: Props) => {
     rpcActionLogs,
     rpcSubActions,
     rpcAllActions,
-    rpcMainActions,
-    rpcErrorMessage,
+    // rpcMainActions,
+    // rpcErrorMessage,
   ] = useMemo(() => {
     if (!isEmpty(rpcTxn)) {
       return [
@@ -201,13 +205,13 @@ const Details = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
 
-  const processedTxn = {
-    ...txn,
-    outcomes: convertNumericStringsToNumbers(txn.outcomes),
-  };
-  const apiErrorMessage = txnErrorMessage(processedTxn);
-  const errorMessage =
-    apiErrorMessage && !shouldUseRpc ? apiErrorMessage : rpcErrorMessage;
+  // const processedTxn = {
+  //   ...txn,
+  //   outcomes: convertNumericStringsToNumbers(txn.outcomes),
+  // };
+  // const apiErrorMessage = txnErrorMessage(processedTxn);
+  // const errorMessage =
+  //   apiErrorMessage && !shouldUseRpc ? apiErrorMessage : rpcErrorMessage;
 
   const rpcAllEvents = useMemo(() => {
     if (
@@ -321,65 +325,65 @@ const Details = (props: Props) => {
       ? apiFilteredLogs
       : rpcFilteredLogs;
 
-  const rpcMainTxnsActions =
-    rpcMainActions &&
-    rpcMainActions?.map((txn) => {
-      const filteredNepLogs = rpcLogs?.filter((item: any) => {
-        try {
-          const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
-          if (logContent) {
-            const jsonLog = JSON.parse(logContent[1]);
-            return jsonLog?.standard === 'nep245';
-          }
-          return false;
-        } catch {
-          return false;
-        }
-      });
-      if (filteredNepLogs?.length > 0) {
-        return {
-          ...txn,
-          logs: [...filteredNepLogs],
-        };
-      } else {
-        return {
-          ...txn,
-          logs: [...txn.logs, ...filteredNepLogs],
-        };
-      }
-    });
+  // const rpcMainTxnsActions =
+  //   rpcMainActions &&
+  //   rpcMainActions?.map((txn) => {
+  //     const filteredNepLogs = rpcLogs?.filter((item: any) => {
+  //       try {
+  //         const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
+  //         if (logContent) {
+  //           const jsonLog = JSON.parse(logContent[1]);
+  //           return jsonLog?.standard === 'nep245';
+  //         }
+  //         return false;
+  //       } catch {
+  //         return false;
+  //       }
+  //     });
+  //     if (filteredNepLogs?.length > 0) {
+  //       return {
+  //         ...txn,
+  //         logs: [...filteredNepLogs],
+  //       };
+  //     } else {
+  //       return {
+  //         ...txn,
+  //         logs: [...txn.logs, ...filteredNepLogs],
+  //       };
+  //     }
+  //   });
 
-  const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
-    const filteredApiNepLogs = apiLogs?.filter((log: any) => {
-      try {
-        if (
-          log?.logs?.standard === 'nep245' ||
-          log?.logs?.standard === 'dip4'
-        ) {
-          return log;
-        }
-        return false;
-      } catch {
-        return false;
-      }
-    });
-    if (filteredApiNepLogs?.length > 0) {
-      return {
-        ...txn,
-        logs: [...filteredApiNepLogs],
-      };
-    } else {
-      return {
-        ...txn,
-        logs: [...txn.logs, ...filteredApiNepLogs],
-      };
-    }
-  });
+  // const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
+  //   const filteredApiNepLogs = apiLogs?.filter((log: any) => {
+  //     try {
+  //       if (
+  //         log?.logs?.standard === 'nep245' ||
+  //         log?.logs?.standard === 'dip4'
+  //       ) {
+  //         return log;
+  //       }
+  //       return false;
+  //     } catch {
+  //       return false;
+  //     }
+  //   });
+  //   if (filteredApiNepLogs?.length > 0) {
+  //     return {
+  //       ...txn,
+  //       logs: [...filteredApiNepLogs],
+  //     };
+  //   } else {
+  //     return {
+  //       ...txn,
+  //       logs: [...txn.logs, ...filteredApiNepLogs],
+  //     };
+  //   }
+  // });
 
-  const updatedMainTxnsActions =
-    apiMainTxnsActions?.length > 0 && !shouldUseRpc
-      ? apiMainTxnsActions
-      : rpcMainTxnsActions;
+  // const updatedMainTxnsActions =
+  //   apiMainTxnsActions?.length > 0 && !shouldUseRpc
+  //     ? apiMainTxnsActions
+  //     : rpcMainTxnsActions;
 
   const rpcTokenIdsCount = rpcActionLogs?.reduce(
     (totalCount: number, item: any) => {
@@ -441,7 +445,7 @@ const Details = (props: Props) => {
       const height = actionRef?.current?.offsetHeight;
       setIsActionScroll(height >= 180);
     }
-  }, [updatedMainTxnsActions]);
+  }, [actionparsed]);
 
   useEffect(() => {
     if (tokensRef?.current) {
@@ -453,8 +457,7 @@ const Details = (props: Props) => {
   const totalTokens = (fts?.length || 0) + (nfts?.length || 0);
   const hasScrolledToken = totalTokens > 5 || isTokensScroll;
 
-  const isActionScrollable =
-    (updatedMainTxnsActions?.length || 0) > 6 || isActionScroll;
+  const isActionScrollable = (actionparsed?.length || 0) > 6 || isActionScroll;
   const totalItems =
     (filteredLogs?.length || 0) +
     (apiSubActions?.length || rpcSubActions?.length || 0);
@@ -467,8 +470,8 @@ const Details = (props: Props) => {
     }
   }, [apiSubActions, rpcSubActions, filteredLogs]);
 
-  const subAction =
-    apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
+  // const subAction =
+  //   apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
 
   return (
     <>
@@ -551,13 +554,20 @@ const Details = (props: Props) => {
                           showReceipt={<FailedReceipts data={txn || rpcTxn} />}
                         />
                       )}
-                      <div className="w-full max-w-xl">
-                        {errorMessage ? (
+                      {/* <div className="w-full max-w-xl">
+                        {!errorMessage && shouldUseRpc ? (
+                          <Loader wrapperClassName="flex w-full " />
+                        ) : errorMessage ? (
                           <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
                             {errorMessage}
                           </div>
                         ) : null}
-                      </div>
+                      </div> */}
+                      {/* <div>
+                        {Array.isArray(errorMessage)
+                          ? JSON.stringify(errorMessage)
+                          : errorMessage}
+                      </div> */}
                     </div>
                   )}
                 </div>
@@ -680,7 +690,8 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
-          {updatedMainTxnsActions && updatedMainTxnsActions?.length >= 0 && (
+
+          {actionparsed?.parsedResponse?.length > 0 && (
             <div
               className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1"
               id="mainaction-row"
@@ -688,8 +699,8 @@ const Details = (props: Props) => {
               <div className="flex items-start flex-wrap px-4 py-2.5">
                 <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7">
                   <Tooltip
-                    className={'w-96 left-25 max-w-[200px]'}
-                    tooltip={'Highlighted events of the transaction'}
+                    className="w-96 left-25 max-w-[200px]"
+                    tooltip="Highlighted events of the transaction"
                   >
                     <div>
                       <Bolt className="w-4 h-4 fill-current mr-1" />
@@ -697,86 +708,67 @@ const Details = (props: Props) => {
                   </Tooltip>
                   Transaction Actions
                 </div>
-                {loading ||
-                (updatedMainTxnsActions?.length === 0 &&
-                  updatedMainTxnsActions) ? (
-                  <div className="w-full md:w-3/4">
-                    <Loader wrapperClassName="flex w-full max-w-xl" />
-                  </div>
-                ) : (
-                  <div
-                    id="mainaction-column"
-                    className="w-full md:w-3/4 align-middle"
-                  >
-                    <div
-                      ref={actionRef}
-                      className={`max-h-[194px] ${
-                        isActionScrollable ? 'mostly-customized-scrollbar' : ''
-                      }`}
-                    >
-                      <div className="break-words space-y-2 align-middle">
-                        {updatedMainTxnsActions &&
-                          updatedMainTxnsActions?.[0]?.logs?.map(
-                            (event: TransactionLog, i: number) => (
-                              <EventLogs
-                                key={i}
-                                event={event}
-                                allActionLog={apiAllActions || rpcAllActions}
-                                tokenMetadata={tokenMetadata}
-                              />
-                            ),
-                          )}
-                        {updatedMainTxnsActions &&
-                          (updatedMainTxnsActions[0]?.logs?.length === 0 ||
-                            (() => {
-                              try {
-                                const logs = updatedMainTxnsActions[0]?.logs;
-                                return logs?.every((log: any) => {
-                                  const logData = log?.logs;
-                                  const isJson =
-                                    typeof logData === 'string' &&
-                                    logData?.startsWith('EVENT_JSON:');
-                                  if (isJson) {
-                                    const parsedJson = JSON.parse(
-                                      logData.replace('EVENT_JSON:', ''),
-                                    );
 
-                                    return parsedJson?.standard !== 'nep245';
-                                  } else {
-                                    return logData?.standard !== 'nep245';
-                                  }
-                                });
-                              } catch (error) {
-                                return false;
-                              }
-                            })()) &&
-                          updatedMainTxnsActions?.map(
-                            (action: any, i: number) => (
-                              <Actions key={i} action={action} />
-                            ),
-                          )}
-                      </div>
+                <div
+                  id="mainaction-column"
+                  className="w-full md:w-3/4 align-middle"
+                >
+                  <div
+                    ref={actionRef}
+                    className={`max-h-[194px] ${
+                      isActionScrollable ? 'mostly-customized-scrollbar' : ''
+                    }`}
+                  >
+                    <div className="break-words space-y-2 align-middle">
+                      {actionparsed.parsedResponse.map(
+                        (action: any, index: number) => {
+                          const receiptId = action?.receiptId;
+                          const type = action?.type;
+                          const details = action?.details;
+                          const contract = action?.contract;
+
+                          if (contract) {
+                            return (
+                              <ContractEvents
+                                key={index}
+                                action={action}
+                                hash={hash}
+                              />
+                            );
+                          }
+                          return (
+                            <ActionEvents
+                              key={index}
+                              type={type}
+                              details={details}
+                              receiptId={receiptId}
+                              action={action}
+                              hash={hash}
+                            />
+                          );
+                        },
+                      )}
                     </div>
-                    {isActionScrollable &&
-                      (isAtBottom ? (
-                        <button
-                          className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10"
-                          onClick={() => scrollToTop()}
-                        >
-                          <ArrowDownDouble
-                            className="w-4 h-4 dark:invert"
-                            style={{ transform: 'rotate(180deg)' }}
-                          />
-                          Scroll to Top
-                        </button>
-                      ) : (
-                        <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
-                          <ArrowDownDouble className="w-4 h-4 dark:invert" />
-                          Scroll for more
-                        </div>
-                      ))}
                   </div>
-                )}
+                  {isActionScrollable &&
+                    (isAtBottom ? (
+                      <button
+                        className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10"
+                        onClick={() => scrollToTop()}
+                      >
+                        <ArrowDownDouble
+                          className="w-4 h-4 dark:invert"
+                          style={{ transform: 'rotate(180deg)' }}
+                        />
+                        Scroll to Top
+                      </button>
+                    ) : (
+                      <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
+                        <ArrowDownDouble className="w-4 h-4 dark:invert" />
+                        Scroll for more
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
           )}
@@ -906,9 +898,9 @@ const Details = (props: Props) => {
                               />
                             ),
                           )}
-                          {subAction?.map((action: any, i: number) => (
+                          {/* {subAction?.map((action: any, i: number) => (
                             <Actions key={i} action={action} />
-                          ))}
+                          ))} */}
                         </div>
                       </div>
                     )}
