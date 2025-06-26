@@ -13,48 +13,61 @@ interface TransferInput {
 }
 
 export async function parseTransfer({ event, data, meta }: TransferInput) {
-  const normalizedData = Array.isArray(data) ? data : [data];
-  const swaps = normalizedData.reduce(
+  const normalizedData = Array.isArray(data) ? data : data ? [data] : [];
+
+  const userSwaps = normalizedData.reduce(
     (acc, { account_id, diff }) => {
-      const existing = acc[account_id] || { sent: [], received: [] };
-      for (const [token, amount] of Object.entries(diff || {})) {
-        const amt = BigInt(amount);
-        const tokenId = token.split(':')[1] || token;
-        if (amt > 0n) {
-          existing.received.push({ token: tokenId, amount });
-        } else if (amt < 0n) {
-          existing.sent.push({
-            token: tokenId,
-            amount: amount.replace('-', ''),
-          });
-        }
+      const swapData = acc[account_id] || { sent: [], received: [] };
+
+      if (typeof diff === 'object') {
+        Object.entries(diff).forEach(([token, amount]) => {
+          const bigIntAmount = BigInt(amount);
+          const tokenId = token.split(':')[1] || token;
+
+          if (bigIntAmount > 0n) {
+            swapData.received.push({ token: tokenId, amount });
+          } else if (bigIntAmount < 0n) {
+            swapData.sent.push({
+              token: tokenId,
+              amount: amount.replace('-', ''),
+            });
+          }
+        });
       }
-      if (existing.sent.length && existing.received.length) {
-        acc[account_id] = existing;
+
+      if (swapData.sent.length > 0 && swapData.received.length > 0) {
+        acc[account_id] = swapData;
       }
+
       return acc;
     },
     {} as Record<string, { sent: any[]; received: any[] }>,
   );
 
-  return {
-    type: 'transfer',
-    contract: 'intents.near',
-    swaps: Object.entries(swaps).map(([accountId, { sent, received }]) => ({
+  const validSwaps = Object.entries(userSwaps).map(
+    ([accountId, { sent, received }]) => ({
       accountId,
       sent: sent.map((s) => ({
         ...s,
-        meta: meta[s.token] || [],
+        meta: meta?.[s.token] || [],
       })),
       received: received.map((r) => ({
         ...r,
-        meta: meta[r.token] || [],
+        meta: meta?.[r.token] || [],
       })),
-    })),
+    }),
+  );
+
+  if (validSwaps.length === 0) return null;
+
+  return {
+    type: 'Swap',
+    contract: 'intents.near',
+    swaps: validSwaps,
     roles: {
       senderLabel: 'for',
       receiverLabel: 'on',
     },
-    receiptId: event.receiptId ?? '',
+    receiptId: event?.receiptId ?? '',
   };
 }

@@ -2,8 +2,9 @@ import { ActionParser } from './actionParser';
 import { shortenAddress } from 'src/utils/libs';
 import { ParsedAction } from 'src/utils/types';
 
-export class DelegateActionParser {
-  static parse(action: any): ParsedAction {
+export const DelegateActionParser = {
+  parse(action: any): ParsedAction {
+    console.log('action from delegate', action);
     const delegate = action.args?.delegate_action;
     const subActions = delegate?.actions || [];
     const receiverId = delegate?.receiver_id || '';
@@ -38,5 +39,5 @@ export class DelegateActionParser {
         subActions: parsedSubActions,
       },
     };
-  }
-}
+  },
+};

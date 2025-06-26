@@ -54,10 +54,12 @@ export async function parseIntents(
         }
         case 'mt_transfer': {
           const parsed = await parseTransfer({ event, data, meta });
-          return [parsed];
+          console.log('parsed from intents mt_transfer', parsed);
+          return [parsed].filter(Boolean);
         }
         case 'mt_burn': {
           const parsed = await parseBurn({ event, data, meta });
+          console.log('parsed from intents mt_burn', parsed);
           return [parsed];
         }
         default:
