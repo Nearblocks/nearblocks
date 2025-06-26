@@ -49,6 +49,7 @@ const TxnsTabActions = ({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const { networkId } = useConfig();
+  const cacheRef = useRef<Record<string, Promise<any>>>({});
 
   // temporary use rpc data for blocks before 192373963 and api data for latest blocks - testnet
   // temporary use rpc data for blocks before 143997621 and api data for latest blocks - mainnet
@@ -103,16 +104,11 @@ const TxnsTabActions = ({
 
   useEffect(() => {
     const checkTxnExistence = async () => {
-      if (txn === undefined || txn === null || !txn) {
-        try {
-          setRpcError(false);
-
-          if (!shouldUseRpc) {
-            setRpcError(true);
-            setAllRpcProviderError(true);
-            return;
-          }
-          const txnExists: any = await transactionStatus(hash, 'bowen');
+      try {
+        setRpcError(false);
+        const res = await transactionStatus(hash, 'bowen', cacheRef, rpcUrl);
+        if (res?.success) {
+          const txnExists = res?.data;
           const status = txnExists.status?.Failure ? false : true;
           let block: any = {};
 
@@ -150,44 +146,43 @@ const TxnsTabActions = ({
             signer_account_id: txnExists.transaction.signer_id,
             transaction_hash: txnExists.transaction_outcome.id,
           };
-          if (txnExists) {
-            setRpcTxn(txnExists);
-            setRpcData(modifiedTxns);
-          }
-        } catch (error) {
+          setRpcTxn(txnExists);
+          setRpcData(modifiedTxns);
+        } else {
           setRpcError(true);
         }
+      } catch (error) {
+        setRpcError(true);
       }
     };
-
-    checkTxnExistence();
+    if (!txn) {
+      checkTxnExistence();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, hash, rpcUrl]);
 
   useEffect(() => {
     const fetchTransactionStatus = async () => {
-      if (!txn || !shouldUseRpc) {
-        setRpcError(true);
-        setAllRpcProviderError(true);
-        return;
-      }
-
       try {
         setRpcError(false);
         const res = await transactionStatus(
           txn.transaction_hash,
           txn.signer_account_id,
+          cacheRef,
+          rpcUrl,
         );
-        if (res?.final_execution_status === 'NONE') {
+        if (res?.success) {
+          setRpcTxn(res?.data);
+        } else {
           setRpcError(true);
         }
-        setRpcTxn(res);
       } catch {
         setRpcError(true);
       }
     };
-
-    fetchTransactionStatus();
+    if (txn && shouldUseRpc) {
+      fetchTransactionStatus();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txn, rpcUrl]);
 
