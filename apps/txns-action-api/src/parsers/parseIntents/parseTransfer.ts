@@ -65,8 +65,8 @@ export async function parseTransfer({ event, data, meta }: TransferInput) {
     contract: 'intents.near',
     swaps: validSwaps,
     roles: {
-      senderLabel: 'for',
-      receiverLabel: 'on',
+      senderLabel: 'For',
+      receiverLabel: 'On',
     },
     receiptId: event?.receiptId ?? '',
   };

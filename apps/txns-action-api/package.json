@@ -2,7 +2,7 @@
   "name": "txns-action-api",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "Business Source License 1.1",
   "type": "commonjs",
   "dependencies": {
     "big.js": "^7.0.1",

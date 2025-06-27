@@ -19,7 +19,7 @@ export function parseBurn({ event, data, meta }: BurnInput) {
     contract: 'intents.near',
     receiver: data[0]?.owner_id || '',
     roles: {
-      senderLabel: 'from',
+      senderLabel: 'From',
       receiverLabel: '',
     },
     tokens: data

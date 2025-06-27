@@ -52,7 +52,7 @@ export async function parseMint({
     sender,
     roles: {
       senderLabel: 'by',
-      receiverLabel: 'on',
+      receiverLabel: 'On',
     },
     tokens: data
       .map(({ token_ids, amounts }) =>
