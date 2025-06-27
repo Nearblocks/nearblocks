@@ -132,18 +132,53 @@ a {
   background: url('../../public/images/leaf.jpg') no-repeat;
   mix-blend-mode: multiply;
   height: 570px;
-  background-position: center top;
+  background-position: center center;
   background-size: cover;
   width: 100%;
   margin-top: 170px;
 }
 
-.errorContent {
-  top: 50px;
+.errorContainer {
+  position: relative;
+  height: 80vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.errorContainer {
+.globalErrorContainer {
+  position: relative;
+  height: 100vh;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  overflow: hidden;
+}
+
+.errorContent {
+  top: 0;
+  z-index: 2;
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+.globalErrorBg {
+  position: absolute;
+  top: 200;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: url('../../public/images/leaf.jpg') no-repeat;
+  background-position: center;
+  background-size: cover;
+  mix-blend-mode: multiply;
+  z-index: 1;
 }
 
 #action-row:not(#action-row:has(.action)) {
@@ -247,7 +282,7 @@ a {
 
 @keyframes slide-down {
   0% {
-    max-height: 0;
+    max-height: 35px;
     overflow: hidden;
   }
 
@@ -262,17 +297,13 @@ a {
   animation: slide-down 4s ease forwards;
 }
 
-.contact-accordian [data-reach-accordion-button][data-state='open'] .contact-icon {
-  transform: rotate(-180deg);
-  color: #31766a;
+@media (min-width: 1400px) {
+  .container-xxl {
+    max-width: 1400px;
+  }
 }
 
-.font-space-mono {
-  font-family: 'Space Mono', monospace;
-}
 
-.visible-scrollbar,
-.invisible-scrollbar,
 .mostly-customized-scrollbar {
   display: block;
   overflow: auto;
@@ -294,3 +325,10 @@ a {
   border-radius: 12px;
 }
 
+.dark .mostly-customized-scrollbar::-webkit-scrollbar {
+  background-color: #1F2228;
+}
+
+.dark .mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  background: #555;
+}

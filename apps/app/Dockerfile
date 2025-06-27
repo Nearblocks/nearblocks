@@ -26,7 +26,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 USER nextjs
-COPY --from=installer /app/apps/app/next.config.js .
+COPY --from=installer /app/apps/app/next.config.mjs .
 COPY --from=installer /app/apps/app/package.json .
 COPY --from=installer --chown=nextjs:nodejs /app/apps/app/public ./apps/app/public
 COPY --from=installer --chown=nextjs:nodejs /app/apps/app/.next/standalone ./

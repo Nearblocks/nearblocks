@@ -5,7 +5,8 @@
     },
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler",
+    "strictNullChecks": true
   },
   "exclude": ["node_modules"],
   "extends": "nb-tsconfig/nextjs.json",

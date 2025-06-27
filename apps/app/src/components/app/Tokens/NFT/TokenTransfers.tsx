@@ -1,0 +1,316 @@
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+
+import { Link } from '@/i18n/routing';
+import { localFormat } from '@/utils/libs';
+import { TransactionInfo } from '@/utils/types';
+
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import TxnStatus from '@/components/app/common/Status';
+import Table from '@/components/app/common/Table';
+import Tooltip from '@/components/app/common/Tooltip';
+import Clock from '@/components/app/Icons/Clock';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import TimeStamp from '@/components/app/common/TimeStamp';
+
+interface Props {
+  data: {
+    cursor: string;
+    txns: TransactionInfo[];
+  };
+  error: boolean;
+  txnsCount: {
+    txns: { count: string }[];
+  };
+}
+
+export default function TokenTransfers({ data, error, txnsCount }: Props) {
+  const [showAge, setShowAge] = useState(true);
+  const errorMessage = ' No token transfers found!';
+  const [page, setPage] = useState(1);
+  const count = txnsCount?.txns?.[0]?.count;
+  const txns: TransactionInfo[] = data?.txns ? data?.txns : [];
+  let cursor = data?.cursor;
+  const t = useTranslations();
+
+  const toggleShowAge = () => setShowAge((s) => !s);
+
+  const columns: any = [
+    {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
+        </span>
+      ),
+      header: '',
+      key: 'status',
+      tdClassName:
+        'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+    },
+    {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.transaction_hash}
+          >
+            <AddressOrTxnsLink
+              copy
+              txnHash={row?.transaction_hash}
+              className={
+                'truncate max-w-[120px] inline-block  align-bottom whitespace-nowrap'
+              }
+            />
+          </Tooltip>
+        </span>
+      ),
+      header: <span>Txn Hash</span>,
+      key: 'hash',
+      tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+    },
+    {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Tooltip
+            className={'left-1/2 max-w-[200px]'}
+            position="top"
+            tooltip={row?.cause}
+          >
+            <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl max-w-[120px] px-2 py-1 inline-flex truncate">
+              <span className="block truncate">{row?.cause}</span>
+            </span>
+          </Tooltip>
+        </span>
+      ),
+      header: <span>{t('type') || 'METHOD'}</span>,
+      key: 'type',
+      tdClassName:
+        'px-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+    },
+    {
+      cell: (row: TransactionInfo) => {
+        return Number(row.delta_amount) < 0 ? (
+          <span>
+            {row?.affected_account_id ? (
+              <Tooltip
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
+              >
+                <span>
+                  <AddressOrTxnsLink
+                    copy
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.affected_account_id}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
+              'system'
+            )}
+          </span>
+        ) : (
+          <span>
+            {row?.involved_account_id ? (
+              <Tooltip
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
+              >
+                <span>
+                  <AddressOrTxnsLink
+                    copy
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.involved_account_id}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
+              'system'
+            )}
+          </span>
+        );
+      },
+      header: <span>From</span>,
+      key: 'affected_account_id',
+      tdClassName: 'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+    },
+    {
+      cell: (row: TransactionInfo) => {
+        return row.affected_account_id === row.involved_account_id ? (
+          <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
+            {t('txnSelf')}
+          </span>
+        ) : (
+          <div className="w-5 h-5 p-1 bg-green-100 rounded-full text-center flex justify-center items-center mx-auto text-white">
+            <FaLongArrowAltRight />
+          </div>
+        );
+      },
+      header: <span></span>,
+      key: '',
+      tdClassName: 'text-center',
+    },
+    {
+      cell: (row: TransactionInfo) => {
+        return Number(row.delta_amount) < 0 ? (
+          <span>
+            {row?.involved_account_id ? (
+              <Tooltip
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.involved_account_id}
+              >
+                <span>
+                  <AddressOrTxnsLink
+                    copy
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.involved_account_id}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
+              'system'
+            )}
+          </span>
+        ) : (
+          <span>
+            {row?.affected_account_id ? (
+              <Tooltip
+                className={'left-1/2 max-w-[200px]'}
+                position="top"
+                tooltip={row?.affected_account_id}
+              >
+                <span>
+                  <AddressOrTxnsLink
+                    copy
+                    className={'inline-block align-bottom whitespace-nowrap'}
+                    currentAddress={row?.affected_account_id}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
+              'system'
+            )}
+          </span>
+        );
+      },
+      header: <span>To</span>,
+      key: 'involved_account_id',
+      tdClassName:
+        'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
+    },
+    {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <Link
+            className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
+            href={`/blocks/${row?.included_in_block_hash}`}
+          >
+            {row?.block?.block_height
+              ? localFormat(row?.block?.block_height)
+              : row?.block?.block_height ?? ''}
+          </Link>
+        </span>
+      ),
+      header: <span>BLOCK</span>,
+      key: 'block_hash',
+      tdClassName:
+        'px-6 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 font-medium',
+      thClassName:
+        'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider h-[57px]',
+    },
+    {
+      cell: (row: TransactionInfo) => (
+        <span>
+          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+        </span>
+      ),
+      header: (
+        <div>
+          <Tooltip
+            className={'-left-5 max-w-[200px] mt-5'}
+            position="bottom"
+            tooltip={
+              <span className="flex flex-wrap">
+                <span className="whitespace-nowrap">Click to show</span>{' '}
+                <span className="whitespace-nowrap">
+                  {showAge ? 'Datetime' : 'Age'} Format
+                </span>
+              </span>
+            }
+          >
+            <button
+              className="w-full flex items-center px-6 py-2 text-left text-xs font-semibold uppercase tracking-wider text-green-500 dark:text-green-250 focus:outline-none flex-row"
+              onClick={toggleShowAge}
+              type="button"
+            >
+              {showAge ? (
+                <>
+                  AGE
+                  <Clock className="text-green-500 dark:text-green-250 ml-2" />
+                </>
+              ) : (
+                'DATE TIME (UTC)'
+              )}
+            </button>
+          </Tooltip>
+        </div>
+      ),
+      key: 'block_timestamp',
+      tdClassName:
+        'px-5 py-3 text-sm text-nearblue-600 dark:text-neargray-10 w-48',
+    },
+  ];
+  return (
+    <>
+      {!count ? (
+        <div className="pl-3 max-w-sm py-5 h-[60px]">
+          <Skeleton className="h-4" />
+        </div>
+      ) : (
+        <div className={`flex flex-col lg:flex-row pt-4`}>
+          <div className="flex flex-col">
+            <p className="leading-7 px-6 text-sm mb-4 text-nearblue-600 dark:text-neargray-10">
+              {txns &&
+                !error &&
+                `A total of ${
+                  count ? localFormat && localFormat(count.toString()) : 0
+                }${' '}
+                transactions found`}
+            </p>
+          </div>
+        </div>
+      )}
+      <Table
+        columns={columns}
+        cursor={cursor}
+        cursorPagination={true}
+        data={txns}
+        Error={error}
+        ErrorText={
+          <ErrorMessage
+            icons={<FaInbox />}
+            message={errorMessage}
+            mutedText="Please try again later"
+          />
+        }
+        limit={25}
+        page={page}
+        setPage={setPage}
+      />
+    </>
+  );
+}

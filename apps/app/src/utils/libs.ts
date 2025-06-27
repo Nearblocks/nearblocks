@@ -1,9 +1,6 @@
 import Big from 'big.js';
-import { FieldType, GuessableTypeString } from './types';
-import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
 
-const ACCOUNT_ID_REGEX =
-  /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+import { FieldType, GuessableTypeString } from './types';
 
 export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
   Object.entries(obj).reduce((a, [k, v]) => {
@@ -17,7 +14,7 @@ export const stripEmpty = <T extends Record<string, any>>(obj: T): T =>
 export function shortenAddress(address: string) {
   const string = String(address);
 
-  if (string.length <= 20) return string;
+  if (string?.length <= 20) return string;
 
   return `${string.substr(0, 10)}...${string.substr(-7)}`;
 }
@@ -51,22 +48,22 @@ export function dollarNonCentFormat(number: string) {
   const bigNumber = new Big(number).toFixed(0);
 
   // Extract integer part and format with commas
-  const integerPart = bigNumber.toString();
+  const integerPart = bigNumber?.toString();
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
   return formattedInteger;
 }
 
 export function yoctoToNear(yocto: string, format: boolean) {
-  const YOCTO_PER_NEAR = Big(10).pow(24).toString();
+  const YOCTO_PER_NEAR = Big(10).pow(24)?.toString();
 
-  const near = Big(yocto).div(YOCTO_PER_NEAR).toString();
+  const near = Big(yocto)?.div(YOCTO_PER_NEAR)?.toString();
 
   return format ? localFormat(near) : near;
 }
 
 export function truncateString(str: string, maxLength: number, suffix: string) {
-  if (str && str?.length <= maxLength) {
+  if (str?.length <= maxLength) {
     return str;
   }
   return str?.substring(0, maxLength) + suffix;
@@ -78,7 +75,7 @@ export function currency(number: string) {
   const suffixes = ['', 'K', 'M', 'B', 'T', 'Q'];
   let suffixIndex = 0;
 
-  while (absNumber.gte(1000) && suffixIndex < suffixes.length - 1) {
+  while (absNumber.gte(1000) && suffixIndex < suffixes?.length - 1) {
     absNumber = absNumber.div(1000); // Divide using big.js's div method
     suffixIndex++;
   }
@@ -97,7 +94,7 @@ export function fiatValue(big: string, price: string) {
   const value = Big(big).mul(Big(price));
   const stringValue = value.toFixed(6); // Set the desired maximum fraction digits
 
-  const [integerPart, fractionalPart] = stringValue.split('.');
+  const [integerPart, fractionalPart] = stringValue && stringValue?.split('.');
 
   // Format integer part with commas
   const formattedIntegerPart = integerPart.replace(
@@ -120,10 +117,11 @@ export function dollarFormat(number: string) {
   const formattedNumber = bigNumber.toFixed(2);
 
   // Add comma as a thousands separator
-  const parts = formattedNumber.split('.');
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const parts = formattedNumber && formattedNumber?.split('.');
+  if (parts)
+    parts[0] = parts && parts?.[0]?.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-  const dollarFormattedNumber = `${parts.join('.')}`;
+  const dollarFormattedNumber = parts && `${parts.join('.')}`;
 
   return dollarFormattedNumber;
 }
@@ -179,7 +177,7 @@ export function convertToMetricPrefix(numberStr: string) {
   let result = new Big(numberStr);
   let count = 0;
 
-  while (result.abs().gte('1e3') && count < prefixes.length - 1) {
+  while (result.abs().gte('1e3') && count < prefixes?.length - 1) {
     result = result.div(1e3);
     count++;
   }
@@ -191,11 +189,11 @@ export function convertToMetricPrefix(numberStr: string) {
     formattedResult = result.toFixed(0);
   }
 
-  return formattedResult.toString() + ' ' + prefixes[count];
+  return formattedResult?.toString() + ' ' + prefixes[count];
 }
 
 export function gasFee(gas: string, price: string) {
-  const near = yoctoToNear(Big(gas).mul(Big(price)).toString(), true);
+  const near = yoctoToNear(Big(gas).mul(Big(price))?.toString(), true);
 
   return `${near}`;
 }
@@ -204,7 +202,7 @@ export function formatNumber(value: string) {
   const suffixes = ['', 'K', 'M', 'B', 'T'];
   let suffixIndex = 0;
 
-  while (bigValue.gte(10000) && suffixIndex < suffixes.length - 1) {
+  while (bigValue.gte(10000) && suffixIndex < suffixes?.length - 1) {
     bigValue = bigValue.div(1000);
     suffixIndex++;
   }
@@ -218,12 +216,12 @@ export function getTimeAgoString(timestamp: number) {
   const seconds = Math.floor((currentUTC - date.getTime()) / 1000);
 
   const intervals = {
-    year: seconds / (60 * 60 * 24 * 365),
-    month: seconds / (60 * 60 * 24 * 30),
-    week: seconds / (60 * 60 * 24 * 7),
     day: seconds / (60 * 60 * 24),
     hour: seconds / (60 * 60),
     minute: seconds / 60,
+    month: seconds / (60 * 60 * 24 * 30),
+    week: seconds / (60 * 60 * 24 * 7),
+    year: seconds / (60 * 60 * 24 * 365),
   };
 
   if (intervals.year >= 1) {
@@ -266,13 +264,14 @@ export function getTimeAgoString(timestamp: number) {
   }
 }
 export function formatWithCommas(number: string) {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return number?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 export function formatTimestampToString(timestamp: number) {
   const date = new Date(timestamp);
 
   // Format the date to 'YYYY-MM-DD HH:mm:ss' format
-  const formattedDate = date.toISOString().replace('T', ' ').split('.')[0];
+  const formattedDate =
+    date && date?.toISOString()?.replace('T', ' ')?.split('.')[0];
 
   return formattedDate;
 }
@@ -354,7 +353,7 @@ export function weight(number: string) {
   const suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   let suffixIndex = 0;
 
-  while (sizeInBytes.gte(1000) && suffixIndex < suffixes.length - 1) {
+  while (sizeInBytes.gte(1000) && suffixIndex < suffixes?.length - 1) {
     sizeInBytes = sizeInBytes.div(1000); // Assign the result back to sizeInBytes
     suffixIndex++;
   }
@@ -365,26 +364,29 @@ export function weight(number: string) {
 }
 
 export function capitalizeWords(str: string) {
-  const words: string[] = str.split('_');
-  const capitalizedWords: string[] = words.map(
-    (word) => word.charAt(0).toUpperCase() + word.slice(1),
-  );
+  const words: any | string[] = str && str.split('_');
+  const capitalizedWords: string[] =
+    words &&
+    words.map((word: any) => word.charAt(0).toUpperCase() + word.slice(1));
   const result: string = capitalizedWords.join(' ');
   return result;
 }
 
 export function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string ? string.charAt(0).toUpperCase() + string.slice(1) : '';
 }
 
 export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
 
 export function toSnakeCase(str: string) {
-  return str
-    .replace(/[A-Z]/g, (match) => '_' + match.toLowerCase())
-    .replace(/^_/, '');
+  return (
+    str &&
+    str
+      .replace(/[A-Z]/g, (match) => '_' + match.toLowerCase())
+      .replace(/^_/, '')
+  );
 }
 
 export function serialNumber(index: number, page: number, perPage: number) {
@@ -399,15 +401,15 @@ export function shortenTokenSymbol(token: string) {
   return truncateString(token, 5, '');
 }
 
-export function gasPercentage(gasUsed: string, gasAttached: string) {
-  if (!gasAttached) return '0%';
+export function gasPercentage(gasUsed: number, gasAttached: number) {
+  if (!gasAttached) return 'N/A';
   // @ts-ignore
   const formattedNumber = (Big(gasUsed).div(Big(gasAttached)) * 100).toFixed(2);
   return `${formattedNumber}%`;
 }
 
 export function shortenHex(address: string) {
-  return `${address && address.substr(0, 6)}...${address.substr(-4)}`;
+  return `${address && address?.substr(0, 6)}...${address?.substr(-4)}`;
 }
 export function formatDate(dateString: string) {
   const inputDate = new Date(dateString);
@@ -446,7 +448,7 @@ export function formatDate(dateString: string) {
 }
 
 export const isJson = (string: string) => {
-  const str = string.replace(/\\/g, '');
+  const str = string && string.replace(/\\/g, '');
 
   try {
     JSON.parse(str);
@@ -464,7 +466,7 @@ const strToType = (str: string, type: GuessableTypeString): unknown => {
       return Number(str);
     case 'boolean':
       return (
-        str.trim().length > 0 && !['false', '0'].includes(str.toLowerCase())
+        str.trim()?.length > 0 && !['0', 'false'].includes(str.toLowerCase())
       );
     case 'null':
       return null;
@@ -476,9 +478,10 @@ const strToType = (str: string, type: GuessableTypeString): unknown => {
 export const mapFeilds = (fields: FieldType[]) => {
   const args: any = {};
 
-  fields.forEach((fld: FieldType) => {
-    args[fld.name] = strToType(fld.value, fld.type as GuessableTypeString);
-  });
+  fields &&
+    fields.forEach((fld: FieldType) => {
+      args[fld?.name] = strToType(fld?.value, fld?.type as GuessableTypeString);
+    });
 
   return args;
 };
@@ -504,7 +507,7 @@ export function holderPercentage(supply: string, quantity: string) {
 
 export function tokenAmount(
   amount: string,
-  decimal: string,
+  decimal: string | number,
   format: boolean,
 ): string {
   if (amount === undefined || amount === null) return 'N/A';
@@ -550,14 +553,14 @@ export function timeAgo(unixTimestamp: number): string {
 export function convertTimestampToTime(timestamp: string) {
   const timestampBig = new Big(timestamp);
 
-  const hours = timestampBig.div(3600).round(0, 0).toString();
-  const minutes = timestampBig.mod(3600).div(60).round(0, 0).toString();
-  const seconds = timestampBig.mod(60).round(0, 0).toString();
+  const hours = timestampBig?.div(3600)?.round(0, 0)?.toString();
+  const minutes = timestampBig?.mod(3600)?.div(60)?.round(0, 0)?.toString();
+  const seconds = timestampBig?.mod(60)?.round(0, 0)?.toString();
 
-  return `${hours.padStart(2, '0')}H ${minutes.padStart(
+  return `${hours?.padStart(2, '0')}H ${minutes?.padStart(
     2,
     '0',
-  )}M ${seconds.padStart(2, '0')}S`;
+  )}M ${seconds?.padStart(2, '0')}S`;
 }
 
 export function convertAmountToReadableString(amount: string, type: string) {
@@ -571,12 +574,12 @@ export function convertAmountToReadableString(amount: string, type: string) {
   const amountInNear = new Big(amount).div(nearNomination);
 
   if (type === 'totalSupply' || type === 'totalStakeAmount') {
-    value = formatWithCommas(amountInNear.div(1e6).toFixed(1));
+    value = formatWithCommas(amountInNear?.div(1e6)?.toFixed(1));
     suffix = 'M';
   } else if (type === 'seatPriceAmount') {
-    value = formatWithCommas(amountInNear.round().toString());
+    value = formatWithCommas(amountInNear?.round()?.toString());
   } else {
-    value = amount.toString();
+    value = amount?.toString();
   }
   return `${value}${suffix}`;
 }
@@ -601,7 +604,7 @@ export function jsonStringify(obj: any, replacer?: any, space?: any) {
 export const getCookieFromRequest = (
   cookieName: string,
   req: any,
-): string | null => {
+): null | string => {
   const cookies = req.headers.cookie || '';
   const cookie = cookies
     .split('; ')
@@ -609,16 +612,6 @@ export const getCookieFromRequest = (
 
   return cookie ? cookie.split('=')[1] : null;
 };
-
-export function getFilteredQueryParams(
-  query: QueryParams,
-  requiredKeys: string[],
-) {
-  const filteredParams = Object.fromEntries(
-    Object.entries(query).filter(([key]) => requiredKeys.includes(key)),
-  );
-  return Object.keys(filteredParams).length ? filteredParams : {};
-}
 
 export const parseGitHubLink = (snapshot: string) => {
   const regex =
@@ -630,9 +623,9 @@ export const parseGitHubLink = (snapshot: string) => {
 
   const url = snapshot.substring(snapshot.indexOf('http'));
 
-  if (match && commitHash) return { url, text: commitHash };
+  if (match && commitHash) return { text: commitHash, url };
 
-  if (url) return { url, text: snapshot };
+  if (url) return { text: snapshot, url };
 
   return null;
 };
@@ -642,20 +635,12 @@ export const parseLink = (link: string) => {
     const url = new URL(link);
 
     return {
-      url: link,
       text: `${url.hostname}${url.pathname}`,
+      url: link,
     };
   } catch {
     return null;
   }
-};
-
-export const isValidAccount = (accountId: string) => {
-  return (
-    accountId.length >= 2 &&
-    accountId.length <= 64 &&
-    ACCOUNT_ID_REGEX.test(accountId)
-  );
 };
 
 export function isValidJson(value: string): boolean {
@@ -692,3 +677,25 @@ export function parseNestedJSON(obj: any): any {
 
   return result;
 }
+
+export const parseEventJson = (log: string) => {
+  if (!log?.startsWith('EVENT_JSON:')) return log;
+
+  const jsonString = log.replace('EVENT_JSON:', '').trim();
+
+  if (typeof jsonString !== 'string') {
+    throw new Error('jsonString is not a valid string');
+  }
+
+  if (!isValidJson(jsonString)) {
+    const fixedJsonString = jsonString.replace(/\\"/g, '"');
+
+    if (isValidJson(fixedJsonString)) {
+      return JSON.parse(fixedJsonString);
+    } else {
+      return null;
+    }
+  }
+
+  return JSON.parse(jsonString);
+};
