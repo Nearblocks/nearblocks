@@ -1,11 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import {
-  useParams,
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { use, useState } from 'react';
 
@@ -14,7 +9,7 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
 import { txnMethod } from '@/utils/app/near';
 import { isAction, localFormat, yoctoToNear } from '@/utils/libs';
 import { FilterKind, TransactionInfo } from '@/utils/types';
@@ -49,7 +44,7 @@ const ReceiptActions = ({ dataPromise, countPromise }: TxnsProps) => {
   const cursor = data?.cursor;
   const error = !data || data === null;
   const txns: TransactionInfo[] = data?.txns;
-  const router = useRouter();
+  const router = useIntlRouter();
   const pathname = usePathname();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();

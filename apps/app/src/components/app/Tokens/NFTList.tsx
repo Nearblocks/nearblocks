@@ -1,11 +1,11 @@
 'use client';
 import { debounce } from 'lodash';
 import { useTranslations } from 'next-intl';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import { useEffect, useRef, useState } from 'react';
 
-import { Link, usePathname } from '@/i18n/routing';
+import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
 import { localFormat, serialNumber } from '@/utils/libs';
 import { Sorting, Token } from '@/utils/types';
 
@@ -33,7 +33,7 @@ interface Props {
 
 const List = ({ data, error, handleSearch, tokensCount }: Props) => {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useIntlRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const page = searchParams?.get('page');

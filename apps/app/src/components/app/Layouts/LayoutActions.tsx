@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import Provider from '@/components/Layouts/Provider';
@@ -14,7 +14,7 @@ import { toast } from 'react-toastify';
 import { getSearchRoute, SearchToast } from '@/components/app/common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
 import { rpcSearch } from '@/utils/app/rpc';
-import { useIntlRouter } from '@/i18n/routing';
+import { usePathname, useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
 import Cookies from 'js-cookie';

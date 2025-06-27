@@ -1,7 +1,7 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
@@ -44,7 +44,7 @@ interface ListProps {
 }
 
 const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
-  const router = useRouter();
+  const router = useIntlRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const order = searchParams?.get('order');
