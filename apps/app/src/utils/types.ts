@@ -1,17 +1,18 @@
 import type { NextPage } from 'next';
 import type { ReactElement, ReactNode } from 'react';
+
 import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
-import { supportedNetworks } from './config';
+import { supportedNetworks } from './app/config';
 
 export type NextPageWithLayout<T = any> = NextPage<T> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+  getLayout?: (page: ReactElement<any>) => ReactNode;
 };
 
 export type NetworkId = ProductionNetwork['networkId'];
 export type Network = ProductionNetwork;
 
 type ProductionNetwork = {
-  networkId: 'testnet' | 'mainnet';
+  networkId: 'mainnet' | 'testnet';
 };
 
 export type SatsInfo = {
@@ -40,64 +41,79 @@ export type DeploymentsInfo = {
 };
 
 export type TokenInfo = {
-  name: string;
   icon: string;
-  symbol: string;
+  name: string;
   price: string;
+  symbol: string;
   website: string;
 };
 
 export type Stats = {
-  block: string;
-  gas_price: string;
   avg_block_time: string;
-  nodes: string;
-  nodes_online: string;
-  near_price: string;
-  near_btc_price: string;
-  market_cap: string;
-  volume: string;
+  block: string;
+  change_24: string;
+  gas_price: string;
   high_24h: string;
   high_all: string;
   low_24h: string;
   low_all: string;
-  change_24: string;
+  market_cap: string;
+  near_btc_price: string;
+  near_price: string;
+  nodes: string;
+  nodes_online: string;
   total_supply: string;
   total_txns: string;
+  volume: string;
 };
 
 export type MetaInfo = {
+  contract: string;
   decimals: string;
   icon: string;
   name: string;
   price: string;
   reference: string;
   symbol: string;
-  contract: string;
+};
+
+export type ApiMetaInfo = {
+  contractId: string;
+  metadata: {
+    decimals: number;
+    description: string;
+    icon: string | null;
+    marketCap: string;
+    name: string;
+    price: string;
+    symbol: string;
+    volume24h: string;
+    website: string;
+  };
 };
 
 export type FtsInfo = {
   affected_account_id: string;
   block_timestamp: string;
-  delta_amount: string;
-  ft_meta: MetaInfo;
-  event_index: string;
-  involved_account_id: string;
-  contract: string;
   cause: string;
+  contract: string;
+  delta_amount: string;
+  event_index: string;
+  ft_meta: MetaInfo;
+  involved_account_id: string;
 };
 
 export type NftsInfo = {
   affected_account_id: string;
   block_timestamp: string;
+  cause: string;
+  contract: string;
   delta_amount: string;
-  nft_meta: MetaInfo;
-  quantity: string;
-  nft_token_meta: string;
   event_index: string;
   involved_account_id: string;
-  contract: string;
-  cause: string;
+  nft_meta: MetaInfo;
+  nft_token_meta: string;
+  quantity: string;
 };
 
 export type InventoryInfo = {
@@ -127,9 +143,10 @@ export type BlocksInfo = {
 
 export type ContractCodeInfo = {
   block_hash: string;
-  block_height: string;
+  block_height: number;
   code_base64: string;
   hash: string;
+  locked: boolean;
 };
 
 export type KeysInfo = {
@@ -143,21 +160,21 @@ export type KeysInfo = {
 export type AccessKeyInfo = {
   block_hash: string;
   block_height: string;
-  keys: KeysInfo[];
   hash: string;
+  keys: KeysInfo[];
 };
 
 export type ContractInfo = {
-  locked?: boolean;
   hash: string;
+  locked?: boolean;
 };
 
 export type TokenListInfo = {
   amount: string;
+  amountUsd: string;
   contract: string;
   ft_meta: MetaInfo;
   rpcAmount: string;
-  amountUsd: string;
 };
 
 export type FtInfo = {
@@ -181,53 +198,33 @@ export type StatusInfo = {
   nodes_online: string;
   total_supply: string;
   total_txns: string;
-  volume: string;
   tps: string;
+  volume: string;
 };
 
 export type ChartSeriesInfo = {
-  type: string;
-  data: number[];
   color: string;
+  data: number[];
+  type: string;
 };
 
 export type ChartConfigType = {
-  chart: {
-    height: number;
-    spacingTop: number;
-    spacingBottom: number;
-    spacingLeft: number;
-    spacingRight: number;
-    backgroundColor: string;
-  };
   accessibility: {
     enabled: boolean;
   };
-  title: {
-    text: null;
+  chart: {
+    backgroundColor: string;
+    height: number;
+    spacingBottom: number;
+    spacingLeft: number;
+    spacingRight: number;
+    spacingTop: number;
   };
-  xAxis: {
-    type: string;
-    lineWidth: number;
-    tickLength: number;
-    labels: {
-      step: number;
-      style: {
-        color: string;
-      };
-    };
-    categories: string[];
+  credits: {
+    enabled: boolean;
   };
-  yAxis: {
-    gridLineWidth: number;
-    title: {
-      text: null;
-    };
-    labels: {
-      style: {
-        color: string;
-      };
-    };
+  exporting: {
+    enabled: boolean;
   };
   legend: {
     enabled: boolean;
@@ -235,26 +232,46 @@ export type ChartConfigType = {
   plotOptions: {
     spline: {
       lineWidth: number;
+      marker: {
+        radius: number;
+      };
       states: {
         hover: {
           lineWidth: number;
         };
       };
-      marker: {
-        radius: number;
-      };
     };
   };
   series: {
-    type: string;
-    data: { y: number; date: string; price: number }[];
     color: string;
+    data: { date: string; price: number; y: number }[];
+    type: string;
   }[];
-  exporting: {
-    enabled: boolean;
+  title: {
+    text: null;
   };
-  credits: {
-    enabled: boolean;
+  xAxis: {
+    categories: string[];
+    labels: {
+      step: number;
+      style: {
+        color: string;
+      };
+    };
+    lineWidth: number;
+    tickLength: number;
+    type: string;
+  };
+  yAxis: {
+    gridLineWidth: number;
+    labels: {
+      style: {
+        color: string;
+      };
+    };
+    title: {
+      text: null;
+    };
   };
 } | null;
 
@@ -273,72 +290,77 @@ export type TransactionInfo = {
     deposit: string;
     gas_attached: string;
   };
-  outcome: {
-    gas_burnt: string;
-    tokens_burnt: string;
-    executor_account_id: string;
-    status: boolean;
-  };
-  receipt_outcome: {
-    gas_burnt: string;
-    tokens_burnt: string;
-    executor_account_id: string;
-    status: boolean;
-  };
+  affected_account_id: string;
   block: {
     block_height: string;
     block_timestamp: string;
+    block_hash: string;
   };
   block_timestamp: string;
+  cause: string;
+  delta_amount: string;
+  ft: Token;
   included_in_block_hash: string;
+  involved_account_id: string;
+  nft: Token;
   outcomes: {
+    status: boolean;
+    result: {
+      ActionError: {
+        index: number;
+        kind: any;
+      };
+    };
+  };
+  outcome: {
     status: boolean;
   };
   outcomes_agg: {
-    transaction_fee: string;
     gas_used: string;
+    transaction_fee: string;
   };
-  shard_id: string;
+  predecessor_account_id: string;
   receipt_conversion_gas_burnt: string;
   receipt_conversion_tokens_burnt: string;
-  receiver_account_id: string;
-  signer_account_id: string;
-  transaction_hash: string;
   receipt_id: string;
+  receipt_outcome: {
+    executor_account_id: string;
+    gas_burnt: string;
+    status: boolean;
+    tokens_burnt: string;
+  };
   receipts: InventoryInfo[];
-  cause: string;
-  affected_account_id: string;
-  involved_account_id: string;
+  receiver_account_id: string;
+  shard_id: string;
+  signer_account_id: string;
   token_id: string;
-  nft: Token;
-  delta_amount: string;
-  ft: Token;
-  predecessor_account_id: string;
+  transaction_hash: string;
 };
 
 export type ChartStat = {
-  date: string;
-  near_price: string;
-  market_cap: string;
-  total_supply: string;
+  active_accounts: string;
+  addresses: string;
+  avg_gas_limit: string;
+  avg_gas_price: string;
   blocks: string;
+  date: string;
   gas_fee: string;
   gas_used: string;
-  avg_gas_price: string;
-  avg_gas_limit: string;
-  txns: string;
-  txn_volume: string;
-  txn_volume_usd: string;
+  market_cap: string;
+  multichain_txns: string;
+  near_price: string;
+  total_addresses: string;
+  total_supply: string;
   txn_fee: string;
   txn_fee_usd: string;
-  total_addresses: string;
-  addresses: string;
-  active_accounts: string;
+  txn_volume: string;
+  txn_volume_usd: string;
+  txns: string;
 };
 
 export type ChartTypeInfo = {
-  title: string;
   description: string;
+  title: string;
 };
 
 export type ChartConfig = {
@@ -346,10 +368,10 @@ export type ChartConfig = {
     height: number;
     zoomType: string;
   };
-  title: {
+  subtitle: {
     text: string;
   };
-  subtitle: {
+  title: {
     text: string;
   };
 };
@@ -361,22 +383,23 @@ export type EpochStartBlock = {
 };
 export type SearchResult = {
   accounts?: Array<{ account_id: string }>;
-  txns?: Array<{ transaction_hash: string }>;
+  blocks?: Array<{ block_hash: string; block_height: number }>;
   receipts?: Array<{
-    receipt_id: string;
     originated_from_transaction_hash: string;
+    receipt_id: string;
   }>;
-  blocks?: Array<{ block_hash: string; block_height: string }>;
+  tokens: Array<{ contract: string }>;
+  txns?: Array<{ transaction_hash: string }>;
 };
 export type SearchRoute = {
-  type?: string;
   path?: string;
+  type?: string;
 };
 export type Debounce<TArgs extends any[]> = {
   (args: TArgs): void;
   cancel(): void;
-  isPending(): boolean;
   flush(args: TArgs): void;
+  isPending(): boolean;
 };
 
 export type FunctionCallInfo = {
@@ -404,8 +427,8 @@ export type OutcomePropsInfo = {
     actions: {
       action_kind: string;
       args: {
-        stake: string;
         deposit: string;
+        stake: string;
       };
     }[];
     outcome: OutcomePropsInfo;
@@ -489,8 +512,8 @@ export type RPCTransactionInfo = {
 
 export type TransactionLog = {
   contract: string;
-  logs: string;
-  receiptId: string;
+  logs: any;
+  receiptId?: string;
 };
 
 export type ActionType = {
@@ -498,73 +521,88 @@ export type ActionType = {
 };
 
 export type Obj = {
-  [key: string]: string | Obj;
+  [key: string]: Obj | string;
 };
 
 export type AccountContractInfo = {
+  access_key: AccessInfo;
+  account_id: string;
   amount: string;
   block_hash: string;
   block_height: string;
   code_hash: string;
-  locked: string;
-  storage_paid_at: string;
-  storage_usage: string;
-  account_id: string;
-  public_key: string;
-  permission_kind: string;
   created: {
-    transaction_hash: string;
     block_timestamp: string;
+    transaction_hash: string;
   };
   deleted: {
-    transaction_hash: string;
     block_timestamp: string;
+    transaction_hash: string;
   };
+  locked: string;
+  permission_kind: string;
+  public_key: string;
+  storage_paid_at: string;
+  storage_usage: string;
 };
 
 export type EventPropsInfo = {
   event: TransactionLog;
   actionsLog?: any;
   allActionLog?: any;
+  tokenMetadata?: ProcessedTokenMeta[];
   isInteracted?: boolean;
 };
 
 export type DepositPropsInfo = {
   event: {
-    token_id: string;
     account_id: string;
     amount: string;
+    token_id: string;
   }[];
-  receiptId: string;
+  receiptId?: string;
+  tokenMetadata?: ProcessedTokenMeta[];
 };
 
 export type ActionPropsInfo = {
   action: {
-    from: string;
-    to: string;
     action_kind: string;
     args: ArgsPropsInfo;
+    from: string;
     receiptId: string;
+    to: string;
   };
   receiver?: string;
 };
 export type ArgsPropsInfo = {
   access_key: {
     permission: {
-      permission_kind: string;
       FunctionCall: {
         method_names: [];
         receiver_id: string;
       };
+      permission_kind: string;
     };
+  };
+  args: string;
+  args_base64: string;
+  beneficiary_id: string;
+  args_json: {
+    holding_account_id?: string;
+    steps_batch?: any[];
+    amounts?: any[];
+    amount?: string;
+    fee?: string;
+    fee_account_id?: string;
+    receiver_id?: string;
   };
   delegate_action: {
     actions: {
       FunctionCall: {
-        method_name: string;
         args: string;
         deposit: string;
         gas: string;
+        method_name: string;
       };
     }[];
     max_block_height: string;
@@ -573,30 +611,28 @@ export type ArgsPropsInfo = {
     receiver_id: string;
     sender_id: string;
   };
-  public_key: string;
-  beneficiary_id: string;
-  method_name: string;
-  args_base64: string;
-  args: string;
-  stake: string;
   deposit: string;
+  method_name: string;
+  public_key: string;
+  stake: string;
+  sender_id: string;
 };
 
 export type TransactionActionInfo = {
+  action?: any;
   args: ArgsPropsInfo;
   receiver: string;
-  action?: any;
 };
 
 export type ReceiptsPropsInfo = {
   actions: {
     action_kind: string;
     args: {
-      deposit: string;
       access_key: {
         nonce: string;
         permission: string;
       };
+      deposit: string;
       public_key: string;
     };
   }[];
@@ -610,13 +646,35 @@ export type ReceiptsPropsInfo = {
       gas_profile: [];
       version: string;
     };
-    receipt_ids: string[];
-    status: {
-      SuccessValue: string;
-    };
-    tokens_burnt: string;
     outgoing_receipts: {
+      actions: {
+        action_kind: string;
+        args: {
+          deposit: string;
+        };
+      }[];
+      block_hash: string;
+      id: string;
+      outcome: {
+        executor_id: string;
+        gas_burnt: string;
+        logs: [];
+        metadata: {
+          gas_profile: [];
+          version: string;
+        };
+        outgoing_receipts: [];
+        receipt_ids: [];
+        status: {
+          SuccessValue: string;
+        };
+        tokens_burnt: string;
+      };
       predecessor_id: string;
+      proof: {
+        direction: string;
+        hash: string;
+      }[];
       receipt: {
         Action: {
           actions: [
@@ -635,34 +693,12 @@ export type ReceiptsPropsInfo = {
       };
       receipt_id: string;
       receiver_id: string;
-      actions: {
-        action_kind: string;
-        args: {
-          deposit: string;
-        };
-      }[];
-      block_hash: string;
-      id: string;
-      outcome: {
-        executor_id: string;
-        gas_burnt: string;
-        logs: [];
-        metadata: {
-          gas_profile: [];
-          version: string;
-        };
-        receipt_ids: [];
-        status: {
-          SuccessValue: string;
-        };
-        tokens_burnt: string;
-        outgoing_receipts: [];
-      };
-      proof: {
-        direction: string;
-        hash: string;
-      }[];
     }[];
+    receipt_ids: string[];
+    status: {
+      SuccessValue: string;
+    };
+    tokens_burnt: string;
   };
   predecessor_id: string;
   proof: {
@@ -700,90 +736,90 @@ export type ReceiptsPropsInfo = {
 };
 
 export type Sorting = {
-  sort: string;
   order: 'asc' | 'desc';
+  sort: string;
 };
 
 export type Token = {
-  name: string;
-  contract: string;
-  icon: string;
-  symbol: string;
-  price: string;
-  change_24: string;
-  volume_24h: string;
-  market_cap: string;
-  onchain_market_cap: string;
-  fully_diluted_market_cap: string;
-  total_supply: string;
-  circulating_supply: string;
-  description: string;
-  coingecko_id: string;
-  coinmarketcap_id: string;
-  holders: string;
-  base_uri: string;
-  reference: string;
-  tokens: string;
-  transfers: string;
-  transfers_3days: string;
-  transfers_day: string;
-  website: string;
-  meta: {
-    twitter: string;
-    facebook: string;
-    telegram: string;
-    coingecko_id: string;
-  };
-  token: string;
-  media: string;
   asset: {
     owner: string;
   };
+  base_uri: string;
+  change_24: string;
+  circulating_supply: string;
+  coingecko_id: string;
+  coinmarketcap_id: string;
+  contract: string;
   decimals: string;
-  title: string;
-  nft: Token;
+  description: string;
+  fully_diluted_market_cap: string;
+  holders: string;
+  icon: string;
+  market_cap: string;
+  media: string;
+  meta: {
+    coingecko_id: string;
+    facebook: string;
+    telegram: string;
+    twitter: string;
+  };
+  name: string;
   nep518_hex_address: string;
+  nft: Token;
+  onchain_market_cap: string;
+  price: string;
+  reference: string;
+  symbol: string;
+  title: string;
+  token: string;
+  tokens: string;
+  total_supply: string;
+  transfers: string;
+  transfers_3days: string;
+  transfers_day: string;
+  volume_24h: string;
+  website: string;
 };
 
 export type TransActionProps = {
-  key: number;
   action: {
     action_kind: string;
     args: ArgsPropsInfo;
   };
+  key: number;
   receiver: any;
 };
 
 export type TokenInfoProps = {
   contract: string;
   amount: string;
-  decimals?: any;
   transferAmount?: string;
   isShowText?: boolean;
+  metaInfo?: ApiMetaInfo[];
 };
 
 export type ValidatorFullData = {
-  validatorEpochData: ValidatorEpochData[];
   currentValidators: string;
-  totalStake: string;
-  seatPrice: string;
   elapsedTime: string;
-  totalSeconds: string;
   epochProgress: string;
+  lastEpochApy: string;
+  seatPrice: string;
+  total: string;
+  totalSeconds: string;
+  totalStake: string;
+  validatorEpochData: ValidatorEpochData[];
   validatorTelemetry: {
     [accountId: string]: ValidatorTelemetry;
   };
-  total: string;
-  lastEpochApy: string;
 };
 
 export type ReceiptStatsProps = {
   receipt: {
     outcome: {
       status: {
-        SuccessValue?: any;
         Failure?: any;
         SuccessReceiptId?: any;
+        SuccessValue?: any;
       };
     };
   };
@@ -791,25 +827,26 @@ export type ReceiptStatsProps = {
 
 export type HoldersPropsInfo = {
   account: string;
-  quantity: string;
   amount: string;
+  quantity: string;
 };
 
 export type NFTImageProps = {
-  base?: string;
-  media?: string;
   alt?: string;
-  reference: string;
+  base?: string;
   className?: string;
-  ownerId?: string;
+  media?: string;
   network?: string;
+  ownerId?: string;
+  reference: string;
 };
 
 export type AccessInfo = {
   block_hash: string;
   block_height: string;
-  keys: KeysInfo[];
+  error: string;
   hash: string;
+  keys: KeysInfo[];
   nonce: string;
   permission: {
     FunctionCall: {
@@ -818,14 +855,13 @@ export type AccessInfo = {
       receiver_id: string;
     };
   };
-  error: string;
 };
 
 type U8 = number;
 type U32 = number;
 type U64 = number;
 type U128 = string;
-type Option<T> = T | null;
+type Option<T> = null | T;
 type String = string;
 type AccountId = string;
 type CryptoHash = string;
@@ -837,20 +873,20 @@ type MerkleHash = CryptoHash;
 type Direction = 'Left' | 'Right';
 
 type MerklePathItem = {
-  hash: MerkleHash;
   direction: Direction;
+  hash: MerkleHash;
 };
 type MerklePath = Vec<MerklePathItem>;
 
 type CostGasUsed = {
-  cost_category: String;
   cost: String;
+  cost_category: String;
   gas_used: Gas;
 };
 
 type ExecutionMetadataView = {
-  version: U32;
   gas_profile: Option<Vec<CostGasUsed>>;
+  version: U32;
 };
 
 export type Nonce = string;
@@ -866,86 +902,86 @@ export type ActionError = {
 };
 
 type ActionErrorKind =
-  | { AccountAlreadyExists: { account_id: AccountId } }
-  | { AccountDoesNotExist: { account_id: AccountId } }
-  | {
-      CreateAccountOnlyByRegistrar: {
-        account_id: AccountId;
-        registrar_account_id: AccountId;
-        predecessor_id: AccountId;
-      };
-    }
+  | 'DelegateActionExpired'
+  | 'DelegateActionInvalidSignature'
   | {
       CreateAccountNotAllowed: {
         account_id: AccountId;
         predecessor_id: AccountId;
       };
     }
-  | { ActorNoPermission: { account_id: AccountId; actor_id: AccountId } }
-  | { DeleteKeyDoesNotExist: { account_id: AccountId; public_key: PublicKey } }
-  | { AddKeyAlreadyExists: { account_id: AccountId; public_key: PublicKey } }
-  | { DeleteAccountStaking: { account_id: AccountId } }
-  | { LackBalanceForState: { account_id: AccountId; amount: Balance } }
-  | { TriesToUnstake: { account_id: AccountId } }
   | {
-      TriesToStake: {
+      CreateAccountOnlyByRegistrar: {
         account_id: AccountId;
-        stake: Balance;
-        locked: Balance;
-        balance: Balance;
+        predecessor_id: AccountId;
+        registrar_account_id: AccountId;
       };
     }
-  | {
-      InsufficientStake: {
-        account_id: AccountId;
-        stake: Balance;
-        minimum_stake: Balance;
-      };
-    }
-  | { FunctionCallError: FunctionCallError }
-  | { NewReceiptValidationError: NewReceiptValidationError }
-  | { OnlyImplicitAccountCreationAllowed: { account_id: AccountId } }
-  | { DeleteAccountWithLargeState: { account_id: AccountId } }
-  | 'DelegateActionInvalidSignature'
-  | {
-      DelegateActionSenderDoesNotMatchTxReceiver: {
-        sender_id: AccountId;
-        receiver_id: AccountId;
-      };
-    }
-  | 'DelegateActionExpired'
-  | { DelegateActionAccessKeyError: InvalidAccessKeyError }
-  | { DelegateActionInvalidNonce: { delegate_nonce: Nonce; ak_nonce: Nonce } }
   | {
       DelegateActionNonceTooLarge: {
         delegate_nonce: Nonce;
         upper_bound: Nonce;
       };
-    };
-
-export type InvalidTxError =
-  | { InvalidAccessKeyError: InvalidAccessKeyError }
-  | { InvalidSignerId: { signer_id: String } }
-  | { SignerDoesNotExist: { signer_id: AccountId } }
-  | { InvalidNonce: { tx_nonce: Nonce; ak_nonce: Nonce } }
-  | { NonceTooLarge: { tx_nonce: Nonce; upper_bound: Nonce } }
-  | { InvalidReceiverId: { receiver_id: String } }
-  // https://docs.rs/near-primitives/0.12.0/near_primitives/errors/enum.InvalidTxError.html#variant.InvalidSignature
-  | { InvalidSignature: unknown }
+    }
   | {
-      NotEnoughBalance: {
-        signer_id: AccountId;
-        balance: Balance;
-        cost: Balance;
+      DelegateActionSenderDoesNotMatchTxReceiver: {
+        receiver_id: AccountId;
+        sender_id: AccountId;
       };
     }
-  | { LackBalanceForState: { signer_id: AccountId; amount: Balance } }
-  | { CostOverflow: unknown }
-  | { InvalidChain: unknown }
-  | { Expired: unknown }
-  // https://docs.rs/near-primitives/0.12.0/near_primitives/errors/enum.ActionsValidationError.html
+  | {
+      InsufficientStake: {
+        account_id: AccountId;
+        minimum_stake: Balance;
+        stake: Balance;
+      };
+    }
+  | {
+      TriesToStake: {
+        account_id: AccountId;
+        balance: Balance;
+        locked: Balance;
+        stake: Balance;
+      };
+    }
+  | { AccountAlreadyExists: { account_id: AccountId } }
+  | { AccountDoesNotExist: { account_id: AccountId } }
+  | { ActorNoPermission: { account_id: AccountId; actor_id: AccountId } }
+  | { AddKeyAlreadyExists: { account_id: AccountId; public_key: PublicKey } }
+  | { DelegateActionAccessKeyError: InvalidAccessKeyError }
+  | { DelegateActionInvalidNonce: { ak_nonce: Nonce; delegate_nonce: Nonce } }
+  | { DeleteAccountStaking: { account_id: AccountId } }
+  | { DeleteAccountWithLargeState: { account_id: AccountId } }
+  | { DeleteKeyDoesNotExist: { account_id: AccountId; public_key: PublicKey } }
+  | { FunctionCallError: FunctionCallError }
+  | { LackBalanceForState: { account_id: AccountId; amount: Balance } }
+  | { NewReceiptValidationError: NewReceiptValidationError }
+  | { OnlyImplicitAccountCreationAllowed: { account_id: AccountId } }
+  | { TriesToUnstake: { account_id: AccountId } };
+
+export type InvalidTxError =
+  | {
+      NotEnoughBalance: {
+        balance: Balance;
+        cost: Balance;
+        signer_id: AccountId;
+      };
+    }
   | { ActionsValidation: unknown }
-  | { TransactionSizeExceeded: { size: U64; limit: U64 } };
+  | { CostOverflow: unknown }
+  | { Expired: unknown }
+  | { InvalidAccessKeyError: InvalidAccessKeyError }
+  | { InvalidChain: unknown }
+  // https://docs.rs/near-primitives/0.12.0/near_primitives/errors/enum.InvalidTxError.html#variant.InvalidSignature
+  | { InvalidNonce: { ak_nonce: Nonce; tx_nonce: Nonce } }
+  | { InvalidReceiverId: { receiver_id: String } }
+  | { InvalidSignature: unknown }
+  | { InvalidSignerId: { signer_id: String } }
+  | { LackBalanceForState: { amount: Balance; signer_id: AccountId } }
+  | { NonceTooLarge: { tx_nonce: Nonce; upper_bound: Nonce } }
+  // https://docs.rs/near-primitives/0.12.0/near_primitives/errors/enum.ActionsValidationError.html
+  | { SignerDoesNotExist: { signer_id: AccountId } }
+  | { TransactionSizeExceeded: { limit: U64; size: U64 } };
 
 export type TxExecutionError =
   | { ActionError: ActionError }
@@ -953,10 +989,6 @@ export type TxExecutionError =
   | {};
 
 export type ExecutionStatusView =
-  | { Unknown: unknown }
-  | { Failure: TxExecutionError }
-  | { SuccessValue: String }
-  | { SuccessReceiptId: CryptoHash }
   | {
       Failure: {
         ActionError: {
@@ -964,27 +996,31 @@ export type ExecutionStatusView =
           kind: { FunctionCallError: { ExecutionError: string } };
         };
       };
-    };
+    }
+  | { Failure: TxExecutionError }
+  | { SuccessReceiptId: CryptoHash }
+  | { SuccessValue: String }
+  | { Unknown: unknown };
 
 export type ExecutionOutcomeView = {
-  logs: Vec<String>;
-  receipt_ids: Vec<CryptoHash>;
-  gas_burnt: Gas;
-  tokens_burnt: Balance;
   executor_id: AccountId;
-  status: ExecutionStatusView;
+  gas_burnt: Gas;
+  logs: Vec<String>;
   metadata: ExecutionMetadataView;
+  receipt_ids: Vec<CryptoHash>;
+  status: ExecutionStatusView;
+  tokens_burnt: Balance;
 };
 
 export type AccessKeyPermissionView =
+  | 'FullAccess'
   | {
       FunctionCall: {
         allowance: Option<Balance>;
-        receiver_id: String;
         method_names: Vec<String>;
+        receiver_id: String;
       };
-    }
-  | 'FullAccess';
+    };
 
 export type DeployContractActionView = {
   DeployContract: {
@@ -993,10 +1029,10 @@ export type DeployContractActionView = {
 };
 export type FunctionCallActionView = {
   FunctionCall: {
-    method_name: String;
     args: String;
-    gas: Gas;
     deposit: Balance;
+    gas: Gas;
+    method_name: String;
   };
 };
 export type TransferActionView = {
@@ -1006,14 +1042,14 @@ export type TransferActionView = {
 };
 export type StakeActionView = {
   Stake: {
-    stake: Balance;
     public_key: PublicKey;
+    stake: Balance;
   };
 };
 export type AddKeyActionView = {
   AddKey: {
-    public_key: PublicKey;
     access_key: AccessKeyView;
+    public_key: PublicKey;
   };
 };
 export type DeleteKeyActionView = {
@@ -1035,15 +1071,15 @@ export type DelegateActionView = {
 
 export type ActionView =
   | 'CreateAccount'
+  | AddKeyActionView
+  | any
+  | DelegateActionView
+  | DeleteAccountActionView
+  | DeleteKeyActionView
   | DeployContractActionView
   | FunctionCallActionView
-  | TransferActionView
   | StakeActionView
-  | AddKeyActionView
-  | DeleteKeyActionView
-  | DeleteAccountActionView
-  | DelegateActionView
-  | any;
+  | TransferActionView;
 
 export type PublicKey = string;
 type DataReceiverView = {
@@ -1053,197 +1089,199 @@ type DataReceiverView = {
 type ReceiptEnumView =
   | {
       Action: {
+        actions: Vec<ActionView>;
+        gas_price: Balance;
+        input_data_ids: Vec<CryptoHash>;
+        output_data_receivers: Vec<DataReceiverView>;
         signer_id: AccountId;
         signer_public_key: PublicKey;
-        gas_price: Balance;
-        output_data_receivers: Vec<DataReceiverView>;
-        input_data_ids: Vec<CryptoHash>;
-        actions: Vec<ActionView>;
       };
     }
   | {
       Data: {
-        data_id: CryptoHash;
         data: Option<Vec<U8>>;
+        data_id: CryptoHash;
       };
     };
 
 export type ReceiptView = {
   predecessor_id: AccountId;
-  receiver_id: AccountId;
-  receipt_id: CryptoHash;
   receipt: ReceiptEnumView;
+  receipt_id: CryptoHash;
+  receiver_id: AccountId;
 };
 
 export type FailedToFindReceipt = { id: string };
 
 export type NonDelegateAction =
   | {
-      kind: 'createAccount';
-      args: {};
-    }
-  | {
-      kind: 'deployContract';
       args: {
-        code: string;
-      };
-    }
-  | {
-      kind: 'functionCall';
-      args: {
-        methodName: string;
-        args: string;
-        gas: string;
-        deposit: string;
-      };
-    }
-  | {
-      kind: 'transfer';
-      args: {
-        deposit: string;
-      };
-    }
-  | {
-      kind: 'stake';
-      args: {
-        stake: string;
-        publicKey: string;
-      };
-    }
-  | {
-      kind: 'addKey';
-      args: {
-        publicKey: string;
         accessKey: {
           nonce: string;
           permission:
             | {
-                type: 'fullAccess';
-              }
-            | {
-                type: 'functionCall';
                 contractId: string;
                 methodNames: string[];
+                type: 'functionCall';
+              }
+            | {
+                type: 'fullAccess';
               };
         };
-      };
-    }
-  | {
-      kind: 'deleteKey';
-      args: {
         publicKey: string;
       };
+      kind: 'addKey';
     }
   | {
-      kind: 'deleteAccount';
+      args: {
+        args: string;
+        deposit: string;
+        gas: string;
+        methodName: string;
+      };
+      kind: 'functionCall';
+    }
+  | {
       args: {
         beneficiaryId: string;
       };
+      kind: 'deleteAccount';
+    }
+  | {
+      args: {
+        code: string;
+      };
+      kind: 'deployContract';
+    }
+  | {
+      args: {
+        deposit: string;
+      };
+      kind: 'transfer';
+    }
+  | {
+      args: {
+        publicKey: string;
+        stake: string;
+      };
+      kind: 'stake';
+    }
+  | {
+      args: {
+        publicKey: string;
+      };
+      kind: 'deleteKey';
+    }
+  | {
+      args: {};
+      kind: 'createAccount';
     };
 
 type DelegateAction = {
-  kind: 'delegateAction';
   args: {
     actions: (NonDelegateAction & { delegateIndex: number })[];
     receiverId: string;
     senderId: string;
   };
+  kind: 'delegateAction';
 };
 export type UnknownError = { type: 'unknown' };
 
 type ActionsValidation = unknown;
 export type RPCNewReceiptValidationError =
-  | { InvalidPredecessorId: { account_id: String } }
-  | { InvalidReceiverId: { account_id: String } }
-  | { InvalidSignerId: { account_id: String } }
-  | { InvalidDataReceiverId: { account_id: String } }
-  | { ReturnedValueLengthExceeded: { length: U64; limit: U64 } }
   | {
       NumberInputDataDependenciesExceeded: {
-        number_of_input_data_dependencies: U64;
         limit: U64;
+        number_of_input_data_dependencies: U64;
       };
     }
   | { ActionsValidation: ActionsValidation }
+  | { InvalidDataReceiverId: { account_id: String } }
+  | { InvalidPredecessorId: { account_id: String } }
+  | { InvalidReceiverId: { account_id: String } }
+  | { InvalidSignerId: { account_id: String } }
+  | { ReturnedValueLengthExceeded: { length: U64; limit: U64 } }
   | {};
 
 export type NewReceiptValidationError =
-  | { type: 'invalidPredecessorId'; accountId: String }
-  | { type: 'invalidReceiverId'; accountId: String }
-  | { type: 'invalidSignerId'; accountId: String }
-  | { type: 'invalidDataReceiverId'; accountId: String }
-  | { type: 'returnedValueLengthExceeded'; length: number; limit: number }
   | {
-      type: 'numberInputDataDependenciesExceeded';
-      numberOfInputDataDependencies: number;
       limit: number;
+      numberOfInputDataDependencies: number;
+      type: 'numberInputDataDependenciesExceeded';
     }
+  | { accountId: String; type: 'invalidDataReceiverId' }
+  | { accountId: String; type: 'invalidPredecessorId' }
+  | { accountId: String; type: 'invalidReceiverId' }
+  | { accountId: String; type: 'invalidSignerId' }
+  | { length: number; limit: number; type: 'returnedValueLengthExceeded' }
   | { type: 'actionsValidation' }
   | UnknownError;
 
 export type CompilationError =
-  | { type: 'codeDoesNotExist'; accountId: string }
+  | { accountId: string; type: 'codeDoesNotExist' }
+  | { msg: string; type: 'unsupportedCompiler' }
+  | { msg: string; type: 'wasmerCompileError' }
   | { type: 'prepareError' }
-  | { type: 'wasmerCompileError'; msg: string }
-  | { type: 'unsupportedCompiler'; msg: string }
   | UnknownError;
 
 export type RPCCompilationError =
   | { CodeDoesNotExist: { account_id: AccountId } }
   // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.PrepareError.html
   | { PrepareError: unknown }
-  | { WasmerCompileError: { msg: String } }
-  | { UnsupportedCompiler: { msg: String } };
+  | { UnsupportedCompiler: { msg: String } }
+  | { WasmerCompileError: { msg: String } };
 
 export type FunctionCallError =
   | {
-      type: 'compilationError';
       error: CompilationError;
+      type: 'compilationError';
     }
-  | { type: 'linkError'; msg: string }
+  | { error: string; type: 'executionError' }
+  | { msg: string; type: 'linkError' }
+  | { type: 'evmError' }
+  | { type: 'hostError' }
   | { type: 'methodResolveError' }
   | { type: 'wasmTrap' }
   | { type: 'wasmUnknownError' }
-  | { type: 'hostError' }
-  | { type: 'evmError' }
-  | { type: 'executionError'; error: string }
   | UnknownError;
 
 export type RPCFunctionCallError =
-  | { CompilationError: RPCCompilationError }
-  | { LinkError: { msg: String } }
-  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.MethodResolveError.html
-  | { MethodResolveError: unknown }
-  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.WasmTrap.html
-  | { WasmTrap: unknown }
-  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.FunctionCallErrorSer.html#variant.WasmUnknownError
-  | { WasmUnknownError: unknown }
-  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.HostError.html
-  | { HostError: unknown }
   | { _EVMError: unknown }
+  | { CompilationError: RPCCompilationError }
+  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.MethodResolveError.html
   | { ExecutionError: String }
+  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.WasmTrap.html
+  | { HostError: unknown }
+  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.FunctionCallErrorSer.html#variant.WasmUnknownError
+  | { LinkError: { msg: String } }
+  // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.HostError.html
+  | { MethodResolveError: unknown }
+  | { WasmTrap: unknown }
+  | { WasmUnknownError: unknown }
   | {};
 
 export type InvalidAccessKeyError =
-  | { type: 'depositWithFunctionCall' }
-  | { type: 'requiresFullAccess' }
-  | { type: 'accessKeyNotFound'; accountId: string; publicKey: string }
   | {
-      type: 'receiverMismatch';
-      akReceiver: string;
-      transactionReceiver: string;
-    }
-  | { type: 'methodNameMismatch'; methodName: string }
-  | {
-      type: 'notEnoughAllowance';
       accountId: string;
       allowance: string;
       cost: string;
       publicKey: string;
+      type: 'notEnoughAllowance';
     }
+  | {
+      akReceiver: string;
+      transactionReceiver: string;
+      type: 'receiverMismatch';
+    }
+  | { accountId: string; publicKey: string; type: 'accessKeyNotFound' }
+  | { methodName: string; type: 'methodNameMismatch' }
+  | { type: 'depositWithFunctionCall' }
+  | { type: 'requiresFullAccess' }
   | UnknownError;
 
 export type RPCInvalidAccessKeyError =
+  | 'DepositWithFunctionCall'
+  | 'RequiresFullAccess'
   | {
       AccessKeyNotFound: {
         account_id: AccountId;
@@ -1251,184 +1289,182 @@ export type RPCInvalidAccessKeyError =
       };
     }
   | {
-      ReceiverMismatch: {
-        tx_receiver: AccountId;
-        ak_receiver: String;
-      };
-    }
-  | {
       MethodNameMismatch: {
         method_name: String;
       };
     }
-  | 'RequiresFullAccess'
   | {
       NotEnoughAllowance: {
         account_id: AccountId;
-        public_key: PublicKey;
         allowance: Balance;
         cost: Balance;
+        public_key: PublicKey;
       };
     }
-  | 'DepositWithFunctionCall'
+  | {
+      ReceiverMismatch: {
+        ak_receiver: String;
+        tx_receiver: AccountId;
+      };
+    }
   | InvalidAccessKeyError;
 
 export type ReceiptActionError =
   | {
-      type: 'accountAlreadyExists';
-      accountId: string;
-    }
-  | {
-      type: 'accountDoesNotExist';
-      accountId: string;
-    }
-  | {
-      type: 'createAccountOnlyByRegistrar';
-      accountId: string;
-      registrarAccountId: string;
-      predecessorId: string;
-    }
-  | {
-      type: 'createAccountNotAllowed';
-      accountId: string;
-      predecessorId: string;
-    }
-  | {
-      type: 'actorNoPermission';
       accountId: string;
       actorId: string;
+      type: 'actorNoPermission';
     }
   | {
-      type: 'deleteKeyDoesNotExist';
-      accountId: string;
-      publicKey: string;
-    }
-  | {
-      type: 'addKeyAlreadyExists';
-      accountId: string;
-      publicKey: string;
-    }
-  | {
-      type: 'deleteAccountStaking';
-      accountId: string;
-    }
-  | {
-      type: 'lackBalanceForState';
       accountId: string;
       amount: string;
+      type: 'lackBalanceForState';
     }
   | {
-      type: 'triesToUnstake';
       accountId: string;
-    }
-  | {
-      type: 'triesToStake';
-      accountId: string;
-      stake: string;
-      locked: string;
       balance: string;
-    }
-  | {
-      type: 'insufficientStake';
-      accountId: string;
+      locked: string;
       stake: string;
+      type: 'triesToStake';
+    }
+  | {
+      accountId: string;
       minimumStake: string;
+      stake: string;
+      type: 'insufficientStake';
     }
   | {
-      type: 'functionCallError';
-      error: FunctionCallError;
+      accountId: string;
+      predecessorId: string;
+      registrarAccountId: string;
+      type: 'createAccountOnlyByRegistrar';
     }
   | {
-      type: 'newReceiptValidationError';
-      error: NewReceiptValidationError;
+      accountId: string;
+      predecessorId: string;
+      type: 'createAccountNotAllowed';
     }
-  | { type: 'onlyImplicitAccountCreationAllowed'; accountId: string }
-  | { type: 'deleteAccountWithLargeState'; accountId: string }
-  | { type: 'delegateActionExpired' }
-  | { type: 'delegateActionInvalidSignature' }
   | {
-      type: 'delegateActionSenderDoesNotMatchTxReceiver';
-      receiverId: string;
-      senderId: string;
+      accountId: string;
+      publicKey: string;
+      type: 'addKeyAlreadyExists';
     }
-  | { type: 'delegateActionAccessKeyError'; error: InvalidAccessKeyError }
   | {
-      type: 'delegateActionInvalidNonce';
+      accountId: string;
+      publicKey: string;
+      type: 'deleteKeyDoesNotExist';
+    }
+  | {
+      accountId: string;
+      type: 'accountAlreadyExists';
+    }
+  | {
+      accountId: string;
+      type: 'accountDoesNotExist';
+    }
+  | {
+      accountId: string;
+      type: 'deleteAccountStaking';
+    }
+  | {
+      accountId: string;
+      type: 'triesToUnstake';
+    }
+  | {
       akNonce: number;
       delegateNonce: number;
+      type: 'delegateActionInvalidNonce';
     }
   | {
-      type: 'delegateActionNonceTooLarge';
       delegateNonce: number;
+      type: 'delegateActionNonceTooLarge';
       upperBound: number;
     }
+  | {
+      error: FunctionCallError;
+      type: 'functionCallError';
+    }
+  | {
+      error: NewReceiptValidationError;
+      type: 'newReceiptValidationError';
+    }
+  | {
+      receiverId: string;
+      senderId: string;
+      type: 'delegateActionSenderDoesNotMatchTxReceiver';
+    }
+  | { accountId: string; type: 'deleteAccountWithLargeState' }
+  | { accountId: string; type: 'onlyImplicitAccountCreationAllowed' }
+  | { error: InvalidAccessKeyError; type: 'delegateActionAccessKeyError' }
+  | { type: 'delegateActionExpired' }
+  | { type: 'delegateActionInvalidSignature' }
   | UnknownError;
 
 export type ReceiptTransactionError =
-  | { type: 'invalidAccessKeyError'; error: InvalidAccessKeyError }
-  | { type: 'invalidSignerId'; signerId: string }
-  | { type: 'signerDoesNotExist'; signerId: string }
-  | { type: 'invalidNonce'; transactionNonce: number; akNonce: number }
-  | { type: 'nonceTooLarge'; transactionNonce: number; upperBound: number }
-  | { type: 'invalidReceiverId'; receiverId: string }
-  | { type: 'invalidSignature' }
   | {
-      type: 'notEnoughBalance';
-      signerId: string;
       balance: string;
       cost: string;
+      signerId: string;
+      type: 'notEnoughBalance';
     }
-  | { type: 'lackBalanceForState'; signerId: string; amount: string }
-  | { type: 'costOverflow' }
-  | { type: 'invalidChain' }
-  | { type: 'expired' }
+  | { akNonce: number; transactionNonce: number; type: 'invalidNonce' }
+  | { amount: string; signerId: string; type: 'lackBalanceForState' }
+  | { error: InvalidAccessKeyError; type: 'invalidAccessKeyError' }
+  | { limit: number; size: number; type: 'transactionSizeExceeded' }
+  | { receiverId: string; type: 'invalidReceiverId' }
+  | { signerId: string; type: 'invalidSignerId' }
+  | { signerId: string; type: 'signerDoesNotExist' }
+  | { transactionNonce: number; type: 'nonceTooLarge'; upperBound: number }
   | { type: 'actionsValidation' }
-  | { type: 'transactionSizeExceeded'; size: number; limit: number }
+  | { type: 'costOverflow' }
+  | { type: 'expired' }
+  | { type: 'invalidChain' }
+  | { type: 'invalidSignature' }
   | UnknownError;
 
 export type ReceiptExecutionStatusError =
   | {
-      type: 'action';
       error: ReceiptActionError;
+      type: 'action';
     }
   | {
-      type: 'transaction';
       error: ReceiptTransactionError;
+      type: 'transaction';
     }
   | UnknownError;
 
-export type Action = NonDelegateAction | DelegateAction;
+export type Action = DelegateAction | NonDelegateAction;
 
 export type ReceiptExecutionStatus =
   | {
-      type: 'failure';
       error: ReceiptExecutionStatusError;
+      type: 'failure';
+    }
+  | {
+      receiptId: string;
+      type: 'successReceiptId';
     }
   | {
       type: 'successValue';
       value: string;
     }
   | {
-      type: 'successReceiptId';
-      receiptId: string;
-    }
-  | {
       type: 'unknown';
     };
 
 export type NestedReceiptWithOutcomeOld = {
-  id: string;
-  predecessorId: string;
-  receiverId: string;
   actions: Action[];
+  id: string;
   outcome: {
     blockHash: string;
-    tokensBurnt: string;
     gasBurnt: string;
-    status: ReceiptExecutionStatus;
     logs: string[];
-    nestedReceipts: (NestedReceiptWithOutcomeOld | FailedToFindReceipt)[];
+    nestedReceipts: (FailedToFindReceipt | NestedReceiptWithOutcomeOld)[];
+    status: ReceiptExecutionStatus;
+    tokensBurnt: string;
   };
+  predecessorId: string;
+  receiverId: string;
 };
 
 export type NestedReceiptWithOutcome = Omit<
@@ -1437,14 +1473,14 @@ export type NestedReceiptWithOutcome = Omit<
 > & {
   outcome: Omit<
     NestedReceiptWithOutcomeOld['outcome'],
-    'nestedReceipts' | 'blockHash'
+    'blockHash' | 'nestedReceipts'
   > & {
     block: {
       hash: string;
       height: string;
       timestamp: string;
     };
-    nestedReceipts: (NestedReceiptWithOutcome | FailedToFindReceipt)[];
+    nestedReceipts: (FailedToFindReceipt | NestedReceiptWithOutcome)[];
   };
 };
 
@@ -1455,20 +1491,20 @@ export type ParsedReceipt = Omit<NestedReceiptWithOutcome, 'outcome'> & {
 };
 
 export type ExecutionOutcomeWithIdView = {
-  proof: MerklePath;
   block_hash: CryptoHash;
   id: CryptoHash;
   outcome: ExecutionOutcomeView;
+  proof: MerklePath;
 };
 
 export type SignedTransactionView = {
-  signer_id: AccountId;
-  public_key: PublicKey;
-  nonce: Nonce;
-  receiver_id: AccountId;
   actions: Vec<ActionView>;
-  signature: Signature;
   hash: CryptoHash;
+  nonce: Nonce;
+  public_key: PublicKey;
+  receiver_id: AccountId;
+  signature: Signature;
+  signer_id: AccountId;
 };
 
 export type NonDelegateActionView = Exclude<ActionView, DelegateActionView>;
@@ -1487,8 +1523,8 @@ export type ParseOutcomeInfo = {
       actions: {
         action_kind: string;
         args: {
-          stake: string;
           deposit: string;
+          stake: string;
         };
       }[];
       outcome: OutcomePropsInfo;
@@ -1522,18 +1558,22 @@ export type TransactionReceiptInfo = {
     }>;
   };
   rpcTxn: RPCTransactionInfo;
+  polledReceipt: any;
+  polledFellowOutgoingReceipts?: any;
 };
 
 export type ReceiptKindInfo = {
   action: any;
-  onClick?: any;
+  polledAction: any;
   isTxTypeActive: boolean;
-  receiver: string;
+  onClick?: any;
   receipt?: any;
+  receiver: string;
 };
 export type CommentItem = {
   accountId: string;
   blockHeight: number;
+  type: string;
   value: {
     post: {
       image?: {
@@ -1542,17 +1582,16 @@ export type CommentItem = {
       text?: string;
     };
   };
-  type: string;
 };
 export type CommentContent = {
-  type: string;
-  text?: string;
   image?:
     | {
         cid?: string;
         url?: string;
       }
     | undefined;
+  text?: string;
+  type: string;
 };
 
 export type ContractParseInfo = {
@@ -1566,27 +1605,17 @@ export type ContractParseInfo = {
 export type FieldType = {
   id: string;
   name: string;
+  placeholder: string;
   type: string;
   value: string;
-  placeholder: string;
 };
 
 export type SchemaInfo = {
-  schema_version: string;
-  metadata: {
-    name: string;
-    version: string;
-    build: {
-      compiler: string;
-      builder: string;
-    };
-  };
   body: {
     functions: {
-      name: string;
       kind: string;
+      name: string;
       params: {
-        serialization_type: string;
         args: [
           {
             name: string;
@@ -1595,6 +1624,7 @@ export type SchemaInfo = {
             };
           },
         ];
+        serialization_type: string;
       };
       result: {
         serialization_type: string;
@@ -1605,58 +1635,73 @@ export type SchemaInfo = {
     }[];
     root_schema: {
       $schema: string;
-      title: String;
-      type: string;
       definitions: {
         AccountId: {
           description: string;
           type: string;
         };
       };
+      title: String;
+      type: string;
     };
   };
+  metadata: {
+    build: {
+      builder: string;
+      compiler: string;
+    };
+    name: string;
+    version: string;
+  };
+  schema_version: string;
 };
 
-export type FieldValueTypes = string | boolean | number | null;
+export type FieldValueTypes = boolean | null | number | string;
 
 export type Status = {
+  jobs: {
+    daily_stats: {
+      date: string;
+      sync: boolean;
+    };
+  };
   aggregates: {
     ft_holders: { height: number; sync: boolean; timestamp: string };
     nft_holders: { height: number; sync: boolean; timestamp: string };
   };
   indexers: {
-    balance: { height: number; sync: boolean };
-    base: { height: string; sync: boolean };
-    events: { height: number; sync: boolean };
+    balance: { height: number; sync: boolean; timestamp: string };
+    base: { height: string; sync: boolean; timestamp: string };
+    events: { height: number; sync: boolean; timestamp: string };
   };
 };
 
 export type chartDataInfo = {
   date: string;
+  shards: { shard: string; txns: string }[];
   txns: string;
-  shards: { txns: string; shard: string }[];
 };
 
 export type AccountDataInfo = {
-  amount: string;
-  locked: string;
-  code_hash: string;
-  storage_usage: string;
-  storage_paid_at: string;
-  block_height: string;
-  block_hash: string;
   account_id: string;
+  amount: string;
+  block_hash: string;
+  block_height: string;
+  code_hash: string;
+  locked: string;
+  storage_paid_at: string;
+  storage_usage: string;
 };
 export type SpamToken = {
   blacklist: string[];
 };
 
 export type GuessableTypeString =
-  | 'null'
-  | 'string'
-  | 'number'
   | 'boolean'
-  | 'json';
+  | 'json'
+  | 'null'
+  | 'number'
+  | 'string';
 
 export type DelegatorInfo = {
   account_id: string;
@@ -1671,9 +1716,9 @@ export type RewardFraction = {
 };
 
 export type ValidatorStatus = {
+  afterNextEpoch: boolean;
   currentEpoch: boolean;
   nextEpoch: boolean;
-  afterNextEpoch: boolean;
 };
 
 export type VerifierData = {
@@ -1683,11 +1728,11 @@ export type VerifierData = {
   lang?: string;
 };
 
-export type VerifierStatus = 'verified' | 'mismatch' | 'notVerified';
+export type VerifierStatus = 'mismatch' | 'notVerified' | 'verified';
 
 export type VerificationData = {
+  data: null | VerifierData;
   status: VerifierStatus;
-  data: VerifierData | null;
 };
 
 export type ContractMetadata = {
@@ -1704,65 +1749,102 @@ export type ContractMetadata = {
 
 export type ContractData = {
   base64Code: string;
-  onChainCodeHash: string;
   contractMetadata: ContractMetadata | null;
+  onChainCodeHash: string;
 };
 
 export type MultiChainTxnInfo = {
-  id: string;
-  receipt_id: string;
   account_id: string;
-  derived_address: string;
-  public_key: string;
-  chain: string;
-  path: string;
-  derived_transaction: string;
   block_height: string;
   block_timestamp: string;
-  transaction_hash: string;
+  chain: string;
+  derived_address: string;
+  derived_transaction: string;
+  id: string;
+  path: string;
+  public_key: string;
+  receipt_id: string;
   status: boolean;
-};
-
-export type Account = {
-  amount: string;
-  block_hash: string;
-  block_height: number;
-  code_hash: string;
-  locked: string;
-  storage_paid_at: number;
-  storage_usage: number;
-  account_id: string;
+  transaction_hash: string;
 };
 
 export type MtTransferLog = {
-  authorized_id?: string;
-  old_owner_id: string;
-  new_owner_id: string;
-  token_ids: string[];
   amounts: string[];
+  authorized_id?: string;
   memo?: string;
+  new_owner_id: string;
+  old_owner_id: string;
+  token_ids: string[];
 };
 
 export type MtBurnLog = {
-  owner_id: string;
-  authorized_id?: string;
-  token_ids: string[];
   amounts: string[];
+  authorized_id?: string;
   memo?: string;
+  owner_id: string;
+  token_ids: string[];
 };
 
 export type MtMintLog = {
-  owner_id: string;
-  token_ids: string[];
   amounts: string[];
   memo?: string;
+  owner_id: string;
+  token_ids: string[];
 };
 
 export type MtEventLogData = {
+  data: MtBurnLog[] | MtMintLog[] | MtTransferLog[];
+  event: string;
   standard: string;
   version: string;
-  event: string;
-  data: MtMintLog[] | MtBurnLog[] | MtTransferLog[];
+};
+
+export type CampaignData = {
+  data?: {
+    desktop_image_right_url?: string;
+    icon?: string;
+    is_active?: number;
+    link_name?: string;
+    mobile_image_url?: string;
+    site_name?: string;
+    start_date?: string;
+    subscription?: {
+      status?: string;
+    };
+    text?: string;
+    title?: string;
+    url?: string;
+  };
+};
+
+export type CampaignProps = {
+  campaignData: CampaignData;
+  campaignId?: string;
+  campaignMutate: () => void;
+  loading: boolean;
+};
+
+export type currentCampaign = {
+  click_count: number;
+  id: string;
+  impression_count: number;
+  is_active: number;
+  is_approved?: number;
+  key: string;
+  price_annually: number;
+  price_monthly: number;
+  start_date: string;
+  subscription?: {
+    campaign_plan?: {
+      title: string;
+    };
+    status: string;
+  };
+  title: string;
+  user?: {
+    username: string;
+    email: string;
+  };
 };
 
 export enum FilterKind {
@@ -1775,7 +1857,248 @@ export enum FilterKind {
   MULTICHAIN_ADDRESS = 'multichain_address',
   EVENT = 'event',
   INVOLVED = 'involved',
+  CONTRACT = 'contract',
   A = 'a',
 }
 
+export type Account = {
+  account_id: string;
+  amount: string;
+  block_hash: string;
+  block_height: number;
+  code_hash: string;
+  locked: string;
+  storage_paid_at: number;
+  storage_usage: number;
+};
+
 export type NetworkType = keyof typeof supportedNetworks;
+export type UserToken = {
+  exp: number;
+  iat: number;
+  role: string;
+  sub: string;
+  username: string;
+};
+
+export type BannerAdData = {
+  desktopImage: string;
+  id?: string;
+  mobileImage: string;
+};
+
+export type TextAdData = {
+  icon: string;
+  id: string;
+  linkName: string;
+  siteName: string;
+  text: string;
+};
+
+export type ActionInfo = {
+  to: string;
+  from: string;
+  receiptId: string;
+  logs: Array<{
+    logs: string;
+    contract: string;
+    receiptId: string;
+  }>;
+  actionsLog: Array<{
+    args: {
+      deposit: number;
+      gas: number;
+      method_name?: string;
+      args?: any;
+    };
+    [key: string]: any;
+  }>;
+  [key: string]: any;
+};
+
+export type TokenMetadata = {
+  name: string;
+  symbol: string;
+  decimals: number;
+  price: string;
+  marketCap: string;
+  volume24h: string;
+  description: string;
+  website: string;
+  icon: string | null;
+};
+
+export type ProcessedTokenMeta = {
+  contractId: string;
+  metadata: TokenMetadata;
+};
+
+export type ApiTxnData = {
+  apiLogs: TransactionLog[];
+  apiActionLogs: any;
+  apiMainActions: ActionInfo[];
+  apiSubActions: ReceiptAction[];
+  apiAllActions: ReceiptAction[];
+  tokenMetadata: ProcessedTokenMeta[];
+  receiptData: TransformedReceipt | null;
+};
+
+export type TransactionData = {
+  txns: ApiTransaction[];
+};
+
+export type ApiTransaction = {
+  transaction_hash: string;
+  included_in_block_hash: string;
+  block_timestamp: string;
+  signer_account_id: string;
+  receiver_account_id: string;
+  receipt_conversion_gas_burnt: string;
+  receipt_conversion_tokens_burnt: string;
+  shard_id: string;
+  block: {
+    block_height: number;
+  };
+  actions: Action[];
+  actions_agg: {
+    deposit: number;
+    gas_attached: number;
+  };
+  outcomes: {
+    status: boolean;
+  };
+  outcomes_agg: {
+    transaction_fee: number;
+    gas_used: number;
+  };
+  receipts: ApiReceipt[];
+};
+
+export type ApiAction = {
+  action: string;
+  method: string;
+  args: string;
+  args_full: {
+    gas: number;
+    deposit: string;
+    args_json: {
+      msg: string;
+      amount: string;
+      receiver_id: string;
+    };
+    args_base64: string | null;
+    method_name: string;
+  };
+};
+
+export type ApiReceipt = {
+  receipt_id: string;
+  predecessor_account_id: string;
+  receiver_account_id: string;
+  receipt_kind: string;
+  block: {
+    block_hash: string;
+    block_height: number;
+    block_timestamp: number;
+  };
+  outcome: {
+    gas_burnt: number;
+    tokens_burnt: number;
+    executor_account_id: string;
+    status: boolean;
+    logs: string[];
+  };
+  fts: any[];
+  nfts: any[];
+};
+
+export type ReceiptTree = {
+  receipt_id: string;
+  predecessor_account_id: string;
+  receiver_account_id: string;
+  public_key: string;
+
+  block?: {
+    block_hash: string;
+    block_height: number;
+    block_timestamp: string;
+  };
+
+  actions?: Array<{
+    action_kind: string;
+    args: {
+      gas?: string;
+      deposit?: string;
+      method_name?: string;
+      args_json?: any;
+      args_base64?: string | null;
+    };
+    rlp_hash: string | null;
+  }>;
+
+  outcome: {
+    logs: string[] | null;
+    result: string;
+    status_key: string;
+    status:
+      | boolean
+      | {
+          SuccessValue?: string;
+          SuccessReceiptId?: string;
+          Failure?: { error_message: string };
+        };
+    gas_burnt: string;
+    tokens_burnt: string;
+    executor_account_id: string;
+  };
+
+  receipts?: ReceiptTree[];
+};
+
+export type TransformedReceipt = {
+  receipt_id: string;
+  predecessor_id: string;
+  receiver_id: string;
+  block_hash?: string;
+  block_height: number | null;
+  actions?: Array<{
+    action_kind: string;
+    args: {
+      gas?: string;
+      deposit: string;
+      method_name?: string;
+      args_json?: any;
+      args_base64?: string | null;
+    };
+    rlp_hash: string | null;
+  }>;
+
+  outcome: {
+    logs: string[];
+    status: {
+      SuccessValue?: string;
+      SuccessReceiptId?: string;
+      Failure?: { error_message: string };
+    };
+    gas_burnt?: string;
+    tokens_burnt?: string;
+    executor_account_id?: string;
+    outgoing_receipts: TransformedReceipt[];
+  };
+
+  public_key?: string;
+};
+
+export type ReceiptApiResponse = {
+  receipts: Array<{
+    receipt_tree: ReceiptTree;
+  }>;
+};
+
+export type ReceiptAction = {
+  from: string;
+  to: string;
+  receiptId: string;
+  action_kind: string;
+  args: Record<string, any>;
+};
