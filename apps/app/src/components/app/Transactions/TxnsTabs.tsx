@@ -53,6 +53,26 @@ export default async function TxnsTabs({
   const balanceIndexerStatus =
     syncData && syncData?.status?.indexers?.base?.sync;
   const txnData: ApiTxnData = await processTransactionWithTokens(txn, receipt);
+
+  const txnapiUrl = process.env.NEXT_PUBLIC_TXN_API_URL;
+  let actiondata = null;
+  try {
+    const res = await fetch(`${txnapiUrl}/v1/txnsaction/${hash}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ txnData }),
+    });
+
+    if (!res.ok) {
+      console.error(' Fetch failed:', res.status, await res.text());
+    }
+
+    const parseddata = await res.json();
+    actiondata = parseddata;
+  } catch (error) {
+    console.error('Fetch exception:', error);
+  }
+
   return (
     <TxnsTabActions
       hash={hash}
@@ -63,6 +83,7 @@ export default async function TxnsTabs({
       txn={txn}
       status={balanceIndexerStatus}
       apiTxnActionsData={txnData}
+      actionparsed={actiondata}
     />
   );
 }

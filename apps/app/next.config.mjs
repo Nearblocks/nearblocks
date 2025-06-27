@@ -18,6 +18,7 @@ const nextConfig = {
     config.experiments.asyncWebAssembly = true;
     return config;
   },
+
   async redirects() {
     return [
       {
@@ -49,6 +50,9 @@ const nextConfig = {
   },
   generateBuildId: async () => {
     return process.env.GITHUB_SHA || 'nearblocks';
+  },
+  env: {
+    NEXT_PUBLIC_TXN_API_URL: process.env.NEXT_PUBLIC_TXN_API_URL,
   },
 };
 

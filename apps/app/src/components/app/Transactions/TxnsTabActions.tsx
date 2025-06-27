@@ -38,6 +38,7 @@ const TxnsTabActions = ({
   txn,
   status,
   apiTxnActionsData,
+  actionparsed,
 }: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
@@ -292,6 +293,7 @@ const TxnsTabActions = ({
                     status={status}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
+                    actionparsed={actionparsed}
                   />
                 )}
                 {tab === 'execution' && (
