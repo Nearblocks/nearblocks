@@ -45,7 +45,7 @@ export const syncData = async () => {
     start: startBlock,
   });
 
-  await forEach(stream, onMessage, 25);
+  await forEach(stream, onMessage, 1);
 
   stream.on('end', () => {
     logger.error('stream ended');
