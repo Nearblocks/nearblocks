@@ -36,17 +36,17 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 25, // Temp batch processing
+    // limit: 25, // Temp batch processing
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlockHeight,
   });
 
-  // for await (const message of stream) {
-  //   await onMessage(message);
-  // }
+  for await (const message of stream) {
+    await onMessage(message);
+  }
   // Temp batch processing
-  await forEach(stream, onMessage, 25);
+  // await forEach(stream, onMessage, 25);
 
   stream.on('end', () => {
     logger.error('stream ended');
