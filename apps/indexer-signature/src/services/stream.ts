@@ -1,5 +1,5 @@
 // Temp batch processing
-import { forEach } from 'hwp';
+// import { forEach } from 'hwp';
 
 import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
