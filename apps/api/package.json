@@ -13,7 +13,7 @@
     "clean": "rimraf dist",
     "build": "yarn clean && tsc && cpx \"src/**/*.sql\" dist",
     "start": "node dist/index.js",
-    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
+    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts  --ext sql",
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./"
   },

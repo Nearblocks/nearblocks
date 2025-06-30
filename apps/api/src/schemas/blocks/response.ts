@@ -28,12 +28,13 @@ const block = v.object({
 });
 
 const blockCount = v.object({
+  cost: v.string(),
   count: v.string(),
 });
 
 const blockResponse = responseSchema(block);
 const blocksResponse = responseSchema(v.array(block));
-const blocksCountResponse = responseSchema(blockCount);
+const blocksCountResponse = responseSchema(v.omit(blockCount, ['cost']));
 
 export type Block = v.InferOutput<typeof block>;
 export type BlockCount = v.InferOutput<typeof blockCount>;
