@@ -75,11 +75,11 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
       'public_key',
       rs.public_key,
       'block',
-      COALESCE(b.block, '{}'::JSONB) AS block
+      COALESCE(b.block, '{}'::JSONB),
       'actions',
       COALESCE(a.actions, '[]'::JSONB),
       'outcome',
-      COALESCE(o.outcomes, '{}'::JSONB) AS outcomes,
+      COALESCE(o.outcome, '{}'::JSONB),
       'receipts',
       (
         SELECT
@@ -97,7 +97,7 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
     receipt_selected rs
     LEFT JOIN LATERAL (
       SELECT
-        JSON_BUILD_OBJECT(
+        JSONB_BUILD_OBJECT(
           'block_hash',
           block_hash,
           'block_height',
@@ -143,7 +143,7 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
     ) a ON TRUE
     LEFT JOIN LATERAL (
       SELECT
-        JSON_BUILD_OBJECT(
+        JSONB_BUILD_OBJECT(
           'gas_burnt',
           eo.gas_burnt::TEXT,
           'tokens_burnt',
