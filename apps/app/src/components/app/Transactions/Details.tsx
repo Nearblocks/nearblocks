@@ -98,7 +98,6 @@ const Details = (props: Props) => {
     shouldUseRpc,
     actionparsed,
   } = props;
-  console.log('action parsed', actionparsed);
   const [more, setMore] = useState(false);
   const [utc, setUtc] = useState(true);
   const { utcTime, localTime } = convertTimestampToTimes(
