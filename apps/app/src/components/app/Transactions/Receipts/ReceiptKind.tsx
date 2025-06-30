@@ -54,10 +54,19 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     encodeArgs(polledAction?.args?.args_json) ||
     polledAction.args.args_base64;
 
-  const modifiedData =
-    action?.args?.methodName === 'submit' && receiver.includes('aurora')
-      ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
-      : action?.args.args_base64 || action?.args.args;
+  const methodName = action?.args?.method_name || action?.args?.methodName;
+
+  const isSubmitOrRlp = ['rlp_execute', 'submit', 'submit_with_args'].includes(
+    methodName,
+  );
+
+  const isAuroraSubmit =
+    ['submit', 'submit_with_args'].includes(methodName) &&
+    receiver.includes('aurora');
+
+  const modifiedData = isAuroraSubmit
+    ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
+    : action?.args.args_base64 || action?.args.args;
 
   function parseNestedJSON(obj: any): any {
     if (typeof obj !== 'object' || obj === null) return obj;
@@ -182,11 +191,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
       {isTxTypeActive ? (
         action?.kind === 'functionCall' ||
         action?.action_kind === 'FUNCTION_CALL' ? (
-          action?.args?.methodName === 'rlp_execute' ||
-          action?.args?.method_name === 'rlp_execute' ||
-          action?.args?.methodName === 'submit' ||
-          (action?.args?.method_name === 'submit' &&
-            receiver.includes('aurora')) ? (
+          isSubmitOrRlp || isAuroraSubmit ? (
             <RlpTransaction
               method={action?.args?.method_name || action?.args?.methodName}
               pretty={modifiedData}
