@@ -11,16 +11,16 @@ WITH
     WHERE
       (
         (
-          $1::TEXT IS NOT NULL
-          AND block_hash = $1
+          ${hash}::TEXT IS NOT NULL
+          AND block_hash = ${hash}
         )
         OR (
-          $2::BIGINT IS NOT NULL
-          AND block_height = $2
+          ${height}::BIGINT IS NOT NULL
+          AND block_height = ${height}
         )
       )
-      AND block_timestamp >= $3
-      AND block_timestamp < $4
+      AND block_timestamp >= ${start} -- rolling window start
+      AND block_timestamp <= ${end} -- rolling window end
     LIMIT
       1
   )
@@ -30,71 +30,44 @@ SELECT
   bs.block_hash,
   bs.author_account_id,
   bs.gas_price,
-  COALESCE(
-    c.agg,
-    JSON_BUILD_OBJECT('count', '0', 'gas_used', '0', 'gas_limit', '0')
-  ) AS chunks_agg,
-  COALESCE(t.agg, JSON_BUILD_OBJECT('count', 0)) AS transactions_agg,
-  COALESCE(r.agg, JSON_BUILD_OBJECT('count', 0)) AS receipts_agg
+  c.chunks_agg,
+  t.transactions_agg,
+  r.receipts_agg
 FROM
   block_selected bs
   LEFT JOIN LATERAL (
     SELECT
-      included_in_block_hash,
-      JSON_BUILD_OBJECT(
+      JSONB_BUILD_OBJECT(
         'count',
         COUNT(included_in_block_hash),
         'gas_used',
         SUM(gas_used)::TEXT,
         'gas_limit',
         SUM(gas_limit)::TEXT
-      ) AS agg
+      ) AS chunks_agg
     FROM
       chunks
     WHERE
-      included_in_block_timestamp = (
-        SELECT
-          block_timestamp
-        FROM
-          block_selected
-      )
+      included_in_block_timestamp = bs.block_timestamp
       AND included_in_block_hash = bs.block_hash
-    GROUP BY
-      included_in_block_hash
   ) c ON TRUE
   LEFT JOIN LATERAL (
     SELECT
-      included_in_block_hash,
-      JSON_BUILD_OBJECT('count', COUNT(*)) AS agg
+      JSONB_BUILD_OBJECT('count', COUNT(*)) AS transactions_agg
     FROM
       transactions
     WHERE
-      block_timestamp = (
-        SELECT
-          block_timestamp
-        FROM
-          block_selected
-      )
+      block_timestamp = bs.block_timestamp
       AND included_in_block_hash = bs.block_hash
-    GROUP BY
-      included_in_block_hash
   ) t ON TRUE
   LEFT JOIN LATERAL (
     SELECT
-      included_in_block_hash,
-      JSON_BUILD_OBJECT('count', COUNT(*)) AS agg
+      JSONB_BUILD_OBJECT('count', COUNT(*)) AS receipts_agg
     FROM
       receipts
     WHERE
-      included_in_block_timestamp = (
-        SELECT
-          block_timestamp
-        FROM
-          block_selected
-      )
+      included_in_block_timestamp = bs.block_timestamp
       AND included_in_block_hash = bs.block_hash
-    GROUP BY
-      included_in_block_hash
   ) r ON TRUE
 ORDER BY
   bs.block_timestamp DESC

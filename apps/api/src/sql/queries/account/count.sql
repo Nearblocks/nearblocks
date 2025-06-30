@@ -12,4 +12,4 @@ FROM
         predecessor_account_id = %L',
       $1
     )
-  );
+  )
