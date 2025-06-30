@@ -45,7 +45,7 @@ export const syncData = async () => {
   });
 
   for await (const message of stream) {
-     await onMessage(message);
+    await onMessage(message);
   }
   // Temp batch processing
   // await forEach(stream, onMessage, 25);
