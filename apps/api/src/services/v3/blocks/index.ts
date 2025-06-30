@@ -20,7 +20,11 @@ const latest = responseHandler(
 
     const blocks = await redis.cache<Block[]>(
       `blocks:latest:${limit}`,
-      async () => dbBase.manyOrNone<Block>(sql.list, [null, limit]),
+      async () =>
+        dbBase.manyOrNone<Block>(sql.blocks, {
+          cursor: { timestamp: null },
+          limit,
+        }),
       5, // 5 sec,
     );
 
@@ -36,17 +40,19 @@ const blocks = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const blocks = await dbBase.manyOrNone<Block>(sql.list, [
-      cursor?.block_timestamp,
-      limit + 1,
-    ]);
+    const blocks = await dbBase.manyOrNone<Block>(sql.blocks, {
+      cursor: { timestamp: cursor?.timestamp },
+      limit: limit + 1,
+    });
 
-    return paginateData(blocks, limit, ['block_timestamp']);
+    return paginateData(blocks, limit, (txn) => ({
+      timestamp: txn.block_timestamp,
+    }));
   },
 );
 
 const count = responseHandler(response.count, async () => {
-  const block = await dbBase.oneOrNone<BlockCount>(sql.count);
+  const block = await dbBase.one<BlockCount>(sql.estimate);
 
   return { data: block };
 });
@@ -58,8 +64,10 @@ const block = responseHandler(
     const hash = input.length >= 43 ? input : null;
     const height = !isNaN(+input) ? +input : null;
 
-    const block = await rollingWindow(config.baseStart, async (start, end) =>
-      dbBase.oneOrNone<Block>(sql.block, [hash, height, start, end]),
+    const block = await rollingWindow(
+      async (start, end) =>
+        dbBase.oneOrNone<Block>(sql.block, { end, hash, height, start }),
+      { start: config.baseStart },
     );
 
     return { data: block };

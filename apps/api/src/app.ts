@@ -28,7 +28,9 @@ app.set('query parser', (str: string) =>
     types: {
       account: 'string',
       after_timestamp: 'string',
+      after_ts: 'string',
       before_timestamp: 'string',
+      before_ts: 'string',
       cursor: 'string',
       hash: 'string',
       keyword: 'string',

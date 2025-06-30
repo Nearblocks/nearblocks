@@ -21,12 +21,15 @@ const routes = (app: Router) => {
    *     parameters:
    *       - in: query
    *         name: cursor
-   *         description: Next page cursor
+   *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
    *           type: string
+   *         examples:
+   *           cursor:
+   *             value: 'eyJ0...In0='
    *       - in: query
    *         name: limit
-   *         description: The number of items to return
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
    *         schema:
    *           type: integer
    *           minimum: 1
@@ -85,12 +88,16 @@ const routes = (app: Router) => {
    *       - in: path
    *         name: hash
    *         required: true
-   *         description: Block hash or block height
+   *         description: Block hash or block height to retrieve
    *         schema:
    *           type: string
    *         examples:
-   *           hash:
-   *             value: example-block-hash-or-block-height
+   *           example1:
+   *             summary: Block hash
+   *             value: 'kjih...dcba'
+   *           example2:
+   *             summary: Block height
+   *             value: '12345678'
    *     responses:
    *       200:
    *         description: Success response
