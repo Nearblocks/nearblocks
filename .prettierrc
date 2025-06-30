@@ -11,7 +11,9 @@
     {
       "files": ["*.sql"],
       "options": {
-        "formatter": "sql-formatter"
+        "formatter": "sql-formatter",
+        "language": "postgresql",
+        "paramTypes": "{ \"custom\": [ { \"regex\": \"\\\\$\\\\{[^}]+\\\\}\" } ] }"
       }
     }
   ],
