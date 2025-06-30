@@ -1,4 +1,4 @@
-import pgp from 'pg-promise';
+import pgpromise from 'pg-promise';
 import { ISSLConfig } from 'pg-promise/typescript/pg-subset.js';
 
 import config from '#config';
@@ -14,7 +14,7 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const db = pgp({
+export const pgp = pgpromise({
   error: (_err, e) => {
     if (e.cn) {
       logger.error(e.cn);
@@ -38,7 +38,7 @@ const db = pgp({
   },
 });
 
-export const dbBase = db({
+export const dbBase = pgp({
   application_name: 'api',
   connectionString: config.dbUrl,
   max: 20,
