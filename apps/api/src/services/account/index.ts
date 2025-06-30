@@ -146,18 +146,17 @@ const parse = catchAsync(
         `contract:${account}`,
         async () => {
           try {
-            const code: QueryResponseKind & { code_base64?: string } =
-              await redis.cache(
-                `contract:${account}:code`,
-                async () => {
-                  try {
-                    return await viewCode(provider, account);
-                  } catch (error) {
-                    return null;
-                  }
-                },
-                EXPIRY * 5, // 5 mins
-              );
+            const code = (await redis.cache(
+              `contract:${account}:code`,
+              async () => {
+                try {
+                  return await viewCode(provider, account);
+                } catch (error) {
+                  return null;
+                }
+              },
+              EXPIRY * 5, // 5 mins
+            )) as QueryResponseKind & { code_base64?: string };
 
             if (code?.code_base64) {
               return await parser.parseContract(code.code_base64);
