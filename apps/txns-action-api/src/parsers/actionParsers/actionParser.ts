@@ -59,16 +59,7 @@ export function parseAction(action: ActionData): ParsedAction | ParsedAction[] {
       return DelegateActionParser.parse(action);
 
     default:
-      return {
-        type: 'UNKNOWN',
-        details: {
-          ...action,
-          action_kind: action.action_kind,
-        },
-        from: action.from,
-        to: action.to,
-        receiptId: action.receiptId,
-      };
+      return null;
   }
 }
 

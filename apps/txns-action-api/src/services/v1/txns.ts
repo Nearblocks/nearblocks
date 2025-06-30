@@ -13,8 +13,20 @@ const parsedTxn = catchAsync(
     const { txnData } = req.body;
 
     const apiTxnActionsData: ApiTxnData = txnData;
-    const { apiLogs, apiMainActions, tokenMetadata, apiAllActions } =
-      apiTxnActionsData;
+    const {
+      apiLogs,
+      apiMainActions,
+      tokenMetadata,
+      apiAllActions,
+      apiSubActions,
+    } = apiTxnActionsData;
+
+    const subAction = apiSubActions?.length > 0 ? apiSubActions : null;
+
+    const parsedSubActions =
+      Array.isArray(apiSubActions) && apiSubActions.length > 0
+        ? apiSubActions.map((action) => ActionParser.parseAction(action))
+        : [];
 
     const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
       const filteredApiNepLogs = apiLogs?.filter((log: any) => {
@@ -69,9 +81,21 @@ const parsedTxn = catchAsync(
         ActionParser.parseAction(action),
       );
 
+      const allUnknown = parsedActions?.every(
+        (a: any) => a?.type === 'UNKNOWN',
+      );
+
+      const result =
+        allUnknown && parsedSubActions?.length > 0
+          ? parsedSubActions
+          : parsedActions;
+
       return res.status(200).json({
-        parsedResponse: parsedActions,
+        Actions: result,
       });
+    }
+
+    if (subAction) {
     }
 
     const tokenMetadataMap = Array.isArray(tokenMetadata)
@@ -83,9 +107,10 @@ const parsedTxn = catchAsync(
       tokenMetadataMap,
       apiAllActions,
     );
+    const Eventsresult = response?.length > 0 ? response : parsedSubActions;
 
     return res.status(200).json({
-      parsedResponse: response,
+      Actions: Eventsresult,
     });
   },
 );

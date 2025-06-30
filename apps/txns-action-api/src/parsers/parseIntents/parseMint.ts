@@ -45,7 +45,7 @@ export async function parseMint({
 
   return {
     label: 'Deposit',
-    type: 'mint',
+    type: 'mt_mint',
     contract: 'intents.near',
     receiverId,
     receiver,
