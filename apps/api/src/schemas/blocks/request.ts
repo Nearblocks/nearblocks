@@ -20,12 +20,12 @@ const block = v.object({
 });
 
 const cursor = v.object({
-  block_timestamp: v.string(),
+  timestamp: v.string(),
 });
 
-export type BlocksReq = v.InferOutput<typeof blocks>;
 export type BlocksLatestReq = v.InferOutput<typeof latest>;
+export type BlocksReq = v.InferOutput<typeof blocks>;
 export type BlockReq = v.InferOutput<typeof block>;
-export type BlockCursorReq = v.InferOutput<typeof cursor>;
+export type BlocksCursor = v.InferOutput<typeof cursor>;
 
 export default { block, blocks, cursor, latest };

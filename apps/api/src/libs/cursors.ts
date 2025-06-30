@@ -2,6 +2,9 @@ import * as v from 'valibot';
 
 import { CursorError } from '#libs/errors';
 
+type CursorValue = boolean | null | number | string;
+export type CursorObject = Record<string, CursorValue>;
+
 export const encode = <T>(data: T): string => {
   return Buffer.from(JSON.stringify(data)).toString('base64');
 };

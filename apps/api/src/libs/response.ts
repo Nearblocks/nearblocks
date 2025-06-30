@@ -1,12 +1,65 @@
-import cursors from '#libs/cursors';
+import config from '#config';
+import cursors, { CursorObject } from '#libs/cursors';
+
+export type PaginatedResponse<T> = {
+  data: null | T[];
+  meta?: { cursor: string };
+};
+
+export type RollingWindowQuery<T> = (
+  start: string,
+  end: string,
+  limit?: number,
+) => Promise<null | T | T[]>;
+
+export type RollingWindowOptions = {
+  end?: bigint;
+  limit?: number;
+  start?: bigint;
+  windowSize?: bigint;
+};
 
 const DEFAULT_WINDOW = BigInt(60 * 60 * 24 * 30 * 12) * 1_000_000_000n; // 1yr in ns
 
+export const rollingWindowList = async <T>(
+  queryFn: RollingWindowQuery<T>,
+  options: RollingWindowOptions = {},
+): Promise<T[]> => {
+  const {
+    end = BigInt(Date.now()) * 1_000_000n,
+    limit = 1,
+    start = config.baseStart,
+    windowSize = DEFAULT_WINDOW,
+  } = options;
+  const results: T[] = [];
+  let endNs = end;
+
+  while (endNs > start && results.length < limit) {
+    const windowStart = endNs - windowSize > start ? endNs - windowSize : start;
+    const remaining = limit - results.length;
+
+    const batch = await queryFn(
+      windowStart.toString(),
+      endNs.toString(),
+      remaining,
+    );
+
+    if (batch) {
+      const items = Array.isArray(batch) ? batch : [batch];
+      results.push(...items.slice(0, remaining));
+    }
+
+    endNs = windowStart;
+  }
+
+  return results;
+};
+
 export const rollingWindow = async <T>(
-  start: bigint,
   queryFn: (start: string, end: string) => Promise<null | T>,
-  windowSize = DEFAULT_WINDOW,
+  options: { start?: bigint; windowSize?: bigint } = {},
 ): Promise<null | T> => {
+  const { start = config.baseStart, windowSize = DEFAULT_WINDOW } = options;
   let endNs = BigInt(Date.now()) * 1_000_000n;
 
   while (endNs > start) {
@@ -25,25 +78,20 @@ export const rollingWindow = async <T>(
   return null;
 };
 
-export const paginateData = <T, K extends keyof T>(
-  items: T[],
+export const paginateData = <T, C extends CursorObject>(
+  items: null | T[],
   limit: number,
-  columns: K[],
-): { data: T[]; meta?: { cursor: string } } => {
+  cursorExtractor: (item: T) => C,
+): PaginatedResponse<T> => {
+  if (!items) return { data: [] };
+
   const hasMore = items.length > limit;
 
   if (!hasMore) return { data: items };
 
   const sliced = items.slice(0, limit);
   const lastItem = sliced[limit - 1];
-  const cursor = columns.reduce(
-    (obj, key) => {
-      obj[key] = lastItem[key];
-
-      return obj;
-    },
-    {} as Pick<T, K>,
-  );
+  const cursor = cursorExtractor(lastItem);
   const next = cursors.encode(cursor);
 
   return { data: sliced, meta: { cursor: next } };
