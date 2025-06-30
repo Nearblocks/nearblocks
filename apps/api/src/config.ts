@@ -39,6 +39,10 @@ const env = cleanEnv(process.env, {
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
   apiUrl: env.API_URL,
+  baseStart:
+    env.NETWORK === Network.MAINNET
+      ? 1595350551591948000n
+      : 1596166782911378000n,
   campaignsPublicUrl: env.CAMPAIGNS_PUBLIC_URL,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,

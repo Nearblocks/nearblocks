@@ -15,6 +15,7 @@ export type RequestValidator<T> = Required<RequestValidators<T>>;
 export type Config = {
   apiAccessKey: string;
   apiUrl: string;
+  baseStart: bigint;
   campaignsPublicUrl: string;
   dbCa: string;
   dbCert: string;
