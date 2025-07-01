@@ -12,6 +12,8 @@ export const networks: Record<NetworkId, Network> = {
 export const networkId: NetworkId =
   (process.env.NEXT_PUBLIC_NETWORK_ID as NetworkId) || 'testnet';
 
+export const rpcKey = process.env.RPC_KEY || '';
+
 export const network = networks[networkId];
 
 export const apiUrl: string =

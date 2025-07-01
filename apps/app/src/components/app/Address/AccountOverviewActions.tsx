@@ -41,7 +41,7 @@ const AccountOverviewActions = ({
   const { account: accountView } = useAddressRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
-  const { networkId } = useConfig();
+  const { networkId, rpcKey } = useConfig();
   const { ftBalanceOf } = useRpc();
   const params = useParams<{ id: string }>();
 
@@ -52,6 +52,10 @@ const AccountOverviewActions = ({
   const RpcProviders =
     networkId === 'mainnet'
       ? [
+          {
+            name: 'FastNEAR (Archival)',
+            url: `https://rpc.mainnet.fastnear.com?apiKey=${rpcKey}`,
+          },
           {
             name: 'NEAR',
             url: 'https://rpc.mainnet.near.org',

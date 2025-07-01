@@ -41,7 +41,10 @@ export const useConfig = () => {
     NEXT_PUBLIC_TURNSTILE_SITE_KEY,
     NEXT_PUBLIC_USER_AUTH_URL,
     NEXT_PUBLIC_USER_API_URL,
+    RPC_KEY,
   } = useEnvContext();
+
+  const rpcKey = RPC_KEY || '';
 
   const networkId: NetworkId =
     (NEXT_PUBLIC_NETWORK_ID as NetworkId) || dynamicNetworkId;
@@ -118,5 +121,6 @@ export const useConfig = () => {
     userAuthURL,
     userApiURL,
     verifierConfig,
+    rpcKey,
   };
 };

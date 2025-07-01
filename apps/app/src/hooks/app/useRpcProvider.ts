@@ -1,10 +1,14 @@
 import { useConfig } from './useConfig';
 
 export const useRpcProvider = () => {
-  const { networkId } = useConfig();
+  const { networkId, rpcKey } = useConfig();
   const RpcProviders =
     networkId === 'mainnet'
       ? [
+          {
+            name: 'FastNEAR (Archival)',
+            url: `https://rpc.mainnet.fastnear.com?apiKey=${rpcKey}`,
+          },
           {
             name: 'NEAR (Archival)',
             url: 'https://archival-rpc.mainnet.near.org',

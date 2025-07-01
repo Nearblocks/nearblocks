@@ -32,7 +32,8 @@
         "NEXT_RUNTIME",
         "CI",
         "NEXT_PUBLIC_REOWN_PROJECT_ID",
-        "NEXT_PUBLIC_USER_AUTH_URL"
+        "NEXT_PUBLIC_USER_AUTH_URL",
+        "RPC_KEY"
       ]
     },
     "pages:build": {
