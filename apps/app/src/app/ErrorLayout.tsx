@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import Cookies from 'js-cookie';
 
 import { getMessage, getCookie } from '@/utils/app/actions';
@@ -16,6 +16,7 @@ import { NearContext } from '@/components/app/wallet/near-context';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
 import Header from '@/components/app/Layouts/Header';
 import Footer from '@/components/app/Layouts/Footer';
+import { locales } from '@/utils/app/config';
 
 const fallbackMessages = {
   header: {
@@ -91,7 +92,10 @@ export default function ErrorLayout({ reset }: { reset: () => void }) {
 
   const [signedAccountId, setSignedAccountId] = useState<any>(null);
   const theme = Cookies.get('theme') || 'light';
-  const locale = Cookies.get('NEXT_LOCALE') || 'en';
+  const locale =
+    window.location.pathname?.match(
+      new RegExp(`^/(${locales.join('|')})(?=/|$)`),
+    )?.[1] || 'en';
 
   useEffect(() => {
     const fetchAllData = async () => {

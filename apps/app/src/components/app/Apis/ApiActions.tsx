@@ -1,7 +1,7 @@
 'use client';
 import { useTheme } from 'next-themes';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useIntlRouter } from '@/i18n/routing';
+
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useConfig } from 'app/src/hooks/app/useConfig';
@@ -33,7 +33,7 @@ const ApiActions = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
-  const router = useRouter();
+  const router = useIntlRouter();
 
   const { docsUrl } = useConfig();
 
