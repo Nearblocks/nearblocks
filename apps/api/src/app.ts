@@ -71,10 +71,15 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       (issue) => `${v.getDotPath(issue)}: ${issue.message}`,
     );
     logger.error(errors);
+    return res
+      .status(500)
+      .json({ data: null, errors: [{ message: 'Server Error' }] });
   }
 
   logger.error(err.stack);
-  res.status(500).json({ data: null, errors: [{ message: 'Server Error' }] });
+  return res
+    .status(500)
+    .json({ data: null, errors: [{ message: 'Server Error' }] });
 });
 
 export default app;
