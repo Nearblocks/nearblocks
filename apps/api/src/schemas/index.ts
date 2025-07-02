@@ -47,3 +47,18 @@ export const jsonSchema: v.GenericSchema<JsonData> = v.lazy(() =>
     v.array(jsonSchema),
   ]),
 );
+
+export const limitSchema = v.optional(
+  v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)),
+  25,
+);
+
+export const cursorSchema = v.optional(v.pipe(v.string(), v.base64()));
+
+export const tsSchema = v.optional(
+  v.pipe(
+    v.string(),
+    v.regex(/^\d+$/, 'Invalid type: Expected numeric string'),
+    v.length(19),
+  ),
+);
