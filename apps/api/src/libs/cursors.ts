@@ -6,7 +6,7 @@ type CursorValue = boolean | null | number | string;
 export type CursorObject = Record<string, CursorValue>;
 
 /**
- * Encodes a JavaScript object as a base64 string for use as a cursor.
+ * Encodes cursor object as a base64 string.
  *
  * @param data - The data object to encode.
  * @returns The base64-encoded string representation of the object.
@@ -16,7 +16,7 @@ export const encode = <T>(data: T): string => {
 };
 
 /**
- * Decodes a base64-encoded cursor string into a JavaScript object and validates it against the provided schema.
+ * Decodes cursor object from a base64 string and validates it against the schema.
  *
  * @param schema - The Valibot schema to validate the decoded object.
  * @param cursor - The base64-encoded string to decode.

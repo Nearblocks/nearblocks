@@ -1,3 +1,6 @@
+/**
+ * Cursor error.
+ */
 export class CursorError extends Error {
   status: number;
 

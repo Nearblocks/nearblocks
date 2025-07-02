@@ -1,5 +1,7 @@
 import * as v from 'valibot';
 
+import { cursorSchema, limitSchema } from '#schemas/index';
+
 const latest = v.object({
   limit: v.optional(
     v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(10)),
@@ -8,11 +10,8 @@ const latest = v.object({
 });
 
 const blocks = v.object({
-  cursor: v.optional(v.string()),
-  limit: v.optional(
-    v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)),
-    25,
-  ),
+  cursor: cursorSchema,
+  limit: limitSchema,
 });
 
 const block = v.object({

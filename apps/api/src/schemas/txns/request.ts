@@ -1,5 +1,7 @@
 import * as v from 'valibot';
 
+import { cursorSchema, limitSchema, tsSchema } from '#schemas/index';
+
 const latest = v.object({
   limit: v.optional(
     v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(10)),
@@ -8,43 +10,16 @@ const latest = v.object({
 });
 
 const txns = v.object({
-  after_ts: v.optional(
-    v.pipe(
-      v.string(),
-      v.regex(/^\d+$/, 'Invalid type: Expected numeric string'),
-      v.length(19),
-    ),
-  ),
-  before_ts: v.optional(
-    v.pipe(
-      v.string(),
-      v.regex(/^\d+$/, 'Invalid type: Expected numeric string'),
-      v.length(19),
-    ),
-  ),
+  after_ts: tsSchema,
+  before_ts: tsSchema,
   block: v.optional(v.string()),
-  cursor: v.optional(v.string()),
-  limit: v.optional(
-    v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)),
-    25,
-  ),
+  cursor: cursorSchema,
+  limit: limitSchema,
 });
 
 const count = v.object({
-  after_ts: v.optional(
-    v.pipe(
-      v.string(),
-      v.regex(/^\d+$/, 'Invalid type: Expected numeric string'),
-      v.length(19),
-    ),
-  ),
-  before_ts: v.optional(
-    v.pipe(
-      v.string(),
-      v.regex(/^\d+$/, 'Invalid type: Expected numeric string'),
-      v.length(19),
-    ),
-  ),
+  after_ts: tsSchema,
+  before_ts: tsSchema,
   block: v.optional(v.string()),
 });
 
