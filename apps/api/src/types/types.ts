@@ -136,3 +136,22 @@ export type RPCResponse = {
 export type IntentsToken = {
   token_id: string;
 };
+
+export type mtMetadata = {
+  base: {
+    decimals?: number;
+    icon?: string;
+    id: string;
+    name: string;
+    symbol: string;
+  };
+  token: {
+    description?: string;
+    extra?: string;
+    issued_at?: number;
+    media?: string;
+    starts_at?: number;
+    title?: string;
+    updated_at?: number;
+  };
+};
