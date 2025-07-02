@@ -41,9 +41,9 @@ FROM
         'count',
         COUNT(included_in_block_hash),
         'gas_used',
-        SUM(gas_used)::TEXT,
+        COALESCE(SUM(gas_used)::TEXT, '0'),
         'gas_limit',
-        SUM(gas_limit)::TEXT
+        COALESCE(SUM(gas_limit)::TEXT, '0')
       ) AS chunks_agg
     FROM
       chunks

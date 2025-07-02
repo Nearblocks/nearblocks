@@ -13,6 +13,14 @@ WITH
         ${cursor.timestamp}::BIGINT IS NULL
         OR block_timestamp < ${cursor.timestamp}
       )
+      AND (
+        ${start}::BIGINT IS NULL
+        OR block_timestamp >= ${start} -- rolling window start
+      )
+      AND (
+        ${end}::BIGINT IS NULL
+        OR block_timestamp <= ${end} -- rolling window end
+      )
     ORDER BY
       block_timestamp DESC
     LIMIT
@@ -35,9 +43,9 @@ FROM
         'count',
         COUNT(included_in_block_hash),
         'gas_used',
-        SUM(gas_used)::TEXT,
+        COALESCE(SUM(gas_used)::TEXT, '0'),
         'gas_limit',
-        SUM(gas_limit)::TEXT
+        COALESCE(SUM(gas_limit)::TEXT, '0')
       ) AS chunks_agg
     FROM
       chunks

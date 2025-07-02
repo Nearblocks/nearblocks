@@ -11,6 +11,9 @@ txns_selected AS (
     t.receipt_conversion_tokens_burnt
   FROM
     transactions t
+  WHERE
+    t.block_timestamp >= ${start} -- rolling window start
+    AND t.block_timestamp <= ${end} -- rolling window end
   ORDER BY
     t.block_timestamp DESC,
     t.shard_id DESC,

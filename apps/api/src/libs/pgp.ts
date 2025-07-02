@@ -38,6 +38,9 @@ export const pgp = pgpromise({
   },
 });
 
+/**
+ * Base indexer database connection.
+ */
 export const dbBase = pgp({
   application_name: 'api',
   connectionString: config.dbUrl,

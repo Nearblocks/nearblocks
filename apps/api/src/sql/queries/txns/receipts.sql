@@ -12,3 +12,5 @@ SELECT
 FROM
   txn_selected ts,
   LATERAL receipt_tree (ts.converted_into_receipt_id, ts.block_timestamp) rt
+WHERE
+  rt -> 'receipt_id' IS NOT NULL

@@ -2,7 +2,7 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase } from '#libs/pgp';
 import redis from '#libs/redis';
-import { paginateData, rollingWindow } from '#libs/response';
+import { paginateData, rollingWindow, rollingWindowList } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import { RequestValidator } from '#middlewares/validate';
 import request, {
@@ -20,12 +20,18 @@ const latest = responseHandler(
 
     const blocks = await redis.cache<Block[]>(
       `blocks:latest:${limit}`,
-      async () =>
-        dbBase.manyOrNone<Block>(sql.blocks, {
-          cursor: { timestamp: null },
-          limit,
-        }),
-      5, // 5 sec,
+      () =>
+        rollingWindowList<Block>(
+          (start, end) =>
+            dbBase.manyOrNone<Block>(sql.blocks, {
+              cursor: { timestamp: null },
+              end,
+              limit,
+              start,
+            }),
+          { limit, start: config.baseStart },
+        ),
+      5, // cache results for 5s
     );
 
     return { data: blocks };
@@ -40,10 +46,21 @@ const blocks = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const blocks = await dbBase.manyOrNone<Block>(sql.blocks, {
-      cursor: { timestamp: cursor?.timestamp },
-      limit: limit + 1,
-    });
+    const blocks = await rollingWindowList<Block>(
+      (start, end, limit) =>
+        dbBase.manyOrNone<Block>(sql.blocks, {
+          cursor: { timestamp: cursor?.timestamp },
+          end,
+          limit,
+          start,
+        }),
+      {
+        end: cursor?.timestamp ? BigInt(cursor.timestamp) : undefined,
+        // Fetch one extra to check if there is a next page
+        limit: limit + 1,
+        start: config.baseStart,
+      },
+    );
 
     return paginateData(blocks, limit, (txn) => ({
       timestamp: txn.block_timestamp,
@@ -65,7 +82,7 @@ const block = responseHandler(
     const height = !isNaN(+input) ? +input : null;
 
     const block = await rollingWindow(
-      async (start, end) =>
+      (start, end) =>
         dbBase.oneOrNone<Block>(sql.block, { end, hash, height, start }),
       { start: config.baseStart },
     );
