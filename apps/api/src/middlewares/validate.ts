@@ -5,6 +5,14 @@ export interface RequestValidator<T> extends Request {
   validator: T;
 }
 
+/**
+ * Request validator for validating request against a Valibot schema.
+ * On success, attaches the validated data to req.validator.
+ * On validation error, responds with a 422 error; otherwise, forwards errors to Express.
+ *
+ * @param schema - The Valibot schema to validate the request against.
+ * @returns An Express middleware function.
+ */
 export const validate = <
   T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
 >(
