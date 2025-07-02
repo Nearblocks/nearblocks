@@ -23,12 +23,17 @@ const latest = responseHandler(
 
     const txns = await redis.cache<Txns[]>(
       `txns:latest:${limit}`,
-      async () => {
-        const cte = pgp.as.format(sql.latestCte, { limit });
+      () => {
+        return rollingWindowList<Txns>(
+          (start, end) => {
+            const cte = pgp.as.format(sql.latestCte, { end, limit, start });
 
-        return dbBase.manyOrNone<Txns>(sql.txns, { cte });
+            return dbBase.manyOrNone<Txns>(sql.txns, { cte });
+          },
+          { limit, start: config.baseStart },
+        );
       },
-      5, // 5 sec,
+      5, // cache results for 5s
     );
 
     return { data: txns };
@@ -63,7 +68,12 @@ const txns = responseHandler(
         return dbBase.manyOrNone<Txns>(sql.txns, { cte });
       },
       {
-        end: before ? BigInt(before) : undefined,
+        end: cursor?.timestamp
+          ? BigInt(cursor.timestamp)
+          : before
+          ? BigInt(before)
+          : undefined,
+        // Fetch one extra to check if there is a next page
         limit: limit + 1,
         start: after ? BigInt(after) : config.baseStart,
       },

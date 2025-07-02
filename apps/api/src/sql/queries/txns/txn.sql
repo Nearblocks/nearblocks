@@ -29,7 +29,12 @@ FROM
     FROM
       blocks
     WHERE
-      block_timestamp = ts.block_timestamp
+      block_timestamp = (
+        SELECT
+          t.block_timestamp
+        FROM
+          txn_selected t
+      )
       AND block_hash = ts.included_in_block_hash
   ) b ON TRUE
   LEFT JOIN LATERAL (
