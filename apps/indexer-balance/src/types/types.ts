@@ -14,6 +14,7 @@ export type Config = {
   s3Host: string;
   s3Port: number;
   s3SecretKey: string;
+  s3UseSsl: boolean;
   sentryDsn?: string;
   startBlockHeight: number;
 };

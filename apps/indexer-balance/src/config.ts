@@ -1,4 +1,4 @@
-import { cleanEnv, num, str } from 'envalid';
+import { bool, cleanEnv, num, str } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -20,6 +20,7 @@ const env = cleanEnv(process.env, {
   S3_HOST: str(),
   S3_PORT: num(),
   S3_SECRET_KEY: str(),
+  S3_USE_SSL: bool(),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -37,6 +38,7 @@ const config: Config = {
   s3Host: env.S3_HOST,
   s3Port: env.S3_PORT,
   s3SecretKey: env.S3_SECRET_KEY,
+  s3UseSsl: env.S3_USE_SSL,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.BALANCE_START_BLOCK,
 };

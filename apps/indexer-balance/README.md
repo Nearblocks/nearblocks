@@ -13,6 +13,7 @@ S3_ACCESS_KEY=
 S3_SECRET_KEY=
 S3_HOST=play.min.io
 S3_PORT=9000
+S3_USE_SSL=true
 
 # Optional
 DATABASE_CA=
