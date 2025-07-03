@@ -8,6 +8,11 @@ Balance indexer collects the info about native NEAR token balance changes 📊 (
 DATABASE_URL=
 DATABASE_URL_BASE=
 NETWORK=mainnet
+BALANCE_INDEXER_KEY=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+S3_HOST=play.min.io
+S3_PORT=9000
 
 # Optional
 DATABASE_CA=
