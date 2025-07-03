@@ -9,7 +9,7 @@ const route = Router();
 const routes = (app: Router) => {
   app.use('/mt', bearerAuth, route);
 
-  route.get('/', validator(schema.mt), mt.nep245);
+  route.post('/', validator(schema.mt), mt.nep245);
 };
 
 export default routes;
