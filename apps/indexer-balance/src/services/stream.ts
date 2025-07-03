@@ -15,7 +15,7 @@ const s3Config = {
   endPoint: config.s3Host,
   port: config.s3Port,
   secretKey: config.s3SecretKey,
-  useSSL: false,
+  useSSL: config.s3UseSsl,
 };
 
 export const syncData = async () => {
