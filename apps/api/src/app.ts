@@ -38,6 +38,7 @@ app.set('query parser', (str: string) =>
 app.use(sentry.Handlers.requestHandler());
 apiDocumentation(app, dir);
 app.use(cors());
+app.use(express.json());
 app.use(helmet());
 passport.use(bearerStrategy);
 passport.use(anonymousStrategy);

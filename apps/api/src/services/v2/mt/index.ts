@@ -42,10 +42,9 @@ export const Metadata = async <T>(
 const nep245 = catchAsync(
   async (req: RequestValidator<TokenId>, res: Response) => {
     const tokenIds = req.validator.data.token_ids;
-
     const metas = await Metadata<mtMetadata[]>(provider, tokenIds);
 
-    return res.status(200).json({ nep245: metas });
+    return res.status(200).json(metas);
   },
 );
 
