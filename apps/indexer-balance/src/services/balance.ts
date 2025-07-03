@@ -5,7 +5,7 @@ import {
   IndexerTransactionWithOutcome,
   Message,
   Shard,
-} from 'nb-blocks';
+} from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import {
   BalanceEvent,
