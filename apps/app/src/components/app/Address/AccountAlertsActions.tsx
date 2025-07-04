@@ -31,11 +31,7 @@ const AccountAlertsActions = ({
     );
   }
 
-  if (
-    !account &&
-    accountData?.account?.[0]?.deleted?.transaction_hash &&
-    !isLoading
-  ) {
+  if (accountData?.account?.[0]?.deleted?.transaction_hash) {
     return (
       <>
         <div className="block lg:flex lg:space-x-2">
