@@ -5,15 +5,9 @@ import { providers } from 'near-api-js';
 import { format } from 'numerable';
 
 import logger from '#libs/logger';
-import { callFunction } from '#libs/near';
+import { bytesParse, callFunction } from '#libs/near';
 import Sentry from '#libs/sentry';
-import { ValidationError } from '#types/types';
-
-type ABIResponse = {
-  block_hash: string;
-  block_height: number;
-  result: Uint8Array;
-};
+import { RPCResponse, ValidationError } from '#types/types';
 
 Big.NE = -18;
 const MS_PER_NS = Big(10).pow(6);
@@ -114,12 +108,12 @@ export const abiSchema = async (
   provider: providers.JsonRpcProvider,
   contract: string,
 ) => {
-  const response: ABIResponse = await callFunction(
+  const response: RPCResponse = await callFunction(
     provider,
     contract,
     '__contract_abi',
   );
   const decompressed = decompress(new Uint8Array(response.result));
 
-  return JSON.parse(Buffer.from(decompressed).toString());
+  return bytesParse(decompressed);
 };
