@@ -1,5 +1,6 @@
 'use client';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { usePathname, useIntlRouter } from '@/i18n/routing';
 import QueryString from 'qs';
 import { use, useState } from 'react';
 import { AccountContractInfo } from '@/utils/types';
@@ -22,7 +23,7 @@ const AccessKeysActions = ({ dataPromise, countPromise }: Props) => {
   const count = countData?.keys?.[0]?.count;
   const error = !data || data?.message === 'Error';
   const keys: AccountContractInfo[] = data?.keys;
-  const router = useRouter();
+  const router = useIntlRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const order = searchParams?.get('order');

@@ -5,7 +5,7 @@ import {
   tokenAmount,
 } from '@/utils/libs';
 import { MetaInfo, TokenInfoProps } from '@/utils/types';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useEffect, useRef, useState } from 'react';
 import TokenImage from '@/components/app/common/TokenImage';
 import useRpc from '@/hooks/app/useRpc';

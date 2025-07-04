@@ -1,6 +1,6 @@
 'use client';
 import classNames from 'classnames';
-import { useRouter } from 'next/navigation';
+import { useIntlRouter } from '@/i18n/routing';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
@@ -47,7 +47,7 @@ const TxnsTabActions = ({
   const initializedRef = useRef(false);
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const router = useRouter();
+  const router = useIntlRouter();
   const { networkId } = useConfig();
 
   // temporary use rpc data for blocks before 192373963 and api data for latest blocks - testnet
