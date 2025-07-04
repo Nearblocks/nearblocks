@@ -1,9 +1,8 @@
 'use client';
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
 import { parseGitHubLink, parseLink } from '@/utils/libs';
 import { ContractCodeInfo, ContractMetadata } from '@/utils/types';
@@ -13,6 +12,7 @@ import LoadingCircular from '@/components/app/common/LoadingCircular';
 import ArrowDown from '@/components/app/Icons/ArrowDown';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
+import { contractCode } from '@/utils/app/actions';
 
 type contractData = {
   message: string;
@@ -44,7 +44,6 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [contractMetadata, setContractMetadata] = useState<ContractMetadata>();
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
-  const initializedRef = useRef(false);
   const { verifierConfig } = useConfig();
   const contractData = use(contractPromise);
   const contractError =
@@ -57,21 +56,8 @@ const Verifier: React.FC<ContractFormProps> = ({
     contractOnChainHash,
   );
 
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { switchRpc } = useRpcStoreWithProviders();
-  const { contractCode, getContractMetadata, getVerifierData } = useRpc();
+  const { switchRpc } = useRpcStore();
+  const { getContractMetadata, getVerifierData } = useRpc();
 
   useEffect(() => {
     if (rpcError) {

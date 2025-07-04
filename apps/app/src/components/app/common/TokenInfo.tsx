@@ -22,7 +22,7 @@ const TokenInfo = (props: TokenInfoProps) => {
   const [loading, setLoading] = useState(true);
   const cacheRef = useRef(metadataCache);
 
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const { switchRpc } = useRpcStore();
 
   const rpcAmount = localFormat(
     tokenAmount(amount, apiMeta?.decimals || meta?.decimals || 18, true),

@@ -9,6 +9,7 @@ import { revalidateTag } from 'next/cache';
 import { getMessages } from 'next-intl/server';
 import { providers } from 'near-api-js';
 import { getRpcProviders } from './rpc';
+import { fetchJsonRpc } from '@/hooks/app/useRpc';
 
 interface ExportParams {
   exportType: string;
@@ -230,62 +231,6 @@ export const viewAccount = async (accountId: string) => {
   return viewAccount;
 };
 
-type QueryParams = {
-  request_type: 'call_function';
-  account_id: string;
-  method_name: string;
-  args_base64: string;
-  finality: 'optimistic' | 'final';
-};
-
-type QueryResponse = {
-  data?: any;
-  error?: any;
-  statusCode: number;
-};
-
-const queryWithStatus = async (
-  rpcUrl: string,
-  params: QueryParams,
-): Promise<QueryResponse> => {
-  try {
-    const res = await fetch(rpcUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'dontcare',
-        method: 'query',
-        params,
-      }),
-    });
-
-    const text = await res.text();
-    let body;
-    try {
-      body = JSON.parse(text);
-    } catch (parseError) {
-      return {
-        statusCode: res.status,
-        error: {
-          message: 'Invalid JSON response',
-          raw: text.substring(0, 200),
-        },
-      };
-    }
-    return {
-      statusCode: res.status,
-      ...(res.ok ? { data: body } : { error: body }),
-    };
-  } catch (fetchError) {
-    console.error('Fetch error:', fetchError);
-    return {
-      statusCode: 0,
-      error: { message: 'Network error', details: fetchError },
-    };
-  }
-};
-
 export const viewMethod = async ({
   args = {},
   contractId,
@@ -297,14 +242,13 @@ export const viewMethod = async ({
   method: string;
   rpcUrl: string;
 }) => {
-  const { data, error, statusCode } = await queryWithStatus(rpcUrl, {
+  const { data, error, statusCode } = await fetchJsonRpc(rpcUrl, {
     request_type: 'call_function',
     account_id: contractId,
     method_name: method,
     args_base64: Buffer.from(JSON.stringify(args)).toString('base64'),
     finality: 'optimistic',
   });
-
   if (statusCode === 200) {
     const result = data?.result?.result;
     if (result && (result instanceof Uint8Array || Array.isArray(result))) {

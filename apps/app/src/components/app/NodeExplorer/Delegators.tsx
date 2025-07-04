@@ -9,7 +9,6 @@ import { CurrentEpochValidatorInfo, ValidatorDescription } from 'nb-types';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { Link } from '@/i18n/routing';
 import { useRpcStore } from '@/stores/app/rpc';
 import { formatWithCommas, yoctoToNear } from '@/utils/libs';
@@ -51,26 +50,12 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
   const [status, setStatus] = useState<string>();
   const [count, setCount] = useState<number>();
   const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
-  const initializedRef = useRef(false);
 
   if (theme == undefined) {
     theme = cookieTheme;
   }
 
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
+  const { rpc: rpcUrl, switchRpc } = useRpcStore();
   const start = (pagination.page - 1) * pagination.per_page;
 
   const getStatusColorClass = (status: string) => {

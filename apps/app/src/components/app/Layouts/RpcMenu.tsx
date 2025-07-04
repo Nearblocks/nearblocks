@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useRpcStore } from '@/stores/app/rpc';
 import Check from '@/components/app/Icons/Check';
 import Rpc from '@/components/app/Icons/Rpc';
@@ -11,14 +10,22 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { getRpcProviders } from '@/utils/app/rpc';
 
 const RpcMenu = ({ positionClass }: { positionClass?: string }) => {
   const [isClient, setIsClient] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const { RpcProviders } = useRpcProvider();
+  const { providers: RpcProviders } = useRpcStore();
 
   useEffect(() => {
+    const fetchProviders = async () => {
+      const providers = await getRpcProviders();
+      const defaultRPC = providers[0]?.url ?? '';
+      setRpc(defaultRPC);
+    };
     setIsClient(true);
+    fetchProviders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { rpc: rpcUrl, setRpc } = useRpcStore();
