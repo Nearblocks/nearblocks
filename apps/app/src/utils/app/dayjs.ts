@@ -8,5 +8,6 @@ dayjs.extend(utc);
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(timezone);
+dayjs.locale('en');
 
 export default dayjs;
