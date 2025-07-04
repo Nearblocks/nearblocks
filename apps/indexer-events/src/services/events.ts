@@ -1,4 +1,4 @@
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import { EventStandard, EventType, FTEvent, NFTEvent } from 'nb-types';
 

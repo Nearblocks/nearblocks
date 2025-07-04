@@ -8,9 +8,12 @@ Staking indexer collects the info about staking changes 📊
 DATABASE_URL=
 DATABASE_URL_BASE=
 NETWORK=mainnet
-S3_ENDPOINT=
+STAKING_INDEXER_KEY=
 S3_ACCESS_KEY=
 S3_SECRET_KEY=
+S3_HOST=play.min.io
+S3_PORT=9000
+S3_USE_SSL=true
 
 # Optional
 DATABASE_CA=

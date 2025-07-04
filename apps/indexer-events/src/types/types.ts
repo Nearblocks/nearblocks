@@ -3,7 +3,7 @@ import {
   ExecutionOutcomeWithReceipt,
   ExecutionStatus,
   FunctionCallAction,
-} from 'nb-blocks';
+} from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import { EventCause, Network } from 'nb-types';
 
@@ -13,12 +13,14 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbUrlBase: string;
+  indexerKey: string;
   network: Network;
   s3AccessKey: string;
   s3Bucket: string;
-  s3Endpoint: string;
-  s3Region: string;
+  s3Host: string;
+  s3Port: number;
   s3SecretKey: string;
+  s3UseSsl: boolean;
   sentryDsn?: string;
   startBlockHeight: number;
 };

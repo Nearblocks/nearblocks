@@ -18,9 +18,9 @@ const env = cleanEnv(process.env, {
   S3_ACCESS_KEY: str(),
   S3_BUCKET: str(),
   S3_HOST: str(),
-  S3_PORT: num(),
+  S3_PORT: num({ default: 443 }),
   S3_SECRET_KEY: str(),
-  S3_USE_SSL: bool(),
+  S3_USE_SSL: bool({ default: true }),
   SENTRY_DSN: str({ default: '' }),
 });
 

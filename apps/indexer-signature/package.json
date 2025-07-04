@@ -35,7 +35,7 @@
     "@types/node": "22",
     "eslint-config-custom-node": "*",
     "nb-json": "*",
-    "nb-blocks": "*",
+    "nb-blocks-minio": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-redis": "*",

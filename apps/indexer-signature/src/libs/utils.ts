@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { ExecutionStatus } from 'nb-blocks';
+import { ExecutionStatus } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
 
 import sentry from '#libs/sentry';

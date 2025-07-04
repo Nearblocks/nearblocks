@@ -1,4 +1,4 @@
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks-minio';
 import { Transaction } from 'nb-types';
 import { retry } from 'nb-utils';
 

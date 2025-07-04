@@ -1,4 +1,4 @@
-import { cleanEnv, num, str, url } from 'envalid';
+import { bool, cleanEnv, num, str } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -15,10 +15,12 @@ const env = cleanEnv(process.env, {
   }),
   S3_ACCESS_KEY: str(),
   S3_BUCKET: str(),
-  S3_ENDPOINT: url(),
-  S3_REGION: str(),
+  S3_HOST: str(),
+  S3_PORT: num({ default: 443 }),
   S3_SECRET_KEY: str(),
+  S3_USE_SSL: bool({ default: true }),
   SENTRY_DSN: str({ default: '' }),
+  SIGNATURE_INDEXER_KEY: str(),
   SIGNATURE_START_BLOCK: num({ default: 0 }),
 });
 
@@ -29,13 +31,15 @@ const config: Config = {
   dbUrl: env.DATABASE_URL,
   dbUrlBase: env.DATABASE_URL_BASE,
   delta: 10,
+  indexerKey: env.SIGNATURE_INDEXER_KEY,
   insertLimit: 2500,
   network: env.NETWORK,
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,
-  s3Endpoint: env.S3_ENDPOINT,
-  s3Region: env.S3_REGION,
+  s3Host: env.S3_HOST,
+  s3Port: env.S3_PORT,
   s3SecretKey: env.S3_SECRET_KEY,
+  s3UseSsl: env.S3_USE_SSL,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.SIGNATURE_START_BLOCK,
 };
