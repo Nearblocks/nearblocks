@@ -29,7 +29,7 @@
     "@types/lodash-es": "~4.17",
     "@types/node": "~22.13",
     "eslint-config-custom-node": "*",
-    "nb-blocks": "*",
+    "nb-blocks-minio": "*",
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",

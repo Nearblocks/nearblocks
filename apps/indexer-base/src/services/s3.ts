@@ -1,49 +1,32 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { NodeHttpHandler } from '@smithy/node-http-handler';
+import * as Minio from 'minio';
 
 import { Message } from 'nb-neardata';
 
 import config from '#config';
 import { s3Histogram } from '#libs/prom';
 
-const s3Client = new S3Client({
-  credentials: {
-    accessKeyId: config.s3AccessKey,
-    secretAccessKey: config.s3SecretKey,
-  },
-  endpoint: config.s3Endpoint,
-  forcePathStyle: true,
-  logger: {
-    debug: () => {},
-    error: console.error,
-    info: () => {},
-    warn: console.warn,
-  },
-  maxAttempts: 5,
-  region: config.s3Region,
-  requestHandler: new NodeHttpHandler({
-    connectionTimeout: 5000,
-    logger: {
-      debug: () => {},
-      error: console.error,
-      info: () => {},
-      warn: console.warn,
-    },
-    requestTimeout: 10000,
-  }),
-});
+export const s3Config = {
+  accessKey: config.s3AccessKey,
+  endPoint: config.s3Host,
+  port: config.s3Port,
+  secretKey: config.s3SecretKey,
+  useSSL: config.s3UseSsl,
+};
+
+const minio = new Minio.Client(s3Config);
 
 export const uploadJson = async (message: Message) => {
   if (config.disableS3Upload) return;
 
   const start = performance.now();
-  const command = new PutObjectCommand({
-    Body: JSON.stringify(message),
-    Bucket: config.s3Bucket,
-    ContentType: 'application/json',
-    Key: `${message.block.header.height}.json`,
-  });
 
-  await s3Client.send(command);
+  await minio.putObject(
+    config.s3Bucket,
+    `${message.block.header.height}.json`,
+    Buffer.from(JSON.stringify(message)),
+    undefined,
+    { 'Content-Type': 'application/json' },
+  );
+
   s3Histogram.labels(config.network).observe(performance.now() - start);
 };

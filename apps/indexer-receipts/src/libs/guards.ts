@@ -13,7 +13,7 @@ import {
   TransferAction,
   UseGlobalContractAction,
   UseGlobalContractByAccountIdAction,
-} from 'nb-blocks';
+} from 'nb-blocks-minio';
 
 export const isFunctionCallAction = (
   action: Action,

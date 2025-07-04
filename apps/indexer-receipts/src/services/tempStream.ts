@@ -46,13 +46,13 @@ export const syncData = async () => {
     messages.push(message);
 
     if (messages.length >= concurrency) {
-      await Promise.all(messages.map((msg) => onMessage(msg)));
+      await Promise.all(messages.map((msg) => onMessage(startBlock, msg)));
       messages = [];
     }
   }
 
   if (messages.length > 0) {
-    await Promise.all(messages.map((msg) => onMessage(msg)));
+    await Promise.all(messages.map((msg) => onMessage(startBlock, msg)));
   }
 
   stream.on('end', () => {
@@ -65,7 +65,7 @@ export const syncData = async () => {
   });
 };
 
-export const onMessage = async (message: Message) => {
+export const onMessage = async (start: number, message: Message) => {
   try {
     const start = performance.now();
 
@@ -89,6 +89,8 @@ export const onMessage = async (message: Message) => {
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
-    process.exit();
+    if (message.block.header.height > start + 25) {
+      process.exit();
+    }
   }
 };

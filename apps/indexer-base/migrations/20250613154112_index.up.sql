@@ -178,18 +178,18 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
     ) o ON TRUE
 $$;
 
-CREATE INDEX b_block_height_idx ON blocks (block_height DESC);
+CREATE INDEX IF NOT EXISTS b_block_height_idx ON blocks (block_height DESC);
 
-CREATE INDEX c_block_hash_timestamp_idx ON chunks (
+CREATE INDEX IF NOT EXISTS c_block_hash_timestamp_idx ON chunks (
   included_in_block_hash,
   included_in_block_timestamp DESC
 );
 
-CREATE INDEX r_block_hash_timestamp_idx ON receipts (
+CREATE INDEX IF NOT EXISTS r_block_hash_timestamp_idx ON receipts (
   included_in_block_hash,
   included_in_block_timestamp DESC
 );
 
-CREATE INDEX t_block_hash_timestamp_idx ON transactions (included_in_block_hash, block_timestamp DESC);
+CREATE INDEX IF NOT EXISTS t_block_hash_timestamp_idx ON transactions (included_in_block_hash, block_timestamp DESC);
 
-CREATE INDEX ara_nep518_rlp_hash_idx ON action_receipt_actions (nep518_rlp_hash);
+CREATE INDEX IF NOT EXISTS ara_nep518_rlp_hash_idx ON action_receipt_actions (nep518_rlp_hash);

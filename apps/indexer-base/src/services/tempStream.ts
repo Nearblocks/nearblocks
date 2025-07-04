@@ -1,6 +1,6 @@
 import { forEach } from 'hwp';
 
-import { streamBlock } from 'nb-blocks';
+import { streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
 import { Message } from 'nb-neardata';
 
@@ -11,21 +11,14 @@ import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
 import { storeChunks } from '#services/chunk';
+import { s3Config } from '#services/s3';
 import { storeTransactions } from '#services/transaction';
 
-const s3Config = {
-  credentials: {
-    accessKeyId: config.s3AccessKey,
-    secretAccessKey: config.s3SecretKey,
-  },
-  endpoint: config.s3Endpoint,
-  forcePathStyle: true,
-  region: config.s3Region,
-};
+const indexerKey = config.indexerKey;
 
 export const syncData = async () => {
-  const block = await dbRead('blocks').orderBy('block_height', 'desc').first();
-  const latestBlock = block?.block_height;
+  const settings = await dbRead('settings').where({ key: indexerKey }).first();
+  const latestBlock = settings?.value?.sync;
   let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
 
   if (!startBlockHeight && latestBlock) {
@@ -41,7 +34,7 @@ export const syncData = async () => {
     dbConfig: streamConfig,
     limit: 25,
     s3Bucket: config.s3Bucket,
-    s3Config,
+    s3Config: s3Config,
     start: startBlock,
   });
 
@@ -68,6 +61,14 @@ export const onMessage = async (message: Message) => {
       storeAccounts(dbWrite, message),
       storeAccessKeys(dbWrite, message),
     ]);
+
+    await dbWrite('settings')
+      .insert({
+        key: indexerKey,
+        value: { sync: message.block.header.height },
+      })
+      .onConflict('key')
+      .merge();
   } catch (error) {
     logger.error(`aborting... block ${message.block.header.height} `);
     logger.error(error);

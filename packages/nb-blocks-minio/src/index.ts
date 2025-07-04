@@ -85,7 +85,7 @@ const fetchJson = async (
         throw new Error(`Failed to fetch block ${block}: ${error}`);
       }
     },
-    { exponential: true, logger: retryLogger, retries: 1 },
+    { exponential: true, logger: retryLogger, retries: 3 },
   );
 };
 
