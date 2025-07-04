@@ -15,6 +15,7 @@ import ThemeInitializer from '@/components/app/Layouts/ThemeInitializer';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
 import { getCookie, getLatestStats, getSyncStatus } from '@/utils/app/actions';
 import { RpcInitializer } from './RpcInitializer';
+import { getRpcProviders } from '@/utils/app/rpc';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,6 +27,8 @@ const Layout = async ({ children, locale }: LayoutProps) => {
   const messages = await getMessages();
   const theme = (await cookies()).get('theme')?.value || 'light';
   const signedAccountId = await getCookie('signedAccountId');
+  const rpcCookie = (await getCookie('rpcUrl')) || '';
+  const rpcProviders = await getRpcProviders();
   const network = networkId;
   const stats = await getLatestStats();
   const syncStatus = await getSyncStatus();
@@ -84,7 +87,10 @@ const Layout = async ({ children, locale }: LayoutProps) => {
             <AddressHoverProvider>
               <ThemeProvider attribute="class" defaultTheme={theme}>
                 <ThemeInitializer initialTheme={theme} />
-                <RpcInitializer />
+                <RpcInitializer
+                  rpcCookie={rpcCookie}
+                  rpcProviders={rpcProviders}
+                />
                 <ToastContainer />
                 <LayoutActions
                   theme={theme}

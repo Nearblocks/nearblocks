@@ -12,7 +12,9 @@ export const getRpcProviders = async () => {
     ? [
         {
           name: 'FastNEAR (Archival)',
-          url: `https://rpc.mainnet.fastnear.com?apiKey=${rpcKey}`,
+          url: `https://rpc.mainnet.fastnear.com${
+            rpcKey ? `?apiKey=${rpcKey}` : ''
+          }`,
         },
         {
           name: 'NEAR (Archival)',
@@ -21,10 +23,6 @@ export const getRpcProviders = async () => {
         {
           name: 'NEAR',
           url: 'https://rpc.mainnet.near.org',
-        },
-        {
-          name: 'NEAR (Beta)',
-          url: 'https://beta.rpc.mainnet.near.org',
         },
         {
           name: 'FASTNEAR Free',

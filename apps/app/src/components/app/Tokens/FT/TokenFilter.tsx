@@ -20,9 +20,9 @@ interface Props {
 export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
   const modifiedId = id === 'eth.bridge.near' ? 'aurora' : id;
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
+  const rpcUrl = useRpcStore((state) => state.rpc);
   const { ftBalanceOf } = useRpc();
   const [inventoryLoading, setInventoryLoading] = useState(true);
-  const { rpc: rpcUrl } = useRpcStore();
 
   useEffect(() => {
     function loadBalances() {
@@ -49,7 +49,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
             ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
             tokenFilter,
           );
-          return { ...ft, amount: rslt.data };
+          return { ...ft, amount: rslt };
         }),
       )
         .then((results: any) => {
