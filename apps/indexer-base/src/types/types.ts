@@ -18,6 +18,7 @@ export interface Config {
   genesisFile: string;
   genesisHeight: number;
   genesisTimestamp: string;
+  indexerKey: string;
   insertLimit: number;
   nearlakeAccessKey: string;
   nearlakeBucketName: string;
@@ -28,9 +29,10 @@ export interface Config {
   preloadSize: number;
   s3AccessKey: string;
   s3Bucket: string;
-  s3Endpoint: string;
-  s3Region: string;
+  s3Host: string;
+  s3Port: number;
   s3SecretKey: string;
+  s3UseSsl: boolean;
   sentryDsn?: string;
   startBlockHeight: number;
 }

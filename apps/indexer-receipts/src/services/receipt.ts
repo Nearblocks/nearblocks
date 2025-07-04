@@ -1,4 +1,9 @@
-import { Action, DataReceiver, Receipt as JReceipt, Message } from 'nb-blocks';
+import {
+  Action,
+  DataReceiver,
+  Receipt as JReceipt,
+  Message,
+} from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import {

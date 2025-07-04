@@ -1,4 +1,4 @@
-import { Action } from 'nb-blocks';
+import { Action } from 'nb-blocks-minio';
 import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
 
 export type Config = {
@@ -11,13 +11,15 @@ export type Config = {
   dbUrlBase: string;
   dbUrlRead: string;
   delta: number;
+  indexerKey: string;
   insertLimit: number;
   network: Network;
   s3AccessKey: string;
   s3Bucket: string;
-  s3Endpoint: string;
-  s3Region: string;
+  s3Host: string;
+  s3Port: number;
   s3SecretKey: string;
+  s3UseSsl: boolean;
   sentryDsn?: string;
   startBlockHeight: number;
 };

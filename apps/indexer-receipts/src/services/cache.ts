@@ -1,4 +1,4 @@
-import { Message } from 'nb-blocks';
+import { Message } from 'nb-blocks-minio';
 
 import { lru } from '#libs/lru';
 

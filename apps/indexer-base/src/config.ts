@@ -11,6 +11,7 @@ const env = cleanEnv(process.env, {
     choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
     default: DataSource.NEAR_LAKE,
   }),
+  BASE_INDEXER_KEY: str(),
   BASE_START_BLOCK: num({ default: 0 }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
@@ -30,9 +31,10 @@ const env = cleanEnv(process.env, {
   }),
   S3_ACCESS_KEY: str(),
   S3_BUCKET: str({ default: '' }),
-  S3_ENDPOINT: url(),
-  S3_REGION: str({ default: '' }),
+  S3_HOST: str(),
+  S3_PORT: num({ default: 443 }),
   S3_SECRET_KEY: str(),
+  S3_USE_SSL: bool({ default: true }),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -74,6 +76,7 @@ const config: Config = {
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
   genesisTimestamp,
+  indexerKey: env.BASE_INDEXER_KEY,
   insertLimit: 2_500, // records to insert into the db at a time
   nearlakeAccessKey: env.NEARLAKE_ACCESS_KEY,
   nearlakeBucketName,
@@ -84,9 +87,10 @@ const config: Config = {
   preloadSize: 100, // blocks to preload in nearlake
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,
-  s3Endpoint: env.S3_ENDPOINT,
-  s3Region: env.S3_REGION,
+  s3Host: env.S3_HOST,
+  s3Port: env.S3_PORT,
   s3SecretKey: env.S3_SECRET_KEY,
+  s3UseSsl: env.S3_USE_SSL,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.BASE_START_BLOCK,
 };

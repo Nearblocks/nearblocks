@@ -1,4 +1,4 @@
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks';
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import { ExecutionOutcome, ExecutionOutcomeReceipt } from 'nb-types';
 import { retry } from 'nb-utils';
