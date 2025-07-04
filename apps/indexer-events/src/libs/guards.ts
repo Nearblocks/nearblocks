@@ -1,4 +1,4 @@
-import { Action, FunctionCallAction } from 'nb-blocks';
+import { Action, FunctionCallAction } from 'nb-blocks-minio';
 import { FTLogKind, NEP, NFTLogKind } from 'nb-types';
 
 import {

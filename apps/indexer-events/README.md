@@ -9,6 +9,12 @@ You can find the code for legacy token implementations in the `src/services/cont
 ```
 DATABASE_URL=
 NETWORK=mainnet
+EVENTS_INDEXER_KEY=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+S3_HOST=play.min.io
+S3_PORT=9000
+S3_USE_SSL=true
 
 # Optional
 DATABASE_URL_READ=

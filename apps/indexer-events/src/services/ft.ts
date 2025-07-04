@@ -1,4 +1,4 @@
-import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-blocks';
+import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import { EventCause, EventStandard, EventType, FTEvent } from 'nb-types';
 import { retry } from 'nb-utils';

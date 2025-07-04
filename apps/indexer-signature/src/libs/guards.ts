@@ -1,4 +1,4 @@
-import { Action, DelegateAction, FunctionCallAction } from 'nb-blocks';
+import { Action, DelegateAction, FunctionCallAction } from 'nb-blocks-minio';
 
 import { Ecdsa, Eddsa } from '#types/types';
 

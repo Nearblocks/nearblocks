@@ -1,4 +1,4 @@
-import { BlockHeader } from 'nb-blocks';
+import { BlockHeader } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import { EventCause, EventStandard, NFTEvent } from 'nb-types';
 import { retry } from 'nb-utils';

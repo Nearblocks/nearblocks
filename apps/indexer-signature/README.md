@@ -8,6 +8,12 @@ Signature indexer works with mpc signatures
 DATABASE_URL=
 DATABASE_URL_BASE=
 NETWORK=mainnet
+SIGNATURE_INDEXER_KEY=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+S3_HOST=play.min.io
+S3_PORT=9000
+S3_USE_SSL=true
 
 # Optional
 DATABASE_CA=
