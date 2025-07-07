@@ -26,7 +26,11 @@ export const storeNFTEvents = async (
           ? eventItem.token_ids
           : [];
 
-        if (eventItem.owner_id && eventItem.owner_id.trim() && tokens.length) {
+        if (
+          typeof eventItem.owner_id === 'string' &&
+          eventItem.owner_id.trim() &&
+          tokens.length
+        ) {
           tokens
             .filter((token) => token)
             .forEach((token) => {
@@ -57,7 +61,11 @@ export const storeNFTEvents = async (
           ? eventItem.token_ids
           : [];
 
-        if (eventItem.owner_id && eventItem.owner_id.trim() && tokens.length) {
+        if (
+          typeof eventItem.owner_id === 'string' &&
+          eventItem.owner_id.trim() &&
+          tokens.length
+        ) {
           tokens
             .filter((token) => token)
             .forEach((token) => {
@@ -89,9 +97,9 @@ export const storeNFTEvents = async (
           : [];
 
         if (
-          eventItem.old_owner_id &&
+          typeof eventItem.old_owner_id === 'string' &&
           eventItem.old_owner_id.trim() &&
-          eventItem.new_owner_id &&
+          typeof eventItem.new_owner_id === 'string' &&
           eventItem.new_owner_id.trim() &&
           tokens.length
         ) {
