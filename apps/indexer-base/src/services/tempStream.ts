@@ -1,5 +1,3 @@
-import { forEach } from 'hwp';
-
 import { streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
 import { Message } from 'nb-neardata';
@@ -38,16 +36,21 @@ export const syncData = async () => {
     start: startBlock,
   });
 
-  await forEach(stream, onMessage, 25);
+  let messages: Message[] = [];
 
-  stream.on('end', () => {
-    logger.error('stream ended');
-    process.exit();
-  });
-  stream.on('error', (error: Error) => {
-    logger.error(error);
-    process.exit();
-  });
+  for await (const message of stream as AsyncIterable<Message>) {
+    const concurrency = message.block.header.height - startBlock > 100 ? 25 : 1;
+    messages.push(message);
+
+    if (messages.length >= concurrency) {
+      await Promise.all(messages.map((msg) => onMessage(msg)));
+      messages = [];
+    }
+  }
+
+  if (messages.length > 0) {
+    await Promise.all(messages.map((msg) => onMessage(msg)));
+  }
 };
 
 export const onMessage = async (message: Message) => {

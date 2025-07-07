@@ -54,18 +54,9 @@ export const syncData = async () => {
   if (messages.length > 0) {
     await Promise.all(messages.map((msg) => onMessage(startBlock, msg)));
   }
-
-  stream.on('end', () => {
-    logger.error('stream ended');
-    process.exit();
-  });
-  stream.on('error', (error: Error) => {
-    logger.error(error);
-    process.exit();
-  });
 };
 
-export const onMessage = async (start: number, message: Message) => {
+export const onMessage = async (startBlock: number, message: Message) => {
   try {
     const start = performance.now();
 
@@ -89,7 +80,7 @@ export const onMessage = async (start: number, message: Message) => {
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
-    if (message.block.header.height > start + 25) {
+    if (message.block.header.height > startBlock + 25) {
       process.exit();
     }
   }
