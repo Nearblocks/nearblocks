@@ -4,7 +4,7 @@ import * as Minio from 'minio';
 
 import { createKnex, Knex, KnexConfig } from 'nb-knex';
 import { logger } from 'nb-logger';
-import { retry } from 'nb-utils';
+import { retry, sleep } from 'nb-utils';
 
 import { Message } from './type.js';
 
@@ -18,7 +18,16 @@ export type BlockStreamConfig = {
   start: number;
 };
 
-const retries = 5;
+const withTimeout = <T>(promise: Promise<T>, timeout: number) =>
+  Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(
+        () => reject(new Error(`Promise timed out after ${timeout} ms`)),
+        timeout,
+      ),
+    ),
+  ]);
 
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
@@ -36,7 +45,7 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
 
       return blocks;
     },
-    { exponential: true, logger: retryLogger, retries },
+    { exponential: true, logger: retryLogger, retries: 5 },
   );
 };
 
@@ -48,42 +57,23 @@ const fetchJson = async (
   return retry(
     async () => {
       const objectName = `${block}.json`;
+      const stream = await minioClient.getObject(bucket, objectName);
 
-      try {
-        const stream = await minioClient.getObject(bucket, objectName);
+      return new Promise<string>((resolve, reject) => {
+        const chunks: Uint8Array[] = [];
 
-        return new Promise<string>((resolve, reject) => {
-          const chunks: Uint8Array[] = [];
-          const timer: NodeJS.Timeout = setTimeout(() => {
-            cleanup();
-            stream.destroy();
-            reject(new Error(`Timeout fetching block: ${block}`));
-          }, 60_000);
+        stream.on('data', (chunk: Uint8Array) => chunks.push(chunk));
+        stream.on('error', (error) => reject(error));
+        stream.on('end', () => {
+          const data = Buffer.concat(chunks).toString('utf8');
 
-          const cleanup = () => {
-            if (timer) clearTimeout(timer);
-          };
+          if (!data) {
+            reject(new Error(`Empty response: block: ${block}`));
+          }
 
-          stream.on('data', (chunk: Uint8Array) => chunks.push(chunk));
-
-          stream.on('end', () => {
-            cleanup();
-            const data = Buffer.concat(chunks).toString('utf8');
-            if (!data) {
-              reject(new Error(`Empty response: block: ${block}`));
-            } else {
-              resolve(data);
-            }
-          });
-
-          stream.on('error', (error) => {
-            cleanup();
-            reject(error);
-          });
+          resolve(data);
         });
-      } catch (error) {
-        throw new Error(`Failed to fetch block ${block}: ${error}`);
-      }
+      });
     },
     { exponential: true, logger: retryLogger, retries: 3 },
   );
@@ -93,60 +83,57 @@ export const streamBlock = (config: BlockStreamConfig) => {
   const knex: Knex = createKnex(config.dbConfig);
   const minioClient = new Minio.Client(config.s3Config);
 
-  let start = config.start;
-  let isFetching = false;
   const limit = config.limit ?? 10;
   const highWaterMark = limit * 100;
 
-  knex.on('error', (error) => {
-    throw error;
-  });
-
-  const readable = new Readable({
-    highWaterMark,
-    objectMode: true,
-    read() {},
-  });
-
-  const getBlocks = async () => {
-    if (isFetching) return;
-
-    isFetching = true;
+  async function* iterator() {
+    let start = config.start;
 
     try {
-      const remaining = highWaterMark - readable.readableLength;
+      while (true) {
+        const blocks = await withTimeout(
+          fetchBlocks(knex, start, limit),
+          10_000,
+        );
 
-      if (remaining > limit) {
-        const blocks = await fetchBlocks(knex, start, limit);
-
-        blocks.pop();
+        if (blocks.length === 0) {
+          await sleep(100);
+          continue;
+        }
 
         const jsons = await Promise.all(
           blocks.map((block) =>
-            fetchJson(minioClient, config.s3Bucket, block.block_height),
+            withTimeout(
+              fetchJson(minioClient, config.s3Bucket, block.block_height),
+              60_000,
+            ),
           ),
         );
 
         for (const json of jsons) {
           const parsed: Message = JSON.parse(json);
 
-          if (!readable.push(parsed)) {
-            return;
-          }
-
+          yield parsed;
           start = parsed.block.header.height;
         }
       }
-    } catch (error) {
-      readable.destroy(error as Error);
     } finally {
-      isFetching = false;
+      await knex.destroy();
     }
-  };
+  }
 
-  const interval = setInterval(getBlocks, 100);
+  const readable = Readable.from(iterator(), {
+    emitClose: true,
+    highWaterMark,
+    objectMode: true,
+  });
 
-  readable.on('close', () => clearInterval(interval));
+  readable.on('end', () => process.exit());
+  readable.on('error', (error) => {
+    logger.error(error);
+    process.exit();
+  });
+  readable.on('close', () => process.exit());
 
   return readable;
 };
