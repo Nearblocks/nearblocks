@@ -28,7 +28,6 @@ import {
   yoctoToNear,
 } from '@/utils/libs';
 import {
-  // convertNumericStringsToNumbers,
   mainActions,
   txnActionLogs,
   txnActions,
@@ -119,7 +118,6 @@ const Details = (props: Props) => {
   const {
     apiLogs,
     apiActionLogs,
-    // apiMainActions,
     tokenMetadata,
     apiAllActions,
     apiSubActions,
@@ -181,14 +179,7 @@ const Details = (props: Props) => {
   }
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
-  const [
-    rpcLogs,
-    rpcActionLogs,
-    rpcSubActions,
-    rpcAllActions,
-    // rpcMainActions,
-    // rpcErrorMessage,
-  ] = useMemo(() => {
+  const [rpcLogs, rpcActionLogs, rpcSubActions, rpcAllActions] = useMemo(() => {
     if (!isEmpty(rpcTxn)) {
       return [
         txnLogs(rpcTxn),
@@ -203,14 +194,6 @@ const Details = (props: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
-
-  // const processedTxn = {
-  //   ...txn,
-  //   outcomes: convertNumericStringsToNumbers(txn.outcomes),
-  // };
-  // const apiErrorMessage = txnErrorMessage(processedTxn);
-  // const errorMessage =
-  //   apiErrorMessage && !shouldUseRpc ? apiErrorMessage : rpcErrorMessage;
 
   const rpcAllEvents = useMemo(() => {
     if (
@@ -324,66 +307,6 @@ const Details = (props: Props) => {
       ? apiFilteredLogs
       : rpcFilteredLogs;
 
-  // const rpcMainTxnsActions =
-  //   rpcMainActions &&
-  //   rpcMainActions?.map((txn) => {
-  //     const filteredNepLogs = rpcLogs?.filter((item: any) => {
-  //       try {
-  //         const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
-  //         if (logContent) {
-  //           const jsonLog = JSON.parse(logContent[1]);
-  //           return jsonLog?.standard === 'nep245';
-  //         }
-  //         return false;
-  //       } catch {
-  //         return false;
-  //       }
-  //     });
-  //     if (filteredNepLogs?.length > 0) {
-  //       return {
-  //         ...txn,
-  //         logs: [...filteredNepLogs],
-  //       };
-  //     } else {
-  //       return {
-  //         ...txn,
-  //         logs: [...txn.logs, ...filteredNepLogs],
-  //       };
-  //     }
-  //   });
-
-  // const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
-  //   const filteredApiNepLogs = apiLogs?.filter((log: any) => {
-  //     try {
-  //       if (
-  //         log?.logs?.standard === 'nep245' ||
-  //         log?.logs?.standard === 'dip4'
-  //       ) {
-  //         return log;
-  //       }
-  //       return false;
-  //     } catch {
-  //       return false;
-  //     }
-  //   });
-  //   if (filteredApiNepLogs?.length > 0) {
-  //     return {
-  //       ...txn,
-  //       logs: [...filteredApiNepLogs],
-  //     };
-  //   } else {
-  //     return {
-  //       ...txn,
-  //       logs: [...txn.logs, ...filteredApiNepLogs],
-  //     };
-  //   }
-  // });
-
-  // const updatedMainTxnsActions =
-  //   apiMainTxnsActions?.length > 0 && !shouldUseRpc
-  //     ? apiMainTxnsActions
-  //     : rpcMainTxnsActions;
-
   const rpcTokenIdsCount = rpcActionLogs?.reduce(
     (totalCount: number, item: any) => {
       try {
@@ -468,9 +391,6 @@ const Details = (props: Props) => {
       setIsActionRowScroll(height >= 160);
     }
   }, [apiSubActions, rpcSubActions, filteredLogs]);
-
-  // const subAction =
-  //   apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
 
   return (
     <>
