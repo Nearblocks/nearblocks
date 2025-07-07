@@ -469,8 +469,8 @@ const Details = (props: Props) => {
     }
   }, [apiSubActions, rpcSubActions, filteredLogs]);
 
-  const subAction =
-    apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
+  // const subAction =
+  //   apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
 
   return (
     <>
@@ -690,7 +690,7 @@ const Details = (props: Props) => {
             </div>
           </div>
 
-          {actionparsed?.parsedResponse?.length > 0 && (
+          {actionparsed?.Actions?.length > 0 && (
             <div
               className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1"
               id="mainaction-row"
@@ -723,7 +723,7 @@ const Details = (props: Props) => {
                       }`}
                     >
                       <div className="break-words space-y-2 align-middle">
-                        {actionparsed.parsedResponse.map(
+                        {actionparsed.Actions.map(
                           (action: any, index: number) => {
                             const receiptId = action?.receiptId;
                             const type = action?.type;
