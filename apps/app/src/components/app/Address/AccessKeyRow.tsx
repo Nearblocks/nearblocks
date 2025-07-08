@@ -8,7 +8,7 @@ import { AccessInfo, AccountContractInfo } from '@/utils/types';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 
 interface Props {
   accessKey: AccountContractInfo;
@@ -197,7 +197,7 @@ const AccessKeyRow = ({ accessKey, showWhen, error }: Props) => {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48">
           {txn?.block_timestamp ? (
-            <TimeStamp showAge={showWhen} timestamp={txn?.block_timestamp} />
+            <Timestamp showAge={showWhen} timestamp={txn?.block_timestamp} />
           ) : (
             'Genesis'
           )}

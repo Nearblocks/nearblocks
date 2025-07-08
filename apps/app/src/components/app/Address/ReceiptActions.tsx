@@ -24,7 +24,7 @@ import Filters from '@/components/app/common/Filters';
 import TxnStatus from '@/components/app/common/Status';
 import Table from '@/components/app/common/Table';
 import TableSummary from '@/components/app/common/TableSummary';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 import Tooltip from '@/components/app/common/Tooltip';
 import Clock from '@/components/app/Icons/Clock';
 import Download from '@/components/app/Icons/Download';
@@ -484,7 +484,7 @@ const ReceiptActions = ({ dataPromise, countPromise }: TxnsProps) => {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp
+          <Timestamp
             timestamp={Number(row?.block?.block_timestamp)}
             showAge={showAge}
           />

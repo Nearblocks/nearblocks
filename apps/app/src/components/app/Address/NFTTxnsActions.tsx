@@ -33,7 +33,7 @@ import SortIcon from '@/components/app/Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import { CopyButton } from '@/components/app/common/CopyButton';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 
 interface NftTokenTxnsProps {
   dataPromise: Promise<any>;
@@ -486,7 +486,7 @@ const NFTTransactionActions = ({
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (

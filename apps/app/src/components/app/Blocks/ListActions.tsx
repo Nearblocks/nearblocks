@@ -14,7 +14,7 @@ import Clock from '@/components/app/Icons/Clock';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 
 const ListActions = ({
   countLoading,
@@ -58,7 +58,7 @@ const ListActions = ({
     {
       cell: (row: BlocksInfo) => (
         <span>
-          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (

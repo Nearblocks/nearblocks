@@ -10,7 +10,7 @@ import { TransactionInfo } from '@/utils/types';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import TxnStatus from '@/components/app/common/Status';
 import Table from '@/components/app/common/Table';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 import TokenImage from '@/components/app/common/TokenImage';
 import Tooltip from '@/components/app/common/Tooltip';
 import Clock from '@/components/app/Icons/Clock';
@@ -333,7 +333,7 @@ const NFTTransfersActions = ({
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp
+          <Timestamp
             showAge={showAge}
             suppressHydrationWarning
             timestamp={row?.block_timestamp}

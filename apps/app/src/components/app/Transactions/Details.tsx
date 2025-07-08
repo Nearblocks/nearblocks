@@ -14,14 +14,12 @@ import {
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link } from '@/i18n/routing';
 import { parseEventLogs } from '@/utils/app/near';
-import dayjs from '@/utils/app/dayjs';
 import {
   convertToMetricPrefix,
   dollarFormat,
   fiatValue,
   gasPercentage,
   localFormat,
-  nanoToMilli,
   shortenToken,
   shortenTokenSymbol,
   tokenAmount,
@@ -64,6 +62,7 @@ import { convertTimestampToTimes } from '@/utils/app/libs';
 import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import RpcTxnStatus from '@/components/app/common/RpcStatus';
 import useScrollToTop from '@/hooks/app/useScrollToTop';
+import Timestamp from '@/components/app/common/Timestamp';
 
 interface Props {
   hash: string;
@@ -625,14 +624,12 @@ const Details = (props: Props) => {
                   {(txn?.block?.block_timestamp || txn?.block_timestamp) && (
                     <>
                       <span className="mr-1">
-                        {dayjs().to(
-                          dayjs(
-                            nanoToMilli(
-                              txn?.block?.block_timestamp ||
-                                txn?.block_timestamp,
-                            ),
-                          ),
-                        )}
+                        <Timestamp
+                          showTooltip={false}
+                          timestamp={
+                            txn?.block?.block_timestamp || txn?.block_timestamp
+                          }
+                        />
                       </span>
                       <Tooltip
                         className={'left-1/2 whitespace-nowrap max-w-[200px]'}
