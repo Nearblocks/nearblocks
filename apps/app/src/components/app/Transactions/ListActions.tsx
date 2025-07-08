@@ -23,7 +23,7 @@ import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Filters from '@/components/app/common/Filters';
 import TxnStatus from '@/components/app/common/Status';
 import Table from '@/components/app/common/Table';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 import Tooltip from '@/components/app/common/Tooltip';
 import Clock from '@/components/app/Icons/Clock';
 import FaInbox from '@/components/app/Icons/FaInbox';
@@ -475,7 +475,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (

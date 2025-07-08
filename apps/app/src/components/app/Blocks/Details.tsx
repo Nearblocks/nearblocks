@@ -23,7 +23,7 @@ import Tooltip from '@/components/app/common/Tooltip';
 import { useParams } from 'next/navigation';
 import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 interface Props {
   data: any;
   loading?: any;
@@ -244,7 +244,7 @@ export default function Details(props: Props) {
                   {block?.block_timestamp && (
                     <>
                       <span className="mr-1">
-                        <TimeStamp
+                        <Timestamp
                           showTooltip={false}
                           timestamp={block?.block_timestamp}
                         />

@@ -62,7 +62,7 @@ import { convertTimestampToTimes } from '@/utils/app/libs';
 import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import RpcTxnStatus from '@/components/app/common/RpcStatus';
 import useScrollToTop from '@/hooks/app/useScrollToTop';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 
 interface Props {
   hash: string;
@@ -624,7 +624,7 @@ const Details = (props: Props) => {
                   {(txn?.block?.block_timestamp || txn?.block_timestamp) && (
                     <>
                       <span className="mr-1">
-                        <TimeStamp
+                        <Timestamp
                           showTooltip={false}
                           timestamp={
                             txn?.block?.block_timestamp || txn?.block_timestamp

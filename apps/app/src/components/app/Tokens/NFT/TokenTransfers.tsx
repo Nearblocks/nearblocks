@@ -14,7 +14,7 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 
 interface Props {
   data: {
@@ -235,7 +235,7 @@ export default function TokenTransfers({ data, error, txnsCount }: Props) {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (

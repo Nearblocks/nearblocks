@@ -18,7 +18,7 @@ import Clock from '@/components/app/Icons/Clock';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import TimeStamp from '@/components/app/common/TimeStamp';
+import Timestamp from '@/components/app/common/Timestamp';
 
 interface ListProps {
   data: {
@@ -321,7 +321,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
     {
       cell: (row: TransactionInfo) => (
         <span>
-          <TimeStamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
       ),
       header: (

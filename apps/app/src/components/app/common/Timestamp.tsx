@@ -3,7 +3,7 @@ import { nanoToMilli } from '@/utils/libs';
 import dayjs from '@/utils/app/dayjs';
 import Tooltip from '@/components/app/common/Tooltip';
 
-const TimeStamp = ({ showAge = true, timestamp, showTooltip = true }: any) => {
+const Timestamp = ({ showAge = true, timestamp, showTooltip = true }: any) => {
   const isValidTimestamp = timestamp && !isNaN(nanoToMilli(timestamp));
   if (!isValidTimestamp) return;
   if (showTooltip) {
@@ -47,4 +47,4 @@ const TimeStamp = ({ showAge = true, timestamp, showTooltip = true }: any) => {
   }
 };
 
-export default TimeStamp;
+export default Timestamp;
