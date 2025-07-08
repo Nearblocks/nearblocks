@@ -12,11 +12,9 @@ import {
   dollarFormat,
   gasFee,
   localFormat,
-  nanoToMilli,
 } from '@/utils/app/libs';
 import { gasPrice } from '@/utils/near';
 import { BlocksInfo } from '@/utils/types';
-import dayjs from '@/utils/app/dayjs';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FileSlash from '@/components/app/Icons/FileSlash';
@@ -25,6 +23,7 @@ import Tooltip from '@/components/app/common/Tooltip';
 import { useParams } from 'next/navigation';
 import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
+import TimeStamp from '@/components/app/common/TimeStamp';
 interface Props {
   data: any;
   loading?: any;
@@ -245,7 +244,10 @@ export default function Details(props: Props) {
                   {block?.block_timestamp && (
                     <>
                       <span className="mr-1">
-                        {dayjs().to(dayjs(nanoToMilli(block?.block_timestamp)))}
+                        <TimeStamp
+                          showTooltip={false}
+                          timestamp={block?.block_timestamp}
+                        />
                       </span>
                       <Tooltip
                         className={'left-1/2 whitespace-nowrap max-w-[200px]'}
