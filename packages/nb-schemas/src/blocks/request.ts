@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import { cursorSchema, limitSchema } from '#schemas/index';
+import { cursorSchema, limitSchema } from '../common.js';
 
 const latest = v.object({
   limit: v.optional(
