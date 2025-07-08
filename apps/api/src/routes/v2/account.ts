@@ -147,7 +147,7 @@ const routes = (app: Router) => {
   );
 
   route.get(
-    '/:account/inventory/intents',
+    '/:account/inventory/nep245',
     validator(schema.inventory),
     account.inventory,
   );

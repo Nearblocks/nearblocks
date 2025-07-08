@@ -1,17 +1,19 @@
 import { Response } from 'express';
 import { providers } from 'near-api-js';
+
+import { Network } from 'nb-types';
+
+import config from '#config';
 import catchAsync from '#libs/async';
 import { callFunction, getProvider } from '#libs/near';
 import redis from '#libs/redis';
+import { Inventory } from '#libs/schema/account';
 import {
   IntentsToken,
   mtMetadata,
   RequestValidator,
   RPCResponse,
 } from '#types/types';
-import { Inventory } from '#libs/schema/account';
-import config from '#config';
-import { Network } from 'nb-types';
 
 const EXPIRY = 60;
 const provider = getProvider();
@@ -78,45 +80,29 @@ export const intentsTokens = async <T>(
 
 export const intentsBalances = async <T>(
   provider: providers.JsonRpcProvider,
-  account: string,
+  account_id: string,
   tokenIds: string[],
 ): Promise<T> => {
   try {
     return redis.cache(
-      `intents:${account}:balances`,
+      `intents:${account_id}:balances`,
       async () => {
         const response: RPCResponse = await callFunction(
           provider,
           'intents.near',
           'mt_batch_balance_of',
-          { account_id: account, token_ids: tokenIds },
+          {
+            accounts: [
+              {
+                account_id: account_id,
+                token_ids: tokenIds,
+              },
+            ],
+          },
         );
         return bytesParse(response.result);
       },
       EXPIRY,
-    );
-  } catch (error) {
-    return [] as T;
-  }
-};
-
-export const intentsMetadata = async <T>(
-  provider: providers.JsonRpcProvider,
-  tokenIds: string[],
-): Promise<T> => {
-  try {
-    return redis.cache(
-      `intents:metadata:${tokenIds.join(',')}`,
-      async () => {
-        const response: RPCResponse = await callFunction(
-          provider,
-          'intents.near',
-          'mt_tokens',
-          { token_ids: tokenIds },
-        );
-        return bytesParse(response.result);
-      },
-      EXPIRY * 5,
     );
   } catch (error) {
     return [] as T;
@@ -131,40 +117,29 @@ const nep245 = catchAsync(
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const nep245 = 'nep245:';
     const tokens = await intentsTokens<IntentsToken[]>(provider, account);
 
     const tokenIds = tokens
       .map((token) => token.token_id)
-      .filter((token) => token.startsWith(nep245));
+      .filter((token) => token.startsWith('nep245'));
 
     if (!tokenIds.length) {
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const [balances, metadata] = await Promise.all([
-      intentsBalances<string[]>(provider, account, tokenIds),
-      intentsMetadata<
-        Array<{ title?: string; description?: string; media?: string }>
-      >(provider, tokenIds),
-    ]);
-    const intents = tokenIds.map((token, index) => {
-      const balance = balances?.[index] ?? '0';
-      const meta = metadata?.[index] ?? {};
+    const balances = await intentsBalances<string[]>(
+      provider,
+      account,
+      tokenIds,
+    );
 
-      return {
-        amount: balance,
-        token_id: token,
-        metadata: {
-          title: meta.title,
-          description: meta.description,
-          media: meta.media,
-        },
-      };
-    });
+    const intents = tokenIds.map((token, index) => ({
+      amount: balances?.[index] ?? '0',
+      token_id: token,
+    }));
 
     return res.status(200).json({ nep245: { intents } });
   },
 );
 
-export default { nep245, metadata };
+export default { metadata, nep245 };
