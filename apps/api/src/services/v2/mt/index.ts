@@ -55,7 +55,7 @@ const metadata = catchAsync(
   },
 );
 
-export const intentsTokens = async <T>(
+export const nep245Tokens = async <T>(
   provider: providers.JsonRpcProvider,
   account: string,
 ): Promise<T> => {
@@ -78,7 +78,7 @@ export const intentsTokens = async <T>(
   }
 };
 
-export const intentsBalances = async <T>(
+export const nep245Balances = async <T>(
   provider: providers.JsonRpcProvider,
   account_id: string,
   tokenIds: string[],
@@ -117,7 +117,7 @@ const nep245 = catchAsync(
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const tokens = await intentsTokens<IntentsToken[]>(provider, account);
+    const tokens = await nep245Tokens<IntentsToken[]>(provider, account);
 
     const tokenIds = tokens
       .map((token) => token.token_id)
@@ -127,7 +127,7 @@ const nep245 = catchAsync(
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const balances = await intentsBalances<string[]>(
+    const balances = await nep245Balances<string[]>(
       provider,
       account,
       tokenIds,
