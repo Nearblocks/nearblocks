@@ -1,3 +1,17 @@
+import request from 'nb-schemas/dist/txns/request.js';
+import response from 'nb-schemas/dist/txns/response.js';
+
+import type {
+  Txn,
+  TxnCount,
+  TxnReceiptsReq,
+  TxnReq,
+  Txns,
+  TxnsCountReq,
+  TxnsLatestReq,
+  TxnsReq,
+} from 'nb-schemas';
+
 import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, pgp } from '#libs/pgp';
@@ -6,14 +20,6 @@ import { paginateData, rollingWindow, rollingWindowList } from '#libs/response';
 import { TxnReceipts } from '#libs/schema/v2/txns';
 import { responseHandler } from '#middlewares/response';
 import { RequestValidator } from '#middlewares/validate';
-import request, {
-  TxnReceiptsReq,
-  TxnReq,
-  TxnsCountReq,
-  TxnsLatestReq,
-  TxnsReq,
-} from '#schemas/txns/request';
-import response, { Txn, TxnCount, Txns } from '#schemas/txns/response';
 import sql from '#sql/txns';
 
 const latest = responseHandler(
