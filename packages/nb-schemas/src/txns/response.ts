@@ -2,8 +2,8 @@ import * as v from 'valibot';
 
 import { ActionKind, ExecutionOutcomeStatus } from 'nb-types';
 
-import type { JsonData } from '#schemas/index';
-import { jsonSchema, responseSchema } from '#schemas/index';
+import type { JsonData } from '../common.js';
+import { jsonSchema, responseSchema } from '../common.js';
 
 const block = v.object({
   block_hash: v.optional(v.string()),

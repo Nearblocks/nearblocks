@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import { responseSchema } from '#schemas/index';
+import { responseSchema } from '../common.js';
 
 const blockChunkAgg = v.object({
   count: v.number(),

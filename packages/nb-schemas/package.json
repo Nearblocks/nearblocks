@@ -1,0 +1,23 @@
+{
+  "name": "nb-schemas",
+  "version": "0.0.1",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "lint": "tsc --noEmit && eslint ./ --fix"
+  },
+  "devDependencies": {
+    "@types/node": "~22.14",
+    "eslint-config-custom-node": "*",
+    "nb-tsconfig": "*",
+    "typescript": "~5.8"
+  },
+  "dependencies": {
+    "valibot": "1.1.0"
+  }
+}
