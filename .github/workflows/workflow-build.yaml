@@ -1,7 +1,7 @@
 name: Build Docker Images
 on:
   push:
-    branches: ['main']
+    branches: ['indexers']
 
 jobs:
   build-deploy:
@@ -40,7 +40,7 @@ jobs:
 
       - name: Get current image digest
         run: |
-          CURRENT_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}:latest | jq -r '.config.digest' || echo "")
+          CURRENT_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}:indexers | jq -r '.config.digest' || echo "")
           echo "CURRENT_DIGEST=$CURRENT_DIGEST" >> $GITHUB_ENV
           echo $GITHUB_ENV
 
@@ -53,16 +53,16 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ghcr.io/nearblocks/${{ matrix.service }}:latest
+            ghcr.io/nearblocks/${{ matrix.service }}:indexers
             ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
-          cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:latest
+          cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}:indexers
           cache-to: type=inline
           build-args: |
             GITHUB_SHA=${{ github.sha }}
 
       - name: Get new image digest
         run: |
-          NEW_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}:latest | jq -r '.config.digest')
+          NEW_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}:indexers | jq -r '.config.digest')
           echo "NEW_DIGEST=$NEW_DIGEST" >> $GITHUB_ENV
 
 #      - name: Deploy testnet
