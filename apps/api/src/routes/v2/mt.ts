@@ -11,7 +11,7 @@ const routes = (app: Router) => {
 
   route.get('/balance', validator(schema.list), mt.nep245);
 
-  route.post('/meta', validator(schema.meta), mt.metadata);
+  route.get('/meta', validator(schema.meta), mt.metadata);
 };
 
 export default routes;
