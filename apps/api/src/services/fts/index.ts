@@ -36,7 +36,8 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     FROM
       ft_list
     WHERE
-      ${search
+      contract NOT ILIKE 'aurora'
+      AND ${search
       ? sql`
           contract ILIKE ${search + '%'}
           OR symbol ILIKE ${search + '%'}
