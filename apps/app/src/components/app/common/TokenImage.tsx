@@ -74,7 +74,20 @@ const TokenImage = ({ alt, src, ...rest }: any) => {
     e.target.src = placeholder;
   };
   /* eslint-disable @next/next/no-img-element */
-  return <img alt={alt} src={src || placeholder} {...rest} onError={onError} />;
+  return (
+    <img
+      alt={alt}
+      src={
+        src
+          ? src.startsWith('https') || src?.startsWith('data:image/')
+            ? src
+            : placeholder
+          : placeholder
+      }
+      {...rest}
+      onError={onError}
+    />
+  );
 };
 
 export default TokenImage;
