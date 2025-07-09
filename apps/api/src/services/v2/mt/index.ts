@@ -60,13 +60,13 @@ export const mtTokens = async <T>(
 
   try {
     const tokens = await redis.cache(
-      `${account}:tokens`, 
+      `${account}:tokens`,
       async () => {
         const response: RPCResponse = await callFunction(
           provider,
-          account, 
+          account,
           'mt_tokens_for_owner',
-          { account_id: account }, 
+          { account_id: account },
         );
         return bytesParse(response.result);
       },
