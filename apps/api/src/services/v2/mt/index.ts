@@ -23,7 +23,7 @@ type MetaRequest = {
   token_ids: string[];
 };
 
-const metadata = catchAsync(
+const metaData = catchAsync(
   async (req: RequestValidator<MetaRequest>, res: Response) => {
     const contract = req.query.contract as string;
     const token_ids = (req.query.token_ids as string)?.split(',') ?? [];
@@ -52,44 +52,41 @@ const metadata = catchAsync(
   },
 );
 
-export const MTTokens = async <T>(
+export const mtTokens = async <T>(
   provider: providers.JsonRpcProvider,
   account: string,
 ): Promise<T> => {
   const allTokens = [];
-  const contracts = ['intents.near', 'v2.omni.hot.tg'];
 
-  for (const contract of contracts) {
-    try {
-      const tokens = await redis.cache(
-        `${contract}:${account}:tokens`,
-        async () => {
-          const response: RPCResponse = await callFunction(
-            provider,
-            contract,
-            'mt_tokens_for_owner',
-            { account_id: account },
-          );
-          return bytesParse(response.result);
-        },
-        EXPIRY * 5,
-      );
+  try {
+    const tokens = await redis.cache(
+      `${account}:tokens`, 
+      async () => {
+        const response: RPCResponse = await callFunction(
+          provider,
+          account, 
+          'mt_tokens_for_owner',
+          { account_id: account }, 
+        );
+        return bytesParse(response.result);
+      },
+      EXPIRY * 5,
+    );
 
-      for (const token of tokens) {
-        allTokens.push({
-          ...token,
-          token_id: `nep245:${contract}:${token.token_id}`,
-        });
-      }
-    } catch {
-      continue;
+    for (const token of tokens) {
+      allTokens.push({
+        ...token,
+        token_id: `nep245:${account}:${token.token_id}`,
+      });
     }
+  } catch (error) {
+    console.error(`Failed to fetch tokens for contract: ${account}`, error);
   }
 
   return allTokens as T;
 };
 
-export const MTBalances = async <T>(
+export const mtBalances = async <T>(
   provider: providers.JsonRpcProvider,
   accountId: string,
   tokenIds: string[],
@@ -132,7 +129,7 @@ export const MTBalances = async <T>(
   return balances as T;
 };
 
-const MT = catchAsync(
+const mtInventory = catchAsync(
   async (req: RequestValidator<Inventory>, res: Response) => {
     const account = req.query.account as string;
 
@@ -140,7 +137,7 @@ const MT = catchAsync(
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const tokens = await MTTokens<IntentsToken[]>(provider, account);
+    const tokens = await mtTokens<IntentsToken[]>(provider, account);
 
     const tokenIds = tokens
       .map((token) => token.token_id)
@@ -150,15 +147,36 @@ const MT = catchAsync(
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const balances = await MTBalances<string[]>(provider, account, tokenIds);
+    const balances = await mtBalances<string[]>(provider, account, tokenIds);
 
-    const intents = tokenIds.map((token, index) => ({
-      amount: balances?.[index] ?? '0',
-      token_id: token,
-    }));
+    const intents = await Promise.all(
+      tokenIds.map(async (token, index) => {
+        const [, contract, id] = token.split(':');
 
-    return res.status(200).json({ MT: { intents } });
+        let meta = null;
+        try {
+          const response: RPCResponse = await callFunction(
+            provider,
+            contract,
+            'mt_metadata',
+            { token_id: id },
+          );
+          meta = bytesParse(response.result);
+        } catch (error) {
+          console.error(`mt_metadata failed for ${contract}:${id}`, error);
+        }
+
+        return {
+          amount: balances?.[index] ?? '0',
+          contract,
+          meta,
+          token_id: token,
+        };
+      }),
+    );
+
+    return res.status(200).json({ inventory: { intents } });
   },
 );
 
-export default { metadata, MT };
+export default { metaData, mtInventory };

@@ -9,9 +9,9 @@ const route = Router();
 const routes = (app: Router) => {
   app.use('/mt', bearerAuth, route);
 
-  route.get('/balance', validator(schema.inventory), mt.MT);
+  route.get('/list', validator(schema.inventory), mt.mtInventory);
 
-  route.get('/meta', validator(schema.meta), mt.metadata);
+  route.get('/meta', validator(schema.meta), mt.metaData);
 };
 
 export default routes;
