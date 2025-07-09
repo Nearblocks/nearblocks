@@ -11,7 +11,7 @@ const routes = (app: Router) => {
 
   route.get('/', validator(schema.inventory), mt.list);
 
-  route.get('/:contract', validator(schema.meta), mt.metaData);
+  route.get('/contract', validator(schema.meta), mt.metaData);
 };
 
 export default routes;

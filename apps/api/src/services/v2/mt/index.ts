@@ -26,12 +26,12 @@ type MetaRequest = {
 const metaData = catchAsync(
   async (req: RequestValidator<MetaRequest>, res: Response) => {
     const contract = req.query.contract as string;
-    const token_id = (req.query.token_id as string)?.split(',') ?? [];
+    const token_ids = (req.query.token_ids as string)?.split(',') ?? [];
 
-    const tokenId = [...token_id].sort();
+    const tokenId = [...token_ids].sort();
     const cacheKey = `nep245:${contract}:meta:${JSON.stringify(tokenId)}`;
 
-    const meta = await redis.cache(
+    const metas = await redis.cache(
       cacheKey,
       async () => {
         const response: RPCResponse = await callFunction(
@@ -48,7 +48,7 @@ const metaData = catchAsync(
       EXPIRY,
     );
 
-    return res.status(200).json(meta);
+    return res.status(200).json(metas);
   },
 );
 
