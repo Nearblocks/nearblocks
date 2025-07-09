@@ -5,7 +5,7 @@ import { Network } from 'nb-types';
 
 import config from '#config';
 import catchAsync from '#libs/async';
-import { callFunction, getProvider } from '#libs/near';
+import { bytesParse, callFunction, getProvider } from '#libs/near';
 import redis from '#libs/redis';
 import { Inventory } from '#libs/schema/account';
 import {
@@ -23,16 +23,13 @@ type MetaRequest = {
   token_ids: string[];
 };
 
-export function bytesParse<T>(result: Uint8Array): T {
-  return JSON.parse(Buffer.from(result).toString());
-}
-
 const metadata = catchAsync(
   async (req: RequestValidator<MetaRequest>, res: Response) => {
-    const { contract, token_ids } = req.validator.data;
+    const contract = req.query.contract as string;
+    const token_ids = (req.query.token_ids as string)?.split(',') ?? [];
 
-    const safeTokenIds = Array.isArray(token_ids) ? [...token_ids].sort() : [];
-    const cacheKey = `nep245:${contract}:meta:${JSON.stringify(safeTokenIds)}`;
+    const tokenId = [...token_ids].sort();
+    const cacheKey = `nep245:${contract}:meta:${JSON.stringify(tokenId)}`;
 
     const metas = await redis.cache(
       cacheKey,
@@ -42,11 +39,11 @@ const metadata = catchAsync(
           contract,
           'mt_metadata_token_all',
           {
-            token_ids: safeTokenIds,
+            token_ids: tokenId,
           },
         );
 
-        return bytesParse<mtMetadata[]>(response.result);
+        return bytesParse(response.result) as mtMetadata[];
       },
       EXPIRY,
     );
@@ -55,69 +52,95 @@ const metadata = catchAsync(
   },
 );
 
-export const nep245Tokens = async <T>(
+export const MTTokens = async <T>(
   provider: providers.JsonRpcProvider,
   account: string,
 ): Promise<T> => {
-  try {
-    return redis.cache(
-      `intents:${account}:tokens`,
-      async () => {
-        const response: RPCResponse = await callFunction(
-          provider,
-          'intents.near',
-          'mt_tokens',
-          { account_id: account },
-        );
-        return bytesParse(response.result);
-      },
-      EXPIRY * 5,
-    );
-  } catch (error) {
-    return [] as T;
+  const allTokens = [];
+  const contracts = ['intents.near', 'v2.omni.hot.tg'];
+
+  for (const contract of contracts) {
+    try {
+      const tokens = await redis.cache(
+        `${contract}:${account}:tokens`,
+        async () => {
+          const response: RPCResponse = await callFunction(
+            provider,
+            contract,
+            'mt_tokens_for_owner',
+            { account_id: account },
+          );
+          return bytesParse(response.result);
+        },
+        EXPIRY * 5,
+      );
+
+      for (const token of tokens) {
+        allTokens.push({
+          ...token,
+          token_id: `nep245:${contract}:${token.token_id}`,
+        });
+      }
+    } catch {
+      continue;
+    }
   }
+
+  return allTokens as T;
 };
 
-export const nep245Balances = async <T>(
+export const MTBalances = async <T>(
   provider: providers.JsonRpcProvider,
-  account_id: string,
+  accountId: string,
   tokenIds: string[],
 ): Promise<T> => {
-  try {
-    return redis.cache(
-      `intents:${account_id}:balances`,
-      async () => {
-        const response: RPCResponse = await callFunction(
-          provider,
-          'intents.near',
-          'mt_batch_balance_of',
-          {
-            accounts: [
-              {
-                account_id: account_id,
-                token_ids: tokenIds,
-              },
-            ],
-          },
-        );
-        return bytesParse(response.result);
-      },
-      EXPIRY,
-    );
-  } catch (error) {
-    return [] as T;
+  const tokensByContract: Record<string, string[]> = {};
+
+  for (const tokenId of tokenIds) {
+    const [, contract, id] = tokenId.split(':');
+    if (!tokensByContract[contract]) {
+      tokensByContract[contract] = [];
+    }
+    tokensByContract[contract].push(id);
   }
+
+  const balances: string[] = [];
+
+  for (const [contract, ids] of Object.entries(tokensByContract)) {
+    try {
+      const result = await redis.cache(
+        `${contract}:${accountId}:balances`,
+        async () => {
+          const response: RPCResponse = await callFunction(
+            provider,
+            contract,
+            'mt_batch_balance_of',
+            {
+              accounts: [{ account_id: accountId, token_ids: ids }],
+            },
+          );
+          return bytesParse(response.result);
+        },
+        EXPIRY,
+      );
+      balances.push(...result);
+    } catch {
+      balances.push(...ids.map(() => '0'));
+    }
+  }
+
+  return balances as T;
 };
 
-const nep245 = catchAsync(
+const MT = catchAsync(
   async (req: RequestValidator<Inventory>, res: Response) => {
-    const account = req.validator.data.account;
+    const account = req.query.account as string;
 
     if (config.network !== Network.MAINNET) {
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const tokens = await nep245Tokens<IntentsToken[]>(provider, account);
+    const tokens = await MTTokens<IntentsToken[]>(provider, account);
 
     const tokenIds = tokens
       .map((token) => token.token_id)
@@ -127,19 +150,15 @@ const nep245 = catchAsync(
       return res.status(200).json({ nep245: { intents: [] } });
     }
 
-    const balances = await nep245Balances<string[]>(
-      provider,
-      account,
-      tokenIds,
-    );
+    const balances = await MTBalances<string[]>(provider, account, tokenIds);
 
     const intents = tokenIds.map((token, index) => ({
       amount: balances?.[index] ?? '0',
       token_id: token,
     }));
 
-    return res.status(200).json({ nep245: { intents } });
+    return res.status(200).json({ MT: { intents } });
   },
 );
 
-export default { metadata, nep245 };
+export default { metadata, MT };
