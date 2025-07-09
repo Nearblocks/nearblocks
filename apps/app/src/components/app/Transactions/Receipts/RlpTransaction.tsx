@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { space_mono } from '@/fonts/font';
 import { useConfig } from '@/hooks/app/useConfig';
 import { jsonParser, jsonStringify } from '@/utils/libs';
+import { deserializeUnchecked } from 'borsh';
 
 interface Props {
   method?: string;
@@ -11,14 +12,42 @@ interface Props {
   receiver?: any | string;
 }
 
+class SubmitArgs {
+  tx_data: Uint8Array;
+  max_gas_price: bigint | null;
+  gas_token_address: Uint8Array | null;
+
+  constructor({ tx_data, max_gas_price, gas_token_address }: any) {
+    this.tx_data = tx_data;
+    this.max_gas_price = max_gas_price;
+    this.gas_token_address = gas_token_address;
+  }
+}
+
+const schema = new Map([
+  [
+    SubmitArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['tx_data', ['u8']],
+        ['max_gas_price', { kind: 'option', type: 'u128' }],
+        ['gas_token_address', { kind: 'option', type: [20] }],
+      ],
+    },
+  ],
+]);
+
 const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   const { aurorablocksUrl } = useConfig();
   const decoded =
-    method === 'submit' && receiver?.includes('aurora')
+    (method === 'submit' || method === 'submit_with_args') &&
+    receiver?.includes('aurora')
       ? pretty
       : pretty && Buffer.from(pretty, 'base64');
   const parsed =
-    method === 'submit' && receiver?.includes('aurora')
+    (method === 'submit' || method === 'submit_with_args') &&
+    receiver?.includes('aurora')
       ? decoded
       : decoded && jsonParser(decoded?.toString());
 
@@ -35,21 +64,62 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
     }
   }
 
-  function decodeTransaction(parsed: any) {
+  function decodeSubmitTransaction(parsed: any) {
     if (!parsed || !parsed?.tx_bytes_b64 || !isBase64(parsed?.tx_bytes_b64)) {
       return parsed;
     }
 
-    const input = ethers?.utils?.base64?.decode(parsed?.tx_bytes_b64);
-    const data = ethers?.utils?.parseTransaction(input);
-    const parsedData = {
-      ...data,
-      gasLimit: data?.gasLimit?.toString(),
-      gasPrice: data?.gasPrice?.toString(),
-      value: data?.value?.toString(),
-    };
+    try {
+      const input = ethers?.utils?.base64?.decode(parsed?.tx_bytes_b64);
+      const data = ethers?.utils?.parseTransaction(input);
+      const parsedData = {
+        ...data,
+        gasLimit: data?.gasLimit?.toString(),
+        gasPrice: data?.gasPrice?.toString(),
+        value: data?.value?.toString(),
+      };
 
-    return { ...parsed, tx_bytes_b64: parsedData };
+      return { ...parsed, tx_bytes_b64: parsedData };
+    } catch (error) {
+      console.error('Failed to parse submit transaction:', error);
+      return parsed;
+    }
+  }
+
+  function decodeSubmitWithArgsTransaction(parsed: any) {
+    if (!parsed || !parsed?.tx_bytes_b64 || !isBase64(parsed?.tx_bytes_b64)) {
+      return parsed;
+    }
+
+    try {
+      const buffer = Buffer.from(parsed.tx_bytes_b64, 'base64');
+      const submitArgs = deserializeUnchecked(schema, SubmitArgs, buffer);
+
+      const data = ethers?.utils?.parseTransaction(submitArgs.tx_data);
+      const parsedData = {
+        ...data,
+        gasLimit: data?.gasLimit?.toString(),
+        gasPrice: data?.gasPrice?.toString(),
+        value: data?.value?.toString(),
+      };
+
+      return {
+        ...parsed,
+        tx_bytes_b64: parsedData,
+      };
+    } catch (error) {
+      console.error('Failed to parse submit_with_args transaction:', error);
+      return parsed;
+    }
+  }
+
+  function decodeTransaction(parsed: any) {
+    if (method === 'submit') {
+      return decodeSubmitTransaction(parsed);
+    } else if (method === 'submit_with_args') {
+      return decodeSubmitWithArgsTransaction(parsed);
+    }
+    return parsed;
   }
 
   const handleFormatChange = (event: any) => {
@@ -71,6 +141,24 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
     setDisplayedArgs(transformedArgs);
   };
 
+  const getDisplayData = () => {
+    if (
+      (method === 'submit' || method === 'submit_with_args') &&
+      receiver?.includes('aurora')
+    ) {
+      if (!displayedArgs) return {};
+
+      try {
+        const parsedArgs = jsonParser(displayedArgs);
+        return parsedArgs?.tx_bytes_b64 || {};
+      } catch (error) {
+        console.error('Failed to parse displayed args:', error);
+        return {};
+      }
+    }
+    return displayedArgs || {};
+  };
+
   return (
     <>
       {format === 'table' ? (
@@ -87,71 +175,67 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
             </thead>
             <tbody>
               {displayedArgs &&
-                Object.entries(jsonParser(displayedArgs).tx_bytes_b64).map(
-                  ([key, value]) => (
-                    <tr key={key}>
-                      <td className="border px-4 py-2 whitespace-nowrap align-top">
-                        {key}
-                      </td>
-                      <td className="border px-4 py-2">
-                        {key === 'hash' &&
-                        method === 'submit' &&
-                        receiver.includes('aurora') ? (
-                          <a
-                            className="text-green-500 dark:text-green-250 hover:no-underline"
-                            href={`${aurorablocksUrl}/tx/${value}`}
-                            rel="noopener noreferrer"
-                            target="_blank"
-                          >
-                            {String(value)}
-                          </a>
-                        ) : typeof value === 'object' ? (
-                          <pre className="whitespace-pre-wrap text-sm">
-                            {JSON.stringify(value, null, 2)}
-                          </pre>
-                        ) : (
-                          <>{String(value)}</>
-                        )}
-                      </td>
-                    </tr>
-                  ),
-                )}
+                Object.entries(getDisplayData()).map(([key, value]) => (
+                  <tr key={key}>
+                    <td className="border px-4 py-2 whitespace-nowrap align-top">
+                      {key}
+                    </td>
+                    <td className="border px-4 py-2">
+                      {key === 'hash' &&
+                      (method === 'submit' || method === 'submit_with_args') &&
+                      receiver?.includes('aurora') ? (
+                        <a
+                          className="text-green-500 dark:text-green-250 hover:no-underline"
+                          href={`${aurorablocksUrl}/tx/${value}`}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
+                          {String(value)}
+                        </a>
+                      ) : typeof value === 'object' ? (
+                        <pre className="whitespace-pre-wrap text-sm">
+                          {JSON.stringify(value, null, 2)}
+                        </pre>
+                      ) : (
+                        <>{String(value)}</>
+                      )}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
-      ) : method === 'submit' &&
-        receiver.includes('aurora') &&
+      ) : (method === 'submit' || method === 'submit_with_args') &&
+        receiver?.includes('aurora') &&
         format === 'rlp' ? (
         <div
           className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
           style={{ height: '150px' }}
         >
           {displayedArgs &&
-            Object.entries(jsonParser(displayedArgs).tx_bytes_b64).map(
-              ([key, value]) => (
-                <p className="mb-2" key={key}>
-                  {key}:{' '}
-                  {key === 'hash' &&
-                  method === 'submit' &&
-                  receiver.includes('aurora') ? (
-                    <a
-                      className="text-green-500 dark:text-green-250 hover:no-underline"
-                      href={`${aurorablocksUrl}/tx/${value}`}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      {String(value)}
-                    </a>
-                  ) : typeof value === 'object' ? (
-                    <pre className="whitespace-pre-wrap text-sm">
-                      {JSON.stringify(value, null, 2)}
-                    </pre>
-                  ) : (
-                    <>{String(value)}</>
-                  )}
-                </p>
-              ),
-            )}
+            Object.entries(getDisplayData()).map(([key, value]) => (
+              <p className="mb-2" key={key}>
+                {key}:{' '}
+                {key === 'hash' &&
+                (method === 'submit' || method === 'submit_with_args') &&
+                receiver?.includes('aurora') ? (
+                  <a
+                    className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`${aurorablocksUrl}/tx/${value}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {String(value)}
+                  </a>
+                ) : typeof value === 'object' ? (
+                  <pre className="whitespace-pre-wrap text-sm">
+                    {JSON.stringify(value, null, 2)}
+                  </pre>
+                ) : (
+                  <>{String(value)}</>
+                )}
+              </p>
+            ))}
         </div>
       ) : (
         <textarea
@@ -160,9 +244,10 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
           rows={4}
           style={{ height: '150px' }}
           value={
-            method === 'submit' && receiver.includes('aurora')
-              ? jsonParser(displayedArgs).tx_bytes_b64
-              : displayedArgs
+            (method === 'submit' || method === 'submit_with_args') &&
+            receiver?.includes('aurora')
+              ? JSON.stringify(getDisplayData(), null, 2)
+              : displayedArgs || ''
           }
         ></textarea>
       )}
