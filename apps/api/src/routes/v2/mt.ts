@@ -1,17 +1,17 @@
 import { Router } from 'express';
 
-import { schema } from '#libs/schema/v2/mt';
+import schema from '#libs/schema/v2/mt';
 import { bearerAuth } from '#middlewares/passport';
 import validator from '#middlewares/validator';
 import mt from '#services/v2/mt/index';
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/mt', bearerAuth, route);
+  app.use('/mts', bearerAuth, route);
 
-  route.get('/list', validator(schema.inventory), mt.mtInventory);
+  route.get('/', validator(schema.inventory), mt.list);
 
-  route.get('/meta', validator(schema.meta), mt.metaData);
+  route.get('/:contract', validator(schema.meta), mt.metaData);
 };
 
 export default routes;

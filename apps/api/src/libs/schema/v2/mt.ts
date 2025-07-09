@@ -4,13 +4,14 @@ const inventory = z.object({
   account: z.string(),
 });
 
-export const schema = {
-  inventory: inventory,
+const meta = z.object({
+  contract: z.string(),
+  token_ids: z.string().transform((val) => val.split(',').filter(Boolean)),
+});
 
-  meta: z.object({
-    contract: z.string(),
-    token_ids: z.string().transform((val) => val.split(',').filter(Boolean)),
-  }),
+export default {
+  inventory,
+  meta,
 };
 
 export type Inventory = z.infer<typeof inventory>;

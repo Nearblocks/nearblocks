@@ -26,12 +26,12 @@ type MetaRequest = {
 const metaData = catchAsync(
   async (req: RequestValidator<MetaRequest>, res: Response) => {
     const contract = req.query.contract as string;
-    const token_ids = (req.query.token_ids as string)?.split(',') ?? [];
+    const token_id = (req.query.token_id as string)?.split(',') ?? [];
 
-    const tokenId = [...token_ids].sort();
+    const tokenId = [...token_id].sort();
     const cacheKey = `nep245:${contract}:meta:${JSON.stringify(tokenId)}`;
 
-    const metas = await redis.cache(
+    const meta = await redis.cache(
       cacheKey,
       async () => {
         const response: RPCResponse = await callFunction(
@@ -48,7 +48,7 @@ const metaData = catchAsync(
       EXPIRY,
     );
 
-    return res.status(200).json(metas);
+    return res.status(200).json(meta);
   },
 );
 
@@ -129,7 +129,7 @@ export const mtBalances = async <T>(
   return balances as T;
 };
 
-const mtInventory = catchAsync(
+const list = catchAsync(
   async (req: RequestValidator<Inventory>, res: Response) => {
     const account = req.query.account as string;
 
@@ -179,4 +179,4 @@ const mtInventory = catchAsync(
   },
 );
 
-export default { metaData, mtInventory };
+export default { list, metaData };
