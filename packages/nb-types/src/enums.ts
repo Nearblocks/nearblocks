@@ -89,12 +89,14 @@ export enum DexEventType {
 export enum NEP {
   Nep141 = 'nep141',
   Nep171 = 'nep171',
+  Nep245 = 'nep245',
 }
 
 export enum EventStandard {
   FT = 'FT',
   FT_LEGACY = 'FT_LEGACY',
   NFT = 'NFT',
+  MT = 'MT',
 }
 
 export enum FTLogKind {
@@ -107,6 +109,12 @@ export enum NFTLogKind {
   BURN = 'nft_burn',
   MINT = 'nft_mint',
   TRANSFER = 'nft_transfer',
+}
+
+export enum MTLogKind {
+  BURN = 'mt_burn',
+  MINT = 'mt_mint',
+  TRANSFER = 'mt_transfer',
 }
 
 export enum StakingEventType {

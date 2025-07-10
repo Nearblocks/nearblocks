@@ -258,6 +258,23 @@ export type FTMeta = {
   website: null | string;
 };
 
+export type MTEvent = {
+  affected_account_id: string;
+  authorized_account_id: null | string;
+  block_height: number;
+  block_timestamp: string;
+  cause: EventCause;
+  contract_account_id: string;
+  delta_amount: string;
+  event_index: number;
+  event_memo: null | string;
+  involved_account_id: null | string;
+  receipt_id: string;
+  shard_id: number;
+  standard: string;
+  token_id: string;
+};
+
 export type MultichainSignature = {
   account_id: string;
   block_timestamp: string;
