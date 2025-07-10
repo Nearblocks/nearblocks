@@ -27,7 +27,7 @@ export type Config = {
 
 export type EventDataEvent = {
   data: EventReceiptData;
-  event: FTEventLogs | NFTEventLogs;
+  event: EventLogs;
 };
 
 export type EventReceiptData = {
@@ -35,12 +35,16 @@ export type EventReceiptData = {
   receiptId: string;
 };
 
+export type EventLogs = FTEventLogs | MTEventLogs | NFTEventLogs;
+
 export type FTEventLogs = FTBurnEventLog | FTMintEventLog | FTTransferEventLog;
 
 export type NFTEventLogs =
   | NFTBurnEventLog
   | NFTMintEventLog
   | NFTTransferEventLog;
+
+export type MTEventLogs = MTBurnEventLog | MTMintEventLog | MTTransferEventLog;
 
 export interface FTMintEventLog {
   data: FTMintLog[];
@@ -84,6 +88,27 @@ export interface NFTTransferEventLog {
   version: string;
 }
 
+export interface MTMintEventLog {
+  data: MTMintLog[];
+  event: 'mt_mint';
+  standard: string;
+  version: string;
+}
+
+export interface MTBurnEventLog {
+  data: MTBurnLog[];
+  event: 'mt_burn';
+  standard: string;
+  version: string;
+}
+
+export interface MTTransferEventLog {
+  data: MTTransferLog[];
+  event: 'mt_transfer';
+  standard: string;
+  version: string;
+}
+
 export interface FTMintLog {
   amount: string;
   memo?: string;
@@ -117,6 +142,30 @@ export interface NFTBurnLog {
 }
 
 export interface NFTTransferLog {
+  authorized_id?: string;
+  memo?: string;
+  new_owner_id: string;
+  old_owner_id: string;
+  token_ids: string[];
+}
+
+export interface MTMintLog {
+  amounts: string[];
+  memo?: string;
+  owner_id: string;
+  token_ids: string[];
+}
+
+export interface MTBurnLog {
+  amounts: string[];
+  authorized_id?: string;
+  memo?: string;
+  owner_id: string;
+  token_ids: string[];
+}
+
+export interface MTTransferLog {
+  amounts: string[];
   authorized_id?: string;
   memo?: string;
   new_owner_id: string;

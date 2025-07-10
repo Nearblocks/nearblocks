@@ -1,14 +1,14 @@
 import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
-import { EventStandard, EventType, FTEvent, NFTEvent } from 'nb-types';
+import { EventStandard, EventType, FTEvent, MTEvent, NFTEvent } from 'nb-types';
 
-import { isNep141, isNep171 } from '#libs/guards';
+import { isNep141, isNep171, isNep245 } from '#libs/guards';
 import { isExecutionSuccess } from '#libs/utils';
+import { matchLegacyFTEvents } from '#services/contracts/ft/index';
 import { storeFTEvents } from '#services/ft';
+import { storeMTEvents } from '#services/mt';
 import { storeNFTEvents } from '#services/nft';
 import { EventDataEvent, FTEventLogs, NFTEventLogs } from '#types/types';
-
-import { matchLegacyFTEvents } from './contracts/ft/index.js';
 
 export const EVENT_PATTERN = {
   ACCOUNT: /^Account @([\S]+) burned (\d+)/,
@@ -31,6 +31,7 @@ export const storeNEPEvents = async (knex: Knex, message: Message) => {
     message.shards.map(async (shard) => {
       const ftEvents: EventDataEvent[] = [];
       const nftEvents: EventDataEvent[] = [];
+      const mtEvents: EventDataEvent[] = [];
 
       shard.receiptExecutionOutcomes.forEach((outcome) => {
         if (
@@ -55,6 +56,10 @@ export const storeNEPEvents = async (knex: Knex, message: Message) => {
             if (isNep171(event)) {
               nftEvents.push({ data, event });
             }
+
+            if (isNep245(event)) {
+              mtEvents.push({ data, event });
+            }
           }
         }
       });
@@ -62,6 +67,7 @@ export const storeNEPEvents = async (knex: Knex, message: Message) => {
       await Promise.all([
         storeFTEvents(knex, shard.shardId, message.block.header, ftEvents),
         storeNFTEvents(knex, shard.shardId, message.block.header, nftEvents),
+        storeMTEvents(knex, shard.shardId, message.block.header, mtEvents),
       ]);
     }),
   );
@@ -111,6 +117,22 @@ export function updateNFTEvents(
   eventStandard: EventStandard,
   events: NFTEvent[],
 ): NFTEvent[] {
+  const dataLength = events.length;
+
+  for (let index = 0; index < dataLength; index++) {
+    events[index].shard_id = shardId;
+    events[index].event_index = index;
+    events[index].standard = eventStandard;
+  }
+
+  return events;
+}
+
+export function updateMTEvents(
+  shardId: number,
+  eventStandard: EventStandard,
+  events: MTEvent[],
+): MTEvent[] {
   const dataLength = events.length;
 
   for (let index = 0; index < dataLength; index++) {
