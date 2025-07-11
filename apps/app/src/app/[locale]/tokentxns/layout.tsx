@@ -3,6 +3,8 @@ import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 
 import { appUrl } from '@/utils/app/config';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
+import { getRpcProviders } from '@/utils/app/rpc';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -50,5 +52,10 @@ export default async function TokentxnsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return [children];
+  const rpcProviders = await getRpcProviders();
+  return (
+    <RpcContextProvider rpcProviders={rpcProviders}>
+      {children}
+    </RpcContextProvider>
+  );
 }

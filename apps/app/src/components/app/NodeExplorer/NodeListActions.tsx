@@ -23,7 +23,7 @@ import Tooltip from '@/components/app/common/Tooltip';
 import ArrowDown from '@/components/app/Icons/ArrowDown';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Question from '@/components/app/Icons/Question';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { getSeatInfo } from '@/utils/app/actions';
 
@@ -32,7 +32,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [expanded, setExpanded] = useState<number[]>([]);
-  const { rpc, switchRpc } = useRpcStore();
+  const { rpc, switchRpc } = useRpcProvider();
   const [isLoading, setIsLoading] = useState(true);
   const [rpcError, setRpcError] = useState(false);
   const errorMessage = 'No validator data!';

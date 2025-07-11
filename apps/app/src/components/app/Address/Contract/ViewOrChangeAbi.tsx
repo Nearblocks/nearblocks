@@ -16,7 +16,7 @@ import CloseCircle from '@/components/app/Icons/CloseCircle';
 import Question from '@/components/app/Icons/Question';
 import { NearContext } from '@/components/app/wallet/near-context';
 import { viewMethod } from '@/utils/app/actions';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
 
 interface Props {
@@ -40,7 +40,7 @@ const sortFields = (fields: FieldType[]) => {
 
 const ViewOrChangeAbi = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
-  const { rpc } = useRpcStore();
+  const { rpc } = useRpcProvider();
   const t = useTranslations();
   const { index, method, schema } = props;
   const [txn, setTxn] = useState<null | string>(null);

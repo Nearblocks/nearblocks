@@ -9,9 +9,8 @@ import { CurrentEpochValidatorInfo, ValidatorDescription } from 'nb-types';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { Link } from '@/i18n/routing';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { formatWithCommas, yoctoToNear } from '@/utils/libs';
 import { DelegatorInfo, RewardFraction, ValidatorStatus } from '@/utils/types';
 
@@ -51,26 +50,12 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
   const [status, setStatus] = useState<string>();
   const [count, setCount] = useState<number>();
   const [_allRpcProviderError, setAllRpcProviderError] = useState(false);
-  const initializedRef = useRef(false);
 
   if (theme == undefined) {
     theme = cookieTheme;
   }
 
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { rpc: rpcUrl, switchRpc } = useRpcStoreWithProviders();
+  const { rpc: rpcUrl, switchRpc } = useRpcProvider();
   const start = (pagination.page - 1) * pagination.per_page;
 
   const getStatusColorClass = (status: string) => {
@@ -161,7 +146,7 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
         setSearchResults([]);
         return;
       }
-      getAccount(accountId, value).then((resp: any) => {
+      getAccount(rpcUrl, accountId, value).then((resp: any) => {
         if (resp.staked_balance === '0' && resp.unstaked_balance === '0') {
           setSearchResults([]);
         } else {
@@ -218,12 +203,13 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
   }
 
   useEffect(() => {
-    getNumberOfAccounts(accountId).then((resp) => {
+    getNumberOfAccounts(rpcUrl, accountId).then((resp) => {
       if (typeof resp === 'number' && resp > 0) {
         setCount(resp);
       }
     });
     getAccounts(
+      rpcUrl,
       accountId,
       start,
       pagination.per_page,
@@ -232,14 +218,14 @@ const Delegators = ({ accountId, theme: cookieTheme }: Props) => {
     ).then((resp) => {
       setDelegators(resp);
     });
-    getRewardFeeFraction(accountId).then((resp) => {
+    getRewardFeeFraction(rpcUrl, accountId).then((resp) => {
       setRewardFraction(resp);
     });
-    getValidators().then((resp) => {
+    getValidators(rpcUrl).then((resp) => {
       validatorStatus(resp, accountId);
     });
     if (networkId === 'mainnet') {
-      getFieldsByPool(accountId).then((resp) => {
+      getFieldsByPool(rpcUrl, accountId).then((resp) => {
         setContactInfo(resp);
       });
     }

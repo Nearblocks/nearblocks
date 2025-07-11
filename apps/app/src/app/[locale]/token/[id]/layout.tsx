@@ -4,6 +4,8 @@ import { headers } from 'next/headers';
 import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
 import { Token } from '@/utils/types';
+import { getRpcProviders } from '@/utils/app/rpc';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -58,9 +60,12 @@ export default async function TokenLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const rpcProviders = await getRpcProviders();
   return (
     <div className="relative container-xxl mx-auto px-5">
-      <section>{children}</section>
+      <RpcContextProvider rpcProviders={rpcProviders}>
+        {children}
+      </RpcContextProvider>
     </div>
   );
 }
