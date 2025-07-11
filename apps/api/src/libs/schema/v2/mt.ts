@@ -6,7 +6,7 @@ const inventory = z.object({
 
 const meta = z.object({
   contract: z.string(),
-  token_ids: z.string().transform((val) => val.split(',').filter(Boolean)),
+  token_id: z.string(),
 });
 
 export default {
