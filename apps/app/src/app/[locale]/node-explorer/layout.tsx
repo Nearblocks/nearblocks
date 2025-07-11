@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
 import { appUrl } from '@/utils/app/config';
+import { getRpcProviders } from '@/utils/app/rpc';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -43,5 +45,10 @@ export default async function ExplorerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return [children];
+  const rpcProviders = await getRpcProviders();
+  return (
+    <RpcContextProvider rpcProviders={rpcProviders}>
+      {children}
+    </RpcContextProvider>
+  );
 }

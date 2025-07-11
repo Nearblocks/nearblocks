@@ -21,6 +21,7 @@ import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
 import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { networkId } from '@/utils/app/config';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
@@ -47,6 +48,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
 
   const [block, setBlock] = useState<{ height: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
@@ -61,7 +63,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
     function fetchBlocks() {
       setLoading(true);
       if (receipt?.block_hash || receipt?.outcome?.blockHash) {
-        getBlockDetails(receipt?.block_hash || receipt?.outcome.blockHash)
+        getBlockDetails(rpc, receipt?.block_hash || receipt?.outcome.blockHash)
           .then((resp: any) => {
             setBlock(resp?.header);
             setLoading(false);

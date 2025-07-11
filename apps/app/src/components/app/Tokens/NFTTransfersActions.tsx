@@ -17,6 +17,7 @@ import Clock from '@/components/app/Icons/Clock';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 interface ListProps {
   data: {
@@ -42,6 +43,7 @@ const NFTTransfersActions = ({
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
   const t = useTranslations();
+  const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
   const errorMessage = t ? t('noTxns') : 'No transactions found!';
   const [timestamp, setTimeStamp] = useState('');
@@ -53,7 +55,7 @@ const NFTTransfersActions = ({
   useEffect(() => {
     const fetchTimeStamp = async (height: string) => {
       try {
-        const res = await getBlockDetails(Number(height));
+        const res = await getBlockDetails(rpc, Number(height));
         const resp = res?.header;
         if (resp) {
           setTimeStamp(resp?.timestamp_nanosec);

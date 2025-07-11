@@ -9,7 +9,7 @@ import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
 
 import FaAddressBook from '@/components/app/Icons/FaAddressBook';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 interface Props {
   id: string;
@@ -20,9 +20,9 @@ interface Props {
 export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
   const modifiedId = id === 'eth.bridge.near' ? 'aurora' : id;
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
+  const { rpc } = useRpcProvider();
   const { ftBalanceOf } = useRpc();
   const [inventoryLoading, setInventoryLoading] = useState(true);
-  const { rpc: rpcUrl } = useRpcStore();
 
   useEffect(() => {
     function loadBalances() {
@@ -45,11 +45,11 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
       Promise.all(
         fts.map(async (ft: FtsInfo) => {
           const rslt = await ftBalanceOf(
-            rpcUrl,
+            rpc,
             ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
             tokenFilter,
           );
-          return { ...ft, amount: rslt.data };
+          return { ...ft, amount: rslt };
         }),
       )
         .then((results: any) => {
