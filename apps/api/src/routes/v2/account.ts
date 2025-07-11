@@ -147,7 +147,7 @@ const routes = (app: Router) => {
   );
 
   route.get(
-    '/:account/inventory/MT',
+    '/:account/inventory/mts',
     validator(schema.inventory),
     account.inventory,
   );

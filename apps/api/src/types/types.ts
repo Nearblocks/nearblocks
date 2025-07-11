@@ -137,7 +137,7 @@ export type IntentsToken = {
   token_id: string;
 };
 
-export type mtMetadata = {
+export type MtMetadata = {
   base: {
     decimals?: number;
     icon?: string;

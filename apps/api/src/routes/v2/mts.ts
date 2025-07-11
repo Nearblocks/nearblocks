@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import schema from '#libs/schema/v2/mt';
+import schema from '#libs/schema/v2/mts';
 import { bearerAuth } from '#middlewares/passport';
 import validator from '#middlewares/validator';
 import mts from '#services/v2/mts/index';

@@ -11,7 +11,7 @@ import redis from '#libs/redis';
 import { Inventory } from '#libs/schema/v2/account';
 import {
   IntentsToken,
-  mtMetadata,
+  MtMetadata,
   RequestValidator,
   RPCResponse,
 } from '#types/types';
@@ -216,7 +216,7 @@ const inventory = catchAsync(
                 'mt_metadata_token_all',
                 { token_ids: [id] },
               );
-              return bytesParse(response.result) as mtMetadata[];
+              return bytesParse(response.result) as MtMetadata[];
             },
             EXPIRY,
           );

@@ -3,7 +3,7 @@ import { Response } from 'express';
 import catchAsync from '#libs/async';
 import { bytesParse, callFunction, getProvider } from '#libs/near';
 import redis from '#libs/redis';
-import { mtMetadata, RequestValidator, RPCResponse } from '#types/types';
+import { MtMetadata, RequestValidator, RPCResponse } from '#types/types';
 
 const EXPIRY = 60;
 const provider = getProvider();
@@ -30,7 +30,7 @@ const metaData = catchAsync(
           },
         );
 
-        return bytesParse(response.result) as mtMetadata[];
+        return bytesParse(response.result) as MtMetadata[];
       },
       EXPIRY,
     );
