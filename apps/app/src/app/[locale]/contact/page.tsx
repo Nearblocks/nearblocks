@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 
 import ContactOptions from '@/components/app/Contact/ContactOptions';
 import { appUrl } from '@/utils/app/config';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;

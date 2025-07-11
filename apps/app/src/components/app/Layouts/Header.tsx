@@ -6,7 +6,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import { Link, routing } from '@/i18n/routing';
+import { Link, routing, usePathname } from '@/i18n/routing';
 import { nanoToMilli } from '@/utils/app/libs';
 import { dollarFormat } from '@/utils/libs';
 
@@ -19,7 +19,6 @@ import UserMenu from '@/components/app/Layouts/UserMenu';
 import useStatsStore from '@/stores/app/syncStats';
 import { getLatestStats, getSyncStatus } from '@/utils/app/actions';
 import useFallbackPathname from '@/hooks/app/useFallbackPathname';
-import { usePathname } from 'next/navigation';
 
 const menus = [
   {
@@ -177,7 +176,12 @@ const Header = ({
 
   const fallbackPathname = useFallbackPathname();
   const currentPathname = usePathname();
-  const pathname = globalError ? fallbackPathname : currentPathname;
+  const localeList = languages.map((lang) => lang.locale);
+  const pathname =
+    (globalError ? fallbackPathname : currentPathname)?.replace(
+      new RegExp(`^/(${localeList.join('|')})(?=/|$)`),
+      '',
+    ) || '/';
 
   useEffect(() => {
     const fetchSyncStats = async () => {
@@ -272,14 +276,16 @@ const Header = ({
       console.error(`Invalid locale: ${props.locale}`);
       return null;
     }
+    const setLocaleCookie = () => {
+      Cookies.set('NEXT_LOCALE', props.locale, {
+        expires: 365,
+        path: '/',
+        sameSite: 'lax',
+      });
+    };
 
-    return <Link {...props} />;
+    return <Link onClick={setLocaleCookie} {...props} />;
   };
-
-  const localeList = languages.map((lang) => lang.locale);
-  const newPathname =
-    pathname.replace(new RegExp(`^/(${localeList.join('|')})(?=/|$)`), '') ||
-    '/';
 
   return (
     <>
@@ -595,7 +601,7 @@ const Header = ({
                                     ? 'text-green-500 dark:text-green-250'
                                     : 'dark:text-neargray-10 text-nearblue-600'
                                 }`}
-                                href={newPathname}
+                                href={pathname}
                                 locale={language.locale}
                               >
                                 {language.title}
@@ -625,7 +631,7 @@ const Header = ({
                                     ? 'text-green-500 dark:text-green-250'
                                     : 'dark:text-neargray-10 text-nearblue-600'
                                 }`}
-                                href={newPathname}
+                                href={pathname}
                                 locale={language.locale}
                               >
                                 {language.title}

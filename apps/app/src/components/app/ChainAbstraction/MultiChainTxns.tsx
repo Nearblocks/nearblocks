@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
 
@@ -9,7 +9,7 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
 import { chain, chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { getFilteredQueryParams, localFormat } from '@/utils/app/libs';
 import { FilterKind, MultiChainTxnInfo } from '@/utils/types';
@@ -47,7 +47,7 @@ const MultiChainTxns = ({
   txns,
 }: MultiChainTxnsProps) => {
   const t = useTranslations();
-  const router = useRouter();
+  const router = useIntlRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);

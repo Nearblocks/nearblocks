@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NetworkType, TransactionLog } from '@/utils/types';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { shortenText } from '@/utils/libs';
 import { getNetworkDetails, networkFullNames } from '@/utils/near';
 import IntentsIcon from '@/components/app/Icons/IntentsIcon';
