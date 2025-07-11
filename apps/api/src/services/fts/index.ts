@@ -36,7 +36,9 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     FROM
       ft_list
     WHERE
-      ${search
+      -- The 'aurora' token has been removed from the list of tokens due to its role as a proxy contract for the ETH bridge on the NEAR
+      contract <> 'aurora'
+      AND ${search
       ? sql`
           contract ILIKE ${search + '%'}
           OR symbol ILIKE ${search + '%'}
