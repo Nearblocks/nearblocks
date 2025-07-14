@@ -1,7 +1,7 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { dbMigration, dbRead, dbWrite } from '#libs/knex';
+import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncGenesis } from '#services/genesis';
 import { syncData } from '#services/stream';
@@ -9,8 +9,6 @@ import { syncData } from '#services/stream';
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
-    await dbMigration.migrate.latest();
-    await dbMigration.destroy();
     logger.info('syncing genesis data...');
     await syncGenesis();
     logger.info('syncing blockchain data...');
