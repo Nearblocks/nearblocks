@@ -1,15 +1,13 @@
+import { BlockHeader, Message, Receipt } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
-import { BlockHeader, Message, Receipt } from 'nb-neardata';
 import { Account } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
 import {
   isCreateAccountAction,
   isDeleteAccountAction,
   isTransferAction,
 } from '#libs/guards';
-import { accountHistogram } from '#libs/prom';
 import { isEthImplicit, isExecutionSuccess, isNearImplicit } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
@@ -21,7 +19,6 @@ export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
 };
 
 export const storeAccounts = async (knex: Knex, message: Message) => {
-  const start = performance.now();
   const accounts: AccountMap = new Map();
   const accountsToUpdate: AccountMap = new Map();
 
@@ -43,30 +40,42 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
 
   if (accounts.size) {
     await retry(async () => {
-      await knex('accounts')
+      return knex('accounts')
         .insert([...accounts.values()])
         .onConflict(['account_id'])
-        .merge();
+        .merge()
+        .whereRaw(
+          'accounts.created_by_block_timestamp < EXCLUDED.created_by_block_timestamp',
+        );
     });
   }
 
   if (accountsToUpdate.size) {
     await Promise.all(
       [...accountsToUpdate.values()].map(async (account) => {
-        await retry(async () => {
-          await knex('accounts')
+        return retry(async () => {
+          return knex('accounts')
             .update({
-              deleted_by_block_height: account.deleted_by_block_height,
+              deleted_by_block_timestamp: account.deleted_by_block_timestamp,
               deleted_by_receipt_id: account.deleted_by_receipt_id,
             })
             .where('account_id', account.account_id)
-            .whereNull('deleted_by_block_height');
+            .where(
+              'created_by_block_timestamp',
+              '<=',
+              account.deleted_by_block_timestamp,
+            )
+            .andWhere(function () {
+              this.whereNull('deleted_by_block_timestamp').orWhere(
+                'deleted_by_block_timestamp',
+                '<',
+                account.deleted_by_block_timestamp,
+              );
+            });
         });
       }),
     );
   }
-
-  accountHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 const getChunkAccounts = (
@@ -83,32 +92,20 @@ const getChunkAccounts = (
       if (isCreateAccountAction(action)) {
         accounts.set(
           accountId,
-          getAccountData(accountId, block.height, receiptId),
+          getAccountData(accountId, block.timestampNanosec, receiptId),
         );
 
         continue;
       }
 
       if (isDeleteAccountAction(action)) {
-        const existingAccount = accounts.get(accountId);
-
-        if (existingAccount) {
-          accounts.set(accountId, {
-            ...existingAccount,
-            deleted_by_block_height: block.height,
-            deleted_by_receipt_id: receiptId,
-          });
-
-          continue;
-        }
-
         accountsToUpdate.set(
           accountId,
           getAccountData(
             accountId,
-            block.height,
+            block.timestampNanosec,
             receiptId,
-            block.height,
+            block.timestampNanosec,
             receiptId,
           ),
         );
@@ -122,7 +119,7 @@ const getChunkAccounts = (
       ) {
         accounts.set(
           accountId,
-          getAccountData(accountId, block.height, receiptId),
+          getAccountData(accountId, block.timestampNanosec, receiptId),
         );
 
         continue;
@@ -133,14 +130,14 @@ const getChunkAccounts = (
 
 export const getAccountData = (
   account: string,
-  blockHeight: number,
+  blockTimestamp: string,
   receiptId: null | string = null,
-  deletedBlockBlockHeight: null | number = null,
+  deletedBlockBlockTimestamp: null | string = null,
   deletedReceiptId: null | string = null,
 ): Account => ({
   account_id: account,
-  created_by_block_height: blockHeight,
+  created_by_block_timestamp: blockTimestamp,
   created_by_receipt_id: receiptId,
-  deleted_by_block_height: deletedBlockBlockHeight,
+  deleted_by_block_timestamp: deletedBlockBlockTimestamp,
   deleted_by_receipt_id: deletedReceiptId,
 });

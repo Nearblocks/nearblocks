@@ -1,21 +1,19 @@
-import { Knex } from 'nb-knex';
 import {
   AccessKeyFunctionCallPermission,
   BlockHeader,
   Message,
   Receipt,
-} from 'nb-neardata';
+} from 'nb-blocks-minio';
+import { Knex } from 'nb-knex';
 import { AccessKey, AccessKeyPermissionKind, JsonValue } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
 import {
   isAddKeyAction,
   isDeleteAccountAction,
   isDeleteKeyAction,
   isTransferAction,
 } from '#libs/guards';
-import { keyHistogram } from '#libs/prom';
 import {
   isExecutionSuccess,
   jsonStringify,
@@ -39,7 +37,6 @@ export const storeGenesisAccessKeys = async (
 };
 
 export const storeAccessKeys = async (knex: Knex, message: Message) => {
-  const start = performance.now();
   const accessKeys: AccessKeyMap = new Map();
   const accessKeysToUpdate: AccessKeyMap = new Map();
   const deletedAccounts: DeletedAccountMap = new Map();
@@ -63,25 +60,39 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
 
   if (accessKeys.size) {
     await retry(async () => {
-      await knex('access_keys')
+      return knex('access_keys')
         .insert([...accessKeys.values()])
         .onConflict(['public_key', 'account_id'])
-        .merge();
+        .merge()
+        .whereRaw(
+          'access_keys.created_by_block_timestamp < EXCLUDED.created_by_block_timestamp',
+        );
     });
   }
 
   if (accessKeysToUpdate.size) {
     await Promise.all(
       [...accessKeysToUpdate.values()].map(async (accessKey) => {
-        await retry(async () => {
-          await knex('access_keys')
+        return retry(async () => {
+          return knex('access_keys')
             .update({
-              deleted_by_block_height: accessKey.deleted_by_block_height,
+              deleted_by_block_timestamp: accessKey.deleted_by_block_timestamp,
               deleted_by_receipt_id: accessKey.deleted_by_receipt_id,
             })
             .where('public_key', accessKey.public_key)
             .where('account_id', accessKey.account_id)
-            .whereNull('deleted_by_block_height');
+            .where(
+              'created_by_block_timestamp',
+              '<=',
+              accessKey.deleted_by_block_timestamp,
+            )
+            .andWhere(function () {
+              this.whereNull('deleted_by_block_timestamp').orWhere(
+                'deleted_by_block_timestamp',
+                '<',
+                accessKey.deleted_by_block_timestamp,
+              );
+            });
         });
       }),
     );
@@ -90,20 +101,24 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
   if (deletedAccounts.size) {
     await Promise.all(
       [...deletedAccounts.values()].map(async (deleted) => {
-        await retry(async () => {
-          await knex('access_keys')
+        return retry(async () => {
+          return knex('access_keys')
             .update({
-              deleted_by_block_height: message.block.header.height,
+              deleted_by_block_timestamp: message.block.header.timestampNanosec,
               deleted_by_receipt_id: deleted.receiptId,
             })
             .where('account_id', deleted.accountId)
-            .whereNull('deleted_by_block_height');
+            .andWhere(function () {
+              this.whereNull('deleted_by_block_timestamp').orWhere(
+                'deleted_by_block_timestamp',
+                '<',
+                message.block.header.timestampNanosec,
+              );
+            });
         });
       }),
     );
   }
-
-  keyHistogram.labels(config.network).observe(performance.now() - start);
 };
 
 const getChunkAccessKeys = (
@@ -142,7 +157,7 @@ const getChunkAccessKeys = (
             accountId,
             publicKey,
             accessKey.permission,
-            block.height,
+            block.timestampNanosec,
             receiptId,
           ),
         );
@@ -158,7 +173,7 @@ const getChunkAccessKeys = (
         if (existingKey) {
           accessKeys.set(mapKey, {
             ...existingKey,
-            deleted_by_block_height: block.height,
+            deleted_by_block_timestamp: block.timestampNanosec,
             deleted_by_receipt_id: receiptId,
           });
 
@@ -171,9 +186,9 @@ const getChunkAccessKeys = (
             accountId,
             publicKey,
             null,
-            block.height,
+            block.timestampNanosec,
             receiptId,
-            block.height,
+            block.timestampNanosec,
             receiptId,
           ),
         );
@@ -192,7 +207,7 @@ const getChunkAccessKeys = (
               accountId,
               publicKey,
               AccessKeyPermissionKind.FULL_ACCESS,
-              block.height,
+              block.timestampNanosec,
               receiptId,
             ),
           );
@@ -208,9 +223,9 @@ export const getAccessKeyData = (
   account: string,
   publicKey: string,
   permission: AccessKeyFunctionCallPermission | null | string,
-  blockHeight: number,
+  blockTimestamp: string,
   receiptId: null | string = null,
-  deletedBlockHeight: null | number = null,
+  deletedBlockTimestamp: null | string = null,
   deletedReceiptId: null | string = null,
 ): AccessKey => {
   let permissions: JsonValue | null = null;
@@ -223,9 +238,9 @@ export const getAccessKeyData = (
 
   return {
     account_id: account,
-    created_by_block_height: blockHeight,
+    created_by_block_timestamp: blockTimestamp,
     created_by_receipt_id: receiptId,
-    deleted_by_block_height: deletedBlockHeight,
+    deleted_by_block_timestamp: deletedBlockTimestamp,
     deleted_by_receipt_id: deletedReceiptId,
     permission: permissions,
     permission_kind: permissionKind,

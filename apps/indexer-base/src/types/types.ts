@@ -15,9 +15,7 @@ export interface Config {
   disableAutoSwitch: boolean;
   disableS3Upload: boolean;
   fastnearEndpoint?: string;
-  genesisFile: string;
   genesisHeight: number;
-  genesisTimestamp: string;
   indexerKey: string;
   insertLimit: number;
   nearlakeAccessKey: string;

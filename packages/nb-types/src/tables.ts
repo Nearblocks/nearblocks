@@ -46,9 +46,9 @@ export interface TTables {
 
 export type AccessKey = {
   account_id: string;
-  created_by_block_height: number;
+  created_by_block_timestamp: string;
   created_by_receipt_id: null | string;
-  deleted_by_block_height: null | number;
+  deleted_by_block_timestamp: null | string;
   deleted_by_receipt_id: null | string;
   permission: JsonValue;
   permission_kind: string;
@@ -57,9 +57,9 @@ export type AccessKey = {
 
 export type Account = {
   account_id: string;
-  created_by_block_height: number;
+  created_by_block_timestamp: string;
   created_by_receipt_id: null | string;
-  deleted_by_block_height: null | number;
+  deleted_by_block_timestamp: null | string;
   deleted_by_receipt_id: null | string;
 };
 

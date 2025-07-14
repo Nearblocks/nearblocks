@@ -39,11 +39,6 @@ const env = cleanEnv(process.env, {
 });
 
 const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
-const genesisTimestamp =
-  env.NETWORK === Network.MAINNET
-    ? '1595350551591948000'
-    : '1596166782911378000';
-const genesisFile = `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/${env.NETWORK}/genesis.json`;
 let nearlakeEndpoint: null | types.EndpointConfig = null;
 const nearlakeBucketName =
   env.NETWORK === Network.MAINNET
@@ -73,9 +68,7 @@ const config: Config = {
   disableAutoSwitch: env.DISABLE_AUTO_SWITCH,
   disableS3Upload: env.DISABLE_S3_UPLOAD,
   fastnearEndpoint: env.FASTNEAR_ENDPOINT,
-  genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
-  genesisTimestamp,
   indexerKey: env.BASE_INDEXER_KEY,
   insertLimit: 2_500, // records to insert into the db at a time
   nearlakeAccessKey: env.NEARLAKE_ACCESS_KEY,
