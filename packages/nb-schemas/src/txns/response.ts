@@ -114,7 +114,7 @@ type OutcomeReceipts = {
   tokens_burnt?: string;
 };
 
-type TxnReceipts = {
+export type TxnReceipts = {
   actions: ActionReceipt[];
   block: BlockReceipt;
   outcome: OutcomeReceipts;

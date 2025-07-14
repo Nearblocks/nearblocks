@@ -20,8 +20,13 @@ export type Config = {
   dbCa: string;
   dbCert: string;
   dbKey: string;
-  dbUrl: string;
-  dbWriteUrl: string;
+  dbUrlBalance: string;
+  dbUrlBase: string;
+  dbUrlContract: string;
+  dbUrlEvents: string;
+  dbUrlSignature: string;
+  dbUrlStaking: string;
+  dbWriteUrlBase: string;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryRows: number;

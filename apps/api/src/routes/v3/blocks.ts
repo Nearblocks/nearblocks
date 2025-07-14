@@ -1,9 +1,10 @@
 import { Router } from 'express';
 
+import request from 'nb-schemas/dist/blocks/request.js';
+
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
-import request from '#schemas/blocks/request';
 import service from '#services/v3/blocks/index';
 
 const route = Router();
