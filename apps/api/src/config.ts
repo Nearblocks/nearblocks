@@ -11,8 +11,14 @@ const env = cleanEnv(process.env, {
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
-  DATABASE_URL: str(),
-  DATABASE_WRITE_URL: str(),
+  DB_URL_BALANCE: str(),
+  DB_URL_BASE: str(),
+  DB_URL_CONTRACT: str(),
+  DB_URL_EVENTS: str(),
+  DB_URL_SIGNATURE: str(),
+  DB_URL_STAKING: str(),
+  DB_URL_USER: str(),
+  DB_WRITE_URL_BASE: str(),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -33,7 +39,6 @@ const env = cleanEnv(process.env, {
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
   TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
-  USER_DB_URL: str(),
 });
 
 const config: Config = {
@@ -47,8 +52,13 @@ const config: Config = {
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
-  dbUrl: env.DATABASE_URL,
-  dbWriteUrl: env.DATABASE_WRITE_URL,
+  dbUrlBalance: env.DB_URL_BALANCE,
+  dbUrlBase: env.DB_URL_BASE,
+  dbUrlContract: env.DB_URL_CONTRACT,
+  dbUrlEvents: env.DB_URL_EVENTS,
+  dbUrlSignature: env.DB_URL_SIGNATURE,
+  dbUrlStaking: env.DB_URL_STAKING,
+  dbWriteUrlBase: env.DB_WRITE_URL_BASE,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryRows: 5000,
@@ -70,7 +80,7 @@ const config: Config = {
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
   testnetUrl: env.TESTNET_URL,
-  userDbUrl: env.USER_DB_URL,
+  userDbUrl: env.DB_URL_USER,
 };
 
 export default config;
