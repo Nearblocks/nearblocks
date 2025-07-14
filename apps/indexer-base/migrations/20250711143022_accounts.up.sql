@@ -28,9 +28,3 @@ CREATE TABLE accounts (
   deleted_by_receipt_id text,
   PRIMARY KEY (account_id)
 );
-
-CREATE TABLE settings (
-  key TEXT NOT NULL,
-  value JSONB NOT NULL,
-  PRIMARY KEY (key)
-);

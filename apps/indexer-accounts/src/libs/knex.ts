@@ -31,19 +31,6 @@ const writeConfig = {
   },
 };
 
-const migrationConfig = {
-  ...writeConfig,
-  connection: {
-    ...writeConfig.connection,
-    application_name: 'indexer-accounts-migration',
-  },
-  migrations: {
-    directory: './apps/indexer-accounts/migrations',
-    tableName: 'knex_migrations',
-  },
-  pool: { max: 1, min: 0 },
-};
-
 export const readConfig = {
   ...writeConfig,
   connection: {
@@ -67,5 +54,3 @@ export const streamConfig = {
 export const dbWrite: Knex = createKnex(writeConfig);
 
 export const dbRead: Knex = createKnex(readConfig);
-
-export const dbMigration: Knex = createKnex(migrationConfig);
