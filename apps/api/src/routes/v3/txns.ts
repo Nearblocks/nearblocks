@@ -1,9 +1,10 @@
 import { Router } from 'express';
 
+import request from 'nb-schemas/dist/txns/request.js';
+
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
-import request from '#schemas/txns/request';
 import service from '#services/v3/txns/index';
 
 const route = Router();
