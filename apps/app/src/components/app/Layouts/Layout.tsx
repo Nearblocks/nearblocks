@@ -14,7 +14,6 @@ import LayoutActions from '@/components/app/Layouts/LayoutActions';
 import ThemeInitializer from '@/components/app/Layouts/ThemeInitializer';
 import { AddressHoverProvider } from '@/components/app/common/HoverContextProvider';
 import { getCookie, getLatestStats, getSyncStatus } from '@/utils/app/actions';
-import { RpcInitializer } from './RpcInitializer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -84,7 +83,6 @@ const Layout = async ({ children, locale }: LayoutProps) => {
             <AddressHoverProvider>
               <ThemeProvider attribute="class" defaultTheme={theme}>
                 <ThemeInitializer initialTheme={theme} />
-                <RpcInitializer />
                 <ToastContainer />
                 <LayoutActions
                   theme={theme}

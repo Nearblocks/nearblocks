@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import TokenImage from '@/components/app/common/TokenImage';
 import useRpc from '@/hooks/app/useRpc';
-import { useRpcStore } from '@/stores/app/rpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { isEmpty } from 'lodash';
 
 const metadataCache: Record<string, Promise<MetaInfo>> = {};
@@ -22,7 +22,7 @@ const TokenInfo = (props: TokenInfoProps) => {
   const [loading, setLoading] = useState(true);
   const cacheRef = useRef(metadataCache);
 
-  const switchRpc: () => void = useRpcStore((state) => state.switchRpc);
+  const { rpc, switchRpc } = useRpcProvider();
 
   const rpcAmount = localFormat(
     tokenAmount(amount, apiMeta?.decimals || meta?.decimals || 18, true),
@@ -31,7 +31,7 @@ const TokenInfo = (props: TokenInfoProps) => {
     if (!apiMeta && contract) {
       setLoading(true);
       if (!cacheRef.current[contract]) {
-        cacheRef.current[contract] = ftMetadata(contract)
+        cacheRef.current[contract] = ftMetadata(rpc, contract)
           .then((data) => {
             if (isEmpty(data)) {
               switchRpc();
@@ -61,7 +61,8 @@ const TokenInfo = (props: TokenInfoProps) => {
     } else {
       setLoading(false);
     }
-  }, [contract, apiMeta, ftMetadata, switchRpc]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract, apiMeta, ftMetadata, switchRpc, rpc]);
 
   const Loader = ({
     className = '',

@@ -5,6 +5,8 @@ import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import { appUrl, networkId } from '@/utils/app/config';
 import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
+import { getRpcProviders } from '@/utils/app/rpc';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -59,9 +61,10 @@ export default async function TxnsLayout(props: {
   const { children } = props;
 
   const t = await getTranslations({ locale });
+  const rpcProviders = await getRpcProviders();
 
   return (
-    <>
+    <RpcContextProvider rpcProviders={rpcProviders}>
       <div className="md:flex items-center justify-between container-xxl mx-auto px-5">
         <div className="flex justify-between dark:text-neargray-10 border-b w-full dark:border-black-200">
           <h1 className="py-4 space-x-2 text-lg leading-8 font-medium dark:text-neargray-10 text-nearblue-600">
@@ -89,6 +92,6 @@ export default async function TxnsLayout(props: {
         </div>
       </div>
       {children}
-    </>
+    </RpcContextProvider>
   );
 }

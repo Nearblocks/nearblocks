@@ -9,6 +9,7 @@ import { AccessInfo, AccountContractInfo } from '@/utils/types';
 import Tooltip from '@/components/app/common/Tooltip';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import Timestamp from '@/components/app/common/Timestamp';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 interface Props {
   accessKey: AccountContractInfo;
@@ -22,6 +23,7 @@ const AccessKeyRow = ({ accessKey, showWhen, error }: Props) => {
     error ? accessKey?.access_key : ({} as AccessInfo),
   );
   const { viewAccessKey } = useRpc();
+  const { rpc } = useRpcProvider();
   const createdTime = accessKey?.created?.block_timestamp
     ? nanoToMilli(accessKey?.created?.block_timestamp)
     : '';
@@ -102,7 +104,7 @@ const AccessKeyRow = ({ accessKey, showWhen, error }: Props) => {
         accessKey?.public_key &&
         accessKey?.permission_kind === 'FUNCTION_CALL'
       ) {
-        viewAccessKey(accessKey?.account_id, accessKey?.public_key)
+        viewAccessKey(rpc, accessKey?.account_id, accessKey?.public_key)
           .then((data) => {
             if (data) {
               setKeyInfo(data);

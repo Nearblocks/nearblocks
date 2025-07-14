@@ -4,6 +4,8 @@ import { headers } from 'next/headers';
 
 import { getRequest } from '@/utils/app/api';
 import { appUrl } from '@/utils/app/config';
+import { getRpcProviders } from '@/utils/app/rpc';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -56,5 +58,10 @@ export default async function HashLayout({
   children: React.ReactNode;
   params: any;
 }) {
-  return [children];
+  const rpcProviders = await getRpcProviders();
+  return (
+    <RpcContextProvider rpcProviders={rpcProviders}>
+      {children}
+    </RpcContextProvider>
+  );
 }

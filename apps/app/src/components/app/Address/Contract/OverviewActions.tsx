@@ -23,6 +23,7 @@ import { shortenAddress } from '@/utils/libs';
 import { useParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
 import { useAddressRpc } from '../../common/AddressRpcProvider';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 interface Props {
   schema?: SchemaInfo;
@@ -57,6 +58,7 @@ const OverviewActions = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
   const params = useParams<{ id: string }>();
   const { verifierConfig } = useConfig();
+  const { rpc } = useRpcProvider();
   const verifiers = verifierConfig.map((config) => config.accountId);
 
   const [tab, setTab] = useState(0);
@@ -85,6 +87,7 @@ const OverviewActions = (props: Props) => {
 
         if (methodExist) {
           contractMetadataResponse = await getContractMetadata(
+            rpc,
             accountId as string,
           );
         }
@@ -112,7 +115,7 @@ const OverviewActions = (props: Props) => {
     const fetchVerifierData = async () => {
       try {
         const verifierDataPromises = verifiers.map((verifierAccountId) =>
-          getVerifierData(accountId as string, verifierAccountId),
+          getVerifierData(rpc, accountId as string, verifierAccountId),
         );
 
         const verifierResponses = await Promise.all(verifierDataPromises);

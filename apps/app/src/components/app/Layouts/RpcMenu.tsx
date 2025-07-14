@@ -1,9 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
-import { useRpcStore } from '@/stores/app/rpc';
 import Check from '@/components/app/Icons/Check';
 import Rpc from '@/components/app/Icons/Rpc';
 import {
@@ -11,17 +8,18 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 const RpcMenu = ({ positionClass }: { positionClass?: string }) => {
   const [isClient, setIsClient] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const { RpcProviders } = useRpcProvider();
 
   useEffect(() => {
     setIsClient(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { rpc: rpcUrl, setRpc } = useRpcStore();
+  const { rpc: rpcUrl, setRpc, providers: RpcProviders } = useRpcProvider();
 
   const handleSelect = (url: string) => {
     setRpc(url);

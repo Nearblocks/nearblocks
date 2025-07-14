@@ -4,6 +4,8 @@ import { headers } from 'next/headers';
 import Verifier from '@/components/app/Address/Contract/Verifier';
 import { appUrl } from '@/utils/app/config';
 import { getRequest } from '@/utils/app/api';
+import { getRpcProviders } from '@/utils/app/rpc';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet';
 
@@ -45,6 +47,7 @@ export default async function VerifyContract(props: {
   searchParams: Promise<{ accountId: string; selectedVerifier: string }>;
 }) {
   const searchParams = await props.searchParams;
+  const rpcProviders = await getRpcProviders();
 
   const options: RequestInit = {
     cache: 'no-store',
@@ -67,12 +70,14 @@ export default async function VerifyContract(props: {
           </h1>
         </div>
         <div className="w-full max-w-3xl items-center mt-4 space-y-6">
-          <Verifier
-            accountId={accountId}
-            network={network}
-            selectedVerifier={selectedVerifier}
-            contractPromise={contractPromise}
-          />
+          <RpcContextProvider rpcProviders={rpcProviders}>
+            <Verifier
+              accountId={accountId}
+              network={network}
+              selectedVerifier={selectedVerifier}
+              contractPromise={contractPromise}
+            />
+          </RpcContextProvider>
         </div>
       </div>
       <div className="py-8"></div>
