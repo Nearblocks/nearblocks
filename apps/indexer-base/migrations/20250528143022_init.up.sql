@@ -2,27 +2,6 @@ CREATE FUNCTION epoch_nano_seconds () RETURNS BIGINT AS $$ -- epoch in ns
   SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT * 1000 * 1000 * 1000;
 $$ LANGUAGE SQL STABLE;
 
-CREATE TABLE access_keys (
-  created_by_block_height BIGINT NOT NULL,
-  deleted_by_block_height BIGINT,
-  public_key TEXT NOT NULL,
-  account_id TEXT NOT NULL,
-  permission_kind TEXT NOT NULL,
-  created_by_receipt_id TEXT,
-  deleted_by_receipt_id TEXT,
-  permission JSONB,
-  PRIMARY KEY (public_key, account_id)
-);
-
-CREATE TABLE accounts (
-  created_by_block_height BIGINT NOT NULL,
-  deleted_by_block_height BIGINT,
-  account_id text NOT NULL,
-  created_by_receipt_id text,
-  deleted_by_receipt_id text,
-  PRIMARY KEY (account_id)
-);
-
 CREATE TABLE action_receipt_actions (
   receipt_included_in_block_timestamp BIGINT NOT NULL,
   index_in_chunk INTEGER NOT NULL,

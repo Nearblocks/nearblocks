@@ -23,6 +23,7 @@ jobs:
             indexer-staking,
             indexer-receipts,
             indexer-s3,
+            indexer-accounts,
             explorer-selector,
             aggregates,
           ]

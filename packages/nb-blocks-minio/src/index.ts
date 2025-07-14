@@ -84,7 +84,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
   const minioClient = new Minio.Client(config.s3Config);
 
   const limit = config.limit ?? 10;
-  const highWaterMark = limit * 100;
+  const highWaterMark = limit * 50;
 
   async function* iterator() {
     let start = config.start;

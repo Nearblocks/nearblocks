@@ -83,7 +83,7 @@ export const insertGenesisData = async (path: string) => {
     if (chunk.key === 'Account') {
       const accountData = getAccountData(
         chunk.value.account_id,
-        config.genesisHeight,
+        config.genesisTimestamp,
       );
 
       accounts.push(accountData);
@@ -95,7 +95,7 @@ export const insertGenesisData = async (path: string) => {
         chunk.value.account_id,
         chunk.value.public_key,
         chunk.value.access_key.permission,
-        config.genesisHeight,
+        config.genesisTimestamp,
       );
 
       accessKeys.push(accessKeyData);

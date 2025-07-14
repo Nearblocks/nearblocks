@@ -8,8 +8,6 @@ import { dbRead, dbWrite } from '#libs/knex';
 import { blockGauge, blocksHistogram, dataSourceGauge } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { checkFastnear } from '#libs/utils';
-import { storeAccessKeys } from '#services/accessKey';
-import { storeAccounts } from '#services/account';
 import { storeBlock } from '#services/block';
 import { storeChunks } from '#services/chunk';
 import { uploadJson } from '#services/s3';
@@ -129,8 +127,6 @@ export const onMessage = async (message: Message) => {
         storeBlock(dbWrite, message),
         storeChunks(dbWrite, message),
         storeTransactions(dbWrite, message),
-        storeAccounts(dbWrite, message),
-        storeAccessKeys(dbWrite, message),
         uploadJson(message),
       ]),
       new Promise((_, reject) =>

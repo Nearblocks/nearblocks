@@ -1,25 +1,28 @@
-import { streamBlock } from 'nb-blocks-minio';
+import { Message, streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
-import { Message } from 'nb-neardata';
 
 import config from '#config';
 import { dbRead, dbWrite, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { storeBlock } from '#services/block';
-import { storeChunks } from '#services/chunk';
-import { s3Config } from '#services/s3';
-import { storeTransactions } from '#services/transaction';
+import { storeAccessKeys } from '#services/accessKey';
+import { storeAccounts } from '#services/account';
 
-const indexerKey = config.indexerKey;
+const indexerKey = 'accounts';
+const s3Config = {
+  accessKey: config.s3AccessKey,
+  endPoint: config.s3Host,
+  port: config.s3Port,
+  secretKey: config.s3SecretKey,
+  useSSL: config.s3UseSsl,
+};
 
 export const syncData = async () => {
   const settings = await dbRead('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
+  let startBlockHeight = config.startBlockHeight;
 
   if (!startBlockHeight && latestBlock) {
-    logger.info(`last synced block: ${latestBlock}`);
-    startBlockHeight = +latestBlock - 25;
+    startBlockHeight = +latestBlock - config.delta;
   }
 
   const startBlock = startBlockHeight || 0;
@@ -28,13 +31,12 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 25,
     s3Bucket: config.s3Bucket,
-    s3Config: s3Config,
+    s3Config,
     start: startBlock,
   });
 
-  for await (const message of stream as AsyncIterable<Message>) {
+  for await (const message of stream) {
     await onMessage(message);
   }
 };
@@ -44,9 +46,8 @@ export const onMessage = async (message: Message) => {
     logger.info(`syncing block: ${message.block.header.height}`);
 
     await Promise.all([
-      storeBlock(dbWrite, message),
-      storeChunks(dbWrite, message),
-      storeTransactions(dbWrite, message),
+      storeAccounts(dbWrite, message),
+      storeAccessKeys(dbWrite, message),
     ]);
 
     await dbWrite('settings')
@@ -57,7 +58,7 @@ export const onMessage = async (message: Message) => {
       .onConflict('key')
       .merge();
   } catch (error) {
-    logger.error(`aborting... block ${message.block.header.height} `);
+    logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
     process.exit();
