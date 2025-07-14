@@ -19,7 +19,7 @@ if (config.dbCa) {
 
 const db = new Pool({
   application_name: 'api',
-  connectionString: config.dbUrl,
+  connectionString: config.dbUrlBase,
   connectionTimeoutMillis: 10000,
   idleTimeoutMillis: 30000,
   keepAlive: true,
