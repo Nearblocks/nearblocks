@@ -17,8 +17,8 @@ import CloseCircle from '@/components/app/Icons/CloseCircle';
 import Question from '@/components/app/Icons/Question';
 import { NearContext } from '@/components/app/wallet/near-context';
 import { stringify } from 'querystring';
-import { viewMethod } from '@/utils/app/actions';
-import { useRpcStore } from '@/stores/app/rpc';
+import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
 
 interface Props {
@@ -49,7 +49,8 @@ const sortFields = (fields: FieldType[]) => {
 
 const ViewOrChange = (props: Props) => {
   const { signedAccountId, wallet } = useContext(NearContext);
-  const { rpc } = useRpcStore();
+  const { rpc } = useRpcProvider();
+  const { viewMethod } = useRpc();
   const t = useTranslations();
   const { fetcher } = useFetch();
   const { index, method } = props;
@@ -109,22 +110,19 @@ const ViewOrChange = (props: Props) => {
       });
       if (response?.success) {
         resetState(
-          response?.data?.transaction_outcome?.id || null,
+          response?.data?.transaction_outcome?.id ?? null,
           null,
           JSON.stringify(response?.data, null, 2),
         );
-      } else if ([429, 408].includes(response?.statusCode)) {
-        resetState(
-          null,
-          t('rpcRateLimitError', {
-            rpcUrl: rpc,
-            icon: '📡',
-          }),
-        );
       } else {
-        resetState(null, response?.error);
+        const errorMsg =
+          [429, 408].includes(response?.statusCode) ||
+          response?.error?.details?.message
+            ? t('rpcRateLimitError', { rpcUrl: rpc, icon: '📡' })
+            : response?.error;
+        resetState(null, errorMsg);
       }
-    } catch (error) {
+    } catch {
       resetState(null, 'An unknown error occurred');
     } finally {
       setLoading(false);

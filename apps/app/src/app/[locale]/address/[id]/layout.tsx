@@ -11,6 +11,8 @@ import { getRequest } from '@/utils/app/api';
 import { Suspense } from 'react';
 import BalanceSkeleton from '@/components/app/skeleton/address/balance';
 import Balance from '@/components/app/Address/Balance';
+import { getRpcProviders } from '@/utils/app/rpc';
+import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
 const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
@@ -68,8 +70,10 @@ export default async function AddressLayout(props: {
   );
   const tokenDetails = getRequest(`v1/fts/${id}`, {}, options);
   const nftTokenData = getRequest(`v1/nfts/${id}`, {}, options);
+  const rpcProviders = await getRpcProviders();
+
   return (
-    <>
+    <RpcContextProvider rpcProviders={rpcProviders}>
       <div className="relative container-xxl mx-auto px-4">
         <div className="flex items-center justify-between flex-wrap">
           <div className="flex md:flex-wrap w-full border-b dark:border-black-200">
@@ -132,6 +136,6 @@ export default async function AddressLayout(props: {
           </AddressRpcProvider>
         </div>
       </div>
-    </>
+    </RpcContextProvider>
   );
 }

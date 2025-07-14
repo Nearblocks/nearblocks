@@ -11,6 +11,7 @@ import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 import { useParams } from 'next/navigation';
 import { useAddressRpc } from '../common/AddressRpcProvider';
 import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 const AccountOverviewActions = ({
   accountDataPromise,
@@ -41,7 +42,7 @@ const AccountOverviewActions = ({
   const { account: accountView } = useAddressRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
-  const { networkId, rpcKey } = useConfig();
+  const { networkId } = useConfig();
   const { ftBalanceOf } = useRpc();
   const params = useParams<{ id: string }>();
 
@@ -49,37 +50,7 @@ const AccountOverviewActions = ({
     ? accountData?.amount
     : accountView?.amount;
   const nearPrice = statsData?.near_price ?? '';
-  const RpcProviders =
-    networkId === 'mainnet'
-      ? [
-          {
-            name: 'FastNEAR (Archival)',
-            url: `https://rpc.mainnet.fastnear.com?apiKey=${rpcKey}`,
-          },
-          {
-            name: 'NEAR',
-            url: 'https://rpc.mainnet.near.org',
-          },
-          {
-            name: 'FASTNEAR Free',
-            url: 'https://free.rpc.fastnear.com',
-          },
-          {
-            name: 'Lava Network',
-            url: 'https://near.lava.build',
-          },
-        ]
-      : [
-          {
-            name: 'NEAR (Archival)',
-            url: 'https://archival-rpc.testnet.near.org',
-          },
-          {
-            name: 'NEAR',
-            url: 'https://rpc.testnet.near.org',
-          },
-        ];
-  const rpcUrls: string[] = RpcProviders.map((provider) => provider.url);
+  const { rpc: rpcUrl } = useRpcProvider();
 
   useEffect(() => {
     const loadBalances = async () => {
@@ -87,162 +58,59 @@ const AccountOverviewActions = ({
       let total = Big(0);
       const tokens: TokenListInfo[] = [];
       const pricedTokens: TokenListInfo[] = [];
-
-      if (!fts || fts.length === 0) {
-        setFT({
-          amount: total.toString(),
-          tokens: [],
-        });
-        return;
-      }
-      const distributeTokensAcrossRPCs = (
-        tokens: TokenListInfo[],
-        rpcUrls: string[],
-      ) => {
-        const rpcBuckets: { [rpcUrl: string]: TokenListInfo[] } = {};
-        rpcUrls.forEach((url) => {
-          rpcBuckets[url] = [];
-        });
-        tokens.forEach((token, index) => {
-          const rpcUrl = rpcUrls[index % rpcUrls.length];
-          rpcBuckets[rpcUrl].push(token);
-        });
-
-        return rpcBuckets;
-      };
-      const delay = (ms: number) =>
-        new Promise((resolve) => setTimeout(resolve, ms));
-      const processBucket = async (
-        tokens: TokenListInfo[],
-        rpcUrl: string,
-        bucketIndex: number,
-      ) => {
-        await delay(bucketIndex * 100);
-
-        const processedTokens = await Promise.allSettled(
-          tokens.map(async (ft: TokenListInfo, tokenIndex) => {
-            if (tokenIndex > 0) {
-              await delay(50);
-            }
-
-            let sum = Big(0);
-            let rpcAmount = Big(0);
-
-            try {
-              const amount = await ftBalanceOf(
-                rpcUrl,
-                ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
-                params?.id as string,
-              );
-
-              if (amount?.data) {
-                rpcAmount = ft?.ft_meta?.decimals
-                  ? Big(amount?.data).div(Big(10).pow(+ft.ft_meta.decimals))
-                  : Big(0);
-              }
-
-              if (ft?.ft_meta?.price) {
-                sum = rpcAmount.mul(Big(ft?.ft_meta?.price));
-
-                return {
-                  type: 'priced',
-                  token: {
-                    ...ft,
-                    amountUsd: sum?.toString(),
-                    rpcAmount: rpcAmount?.toString(),
-                  },
-                  usdValue: sum,
-                };
-              } else {
-                return {
-                  type: 'unpriced',
-                  token: {
-                    ...ft,
-                    amountUsd: sum?.toString(),
-                    rpcAmount: rpcAmount?.toString(),
-                  },
-                  usdValue: Big(0),
-                };
-              }
-            } catch (error) {
-              console.error(
-                `Error fetching balance for ${ft?.contract} via ${rpcUrl}:`,
-                error,
-              );
-              return {
-                type: 'error',
-                token: {
-                  ...ft,
-                  amountUsd: '0',
-                  rpcAmount: '0',
-                },
-                usdValue: Big(0),
-              };
-            }
-          }),
-        );
-
-        return processedTokens;
-      };
-
-      try {
-        const rpcBuckets = distributeTokensAcrossRPCs(fts, rpcUrls);
-        const allBucketResults = await Promise.all(
-          Object.entries(rpcBuckets).map(([rpcUrl, bucketTokens], index) =>
-            processBucket(bucketTokens, rpcUrl, index),
-          ),
-        );
-
-        const allTokenResults = allBucketResults.flat();
-
-        allTokenResults.forEach((result) => {
-          if (result.status === 'fulfilled' && result.value) {
-            const { type, token, usdValue } = result.value;
-
-            if (type === 'priced') {
-              pricedTokens.push(token);
-              total = total.add(usdValue);
-            } else if (type === 'unpriced' || type === 'error') {
-              tokens.push(token);
-            }
-          } else if (result.status === 'rejected') {
-            console.error('Token processing rejected:', result.reason);
+      await Promise.all(
+        fts?.map(async (ft: TokenListInfo) => {
+          let sum = Big(0);
+          let rpcAmount = Big(0);
+          const amount = await ftBalanceOf(
+            rpcUrl,
+            ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
+            params?.id as string,
+          ).catch((error) => {
+            console.error('Error in loadBalances:', error);
+          });
+          if (amount) {
+            rpcAmount = ft?.ft_meta?.decimals
+              ? Big(amount).div(Big(10).pow(+ft.ft_meta.decimals))
+              : Big(0);
           }
-        });
-
-        if (tokens.length > 0) {
-          tokens.sort((a, b) => {
-            const first = Big(a?.rpcAmount || '0');
-            const second = Big(b?.rpcAmount || '0');
-            if (first.lt(second)) return 1;
-            if (first.gt(second)) return -1;
-            return 0;
+          if (ft?.ft_meta?.price) {
+            sum = rpcAmount.mul(Big(ft?.ft_meta?.price));
+            total = total.add(sum);
+            return pricedTokens.push({
+              ...ft,
+              amountUsd: sum?.toString(),
+              rpcAmount: rpcAmount?.toString(),
+            });
+          }
+          return tokens.push({
+            ...ft,
+            amountUsd: sum?.toString(),
+            rpcAmount: rpcAmount?.toString(),
           });
-        }
-
-        if (pricedTokens.length > 0) {
-          pricedTokens.sort((a, b) => {
-            const first = Big(a?.amountUsd || '0');
-            const second = Big(b?.amountUsd || '0');
-            if (first.lt(second)) return 1;
-            if (first.gt(second)) return -1;
-            return 0;
-          });
-        }
-
-        setFT({
-          amount: total.toString(),
-          tokens: [...pricedTokens, ...tokens],
-        });
-      } catch (error) {
-        console.error('Error in loadBalances:', error);
-        setFT({
-          amount: '0',
-          tokens: [],
+        }),
+      );
+      if (tokens) {
+        tokens?.sort((a, b) => {
+          const first = Big(a?.rpcAmount);
+          const second = Big(b?.rpcAmount);
+          if (first?.lt(second)) return 1;
+          if (first?.gt(second)) return -1;
+          return 0;
         });
       }
+      pricedTokens?.sort((a, b) => {
+        const first = Big(a?.amountUsd);
+        const second = Big(b?.amountUsd);
+        if (first?.lt(second)) return 1;
+        if (first?.gt(second)) return -1;
+        return 0;
+      });
+      setFT({
+        amount: total.toString(),
+        tokens: [...pricedTokens, ...tokens],
+      });
     };
-
     loadBalances();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inventoryData?.fts, params?.id]);

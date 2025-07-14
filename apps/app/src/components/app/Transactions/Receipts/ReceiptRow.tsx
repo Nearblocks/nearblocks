@@ -19,6 +19,7 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
 import useRpc from '@/hooks/app/useRpc';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 interface Props {
   borderFlag?: boolean;
@@ -43,6 +44,7 @@ const ReceiptRow = (props: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const lastBlockHash = useRef<null | string>(null);
   const [block, setBlock] = useState<{ height: string }>({ height: '' });
+  const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
 
   const status = receipt?.outcome?.status;
@@ -81,12 +83,13 @@ const ReceiptRow = (props: Props) => {
     ) {
       lastBlockHash.current = receipt.block_hash;
 
-      getBlockDetails(receipt?.block_hash)
+      getBlockDetails(rpc, receipt?.block_hash)
         .then((resp: any) => {
           setBlock(resp?.header);
         })
         .catch(() => {});
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipt?.block_hash, receipt?.block_height, getBlockDetails]);
 
   useEffect(() => {

@@ -19,7 +19,7 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import Timestamp from '@/components/app/common/Timestamp';
-
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 interface ListProps {
   data: {
     cursor: string;
@@ -40,6 +40,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
   const errorMessage = t ? t('noTxns') : 'No transactions found!';
+  const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
   const [timestamp, setTimeStamp] = useState('');
   const tokens = data?.txns;
@@ -49,7 +50,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
   useEffect(() => {
     const fetchTimeStamp = async (height: string) => {
       try {
-        const res = await getBlockDetails(Number(height));
+        const res = await getBlockDetails(rpc, Number(height));
         const resp = res?.header;
         if (resp) {
           setTimeStamp(resp.timestamp_nanosec);

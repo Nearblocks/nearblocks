@@ -24,6 +24,7 @@ import { useParams } from 'next/navigation';
 import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
 import Timestamp from '@/components/app/common/Timestamp';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 interface Props {
   data: any;
   loading?: any;
@@ -39,6 +40,7 @@ export default function Details(props: Props) {
   const { data, price } = props;
   const nearPrice = price?.stats?.[0]?.near_price;
   const { networkId } = useConfig();
+  const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
   const [blockInfo, setBlockInfo] = useState<BlockData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +52,7 @@ export default function Details(props: Props) {
       if (!data || data?.blocks?.length === 0 || data?.message === 'Error') {
         setIsLoading(true);
         try {
-          const res = await getBlockDetails(params?.hash);
+          const res = await getBlockDetails(rpc, params?.hash);
 
           if (res) {
             let limit = 0;

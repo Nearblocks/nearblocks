@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ContractMetadata, VerifierData } from '@/utils/types';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaCode from '@/components/app/Icons/FaCode';
@@ -6,10 +6,9 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import CodeViewer from '@/components/app/Address/Contract/CodeViewer';
 import { toast } from 'react-toastify';
 import { useParams } from 'next/navigation';
-import { useRpcStore } from '@/stores/app/rpc';
-import { useRpcProvider } from '@/hooks/app/useRpcProvider';
 import { useConfig } from '@/hooks/app/useConfig';
 import { isEmpty } from 'lodash';
+import { useRpcProvider } from '@/components/app/common/RpcContext';
 
 type VerifiedDataProps = {
   base64Code: string;
@@ -31,23 +30,9 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
   const [fileDataError, setFileDataError] = useState<null | string>(null);
   const params = useParams<{ id: string }>();
   const contractId = params?.id?.toLowerCase();
-  const initializedRef = useRef(false);
   const { verifierConfig } = useConfig();
 
-  const useRpcStoreWithProviders = () => {
-    const setProviders = useRpcStore((state) => state.setProviders);
-    const { RpcProviders } = useRpcProvider();
-    useEffect(() => {
-      if (!initializedRef.current) {
-        initializedRef.current = true;
-        setProviders(RpcProviders);
-      }
-    }, [RpcProviders, setProviders]);
-
-    return useRpcStore((state) => state);
-  };
-
-  const { switchRpc } = useRpcStoreWithProviders();
+  const { switchRpc } = useRpcProvider();
 
   useEffect(() => {
     const fetchCode = async () => {

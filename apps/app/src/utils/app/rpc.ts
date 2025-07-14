@@ -12,7 +12,9 @@ export const getRpcProviders = async () => {
     ? [
         {
           name: 'FastNEAR (Archival)',
-          url: `https://rpc.mainnet.fastnear.com?apiKey=${rpcKey}`,
+          url: `https://archival-rpc.mainnet.fastnear.com${
+            rpcKey ? `?apiKey=${rpcKey}` : ''
+          }`,
         },
         {
           name: 'NEAR (Archival)',
@@ -21,10 +23,6 @@ export const getRpcProviders = async () => {
         {
           name: 'NEAR',
           url: 'https://rpc.mainnet.near.org',
-        },
-        {
-          name: 'NEAR (Beta)',
-          url: 'https://beta.rpc.mainnet.near.org',
         },
         {
           name: 'FASTNEAR Free',
@@ -138,7 +136,7 @@ export const rpcSearch = async (keyword: string): Promise<SearchResponse> => {
 };
 const RpcProviders = await getRpcProviders();
 const jsonProviders = RpcProviders.map(
-  (p) => new providers.JsonRpcProvider({ url: p.url }),
+  (p) => new providers.JsonRpcProvider({ url: p.url }, { retries: 0 }),
 );
 
 const provider = new providers.FailoverRpcProvider(jsonProviders);
