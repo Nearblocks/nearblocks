@@ -14,7 +14,7 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
-const sql = postgres(config.dbUrl, {
+const sql = postgres(config.dbUrlBase, {
   connect_timeout: 10,
   connection: {
     application_name: 'api',
@@ -24,7 +24,7 @@ const sql = postgres(config.dbUrl, {
   ssl: ssl?.ca ? ssl : false,
 });
 
-export const writeSql = postgres(config.dbWriteUrl, {
+export const writeSql = postgres(config.dbWriteUrlBase, {
   connect_timeout: 10,
   connection: {
     application_name: 'api-write',

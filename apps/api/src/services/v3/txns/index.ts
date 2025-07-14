@@ -1,9 +1,7 @@
-import request from 'nb-schemas/dist/txns/request.js';
-import response from 'nb-schemas/dist/txns/response.js';
-
 import type {
   Txn,
   TxnCount,
+  TxnReceipts,
   TxnReceiptsReq,
   TxnReq,
   Txns,
@@ -11,15 +9,16 @@ import type {
   TxnsLatestReq,
   TxnsReq,
 } from 'nb-schemas';
+import request from 'nb-schemas/dist/txns/request.js';
+import response from 'nb-schemas/dist/txns/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
 import { paginateData, rollingWindow, rollingWindowList } from '#libs/response';
-import { TxnReceipts } from '#libs/schema/v2/txns';
 import { responseHandler } from '#middlewares/response';
-import { RequestValidator } from '#middlewares/validate';
+import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/txns';
 
 const latest = responseHandler(

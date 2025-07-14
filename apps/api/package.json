@@ -13,7 +13,7 @@
     "clean": "rimraf dist",
     "build": "yarn clean && tsc && cpx \"src/**/*.sql\" dist",
     "start": "node dist/index.js",
-    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts  --ext sql",
+    "dev": "tsx watch --env-file=.env src/index.ts",
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./"
   },
@@ -68,15 +68,15 @@
     "@types/swagger-jsdoc": "~6.0.4",
     "@types/swagger-ui-express": "~4.1",
     "cpx": "~1.5.0",
-    "nb-schemas": "*",
     "nb-logger": "*",
     "nb-near": "*",
     "nb-redis": "*",
+    "nb-schemas": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
-    "nodemon": "~2.0",
     "rimraf": "~5.0",
+    "tsx": "~4.20.3",
     "typescript": "~5.2"
   }
 }

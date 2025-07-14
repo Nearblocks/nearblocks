@@ -1,6 +1,3 @@
-import request from 'nb-schemas/dist/blocks/request.js';
-import response from 'nb-schemas/dist/blocks/response.js';
-
 import type {
   Block,
   BlockCount,
@@ -8,6 +5,8 @@ import type {
   BlocksLatestReq,
   BlocksReq,
 } from 'nb-schemas';
+import request from 'nb-schemas/dist/blocks/request.js';
+import response from 'nb-schemas/dist/blocks/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
@@ -15,7 +14,7 @@ import { dbBase } from '#libs/pgp';
 import redis from '#libs/redis';
 import { paginateData, rollingWindow, rollingWindowList } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
-import { RequestValidator } from '#middlewares/validate';
+import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/blocks';
 
 const latest = responseHandler(

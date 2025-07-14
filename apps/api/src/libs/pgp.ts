@@ -39,11 +39,23 @@ export const pgp = pgpromise({
 });
 
 /**
- * Base indexer database connection.
+ * Base database connection.
  */
 export const dbBase = pgp({
-  application_name: 'api',
-  connectionString: config.dbUrl,
+  application_name: 'api-base',
+  connectionString: config.dbUrlBase,
+  max: 20,
+  ssl: ssl?.ca ? ssl : false,
+  // TODO: remove before merge
+  statement_timeout: 10 * 60 * 100, // 10s
+});
+
+/**
+ * Balance database connection.
+ */
+export const dbBalance = pgp({
+  application_name: 'api-balance',
+  connectionString: config.dbUrlBalance,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
   // TODO: remove before merge
