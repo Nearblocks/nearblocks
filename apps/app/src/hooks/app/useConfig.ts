@@ -79,8 +79,8 @@ export const useConfig = () => {
 
   const aurorablocksUrl =
     networkId === 'mainnet'
-      ? 'https://aurora.exploreblocks.io'
-      : 'https://aurora.exploreblocks.io';
+      ? 'https://explorer.mainnet.aurora.dev'
+      : 'https://explorer.testnet.aurora.dev';
 
   const verifierConfig: VerifierConfig[] =
     networkId === 'mainnet'
