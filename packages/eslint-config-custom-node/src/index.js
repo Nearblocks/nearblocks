@@ -26,8 +26,7 @@ module.exports = {
       {
         groups: ['builtin', 'external', 'nb', 'internal'],
         'custom-groups': {
-          value: { nb: ['nb-**'] },
-          type: { nb: 'nb' },
+          value: { nb: ['nb-**', 'nb-**/**'] },
         },
         'internal-pattern': ['#**', '#**/**'],
         'newlines-between': 'always',
