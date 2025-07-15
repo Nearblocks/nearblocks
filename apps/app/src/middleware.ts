@@ -1,8 +1,43 @@
 import createMiddleware from 'next-intl/middleware';
 
 import { routing } from './i18n/routing';
+import { NextRequest, NextResponse } from 'next/server';
+import { locales } from '@/utils/app/config';
 
-export default createMiddleware(routing);
+const nextIntlMiddleware = createMiddleware(routing);
+
+export default function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  const localeCookie = request.cookies.get('NEXT_LOCALE')?.value;
+
+  if (!localeCookie || !locales.includes(localeCookie)) {
+    return nextIntlMiddleware(request);
+  }
+  const currentLocale = locales.find(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+  );
+
+  const needsRedirect =
+    currentLocale !== localeCookie &&
+    !(currentLocale === undefined && localeCookie === routing.defaultLocale);
+
+  if (needsRedirect) {
+    const url = request.nextUrl.clone();
+    const pathWithoutLocale = currentLocale
+      ? pathname.replace(new RegExp(`^/${currentLocale}`), '') || '/'
+      : pathname;
+    url.pathname =
+      localeCookie === routing.defaultLocale
+        ? pathWithoutLocale
+        : `/${localeCookie}${
+            pathWithoutLocale === '/' ? '' : pathWithoutLocale
+          }`;
+
+    return NextResponse.redirect(url);
+  }
+  return nextIntlMiddleware(request);
+}
 
 export const config = {
   matcher: [

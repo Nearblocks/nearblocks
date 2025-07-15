@@ -15,7 +15,7 @@ import FunctionCall from '@/components/app/Transactions/Receipts/Action/Function
 import Stake from '@/components/app/Transactions/Receipts/Action/Stake';
 import Transfer from '@/components/app/Transactions/Receipts/Action/Transfer';
 import { Delegate } from '@/components/app/Icons/Delegate';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { shortenAddress } from '@/utils/app/libs';
 import Tooltip from '@/components/app/common/Tooltip';
 import DeployGlobalContract from '@/components/app/Transactions/Receipts/Action/DeployGlobalContract';

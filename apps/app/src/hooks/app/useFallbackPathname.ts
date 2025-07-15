@@ -1,18 +1,16 @@
 'use client';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 
 export default function useFallbackPathname(): string {
   const pathname = usePathname();
-  const [Path, setPath] = useState<string>('/');
+  const [path, setPath] = useState<string>(pathname ?? '/');
 
   useEffect(() => {
-    if (pathname) {
-      setPath(pathname);
-    } else if (typeof window !== 'undefined' && window.location.pathname) {
-      setPath(window.location.pathname);
+    if (!pathname && typeof window !== 'undefined') {
+      setPath(window.location.pathname ?? '/');
     }
   }, [pathname]);
 
-  return Path;
+  return path;
 }

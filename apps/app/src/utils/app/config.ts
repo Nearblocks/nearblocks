@@ -231,3 +231,20 @@ export const supportedNetworks = {
   doge: 'doge',
   xrp: 'xrp',
 } as const;
+
+export const locales = [
+  'en',
+  'kr',
+  'id',
+  'zh-cn',
+  'zh-hk',
+  'ua',
+  'ru',
+  'es',
+  'vi',
+  'ph',
+  'fr',
+  'jp',
+  'th',
+  'it',
+];

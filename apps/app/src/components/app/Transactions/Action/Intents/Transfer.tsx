@@ -1,6 +1,6 @@
 import React from 'react';
 import { TransactionLog } from '@/utils/types';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import FaRight from '@/components/app/Icons/FaRight';
 import TokenInfo from '@/components/app/common/TokenInfo';
 import IntentsIcon from '@/components/app/Icons/IntentsIcon';

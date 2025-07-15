@@ -7,10 +7,9 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import Link from 'next/link';
+import { Link, usePathname } from '@/i18n/routing';
 import { truncateString } from '@/utils/app/libs';
 import { CopyButton } from '@/components/app/common/CopyButton';
-import { usePathname } from '@/i18n/routing';
 import { shortenText } from '@/utils/libs';
 
 type AddressHoverContextType = {
