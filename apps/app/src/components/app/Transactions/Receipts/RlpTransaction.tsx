@@ -12,6 +12,11 @@ interface Props {
   receiver?: any | string;
 }
 
+// Supports both Aurora transaction types:
+// 1. submit - Simple transaction format
+// 2. submit_with_args - Uses SubmitArgs structure for EVM transactions:
+//    https://github.com/aurora-is-near/aurora-engine/blob/develop/engine-types/src/parameters/engine.rs#L133
+
 class SubmitArgs {
   tx_data: Uint8Array;
   max_gas_price: bigint | null;
@@ -40,14 +45,13 @@ const schema = new Map([
 
 const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   const { aurorablocksUrl } = useConfig();
+  const isAuroraSubmit = method === 'submit' || method === 'submit_with_args';
   const decoded =
-    (method === 'submit' || method === 'submit_with_args') &&
-    receiver?.includes('aurora')
+    isAuroraSubmit && receiver?.includes('aurora')
       ? pretty
       : pretty && Buffer.from(pretty, 'base64');
   const parsed =
-    (method === 'submit' || method === 'submit_with_args') &&
-    receiver?.includes('aurora')
+    isAuroraSubmit && receiver?.includes('aurora')
       ? decoded
       : decoded && jsonParser(decoded?.toString());
 
@@ -142,10 +146,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   };
 
   const getDisplayData = () => {
-    if (
-      (method === 'submit' || method === 'submit_with_args') &&
-      receiver?.includes('aurora')
-    ) {
+    if (isAuroraSubmit && receiver?.includes('aurora')) {
       if (!displayedArgs) return {};
 
       try {
@@ -182,7 +183,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
                     </td>
                     <td className="border px-4 py-2">
                       {key === 'hash' &&
-                      (method === 'submit' || method === 'submit_with_args') &&
+                      isAuroraSubmit &&
                       receiver?.includes('aurora') ? (
                         <a
                           className="text-green-500 dark:text-green-250 hover:no-underline"
@@ -205,9 +206,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
             </tbody>
           </table>
         </div>
-      ) : (method === 'submit' || method === 'submit_with_args') &&
-        receiver?.includes('aurora') &&
-        format === 'rlp' ? (
+      ) : isAuroraSubmit && receiver?.includes('aurora') && format === 'rlp' ? (
         <div
           className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
           style={{ height: '150px' }}
@@ -217,7 +216,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
               <p className="mb-2" key={key}>
                 {key}:{' '}
                 {key === 'hash' &&
-                (method === 'submit' || method === 'submit_with_args') &&
+                isAuroraSubmit &&
                 receiver?.includes('aurora') ? (
                   <a
                     className="text-green-500 dark:text-green-250 hover:no-underline"
@@ -244,8 +243,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
           rows={4}
           style={{ height: '150px' }}
           value={
-            (method === 'submit' || method === 'submit_with_args') &&
-            receiver?.includes('aurora')
+            isAuroraSubmit && receiver?.includes('aurora')
               ? JSON.stringify(getDisplayData(), null, 2)
               : displayedArgs || ''
           }
