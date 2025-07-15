@@ -87,10 +87,10 @@ const FunctionCall = (props: TransactionActionInfo) => {
     return pretty;
   }
 
+  const isAuroraSubmit =
+    args?.method_name === 'submit' || args?.method_name === 'submit_with_args';
   const modifiedData =
-    (args?.method_name === 'submit' ||
-      args?.method_name === 'submit_with_args') &&
-    receiver.includes('aurora')
+    isAuroraSubmit && receiver?.includes('aurora')
       ? { tx_bytes_b64: args.args_base64 || args.args }
       : args.args_base64 || args.args || encodeArgs(args?.args_json);
 
@@ -111,9 +111,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
         {shortenAddress(receiver)}
       </Link>
       {args?.method_name === 'rlp_execute' ||
-      ((args?.method_name === 'submit' ||
-        args?.method_name === 'submit_with_args') &&
-        receiver.includes('aurora')) ? (
+      (isAuroraSubmit && receiver?.includes('aurora')) ? (
         <RlpTransaction
           pretty={modifiedData}
           method={args?.method_name}
