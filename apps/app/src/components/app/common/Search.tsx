@@ -1,11 +1,10 @@
 'use client';
 import debounce from 'lodash/debounce';
-import Link from 'next/link';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
-import { routing, useIntlRouter } from '@/i18n/routing';
+import { Link, routing, useIntlRouter } from '@/i18n/routing';
 import { rpcSearch } from '@/utils/app/rpc';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import { NetworkId, SearchResult, SearchRoute } from '@/utils/types';
@@ -16,6 +15,7 @@ import { Spinner } from '@/components/app/common/Spinner';
 import useStatsStore from '@/stores/app/syncStats';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
+import { locales } from '@/utils/app/config';
 
 export const SearchToast = (networkId: NetworkId) => {
   if (networkId === 'testnet') {
@@ -476,8 +476,13 @@ export const SearchWithGlobalError = ({
   header?: boolean;
   pathname?: string;
 }) => {
+  // handleRedirect navigates to a new path with locale, used in Global Error Boundary for full reload to reset app state.
   const handleRedirect = async (newPath: string) => {
-    window.location.href = newPath;
+    const locale = window.location.pathname?.match(
+      new RegExp(`^/(${locales.join('|')})(?=/|$)`),
+    )?.[1];
+    const path = locale ? `/${locale}${newPath}` : newPath;
+    window.location.assign(path);
   };
 
   return (

@@ -203,16 +203,16 @@ const useRpc = () => {
 
       if (statusCode === 200 && data) {
         const result = data.result?.result;
-        return result ? decodeArgs(result) : null;
+        return result ? decodeArgs(result) : [];
       } else {
         setError(true);
         console.error('RPC Error:', error);
-        return null;
+        return [];
       }
     } catch (fetchError) {
       setError(true);
       console.error('Error fetching accounts:', fetchError);
-      return null;
+      return [];
     } finally {
       setLoading(false);
     }

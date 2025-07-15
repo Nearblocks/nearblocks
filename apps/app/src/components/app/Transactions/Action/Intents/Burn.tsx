@@ -1,5 +1,5 @@
 import { TransactionLog } from '@/utils/types';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import TokenInfo from '@/components/app/common/TokenInfo';
 import FaRight from '@/components/app/Icons/FaRight';
 import IntentsIcon from '@/components/app/Icons/IntentsIcon';
