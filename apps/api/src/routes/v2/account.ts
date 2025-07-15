@@ -4,6 +4,7 @@ import schema from '#libs/schema/v2/account';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import account from '#services/v2/account/index';
 import receipts from '#services/v2/account/receipts';
 
 const route = Router();
@@ -143,6 +144,12 @@ const routes = (app: Router) => {
     '/:account/receipts/count',
     validator(schema.receiptsCount),
     receipts.receiptsCount,
+  );
+
+  route.get(
+    '/:account/inventory/mts',
+    validator(schema.inventory),
+    account.inventory,
   );
 };
 

@@ -1,11 +1,13 @@
 import { Response } from 'express';
 
 import catchAsync from '#libs/async';
+import { bytesParse, callFunction, getProvider } from '#libs/near';
 import sql from '#libs/postgres';
 import { Item } from '#libs/schema/search';
-import { RequestValidator } from '#types/types';
+import { MtMetadata, RequestValidator, RPCResponse } from '#types/types';
 
 const isHexAddress = (id: string) => /^0x[a-fA-F0-9]{40}$/.test(id);
+const provider = getProvider();
 
 const txnQuery = (keyword: string) => {
   if (keyword.startsWith('0x')) {
@@ -107,6 +109,37 @@ const tokenQuery = (keyword: string) => {
   `;
 };
 
+const mtTokenQuery = async (keyword: string) => {
+  const [contract, tokenId] = keyword.split(':');
+  if (!contract || !tokenId) return [];
+
+  try {
+    const response: RPCResponse = await callFunction(
+      provider,
+      contract,
+      'mt_metadata_token_all',
+      {
+        token_ids: [tokenId],
+      },
+    );
+
+    const [meta] = bytesParse(response.result) as MtMetadata[];
+
+    if (meta) {
+      return [
+        {
+          contract,
+          token_id: tokenId,
+        },
+      ];
+    }
+  } catch (err) {
+    return [];
+  }
+
+  return [];
+};
+
 const txns = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
   const keyword = req.validator.data.keyword;
   const txns = await txnQuery(keyword);
@@ -153,20 +186,24 @@ const tokens = catchAsync(
 const search = catchAsync(
   async (req: RequestValidator<Item>, res: Response) => {
     const keyword = req.validator.data.keyword;
-    const [txns, blocks, accounts, receipts, tokens] = await Promise.all([
-      txnQuery(keyword),
-      blockQuery(keyword),
-      accountQuery(keyword),
-      receiptQuery(keyword),
-      tokenQuery(keyword),
-    ]);
+    const [txns, blocks, accounts, receipts, tokens, mtTokens] =
+      await Promise.all([
+        txnQuery(keyword),
+        blockQuery(keyword),
+        accountQuery(keyword),
+        receiptQuery(keyword),
+        tokenQuery(keyword),
+        mtTokenQuery(keyword),
+      ]);
 
     // The chances of a conflict should be infinitesimal. An account (a user's EOA) is derived from the keccak256 of the user's uncompressed Ethereum public key (64 bytes). Even if someone were to intentionally attempt to create such a conflict (considering they can create a named account consisting of 64 arbitrary characters allowed by NEAR for account addresses), they would need to find a private key that produces a public key consisting only of lowercase alphanumeric characters, dots, dashes, or underscores (when decoded as ASCII), which seems to be a practically infeasible task (would require on the order of 2^174 attempts to brute-force, according to my calculations).
     if (tokens.length > 0 && isHexAddress(keyword)) {
       accounts.length = 0;
     }
 
-    return res.status(200).json({ accounts, blocks, receipts, tokens, txns });
+    return res
+      .status(200)
+      .json({ accounts, blocks, mtTokens, receipts, tokens, txns });
   },
 );
 
