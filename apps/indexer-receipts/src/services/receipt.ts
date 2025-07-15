@@ -142,7 +142,12 @@ const storeChunkReceipts = async (
   const receiptOrDataIds = receipts.map((receipt) =>
     'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
   );
-  const txnHashes = await getTxnHashes(knex, blockHash, receiptOrDataIds);
+  const txnHashes = await getTxnHashes(
+    knex,
+    blockHash,
+    blockTimestamp,
+    receiptOrDataIds,
+  );
 
   const receiptData: Receipt[] = [];
   const receiptActionsData: ActionReceiptAction[] = [];
@@ -250,7 +255,12 @@ const storeChunkReceipts = async (
   };
 };
 
-const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
+const getTxnHashes = async (
+  knex: Knex,
+  blockHash: string,
+  blockTimestamp: string,
+  ids: string[],
+) => {
   const receiptOrDataIds = [...new Set(ids)];
   let txnHashes = fetchTxnHashesFromCache(receiptOrDataIds);
 
@@ -264,7 +274,7 @@ const getTxnHashes = async (knex: Knex, blockHash: string, ids: string[]) => {
   );
 
   txnHashes = await retry(async () => {
-    return await fetchTxnHashesFromDB(knex, receiptOrDataIds);
+    return await fetchTxnHashesFromDB(knex, blockTimestamp, receiptOrDataIds);
   });
 
   return txnHashes;
@@ -282,7 +292,12 @@ const fetchTxnHashesFromCache = (receiptOrDataIds: string[]) => {
   return txnHashes;
 };
 
-const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
+const fetchTxnHashesFromDB = async (
+  knex: Knex,
+  blockTimestamp: string,
+  receiptOrDataIds: string[],
+) => {
+  const timestamp = String(BigInt(blockTimestamp) - 300_000_000_000n); // 5m in ns
   const txnHashes: Map<string, string> = new Map();
   const receiptInputs = await knex('action_receipt_input_data')
     .innerJoin(
@@ -291,6 +306,8 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
       'receipts.receipt_id',
     )
     .whereIn('input_data_id', receiptOrDataIds)
+    .where('included_in_block_timestamp', '>=', timestamp)
+    .where('included_in_block_timestamp', '<=', blockTimestamp)
     .select('input_data_id', 'originated_from_transaction_hash');
 
   receiptInputs.forEach((outputReceipt) => {
@@ -311,6 +328,8 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
       'receipts.receipt_id',
     )
     .whereIn('output_data_id', receiptOrDataIds)
+    .where('included_in_block_timestamp', '>=', timestamp)
+    .where('included_in_block_timestamp', '<=', blockTimestamp)
     .select('output_data_id', 'originated_from_transaction_hash');
 
   receiptOutputs.forEach((outputReceipt) => {
@@ -331,6 +350,8 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
       'receipts.receipt_id',
     )
     .whereIn('produced_receipt_id', receiptOrDataIds)
+    .where('included_in_block_timestamp', '>=', timestamp)
+    .where('included_in_block_timestamp', '<=', blockTimestamp)
     .select('produced_receipt_id', 'originated_from_transaction_hash');
 
   outcomeReceipts.forEach((outcomeReceipt) => {
@@ -346,6 +367,8 @@ const fetchTxnHashesFromDB = async (knex: Knex, receiptOrDataIds: string[]) => {
 
   const transactions = await knex('transactions')
     .whereIn('converted_into_receipt_id', receiptOrDataIds)
+    .where('block_timestamp', '>=', timestamp)
+    .where('block_timestamp', '<=', blockTimestamp)
     .select('converted_into_receipt_id', 'transaction_hash');
 
   transactions.forEach((transaction) => {
