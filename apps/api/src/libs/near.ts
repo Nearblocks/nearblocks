@@ -11,7 +11,7 @@ export const getProvider = (url?: string) => {
   return new providers.JsonRpcProvider({ url: url ?? config.rpcUrl });
 };
 
-export const bytesParse = (input: ArrayBuffer) =>
+export const bytesParse = (input: Uint8Array) =>
   JSON.parse(Buffer.from(input).toString());
 
 export const bytesStringify = (input: unknown) =>
