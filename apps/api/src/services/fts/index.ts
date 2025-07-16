@@ -53,8 +53,15 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     OFFSET
       ${offset}
   `;
+  // The 'aurora' contract is a proxy for the ETH bridge on NEAR. Rename it to 'eth.bridge.near'.
+  const updatedTokens = tokens.map((token) => {
+    if (token.contract === 'aurora') {
+      return { ...token, contract: 'eth.bridge.near' };
+    }
+    return token;
+  });
 
-  return res.status(200).json({ tokens });
+  return res.status(200).json({ tokens: updatedTokens });
 });
 
 const count = catchAsync(
