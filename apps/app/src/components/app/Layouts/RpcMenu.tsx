@@ -66,10 +66,14 @@ const RpcMenu = ({ positionClass }: { positionClass?: string }) => {
                   key={provider.url}
                   onClick={() => handleSelect(provider.url)}
                 >
-                  <span>{provider.name}</span>
-                  {provider.url === rpcUrl && (
-                    <Check className="w-3 mr-2 text-green-500 dark:text-green-250" />
-                  )}
+                  <span className="whitespace-nowrap max-w-[105px] overflow-hidden text-ellipsis">
+                    {provider.name}
+                  </span>
+                  <div className="w-5 h-3 ml-2 flex justify-center items-center flex-shrink-0">
+                    {provider.url === rpcUrl && (
+                      <Check className="w-3 h-3 text-green-500 dark:text-green-250" />
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

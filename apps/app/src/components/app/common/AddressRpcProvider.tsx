@@ -79,7 +79,7 @@ export const AddressRpcProvider: React.FC<AddressRpcProviderProps> = ({
                 return null;
               })
             : Promise.resolve(null),
-          contractError
+          contractError || lockedInfo === null
             ? viewAccessKeys(accountId).catch((error: any) => {
                 console.log(
                   `Error fetching access keys for ${accountId}:`,
@@ -108,7 +108,7 @@ export const AddressRpcProvider: React.FC<AddressRpcProviderProps> = ({
             });
           }
         }
-        if (contractError) {
+        if (contractError || lockedInfo === null) {
           const locked = (keys?.keys || []).every(
             (key: { access_key: { permission: string } }) =>
               key?.access_key?.permission !== 'FullAccess',

@@ -67,7 +67,6 @@ const AccountAlertsActions = ({
     isLocked &&
     accountData?.account?.[0]?.deleted?.transaction_hash == null &&
     accessKeys &&
-    Object.keys(accessKeys)?.length === 0 &&
     contractInfo === null &&
     !isLoading
   ) {

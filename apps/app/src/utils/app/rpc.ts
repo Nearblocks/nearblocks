@@ -4,7 +4,7 @@ import { baseDecode } from 'borsh';
 import { providers } from 'near-api-js';
 
 import { SearchResult } from '../types';
-import { networkId, rpcKey } from './config';
+import { networkId, fastNearRpcKey } from './config';
 import { isValidAccount } from './libs';
 
 export const getRpcProviders = async () => {
@@ -13,7 +13,7 @@ export const getRpcProviders = async () => {
         {
           name: 'FastNEAR (Archival)',
           url: `https://archival-rpc.mainnet.fastnear.com${
-            rpcKey ? `?apiKey=${rpcKey}` : ''
+            fastNearRpcKey ? `?apiKey=${fastNearRpcKey}` : ''
           }`,
         },
         {
