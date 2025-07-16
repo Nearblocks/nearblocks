@@ -161,7 +161,7 @@ const AccountMoreInfoActions = ({
                 ) : storageUsed != null ? (
                   weight(storageUsed)
                 ) : (
-                  ''
+                  '0'
                 )}
               </div>
             </div>
