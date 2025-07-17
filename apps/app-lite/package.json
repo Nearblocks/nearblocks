@@ -19,8 +19,8 @@
     "big.js": "6.2.1",
     "ieee754": "1.2.1",
     "near-social-vm": "github:NearSocial/VM#2.6.1",
-    "next": "13.3.4",
-    "react": "18.2.0",
+    "next": "^14.2.30",
+    "react": "18",
     "react-dom": "18.2.0",
     "zustand": "4.5.2"
   },
