@@ -3,6 +3,17 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import styles from '../styles/ExplorerSelector.module.css';
 import { getNetworkId } from '@/utils/config';
+import Image from 'next/image';
+
+const imageStyle = {
+  width: 'auto',
+  height: '45px',
+};
+
+const footerImageStyle = {
+  height: '2rem',
+  width: 'auto',
+};
 
 export default function ExplorerSelector() {
   const router = useRouter();
@@ -254,9 +265,11 @@ export default function ExplorerSelector() {
                     isNearblocksLiteInactive ? styles.inactive : ''
                   }`}
                 >
-                  <img
-                    className={styles.imageTab}
-                    src={'https://nearvalidate.org/images/near-validate.svg'}
+                  <Image
+                    src="https://nearvalidate.org/images/near-validate.svg"
+                    style={imageStyle}
+                    width={216}
+                    height={45}
                     alt="Near Validate"
                   />
                   <h3 className={styles.explorerHead}>Near Validate</h3>
@@ -273,9 +286,12 @@ export default function ExplorerSelector() {
                   } ${isNearblocksInactive ? styles.inactive : ''}`}
                 >
                   <span className={styles.tag}>Recommended</span>
-                  <img
-                    className={styles.imageTab}
-                    src={'https://nearblocks.io/images/nearblocksblack.svg'}
+
+                  <Image
+                    src="https://nearblocks.io/images/nearblocksblack.svg"
+                    style={imageStyle}
+                    width={216}
+                    height={45}
                     alt="Nearblocks"
                   />
                   <h3 className={styles.explorerHead}>Nearblocks</h3>
@@ -293,11 +309,11 @@ export default function ExplorerSelector() {
                       isPikespeakInactive ? styles.inactive : ''
                     }`}
                   >
-                    <img
-                      className={styles.imageTab}
-                      src={
-                        'https://explorer.near.org/images/pikespeak_logo.png'
-                      }
+                    <Image
+                      src="/images/pikespeak_logo.png"
+                      style={imageStyle}
+                      width={51}
+                      height={45}
                       alt="Pikespeak"
                     />
                     <h3 className={styles.explorerHead}>Pikespeak</h3>
@@ -309,9 +325,11 @@ export default function ExplorerSelector() {
             <div className={styles.footer}>
               <div className={styles.footerText}>
                 <a href="https://github.com/Nearblocks/nearblocks/blob/main/apps/explorer-selector/src/components/ExplorerSelector.tsx">
-                  <img
-                    className={styles.footerImage}
-                    src={'https://nearblocks.io/images/github_icon.svg'}
+                  <Image
+                    src="https://nearblocks.io/images/github_icon.svg"
+                    style={footerImageStyle}
+                    width={51}
+                    height={45}
                     alt="ExplorerSelector"
                   />
                 </a>
