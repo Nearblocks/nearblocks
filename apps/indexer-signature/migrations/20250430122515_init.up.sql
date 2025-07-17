@@ -1,9 +1,11 @@
 CREATE TABLE multichain_signatures (
-  id BIGINT GENERATED ALWAYS AS IDENTITY,
-  block_timestamp BIGINT,
-  transaction_hash TEXT NOT NULL,
-  account_id TEXT,
-  path TEXT,
+  block_timestamp BIGINT NOT NULL,
+  event_index INT NOT NULL,
+  receipt_id TEXT NOT NULL,
+  success_receipt_id TEXT NOT NULL,
+  account_id TEXT NOT NULL,
+  public_key TEXT NOT NULL,
+  path TEXT NOT NULL,
   scheme TEXT,
   signature BYTEA,
   r BYTEA,
@@ -18,19 +20,28 @@ SELECT
     create_default_indexes => false
   );
 
-CREATE UNIQUE INDEX ms_transaction_uidx ON multichain_signatures (transaction_hash, block_timestamp DESC);
+CREATE UNIQUE INDEX ms_receipt_uidx ON multichain_signatures (
+  receipt_id,
+  block_timestamp DESC,
+  event_index DESC
+);
 
-CREATE INDEX ms_block_timestamp_idx ON multichain_signatures (block_timestamp DESC);
+CREATE INDEX ms_block_timestamp_idx ON multichain_signatures (block_timestamp DESC, event_index DESC);
 
-CREATE INDEX ms_account_timestamp_id_desc_idx ON multichain_signatures (account_id, block_timestamp, id DESC);
+CREATE INDEX ms_account_timestamp_idx ON multichain_signatures (
+  account_id,
+  block_timestamp DESC,
+  event_index DESC
+);
+
+CREATE INDEX ms_success_receipt_account_idx ON multichain_signatures (success_receipt_id, account_id);
 
 CREATE INDEX ms_signature_idx ON multichain_signatures (signature);
 
 CREATE INDEX ms_r_s_idx ON multichain_signatures (r, s);
 
 CREATE TABLE multichain_transactions (
-  id BIGINT GENERATED ALWAYS AS IDENTITY,
-  "timestamp" BIGINT,
+  "timestamp" BIGINT NOT NULL,
   chain TEXT NOT NULL,
   transaction TEXT NOT NULL,
   address TEXT NOT NULL,

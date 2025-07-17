@@ -1,6 +1,3 @@
-// Temp batch processing
-import { forEach } from 'hwp';
-
 import { Message, streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
 
@@ -40,11 +37,9 @@ export const syncData = async () => {
     start: startBlockHeight,
   });
 
-  // for await (const message of stream) {
-  //   await onMessage(message);
-  // }
-  // Temp batch processing
-  await forEach(stream, onMessage, 25);
+  for await (const message of stream) {
+    await onMessage(message);
+  }
 
   stream.on('end', () => {
     logger.error('stream ended');

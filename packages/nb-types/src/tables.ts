@@ -278,12 +278,15 @@ export type MTEvent = {
 export type MultichainSignature = {
   account_id: string;
   block_timestamp: string;
+  event_index: number;
   path: string;
+  public_key: string;
   r: Buffer | null;
+  receipt_id: string;
   s: Buffer | null;
-  scheme?: string;
+  scheme: null | string;
   signature: Buffer | null;
-  transaction_hash: string;
+  success_receipt_id: string;
   v: null | number;
 };
 
