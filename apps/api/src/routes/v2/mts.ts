@@ -14,7 +14,7 @@ const routes = (app: Router) => {
   route.get(
     '/contract/:contract/:token_id',
     validator(schema.meta),
-    mts.metaData,
+    mts.metadata,
   );
 };
 
