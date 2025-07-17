@@ -25,11 +25,14 @@ export const intentsTokens = async <T>(
       async () => {
         const response: RPCResponse = await callFunction(
           provider,
-          account,
-          'mt_tokens',
-          { account_id: account },
+          'intents.near',
+          'mt_tokens_for_owner',
+          {
+            account_id: account,
+          },
         );
-        return bytesParse(response.result);
+        const tokens = bytesParse(response.result);
+        return tokens as T;
       },
       EXPIRY * 5,
     );
@@ -64,21 +67,19 @@ export const nftBalanceOf = async <T>(
 
 export const mtBalances = async <T>(
   provider: providers.JsonRpcProvider,
-  contractId: string,
   accountId: string,
-  tokenIds: string[],
+  tokenId: string,
 ): Promise<T> => {
   try {
     return redis.cache(
-      `mt:${contractId}:${accountId}:balances`,
+      `mt:${accountId}:${tokenId}:balances`,
       async () => {
         const response: RPCResponse = await callFunction(
           provider,
-          contractId,
-          'mt_batch_balance_of',
-          { account_id: accountId, token_ids: tokenIds },
+          'intents.near',
+          'mt_balance_of',
+          { account_id: accountId, token_id: tokenId },
         );
-
         return bytesParse(response.result);
       },
       EXPIRY,
@@ -203,11 +204,10 @@ const inventory = catchAsync(
             try {
               const balances = await mtBalances<string[]>(
                 provider,
-                contract,
                 account,
-                [id],
+                token,
               );
-              return balances?.[0] ?? '0';
+              return balances ?? '0';
             } catch (error) {
               return '0';
             }
@@ -227,8 +227,8 @@ const inventory = catchAsync(
       inventory: {
         fts: tokenIds141.map((token_id, index) => {
           const contract = contractIds141[index];
-          const Metas141 = Array.isArray(metas141) ? metas141 : [];
-          const meta = Metas141.find((m) => m.contract === contract);
+          const ftMetas = Array.isArray(metas141) ? metas141 : [];
+          const meta = ftMetas.find((m) => m.contract === contract);
           return {
             amount: balances141[index] ?? '0',
             contract,
@@ -257,7 +257,6 @@ const inventory = catchAsync(
                 token_id: `nep171:${contract}`,
               };
             }
-
             return {
               amount,
               contract,

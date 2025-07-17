@@ -9,7 +9,7 @@ type MetaRequest = {
   token_id: string;
 };
 
-const metaData = catchAsync(
+const metadata = catchAsync(
   async (req: RequestValidator<MetaRequest>, res: Response) => {
     const { contract, token_id } = req.validator.data;
 
@@ -19,4 +19,4 @@ const metaData = catchAsync(
   },
 );
 
-export default { metaData };
+export default { metadata };
