@@ -105,7 +105,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
           blocks.map((block) =>
             withTimeout(
               fetchJson(minioClient, config.s3Bucket, block.block_height),
-              120_000, // TEMP HACK
+              240_000, // TEMP HACK
             ),
           ),
         );
