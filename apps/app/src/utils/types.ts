@@ -89,6 +89,7 @@ export type ApiMetaInfo = {
     symbol: string;
     volume24h: string;
     website: string;
+    tokenId?: string;
   };
 };
 
@@ -389,11 +390,13 @@ export type SearchResult = {
     receipt_id: string;
   }>;
   tokens: Array<{ contract: string }>;
+  mtTokens: Array<{ contract: string; token_id: string }>;
   txns?: Array<{ transaction_hash: string }>;
 };
 export type SearchRoute = {
   path?: string;
   type?: string;
+  rawPath?: string;
 };
 export type Debounce<TArgs extends any[]> = {
   (args: TArgs): void;
@@ -1926,6 +1929,7 @@ export type TokenMetadata = {
   description: string;
   website: string;
   icon: string | null;
+  tokenId?: string;
 };
 
 export type ProcessedTokenMeta = {
@@ -2101,4 +2105,87 @@ export type ReceiptAction = {
   receiptId: string;
   action_kind: string;
   args: Record<string, any>;
+};
+
+export type FTToken = {
+  amount: string;
+  contract: string;
+  meta: {
+    contract: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+    icon: string | null;
+    reference: string | null;
+    price: string;
+  };
+  token_id: string;
+};
+
+export type MTToken = {
+  amount: string;
+  contract: string;
+  meta: {
+    base: {
+      name: string;
+      id: string;
+      symbol: string;
+      icon: string;
+      decimals: number;
+    };
+    token: {
+      title: string;
+      description: string;
+      media: string;
+      issued_at: number;
+      starts_at: number;
+      updated_at: number;
+      extra: string;
+    };
+  };
+  token_id: string;
+};
+
+export type NFTToken = {
+  amount: string;
+  contract: string;
+  meta: {
+    spec: string;
+    name: string;
+    symbol: string;
+    icon: string;
+    base_uri: string;
+    reference: string | null;
+    reference_hash: string | null;
+  };
+  token_id: string;
+};
+
+export type Inventory = {
+  fts: FTToken[];
+  mts: MTToken[];
+  nfts: NFTToken[];
+};
+
+export type mts = {
+  inventory: Inventory;
+};
+
+export type MTTokenMeta = {
+  base: {
+    name: string;
+    id: string;
+    symbol: string;
+    icon: string;
+    decimals: number;
+  };
+  token: {
+    title: string;
+    description: string;
+    media: string;
+    issued_at: number;
+    starts_at: number;
+    updated_at: number;
+    extra: string;
+  };
 };

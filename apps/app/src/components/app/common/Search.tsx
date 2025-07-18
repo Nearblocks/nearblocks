@@ -41,26 +41,51 @@ export const SearchToast = (networkId: NetworkId) => {
 
 export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
   if (res.blocks?.[0]?.block_hash) {
-    return { path: res.blocks[0].block_hash, type: 'block' };
+    return {
+      path: res.blocks[0].block_hash,
+      rawPath: res.blocks[0].block_hash,
+      type: 'block',
+    };
   }
 
   if (res.txns?.[0]?.transaction_hash) {
-    return { path: res.txns[0].transaction_hash, type: 'txn' };
+    return {
+      path: res.txns[0].transaction_hash,
+      rawPath: res.txns[0].transaction_hash,
+      type: 'txn',
+    };
   }
 
   if (res.receipts?.[0]?.originated_from_transaction_hash) {
     return {
       path: res.receipts[0].originated_from_transaction_hash,
+      rawPath: res.receipts[0].originated_from_transaction_hash,
       type: 'txn',
     };
   }
 
   if (res.accounts?.[0]?.account_id) {
-    return { path: res.accounts[0].account_id, type: 'address' };
+    return {
+      path: res.accounts[0].account_id,
+      rawPath: res.accounts[0].account_id,
+      type: 'address',
+    };
   }
 
   if (res.tokens?.[0]?.contract) {
-    return { path: res.tokens[0].contract, type: 'token' };
+    return {
+      path: res.tokens[0].contract,
+      rawPath: res.tokens[0].contract,
+      type: 'token',
+    };
+  }
+
+  if (res?.mtTokens?.[0]?.contract && res?.mtTokens?.[0]?.token_id) {
+    return {
+      path: `${res?.mtTokens?.[0]?.token_id}?a=${res?.mtTokens?.[0]?.contract}`,
+      rawPath: `/mt-token/${res?.mtTokens?.[0]?.token_id}`,
+      type: 'mt_token',
+    };
   }
   return null;
 };
@@ -109,9 +134,11 @@ const BaseSearch = ({
         ? `/address/${route?.path}`
         : route?.type === 'token'
         ? `/token/${route?.path}`
+        : route?.type === 'mt_token'
+        ? `/mt-token/${route?.path}`
         : null;
 
-    if (newPath === pathname) {
+    if (newPath === pathname || route?.rawPath === pathname) {
       setIsLoading(false);
       return;
     }
@@ -146,7 +173,8 @@ const BaseSearch = ({
     result?.txns?.length > 0 ||
     result?.accounts?.length > 0 ||
     result?.receipts?.length > 0 ||
-    result?.tokens?.length > 0;
+    result?.tokens?.length > 0 ||
+    result?.mtTokens?.length > 0;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -184,7 +212,7 @@ const BaseSearch = ({
           }
         }
       } catch (error) {
-        console.log('Error in fetchData:', error);
+        console.error('Error in fetchData:', error);
       }
     };
 
@@ -251,7 +279,6 @@ const BaseSearch = ({
     }
 
     const cachedResults = await getSearchResults(query, filter);
-
     if (cachedResults) {
       return redirect(getSearchRoute(cachedResults));
     } else {
@@ -352,6 +379,7 @@ const BaseSearch = ({
                         onClick={() =>
                           onSelect({
                             path: address.account_id,
+                            rawPath: address.account_id,
                             type: 'address',
                           })
                         }
@@ -372,7 +400,11 @@ const BaseSearch = ({
                       className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={txn.transaction_hash}
                       onClick={() =>
-                        onSelect({ path: txn.transaction_hash, type: 'txn' })
+                        onSelect({
+                          path: txn.transaction_hash,
+                          rawPath: txn.transaction_hash,
+                          type: 'txn',
+                        })
                       }
                     >
                       {shortenHex(txn.transaction_hash)}
@@ -392,6 +424,7 @@ const BaseSearch = ({
                       onClick={() =>
                         onSelect({
                           path: receipt.originated_from_transaction_hash,
+                          rawPath: receipt.originated_from_transaction_hash,
                           type: 'receipt',
                         })
                       }
@@ -411,7 +444,11 @@ const BaseSearch = ({
                       className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={block.block_hash}
                       onClick={() =>
-                        onSelect({ path: block.block_hash, type: 'block' })
+                        onSelect({
+                          path: block.block_hash,
+                          rawPath: block.block_hash,
+                          type: 'block',
+                        })
                       }
                     >
                       #{localFormat(block.block_height)} (0x
@@ -430,12 +467,40 @@ const BaseSearch = ({
                       className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
                       key={token.contract}
                       onClick={() =>
-                        onSelect({ path: token.contract, type: 'token' })
+                        onSelect({
+                          path: token.contract,
+                          rawPath: token?.contract,
+                          type: 'token',
+                        })
                       }
                     >
                       {shortenAddress(token.contract)}
                     </div>
                   ))}
+                </>
+              )}
+              {result?.mtTokens?.length > 0 && (
+                <>
+                  <h3 className=" mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                    Multi Tokens
+                  </h3>
+                  {result?.mtTokens?.map(
+                    (token: { contract: string; token_id: string }) => (
+                      <div
+                        className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                        key={token.contract}
+                        onClick={() =>
+                          onSelect({
+                            path: `${token?.token_id}?a=${token?.contract}`,
+                            rawPath: `/mt-token/${token?.token_id}`,
+                            type: 'mt_token',
+                          })
+                        }
+                      >
+                        {shortenAddress(token.token_id)}
+                      </div>
+                    ),
+                  )}
                 </>
               )}
             </>

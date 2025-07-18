@@ -20,10 +20,12 @@ const AccountOverviewActions = ({
   spamTokensPromise,
   statsDataPromise,
   tokenDataPromise,
+  mtsDataPromise,
 }: {
   accountDataPromise: Promise<any>;
   inventoryDataPromise: Promise<any>;
   loading?: boolean;
+  mtsDataPromise: Promise<any>;
   spamTokensPromise: Promise<any>;
   statsDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
@@ -34,6 +36,7 @@ const AccountOverviewActions = ({
   const token = use(tokenDataPromise);
   const inventory = use(inventoryDataPromise);
   const spam = use(spamTokensPromise);
+  const mtsData = use(mtsDataPromise);
   const accountData = account?.account?.[0];
   const statsData = stats?.stats?.[0];
   const tokenData = token?.contracts?.[0];
@@ -191,6 +194,7 @@ const AccountOverviewActions = ({
                 inventoryLoading={loading}
                 loading={loading}
                 spamTokens={spamTokens?.blacklist}
+                mtsData={mtsData}
               />
             </div>
           </div>
