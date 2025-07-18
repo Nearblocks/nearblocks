@@ -30,6 +30,7 @@ export async function GET(request: Request) {
   const blockHash = url.searchParams.has('blockHash');
   const token = url.searchParams.has('token');
   const nft = url.searchParams.has('nft');
+  const mtTokens = url.searchParams.has('mtTokens');
 
   const transaction = url.searchParams.has('transaction');
   const home = url.searchParams.has('home');
@@ -54,6 +55,8 @@ export async function GET(request: Request) {
   } else if (token) {
     svgString = thumbnailTokenSvg(brandConfig);
   } else if (nft) {
+    svgString = thumbnailTokenSvg(brandConfig);
+  } else if (mtTokens) {
     svgString = thumbnailTokenSvg(brandConfig);
   } else if (transaction) {
     svgString = thumbnailTransactionSvg(brandConfig);
@@ -85,6 +88,8 @@ export async function GET(request: Request) {
     titleText = `${brand.charAt(0).toUpperCase() + brand.slice(1)} Token`;
   } else if (nft && nftHash) {
     titleText = `${brand.charAt(0).toUpperCase() + brand.slice(1)} NFT Token`;
+  } else if (mtTokens && tokenHash) {
+    titleText = `${brand.charAt(0).toUpperCase() + brand.slice(1)} MT Token`;
   }
 
   return new ImageResponse(
@@ -230,6 +235,18 @@ export async function GET(request: Request) {
                 }}
               >
                 {truncateString(nftHash)}
+              </div>
+            )}
+
+            {mtTokens && tokenHash && (
+              <div
+                style={{
+                  fontSize: 40,
+                  fontWeight: 700,
+                  marginTop: '10px',
+                }}
+              >
+                {truncateString(tokenHash)}
               </div>
             )}
           </div>

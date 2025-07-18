@@ -46,6 +46,7 @@ export const config = {
     '/([\\w-]+)?/address/(.+)',
     '/([\\w-]+)?/token/(.+)',
     '/([\\w-]+)?/nft-token/(.+)',
+    '/([\\w-]+)?/mt-token/(.+)',
     '/([\\w-]+)?/node-explorer/(.+)',
     '/([\\w-]+)?/apis/:path*',
   ],

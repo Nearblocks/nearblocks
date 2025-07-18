@@ -7,11 +7,12 @@ import {
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat, truncateString } from '@/utils/libs';
-import { InventoryInfo, TokenListInfo } from '@/utils/types';
+import { Inventory, InventoryInfo, mts, TokenListInfo } from '@/utils/types';
 
 import ArrowDown from '@/components/app/Icons/ArrowDown';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { priceFormat } from '@/utils/app/libs';
+import Big from 'big.js';
 
 interface Props {
   appUrl?: string;
@@ -24,14 +25,43 @@ interface Props {
   inventoryLoading?: boolean;
   loading?: boolean;
   spamTokens?: string[];
+  mtsData: mts;
 }
 
 const TokenHoldings = (props: Props) => {
   /* eslint-disable @next/next/no-img-element */
   const ft = props?.ft?.tokens?.filter((token) => token?.contract !== 'aurora'); // The 'aurora' token has been removed from the list of tokens due to its role as a proxy contract for the ETH bridge on the NEAR
   const nfts = props?.data?.nfts || [];
+  const inventoryData: Inventory = props?.mtsData?.inventory;
 
-  if (ft?.length === 0 && nfts?.length === 0) {
+  const mt = (inventoryData?.mts || [])?.map((token) => {
+    const rawAmount = token?.amount;
+    const decimals = token?.meta?.base?.decimals;
+    const humanReadableAmount =
+      decimals && rawAmount !== '0'
+        ? Big(rawAmount).div(Big(10).pow(decimals)).toString()
+        : '0';
+
+    return {
+      contract: token?.contract,
+      mt_meta: {
+        token_id: token?.meta?.base?.id,
+        name: token?.meta?.base?.name,
+        symbol: token?.meta?.base?.symbol,
+        icon: token?.meta?.base?.icon,
+        price: '0',
+        decimals: token?.meta?.base?.decimals,
+        title: token?.meta?.token?.title,
+        description: token?.meta?.token?.description,
+        media: token?.meta?.token?.media,
+      },
+      rpcAmount: humanReadableAmount,
+      amountUsd: '0',
+      token_id: token.token_id,
+    };
+  });
+
+  if (ft?.length === 0 && mt?.length === 0 && nfts?.length === 0) {
     return (
       <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
         <option>N/A</option>
@@ -59,11 +89,11 @@ const TokenHoldings = (props: Props) => {
       >
         <button>
           <span>
-            {ftAmount && (ft?.length || nfts?.length) ? (
+            {ftAmount && (ft?.length || mt?.length || nfts?.length) ? (
               <>
-                {'$' + dollarFormat(ftAmount)}
+                {'$' + dollarFormat(String(ftAmount))}
                 <span className="bg-green-500 dark:bg-green-250 text-xs text-white rounded ml-2 px-1 p-0.5">
-                  {(ft?.length || 0) + (nfts?.length || 0)}
+                  {(ft?.length || 0) + (mt?.length || 0) + (nfts?.length || 0)}
                 </span>
               </>
             ) : (
@@ -158,6 +188,100 @@ const TokenHoldings = (props: Props) => {
                                 {token?.ft_meta?.price
                                   ? '@' + priceFormat(token?.ft_meta?.price)
                                   : '@' + (token?.ft_meta?.price ?? '')}
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <div className="text-gray-500 p-0.5">[Spam]</div>
+                        )}
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {mt?.length > 0 && (
+              <>
+                <div className="bg-neargray-700 !bg-opacity-60 dark:bg-black-200 text-nearblue-600 dark:text-neargray-10 font-semibold pr-2 pl-2.5 py-2">
+                  Multi Tokens{' '}
+                  <span className="font-normal">({mt?.length})</span>
+                </div>
+                <div className="text-nearblue-600 dark:text-neargray-10 text-xs divide-y dark:divide-black-200 outline-none">
+                  {mt?.map((token, index) => (
+                    <div className="dark:bg-black px-1 py-1" key={index}>
+                      <Link
+                        className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
+                        href={`/mt-token/${token?.mt_meta
+                          ?.token_id}?a=${props.id?.toLowerCase()}`}
+                      >
+                        <div key={index}>
+                          <div className="flex items-center p-1">
+                            <div className="flex mr-1">
+                              <img
+                                alt={token?.mt_meta?.name ?? 'MT Token Icon'}
+                                className="w-4 h-4"
+                                height={16}
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src =
+                                    '/images/tokenplaceholder.svg';
+                                }}
+                                src={
+                                  token?.mt_meta?.icon || token?.mt_meta?.media
+                                    ? (
+                                        token?.mt_meta?.icon ||
+                                        token?.mt_meta?.media
+                                      ).startsWith('http') ||
+                                      (
+                                        token?.mt_meta?.icon ||
+                                        token?.mt_meta?.media
+                                      ).startsWith('data:image/')
+                                      ? token?.mt_meta?.icon ||
+                                        token?.mt_meta?.media
+                                      : '/images/tokenplaceholder.svg'
+                                    : '/images/tokenplaceholder.svg'
+                                }
+                                width={16}
+                              />
+                            </div>
+                            <span>
+                              {token?.mt_meta?.name
+                                ? truncateString(
+                                    token?.mt_meta?.name,
+                                    13,
+                                    '...',
+                                  )
+                                : ''}
+                              (
+                              {truncateString(
+                                token?.mt_meta?.symbol,
+                                15,
+                                '...',
+                              )}
+                              )
+                            </span>
+                          </div>
+                          <div className="text-nearblue-600 dark:text-neargray-10 flex items-center my-0.5 mr-2.5 ml-1">
+                            {token?.rpcAmount && token?.rpcAmount !== '0'
+                              ? localFormat(token?.rpcAmount)
+                              : '0'}
+                          </div>
+                        </div>
+
+                        {!isTokenSpam(token?.contract) ? (
+                          token?.mt_meta?.price &&
+                          parseFloat(token?.mt_meta?.price) > 0 && (
+                            <div className="text-right p-0.5 pt-1">
+                              <div>
+                                {token?.amountUsd && token?.amountUsd !== '0'
+                                  ? '$' + dollarFormat(token?.amountUsd)
+                                  : '$0.00'}
+                              </div>
+                              <div className="text-gray-500 dark:text-gray-400">
+                                {token?.mt_meta?.price
+                                  ? '@' + priceFormat(token?.mt_meta?.price)
+                                  : '@0.00'}
                               </div>
                             </div>
                           )

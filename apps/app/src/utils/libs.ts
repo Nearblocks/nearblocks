@@ -699,3 +699,10 @@ export const parseEventJson = (log: string) => {
 
   return JSON.parse(jsonString);
 };
+
+export const constructTokenId = (
+  tokenId: string,
+  contractId: string,
+): string => {
+  return `${tokenId}?a=${contractId}`;
+};

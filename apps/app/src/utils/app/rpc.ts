@@ -78,6 +78,7 @@ export const rpcSearch = async (keyword: string): Promise<SearchResponse> => {
     receipts: [],
     tokens: [],
     txns: [],
+    mtTokens: [],
   };
 
   const isQueryLong = keyword.length >= 43;

@@ -84,7 +84,11 @@ const TokenInfo = (props: TokenInfoProps) => {
     <>
       <span className="font-normal pl-1">{rpcAmount}</span>
       <Link
-        href={`/token/${contract}`}
+        href={
+          apiMeta?.tokenId
+            ? `/mt-token/${apiMeta?.tokenId}`
+            : `/token/${contract}`
+        }
         className="text-green flex items-center hover:no-underline dark:text-green-250 font-semibold"
       >
         <span className="flex items-center">

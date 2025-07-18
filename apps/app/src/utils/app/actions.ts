@@ -67,6 +67,7 @@ export async function handleFilterAndKeyword(
       receipts: [],
       txns: [],
       tokens: [],
+      mtTokens: [],
     };
 
     if (res?.blocks?.length) {
@@ -87,6 +88,10 @@ export async function handleFilterAndKeyword(
 
     if (res?.tokens?.length) {
       data.tokens = res.tokens;
+    }
+
+    if (res?.mtTokens?.length) {
+      data.mtTokens = res?.mtTokens;
     }
     const hasValidData = Object.values(data).some(
       (value) => Array.isArray(value) && value.length > 0,

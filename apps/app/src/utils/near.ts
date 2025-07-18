@@ -35,7 +35,7 @@ import {
   TxExecutionError,
 } from '@/utils/types';
 import { intentsAddressList, supportedNetworks } from './app/config';
-import { isValidJson, parseEventJson } from './libs';
+import { constructTokenId, isValidJson, parseEventJson } from './libs';
 import { getRequest } from './app/api';
 import { cleanNestedObject } from './app/libs';
 
@@ -599,12 +599,16 @@ async function processTokenMetadata(
   const processedTokens: ProcessedTokenMeta[] = [];
   const processedContracts = new Set();
 
-  const fetchTokenMetadata = async (contractId: string) => {
+  const fetchTokenMetadata = async (contractId: string, token_id?: string) => {
     if (processedContracts.has(contractId)) return;
+    let response;
 
     try {
       const options: RequestInit = { next: { revalidate: 10 } };
-      const response = await getRequest(`v1/fts/${contractId}`, {}, options);
+      response = await getRequest(`v1/fts/${contractId}`, {}, options);
+      if (token_id) {
+        await fetchMultiTokenMetadata(contractId, token_id);
+      }
 
       if (response?.contracts?.[0]) {
         const contract = response.contracts[0];
@@ -631,6 +635,44 @@ async function processTokenMetadata(
     }
   };
 
+  const fetchMultiTokenMetadata = async (
+    contractId: string,
+    tokenId: string,
+  ) => {
+    const uniqueKey = `${contractId}:${tokenId}`;
+    if (processedContracts.has(uniqueKey)) return;
+
+    try {
+      const res = await getRequest(`v2/mts/contract/${contractId}/${tokenId}`);
+      const tokenData = res?.contracts?.[0];
+      const base = tokenData.base;
+      const token = tokenData.token;
+
+      processedTokens.push({
+        contractId: contractId,
+        metadata: {
+          name: base.name || '',
+          symbol: base.symbol || '',
+          decimals: base.decimals || 0,
+          price: '0',
+          marketCap: '0',
+          volume24h: '0',
+          description: token.description || '',
+          website: '',
+          icon: token.media || base.icon || '',
+          tokenId: constructTokenId(tokenId, contractId),
+        },
+      });
+
+      processedContracts.add(uniqueKey);
+    } catch (error) {
+      console.error(
+        `Error fetching multi-token metadata for ${uniqueKey}:`,
+        error,
+      );
+    }
+  };
+
   const processContract = (token: string) => {
     const contractName = token?.includes(':') ? token?.split(':')[1] : token;
     if (contractName) {
@@ -639,14 +681,31 @@ async function processTokenMetadata(
     return null;
   };
 
+  const splitTokenString = (token: string) => {
+    const parts = token?.split(':');
+    if (parts.length > 1) {
+      return {
+        standard: parts[0],
+        contract: parts[1],
+        token_id: parts[2],
+      };
+    }
+    return {
+      standard: '',
+      contract: '',
+      token_id: '',
+    };
+  };
+
   for (const log of logs) {
     if (log?.logs?.data && log?.logs?.standard === 'nep245') {
       for (const dataItem of log.logs.data) {
         if (dataItem?.token_ids && Array.isArray(dataItem.token_ids)) {
           for (const token of dataItem.token_ids) {
             const contractName = processContract(token);
+            const token_id = splitTokenString(token)?.token_id;
             if (contractName) {
-              await fetchTokenMetadata(contractName);
+              await fetchTokenMetadata(contractName, token_id);
             }
           }
         }
@@ -667,8 +726,9 @@ async function processTokenMetadata(
             if (diffKeys.length === 2) {
               for (const key of diffKeys) {
                 const contractName = processContract(key);
+                const token_id = splitTokenString(key)?.token_id;
                 if (contractName) {
-                  await fetchTokenMetadata(contractName);
+                  await fetchTokenMetadata(contractName, token_id);
                 }
               }
             }
