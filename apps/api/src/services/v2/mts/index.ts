@@ -14,8 +14,10 @@ const metadata = catchAsync(
     const { contract, token_id } = req.validator.data;
 
     const metas = await fetchMeta(contract, token_id);
-
-    return res.status(200).json(metas);
+    const contracts = Array.isArray(metas)
+      ? metas.filter((v) => v != null)
+      : [];
+    return res.status(200).json({ contracts });
   },
 );
 
