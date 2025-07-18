@@ -345,8 +345,15 @@ const inventory = catchAsync(
     `;
 
     const [fts, nfts] = await Promise.all([ftQuery, nftQuery]);
+    // The 'aurora' contract is a proxy for the ETH bridge on NEAR. Rename it to 'eth.bridge.near'.
+    const updatedFts = fts.map((ft) => {
+      if (ft.contract === 'aurora') {
+        return { ...ft, contract: 'eth.bridge.near' };
+      }
+      return ft;
+    });
 
-    return res.status(200).json({ inventory: { fts, nfts } });
+    return res.status(200).json({ inventory: { fts: updatedFts, nfts } });
   },
 );
 
