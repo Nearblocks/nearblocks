@@ -43,7 +43,6 @@ export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
   if (res.blocks?.[0]?.block_hash) {
     return {
       path: res.blocks[0].block_hash,
-      rawPath: res.blocks[0].block_hash,
       type: 'block',
     };
   }
@@ -51,7 +50,6 @@ export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
   if (res.txns?.[0]?.transaction_hash) {
     return {
       path: res.txns[0].transaction_hash,
-      rawPath: res.txns[0].transaction_hash,
       type: 'txn',
     };
   }
@@ -59,7 +57,6 @@ export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
   if (res.receipts?.[0]?.originated_from_transaction_hash) {
     return {
       path: res.receipts[0].originated_from_transaction_hash,
-      rawPath: res.receipts[0].originated_from_transaction_hash,
       type: 'txn',
     };
   }
@@ -67,7 +64,6 @@ export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
   if (res.accounts?.[0]?.account_id) {
     return {
       path: res.accounts[0].account_id,
-      rawPath: res.accounts[0].account_id,
       type: 'address',
     };
   }
@@ -75,15 +71,13 @@ export const getSearchRoute = (res: SearchResult): SearchRoute | null => {
   if (res.tokens?.[0]?.contract) {
     return {
       path: res.tokens[0].contract,
-      rawPath: res.tokens[0].contract,
       type: 'token',
     };
   }
 
   if (res?.mtTokens?.[0]?.contract && res?.mtTokens?.[0]?.token_id) {
     return {
-      path: `${res?.mtTokens?.[0]?.token_id}?a=${res?.mtTokens?.[0]?.contract}`,
-      rawPath: `/mt-token/${res?.mtTokens?.[0]?.token_id}`,
+      path: `${res?.mtTokens?.[0]?.contract}:${res?.mtTokens?.[0]?.token_id}`,
       type: 'mt_token',
     };
   }
@@ -138,7 +132,7 @@ const BaseSearch = ({
         ? `/mt-token/${route?.path}`
         : null;
 
-    if (newPath === pathname || route?.rawPath === pathname) {
+    if (newPath === pathname) {
       setIsLoading(false);
       return;
     }
@@ -379,7 +373,6 @@ const BaseSearch = ({
                         onClick={() =>
                           onSelect({
                             path: address.account_id,
-                            rawPath: address.account_id,
                             type: 'address',
                           })
                         }
@@ -402,7 +395,6 @@ const BaseSearch = ({
                       onClick={() =>
                         onSelect({
                           path: txn.transaction_hash,
-                          rawPath: txn.transaction_hash,
                           type: 'txn',
                         })
                       }
@@ -424,7 +416,6 @@ const BaseSearch = ({
                       onClick={() =>
                         onSelect({
                           path: receipt.originated_from_transaction_hash,
-                          rawPath: receipt.originated_from_transaction_hash,
                           type: 'receipt',
                         })
                       }
@@ -446,7 +437,6 @@ const BaseSearch = ({
                       onClick={() =>
                         onSelect({
                           path: block.block_hash,
-                          rawPath: block.block_hash,
                           type: 'block',
                         })
                       }
@@ -469,7 +459,6 @@ const BaseSearch = ({
                       onClick={() =>
                         onSelect({
                           path: token.contract,
-                          rawPath: token?.contract,
                           type: 'token',
                         })
                       }
@@ -491,8 +480,7 @@ const BaseSearch = ({
                         key={token.contract}
                         onClick={() =>
                           onSelect({
-                            path: `${token?.token_id}?a=${token?.contract}`,
-                            rawPath: `/mt-token/${token?.token_id}`,
+                            path: `${token?.contract}:${token?.token_id}`,
                             type: 'mt_token',
                           })
                         }

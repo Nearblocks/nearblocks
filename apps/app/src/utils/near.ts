@@ -35,7 +35,7 @@ import {
   TxExecutionError,
 } from '@/utils/types';
 import { intentsAddressList, supportedNetworks } from './app/config';
-import { constructTokenId, isValidJson, parseEventJson } from './libs';
+import { isValidJson, parseEventJson } from './libs';
 import { getRequest } from './app/api';
 import { cleanNestedObject } from './app/libs';
 
@@ -660,7 +660,7 @@ async function processTokenMetadata(
           description: token.description || '',
           website: '',
           icon: token.media || base.icon || '',
-          tokenId: constructTokenId(tokenId, contractId),
+          tokenId: uniqueKey,
         },
       });
 
