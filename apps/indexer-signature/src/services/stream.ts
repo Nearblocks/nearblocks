@@ -31,7 +31,7 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 5, // Temp batch processing
+    limit: 1, // Temp batch processing
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlockHeight,
