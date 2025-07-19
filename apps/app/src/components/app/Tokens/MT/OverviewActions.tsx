@@ -32,9 +32,12 @@ interface MTToken {
 
 interface Props {
   mtToken: MTToken;
+  contract: string;
+  token: string;
+  isUnknown: boolean;
 }
 
-const MTOverviewActions = ({ mtToken }: Props) => {
+const MTOverviewActions = ({ mtToken, contract, token, isUnknown }: Props) => {
   const formatTimestamp = (timestamp: number) => {
     return getTimeAgoString(timestamp * 1000);
   };
@@ -42,7 +45,7 @@ const MTOverviewActions = ({ mtToken }: Props) => {
   return (
     <>
       <div className="flex items-center justify-between flex-wrap">
-        {!mtToken ? (
+        {!mtToken && !isUnknown ? (
           <div className="w-80 max-w-xs px-2 py-5">
             <Skeleton className="h-7" />
           </div>
@@ -58,7 +61,7 @@ const MTOverviewActions = ({ mtToken }: Props) => {
               </span>
               <span className="inline-flex align-middle mx-2">MT Token:</span>
               <span className="break-all align-middle font-semibold">
-                {mtToken?.base?.name}
+                {isUnknown ? 'Unknown' : mtToken?.base?.name}
               </span>
             </h1>
           </div>
@@ -143,7 +146,7 @@ const MTOverviewActions = ({ mtToken }: Props) => {
                   <div className="flex md:items-center xl:gap-x-24 lg:gap-x-12 md:gap-x-28 mr-3 lg:flex-wrap xl:flex-nowrap md:!flex-nowrap sm:flex-wrap flex-wrap justify-between">
                     <div className="w-full mb-1 md:mb-0">Token ID:</div>
                     <div className=" items-center text-center flex lg:ml-[3px]">
-                      {!mtToken ? (
+                      {!token ? (
                         <div className="w-full break-words">
                           <div className="w-32">
                             <Skeleton className="h-4" />
@@ -151,9 +154,30 @@ const MTOverviewActions = ({ mtToken }: Props) => {
                         </div>
                       ) : (
                         <div className="w-full whitespace-nowrap flex">
-                          {shortenAddress(mtToken?.base?.id)}
+                          {shortenAddress(token)}
                           <span className="mx-0.5">
-                            <CopyButton textToCopy={mtToken?.base?.id} />
+                            <CopyButton textToCopy={token} />
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex xl:flex-nowrap md:!flex-nowrap sm:flex-nowrap flex-wrap items-center justify-between sm:divide-x sm:dark:divide-black-200 pt-4 pb-4 gap-y-2">
+                  <div className="flex md:items-center xl:gap-x-24 lg:gap-x-12 md:gap-x-28 mr-3 lg:flex-wrap xl:flex-nowrap md:!flex-nowrap sm:flex-wrap flex-wrap justify-between">
+                    <div className="w-full mb-1 md:mb-0">Contract:</div>
+                    <div className=" items-center text-center flex lg:ml-[3px]">
+                      {!contract ? (
+                        <div className="w-full break-words">
+                          <div className="w-32">
+                            <Skeleton className="h-4" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full whitespace-nowrap flex">
+                          {shortenAddress(contract)}
+                          <span className="mx-0.5">
+                            <CopyButton textToCopy={contract} />
                           </span>
                         </div>
                       )}

@@ -37,6 +37,10 @@ const TokenHoldings = (props: Props) => {
   const mt = (inventoryData?.mts || [])?.map((token) => {
     const rawAmount = token?.amount;
     const decimals = token?.meta?.base?.decimals;
+    const tokenID =
+      token?.token_id?.split(':')?.length >= 3
+        ? token.token_id.split(':')[2]
+        : '';
     const humanReadableAmount =
       decimals && rawAmount !== '0'
         ? Big(rawAmount).div(Big(10).pow(decimals)).toString()
@@ -45,7 +49,7 @@ const TokenHoldings = (props: Props) => {
     return {
       contract: token?.contract,
       mt_meta: {
-        token_id: token?.meta?.base?.id,
+        token_id: tokenID,
         name: token?.meta?.base?.name,
         symbol: token?.meta?.base?.symbol,
         icon: token?.meta?.base?.icon,
@@ -60,7 +64,6 @@ const TokenHoldings = (props: Props) => {
       token_id: token.token_id,
     };
   });
-
   if (ft?.length === 0 && mt?.length === 0 && nfts?.length === 0) {
     return (
       <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
@@ -212,7 +215,7 @@ const TokenHoldings = (props: Props) => {
                     <div className="dark:bg-black px-1 py-1" key={index}>
                       <Link
                         className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
-                        href={`/mt-token/${token?.mt_meta
+                        href={`/mt-token/${token?.contract}:${token?.mt_meta
                           ?.token_id}?a=${props.id?.toLowerCase()}`}
                       >
                         <div key={index}>

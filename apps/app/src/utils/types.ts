@@ -396,7 +396,6 @@ export type SearchResult = {
 export type SearchRoute = {
   path?: string;
   type?: string;
-  rawPath?: string;
 };
 export type Debounce<TArgs extends any[]> = {
   (args: TArgs): void;
