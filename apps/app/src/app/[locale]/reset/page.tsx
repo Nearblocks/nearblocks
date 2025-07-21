@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 
 import Reset from '@/components/app/Reset';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { networkId } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const metaTitle = 'Password Reset | NearBlocks';
@@ -11,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     description: metaDescription,
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

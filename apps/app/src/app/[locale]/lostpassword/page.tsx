@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 
 import LostPassword from '@/components/app/LostPassword';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { networkId } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const metaTitle = `Forgot Password | NearBlocks`;
@@ -11,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     description: metaDescription,
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

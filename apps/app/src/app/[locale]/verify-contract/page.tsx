@@ -2,19 +2,17 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
 import Verifier from '@/components/app/Address/Contract/Verifier';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { getRequest } from '@/utils/app/api';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID || 'testnet';
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const host = headersList.get('host') || '';
   const baseUrl = `https://${host}/`;
   const metaTitle = `${
-    network === 'testnet' ? 'TESTNET ' : ''
+    networkId === 'testnet' ? 'TESTNET ' : ''
   }Verify Contract | Nearblocks`;
   const metaDescription = 'Verify a smart contract on the blockchain.';
 
@@ -39,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 
@@ -73,7 +71,7 @@ export default async function VerifyContract(props: {
           <RpcContextProvider rpcProviders={rpcProviders}>
             <Verifier
               accountId={accountId}
-              network={network}
+              network={networkId}
               selectedVerifier={selectedVerifier}
               contractPromise={contractPromise}
             />

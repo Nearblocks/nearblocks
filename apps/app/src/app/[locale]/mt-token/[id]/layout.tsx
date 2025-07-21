@@ -33,6 +33,7 @@ export async function generateMetadata(props: {
   const ogImageUrl = `${baseUrl}api/og?mtTokens&tokenHash=${token}&title=${encodeURIComponent(
     title,
   )}`;
+
   return {
     alternates: {
       canonical: `${appUrl}/mt-token/${id}`,

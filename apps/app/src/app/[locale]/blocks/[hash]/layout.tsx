@@ -3,11 +3,9 @@ import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 
 import { getRequest } from '@/utils/app/api';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
   params: Promise<{ hash: string; locale: string }>;
@@ -48,7 +46,7 @@ export async function generateMetadata(props: {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

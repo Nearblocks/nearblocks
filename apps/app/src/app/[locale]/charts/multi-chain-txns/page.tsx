@@ -5,9 +5,8 @@ import { Suspense } from 'react';
 import Chart from '@/components/app/Charts/Chart';
 import ChartDetails from '@/components/app/skeleton/charts/Detail';
 import { getRequest } from '@/utils/app/api';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 export async function generateMetadata(props: {
   params: Promise<{ id: string; locale: string }>;
 }) {
@@ -43,7 +42,7 @@ export async function generateMetadata(props: {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

@@ -14,8 +14,6 @@ import Balance from '@/components/app/Address/Balance';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -38,7 +36,7 @@ export async function generateMetadata(props: {
       images: [thumbnail],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET ' : ''}${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET ' : ''}${metaTitle}`,
     twitter: {
       description: metaDescription,
       images: [thumbnail],

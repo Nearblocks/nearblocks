@@ -2,10 +2,8 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
 import { getRequest } from '@/utils/app/api';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { Token } from '@/utils/types';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string; locale: string }>;
@@ -20,7 +18,7 @@ export async function generateMetadata(props: {
 
   const token: Token = tokenDetails?.contracts?.[0];
 
-  const title = `${network === 'testnet' ? 'TESTNET ' : ''}${
+  const title = `${networkId === 'testnet' ? 'TESTNET ' : ''}${
     token ? `${token.name} (${token.symbol}) ` : ''
   }NFT Stats, Holders & Transactions | NearBlocks`;
 

@@ -6,9 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import NFTTokensSkeleton from '@/components/app/skeleton/nft/NFTTokensSkeleton';
-import { appUrl } from '@/utils/app/config';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { appUrl, networkId } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -41,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 
