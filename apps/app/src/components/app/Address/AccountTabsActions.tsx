@@ -22,11 +22,11 @@ const AccountTabsActions = ({ children }: { children: React.ReactNode }) => {
       message: t('nftTokenTxns'),
       name: 'nfttokentxns',
     },
-    /*  {
+    {
       label: 'Multichain Transactions',
       message: t('multi-chainTxns'),
       name: 'multichaintxns',
-    }, */
+    },
     { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
     { label: 'Contract', message: t('contract'), name: 'contract' },
   ];
