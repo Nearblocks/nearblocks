@@ -8,8 +8,6 @@ import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
-
 export async function generateMetadata(props: {
   params: Promise<{ hash: string; locale: string }>;
 }): Promise<Metadata> {
@@ -46,7 +44,7 @@ export async function generateMetadata(props: {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

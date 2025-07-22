@@ -2,10 +2,8 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
 import CampaignEdit from '@/components/app/Campaign/CampaignEdit';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { getUserRole } from '@/utils/app/actions';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata({
   params,
@@ -42,7 +40,7 @@ export async function generateMetadata({
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

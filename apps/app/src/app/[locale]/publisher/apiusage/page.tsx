@@ -3,10 +3,8 @@ import { headers } from 'next/headers';
 import React from 'react';
 
 import Chart from '@/components/app/ApiUsage/Chart';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { getUserRole } from '@/utils/app/actions';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -38,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

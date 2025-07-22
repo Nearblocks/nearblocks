@@ -4,11 +4,9 @@ import { Suspense } from 'react';
 
 import NFTDetail from '@/components/app/skeleton/nft/NFTDetail';
 import { getRequest } from '@/utils/app/api';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { Token } from '@/utils/types';
 import { ErrorBoundary } from 'react-error-boundary';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string; locale: string; tid: string }>;
@@ -24,7 +22,7 @@ export async function generateMetadata(props: {
 
   const token: Token = tokenDetails?.tokens?.[0];
 
-  const prefix = network === 'testnet' ? 'TESTNET ' : '';
+  const prefix = networkId === 'testnet' ? 'TESTNET ' : '';
   const suffix = ' | NearBlocks';
   const metaTitle = token
     ? `NFT ${token.title || token.token} | ${token?.nft?.name}`

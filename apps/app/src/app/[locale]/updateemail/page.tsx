@@ -2,9 +2,7 @@ import { Metadata } from 'next';
 
 import EmailUpdate from '@/components/app/EmailUpdate';
 import { request } from '@/hooks/app/useAuth';
-import { userAuthURL } from '@/utils/app/config';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { networkId, userAuthURL } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const metaTitle = 'Update Email | NearBlocks';
@@ -13,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     description: metaDescription,
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

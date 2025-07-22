@@ -9,6 +9,7 @@ import { thumbnailLogoTop } from '@/components/thumbnail/ThumbnailLogoTop';
 import { thumbnailTokenSvg } from '@/components/thumbnail/ThumbnailToken';
 import { thumbnailTransactionSvg } from '@/components/thumbnail/ThumbnailTransaction';
 import { config } from '@/config/brandConfig';
+import { networkId } from '@/utils/app/config';
 
 function truncateString(str: string, startChars = 6, endChars = 4) {
   if (str.length <= startChars + endChars) return str;
@@ -22,7 +23,6 @@ function svgToBase64(svgString: string) {
 }
 
 export async function GET(request: Request) {
-  const network = process.env.NEXT_PUBLIC_NETWORK_ID;
   const url = new URL(request.url);
   const title = url.searchParams.get('title') || 'Near blocks';
   const basic = url.searchParams.has('basic');
@@ -163,7 +163,7 @@ export async function GET(request: Request) {
             }}
           >
             <div>{`${
-              network === 'testnet' ? 'TESTNET | ' : ''
+              networkId === 'testnet' ? 'TESTNET | ' : ''
             }${titleText}`}</div>
 
             {blockHash && blockHeight && (

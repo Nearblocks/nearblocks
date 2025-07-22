@@ -2,12 +2,10 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
 import { getRequest } from '@/utils/app/api';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { Token } from '@/utils/types';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
@@ -23,7 +21,7 @@ export async function generateMetadata(props: {
 
   const token: Token = tokenDetails?.contracts?.[0];
 
-  const title = `${network === 'testnet' ? 'TESTNET ' : ''}${
+  const title = `${networkId === 'testnet' ? 'TESTNET ' : ''}${
     token ? `${token.name} (${token.symbol}) ` : ''
   }Stats, Price, Holders & Transactions | NearBlocks`;
 

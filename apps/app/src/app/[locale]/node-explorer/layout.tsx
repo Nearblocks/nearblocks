@@ -1,11 +1,9 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -36,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

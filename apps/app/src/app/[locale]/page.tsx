@@ -5,9 +5,7 @@ import { Suspense } from 'react';
 
 import Home from '@/components/app/Home/Home';
 import HomePageSkeleton from '@/components/app/skeleton/home/Home';
-import { appUrl } from '@/utils/app/config';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { appUrl, networkId } from '@/utils/app/config';
 
 export async function generateMetadata(props: {
   params: Promise<{ hash: string; locale: string }>;
@@ -44,7 +42,7 @@ export async function generateMetadata(props: {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
     twitter: {
       description: metaDescription,
       images: [

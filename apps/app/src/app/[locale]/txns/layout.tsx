@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
-import { appUrl } from '@/utils/app/config';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { appUrl, networkId } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -35,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

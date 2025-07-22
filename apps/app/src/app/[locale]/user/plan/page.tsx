@@ -1,10 +1,8 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import Plan from '@/components/app/User/Plan';
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { getUserRole } from '@/utils/app/actions';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -36,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

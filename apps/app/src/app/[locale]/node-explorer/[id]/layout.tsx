@@ -1,11 +1,9 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
-import { appUrl } from '@/utils/app/config';
+import { appUrl, networkId } from '@/utils/app/config';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
 import { getRpcProviders } from '@/utils/app/rpc';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
@@ -17,7 +15,7 @@ export async function generateMetadata(props: {
   const host = headersList.get('host') || '';
   const baseUrl = `https://${host}/`;
 
-  const metaTitle = `${network === 'testnet' ? 'TESTNET ' : ''}${
+  const metaTitle = `${networkId === 'testnet' ? 'TESTNET ' : ''}${
     id ? `${id}: ` : ''
   } delegators | NearBlocks`;
   const metaDescription = id
@@ -45,7 +43,7 @@ export async function generateMetadata(props: {
       ],
       title: metaTitle,
     },
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 

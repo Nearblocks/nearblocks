@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
 import ConfirmEmailClient from '@/components/app/ConfirmEmail';
 import { request } from '@/hooks/app/useAuth';
-import { userAuthURL } from '@/utils/app/config';
-
-const network = process.env.NEXT_PUBLIC_NETWORK_ID;
+import { networkId, userAuthURL } from '@/utils/app/config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const metaTitle = 'Confirmation Email | NearBlocks';
@@ -12,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     description: metaDescription,
-    title: `${network === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
+    title: `${networkId === 'testnet' ? 'TESTNET' : ''} ${metaTitle}`,
   };
 }
 
