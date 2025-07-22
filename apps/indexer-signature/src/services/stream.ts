@@ -24,14 +24,14 @@ export const syncData = async () => {
     logger.info(`last synced block: ${latestBlock}`);
     // startBlockHeight = +latestBlock;
     // Temp batch processing
-    startBlockHeight = +latestBlock - 5;
+    startBlockHeight = +latestBlock - 25;
   }
 
   logger.info(`syncing from block: ${startBlockHeight}`);
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 5, // Temp batch processing
+    limit: 25, // Temp batch processing
     s3Bucket: config.s3Bucket,
     s3Config,
     start: startBlockHeight,
