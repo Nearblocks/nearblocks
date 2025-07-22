@@ -1,36 +1,104 @@
 'use client';
 
+import { RpcProvider } from '@/utils/types';
 import React, {
   createContext,
   useContext,
   useState,
   useCallback,
   useRef,
+  useEffect,
 } from 'react';
-
-export type RpcProvider = {
-  name: string;
-  url: string;
-};
 
 type RpcContextType = {
   providers: RpcProvider[];
   rpc: string;
   setRpc: (rpc: string) => void;
   switchRpc: () => void;
+  addCustomRpc: (rpc: RpcProvider) => void;
+  deleteCustomRpc: (rpcUrl: string) => void;
 };
 
 const RpcContext = createContext<RpcContextType | null>(null);
 
+const loadCustomRpcs = (): RpcProvider[] => {
+  try {
+    const stored = localStorage.getItem('customRpcProviders');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error(
+      'Failed to parse customRpcProviders from localStorage:',
+      error,
+    );
+    return [];
+  }
+};
+
+const saveCustomRpcs = (customRpcs: RpcProvider[]) => {
+  try {
+    localStorage.setItem('customRpcProviders', JSON.stringify(customRpcs));
+  } catch (error) {
+    console.error('Failed to save custom RPCs to localStorage:', error);
+  }
+};
+
 export const RpcContextProvider = ({
   children,
-  rpcProviders: providers,
+  rpcProviders,
 }: {
   children: React.ReactNode;
   rpcProviders: RpcProvider[];
 }) => {
   const [rpc, setRpcState] = useState<string | null>(null);
+  const [providers, setProviders] = useState<RpcProvider[]>(rpcProviders);
   const errorCountRef = useRef<number>(0);
+
+  useEffect(() => {
+    const defaultProviders = rpcProviders.map((provider) => ({
+      ...provider,
+      isCustom: false,
+    }));
+
+    const customProviders = loadCustomRpcs().map((provider) => ({
+      ...provider,
+      isCustom: true,
+    }));
+
+    setProviders([...defaultProviders, ...customProviders]);
+  }, [rpcProviders]);
+
+  const addCustomRpc = useCallback((newRpc: RpcProvider) => {
+    const existingCustomRpcs = loadCustomRpcs();
+    if (existingCustomRpcs.find((rpc) => rpc.url === newRpc.url)) {
+      console.warn(`Custom RPC with URL "${newRpc.url}" already exists.`);
+      return;
+    }
+    const updatedCustomRpcs = [...existingCustomRpcs, newRpc];
+    saveCustomRpcs(updatedCustomRpcs);
+
+    setProviders((prev) => [...prev, { ...newRpc, isCustom: true }]);
+  }, []);
+
+  const deleteCustomRpc = useCallback(
+    (rpcUrl: string) => {
+      const existingCustomRpcs = loadCustomRpcs();
+      const updatedCustomRpcs = existingCustomRpcs.filter(
+        (provider) => provider.url !== rpcUrl,
+      );
+
+      saveCustomRpcs(updatedCustomRpcs);
+      setProviders((prev) => {
+        const updatedProviders = prev.filter(
+          (provider) => provider.url !== rpcUrl,
+        );
+        if (rpc === rpcUrl && updatedProviders.length > 0) {
+          setRpcState(updatedProviders[0].url);
+        }
+        return updatedProviders;
+      });
+    },
+    [rpc],
+  );
 
   const setRpc = useCallback((newRpc: string) => {
     setRpcState(newRpc);
@@ -62,9 +130,11 @@ export const RpcContextProvider = ({
 
   const value: RpcContextType = {
     providers,
-    rpc: rpc ?? providers[0]?.url,
+    rpc: rpc ?? providers[0]?.url ?? '',
     setRpc,
     switchRpc,
+    addCustomRpc,
+    deleteCustomRpc,
   };
 
   return <RpcContext.Provider value={value}>{children}</RpcContext.Provider>;
@@ -73,7 +143,7 @@ export const RpcContextProvider = ({
 export const useRpcProvider = () => {
   const context = useContext(RpcContext);
   if (!context) {
-    throw new Error('useRpcStore must be used within a RpcContextProvider');
+    throw new Error('useRpcProvider must be used within a RpcContextProvider');
   }
   return context;
 };

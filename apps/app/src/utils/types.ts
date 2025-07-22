@@ -2188,3 +2188,8 @@ export type MTTokenMeta = {
     extra: string;
   };
 };
+export type RpcProvider = {
+  name: string;
+  url: string;
+  isCustom?: boolean;
+};
