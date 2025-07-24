@@ -50,6 +50,9 @@ const nextConfig = {
   generateBuildId: async () => {
     return process.env.GITHUB_SHA || 'nearblocks';
   },
+  env: {
+    NEXT_PUBLIC_TXN_ACTION_API_URL: process.env.NEXT_PUBLIC_TXN_ACTION_API_URL,
+  },
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {
