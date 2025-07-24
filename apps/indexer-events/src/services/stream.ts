@@ -47,16 +47,6 @@ export const syncData = async () => {
   // }
   // Temp batch processing
   await forEach(stream, onMessage, 25);
-
-  stream.on('end', () => {
-    logger.error('stream ended');
-    process.exit();
-  });
-
-  stream.on('error', (error: Error) => {
-    logger.error(error);
-    process.exit();
-  });
 };
 
 export const onMessage = async (message: Message) => {

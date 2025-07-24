@@ -79,15 +79,6 @@ export const syncData = async () => {
         for await (const message of stream) {
           await onMessage(message);
         }
-
-        stream.on('end', () => {
-          logger.error('stream ended');
-          process.exit();
-        });
-        stream.on('error', (error: Error) => {
-          logger.error(error);
-          throw error;
-        });
       } else {
         if (!startBlockHeight && block) {
           const next = +block.block_height - config.delta;
