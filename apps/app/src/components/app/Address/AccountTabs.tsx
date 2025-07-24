@@ -11,6 +11,7 @@ import TableSummary from '@/components/app/common/TableSummary';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import { ErrorBoundary } from 'react-error-boundary';
+import MultiChainTransactions from './ChainTxns';
 
 export default async function AccountTabs({
   id,
@@ -68,11 +69,11 @@ export default async function AccountTabs({
         </ErrorBoundary>
       ) : null}
 
-      {/*  {tab === 'multichaintxns' ? (
+      {tab === 'multichaintxns' ? (
         <ErrorBoundary fallback={fallbackError}>
           <MultiChainTransactions id={id} searchParams={searchParams} />
         </ErrorBoundary>
-      ) : null} */}
+      ) : null}
 
       {tab === 'accesskeys' ? (
         <ErrorBoundary fallback={fallbackError}>

@@ -4,7 +4,7 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import AccountAlerts from '@/components/app/Address/AccountAlerts';
 import AccountMoreInfo from '@/components/app/Address/AccountMoreInfo';
 import AccountOverview from '@/components/app/Address/AccountOverview';
-/* import MultichainInfo from './MultichainInfo'; */
+import MultichainInfo from './MultichainInfo';
 
 export default async function Balance({ id }: { id: string }) {
   const errorBoundaryFallback = (
@@ -25,7 +25,7 @@ export default async function Balance({ id }: { id: string }) {
       <ErrorBoundary fallback={<div />}>
         <AccountAlerts id={id} />
       </ErrorBoundary>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ErrorBoundary fallback={errorBoundaryFallback}>
           <AccountOverview id={id} />
         </ErrorBoundary>
@@ -34,9 +34,9 @@ export default async function Balance({ id }: { id: string }) {
           <AccountMoreInfo id={id} />
         </ErrorBoundary>
 
-        {/*  <ErrorBoundary fallback={errorBoundaryFallback}>
+        <ErrorBoundary fallback={errorBoundaryFallback}>
           <MultichainInfo id={id} />
-        </ErrorBoundary> */}
+        </ErrorBoundary>
       </div>
     </>
   );

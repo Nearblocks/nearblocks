@@ -22,11 +22,11 @@ export default function TabSkeletion() {
       message: t('nftTokenTxns'),
       name: 'nfttokentxns',
     },
-    /*   {
+    {
       label: 'Multichain Transactions',
       message: t('multi-chainTxns'),
       name: 'multichaintxns',
-    }, */
+    },
     { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
     { label: 'Contract', message: t('contract'), name: 'contract' },
   ];
@@ -87,9 +87,9 @@ export default function TabSkeletion() {
             {tab === 'nfttokentxns' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
-            {/*     {tab === 'multichaintxns' ? (
+            {tab === 'multichaintxns' ? (
               <TabPanelGeneralSkeleton tab={tab} />
-            ) : null} */}
+            ) : null}
             {tab === 'accesskeys' ? (
               <TabPanelGeneralSkeleton tab={tab} />
             ) : null}
