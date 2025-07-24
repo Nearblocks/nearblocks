@@ -18,16 +18,29 @@ export type BlockStreamConfig = {
   start: number;
 };
 
-const withTimeout = <T>(promise: Promise<T>, timeout: number) =>
-  Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(
-        () => reject(new Error(`Promise timed out after ${timeout} ms`)),
-        timeout,
-      ),
-    ),
-  ]);
+const withTimeout = async <T>(
+  promiseFactory: (signal: AbortSignal) => Promise<T>,
+  timeout: number,
+): Promise<T> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, timeout);
+
+  try {
+    try {
+      return await promiseFactory(controller.signal);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Promise timed out after ${timeout} ms`);
+    }
+
+    throw error;
+  }
+};
 
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
@@ -53,19 +66,55 @@ const fetchJson = async (
   minioClient: Minio.Client,
   bucket: string,
   block: number,
+  signal?: AbortSignal,
 ) => {
   return retry(
     async () => {
+      if (signal?.aborted) {
+        throw new Error('Operation aborted');
+      }
+
       const objectName = `${block}.json`;
       const stream = await minioClient.getObject(bucket, objectName);
 
       return new Promise<string>((resolve, reject) => {
         const chunks: Uint8Array[] = [];
 
-        stream.on('data', (chunk: Uint8Array) => chunks.push(chunk));
-        stream.on('error', (error) => reject(error));
+        const cleanup = () => {
+          stream.destroy();
+          chunks.length = 0;
+        };
+
+        const abortHandler = () => {
+          cleanup();
+          reject(new Error('Operation aborted'));
+        };
+
+        if (signal) {
+          signal.addEventListener('abort', abortHandler);
+        }
+
+        stream.on('data', (chunk: Uint8Array) => {
+          if (signal?.aborted) {
+            cleanup();
+            return;
+          }
+          chunks.push(chunk);
+        });
+        stream.on('error', (error) => {
+          if (signal) {
+            signal.removeEventListener('abort', abortHandler);
+          }
+          cleanup();
+          reject(error);
+        });
         stream.on('end', () => {
+          if (signal) {
+            signal.removeEventListener('abort', abortHandler);
+          }
+
           const data = Buffer.concat(chunks).toString('utf8');
+          chunks.length = 0;
 
           if (!data) {
             reject(new Error(`Empty response: block: ${block}`));
@@ -80,19 +129,20 @@ const fetchJson = async (
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const knex: Knex = createKnex(config.dbConfig);
-  const minioClient = new Minio.Client(config.s3Config);
-
   const limit = config.limit ?? 10;
-  const highWaterMark = limit * 50;
+  const highWaterMark = limit * 10;
+  let isDestroyed = false;
 
   async function* iterator() {
+    const knex: Knex = createKnex(config.dbConfig);
+    const minioClient = new Minio.Client(config.s3Config);
+
     let start = config.start;
 
     try {
-      while (true) {
+      while (!isDestroyed) {
         const blocks = await withTimeout(
-          fetchBlocks(knex, start, limit),
+          () => fetchBlocks(knex, start, limit),
           10_000,
         );
 
@@ -104,7 +154,13 @@ export const streamBlock = (config: BlockStreamConfig) => {
         const jsons = await Promise.all(
           blocks.map((block) =>
             withTimeout(
-              fetchJson(minioClient, config.s3Bucket, block.block_height),
+              (signal) =>
+                fetchJson(
+                  minioClient,
+                  config.s3Bucket,
+                  block.block_height,
+                  signal,
+                ),
               60_000,
             ),
           ),
@@ -128,12 +184,22 @@ export const streamBlock = (config: BlockStreamConfig) => {
     objectMode: true,
   });
 
-  readable.on('end', () => process.exit());
+  const cleanup = () => {
+    isDestroyed = true;
+
+    if (!readable.destroyed) {
+      readable.destroy();
+    }
+
+    process.exit();
+  };
+
+  readable.on('end', cleanup);
+  readable.on('close', cleanup);
   readable.on('error', (error) => {
     logger.error(error);
     process.exit();
   });
-  readable.on('close', () => process.exit());
 
   return readable;
 };

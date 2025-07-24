@@ -54,15 +54,6 @@ export const syncData = async () => {
   if (messages.length > 0) {
     await Promise.all(messages.map((msg) => onMessage(msg)));
   }
-
-  stream.on('end', () => {
-    logger.error('stream ended');
-    process.exit();
-  });
-  stream.on('error', (error: Error) => {
-    logger.error(error);
-    process.exit();
-  });
 };
 
 export const onMessage = async (message: Message) => {
