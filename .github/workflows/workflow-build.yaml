@@ -1,8 +1,7 @@
 name: Build Docker Images
 on:
   push:
-    branches: ['main']
-
+    branches: ['main', 'feat/api']
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -40,20 +39,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Determine image tag
         run: |
-          if [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ]; then
+          if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ]; then
             echo "TAG=:v2" >> $GITHUB_ENV
           else
             echo "TAG=:latest" >> $GITHUB_ENV
           fi
-
       - name: Get current image digest
         run: |
           CURRENT_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }} | jq -r '.config.digest' || echo "")
           echo "CURRENT_DIGEST=$CURRENT_DIGEST" >> $GITHUB_ENV
-
       - uses: docker/build-push-action@v5
         id: build
         with:
@@ -69,12 +65,10 @@ jobs:
           cache-to: type=inline
           build-args: |
             GITHUB_SHA=${{ github.sha }}
-
       - name: Get new image digest
         run: |
           NEW_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }} | jq -r '.config.digest')
           echo "NEW_DIGEST=$NEW_DIGEST" >> $GITHUB_ENV
-
 #      - name: Deploy testnet
 #        if: |
 #          env.CURRENT_DIGEST != env.NEW_DIGEST &&
