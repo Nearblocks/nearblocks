@@ -26,11 +26,11 @@ txns_selected AS (
     )
     AND (
       ${after}::BIGINT IS NULL
-      OR t.block_timestamp >= ${after}
+      OR t.block_timestamp > ${after}
     )
     AND (
       ${before}::BIGINT IS NULL
-      OR t.block_timestamp <= ${before}
+      OR t.block_timestamp < ${before}
     )
     AND (
       ${block}::TEXT IS NULL

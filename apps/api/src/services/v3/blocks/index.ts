@@ -8,11 +8,15 @@ import type {
 import request from 'nb-schemas/dist/blocks/request.js';
 import response from 'nb-schemas/dist/blocks/response.js';
 
-import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase } from '#libs/pgp';
 import redis from '#libs/redis';
-import { paginateData, rollingWindow, rollingWindowList } from '#libs/response';
+import {
+  paginateData,
+  rollingWindow,
+  rollingWindowList,
+  WindowListQuery,
+} from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/blocks';
@@ -22,19 +26,21 @@ const latest = responseHandler(
   async (req: RequestValidator<BlocksLatestReq>) => {
     const limit = req.validator.limit;
 
+    const rollingQuery = rollingWindowList<Block>(
+      (start, end) => {
+        return dbBase.manyOrNone<Block>(sql.blocks, {
+          cursor: { timestamp: null },
+          end,
+          limit,
+          start,
+        });
+      },
+      { limit },
+    );
+
     const blocks = await redis.cache<Block[]>(
       `blocks:latest:${limit}`,
-      () =>
-        rollingWindowList<Block>(
-          (start, end) =>
-            dbBase.manyOrNone<Block>(sql.blocks, {
-              cursor: { timestamp: null },
-              end,
-              limit,
-              start,
-            }),
-          { limit, start: config.baseStart },
-        ),
+      () => rollingQuery,
       5, // cache results for 5s
     );
 
@@ -50,21 +56,20 @@ const blocks = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const blocks = await rollingWindowList<Block>(
-      (start, end, limit) =>
-        dbBase.manyOrNone<Block>(sql.blocks, {
-          cursor: { timestamp: cursor?.timestamp },
-          end,
-          limit,
-          start,
-        }),
-      {
-        end: cursor?.timestamp ? BigInt(cursor.timestamp) : undefined,
-        // Fetch one extra to check if there is a next page
-        limit: limit + 1,
-        start: config.baseStart,
-      },
-    );
+    const blocksQuery: WindowListQuery<Block> = (start, end, limit) => {
+      return dbBase.manyOrNone<Block>(sql.blocks, {
+        cursor: { timestamp: cursor?.timestamp },
+        end,
+        limit,
+        start,
+      });
+    };
+
+    const blocks = await rollingWindowList<Block>(blocksQuery, {
+      end: cursor?.timestamp ? BigInt(cursor.timestamp) : undefined,
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
+    });
 
     return paginateData(blocks, limit, (txn) => ({
       timestamp: txn.block_timestamp,
@@ -85,11 +90,14 @@ const block = responseHandler(
     const hash = input.length >= 43 ? input : null;
     const height = !isNaN(+input) ? +input : null;
 
-    const block = await rollingWindow(
-      (start, end) =>
-        dbBase.oneOrNone<Block>(sql.block, { end, hash, height, start }),
-      { start: config.baseStart },
-    );
+    const block = await rollingWindow((start, end) => {
+      return dbBase.oneOrNone<Block>(sql.block, {
+        end,
+        hash,
+        height,
+        start,
+      });
+    });
 
     return { data: block };
   },
