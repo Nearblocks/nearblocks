@@ -33,19 +33,19 @@ FROM
     WHERE
       r.included_in_block_timestamp = (
         SELECT
-          b.created_ts
+          a.created_by_block_timestamp
         FROM
           account_selected a
       )
       AND t.block_timestamp <= (
         SELECT
-          b.created_ts
+          a.created_by_block_timestamp
         FROM
           account_selected a
       )
       AND t.block_timestamp >= (
         SELECT
-          b.created_ts - 300000000000 -- 5m in ns
+          a.created_by_block_timestamp - 300000000000 -- 5m in ns
         FROM
           account_selected a
       )
@@ -65,19 +65,19 @@ FROM
     WHERE
       r.included_in_block_timestamp = (
         SELECT
-          b.deleted_ts
+          a.deleted_by_block_timestamp
         FROM
           account_selected a
       )
       AND t.block_timestamp <= (
         SELECT
-          b.deleted_ts
+          a.deleted_by_block_timestamp
         FROM
           account_selected a
       )
       AND t.block_timestamp >= (
         SELECT
-          b.deleted_ts - 300000000000 -- 5m in ns
+          a.deleted_by_block_timestamp - 300000000000 -- 5m in ns
         FROM
           account_selected a
       )
