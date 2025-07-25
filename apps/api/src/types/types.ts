@@ -24,7 +24,7 @@ export type Config = {
   dbUrlBase: string;
   dbUrlContract: string;
   dbUrlEvents: string;
-  dbUrlSignature: string;
+  dbUrlMultichain: string;
   dbUrlStaking: string;
   dbWriteUrlBase: string;
   mainnetUrl: string;
