@@ -71,7 +71,7 @@ const txn = v.object({
   transaction_hash: v.string(),
 });
 
-export const txnCount = v.object({
+const txnCount = v.object({
   cost: v.string(),
   count: v.string(),
 });
