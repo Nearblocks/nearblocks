@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get all txns
    *     tags:
-   *       - v3/Txns
+   *       - V3 / Txns
    *     parameters:
    *       - in: query
    *         name: block
@@ -70,7 +70,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated txns count
    *     tags:
-   *       - v3/Txns
+   *       - V3 / Txns
    *     responses:
    *       200:
    *         description: Success response
@@ -83,7 +83,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get the latest txns
    *     tags:
-   *       - v3/Txns
+   *       - V3 / Txns
    *     parameters:
    *       - in: query
    *         name: limit
@@ -105,7 +105,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get a txn
    *     tags:
-   *       - v3/Txns
+   *       - V3 / Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -128,7 +128,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get all txn receipts
    *     tags:
-   *       - v3/Txns
+   *       - V3 / Txns
    *     parameters:
    *       - in: path
    *         name: hash
