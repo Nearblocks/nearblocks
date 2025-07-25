@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get all blocks
    *     tags:
-   *       - v3/Blocks
+   *       - V3 / Blocks
    *     parameters:
    *       - in: query
    *         name: cursor
@@ -48,7 +48,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated blocks count
    *     tags:
-   *       - v3/Blocks
+   *       - V3 / Blocks
    *     responses:
    *       200:
    *         description: Success response
@@ -62,7 +62,7 @@ const routes = (app: Router) => {
    *     summary: Get the latest blocks
    *     description: ⚠️ Response is cached for 5 seconds
    *     tags:
-   *       - v3/Blocks
+   *       - V3 / Blocks
    *     parameters:
    *       - in: query
    *         name: limit
@@ -84,7 +84,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get a block
    *     tags:
-   *       - v3/Blocks
+   *       - V3 / Blocks
    *     parameters:
    *       - in: path
    *         name: hash

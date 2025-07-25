@@ -61,3 +61,15 @@ export const dbBalance = pgp({
   // TODO: remove before merge
   statement_timeout: 10 * 60 * 100, // 10s
 });
+
+/**
+ * Multichain database connection.
+ */
+export const dbMultichain = pgp({
+  application_name: 'api-multichain',
+  connectionString: config.dbUrlMultichain,
+  max: 20,
+  ssl: ssl?.ca ? ssl : false,
+  // TODO: remove before merge
+  statement_timeout: 10 * 60 * 100, // 10s
+});

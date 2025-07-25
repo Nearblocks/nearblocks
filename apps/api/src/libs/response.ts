@@ -1,17 +1,21 @@
 import config from '#config';
 import cursors, { CursorObject } from '#libs/cursors';
 
-export type RollingWindowQuery<T> = (
+export type WindowListQuery<T> = (
   start: string,
   end: string,
   limit?: number,
 ) => Promise<T[]>;
 
-export type RollingWindowOptions = {
+export type WindowQuery<T> = (start: string, end: string) => Promise<null | T>;
+
+export type WindowListOptions = {
   end?: bigint;
   limit?: number;
   start?: bigint;
 };
+
+export type WindowOptions = { start?: bigint };
 
 export type PaginatedResponse<T> = {
   data: null | T[];
@@ -31,8 +35,8 @@ export type PaginatedResponse<T> = {
 const WINDOW_SIZE = BigInt(60 * 60 * 24 * 30 * 12) * 1_000_000_000n; // 1yr in ns
 
 export const rollingWindowList = async <T>(
-  queryFn: RollingWindowQuery<T>,
-  options: RollingWindowOptions = {},
+  queryFn: WindowListQuery<T>,
+  options: WindowListOptions = {},
 ): Promise<T[]> => {
   const {
     end = BigInt(Date.now()) * 1_000_000n,
@@ -73,8 +77,8 @@ export const rollingWindowList = async <T>(
  * @returns The first found result, or null if none is found.
  */
 export const rollingWindow = async <T>(
-  queryFn: (start: string, end: string) => Promise<null | T>,
-  options: { start?: bigint } = {},
+  queryFn: WindowQuery<T>,
+  options: WindowOptions = {},
 ): Promise<null | T> => {
   const { start = config.baseStart } = options;
   const windowSize = WINDOW_SIZE;

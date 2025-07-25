@@ -5,9 +5,9 @@ FROM
   count_cost_estimate (
     FORMAT(
       'SELECT
-        block_timestamp
+        ms.account_id
       FROM
-        transactions
+        multichain_signatures ms
       WHERE
         (
           %L::BIGINT IS NULL
@@ -16,10 +16,16 @@ FROM
         AND (
           %L::BIGINT IS NULL
           OR block_timestamp < %L
+        )
+        AND (
+          %L::TEXT IS NULL
+          OR ms.account_id = %L
         )',
       ${after},
       ${after},
       ${before},
-      ${before}
+      ${before},
+      ${account},
+      ${account}
     )
   )

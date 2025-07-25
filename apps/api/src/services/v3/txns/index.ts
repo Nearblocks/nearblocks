@@ -16,7 +16,12 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
-import { paginateData, rollingWindow, rollingWindowList } from '#libs/response';
+import {
+  paginateData,
+  rollingWindow,
+  rollingWindowList,
+  WindowListQuery,
+} from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/txns';
@@ -26,18 +31,18 @@ const latest = responseHandler(
   async (req: RequestValidator<TxnsLatestReq>) => {
     const limit = req.validator.limit;
 
+    const rollingQuery = rollingWindowList<Txns>(
+      (start, end) => {
+        const cte = pgp.as.format(sql.latestCte, { end, limit, start });
+
+        return dbBase.manyOrNone<Txns>(sql.txns, { cte });
+      },
+      { limit },
+    );
+
     const txns = await redis.cache<Txns[]>(
       `txns:latest:${limit}`,
-      () => {
-        return rollingWindowList<Txns>(
-          (start, end) => {
-            const cte = pgp.as.format(sql.latestCte, { end, limit, start });
-
-            return dbBase.manyOrNone<Txns>(sql.txns, { cte });
-          },
-          { limit, start: config.baseStart },
-        );
-      },
+      () => rollingQuery,
       5, // cache results for 5s
     );
 
@@ -56,33 +61,32 @@ const txns = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const txns = await rollingWindowList(
-      async (start, end, limit) => {
-        const cte = pgp.as.format(sql.txnsCte, {
-          after: start,
-          before: end,
-          block,
-          cursor: {
-            index: cursor?.index,
-            shard: cursor?.shard,
-            timestamp: cursor?.timestamp,
-          },
-          limit,
-        });
+    const txnsQuery: WindowListQuery<Txns> = (start, end, limit) => {
+      const cte = pgp.as.format(sql.txnsCte, {
+        after: start,
+        before: end,
+        block,
+        cursor: {
+          index: cursor?.index,
+          shard: cursor?.shard,
+          timestamp: cursor?.timestamp,
+        },
+        limit,
+      });
 
-        return dbBase.manyOrNone<Txns>(sql.txns, { cte });
-      },
-      {
-        end: cursor?.timestamp
-          ? BigInt(cursor.timestamp)
-          : before
-          ? BigInt(before)
-          : undefined,
-        // Fetch one extra to check if there is a next page
-        limit: limit + 1,
-        start: after ? BigInt(after) : config.baseStart,
-      },
-    );
+      return dbBase.manyOrNone<Txns>(sql.txns, { cte });
+    };
+
+    const txns = await rollingWindowList(txnsQuery, {
+      end: cursor?.timestamp
+        ? BigInt(cursor.timestamp)
+        : before
+        ? BigInt(before)
+        : undefined,
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
+      start: after ? BigInt(after) : config.baseStart,
+    });
 
     return paginateData(txns, limit, (txn) => ({
       index: txn.index_in_chunk,
@@ -100,15 +104,13 @@ const count = responseHandler(
     const before = req.validator.before_ts;
 
     if (block) {
-      const txn = await rollingWindow(
-        async (start, end) =>
-          dbBase.oneOrNone<Txn>(sql.count, {
-            after: start,
-            before: end,
-            block,
-          }),
-        { start: config.baseStart },
-      );
+      const txn = await rollingWindow((start, end) => {
+        return dbBase.oneOrNone<Pick<TxnCount, 'count'>>(sql.count, {
+          after: start,
+          before: end,
+          block,
+        });
+      });
 
       return { data: txn };
     }
@@ -137,26 +139,20 @@ const txn = responseHandler(
     const hash = req.validator.hash;
 
     if (hash.startsWith('0x')) {
-      const txn = await rollingWindow(
-        async (start, end) => {
-          const cte = pgp.as.format(sql.ethCte, { end, hash, start });
+      const txn = await rollingWindow((start, end) => {
+        const cte = pgp.as.format(sql.ethCte, { end, hash, start });
 
-          return dbBase.oneOrNone<Txn>(sql.txn, { cte });
-        },
-        { start: config.baseStart },
-      );
+        return dbBase.oneOrNone<Txn>(sql.txn, { cte });
+      });
 
       return { data: txn };
     }
 
-    const txn = await rollingWindow(
-      async (start, end) => {
-        const cte = pgp.as.format(sql.txnCte, { end, hash, start });
+    const txn = await rollingWindow((start, end) => {
+      const cte = pgp.as.format(sql.txnCte, { end, hash, start });
 
-        return dbBase.oneOrNone<Txn>(sql.txn, { cte });
-      },
-      { start: config.baseStart },
-    );
+      return dbBase.oneOrNone<Txn>(sql.txn, { cte });
+    });
 
     return { data: txn };
   },
@@ -167,14 +163,11 @@ const receipts = responseHandler(
   async (req: RequestValidator<TxnReceiptsReq>) => {
     const hash = req.validator.hash;
 
-    const receipts = await rollingWindow(
-      async (start, end) => {
-        const cte = pgp.as.format(sql.txnCte, { end, hash, start });
+    const receipts = await rollingWindow((start, end) => {
+      const cte = pgp.as.format(sql.txnCte, { end, hash, start });
 
-        return dbBase.oneOrNone<TxnReceipts>(sql.receipts, { cte });
-      },
-      { start: config.baseStart },
-    );
+      return dbBase.oneOrNone<TxnReceipts>(sql.receipts, { cte });
+    });
 
     return { data: receipts };
   },

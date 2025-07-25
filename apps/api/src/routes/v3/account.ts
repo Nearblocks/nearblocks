@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account info
    *     tags:
-   *       - V3/Account
+   *       - V3 / Account
    *     parameters:
    *       - in: path
    *         name: account
