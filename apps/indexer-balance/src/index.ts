@@ -3,7 +3,7 @@ import { logger } from 'nb-logger';
 import config from '#config';
 import { db, dbMigration } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { monitorProgress } from '#libs/utils';
+// import { monitorProgress } from '#libs/utils';
 import { syncData } from '#services/stream';
 
 (async () => {
@@ -11,7 +11,8 @@ import { syncData } from '#services/stream';
     logger.info({ network: config.network }, 'initializing indexer...');
     await dbMigration.migrate.latest();
     await dbMigration.destroy();
-    await Promise.all([syncData(), monitorProgress()]);
+    // await Promise.all([syncData(), monitorProgress()]);
+    await syncData();
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);
