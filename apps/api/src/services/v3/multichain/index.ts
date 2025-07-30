@@ -4,7 +4,7 @@ import response from 'nb-schemas/dist/multichain/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
-import { dbMultichain } from '#libs/pgp';
+import { dbBase, dbMultichain, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
@@ -25,7 +25,7 @@ const txns = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const txnsQuery: WindowListQuery<
+    const signaturesQuery: WindowListQuery<
       Omit<McTxns, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
       return dbMultichain.manyOrNone<
@@ -42,7 +42,7 @@ const txns = responseHandler(
       });
     };
 
-    const txns = await rollingWindowList(txnsQuery, {
+    const signatures = await rollingWindowList(signaturesQuery, {
       end: cursor?.timestamp
         ? BigInt(cursor.timestamp)
         : before
@@ -52,6 +52,12 @@ const txns = responseHandler(
       limit: limit + 1,
       start: after ? BigInt(after) : config.baseStart,
     });
+
+    const queries = signatures.map((signature) => {
+      return pgp.as.format(sql.signatureTxns, signature);
+    });
+    const unionQuery = queries.join('\nUNION ALL\n');
+    const txns = await dbBase.manyOrNone<McTxns>(unionQuery);
 
     return paginateData(txns, limit, (txn) => ({
       index: txn.event_index,
