@@ -69,6 +69,7 @@ jobs:
         run: |
           NEW_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }} | jq -r '.config.digest')
           echo "NEW_DIGEST=$NEW_DIGEST" >> $GITHUB_ENV
+
 #      - name: Deploy testnet
 #        if: |
 #          env.CURRENT_DIGEST != env.NEW_DIGEST &&
