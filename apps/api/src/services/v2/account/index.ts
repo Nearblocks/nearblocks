@@ -89,25 +89,6 @@ export const mtBalances = async <T>(
   }
 };
 
-export const ftsBalances = async (
-  provider: providers.JsonRpcProvider,
-  contract: string,
-  account: string,
-): Promise<string> => {
-  try {
-    const response: RPCResponse = await callFunction(
-      provider,
-      contract,
-      'ft_balance_of',
-      { account_id: account },
-    );
-    const parsed = bytesParse(response.result);
-    return parsed ?? '0';
-  } catch (error) {
-    return '0';
-  }
-};
-
 const inventory = catchAsync(
   async (req: RequestValidator<Inventory>, res: Response) => {
     const account = req.validator.data.account;
@@ -144,8 +125,8 @@ const inventory = catchAsync(
 
     const [balances141, metas141, metas171] = await Promise.all([
       Promise.all(
-        contractIds141.map((contract) =>
-          ftsBalances(provider, contract, account).catch(() => {
+        tokenIds141.map((tokenId) =>
+          mtBalances(provider, account, tokenId).catch(() => {
             return '0';
           }),
         ),
