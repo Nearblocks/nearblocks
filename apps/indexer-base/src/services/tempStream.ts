@@ -28,7 +28,7 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 25,
+    limit: 1,
     s3Bucket: config.s3Bucket,
     s3Config: s3Config,
     start: startBlock,
