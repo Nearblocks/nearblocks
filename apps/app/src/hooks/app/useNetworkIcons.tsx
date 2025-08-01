@@ -1,14 +1,16 @@
 import Arbitrum from '@/components/app/Icons/Arbitrum';
 import Base from '@/components/app/Icons/Base';
 import Bitcoin from '@/components/app/Icons/Bitcoin';
-import Doge from '@/components/app/Icons/Doge';
 import Ethereum from '@/components/app/Icons/Ethereum';
 import Solana from '@/components/app/Icons/Solana';
-import XRP from '@/components/app/Icons/XRP';
 import React from 'react';
-
+import { DestinationChain } from 'nb-types';
+import BSCTrace from '@/components/app/Icons/BSCTrace';
+import Gnosis from '@/components/app/Icons/Gnosis';
+import Optimism from '@/components/app/Icons/Optimism';
+import Polygon from '@/components/app/Icons/Polygon';
 type NetworkIconsProps = {
-  network: string | undefined;
+  network: DestinationChain;
   className?: string;
 };
 
@@ -17,24 +19,28 @@ export const useNetworkIcons = ({
   className = 'w-4 h-4',
 }: NetworkIconsProps) => {
   switch (network) {
-    case 'bitcoin':
+    case DestinationChain.BITCOIN:
       return <Bitcoin className={`${className} text-orange-400`} />;
-    case 'ethereum':
+    case DestinationChain.ETHEREUM:
       return (
         <Ethereum
           className={`${className} text-black-200 dark:text-neargray-10`}
         />
       );
-    case 'solana':
+    case DestinationChain.SOLANA:
       return <Solana className="w-3 h-4" />;
-    case 'arbitrum':
+    case DestinationChain.ARBITRUM:
       return <Arbitrum className={className} />;
-    case 'doge':
-      return <Doge className={className} />;
-    case 'xrp':
-      return <XRP className={className} />;
-    case 'base':
+    case DestinationChain.BASE:
       return <Base className={`${className} dark:!invert`} />;
+    case DestinationChain.BSC:
+      return <BSCTrace />;
+    case DestinationChain.GNOSIS:
+      return <Gnosis />;
+    case DestinationChain.OPTIMISM:
+      return <Optimism />;
+    case DestinationChain.POLYGON:
+      return <Polygon />;
     default:
       return null;
   }

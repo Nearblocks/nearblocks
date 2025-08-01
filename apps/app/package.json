@@ -91,6 +91,7 @@
     "eslint-config-custom-nextjs": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
+    "nb-schemas": "*",
     "pino-pretty": "^11.3.0",
     "postcss": "~8.4",
     "tailwindcss": "~3.3",
