@@ -16,7 +16,7 @@ interface Props {
   countLoading?: boolean;
   cursor?: string;
   cursorPagination?: boolean;
-  data?: any[];
+  data?: any;
   Error?: any | string;
   ErrorText?: any | string;
   expanded?: number[];
@@ -105,7 +105,7 @@ const Table = (props: Props) => {
                   </tr>
                 )}
               {props?.data &&
-                props?.data.map((row, rowIndex: number) => (
+                props?.data.map((row: any, rowIndex: number) => (
                   <Fragment key={rowIndex}>
                     <tr className="h-[57px]" key={`expandRow-${rowIndex}`}>
                       {props?.columns.map(
@@ -160,7 +160,7 @@ const Table = (props: Props) => {
               <tbody className="bg-white dark:bg-black-600 divide-y dark:divide-black-200 divide-gray-200">
                 {props?.data &&
                   props?.data.length > 0 &&
-                  props?.data.map((row, rowIndex: number) => (
+                  props?.data.map((row: any, rowIndex: number) => (
                     <Fragment key={rowIndex}>
                       <tr
                         className="hover:bg-blue-900/5 h-[57px]"

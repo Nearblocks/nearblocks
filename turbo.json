@@ -33,7 +33,8 @@
         "CI",
         "NEXT_PUBLIC_REOWN_PROJECT_ID",
         "NEXT_PUBLIC_USER_AUTH_URL",
-        "FASTNEAR_RPC_KEY"
+        "FASTNEAR_RPC_KEY",
+        "API_BETA_URL"
       ]
     },
     "pages:build": {

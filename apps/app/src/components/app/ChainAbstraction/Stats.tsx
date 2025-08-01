@@ -7,29 +7,34 @@ import { Link } from '@/i18n/routing';
 import MiniChart from '@/components/app/Charts/MiniChart';
 import BarChart from '@/components/app/Icons/BarChart';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import { use } from 'react';
+import { McTxnsCountRes } from 'nb-schemas';
+import { DestinationChain } from 'nb-types';
 
 interface StatsProps {
-  dataChart: any;
+  dataChartPromise: Promise<any>;
   error: boolean;
-  networksCount: number;
-  txns24HrCount: string;
-  txnsTotalCount: string;
+  txns24HrCountPromise: Promise<McTxnsCountRes>;
+  txnsTotalCountPromise: Promise<McTxnsCountRes>;
 }
 
 const Stats = ({
-  dataChart,
+  dataChartPromise,
   error,
-  networksCount,
-  txns24HrCount,
-  txnsTotalCount,
+  txns24HrCountPromise,
+  txnsTotalCountPromise,
 }: StatsProps) => {
+  const dataChart = use(dataChartPromise);
+  const txnsTotalCount = use(txnsTotalCountPromise);
+  const txns24HrCount = use(txns24HrCountPromise);
   const t = useTranslations();
+  const networksCount = Object.keys(DestinationChain).length;
 
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
         <div className="w-full lg:col-span-2">
-          <Link href="/charts/multi-chain-txns">
+          <Link href="/charts/multichain-txns">
             <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden p-5">
               <h2 className="dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold uppercase">
                 {t ? t('totalTxns') : 'TOTAL TRANSACTIONS'}
@@ -37,13 +42,15 @@ const Stats = ({
               <div className="font-semibold text-xl text-gray-700 dark:text-neargray-10 flex flex-wrap items-center">
                 {error ? (
                   <span className="w-full break-words">N/A</span>
-                ) : !txnsTotalCount ? (
+                ) : !txnsTotalCount?.data?.count ? (
                   <div className="w-full break-words">
                     <Skeleton className="h-4 w-full" />
                   </div>
                 ) : (
                   <div className="flex w-full items-center  justify-between">
-                    <span className="flex-shrink-0">{txnsTotalCount}</span>
+                    <span className="flex-shrink-0">
+                      {txnsTotalCount?.data?.count}
+                    </span>
                     <div className="flex-grow flex justify-end w-10 h-10 ml-auto text-green-500  dark:text-green-250">
                       <MiniChart
                         chartsData={dataChart}
@@ -58,7 +65,7 @@ const Stats = ({
         </div>
 
         <div className="w-full">
-          <Link href="/charts/multi-chain-txns">
+          <Link href="/charts/multichain-txns">
             <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden p-5">
               <h2 className="dark:border-black-200 text-nearblue-600 dark:text-neargray-10 text-sm font-semibold uppercase">
                 {t ? t('volume') : 'VOLUME(24H)'}
@@ -66,13 +73,15 @@ const Stats = ({
               <div className="font-semibold text-xl text-gray-700 dark:text-neargray-10 flex flex-wrap items-center">
                 {error ? (
                   <span className="w-full break-words">N/A</span>
-                ) : !txns24HrCount ? (
+                ) : !txns24HrCount?.data?.count ? (
                   <div className="w-full break-words">
                     <Skeleton className="h-4 w-full" />
                   </div>
                 ) : (
                   <div className="flex w-full items-center  justify-between ">
-                    <span className="flex-shrink-0">{txns24HrCount}</span>
+                    <span className="flex-shrink-0">
+                      {txns24HrCount?.data?.count}
+                    </span>
                     <div className="flex-grow flex justify-end w-1/2 ml-auto text-green-500  dark:text-green-250">
                       <BarChart className="w-10 h-10" />
                     </div>
