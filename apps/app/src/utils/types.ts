@@ -2132,6 +2132,11 @@ export type MTToken = {
       icon: string;
       decimals: number;
     };
+    name: string;
+    id: string;
+    symbol: string;
+    icon: string;
+    decimals: number;
     token: {
       title: string;
       description: string;
