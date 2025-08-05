@@ -1,9 +1,6 @@
 import { Response } from 'express';
 import { providers } from 'near-api-js';
 
-import { Network } from 'nb-types';
-
-import config from '#config';
 import catchAsync from '#libs/async';
 import { fetchMeta } from '#libs/fetchMeta';
 import { bytesParse, callFunction, getProvider } from '#libs/near';
@@ -92,10 +89,6 @@ export const mtBalances = async <T>(
 const inventory = catchAsync(
   async (req: RequestValidator<Inventory>, res: Response) => {
     const account = req.validator.data.account;
-
-    if (config.network !== Network.MAINNET) {
-      return res.status(200).json({ inventory: { intents: [], nfts: [] } });
-    }
 
     const nep141 = 'nep141:';
     const nep171 = 'nep171:';
