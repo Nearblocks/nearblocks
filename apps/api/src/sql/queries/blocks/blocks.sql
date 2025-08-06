@@ -5,7 +5,8 @@ WITH
       block_height,
       block_hash,
       gas_price,
-      author_account_id
+      author_account_id,
+      prev_block_hash
     FROM
       blocks
     WHERE
@@ -32,6 +33,7 @@ SELECT
   bs.block_hash,
   bs.author_account_id,
   bs.gas_price,
+  bs.prev_block_hash,
   c.chunks_agg,
   t.transactions_agg,
   r.receipts_agg

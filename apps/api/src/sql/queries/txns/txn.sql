@@ -40,12 +40,7 @@ FROM
   LEFT JOIN LATERAL (
     SELECT
       JSONB_AGG(
-        JSONB_BUILD_OBJECT(
-          'action',
-          action_kind,
-          'method',
-          args ->> 'method_name'
-        )
+        JSONB_BUILD_OBJECT('action', action_kind, 'method', method)
         ORDER BY
           index_in_action_receipt
       ) AS actions
