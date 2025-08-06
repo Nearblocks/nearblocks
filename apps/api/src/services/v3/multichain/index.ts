@@ -1,4 +1,4 @@
-import type { McTxnCount, McTxns, McTxnsCountReq, McTxnsReq } from 'nb-schemas';
+import type { McTxnCount, McTxnCountReq, McTxns, McTxnsReq } from 'nb-schemas';
 import request from 'nb-schemas/dist/multichain/request.js';
 import response from 'nb-schemas/dist/multichain/response.js';
 
@@ -68,12 +68,12 @@ const txns = responseHandler(
 
 const count = responseHandler(
   response.count,
-  async (req: RequestValidator<McTxnsCountReq>) => {
+  async (req: RequestValidator<McTxnCountReq>) => {
     const account = req.validator.account;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
-    const estimated = await dbMultichain.one<McTxnCount>(sql.signaturesCount, {
+    const estimated = await dbMultichain.one<McTxnCount>(sql.signatureCount, {
       account,
       after,
       before,
@@ -86,7 +86,7 @@ const count = responseHandler(
       return { data: estimated };
     }
 
-    const txn = await dbMultichain.one<McTxnCount>(sql.signaturesCount, {
+    const txn = await dbMultichain.one<McTxnCount>(sql.signatureCount, {
       account,
       after,
       before,
