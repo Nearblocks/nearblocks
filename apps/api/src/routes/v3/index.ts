@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import account from '#routes/v3/account';
+import accounts from '#routes/v3/accounts/index';
 import blocks from '#routes/v3/blocks';
 import multichain from '#routes/v3/multichain';
 import txns from '#routes/v3/txns';
@@ -8,7 +8,7 @@ import txns from '#routes/v3/txns';
 const routes = () => {
   const app = Router();
 
-  account(app);
+  accounts(app);
   blocks(app);
   multichain(app);
   txns(app);

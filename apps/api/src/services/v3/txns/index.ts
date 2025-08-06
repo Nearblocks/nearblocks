@@ -1,11 +1,11 @@
 import type {
   Txn,
   TxnCount,
+  TxnCountReq,
   TxnReceipts,
   TxnReceiptsReq,
   TxnReq,
   Txns,
-  TxnsCountReq,
   TxnsLatestReq,
   TxnsReq,
 } from 'nb-schemas';
@@ -98,7 +98,7 @@ const txns = responseHandler(
 
 const count = responseHandler(
   response.count,
-  async (req: RequestValidator<TxnsCountReq>) => {
+  async (req: RequestValidator<TxnCountReq>) => {
     const block = req.validator.block;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;

@@ -10,11 +10,11 @@ import accounts from '#services/v3/accounts/index';
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/account', bearerAuth, rateLimiter, route);
+  app.use('/accounts', bearerAuth, rateLimiter, route);
 
   /**
    * @openapi
-   * /v3/account/{account}:
+   * /v3/accounts/{account}:
    *   get:
    *     summary: Get account info
    *     tags:

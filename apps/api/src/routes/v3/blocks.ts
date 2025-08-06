@@ -93,10 +93,10 @@ const routes = (app: Router) => {
    *         schema:
    *           type: string
    *         examples:
-   *           example1:
+   *           hash:
    *             summary: Block hash
    *             value: 'kjih...dcba'
-   *           example2:
+   *           height:
    *             summary: Block height
    *             value: '12345678'
    *     responses:
