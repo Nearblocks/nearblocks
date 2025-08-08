@@ -27,10 +27,26 @@ CREATE INDEX IF NOT EXISTS r_receiver_timestamp_shard_index_idx ON receipts (
 );
 
 ALTER TABLE action_receipt_actions
-ADD COLUMN method TEXT GENERATED ALWAYS AS (args ->> 'method_name') STORED;
+ADD COLUMN IF NOT EXISTS method TEXT GENERATED ALWAYS AS (args ->> 'method_name') STORED;
 
-CREATE INDEX ara_method_idx ON action_receipt_actions (method)
+CREATE INDEX IF NOT EXISTS ara_method_idx ON action_receipt_actions (method)
 WHERE
   method IS NOT NULL;
 
-CREATE INDEX ara_action_kind_idx ON action_receipt_actions (action_kind);
+CREATE INDEX IF NOT EXISTS ara_action_kind_idx ON action_receipt_actions (action_kind);
+
+DROP INDEX IF EXISTS ak_account_last_action_idx;
+
+ALTER TABLE access_keys
+ADD COLUMN IF NOT EXISTS action_timestamp BIGINT GENERATED ALWAYS AS (
+  GREATEST(
+    created_by_block_timestamp,
+    COALESCE(deleted_by_block_timestamp, 0)
+  )
+) STORED;
+
+CREATE INDEX IF NOT EXISTS ak_account_action_timestamp_public_key_id ON access_keys (
+  account_id,
+  action_timestamp DESC,
+  public_key DESC
+);
