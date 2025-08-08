@@ -11,6 +11,7 @@ interface Props {
 const getOptions = (status: boolean) => {
   switch (status) {
     case null:
+    case undefined:
       return {
         bg: 'bg-yellow-50 dark:bg-black',
         icon: FaHourglassStart,

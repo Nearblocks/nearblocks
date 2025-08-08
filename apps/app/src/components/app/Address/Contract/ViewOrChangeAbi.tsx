@@ -1,6 +1,8 @@
 'use client';
 import uniqueId from 'lodash/uniqueId';
 import { useContext, useEffect, useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 import {
   AccordionItem,
@@ -18,6 +20,7 @@ import { NearContext } from '@/components/app/wallet/near-context';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
+import FaChevronDown from '@/components/app/Icons/FaChevronDown';
 
 interface Props {
   id: string;
@@ -25,6 +28,23 @@ interface Props {
   method: any;
   schema: any;
 }
+
+const getValidationSchema = (fields: FieldType[]) => {
+  const schemaFields: any = {};
+
+  fields.forEach((field) => {
+    schemaFields[`name_${field.id}`] = Yup.string().required(
+      'Argument name is required',
+    );
+    schemaFields[`type_${field.id}`] =
+      Yup.string().required('Type is required');
+    schemaFields[`value_${field.id}`] = Yup.string().required(
+      'Argument value is required',
+    );
+  });
+
+  return Yup.object().shape(schemaFields);
+};
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
 
@@ -50,15 +70,34 @@ const ViewOrChangeAbi = (props: Props) => {
   const [result, setResult] = useState<null | string>('');
   const [loading, setLoading] = useState(false);
   const [hideQuery, setHideQuery] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
   const [options, setOptions] = useState({
     attachedDeposit: '0',
     gas: '30000000000000',
   });
 
+  const getInitialValues = () => {
+    const initialValues: any = {};
+    fields.forEach((field) => {
+      initialValues[`name_${field.id}`] = field.name;
+      initialValues[`type_${field.id}`] = field.type;
+      initialValues[`value_${field.id}`] = field.value;
+    });
+    return initialValues;
+  };
+
+  const formik = useFormik({
+    initialValues: getInitialValues(),
+    validationSchema:
+      fields.length > 0 ? getValidationSchema(fields) : Yup.object(),
+    enableReinitialize: true,
+    onSubmit: () => {},
+  });
+
   const onRemove = (id: string) => () =>
     setFields((flds) => sortFields(flds.filter((fld) => fld.id !== id)));
 
-  const onChange = (id: any) => (e: any) =>
+  const onChange = (id: any) => (e: any) => {
     setFields((flds) => {
       const curFeild = flds.find((fld) => fld.id === id);
 
@@ -73,10 +112,23 @@ const ViewOrChangeAbi = (props: Props) => {
       return sortFields(flds);
     });
 
+    const fieldName = e.target.name;
+    const formikFieldName = `${fieldName}_${id}`;
+    formik.setFieldValue(formikFieldName, e.target.value);
+  };
+
   const onOptionChange = (key: string) => (e: any) =>
     setOptions((optns) => ({ ...optns, [key]: e.target.value }));
 
   const onRead = async () => {
+    if (fields.length > 0) {
+      const errors = await formik.validateForm();
+      if (Object.keys(errors).length > 0) {
+        setShowValidation(true);
+        return;
+      }
+    }
+
     const resetState = (
       txn: string | null = null,
       error: string | null = null,
@@ -221,35 +273,82 @@ const ViewOrChangeAbi = (props: Props) => {
         {fields.map((field: FieldType) => (
           <div className="flex max-w-xl items-center" key={field.id}>
             <div className="sm:grid grid-cols-9 gap-2">
-              <input
-                className="col-span-3 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
-                name="name"
-                onChange={onChange(field.id)}
-                placeholder="Argument name"
-                value={field.name}
-              />
-              <select
-                className="col-span-2 bg-white dark:bg-black-600 block border dark:border-black-200 dark:text-neargray-10 rounded mb-3 h-9 px-3 w-full outline-none"
-                name="type"
-                onChange={onChange(field.id)}
-                value={typeof field.type === 'string' ? field.type : ''}
-              >
-                <option disabled value="">
-                  Type
-                </option>
-                {inputTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {capitalize(type)}
-                  </option>
-                ))}
-              </select>
-              <input
-                className="col-span-4 block border dark:border-black-200 rounded mb-3 h-9 px-3 w-full outline-none bg-white dark:bg-black-600 dark:text-neargray-10"
-                name="value"
-                onChange={onChange(field.id)}
-                placeholder={field.placeholder || 'Argument value'}
-                value={field.value}
-              />
+              <div className="col-span-3">
+                <input
+                  className={`block border ${
+                    formik.errors[`name_${field.id}`] &&
+                    (formik.touched[`name_${field.id}`] || showValidation)
+                      ? 'border-red-500'
+                      : 'dark:border-black-200'
+                  } rounded mb-1 h-9 px-3 w-full outline-none dark:text-neargray-10`}
+                  name="name"
+                  onChange={onChange(field.id)}
+                  placeholder="Argument name"
+                  value={field.name}
+                />
+                {formik.errors[`name_${field.id}`] &&
+                  (formik.touched[`name_${field.id}`] || showValidation) && (
+                    <small className="text-red-500 text-xs mb-2">
+                      {formik.errors[`name_${field.id}`] as string}
+                    </small>
+                  )}
+              </div>
+
+              <div className="col-span-2">
+                <div className="relative">
+                  <select
+                    className={`w-full h-9 mb-1 pl-3 pr-10 bg-white dark:bg-black-600 dark:text-neargray-10 border ${
+                      formik.errors[`type_${field.id}`] &&
+                      (formik.touched[`type_${field.id}`] || showValidation)
+                        ? 'border-red-500'
+                        : 'dark:border-black-200'
+                    } rounded outline-none appearance-none cursor-pointer`}
+                    name="type"
+                    onChange={onChange(field.id)}
+                    required
+                    value={typeof field.type === 'string' ? field.type : ''}
+                  >
+                    <option value="" disabled>
+                      Type
+                    </option>
+                    {inputTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {capitalize(type)}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 top-0 flex items-center pr-3 pointer-events-none">
+                    <FaChevronDown />
+                  </div>
+                </div>
+                {formik.errors[`type_${field.id}`] &&
+                  (formik.touched[`type_${field.id}`] || showValidation) && (
+                    <small className="text-red-500 text-xs mb-2">
+                      {formik.errors[`type_${field.id}`] as string}
+                    </small>
+                  )}
+              </div>
+
+              <div className="col-span-4">
+                <input
+                  className={`w-full h-9 mb-1 pl-3 pr-10 bg-white dark:bg-black-600 dark:text-neargray-10 border ${
+                    formik.errors[`value_${field.id}`] &&
+                    (formik.touched[`value_${field.id}`] || showValidation)
+                      ? 'border-red-500'
+                      : 'dark:border-black-200'
+                  } rounded outline-none appearance-none cursor-pointer`}
+                  name="value"
+                  onChange={onChange(field.id)}
+                  placeholder={field.placeholder || 'Argument value'}
+                  value={field.value}
+                />
+                {formik.errors[`value_${field.id}`] &&
+                  (formik.touched[`value_${field.id}`] || showValidation) && (
+                    <small className="text-red-500 text-xs mb-2">
+                      {formik.errors[`value_${field.id}`] as string}
+                    </small>
+                  )}
+              </div>
             </div>
             <button
               className="ml-3 p-1 mr-1 bg-red-300 dark:bg-red-700 dark:hover:bg-red-600 self-start mt-1.5 hover:bg-red-400 text-xs font-medium rounded-md text-white"
@@ -259,7 +358,7 @@ const ViewOrChangeAbi = (props: Props) => {
             </button>
           </div>
         ))}
-        <div className="flex max-w-xl justify-between mb-3 dark:text-neargray-10">
+        <div className="flex max-w-xl justify-between mb-3 dark:text-neargray-10 mt-2">
           <div className="flex items-center dark:text-neargray-10">
             Options
             <Tooltip

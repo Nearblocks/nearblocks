@@ -77,7 +77,10 @@ const TransactionActions = (props: TransActionProps) => {
         action?.args?.delegate_action?.actions?.map((txn: ActionType) =>
           mapRpcActionToAction(txn),
         );
-
+      const publicKey =
+        action?.args?.public_key || action?.args?.delegate_action?.public_key;
+      const senderId =
+        action?.args?.sender_id || action?.args?.delegate_action?.sender_id;
       return (
         <div className="py-1">
           <Delegate className="inline-flex text-yellow-500" />
@@ -88,32 +91,23 @@ const TransactionActions = (props: TransActionProps) => {
             className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
           >
             {shortenAddress(receiver)}
-            {(action?.args?.delegate_action?.public_key &&
-              action?.args?.delegate_action?.sender_id) ||
-              (action?.args?.public_key && action?.args?.sender_id && (
-                <Tooltip
-                  tooltip={'Access key used for this receipt'}
-                  className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                >
-                  <span>
-                    &nbsp;
-                    <Link
-                      href={`/address/${
-                        action?.args?.sender_id ||
-                        action?.args?.delegate_action?.sender_id
-                      }?tab=accesskeys`}
-                      className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
-                    >
-                      (
-                      {shortenAddress(
-                        action?.args?.public_key ||
-                          action?.args?.delegate_action?.public_key,
-                      )}{' '}
-                      )
-                    </Link>
-                  </span>
-                </Tooltip>
-              ))}
+
+            {publicKey && senderId && (
+              <Tooltip
+                tooltip={'Access key used for this receipt'}
+                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+              >
+                <span>
+                  &nbsp;
+                  <Link
+                    href={`/address/${senderId}?tab=accesskeys`}
+                    className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
+                  >
+                    ({shortenAddress(publicKey)})
+                  </Link>
+                </span>
+              </Tooltip>
+            )}
           </Link>
           {delegateAction &&
             delegateAction.map((subAction: Action | any, i: number) => (
