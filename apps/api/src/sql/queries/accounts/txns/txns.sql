@@ -92,6 +92,6 @@ FROM
       AND r.originated_from_transaction_hash = ts.transaction_hash
   ) oa ON TRUE
 ORDER BY
-  block_timestamp DESC,
-  shard_id DESC,
-  index_in_chunk DESC
+  ts.block_timestamp DESC,
+  ts.shard_id DESC,
+  ts.index_in_chunk DESC

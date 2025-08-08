@@ -77,3 +77,6 @@ FROM
       AND mt."timestamp" >= ss.block_timestamp
       AND mt."timestamp" <= ss.block_timestamp + 3600000000000 -- 1hr in ns
   ) rs ON TRUE
+ORDER BY
+  ss.block_timestamp DESC,
+  ss.event_index DESC

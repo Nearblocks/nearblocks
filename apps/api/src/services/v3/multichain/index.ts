@@ -54,7 +54,7 @@ const txns = responseHandler(
     });
 
     const queries = signatures.map((signature) => {
-      return pgp.as.format(sql.signatureTxns, signature);
+      return pgp.as.format(sql.signatureTxn, signature);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
     const txns = await dbBase.manyOrNone<McTxns>(unionQuery);
