@@ -25,9 +25,6 @@ const routes = (app: Router) => {
    *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
    *           type: string
-   *         examples:
-   *           cursor:
-   *             value: 'eyJ0...In0='
    *       - in: query
    *         name: limit
    *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
@@ -92,13 +89,6 @@ const routes = (app: Router) => {
    *         description: Block hash or block height to retrieve
    *         schema:
    *           type: string
-   *         examples:
-   *           hash:
-   *             summary: Block hash
-   *             value: 'kjih...dcba'
-   *           height:
-   *             summary: Block height
-   *             value: '12345678'
    *     responses:
    *       200:
    *         description: Success response

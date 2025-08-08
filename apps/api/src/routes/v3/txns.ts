@@ -25,9 +25,6 @@ const routes = (app: Router) => {
    *         description: Block hash to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           block:
-   *             value: 'kjih...dcba'
    *       - in: query
    *         name: after_ts
    *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
@@ -47,9 +44,6 @@ const routes = (app: Router) => {
    *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
    *           type: string
-   *         examples:
-   *           cursor:
-   *             value: 'eyJ0...In0='
    *       - in: query
    *         name: limit
    *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
@@ -82,6 +76,7 @@ const routes = (app: Router) => {
    * /v3/txns/latest:
    *   get:
    *     summary: Get the latest txns
+   *     description: ⚠️ Response is cached for 5 seconds
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -113,9 +108,6 @@ const routes = (app: Router) => {
    *         description: Txn hash to retrieve
    *         schema:
    *           type: string
-   *         examples:
-   *           hash:
-   *             value: 'kjih...dcba'
    *     responses:
    *       200:
    *         description: Success response
@@ -126,7 +118,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/{hash}/receipts:
    *   get:
-   *     summary: Get all txn receipts
+   *     summary: Get txn receipts
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -136,9 +128,6 @@ const routes = (app: Router) => {
    *         description: Txn hash to retrieve receipts for
    *         schema:
    *           type: string
-   *         examples:
-   *           hash:
-   *             value: 'kjih...dcba'
    *     responses:
    *       200:
    *         description: Success response
