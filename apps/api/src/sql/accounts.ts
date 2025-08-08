@@ -3,6 +3,10 @@ import { sql } from '#sql/index';
 export default {
   account: sql('queries/accounts/account.sql'),
   balance: sql('queries/accounts/balance.sql'),
+  keys: {
+    count: sql('queries/accounts/keys/count.sql'),
+    keys: sql('queries/accounts/keys/keys.sql'),
+  },
   receipts: {
     cte: sql('queries/accounts/receipts/cte.sql'),
     cteUnion: sql('queries/accounts/receipts/cteUnion.sql'),
