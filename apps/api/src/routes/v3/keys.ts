@@ -1,36 +1,36 @@
 import { Router } from 'express';
 
-import request from 'nb-schemas/dist/accounts/request.js';
+import request from 'nb-schemas/dist/keys/request.js';
 
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
-import accounts from '#services/v3/accounts/index';
+import service from '#services/v3/keys/index';
 
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/accounts', bearerAuth, rateLimiter, route);
+  app.use('/keys', bearerAuth, rateLimiter, route);
 
   /**
    * @openapi
-   * /v3/accounts/{account}:
+   * /v3/keys/{key}:
    *   get:
-   *     summary: Get account info
+   *     summary: Get access key info
    *     tags:
-   *       - V3 / Accounts
+   *       - V3 / Keys
    *     parameters:
    *       - in: path
-   *         name: account
+   *         name: key
    *         required: true
-   *         description: Account ID
+   *         description: Public key
    *         schema:
    *           type: string
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/:account', validate(request.account), accounts.account);
+  route.get('/:key', validate(request.key), service.key);
 };
 
 export default routes;

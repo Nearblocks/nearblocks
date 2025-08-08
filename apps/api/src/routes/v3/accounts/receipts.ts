@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account receipts
    *     tags:
-   *       - V3 / Account Receipts
+   *       - V3 / Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -26,41 +26,26 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: near
    *       - in: query
    *         name: predecessor
    *         description: Receipt predecessor account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           predecessor:
-   *             value: near
    *       - in: query
    *         name: receiver
    *         description: Receipt receiver account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           receiver:
-   *             value: near
    *       - in: query
    *         name: action
    *         description: Receipt action to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           action:
-   *             value: TRANSFER
    *       - in: query
    *         name: method
    *         description: Function call method to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           method:
-   *             value: submit
    *       - in: query
    *         name: after_ts
    *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
@@ -80,9 +65,6 @@ const routes = (app: Router) => {
    *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
    *           type: string
-   *         examples:
-   *           cursor:
-   *             value: 'eyJ0...In0='
    *       - in: query
    *         name: limit
    *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
@@ -103,7 +85,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account receipts count
    *     tags:
-   *       - V3 / Account Receipts Count
+   *       - V3 / Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -111,41 +93,26 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: near
    *       - in: query
    *         name: predecessor
    *         description: Receipt predecessor account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           predecessor:
-   *             value: near
    *       - in: query
    *         name: receiver
    *         description: Receipt receiver account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           receiver:
-   *             value: near
    *       - in: query
    *         name: action
    *         description: Receipt action to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           action:
-   *             value: TRANSFER
    *       - in: query
    *         name: method
    *         description: Function call method to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           method:
-   *             value: submit
    *       - in: query
    *         name: after_ts
    *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)

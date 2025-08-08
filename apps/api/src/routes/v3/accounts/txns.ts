@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account txns
    *     tags:
-   *       - V3 / Account Txns
+   *       - V3 / Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -26,25 +26,16 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: near
    *       - in: query
    *         name: signer
    *         description: Txn signer account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           block:
-   *             value: near
    *       - in: query
    *         name: receiver
    *         description: Txn receiver account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           block:
-   *             value: near
    *       - in: query
    *         name: after_ts
    *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
@@ -64,9 +55,6 @@ const routes = (app: Router) => {
    *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
    *           type: string
-   *         examples:
-   *           cursor:
-   *             value: 'eyJ0...In0='
    *       - in: query
    *         name: limit
    *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
@@ -87,7 +75,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account txns count
    *     tags:
-   *       - V3 / Account Txns Count
+   *       - V3 / Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -95,25 +83,16 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: near
    *       - in: query
    *         name: signer
    *         description: Txn signer account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           signer:
-   *             value: near
    *       - in: query
    *         name: receiver
    *         description: Txn receiver account to filter results by
    *         schema:
    *           type: string
-   *         examples:
-   *           receiver:
-   *             value: near
    *       - in: query
    *         name: after_ts
    *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)

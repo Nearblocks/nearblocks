@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account access keys
    *     tags:
-   *       - V3 / Account Access Keys
+   *       - V3 / Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -26,17 +26,11 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: near
    *       - in: query
    *         name: cursor
    *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
    *           type: string
-   *         examples:
-   *           cursor:
-   *             value: 'eyJ0...In0='
    *       - in: query
    *         name: limit
    *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
@@ -55,9 +49,9 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/accounts/{account}/keys/count:
    *   get:
-   *     summary: Get estimated account keys count
+   *     summary: Get account access keys count
    *     tags:
-   *       - V3 / Account Access Keys Count
+   *       - V3 / Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -65,9 +59,6 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: near
    *     responses:
    *       200:
    *         description: Success response
