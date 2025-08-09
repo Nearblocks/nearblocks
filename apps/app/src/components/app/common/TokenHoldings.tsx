@@ -36,10 +36,12 @@ const TokenHoldings = (props: Props) => {
 
   const mt = (inventoryData?.mts || [])?.map((token) => {
     const rawAmount = token?.amount;
-    const decimals = token?.meta?.base?.decimals;
+    const decimals = token?.meta?.decimals
+      ? token?.meta?.decimals
+      : token?.meta?.base?.decimals;
     const tokenID =
       token?.token_id?.split(':')?.length >= 3
-        ? token.token_id.split(':')[2]
+        ? `${token?.token_id?.split(':')[1]}:${token?.token_id?.split(':')[2]}`
         : '';
     const humanReadableAmount =
       decimals && rawAmount !== '0'
@@ -51,11 +53,17 @@ const TokenHoldings = (props: Props) => {
       mt_meta: {
         token_id: tokenID,
         name: token?.meta?.base?.name,
-        symbol: token?.meta?.base?.symbol,
-        icon: token?.meta?.base?.icon,
+        symbol: token?.meta?.symbol
+          ? token?.meta?.symbol
+          : token?.meta?.base?.symbol,
+        icon: token?.meta?.icon ? token?.meta?.icon : token?.meta?.base?.icon,
         price: '0',
-        decimals: token?.meta?.base?.decimals,
-        title: token?.meta?.token?.title,
+        decimals: token?.meta?.decimals
+          ? token?.meta?.decimals
+          : token?.meta?.base?.decimals,
+        title: token?.meta?.name
+          ? token?.meta?.name
+          : token?.meta?.token?.title,
         description: token?.meta?.token?.description,
         media: token?.meta?.token?.media,
       },
@@ -215,7 +223,7 @@ const TokenHoldings = (props: Props) => {
                     <div className="dark:bg-black px-1 py-1" key={index}>
                       <Link
                         className="flex justify-between items-start px-0.5 py-1 truncate hover:no-underline hover:bg-gray-100 dark:hover:bg-black-200 rounded-lg"
-                        href={`/mt-token/${token?.contract}:${token?.mt_meta
+                        href={`/mt-token/${token?.mt_meta
                           ?.token_id}?a=${props.id?.toLowerCase()}`}
                       >
                         <div key={index}>
@@ -257,11 +265,13 @@ const TokenHoldings = (props: Props) => {
                                   )
                                 : ''}
                               (
-                              {truncateString(
-                                token?.mt_meta?.symbol,
-                                15,
-                                '...',
-                              )}
+                              {token?.mt_meta?.symbol
+                                ? truncateString(
+                                    token?.mt_meta?.symbol,
+                                    15,
+                                    '...',
+                                  )
+                                : 'unknown'}
                               )
                             </span>
                           </div>
