@@ -6,6 +6,7 @@ import TokenImage from '@/components/app/common/TokenImage';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { CopyButton } from '@/components/app/common/CopyButton';
 import { shortenAddress } from '@/utils/app/libs';
+import { Link } from '@/i18n/routing';
 
 interface MTTokenBase {
   name: string;
@@ -175,7 +176,12 @@ const MTOverviewActions = ({ mtToken, contract, token, isUnknown }: Props) => {
                         </div>
                       ) : (
                         <div className="w-full whitespace-nowrap flex">
-                          {shortenAddress(contract)}
+                          <Link
+                            className="text-green-500 dark:text-green-250 font-medium"
+                            href={`/address/${contract}`}
+                          >
+                            {shortenAddress(contract)}
+                          </Link>
                           <span className="mx-0.5">
                             <CopyButton textToCopy={contract} />
                           </span>

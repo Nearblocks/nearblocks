@@ -535,30 +535,28 @@ const Details = (props: Props) => {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {txn?.outcomes?.status !== undefined && (
-                    <div className="flex items-center flex-wrap gap-2">
-                      {!status ? (
-                        <RpcTxnStatus
-                          showLabel
-                          status={rpcTxn.status}
-                          showReceipt={<FailedReceipts data={rpcTxn} />}
-                        />
-                      ) : (
-                        <TxnStatus
-                          showLabel
-                          status={txn?.outcomes?.status}
-                          showReceipt={<FailedReceipts data={txn || rpcTxn} />}
-                        />
-                      )}
-                      <div className="w-full max-w-xl">
-                        {errorMessage ? (
-                          <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
-                            {errorMessage}
-                          </div>
-                        ) : null}
-                      </div>
+                  <div className="flex items-center flex-wrap gap-2">
+                    {!status ? (
+                      <RpcTxnStatus
+                        showLabel
+                        status={rpcTxn.status}
+                        showReceipt={<FailedReceipts data={rpcTxn} />}
+                      />
+                    ) : (
+                      <TxnStatus
+                        showLabel
+                        status={txn?.outcomes?.status}
+                        showReceipt={<FailedReceipts data={txn || rpcTxn} />}
+                      />
+                    )}
+                    <div className="w-full max-w-xl">
+                      {errorMessage ? (
+                        <div className="text-xs bg-orange-50 w-full dark:bg-black-200 dark:text-nearyellow-400 rounded text-left px-2 py-1 truncate overflow-hidden whitespace-nowrap">
+                          {errorMessage}
+                        </div>
+                      ) : null}
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
