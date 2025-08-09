@@ -24,4 +24,4 @@ USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 
-CMD ["node", "--max-old-space-size=2048", "apps/indexer-base/dist/index.js"]
+CMD ["node", "--max-old-space-size=8096", "apps/indexer-base/dist/index.js"]
