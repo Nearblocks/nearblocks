@@ -143,3 +143,15 @@ export enum EventType {
   L2E_NEAR = 13,
   FUSOTAO_TOKEN = 14,
 }
+
+export enum DestinationChain {
+  ARBITRUM = 'ARBITRUM',
+  BASE = 'BASE',
+  BITCOIN = 'BITCOIN',
+  BSC = 'BSC',
+  ETHEREUM = 'ETHEREUM',
+  GNOSIS = 'GNOSIS',
+  OPTIMISM = 'OPTIMISM',
+  POLYGON = 'POLYGON',
+  SOLANA = 'SOLANA',
+}
