@@ -63,6 +63,18 @@ export const dbBalance = pgp({
 });
 
 /**
+ * Events database connection.
+ */
+export const dbEvents = pgp({
+  application_name: 'api-balance',
+  connectionString: config.dbUrlEvents,
+  max: 20,
+  ssl: ssl?.ca ? ssl : false,
+  // TODO: remove before merge
+  statement_timeout: 10 * 60 * 100, // 10s
+});
+
+/**
  * Multichain database connection.
  */
 export const dbMultichain = pgp({

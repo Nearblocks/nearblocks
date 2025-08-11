@@ -1,9 +1,19 @@
 import * as v from 'valibot';
 
-const key = v.object({
+import { cursorSchema, limitSchema } from '../common.js';
+
+const keys = v.object({
+  cursor: cursorSchema,
   key: v.string(),
+  limit: limitSchema,
 });
 
-export type AccessKeyReq = v.InferOutput<typeof key>;
+const cursor = v.object({
+  account: v.string(),
+  timestamp: v.string(),
+});
 
-export default { key };
+export type AccessKeysReq = v.InferOutput<typeof keys>;
+export type AccessKeysCursor = v.InferOutput<typeof cursor>;
+
+export default { cursor, keys };

@@ -4,6 +4,7 @@ import accounts from '#routes/v3/accounts/index';
 import blocks from '#routes/v3/blocks';
 import keys from '#routes/v3/keys';
 import multichain from '#routes/v3/multichain/index';
+import search from '#routes/v3/search';
 import txns from '#routes/v3/txns';
 
 const routes = () => {
@@ -13,6 +14,7 @@ const routes = () => {
   blocks(app);
   keys(app);
   multichain(app);
+  search(app);
   txns(app);
 
   return app;
