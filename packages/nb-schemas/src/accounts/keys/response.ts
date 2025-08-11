@@ -19,7 +19,7 @@ const deleted = v.object({
 });
 
 const keysList = v.object({
-  block_timestamp: v.string(),
+  action_timestamp: v.string(),
   created,
   deleted,
   permission: v.nullable(jsonSchema),
@@ -32,7 +32,7 @@ const keyCount = v.object({
 });
 
 const keysResponse = responseSchema(
-  v.array(v.omit(keysList, ['block_timestamp'])),
+  v.array(v.omit(keysList, ['action_timestamp'])),
 );
 const keyCountResponse = responseSchema(keyCount);
 
