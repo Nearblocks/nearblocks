@@ -115,7 +115,7 @@ const TpsChart: React.FC<Props> = ({
       exclude: false,
       image: `/images/charts/multi-chain-txns.svg`,
       image_dark: `/images/charts/multi-chain-txns_dark.svg`,
-      link: '/charts/multi-chain-txns',
+      link: '/charts/multichain-txns',
       text: t ? t('multichainTxns.heading') : 'Multi Chain Transactions Chart',
     }, */
   ];

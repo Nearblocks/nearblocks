@@ -1861,6 +1861,7 @@ export enum FilterKind {
   INVOLVED = 'involved',
   CONTRACT = 'contract',
   A = 'a',
+  ACCOUNT = 'account',
 }
 
 export type Account = {

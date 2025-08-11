@@ -7,19 +7,16 @@ const MultiChainTransactions = async ({ id, searchParams }: any) => {
     getRequest(`v1/chain-abstraction/${id}/txns`, searchParams),
     getRequest(`v1/chain-abstraction/${id}/txns/count`, searchParams),
   ]);
-
   if (data.message === 'Error') {
     throw new Error(`Server Error : ${data.error}`);
   }
 
   return (
     <MultiChainTxns
-      count={count?.txns?.[0]?.count}
-      cursor={data?.cursor}
-      error={!data || data === null}
+      dataPromise={data}
+      countPromise={count}
       isTab={true}
       tab={'multichaintxns'}
-      txns={data?.txns}
     />
   );
 };

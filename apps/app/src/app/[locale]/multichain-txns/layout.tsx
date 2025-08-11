@@ -1,10 +1,9 @@
 import { getTranslations } from 'next-intl/server';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
-import Chart from '@/components/app/Charts/Chart';
-import ChartDetails from '@/components/app/skeleton/charts/Detail';
-import { getRequest } from '@/utils/app/api';
+import MultiChainSkeleton from '@/components/app/skeleton/Multichain/multiChainSkeleton';
 import { appUrl, networkId } from '@/utils/app/config';
 
 export async function generateMetadata(props: {
@@ -18,16 +17,17 @@ export async function generateMetadata(props: {
   const host = headersList.get('host') || '';
   const baseUrl = `https://${host}/`;
 
-  const metaTitle = t('multichainTxns.metaTitle');
-  const metaDescription = t('multichainTxns.metaDescription');
+  const metaTitle = `${t('metaTitle')} | NearBlocks`;
+
+  const metaDescription = `${t('metaDescription')}`;
 
   const ogImageUrl = `${baseUrl}api/og?basic=true&title=${encodeURIComponent(
-    t('multichainTxns.heading'),
+    t('heading'),
   )}`;
 
   return {
     alternates: {
-      canonical: `${appUrl}/charts/multi-chain-txns`,
+      canonical: `${appUrl}/multichain-txns`,
     },
     description: metaDescription,
     openGraph: {
@@ -46,29 +46,31 @@ export async function generateMetadata(props: {
   };
 }
 
-export default async function AddressesChart() {
-  const data = await getRequest('v1/charts');
-  const theme = (await cookies()).get('theme')?.value || 'light';
+export default async function TokensLayout(props: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const params = await props.params;
+  const { locale } = params;
+  const t = await getTranslations({ locale });
+  const { children } = props;
 
   return (
     <section>
       <div>
         <div className="container-xxl mx-auto p-5">
           <h1 className="text-lg font-medium dark:text-neargray-10 text-nearblue-600">
-            {'Multi Chain Transactions Chart'}
+            {t ? t('heading') : 'Latest Multichain Transactions'}
           </h1>
         </div>
       </div>
       <div className="container-xxl mx-auto px-4">
-        <div className="relative">
-          <Suspense fallback={<ChartDetails chartTypes="multi-chain-txns" />}>
-            <Chart
-              chartsData={data}
-              chartTypes={'multi-chain-txns'}
-              poweredBy={false}
-              theme={theme}
-            />
-          </Suspense>
+        <div className="relative block lg:flex lg:space-x-2">
+          <div className="w-full ">
+            <ErrorBoundary fallback={<MultiChainSkeleton error />}>
+              <Suspense fallback={<MultiChainSkeleton />}>{children}</Suspense>
+            </ErrorBoundary>
+          </div>
         </div>
       </div>
       <div className="py-8"></div>
