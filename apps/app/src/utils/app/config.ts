@@ -22,6 +22,8 @@ export const apiUrl: string =
     ? 'https://api.nearblocks.io/v1/'
     : 'https://api-testnet.nearblocks.io/v1/');
 
+export const apiUrlBeta: string | undefined = process.env.API_BETA_URL;
+
 export const appUrl =
   process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
     ? process.env.NEXT_PUBLIC_MAINNET_URL
@@ -102,6 +104,27 @@ export const chainAbstractionExplorerUrl =
             `https://xrpscan.com/account/${address}`,
           transaction: (hash: string) => `https://xrpscan.com/tx/${hash}`,
         },
+        bsc: {
+          address: (address: string) =>
+            `https://bsctrace.com/address/${address}`,
+          transaction: (hash: string) => `https://bsctrace.com/tx/${hash}`,
+        },
+        gnosis: {
+          address: (address: string) =>
+            `https://gnosisscan.io/address/${address}`,
+          transaction: (hash: string) => `https://gnosisscan.io/tx/${hash}`,
+        },
+        optimism: {
+          address: (address: string) =>
+            `https://optimistic.etherscan.io/address/${address}`,
+          transaction: (hash: string) =>
+            `https://optimistic.etherscan.io/tx/${hash}`,
+        },
+        polygon: {
+          address: (address: string) =>
+            `https://polygonscan.com/address/${address}`,
+          transaction: (hash: string) => `https://polygonscan.com/tx/${hash}`,
+        },
       }
     : {
         ethereum: {
@@ -140,12 +163,30 @@ export const chainAbstractionExplorerUrl =
             `https://xrpscan.com/account/${address}`,
           transaction: (hash: string) => `https://xrpscan.com/tx/${hash}`,
         },
+        bsc: {
+          address: (address: string) =>
+            `https://testnet.bsctrace.com/address/${address}`,
+          transaction: (hash: string) =>
+            `https://testnet.bsctrace.com/tx/${hash}`,
+        },
+        gnosis: {
+          address: (address: string) =>
+            `https://gnosisscan.io/address/${address}`,
+          transaction: (hash: string) => `https://gnosisscan.io/tx/${hash}`,
+        },
+        optimism: {
+          address: (address: string) =>
+            `https://sepolia-optimism.etherscan.io/address/${address}`,
+          transaction: (hash: string) =>
+            `https://sepolia-optimism.etherscan.io/tx/${hash}`,
+        },
+        polygon: {
+          address: (address: string) =>
+            `https://amoy.polygonscan.com/address/${address}`,
+          transaction: (hash: string) =>
+            `https://amoy.polygonscan.com/tx/${hash}`,
+        },
       };
-
-export const chain = {
-  bitcoin: 'BITCOIN',
-  ethereum: 'ETHEREUM',
-};
 
 const evmWalletChains = {
   mainnet: {

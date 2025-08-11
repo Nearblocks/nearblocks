@@ -5,7 +5,7 @@ import Skeleton from '@/components/app/skeleton/common/Skeleton';
 const MultiChainSkeleton = ({ error }: { error?: boolean }) => {
   return (
     <div className=" w-full">
-      <div>
+      {/* <div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           <div className="w-full lg:col-span-2">
             <div className="h-full bg-white dark:bg-black-600 soft-shadow rounded-xl overflow-hidden p-5">
@@ -45,7 +45,7 @@ const MultiChainSkeleton = ({ error }: { error?: boolean }) => {
           </div>
         </div>
       </div>
-      <div className="py-6"></div>
+      <div className="py-6"></div> */}
       <div>
         <div className=" bg-white dark:bg-black-600 dark:border-black-200 border soft-shadow rounded-xl overflow-hidden">
           <div className="overflow-x-auto scroll-smooth -mt-1">
