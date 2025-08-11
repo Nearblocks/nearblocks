@@ -140,7 +140,7 @@ const txn = responseHandler(
 
     if (hash.startsWith('0x')) {
       const txn = await rollingWindow((start, end) => {
-        const cte = pgp.as.format(sql.ethCte, { end, hash, start });
+        const cte = pgp.as.format(sql.rlpCte, { end, hash, start });
 
         return dbBase.oneOrNone<Txn>(sql.txn, { cte });
       });
