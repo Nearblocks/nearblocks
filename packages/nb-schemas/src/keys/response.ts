@@ -18,8 +18,9 @@ const deleted = v.object({
   transaction_hash: v.optional(v.string()),
 });
 
-const key = v.object({
+const keys = v.object({
   account_id: v.string(),
+  action_timestamp: v.string(),
   created,
   deleted,
   permission: v.nullable(jsonSchema),
@@ -27,12 +28,14 @@ const key = v.object({
   public_key: v.string(),
 });
 
-const keyResponse = responseSchema(key);
+const keysResponse = responseSchema(
+  v.array(v.omit(keys, ['action_timestamp'])),
+);
 
-export type AccessKey = v.InferOutput<typeof key>;
+export type AccessKey = v.InferOutput<typeof keys>;
 
-export type AccessKeyRes = v.InferOutput<typeof keyResponse>;
+export type AccessKeyRes = v.InferOutput<typeof keysResponse>;
 
 export default {
-  key: keyResponse,
+  keys: keysResponse,
 };
