@@ -16,7 +16,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/keys/{key}:
    *   get:
-   *     summary: Get access key info
+   *     summary: Get access keys
    *     tags:
    *       - V3 / Keys
    *     parameters:
@@ -30,7 +30,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:key', validate(request.key), service.key);
+  route.get('/:key', validate(request.keys), service.keys);
 };
 
 export default routes;

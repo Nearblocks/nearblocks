@@ -13,23 +13,25 @@ WITH
     FROM
       access_keys
     WHERE
-      account_id = ${account}
+      public_key = ${key}
+      AND deleted_by_block_timestamp IS NULL
       AND (
         ${cursor.timestamp}::BIGINT IS NULL
         OR action_timestamp < ${cursor.timestamp}
         OR (
           action_timestamp = ${cursor.timestamp}
-          AND public_key < ${cursor.key}
+          AND account_id < ${cursor.account}
         )
       )
     ORDER BY
       action_timestamp DESC,
-      public_key DESC
+      account_id DESC
     LIMIT
       ${limit}
   )
 SELECT
   ks.action_timestamp,
+  ks.account_id,
   ks.public_key,
   ks.permission_kind,
   ks.permission,
@@ -93,4 +95,4 @@ FROM
   ) d ON TRUE
 ORDER BY
   ks.action_timestamp DESC,
-  ks.public_key DESC
+  ks.account_id DESC

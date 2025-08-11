@@ -29,12 +29,13 @@ const keys = responseHandler(
         key: cursor?.key,
         timestamp: cursor?.timestamp,
       },
-      limit,
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
     });
 
     return paginateData(keys, limit, (key) => ({
       key: key.public_key,
-      timestamp: key.block_timestamp,
+      timestamp: key.action_timestamp,
     }));
   },
 );
