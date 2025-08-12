@@ -13,10 +13,13 @@ import { setupNearMobileWallet } from '@near-wallet-selector/near-mobile-wallet'
 import { setupNearFi } from '@near-wallet-selector/nearfi';
 import { providers } from 'near-api-js';
 
-import { wagmiAdapter, web3Modal } from '@/components/app/wallet/web3modal';
-
 const THIRTY_TGAS = '30000000000000';
 const NO_DEPOSIT = '0';
+
+interface WalletConfig {
+  wagmiConfig: any;
+  web3Modal: any;
+}
 
 export class Wallet {
   /**
@@ -100,6 +103,7 @@ export class Wallet {
   networkId: string;
   // eslint-disable-next-line
   selector: any; // Make sure this is initialized later
+  walletConfig?: WalletConfig; // Store wallet config
 
   /**
    * Signs and sends transactions
@@ -144,20 +148,32 @@ export class Wallet {
   };
 
   /**
+   * Set the wallet config (wagmi and web3modal instances)
+   */
+  setWalletConfig = (config: WalletConfig) => {
+    this.walletConfig = config;
+  };
+
+  /**
    * To be called when the website loads
    * @param {Function} accountChangeHook - a function that is called when the user signs in or out
    * @returns {Promise<string>} - the accountId of the signed-in user
    */
   // eslint-disable-next-line
   startUp = async (accountChangeHook: (arg0: any) => void) => {
+    if (!this.walletConfig) {
+      console.error('Wallet config not set. Call setWalletConfig first.');
+      return '';
+    }
+
     // Initialize the wallet selector
     this.selector = setupWalletSelector({
       modules: [
         setupBitteWallet(),
         setupCoin98Wallet(),
         setupEthereumWallets({
-          wagmiConfig: wagmiAdapter.wagmiConfig as any,
-          web3Modal: web3Modal as any,
+          wagmiConfig: this.walletConfig.wagmiConfig as any,
+          web3Modal: this.walletConfig.web3Modal as any,
         }),
         setupLedger(),
         setupMintbaseWallet(),

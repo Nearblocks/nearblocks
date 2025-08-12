@@ -41,6 +41,7 @@ export const useConfig = () => {
     NEXT_PUBLIC_TURNSTILE_SITE_KEY,
     NEXT_PUBLIC_USER_AUTH_URL,
     NEXT_PUBLIC_USER_API_URL,
+    NEXT_PUBLIC_REOWN_PROJECT_ID,
   } = useEnvContext();
 
   const networkId: NetworkId =
@@ -106,6 +107,28 @@ export const useConfig = () => {
 
   const apiAccessKey = API_ACCESS_KEY;
 
+  const projectId =
+    NEXT_PUBLIC_REOWN_PROJECT_ID || '5690251ad29b1ed10f9a41bf343964e1';
+
+  const evmWalletChains = {
+    mainnet: {
+      caipNetworkId: '397',
+      chainId: 397,
+      explorer: 'https://nearblocks.io',
+      name: 'Near Mainnet',
+      rpc: 'https://eth-rpc.mainnet.near.org',
+    },
+    testnet: {
+      caipNetworkId: '398',
+      chainId: 398,
+      explorer: 'https://testnet.nearblocks.io',
+      name: 'Near Testnet',
+      rpc: 'https://eth-rpc.testnet.near.org',
+    },
+  };
+
+  const EVMWalletChain = evmWalletChains[networkId];
+
   return {
     apiAccessKey,
     apiUrl,
@@ -118,5 +141,7 @@ export const useConfig = () => {
     userAuthURL,
     userApiURL,
     verifierConfig,
+    projectId,
+    EVMWalletChain,
   };
 };
