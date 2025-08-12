@@ -130,7 +130,7 @@ export type BlocksInfo = {
   chunks_agg: {
     gas_limit: string;
     gas_used: string;
-    shards: string;
+    count: string;
   };
   gas_price: string;
   prev_block_hash: string;

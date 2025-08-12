@@ -2,14 +2,16 @@ import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import List from '@/components/app/Blocks/List';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import ListSkeleton from '@/components/app/skeleton/blocks/list';
+import { BlocksReq } from 'nb-schemas';
+import ListActions from '@/components/app/Blocks/ListActions';
+import { getRequestBeta } from '@/utils/app/api';
 
 export default async function Blocks(props: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ cursor?: string }>;
+  searchParams: Promise<BlocksReq>;
 }) {
   const searchParams = await props.searchParams;
 
@@ -64,7 +66,10 @@ export default async function Blocks(props: {
           <div className="w-full">
             <ErrorBoundary fallback={errorBoundaryFallback}>
               <Suspense fallback={<ListSkeleton />}>
-                <List cursor={cursor || ''} />
+                <ListActions
+                  dataPromise={getRequestBeta('v3/blocks', { cursor })}
+                  countPromise={getRequestBeta('v3/blocks/count')}
+                />
               </Suspense>
             </ErrorBoundary>
           </div>
