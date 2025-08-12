@@ -17,33 +17,42 @@ import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/search';
 
 const getAccounts = async (keyword: string) => {
+  const query = keyword.toLowerCase();
+
   return dbBase.manyOrNone<SearchAccount>(sql.accounts, {
-    account: keyword.toLowerCase(),
+    account: query,
   });
 };
 
 const getKeys = async (keyword: string) => {
   return dbBase.manyOrNone<SearchKey>(sql.keys, {
-    key: keyword.toLowerCase(),
+    key: keyword,
   });
 };
 
 const getFts = async (keyword: string) => {
+  const query = keyword.toLowerCase();
+
   return dbEvents.manyOrNone<SearchFt>(sql.fts, {
-    contract: keyword.toLowerCase(),
+    contract: query,
+    hex: /^0x/.test(query) ? query : null,
   });
 };
 
 const getNfts = async (keyword: string) => {
+  const query = keyword.toLowerCase();
+
   return dbEvents.manyOrNone<SearchNft>(sql.nfts, {
-    contract: keyword.toLowerCase(),
+    contract: query,
   });
 };
 
 const getBlocks = async (keyword: string) => {
-  const query = keyword.replace(/^0x/, '');
-  const hash = query.length >= 43 ? query.toLowerCase() : null;
-  const height = !isNaN(+query) ? +query : null;
+  const hash = keyword.length >= 43 ? keyword : null;
+  const height =
+    /^[0-9]+$/.test(keyword) && BigInt(keyword) <= 1000_000_000_000n
+      ? +keyword
+      : null;
 
   return rollingWindowList((start, end) => {
     return dbBase.manyOrNone<SearchBlock>(sql.blocks, {
@@ -61,28 +70,27 @@ const getReceipts = async (keyword: string) => {
     return dbBase.manyOrNone<SearchReceipt>(sql.receipts, {
       end,
       limit: 1,
-      receipt: keyword.toLowerCase(),
+      receipt: keyword,
       start,
     });
   });
 };
 
 const getTxns = async (keyword: string) => {
+  const hex = /^0x/i.test(keyword) ? keyword.toLowerCase() : null;
+
   return rollingWindowList((start, end) => {
-    return dbBase.manyOrNone<SearchTxn>(
-      keyword.startsWith('0x') ? sql.rlp : sql.txns,
-      {
-        end,
-        hash: keyword.toLowerCase(),
-        limit: 1,
-        start,
-      },
-    );
+    return dbBase.manyOrNone<SearchTxn>(hex ? sql.rlp : sql.txns, {
+      end,
+      hash: hex ?? keyword,
+      limit: 1,
+      start,
+    });
   });
 };
 
 const accounts = responseHandler(
-  response.txns,
+  response.accounts,
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
@@ -93,7 +101,7 @@ const accounts = responseHandler(
 );
 
 const blocks = responseHandler(
-  response.txns,
+  response.blocks,
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
@@ -103,8 +111,19 @@ const blocks = responseHandler(
   },
 );
 
+const keys = responseHandler(
+  response.keys,
+  async (req: RequestValidator<SearchReq>) => {
+    const keyword = req.validator.keyword;
+
+    const keys = await getKeys(keyword);
+
+    return { data: keys };
+  },
+);
+
 const fts = responseHandler(
-  response.txns,
+  response.fts,
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
@@ -114,19 +133,8 @@ const fts = responseHandler(
   },
 );
 
-const keys = responseHandler(
-  response.txns,
-  async (req: RequestValidator<SearchReq>) => {
-    const keyword = req.validator.keyword;
-
-    const keys = await getBlocks(keyword);
-
-    return { data: keys };
-  },
-);
-
 const nfts = responseHandler(
-  response.txns,
+  response.nfts,
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
@@ -137,11 +145,11 @@ const nfts = responseHandler(
 );
 
 const receipts = responseHandler(
-  response.txns,
+  response.receipts,
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
-    const receipts = await getBlocks(keyword);
+    const receipts = await getReceipts(keyword);
 
     return { data: receipts };
   },
@@ -152,7 +160,7 @@ const txns = responseHandler(
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
-    const txns = await getBlocks(keyword);
+    const txns = await getTxns(keyword);
 
     return { data: txns };
   },
@@ -163,12 +171,12 @@ const search = responseHandler(
   async (req: RequestValidator<SearchReq>) => {
     const keyword = req.validator.keyword;
 
-    const [accounts, blocks, fts, keys, nfts, receipts, txns] =
+    const [accounts, blocks, keys, fts, nfts, receipts, txns] =
       await Promise.all([
         getAccounts(keyword),
         getBlocks(keyword),
-        getFts(keyword),
         getKeys(keyword),
+        getFts(keyword),
         getNfts(keyword),
         getReceipts(keyword),
         getTxns(keyword),
