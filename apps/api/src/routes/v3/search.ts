@@ -16,13 +16,13 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/search:
    *   get:
-   *     summary: Search by keyword
+   *     summary: Search
    *     tags:
    *       - V3 / Search
    *     parameters:
    *       - in: query
    *         name: keyword
-   *         description: Keyword to search
+   *         description: Txn hash | account id | block hash | block height | receipt id | token contract
    *         schema:
    *           type: string
    *     responses:
@@ -33,7 +33,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/search/account:
+   * /v3/search/accounts:
    *   get:
    *     summary: Search accounts
    *     tags:
@@ -41,7 +41,7 @@ const routes = (app: Router) => {
    *     parameters:
    *       - in: query
    *         name: keyword
-   *         description: Keyword to search
+   *         description: Account ID
    *         schema:
    *           type: string
    *     responses:
@@ -52,7 +52,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/search/account:
+   * /v3/search/blocks:
    *   get:
    *     summary: Search blocks
    *     tags:
@@ -60,7 +60,7 @@ const routes = (app: Router) => {
    *     parameters:
    *       - in: query
    *         name: keyword
-   *         description: Keyword to search
+   *         description: Block hash or height
    *         schema:
    *           type: string
    *     responses:
@@ -68,6 +68,101 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/blocks', validate(request.search), service.blocks);
+
+  /**
+   * @openapi
+   * /v3/search/keys:
+   *   get:
+   *     summary: Search keys
+   *     tags:
+   *       - V3 / Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         description: Public key
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/keys', validate(request.search), service.keys);
+
+  /**
+   * @openapi
+   * /v3/search/fts:
+   *   get:
+   *     summary: Search fts
+   *     tags:
+   *       - V3 / Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         description: Token contract
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/fts', validate(request.search), service.fts);
+
+  /**
+   * @openapi
+   * /v3/search/nfts:
+   *   get:
+   *     summary: Search nfts
+   *     tags:
+   *       - V3 / Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         description: Token contract
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/nfts', validate(request.search), service.nfts);
+
+  /**
+   * @openapi
+   * /v3/search/receipts:
+   *   get:
+   *     summary: Search receipts
+   *     tags:
+   *       - V3 / Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         description: Receipt ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/receipts', validate(request.search), service.receipts);
+
+  /**
+   * @openapi
+   * /v3/search/txns:
+   *   get:
+   *     summary: Search txns
+   *     tags:
+   *       - V3 / Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         description: Txn hash
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/txns', validate(request.search), service.txns);
 };
 
 export default routes;
