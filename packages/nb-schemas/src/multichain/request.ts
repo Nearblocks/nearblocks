@@ -22,7 +22,7 @@ const cursor = v.object({
 });
 
 export type McTxnsReq = v.InferOutput<typeof txns>;
-export type McTxnsCountReq = v.InferOutput<typeof count>;
+export type McTxnCountReq = v.InferOutput<typeof count>;
 export type McTxnsCursor = v.InferOutput<typeof cursor>;
 
 export default { count, cursor, txns };

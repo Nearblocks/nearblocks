@@ -141,7 +141,7 @@ const txnResponse = responseSchema(txn);
 const txnsResponse = responseSchema(
   v.array(v.omit(txnList, ['block_timestamp', 'shard_id', 'index_in_chunk'])),
 );
-const txnsCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 const txnReceiptsResponse = responseSchema(txnReceipts);
 
 export type Txn = v.InferOutput<typeof txn>;
@@ -151,11 +151,11 @@ export type TxnCount = v.InferOutput<typeof txnCount>;
 
 export type TxnRes = v.InferOutput<typeof txnResponse>;
 export type TxnsRes = v.InferOutput<typeof txnsResponse>;
-export type TxnsCountRes = v.InferOutput<typeof txnsCountResponse>;
+export type TxnCountRes = v.InferOutput<typeof txnCountResponse>;
 export type TxnReceiptsRes = v.InferOutput<typeof txnReceiptsResponse>;
 
 export default {
-  count: txnsCountResponse,
+  count: txnCountResponse,
   receipts: txnReceiptsResponse,
   txn: txnResponse,
   txns: txnsResponse,

@@ -23,6 +23,7 @@ const block = v.object({
   block_timestamp: v.string(),
   chunks_agg: blockChunkAgg,
   gas_price: v.string(),
+  prev_block_hash: v.string(),
   receipts_agg: blockReceiptAgg,
   transactions_agg: blockTransactionAgg,
 });
@@ -34,17 +35,17 @@ const blockCount = v.object({
 
 const blockResponse = responseSchema(block);
 const blocksResponse = responseSchema(v.array(block));
-const blocksCountResponse = responseSchema(v.omit(blockCount, ['cost']));
+const blockCountResponse = responseSchema(v.omit(blockCount, ['cost']));
 
 export type Block = v.InferOutput<typeof block>;
 export type BlockCount = v.InferOutput<typeof blockCount>;
 
 export type BlockRes = v.InferOutput<typeof blockResponse>;
 export type BlocksRes = v.InferOutput<typeof blocksResponse>;
-export type BlocksCountRes = v.InferOutput<typeof blocksCountResponse>;
+export type BlockCountRes = v.InferOutput<typeof blockCountResponse>;
 
 export default {
   block: blockResponse,
   blocks: blocksResponse,
-  count: blocksCountResponse,
+  count: blockCountResponse,
 };

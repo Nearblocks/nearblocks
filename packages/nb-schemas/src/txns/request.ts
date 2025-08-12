@@ -39,7 +39,7 @@ const cursor = v.object({
 
 export type TxnsLatestReq = v.InferOutput<typeof latest>;
 export type TxnsReq = v.InferOutput<typeof txns>;
-export type TxnsCountReq = v.InferOutput<typeof count>;
+export type TxnCountReq = v.InferOutput<typeof count>;
 export type TxnReq = v.InferOutput<typeof txn>;
 export type TxnReceiptsReq = v.InferOutput<typeof receipts>;
 export type TxnsCursor = v.InferOutput<typeof cursor>;
