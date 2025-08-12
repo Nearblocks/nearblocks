@@ -3,6 +3,13 @@ SELECT
 FROM
   ft_meta
 WHERE
-  contract = ${contract}
+  (
+    ${hex}::TEXT IS NOT NULL
+    AND hex_address = ${hex}
+  )
+  OR (
+    ${hex}::TEXT IS NULL
+    AND contract = ${contract}
+  )
 LIMIT
   1
