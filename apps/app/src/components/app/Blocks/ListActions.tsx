@@ -1,11 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Suspense, useState } from 'react';
+import { Suspense, use, useState } from 'react';
 
 import { Link } from '@/i18n/routing';
 import { convertToMetricPrefix, gasFee, localFormat } from '@/utils/app/libs';
-import { BlocksInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Table from '@/components/app/common/Table';
@@ -15,28 +14,31 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import Timestamp from '@/components/app/common/Timestamp';
+import { Block, BlockCountRes, BlocksRes } from 'nb-schemas';
 
 const ListActions = ({
-  countLoading,
-  data,
-  error,
-  setUrl,
-  totalCount,
-}: any) => {
+  dataPromise,
+  countPromise,
+}: {
+  dataPromise: Promise<BlocksRes>;
+  countPromise: Promise<BlockCountRes>;
+}) => {
+  const data = use(dataPromise);
+  const totalCount = use(countPromise);
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
   const t = useTranslations();
   const errorMessage = t('noBlocks') || 'No blocks!';
-
-  const blocks = data?.blocks;
-  const start = data?.blocks?.[0];
-  const end = data?.blocks?.[data?.blocks?.length - 1];
-  const count = totalCount?.blocks?.[0]?.count || 0;
-  const cursor = data?.cursor;
+  const blocks = data?.data;
+  const start = data?.data?.[0];
+  const end = data?.data?.[data?.data?.length - 1];
+  const count = totalCount?.data?.count || 0;
+  const cursor = data?.meta?.cursor;
   const toggleShowAge = () => setShowAge((s) => !s);
+
   const columns: any = [
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           <Link
             className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
@@ -56,7 +58,7 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
         </span>
@@ -93,14 +95,14 @@ const ListActions = ({
         'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-48',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           <Link
             className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
             href={`/txns?block=${row?.block_hash}`}
           >
             {row?.transactions_agg?.count
-              ? localFormat(row?.transactions_agg?.count)
+              ? localFormat(String(row?.transactions_agg?.count))
               : row?.transactions_agg?.count ?? ''}
           </Link>
         </span>
@@ -113,10 +115,10 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           {row?.receipts_agg?.count
-            ? localFormat(row?.receipts_agg?.count)
+            ? localFormat(String(row?.receipts_agg?.count))
             : row?.receipts_agg?.count ?? ''}
         </span>
       ),
@@ -128,7 +130,7 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           <AddressOrTxnsLink copy currentAddress={row?.author_account_id} />
         </span>
@@ -141,7 +143,7 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           {row?.chunks_agg?.gas_used !== null
             ? convertToMetricPrefix(row?.chunks_agg?.gas_used) + 'gas'
@@ -156,7 +158,7 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>{convertToMetricPrefix(row?.chunks_agg?.gas_limit ?? 0)}gas</span>
       ),
       header: <span>{t('block.gasLimit') || 'GAS LIMIT'}</span>,
@@ -167,7 +169,7 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: BlocksInfo) => (
+      cell: (row: Block) => (
         <span>
           {row?.chunks_agg?.gas_used
             ? gasFee(row?.chunks_agg?.gas_used, row?.gas_price)
@@ -183,6 +185,7 @@ const ListActions = ({
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
   ];
+
   return (
     <div className="bg-white dark:bg-black-600 drak:border-black-200 border soft-shadow rounded-xl pb-1 ">
       <Suspense
@@ -223,11 +226,10 @@ const ListActions = ({
       <Table
         columns={columns}
         count={count}
-        countLoading={countLoading}
         cursor={cursor}
         cursorPagination={true}
         data={blocks}
-        Error={error}
+        Error={!blocks}
         ErrorText={
           <ErrorMessage
             icons={<FaInbox />}
@@ -238,7 +240,6 @@ const ListActions = ({
         limit={25}
         page={page}
         setPage={setPage}
-        setUrl={setUrl}
       />
     </div>
   );
