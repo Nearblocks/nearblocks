@@ -32,6 +32,7 @@ SELECT
     'receipts',
     if_not_attached => true
   );
+
 SELECT
   attach_tablespace (
     'receipts_tbs3',
