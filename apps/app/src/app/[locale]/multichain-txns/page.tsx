@@ -3,11 +3,11 @@ import MultiChainTxns from '@/components/app/ChainAbstraction/MultiChainTxns';
 import { getRequestBeta } from '@/utils/app/api';
 import {
   //  McTxnsCountRes,
-  McTxnsReq,
+  MCTxnsReq,
 } from 'nb-schemas';
 
 export default async function TransactionList(props: {
-  searchParams: Promise<McTxnsReq>;
+  searchParams: Promise<MCTxnsReq>;
 }) {
   const searchParams = await props.searchParams;
 
