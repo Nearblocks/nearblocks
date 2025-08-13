@@ -59,20 +59,20 @@ const searchResponse = responseSchema(search);
 
 export type SearchAccount = v.InferOutput<typeof account>;
 export type SearchBlock = v.InferOutput<typeof block>;
-export type SearchFt = v.InferOutput<typeof ft>;
+export type SearchFT = v.InferOutput<typeof ft>;
 export type SearchKey = v.InferOutput<typeof key>;
-// export type SearchMt = v.InferOutput<typeof mt>;
-export type SearchNft = v.InferOutput<typeof nft>;
+// export type SearchMT = v.InferOutput<typeof mt>;
+export type SearchNFT = v.InferOutput<typeof nft>;
 export type SearchReceipt = v.InferOutput<typeof receipt>;
 export type SearchTxn = v.InferOutput<typeof txn>;
 export type Search = v.InferOutput<typeof search>;
 
 export type SearchAccountRes = v.InferOutput<typeof accountResponse>;
 export type SearchBlockRes = v.InferOutput<typeof blockResponse>;
-export type SearchFtRes = v.InferOutput<typeof ftResponse>;
+export type SearchFTRes = v.InferOutput<typeof ftResponse>;
 export type SearchKeyRes = v.InferOutput<typeof keyResponse>;
-// export type SearchMtRes = v.InferOutput<typeof mtResponse>;
-export type SearchNftRes = v.InferOutput<typeof nftResponse>;
+// export type SearchMTRes = v.InferOutput<typeof mtResponse>;
+export type SearchNFTRes = v.InferOutput<typeof nftResponse>;
 export type SearchReceiptRes = v.InferOutput<typeof receiptResponse>;
 export type SearchTxnRes = v.InferOutput<typeof txnResponse>;
 export type SearchRes = v.InferOutput<typeof searchResponse>;

@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import { DestinationChain } from 'nb-types';
+import { EventCause, EventStandard } from 'nb-types';
 
 import { responseSchema } from '../common.js';
 
@@ -11,15 +11,18 @@ const block = v.object({
 });
 
 const txn = v.object({
-  account_id: v.string(),
+  affected_account_id: v.string(),
   block: v.optional(block),
   block_timestamp: v.string(),
-  dest_address: v.nullable(v.string()),
-  dest_chain: v.nullable(v.enum(DestinationChain)),
-  dest_txn: v.nullable(v.string()),
+  cause: v.enum(EventCause),
+  contract_account_id: v.string(),
+  delta_amount: v.string(),
   event_index: v.number(),
-  public_key: v.string(),
+  event_type: v.number(),
+  involved_account_id: v.nullable(v.string()),
   receipt_id: v.string(),
+  shard_id: v.number(),
+  standard: v.enum(EventStandard),
   transaction_hash: v.optional(v.string()),
 });
 
@@ -29,15 +32,17 @@ const txnCount = v.object({
 });
 
 const txnsResponse = responseSchema(
-  v.array(v.omit(txn, ['block_timestamp', 'event_index'])),
+  v.array(
+    v.omit(txn, ['block_timestamp', 'shard_id', 'event_type', 'event_index']),
+  ),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
-export type MCTxn = v.InferOutput<typeof txn>;
-export type MCTxnCount = v.InferOutput<typeof txnCount>;
+export type FTTxn = v.InferOutput<typeof txn>;
+export type FTTxnCount = v.InferOutput<typeof txnCount>;
 
-export type MCTxnsRes = v.InferOutput<typeof txnsResponse>;
-export type MCTxnCountRes = v.InferOutput<typeof txnCountResponse>;
+export type FTTxnsRes = v.InferOutput<typeof txnsResponse>;
+export type FTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
 
 export default {
   count: txnCountResponse,

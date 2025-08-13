@@ -27,7 +27,7 @@ const outcomesAgg = v.object({
   transaction_fee: v.string(),
 });
 
-const txnList = v.object({
+const txn = v.object({
   actions: v.array(action),
   actions_agg: actionsAgg,
   block,
@@ -47,11 +47,11 @@ const txnCount = v.object({
 });
 
 const txnsResponse = responseSchema(
-  v.array(v.omit(txnList, ['block_timestamp', 'shard_id', 'index_in_chunk'])),
+  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk'])),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
-export type AccountTxns = v.InferOutput<typeof txnList>;
+export type AccountTxn = v.InferOutput<typeof txn>;
 export type AccountTxnCount = v.InferOutput<typeof txnCount>;
 
 export type AccountTxnsRes = v.InferOutput<typeof txnsResponse>;

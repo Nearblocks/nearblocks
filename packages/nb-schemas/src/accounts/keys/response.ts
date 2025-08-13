@@ -18,7 +18,7 @@ const deleted = v.object({
   transaction_hash: v.optional(v.string()),
 });
 
-const keysList = v.object({
+const key = v.object({
   action_timestamp: v.string(),
   created,
   deleted,
@@ -31,12 +31,10 @@ const keyCount = v.object({
   count: v.string(),
 });
 
-const keysResponse = responseSchema(
-  v.array(v.omit(keysList, ['action_timestamp'])),
-);
+const keysResponse = responseSchema(v.array(v.omit(key, ['action_timestamp'])));
 const keyCountResponse = responseSchema(keyCount);
 
-export type AccountKeys = v.InferOutput<typeof keysList>;
+export type AccountKey = v.InferOutput<typeof key>;
 export type AccountKeyCount = v.InferOutput<typeof keyCount>;
 
 export type AccountKeysRes = v.InferOutput<typeof keysResponse>;
