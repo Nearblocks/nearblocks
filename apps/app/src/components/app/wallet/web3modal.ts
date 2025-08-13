@@ -74,6 +74,7 @@ const createWeb3Modal = (config: Web3ModalConfig) => {
     coinbasePreference: 'eoaOnly', // Smart accounts (Safe contract) not available on NEAR Protocol, only EOA.
     defaultNetwork: near,
     enableWalletConnect: true,
+    allowUnsupportedChain: true,
     features: {
       analytics: true,
       email: false, // Smart accounts (Safe contract) not available on NEAR Protocol, only EOA.
