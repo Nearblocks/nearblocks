@@ -1,7 +1,7 @@
 import type {
+  AccountKey,
   AccountKeyCount,
   AccountKeyCountReq,
-  AccountKeys,
   AccountKeysReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/accounts/keys/request.js';
@@ -23,7 +23,7 @@ const keys = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const keys = await dbBase.manyOrNone<AccountKeys>(sql.keys.keys, {
+    const keys = await dbBase.manyOrNone<AccountKey>(sql.keys.keys, {
       account,
       cursor: {
         key: cursor?.key,
