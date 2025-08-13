@@ -1,7 +1,7 @@
 import type {
+  AccountReceipt,
   AccountReceiptCount,
   AccountReceiptCountReq,
-  AccountReceipts,
   AccountReceiptsReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/accounts/receipts/request.js';
@@ -43,7 +43,7 @@ const receipts = responseHandler(
       return { data: [] };
     }
 
-    const receiptsQuery: WindowListQuery<AccountReceipts> = (
+    const receiptsQuery: WindowListQuery<AccountReceipt> = (
       start,
       end,
       limit,
@@ -66,7 +66,7 @@ const receipts = responseHandler(
         },
       );
 
-      return dbBase.manyOrNone<AccountReceipts>(sql.receipts.receipts, { cte });
+      return dbBase.manyOrNone<AccountReceipt>(sql.receipts.receipts, { cte });
     };
 
     const receipts = await rollingWindowList(receiptsQuery, {

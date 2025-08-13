@@ -16,32 +16,6 @@ const action = v.object({
   method: v.nullable(v.string()),
 });
 
-const actionsAggList = v.object({
-  deposit: v.string(),
-});
-
-const outcomesList = v.object({
-  status: v.optional(v.boolean()),
-});
-
-const outcomesAggList = v.object({
-  transaction_fee: v.string(),
-});
-
-const txnList = v.object({
-  actions: v.array(action),
-  actions_agg: actionsAggList,
-  block,
-  block_timestamp: v.string(),
-  index_in_chunk: v.number(),
-  outcomes: outcomesList,
-  outcomes_agg: outcomesAggList,
-  receiver_account_id: v.string(),
-  shard_id: v.number(),
-  signer_account_id: v.string(),
-  transaction_hash: v.string(),
-});
-
 const actionsAgg = v.object({
   deposit: v.string(),
   gas_attached: v.string(),
@@ -61,6 +35,8 @@ const txn = v.object({
   actions: v.array(action),
   actions_agg: actionsAgg,
   block,
+  block_timestamp: v.string(),
+  index_in_chunk: v.number(),
   outcomes: outcomes,
   outcomes_agg: outcomesAgg,
   receipt_conversion_gas_burnt: v.string(),
@@ -126,28 +102,29 @@ export type TxnReceipts = {
 };
 
 // recursive schemas require explicit types
-const txnReceipts: v.GenericSchema<TxnReceipts> = v.object({
+const txnReceipt: v.GenericSchema<TxnReceipts> = v.object({
   actions: v.array(actionsReceipts),
   block,
   outcome: outcomeReceipts,
   predecessor_account_id: v.string(),
   public_key: v.string(),
   receipt_id: v.string(),
-  receipts: v.array(v.lazy(() => txnReceipts)),
+  receipts: v.array(v.lazy(() => txnReceipt)),
   receiver_account_id: v.string(),
 });
 
-const txnResponse = responseSchema(txn);
+const txnResponse = responseSchema(
+  v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk']),
+);
 const txnsResponse = responseSchema(
-  v.array(v.omit(txnList, ['block_timestamp', 'shard_id', 'index_in_chunk'])),
+  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk'])),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
-const txnReceiptsResponse = responseSchema(txnReceipts);
+const txnReceiptsResponse = responseSchema(txnReceipt);
 
 export type Txn = v.InferOutput<typeof txn>;
-export type Txns = v.InferOutput<typeof txnList>;
 export type TxnCount = v.InferOutput<typeof txnCount>;
-// export type TxnReceipts = v.InferOutput<typeof txnReceipts>;
+// export type TxnReceipt = v.InferOutput<typeof txnReceipt>;
 
 export type TxnRes = v.InferOutput<typeof txnResponse>;
 export type TxnsRes = v.InferOutput<typeof txnsResponse>;

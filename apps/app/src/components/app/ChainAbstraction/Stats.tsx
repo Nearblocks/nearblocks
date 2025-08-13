@@ -7,15 +7,15 @@ import { Link } from '@/i18n/routing';
 import MiniChart from '@/components/app/Charts/MiniChart';
 import BarChart from '@/components/app/Icons/BarChart';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
-import { McTxnCountRes } from 'nb-schemas';
+import { MCTxnCountRes } from 'nb-schemas';
 import { DestinationChain } from 'nb-types';
 import { use } from 'react';
 
 interface StatsProps {
   dataChartPromise: Promise<any>;
   error: boolean;
-  txns24HrCountPromise: Promise<McTxnCountRes>;
-  txnsTotalCountPromise: Promise<McTxnCountRes>;
+  txns24HrCountPromise: Promise<MCTxnCountRes>;
+  txnsTotalCountPromise: Promise<MCTxnCountRes>;
 }
 
 const Stats = ({

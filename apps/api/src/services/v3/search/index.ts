@@ -1,9 +1,9 @@
 import type {
   SearchAccount,
   SearchBlock,
-  SearchFt,
+  SearchFT,
   SearchKey,
-  SearchNft,
+  SearchNFT,
   SearchReceipt,
   SearchReq,
   SearchTxn,
@@ -33,7 +33,7 @@ const getKeys = async (keyword: string) => {
 const getFts = async (keyword: string) => {
   const query = keyword.toLowerCase();
 
-  return dbEvents.manyOrNone<SearchFt>(sql.fts, {
+  return dbEvents.manyOrNone<SearchFT>(sql.fts, {
     contract: query,
     hex: /^0x/.test(query) ? query : null,
   });
@@ -42,7 +42,7 @@ const getFts = async (keyword: string) => {
 const getNfts = async (keyword: string) => {
   const query = keyword.toLowerCase();
 
-  return dbEvents.manyOrNone<SearchNft>(sql.nfts, {
+  return dbEvents.manyOrNone<SearchNFT>(sql.nfts, {
     contract: query,
   });
 };
