@@ -1,7 +1,7 @@
 import type {
+  AccountTxn,
   AccountTxnCount,
   AccountTxnCountReq,
-  AccountTxns,
   AccountTxnsReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/accounts/txns/request.js';
@@ -36,7 +36,7 @@ const txns = responseHandler(
       return { data: [] };
     }
 
-    const txnsQuery: WindowListQuery<AccountTxns> = (start, end, limit) => {
+    const txnsQuery: WindowListQuery<AccountTxn> = (start, end, limit) => {
       const cte = pgp.as.format(
         signer || receiver ? sql.txns.cte : sql.txns.cteUnion,
         {
@@ -53,7 +53,7 @@ const txns = responseHandler(
         },
       );
 
-      return dbBase.manyOrNone<AccountTxns>(sql.txns.txns, { cte });
+      return dbBase.manyOrNone<AccountTxn>(sql.txns.txns, { cte });
     };
 
     const txns = await rollingWindowList(txnsQuery, {

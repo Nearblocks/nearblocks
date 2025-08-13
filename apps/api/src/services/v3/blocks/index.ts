@@ -78,9 +78,9 @@ const blocks = responseHandler(
 );
 
 const count = responseHandler(response.count, async () => {
-  const block = await dbBase.one<BlockCount>(sql.estimate);
+  const blocks = await dbBase.one<BlockCount>(sql.estimate);
 
-  return { data: block };
+  return { data: blocks };
 });
 
 const block = responseHandler(

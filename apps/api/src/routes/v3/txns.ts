@@ -65,6 +65,26 @@ const routes = (app: Router) => {
    *     summary: Get estimated txns count
    *     tags:
    *       - V3 / Txns
+   *     parameters:
+   *       - in: query
+   *         name: block
+   *         description: Block hash to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: after_ts
+   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
+   *       - in: query
+   *         name: before_ts
+   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
    *     responses:
    *       200:
    *         description: Success response

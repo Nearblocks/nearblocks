@@ -1,4 +1,6 @@
-import type { McTxnCount, McTxnCountReq, McTxns, McTxnsReq } from 'nb-schemas';
+import { unionWith } from 'es-toolkit';
+
+import type { MCTxn, MCTxnCount, MCTxnCountReq, MCTxnsReq } from 'nb-schemas';
 import request from 'nb-schemas/dist/multichain/request.js';
 import response from 'nb-schemas/dist/multichain/response.js';
 
@@ -16,7 +18,7 @@ import sql from '#sql/multichain';
 
 const txns = responseHandler(
   response.txns,
-  async (req: RequestValidator<McTxnsReq>) => {
+  async (req: RequestValidator<MCTxnsReq>) => {
     const limit = req.validator.limit;
     const account = req.validator.account;
     const after = req.validator.after_ts;
@@ -26,20 +28,21 @@ const txns = responseHandler(
       : null;
 
     const signaturesQuery: WindowListQuery<
-      Omit<McTxns, 'block' | 'transaction_hash'>
+      Omit<MCTxn, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
-      return dbMultichain.manyOrNone<
-        Omit<McTxns, 'block' | 'transaction_hash'>
-      >(sql.signatures, {
-        account,
-        after: start,
-        before: end,
-        cursor: {
-          index: cursor?.index,
-          timestamp: cursor?.timestamp,
+      return dbMultichain.manyOrNone<Omit<MCTxn, 'block' | 'transaction_hash'>>(
+        sql.signatures,
+        {
+          account,
+          after: start,
+          before: end,
+          cursor: {
+            index: cursor?.index,
+            timestamp: cursor?.timestamp,
+          },
+          limit,
         },
-        limit,
-      });
+      );
     };
 
     const signatures = await rollingWindowList(signaturesQuery, {
@@ -57,7 +60,23 @@ const txns = responseHandler(
       return pgp.as.format(sql.signatureTxn, signature);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<McTxns>(unionQuery);
+    const txns = await dbBase.manyOrNone<MCTxn>(unionQuery);
+
+    // Lengths don't match, it means receipts are missing due to slower indexing.
+    if (txns.length !== signatures.length) {
+      const merged = unionWith(
+        txns,
+        signatures,
+        (a, b) =>
+          `${a.block_timestamp}${a.event_index}` ===
+          `${b.block_timestamp}${b.event_index}`,
+      );
+
+      return paginateData(merged, limit, (txn) => ({
+        index: txn.event_index,
+        timestamp: txn.block_timestamp,
+      }));
+    }
 
     return paginateData(txns, limit, (txn) => ({
       index: txn.event_index,
@@ -68,12 +87,12 @@ const txns = responseHandler(
 
 const count = responseHandler(
   response.count,
-  async (req: RequestValidator<McTxnCountReq>) => {
+  async (req: RequestValidator<MCTxnCountReq>) => {
     const account = req.validator.account;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
-    const estimated = await dbMultichain.one<McTxnCount>(sql.signatureCount, {
+    const estimated = await dbMultichain.one<MCTxnCount>(sql.signatureCount, {
       account,
       after,
       before,
@@ -86,7 +105,7 @@ const count = responseHandler(
       return { data: estimated };
     }
 
-    const txn = await dbMultichain.one<McTxnCount>(sql.signatureCount, {
+    const txn = await dbMultichain.one<MCTxnCount>(sql.signatureCount, {
       account,
       after,
       before,
