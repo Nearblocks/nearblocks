@@ -5,7 +5,6 @@ import type {
   TxnReceipts,
   TxnReceiptsReq,
   TxnReq,
-  Txns,
   TxnsLatestReq,
   TxnsReq,
 } from 'nb-schemas';
@@ -31,16 +30,16 @@ const latest = responseHandler(
   async (req: RequestValidator<TxnsLatestReq>) => {
     const limit = req.validator.limit;
 
-    const rollingQuery = rollingWindowList<Txns>(
+    const rollingQuery = rollingWindowList<Txn>(
       (start, end) => {
         const cte = pgp.as.format(sql.latestCte, { end, limit, start });
 
-        return dbBase.manyOrNone<Txns>(sql.txns, { cte });
+        return dbBase.manyOrNone<Txn>(sql.txns, { cte });
       },
       { limit },
     );
 
-    const txns = await redis.cache<Txns[]>(
+    const txns = await redis.cache<Txn[]>(
       `txns:latest:${limit}`,
       () => rollingQuery,
       5, // cache results for 5s
@@ -61,7 +60,7 @@ const txns = responseHandler(
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
-    const txnsQuery: WindowListQuery<Txns> = (start, end, limit) => {
+    const txnsQuery: WindowListQuery<Txn> = (start, end, limit) => {
       const cte = pgp.as.format(sql.txnsCte, {
         after: start,
         before: end,
@@ -74,7 +73,7 @@ const txns = responseHandler(
         limit,
       });
 
-      return dbBase.manyOrNone<Txns>(sql.txns, { cte });
+      return dbBase.manyOrNone<Txn>(sql.txns, { cte });
     };
 
     const txns = await rollingWindowList(txnsQuery, {
@@ -104,7 +103,7 @@ const count = responseHandler(
     const before = req.validator.before_ts;
 
     if (block) {
-      const txn = await rollingWindow((start, end) => {
+      const txns = await rollingWindow((start, end) => {
         return dbBase.oneOrNone<Pick<TxnCount, 'count'>>(sql.count, {
           after: start,
           before: end,
@@ -112,7 +111,7 @@ const count = responseHandler(
         });
       });
 
-      return { data: txn };
+      return { data: txns };
     }
 
     const estimated = await dbBase.one<TxnCount>(sql.estimate, {
@@ -127,9 +126,13 @@ const count = responseHandler(
       return { data: estimated };
     }
 
-    const txn = await dbBase.one<TxnCount>(sql.count, { after, before, block });
+    const txns = await dbBase.one<TxnCount>(sql.count, {
+      after,
+      before,
+      block,
+    });
 
-    return { data: txn };
+    return { data: txns };
   },
 );
 

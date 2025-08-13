@@ -23,7 +23,7 @@ const outcome = v.object({
   status: v.optional(v.boolean()),
 });
 
-const receiptsList = v.object({
+const receipt = v.object({
   actions: v.array(action),
   actions_agg: actionsAgg,
   block,
@@ -44,7 +44,7 @@ const receiptCount = v.object({
 
 const receiptsResponse = responseSchema(
   v.array(
-    v.omit(receiptsList, [
+    v.omit(receipt, [
       'included_in_block_timestamp',
       'shard_id',
       'index_in_chunk',
@@ -53,7 +53,7 @@ const receiptsResponse = responseSchema(
 );
 const receiptCountResponse = responseSchema(v.omit(receiptCount, ['cost']));
 
-export type AccountReceipts = v.InferOutput<typeof receiptsList>;
+export type AccountReceipt = v.InferOutput<typeof receipt>;
 export type AccountReceiptCount = v.InferOutput<typeof receiptCount>;
 
 export type AccountReceiptsRes = v.InferOutput<typeof receiptsResponse>;

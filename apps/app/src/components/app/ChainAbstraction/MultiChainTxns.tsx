@@ -9,12 +9,13 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
+import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 import { chainAbstractionExplorerUrl } from '@/utils/app/config';
 import { getFilteredQueryParams, localFormat } from '@/utils/app/libs';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Filters from '@/components/app/common/Filters';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import Table from '@/components/app/common/Table';
 import TableSummary from '@/components/app/common/TableSummary';
 import Timestamp from '@/components/app/common/Timestamp';
@@ -23,14 +24,13 @@ import Clock from '@/components/app/Icons/Clock';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Filter from '@/components/app/Icons/Filter';
 import Near from '@/components/app/Icons/Near';
-import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import { McTxnCount, McTxns } from 'nb-schemas';
 import { useNetworkIcons } from '@/hooks/app/useNetworkIcons';
 import { FilterKind } from '@/utils/types';
+import { MCTxn, MCTxnCount, MCTxnsRes } from 'nb-schemas';
 
 interface MultiChainTxnsProps {
-  dataPromise: Promise<{ data: McTxns[]; meta?: { cursor?: string } }>;
-  countPromise: Promise<McTxnCount>;
+  dataPromise: Promise<MCTxnsRes>;
+  countPromise: Promise<MCTxnCount>;
   isTab: boolean;
   tab: string;
 }
@@ -135,7 +135,7 @@ const MultiChainTxns = ({
 
   const columns: any = [
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <Tooltip
           className={'left-20 max-w-[200px]'}
           position="top"
@@ -159,7 +159,7 @@ const MultiChainTxns = ({
         'pl-6 pr-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -192,7 +192,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -276,7 +276,7 @@ const MultiChainTxns = ({
       thClassName: 'px-4 py-4',
     },
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -316,7 +316,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -359,7 +359,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <span>
           <Link
             className="text-green-500  dark:text-green-250 hover:no-underline"
@@ -379,7 +379,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: McTxns) => (
+      cell: (row: MCTxn) => (
         <span>
           <Timestamp
             showAge={showAge}
