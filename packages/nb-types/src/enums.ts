@@ -126,6 +126,11 @@ export enum StakingEventType {
   UNSTAKE = 'UNSTAKE',
 }
 
+export enum ContractEventType {
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE',
+}
+
 // Used for creating DB event index
 export enum EventType {
   NEP141 = 1,
