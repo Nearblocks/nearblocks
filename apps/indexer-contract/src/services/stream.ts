@@ -1,7 +1,4 @@
-// Temp batch processing
-import { forEach } from 'hwp';
-
-import { Message, streamBlock } from 'nb-blocks';
+import { Message, streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
 
 import config from '#config';
@@ -11,13 +8,11 @@ import { storeChanges } from '#services/changes';
 
 const indexerKey = 'contract';
 const s3Config = {
-  credentials: {
-    accessKeyId: config.s3AccessKey,
-    secretAccessKey: config.s3SecretKey,
-  },
-  endpoint: config.s3Endpoint,
-  forcePathStyle: true,
-  region: config.s3Region,
+  accessKey: config.s3AccessKey,
+  endPoint: config.s3Host,
+  port: config.s3Port,
+  secretKey: config.s3SecretKey,
+  useSSL: config.s3UseSsl,
 };
 
 export const syncData = async () => {
@@ -44,11 +39,9 @@ export const syncData = async () => {
     start: startBlock,
   });
 
-  // for await (const message of stream) {
-  //   await onMessage(message);
-  // }
-  // Temp batch processing
-  await forEach(stream, onMessage, 50);
+  for await (const message of stream) {
+    await onMessage(message);
+  }
 
   stream.on('end', () => {
     logger.error('stream ended');
