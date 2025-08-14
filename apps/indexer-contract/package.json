@@ -19,7 +19,6 @@
     "@scure/base": "1.1.9",
     "@sentry/node": "7.74.1",
     "envalid": "8.0.0",
-    "hwp": "0.4.1",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
@@ -27,7 +26,7 @@
     "@types/node": "~22.9",
     "eslint-config-custom-node": "*",
     "knex-migrate-sql-file": "~2.0",
-    "nb-blocks": "*",
+    "nb-blocks-minio": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-tsconfig": "*",

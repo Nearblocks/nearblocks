@@ -8,7 +8,7 @@ import {
   ExecutionOutcomeWithReceipt,
   Message,
   Shard,
-} from 'nb-blocks';
+} from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
 import {
   ContractCodeEvent,
@@ -47,28 +47,24 @@ type ContractEvents = {
 export const storeChanges = async (knex: Knex, message: Message) => {
   await Promise.all(
     message.shards.map(async (shard) => {
-      await storeChunkBalance(knex, shard, message.block.header);
+      await storeChunkChanges(knex, shard, message.block.header);
     }),
   );
 };
 
-export const storeChunkBalance = async (
+export const storeChunkChanges = async (
   knex: Knex,
   shard: Shard,
   block: BlockHeader,
 ) => {
   const changes = getStateChanges(shard.stateChanges);
-  const { code, data } = getReceiptChanges(
+  const { code } = getReceiptChanges(
     shard.receiptExecutionOutcomes,
     changes.code,
-    changes.data,
     block,
   );
 
-  await Promise.all([
-    insertCodeChanges(knex, shard.shardId, code),
-    insertDataChanges(knex, shard.shardId, data),
-  ]);
+  await Promise.all([insertCodeChanges(knex, shard.shardId, code)]);
 };
 
 const getStateChanges = (stateChanges: BStateChange[]) => {
@@ -140,7 +136,6 @@ const getStateChanges = (stateChanges: BStateChange[]) => {
 const getReceiptChanges = (
   outcomes: ExecutionOutcomeWithReceipt[],
   codeChanges: Map<string, ContractCode>,
-  dataChanges: Map<string, ContractData>,
   block: BlockHeader,
 ) => {
   const result: ContractEvents = {
@@ -177,30 +172,6 @@ const getReceiptChanges = (
         shard_id: 0, // placeholder; actual value will be set later
       });
     }
-
-    const dataChange = dataChanges.get(receiptId);
-
-    if (dataChange) {
-      if (dataChange.accountId !== affectedAccount) {
-        throw new Error(
-          `Unexpected code change info found for receipt ${receiptId}. Expected account ${affectedAccount}, Actual account ${dataChange.accountId}`,
-        );
-      }
-
-      dataChanges.delete(receiptId);
-
-      result.data.push({
-        block_height: block.height,
-        block_timestamp: block.timestampNanosec,
-        contract_account_id: dataChange.accountId,
-        event_type: ContractEventType.UPDATE,
-        index_in_chunk: 0, // placeholder; actual value will be set later
-        key_base64: dataChange.keyBase64,
-        receipt_id: receiptId,
-        shard_id: 0, // placeholder; actual value will be set later
-        value_base64: dataChange.valueBase64,
-      });
-    }
   }
 
   if (codeChanges.size) {
@@ -215,29 +186,16 @@ const getReceiptChanges = (
     );
   }
 
-  if (dataChanges.size) {
-    throw new Error(
-      `${
-        dataChanges.size
-      } changes for transactions were not applied, block_height ${
-        block.height
-      }, keys: ${[...dataChanges.keys()]}, values: ${JSON.stringify([
-        ...dataChanges.values(),
-      ])}`,
-    );
-  }
-
   return result;
 };
 
 const getCodeHash = (code: string) => {
   if (!code) return null;
 
-  const sha = createHash('sha256')
-    .update(Buffer.from(code, 'base64'))
-    .digest('hex');
+  const codeBytes = Uint8Array.from(Buffer.from(code, 'base64'));
+  const sha = createHash('sha256').update(codeBytes).digest();
 
-  return base58.encode(Buffer.from(sha, 'hex'));
+  return base58.encode(Uint8Array.from(sha));
 };
 
 const insertCodeChanges = async (
@@ -256,28 +214,6 @@ const insertCodeChanges = async (
 
   await retry(async () => {
     await knex('contract_code_events')
-      .insert(changes)
-      .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
-      .ignore();
-  });
-};
-
-const insertDataChanges = async (
-  knex: Knex,
-  shardId: number,
-  changes: ContractDataEvent[],
-) => {
-  const legnth = changes.length;
-
-  if (!legnth) return;
-
-  for (let index = 0; index < legnth; index++) {
-    changes[index].shard_id = shardId;
-    changes[index].index_in_chunk = index;
-  }
-
-  await retry(async () => {
-    await knex('contract_data_events')
       .insert(changes)
       .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
       .ignore();
