@@ -5,6 +5,7 @@ import { Network } from 'nb-types';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  CONTRACT_INDEXER_KEY: str(),
   CONTRACT_START_BLOCK: num({ default: 0 }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
@@ -31,6 +32,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   dbUrlBase: env.DATABASE_URL_BASE,
+  indexerKey: env.CONTRACT_INDEXER_KEY,
   network: env.NETWORK,
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,

@@ -24,6 +24,7 @@ jobs:
             indexer-receipts,
             indexer-s3,
             indexer-accounts,
+            indexer-contract,
             explorer-selector,
             aggregates,
           ]

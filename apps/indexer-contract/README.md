@@ -8,6 +8,7 @@ Contract indexer collects the info about NEAR contract state changes
 DATABASE_URL=
 DATABASE_URL_BASE=
 NETWORK=mainnet
+CONTRACT_INDEXER_KEY=
 S3_ENDPOINT=
 S3_ACCESS_KEY=
 S3_SECRET_KEY=
