@@ -49,12 +49,10 @@ import ErrorMessage from '@/components/app/common/ErrorMessage';
 import TxnStatus from '@/components/app/common/Status';
 import TokenImage, { NFTImage } from '@/components/app/common/TokenImage';
 import Tooltip from '@/components/app/common/Tooltip';
-import Bolt from '@/components/app/Icons/Bolt';
 import FaRight from '@/components/app/Icons/FaRight';
 import FileSlash from '@/components/app/Icons/FileSlash';
 import Question from '@/components/app/Icons/Question';
 import EventLogs from '@/components/app/Transactions/Action';
-import Actions from '@/components/app/Transactions/Actions';
 import NEPTokenTransactions from '@/components/app/Transactions/NEPTokenTransactions';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import { CopyButton } from '@/components/app/common/CopyButton';
@@ -63,6 +61,7 @@ import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import RpcTxnStatus from '@/components/app/common/RpcStatus';
 import useScrollToTop from '@/hooks/app/useScrollToTop';
 import Timestamp from '@/components/app/common/Timestamp';
+import Actions from './Actions';
 
 interface Props {
   hash: string;
@@ -102,20 +101,16 @@ const Details = (props: Props) => {
   const { networkId } = useConfig();
 
   const t = useTranslations();
-  const actionRef = useRef<HTMLDivElement>(null);
   const actionRowRef = useRef<HTMLDivElement>(null);
   const tokensRef = useRef<HTMLDivElement>(null);
-  const { isAtBottom, scrollToTop } = useScrollToTop(actionRef);
   const { isAtBottom: bottomTokens, scrollToTop: topTokens } =
     useScrollToTop(tokensRef);
-  const [isActionScroll, setIsActionScroll] = useState(false);
   const [isActionRowScroll, setIsActionRowScroll] = useState(false);
   const [isTokensScroll, setisTokensScroll] = useState(false);
 
   const {
     apiLogs,
     apiActionLogs,
-    apiMainActions,
     tokenMetadata,
     apiAllActions,
     apiSubActions,
@@ -177,12 +172,13 @@ const Details = (props: Props) => {
   }
 
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const [
     rpcLogs,
     rpcActionLogs,
     rpcSubActions,
     rpcAllActions,
-    rpcMainActions,
+    ,
     rpcErrorMessage,
   ] = useMemo(() => {
     if (!isEmpty(rpcTxn)) {
@@ -320,66 +316,6 @@ const Details = (props: Props) => {
       ? apiFilteredLogs
       : rpcFilteredLogs;
 
-  const rpcMainTxnsActions =
-    rpcMainActions &&
-    rpcMainActions?.map((txn) => {
-      const filteredNepLogs = rpcLogs?.filter((item: any) => {
-        try {
-          const logContent = item?.logs?.match(/EVENT_JSON:(\{.*\})/);
-          if (logContent) {
-            const jsonLog = JSON.parse(logContent[1]);
-            return jsonLog?.standard === 'nep245';
-          }
-          return false;
-        } catch {
-          return false;
-        }
-      });
-      if (filteredNepLogs?.length > 0) {
-        return {
-          ...txn,
-          logs: [...filteredNepLogs],
-        };
-      } else {
-        return {
-          ...txn,
-          logs: [...txn.logs, ...filteredNepLogs],
-        };
-      }
-    });
-
-  const apiMainTxnsActions = apiMainActions?.map((txn: any) => {
-    const filteredApiNepLogs = apiLogs?.filter((log: any) => {
-      try {
-        if (
-          log?.logs?.standard === 'nep245' ||
-          log?.logs?.standard === 'dip4'
-        ) {
-          return log;
-        }
-        return false;
-      } catch {
-        return false;
-      }
-    });
-    if (filteredApiNepLogs?.length > 0) {
-      return {
-        ...txn,
-        logs: [...filteredApiNepLogs],
-      };
-    } else {
-      return {
-        ...txn,
-        logs: [...txn.logs, ...filteredApiNepLogs],
-      };
-    }
-  });
-
-  const updatedMainTxnsActions =
-    apiMainTxnsActions?.length > 0 && !shouldUseRpc
-      ? apiMainTxnsActions
-      : rpcMainTxnsActions;
-
   const rpcTokenIdsCount = rpcActionLogs?.reduce(
     (totalCount: number, item: any) => {
       try {
@@ -436,13 +372,6 @@ const Details = (props: Props) => {
     : rpcTokenIdsCount;
 
   useEffect(() => {
-    if (actionRef?.current) {
-      const height = actionRef?.current?.offsetHeight;
-      setIsActionScroll(height >= 180);
-    }
-  }, [updatedMainTxnsActions]);
-
-  useEffect(() => {
     if (tokensRef?.current) {
       const height = tokensRef?.current?.offsetHeight;
       setisTokensScroll(height >= 180);
@@ -451,9 +380,6 @@ const Details = (props: Props) => {
 
   const totalTokens = (fts?.length || 0) + (nfts?.length || 0);
   const hasScrolledToken = totalTokens > 5 || isTokensScroll;
-
-  const isActionScrollable =
-    (updatedMainTxnsActions?.length || 0) > 6 || isActionScroll;
   const totalItems =
     (filteredLogs?.length || 0) +
     (apiSubActions?.length || rpcSubActions?.length || 0);
@@ -675,106 +601,6 @@ const Details = (props: Props) => {
               )}
             </div>
           </div>
-          {updatedMainTxnsActions && updatedMainTxnsActions?.length >= 0 && (
-            <div
-              className="bg-white dark:bg-black-600 text-sm text-nearblue-600 dark:text-neargray-10 py-1"
-              id="mainaction-row"
-            >
-              <div className="flex items-start flex-wrap px-4 py-2.5">
-                <div className="flex items-center w-full md:w-1/4 mb-0 sm:mb-2 md:mb-0 leading-7">
-                  <Tooltip
-                    className={'w-96 left-25 max-w-[200px]'}
-                    tooltip={'Highlighted events of the transaction'}
-                  >
-                    <div>
-                      <Bolt className="w-4 h-4 fill-current mr-1" />
-                    </div>
-                  </Tooltip>
-                  Transaction Actions
-                </div>
-                {loading ||
-                (updatedMainTxnsActions?.length === 0 &&
-                  updatedMainTxnsActions) ? (
-                  <div className="w-full md:w-3/4">
-                    <Loader wrapperClassName="flex w-full max-w-xl" />
-                  </div>
-                ) : (
-                  <div
-                    id="mainaction-column"
-                    className="w-full md:w-3/4 align-middle"
-                  >
-                    <div
-                      ref={actionRef}
-                      className={`max-h-[194px] ${
-                        isActionScrollable ? 'mostly-customized-scrollbar' : ''
-                      }`}
-                    >
-                      <div className="break-words space-y-2 align-middle">
-                        {updatedMainTxnsActions &&
-                          updatedMainTxnsActions?.[0]?.logs?.map(
-                            (event: TransactionLog, i: number) => (
-                              <EventLogs
-                                key={i}
-                                event={event}
-                                allActionLog={apiAllActions || rpcAllActions}
-                                tokenMetadata={tokenMetadata}
-                              />
-                            ),
-                          )}
-                        {updatedMainTxnsActions &&
-                          (updatedMainTxnsActions[0]?.logs?.length === 0 ||
-                            (() => {
-                              try {
-                                const logs = updatedMainTxnsActions[0]?.logs;
-                                return logs?.every((log: any) => {
-                                  const logData = log?.logs;
-                                  const isJson =
-                                    typeof logData === 'string' &&
-                                    logData?.startsWith('EVENT_JSON:');
-                                  if (isJson) {
-                                    const parsedJson = JSON.parse(
-                                      logData.replace('EVENT_JSON:', ''),
-                                    );
-
-                                    return parsedJson?.standard !== 'nep245';
-                                  } else {
-                                    return logData?.standard !== 'nep245';
-                                  }
-                                });
-                              } catch (error) {
-                                return false;
-                              }
-                            })()) &&
-                          updatedMainTxnsActions?.map(
-                            (action: any, i: number) => (
-                              <Actions key={i} action={action} />
-                            ),
-                          )}
-                      </div>
-                    </div>
-                    {isActionScrollable &&
-                      (isAtBottom ? (
-                        <button
-                          className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10"
-                          onClick={() => scrollToTop()}
-                        >
-                          <ArrowDownDouble
-                            className="w-4 h-4 dark:invert"
-                            style={{ transform: 'rotate(180deg)' }}
-                          />
-                          Scroll to Top
-                        </button>
-                      ) : (
-                        <div className="flex text-xs pt-2 mt-2 text-nearblue-600 dark:text-neargray-10">
-                          <ArrowDownDouble className="w-4 h-4 dark:invert" />
-                          Scroll for more
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {((txn && Object.keys(txn).length > 0) ||
             (rpcTxn && Object.keys(rpcTxn).length > 0)) && (
