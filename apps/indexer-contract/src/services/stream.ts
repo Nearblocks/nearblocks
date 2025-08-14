@@ -6,7 +6,7 @@ import { db, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeChanges } from '#services/changes';
 
-const indexerKey = 'contract';
+const indexerKey = config.indexerKey;
 const s3Config = {
   accessKey: config.s3AccessKey,
   endPoint: config.s3Host,
