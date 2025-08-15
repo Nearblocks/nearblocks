@@ -19,7 +19,7 @@ const Tooltip = ({
     top: 'bottom-[80%] -translate-x-1/2 mb-2',
   };
 
-  return (
+  return tooltip ? (
     <span className="relative group">
       <span
         className={`absolute z-10 bg-black text-white text-xs break-words rounded-lg p-2 transition-all invisible opacity-0 group-hover:visible group-hover:opacity-80 ${tooltipPositionClasses[position]} ${className}`}
@@ -31,7 +31,7 @@ const Tooltip = ({
       </span>
       <span>{children}</span>
     </span>
-  );
+  ) : null;
 };
 
 export default Tooltip;

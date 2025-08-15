@@ -27,6 +27,7 @@ import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider'
 import { McTxnCount, McTxns } from 'nb-schemas';
 import { useNetworkIcons } from '@/hooks/app/useNetworkIcons';
 import { FilterKind } from '@/utils/types';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface MultiChainTxnsProps {
   dataPromise: Promise<{ data: McTxns[]; meta?: { cursor?: string } }>;
@@ -135,22 +136,25 @@ const MultiChainTxns = ({
 
   const columns: any = [
     {
-      cell: (row: McTxns) => (
-        <Tooltip
-          className={'left-20 max-w-[200px]'}
-          position="top"
-          tooltip={row?.receipt_id}
-        >
-          <span className="truncate max-w-[150px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
-            <Link
-              className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-              href={`/txns/${row?.transaction_hash}?tab=execution#${row?.receipt_id}`}
-            >
-              {row?.receipt_id}
-            </Link>
-          </span>
-        </Tooltip>
-      ),
+      cell: (row: McTxns) =>
+        row?.receipt_id ? (
+          <Tooltip
+            className={'left-20 max-w-[200px]'}
+            position="top"
+            tooltip={row?.receipt_id}
+          >
+            <span className="truncate max-w-[150px] inline-block align-bottom text-green-500  dark:text-green-250 whitespace-nowrap ">
+              <Link
+                className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
+                href={`/txns/${row?.transaction_hash}?tab=execution#${row?.receipt_id}`}
+              >
+                {row?.receipt_id}
+              </Link>
+            </span>
+          </Tooltip>
+        ) : (
+          <Skeleton className="h-4 w-32" />
+        ),
       header: <span>{t ? t('receiptId') : 'RECEIPT ID'}</span>,
       key: 'receipt_id',
       tdClassName:
@@ -159,32 +163,35 @@ const MultiChainTxns = ({
         'pl-6 pr-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
-        <span>
-          <Tooltip
-            className={'left-1/2 max-w-[200px]'}
-            position="top"
-            tooltip={row?.transaction_hash}
-          >
-            <span className="flex items-center">
-              {row?.transaction_hash && (
-                <div className="flex items-center mr-1">
-                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                    <Near className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
+      cell: (row: McTxns) =>
+        row?.transaction_hash ? (
+          <span>
+            <Tooltip
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row?.transaction_hash}
+            >
+              <span className="flex items-center">
+                {row?.transaction_hash && (
+                  <div className="flex items-center mr-1">
+                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                      <Near className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
+                    </div>
                   </div>
-                </div>
-              )}
-              <AddressOrTxnsLink
-                copy
-                txnHash={row?.transaction_hash}
-                className={
-                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
-                }
-              />
-            </span>
-          </Tooltip>
-        </span>
-      ),
+                )}
+                <AddressOrTxnsLink
+                  copy
+                  txnHash={row?.transaction_hash}
+                  className={
+                    'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+                  }
+                />
+              </span>
+            </Tooltip>
+          </span>
+        ) : (
+          <Skeleton className="h-4 w-32" />
+        ),
       header: <span>{t ? t('sourceTxn') : 'SOURCE TXN HASH'}</span>,
       key: 'source_transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
@@ -192,33 +199,36 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
-        <span>
-          <Tooltip
-            className={'left-1/2 max-w-[200px]'}
-            position="top"
-            tooltip={row?.account_id}
-          >
-            <span className="flex items-center">
-              {row?.account_id && (
-                <div className="flex items-center mr-1">
-                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                    <Near className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
+      cell: (row: McTxns) =>
+        row?.account_id ? (
+          <span>
+            <Tooltip
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row?.account_id}
+            >
+              <span className="flex items-center">
+                {row?.account_id && (
+                  <div className="flex items-center mr-1">
+                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                      <Near className="w-4 h-4 text-nearblue-600 dark:text-neargray-10" />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <AddressOrTxnsLink
-                copy
-                currentAddress={row?.account_id}
-                className={
-                  'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
-                }
-              />
-            </span>
-          </Tooltip>
-        </span>
-      ),
+                <AddressOrTxnsLink
+                  copy
+                  currentAddress={row?.account_id}
+                  className={
+                    'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+                  }
+                />
+              </span>
+            </Tooltip>
+          </span>
+        ) : (
+          <Skeleton className="h-4 w-20" />
+        ),
       header: (
         <>
           <PopoverRoot positioning={{ sameWidth: true }}>
@@ -276,39 +286,44 @@ const MultiChainTxns = ({
       thClassName: 'px-4 py-4',
     },
     {
-      cell: (row: McTxns) => (
-        <span>
-          <Tooltip
-            className={'left-1/2 max-w-[200px]'}
-            position="top"
-            tooltip={row?.dest_txn}
-          >
-            <span className="flex items-center">
-              {row?.dest_txn && row?.dest_chain ? (
-                <div className="flex items-center mr-1">
-                  <div className="flex items-center">
-                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                      {networkIcon({ network: row?.dest_chain })}
+      cell: (row: McTxns) =>
+        row?.dest_txn ? (
+          <span>
+            <Tooltip
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row?.dest_txn}
+            >
+              <span className="flex items-center">
+                {row?.dest_txn && row?.dest_chain ? (
+                  <div className="flex items-center mr-1">
+                    <div className="flex items-center">
+                      <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                        {networkIcon({ network: row?.dest_chain })}
+                      </div>
+                      <AddressOrTxnsLink
+                        copy
+                        txnHash={row?.dest_txn}
+                        href={handleChainSelect(
+                          row?.dest_chain?.toLowerCase() || '',
+                          '',
+                          row?.dest_txn,
+                        )}
+                        className="ml-2 truncate max-w-[100px] inline-block align-bottom whitespace-nowrap"
+                      />
                     </div>
-                    <AddressOrTxnsLink
-                      copy
-                      txnHash={row?.dest_txn}
-                      href={handleChainSelect(
-                        row?.dest_chain?.toLowerCase() || '',
-                        '',
-                        row?.dest_txn,
-                      )}
-                      className="ml-2 truncate max-w-[100px] inline-block align-bottom whitespace-nowrap"
-                    />
                   </div>
-                </div>
-              ) : (
-                <span className="text-gray-400">-</span>
-              )}
-            </span>
-          </Tooltip>
-        </span>
-      ),
+                ) : (
+                  <span className="text-gray-400">-</span>
+                )}
+              </span>
+            </Tooltip>
+          </span>
+        ) : (
+          <span className="text-gray-500 italic text-xs">
+            Destination network not indexed
+          </span>
+        ),
       header: <span>{t ? t('destinationTxn') : 'DESTINATION TXN HASH'}</span>,
       key: 'destination_transaction_hash',
       tdClassName: 'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10',
@@ -316,40 +331,45 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
-        <span>
-          <Tooltip
-            className={'left-1/2 max-w-[200px]'}
-            position="top"
-            tooltip={row?.dest_address}
-          >
-            <span className="flex items-center">
-              {row?.dest_address && row?.dest_chain && (
-                <div className="flex items-center mr-1">
-                  <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
-                    {networkIcon({ network: row?.dest_chain })}
+      cell: (row: McTxns) =>
+        row?.dest_address ? (
+          <span>
+            <Tooltip
+              className={'left-1/2 max-w-[200px]'}
+              position="top"
+              tooltip={row?.dest_address}
+            >
+              <span className="flex items-center">
+                {row?.dest_address && row?.dest_chain && (
+                  <div className="flex items-center mr-1">
+                    <div className="p-0.5 w-5 h-5 flex items-center justify-center bg-gray-100 dark:bg-black-200 rounded border dark:border-neargray-50">
+                      {networkIcon({ network: row?.dest_chain })}
+                    </div>
                   </div>
-                </div>
-              )}
-              {row?.dest_address ? (
-                <AddressOrTxnsLink
-                  copy
-                  currentAddress={row?.dest_address}
-                  href={handleChainSelect(
-                    row?.dest_chain?.toLowerCase() || '',
-                    row?.dest_address,
-                  )}
-                  className={
-                    'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
-                  }
-                />
-              ) : (
-                <span className="text-gray-400">-</span>
-              )}
-            </span>
-          </Tooltip>
-        </span>
-      ),
+                )}
+                {row?.dest_address ? (
+                  <AddressOrTxnsLink
+                    copy
+                    currentAddress={row?.dest_address}
+                    href={handleChainSelect(
+                      row?.dest_chain?.toLowerCase() || '',
+                      row?.dest_address,
+                    )}
+                    className={
+                      'truncate max-w-[120px] inline-block align-bottom whitespace-nowrap'
+                    }
+                  />
+                ) : (
+                  <span className="text-gray-400">-</span>
+                )}
+              </span>
+            </Tooltip>
+          </span>
+        ) : (
+          <span className="text-gray-500 italic text-xs">
+            Destination network not indexed
+          </span>
+        ),
       header: (
         <span>{t ? t('destinationAddress') : 'DESTINATION ADDRESS'}</span>
       ),
@@ -359,18 +379,21 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) => (
-        <span>
-          <Link
-            className="text-green-500  dark:text-green-250 hover:no-underline"
-            href={`/blocks/${row.block?.block_hash}`}
-          >
-            {row.block?.block_height
-              ? localFormat(row.block?.block_height)
-              : ''}
-          </Link>
-        </span>
-      ),
+      cell: (row: McTxns) =>
+        row?.block?.block_hash && row?.block?.block_height ? (
+          <span>
+            <Link
+              className="text-green-500  dark:text-green-250 hover:no-underline"
+              href={`/blocks/${row.block?.block_hash}`}
+            >
+              {row.block?.block_height
+                ? localFormat(row.block?.block_height)
+                : ''}
+            </Link>
+          </span>
+        ) : (
+          <Skeleton className="h-4 w-32" />
+        ),
       header: <span>{t('blockHeight') || ' BLOCK HEIGHT'}</span>,
       key: 'block_height',
       tdClassName:
@@ -379,14 +402,17 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: McTxns) => (
-        <span>
-          <Timestamp
-            showAge={showAge}
-            timestamp={row?.block?.block_timestamp}
-          />
-        </span>
-      ),
+      cell: (row: McTxns) =>
+        row?.block?.block_timestamp ? (
+          <span>
+            <Timestamp
+              showAge={showAge}
+              timestamp={row?.block?.block_timestamp}
+            />
+          </span>
+        ) : (
+          <Skeleton className="h-4 w-28" />
+        ),
       header: (
         <div className="w-full inline-flex px-4 py-4">
           <Tooltip
