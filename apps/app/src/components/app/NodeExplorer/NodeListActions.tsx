@@ -667,6 +667,7 @@ const NodeListActions = ({ data, error, latestBlock, totalSupply }: any) => {
                                 height={20}
                                 src={row?.description?.logo}
                                 width={20}
+                                unoptimized
                               />
                             </span>
                           )}
