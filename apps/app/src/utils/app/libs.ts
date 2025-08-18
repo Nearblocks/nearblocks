@@ -573,7 +573,7 @@ export function isValidJson(value: string): boolean {
   }
 }
 
-export function convertTimestampToTimes(nanoTimestamp: string) {
+export function convertTimestampToTimes(nanoTimestamp: string | undefined) {
   if (!nanoTimestamp) {
     return {};
   } else {

@@ -28,16 +28,18 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const txnsResponse = responseSchema(v.array(v.omit(txnList, ['event_index'])));
-const txnsCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnsResponse = responseSchema(
+  v.array(v.omit(txnList, ['block_timestamp', 'event_index'])),
+);
+const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
 export type McTxns = v.InferOutput<typeof txnList>;
 export type McTxnCount = v.InferOutput<typeof txnCount>;
 
 export type McTxnsRes = v.InferOutput<typeof txnsResponse>;
-export type McTxnsCountRes = v.InferOutput<typeof txnsCountResponse>;
+export type McTxnCountRes = v.InferOutput<typeof txnCountResponse>;
 
 export default {
-  count: txnsCountResponse,
+  count: txnCountResponse,
   txns: txnsResponse,
 };
