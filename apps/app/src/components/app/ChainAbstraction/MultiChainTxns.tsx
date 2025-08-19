@@ -321,7 +321,7 @@ const MultiChainTxns = ({
           </span>
         ) : (
           <span className="text-gray-500 italic text-xs">
-            Destination network not indexed
+            {t('destinationNetworkNotIndexed')}
           </span>
         ),
       header: <span>{t ? t('destinationTxn') : 'DESTINATION TXN HASH'}</span>,
@@ -367,7 +367,7 @@ const MultiChainTxns = ({
           </span>
         ) : (
           <span className="text-gray-500 italic text-xs">
-            Destination network not indexed
+            {t('destinationNetworkNotIndexed')}
           </span>
         ),
       header: (
