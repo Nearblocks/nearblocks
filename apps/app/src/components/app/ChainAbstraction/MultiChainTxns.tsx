@@ -137,7 +137,7 @@ const MultiChainTxns = ({
   const columns: any = [
     {
       cell: (row: McTxns) =>
-        row?.receipt_id ? (
+        row?.receipt_id && row?.transaction_hash ? (
           <Tooltip
             className={'left-20 max-w-[200px]'}
             position="top"
