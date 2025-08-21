@@ -23,6 +23,7 @@ import ReceiptSummary from '@/components/app/Transactions/ReceiptSummary';
 import Tree from '@/components/app/Transactions/Tree';
 import { revalidateTxn } from '@/utils/app/actions';
 import { useConfig } from '@/hooks/app/useConfig';
+import TransactionActions from './TreeReceipts/TransactionActions';
 
 export type RpcProvider = {
   name: string;
@@ -42,6 +43,7 @@ const TxnsTabActions = ({
   const [rpcError, setRpcError] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
+  const [actionData, setActionData] = useState<any>({});
   const [allRpcProviderError, setAllRpcProviderError] = useState(false);
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -214,6 +216,37 @@ const TxnsTabActions = ({
         action?.action_kind === 'DELEGATE',
     );
 
+  useEffect(() => {
+    const TxnsActionsData = async () => {
+      const txnapiUrl = process.env.NEXT_PUBLIC_TXN_ACTION_API_URL;
+
+      if (!txn || !txnapiUrl) return;
+      try {
+        const response = await fetch(`${txnapiUrl}/v1/txn-action/${hash}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ txns: txn }),
+        });
+        if (!response.ok) {
+          console.error(
+            'Fetch failed:',
+            response.status,
+            await response.text(),
+          );
+          return;
+        }
+        const parsedData = await response.json();
+        setActionData(parsedData);
+      } catch (error) {
+        console.error('Fetch exception:', error);
+      }
+    };
+    if (txn) {
+      TxnsActionsData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txn, hash]);
+
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
@@ -258,6 +291,13 @@ const TxnsTabActions = ({
                 </div>
               </div>
             </div>
+            {tab === 'overview' && (
+              <TransactionActions
+                hash={hash}
+                loading={false}
+                actionparsed={actionData}
+              />
+            )}
             <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl">
               <>
                 {tab === 'overview' && (
