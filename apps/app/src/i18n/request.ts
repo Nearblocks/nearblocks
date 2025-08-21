@@ -22,7 +22,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     import(`nearblocks-trans-next-intl/${locale}/kb.json`),
     import(`nearblocks-trans-next-intl/${locale}/404.json`),
     import(`nearblocks-trans-next-intl/${locale}/address.json`),
-    import(`nearblocks-trans-next-intl/${locale}/multi-chain-txns.json`),
+    import(`nearblocks-trans-next-intl/${locale}/multichain-txns.json`),
     import(`nearblocks-trans-next-intl/${locale}/about.json`),
   ];
   const results = await Promise.allSettled(imports);
