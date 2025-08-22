@@ -327,6 +327,24 @@ const useRpc = () => {
       'EXPERIMENTAL_tx_status',
     );
 
+    if (
+      error &&
+      ((error.name === 'REQUEST_VALIDATION_ERROR' && error.code === -32700) ||
+        (error.message && error.message.includes('Parse error')) ||
+        (statusCode === 400 && error.code === -32700))
+    ) {
+      const notFoundResult = {
+        success: false,
+        error: 'Transaction not found',
+        statusCode,
+        isNotFound: true,
+        shouldRetry: false,
+      };
+
+      cacheRef.current[cacheKey] = notFoundResult;
+      return notFoundResult;
+    }
+
     if (statusCode === 200) {
       const result = data?.result;
       if (result && result?.final_execution_status !== 'NONE') {
