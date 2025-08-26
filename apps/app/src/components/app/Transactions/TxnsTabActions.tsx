@@ -180,7 +180,7 @@ const TxnsTabActions = ({
     },
     { label: 'Enhanced Plan', message: 'tokenTxns', name: 'enhanced' },
     { label: 'Tree Plan', message: 'nftTokenTxns', name: 'tree' },
-    { label: 'Reciept Summary', message: 'accessKeys', name: 'summary' },
+    { label: 'Receipt Summary', message: 'accessKeys', name: 'summary' },
   ];
 
   const getClassName = (selected: boolean) =>

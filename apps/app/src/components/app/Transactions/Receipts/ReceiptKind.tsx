@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { isValidJson } from '@/utils/app/libs';
 import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
-import { encodeArgs } from '@/utils/app/near';
+import { displayGlobalContractArgs, encodeArgs } from '@/utils/app/near';
 
 const backgroundColorClasses: Record<string, string> = {
   addKey: 'bg-indigo-50 dark:bg-indigo-900',
@@ -44,7 +44,6 @@ const backgroundColorClasses: Record<string, string> = {
 const ReceiptKind = (props: ReceiptKindInfo) => {
   const { action, isTxTypeActive, onClick, receipt, receiver, polledAction } =
     props;
-
   const t = useTranslations();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -52,7 +51,8 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
   const args =
     polledAction?.args?.args ||
     encodeArgs(polledAction?.args?.args_json) ||
-    polledAction.args.args_base64;
+    polledAction.args.args_base64 ||
+    polledAction?.args;
 
   const methodName = action?.args?.method_name || action?.args?.methodName;
 
@@ -123,6 +123,8 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     return pretty;
   }
 
+  const displayData = displayGlobalContractArgs(args);
+
   const decodedData = args;
   const jsonStringifiedData = displayArgs(decodedData);
   const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
@@ -133,6 +135,20 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
       status.type === 'successReceiptId' ||
       'SuccessValue' in status ||
       'SuccessReceiptId' in status);
+
+  const isGlobalContractAction = (actionKind: string) => {
+    const globalContractKinds = [
+      'DEPLOY_GLOBAL_CONTRACT',
+      'DeployGlobalContract',
+      'DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID',
+      'DeployGlobalContractByAccountId',
+      'USE_GLOBAL_CONTRACT',
+      'UseGlobalContract',
+      'USE_GLOBAL_CONTRACT_BY_ACCOUNT_ID',
+      'UseGlobalContractByAccountId',
+    ];
+    return globalContractKinds.includes(actionKind);
+  };
 
   return (
     <div className="pb-3">
@@ -242,6 +258,28 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
               </div>
             </>
           )
+        ) : isGlobalContractAction(action?.kind || action?.action_kind) ? (
+          <div className="relative w-full pt-1">
+            <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
+              <button
+                onClick={() => setIsExpanded((prev) => !prev)}
+                className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
+              >
+                {!isExpanded ? (
+                  <FaMinimize className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                ) : (
+                  <FaExpand className="fill-current -z-50 text-gray-700 dark:text-neargray-10 group-hover:text-white h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <div
+              className={`block appearance-none outline-none w-full border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 resize-y font-space-mono whitespace-pre-wrap overflow-auto max-w-full overflow-x-auto  ${
+                !isExpanded ? 'h-[8rem]' : ''
+              }`}
+            >
+              {displayData}
+            </div>
+          </div>
         ) : action?.kind === 'delegateAction' ||
           action?.action_kind === 'DELEGATE_ACTION' ? (
           <div className="pt-2">

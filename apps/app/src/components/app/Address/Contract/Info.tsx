@@ -15,7 +15,12 @@ interface Props {
 
 const Info = ({ data }: Props) => {
   const deployments = data?.deployments;
-  const { contractInfo: contract, isLocked } = useAddressRpc();
+  const {
+    contractInfo: contract,
+    isLocked,
+    account: rpcAccountInfo,
+  } = useAddressRpc();
+
   const [createAction, updateAction] = deployments || [];
   const action = updateAction || createAction;
 
@@ -128,6 +133,66 @@ const Info = ({ data }: Props) => {
             <div className="w-full md:w-3/4 break-words">{contract?.hash}</div>
           )}
         </div>
+        {!isEmpty(rpcAccountInfo?.global_contract_account_id) ? (
+          <div className="flex flex-wrap py-4">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
+              <Tooltip
+                className={'left-28 max-w-[200px] w-80'}
+                position="bottom"
+                tooltip={`This account uses shared global contract code from the specified account.`}
+              >
+                <div>
+                  <Question className="w-4 h-4 fill-current mr-1" />
+                </div>
+              </Tooltip>
+              Global Contract Account
+            </div>
+            {!deployments ? (
+              <Loader wrapperClassName="w-32" />
+            ) : (
+              <div className="w-full md:w-3/4 break-words">
+                {rpcAccountInfo?.global_contract_account_id && (
+                  <Link
+                    className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${rpcAccountInfo?.global_contract_account_id}`}
+                  >
+                    {rpcAccountInfo?.global_contract_account_id}
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        ) : null}
+        {!isEmpty(rpcAccountInfo?.global_contract_hash) ? (
+          <div className="flex flex-wrap py-4">
+            <div className="flex items-center w-full md:w-1/4 mb-2 md:mb-0 ">
+              <Tooltip
+                className={'left-28 max-w-[200px] w-80'}
+                position="bottom"
+                tooltip={`This account uses shared global contract code from the specified hash.`}
+              >
+                <div>
+                  <Question className="w-4 h-4 fill-current mr-1" />
+                </div>
+              </Tooltip>
+              Global Contract Hash
+            </div>
+            {!deployments ? (
+              <Loader wrapperClassName="w-32" />
+            ) : (
+              <div className="w-full md:w-3/4 break-words">
+                {rpcAccountInfo?.global_contract_hash && (
+                  <Link
+                    className="text-green-500 dark:text-green-250 hover:no-underline"
+                    href={`/address/${rpcAccountInfo?.global_contract_hash}`}
+                  >
+                    {rpcAccountInfo?.global_contract_hash}
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );
