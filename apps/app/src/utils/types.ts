@@ -1693,6 +1693,8 @@ export type AccountDataInfo = {
   locked: string;
   storage_paid_at: string;
   storage_usage: string;
+  global_contract_account_id?: string;
+  global_contract_hash?: string;
 };
 export type SpamToken = {
   blacklist: string[];

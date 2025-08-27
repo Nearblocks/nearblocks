@@ -846,3 +846,17 @@ export function parseEventLogs(event: TransactionLog): {} | any {
 
   return parsedEvent;
 }
+
+export function displayGlobalContractArgs(args: any) {
+  if (!args || typeof args === 'undefined') {
+    return 'The arguments are empty';
+  }
+
+  if (typeof args === 'string') {
+    return args;
+  } else if (typeof args === 'object') {
+    return JSON.stringify(args, null, 2);
+  }
+
+  return String(args);
+}
