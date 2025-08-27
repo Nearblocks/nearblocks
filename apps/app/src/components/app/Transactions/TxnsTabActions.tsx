@@ -40,9 +40,9 @@ const TxnsTabActions = ({
 }: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
+  const [isTransactionNotFound, setIsTransactionNotFound] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
-  const [allRpcProviderError, setAllRpcProviderError] = useState(false);
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useIntlRouter();
@@ -55,7 +55,7 @@ const TxnsTabActions = ({
     (networkId === 'testnet' && txn?.block?.block_height <= 192373963) ||
     (networkId === 'mainnet' && txn?.block?.block_height <= 143997621);
 
-  const { rpc: rpcUrl, switchRpc } = useRpcProvider();
+  const { rpc: rpcUrl, switchRpc, rpcStats } = useRpcProvider();
 
   useEffect(() => {
     if (txn != null && txn?.outcomes?.status === null) {
@@ -75,22 +75,29 @@ const TxnsTabActions = ({
   }, [txn, router, retryCount]);
 
   useEffect(() => {
-    if (rpcError) {
+    if (rpcError && !isTransactionNotFound) {
       try {
         switchRpc();
       } catch (error) {
         setRpcError(true);
-        setAllRpcProviderError(true);
         console.error('Failed to switch RPC:', error);
       }
     }
-  }, [txn, rpcError, switchRpc]);
+  }, [txn, rpcError, isTransactionNotFound, switchRpc]);
 
   useEffect(() => {
     const checkTxnExistence = async () => {
       try {
         setRpcError(false);
+        setIsTransactionNotFound(false);
+
         const res = await transactionStatus(rpcUrl, hash, 'bowen', cacheRef);
+
+        if (res?.isNotFound) {
+          setIsTransactionNotFound(true);
+          return;
+        }
+
         if (res?.success) {
           const txnExists = res?.data;
           const status = txnExists.status?.Failure ? false : true;
@@ -134,7 +141,9 @@ const TxnsTabActions = ({
           setRpcTxn(txnExists);
           setRpcData(modifiedTxns);
         } else {
-          setRpcError(true);
+          if (res?.shouldRetry !== false) {
+            setRpcError(true);
+          }
         }
       } catch (error) {
         setRpcError(true);
@@ -156,9 +165,14 @@ const TxnsTabActions = ({
           txn.signer_account_id,
           cacheRef,
         );
+        if (res?.isNotFound) {
+          setIsTransactionNotFound(true);
+          return;
+        }
+
         if (res?.success) {
           setRpcTxn(res?.data);
-        } else {
+        } else if (res?.shouldRetry !== false) {
           setRpcError(true);
         }
       } catch {
@@ -217,7 +231,18 @@ const TxnsTabActions = ({
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
-        {rpcError && !txn && allRpcProviderError ? (
+        {isTransactionNotFound ? (
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
+            <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
+              <ErrorMessage
+                icons={<FileSlash />}
+                message="Transaction hash not found. Invalid transaction hash entered."
+                mutedText={hash || ''}
+                errorBg
+              />
+            </div>
+          </div>
+        ) : rpcError && !txn && rpcStats?.allRpcsFailed ? (
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
               <ErrorMessage
