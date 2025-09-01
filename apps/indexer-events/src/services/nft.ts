@@ -1,6 +1,12 @@
 import { BlockHeader } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
-import { EventCause, EventStandard, NFTEvent } from 'nb-types';
+import {
+  EventCause,
+  EventStandard,
+  NFTEvent,
+  NFTMeta,
+  NFTTokenMeta,
+} from 'nb-types';
 import { retry } from 'nb-utils';
 
 import {
@@ -146,7 +152,19 @@ export const storeNFTEvents = async (
 
   if (eventData.length) {
     const data = updateNFTEvents(shardId, EventStandard.NFT, eventData);
-    await saveNFTData(knex, data);
+    const meta: NFTMeta[] = eventData.map((event) => ({
+      contract: event.contract_account_id,
+    }));
+    const tokenMeta: NFTTokenMeta[] = eventData.map((event) => ({
+      contract: event.contract_account_id,
+      token: event.token_id,
+    }));
+
+    await Promise.all([
+      saveNFTData(knex, data),
+      saveNFTMeta(knex, meta),
+      saveNFTTokenMeta(knex, tokenMeta),
+    ]);
   }
 };
 
@@ -155,6 +173,21 @@ export const saveNFTData = async (knex: Knex, data: NFTEvent[]) => {
     await knex('nft_events')
       .insert(data)
       .onConflict(['block_timestamp', 'shard_id', 'event_index'])
+      .ignore();
+  });
+};
+
+export const saveNFTMeta = async (knex: Knex, meta: NFTMeta[]) => {
+  await retry(async () => {
+    await knex('nft_meta').insert(meta).onConflict(['contract']).ignore();
+  });
+};
+
+export const saveNFTTokenMeta = async (knex: Knex, meta: NFTTokenMeta[]) => {
+  await retry(async () => {
+    await knex('nft_token_meta')
+      .insert(meta)
+      .onConflict(['contract', 'token'])
       .ignore();
   });
 };

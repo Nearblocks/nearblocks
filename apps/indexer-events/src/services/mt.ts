@@ -1,6 +1,14 @@
 import { BlockHeader } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
-import { EventCause, EventStandard, MTEvent } from 'nb-types';
+import {
+  EventCause,
+  EventStandard,
+  IntentsMeta,
+  MTBaseMeta,
+  MTEvent,
+  MTMeta,
+  MTTokenMeta,
+} from 'nb-types';
 import { retry } from 'nb-utils';
 
 import {
@@ -8,8 +16,11 @@ import {
   isMTMintEventLog,
   isMTTransferEventLog,
 } from '#libs/guards';
+import { parseIntentsToken } from '#libs/utils';
 import { updateMTEvents } from '#services/events';
 import { EventDataEvent } from '#types/types';
+
+const INTENTS = 'intents.near';
 
 export const storeMTEvents = async (
   knex: Knex,
@@ -181,7 +192,29 @@ export const storeMTEvents = async (
 
   if (eventData.length) {
     const data = updateMTEvents(shardId, EventStandard.MT, eventData);
-    await saveMTData(knex, data);
+    const meta: MTMeta[] = eventData.map((event) => ({
+      contract: event.contract_account_id,
+    }));
+    const tokenMeta: MTTokenMeta[] = eventData.map((event) => ({
+      contract: event.contract_account_id,
+      token: event.token_id,
+    }));
+    const intentsMeta: IntentsMeta[] = eventData
+      .filter((event) => INTENTS === event.contract_account_id)
+      .flatMap((event) => {
+        const token = parseIntentsToken(event.token_id);
+        return token
+          ? [{ contract: token.contract, token: token.token, type: token.type }]
+          : [];
+      });
+
+    await Promise.all([
+      saveMTData(knex, data),
+      saveMTMeta(knex, meta),
+      saveMTBaseMeta(knex, tokenMeta),
+      saveMTTokenMeta(knex, tokenMeta),
+      intentsMeta.length && saveIntentsMeta(knex, intentsMeta),
+    ]);
   }
 };
 
@@ -190,6 +223,39 @@ export const saveMTData = async (knex: Knex, data: MTEvent[]) => {
     await knex('mt_events')
       .insert(data)
       .onConflict(['block_timestamp', 'shard_id', 'event_index'])
+      .ignore();
+  });
+};
+
+export const saveMTMeta = async (knex: Knex, data: MTMeta[]) => {
+  await retry(async () => {
+    await knex('mt_meta').insert(data).onConflict(['contract']).ignore();
+  });
+};
+
+export const saveMTBaseMeta = async (knex: Knex, data: MTBaseMeta[]) => {
+  await retry(async () => {
+    await knex('mt_base_meta')
+      .insert(data)
+      .onConflict(['contract', 'token'])
+      .ignore();
+  });
+};
+
+export const saveMTTokenMeta = async (knex: Knex, data: MTTokenMeta[]) => {
+  await retry(async () => {
+    await knex('mt_token_meta')
+      .insert(data)
+      .onConflict(['contract', 'token'])
+      .ignore();
+  });
+};
+
+export const saveIntentsMeta = async (knex: Knex, data: IntentsMeta[]) => {
+  await retry(async () => {
+    await knex('intents_meta')
+      .insert(data)
+      .onConflict(['contract', 'type', 'token'])
       .ignore();
   });
 };

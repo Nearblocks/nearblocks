@@ -251,38 +251,44 @@ export type FTEvent = {
 };
 
 export type FTMeta = {
-  change_24: null | string;
-  circulating_supply: null | string;
-  coingecko_id: null | string;
-  coinmarketcap_id: null | string;
+  change_24?: null | string;
+  circulating_supply?: null | string;
+  coingecko_id?: null | string;
+  coinmarketcap_id?: null | string;
   contract: string;
-  created_at: null | string;
-  decimals: number;
-  description: null | string;
-  facebook: null | string;
-  fully_diluted_market_cap: null | string;
-  icon: null | string;
-  livecoinwatch_id: null | string;
-  market_cap: null | string;
-  name: string;
-  nep518_hex_address: null | string;
-  price: null | string;
-  price_btc: null | string;
-  price_eth: null | string;
-  reddit: null | string;
-  reference: null | string;
-  reference_hash: null | string;
-  refreshed_at: null | string;
-  searched_at: null | string;
-  spec: null | string;
-  symbol: string;
-  synced_at: null | string;
-  telegram: null | string;
-  total_supply: null | string;
-  twitter: null | string;
-  updated_at: null | string;
-  volume_24h: null | string;
-  website: null | string;
+  created_at?: null | string;
+  decimals?: null | number;
+  description?: null | string;
+  facebook?: null | string;
+  fully_diluted_market_cap?: null | string;
+  icon?: null | string;
+  livecoinwatch_id?: null | string;
+  market_cap?: null | string;
+  name?: null | string;
+  nep518_hex_address?: null | string;
+  price?: null | string;
+  price_btc?: null | string;
+  price_eth?: null | string;
+  reddit?: null | string;
+  reference?: null | string;
+  reference_hash?: null | string;
+  refreshed_at?: null | string;
+  searched_at?: null | string;
+  spec?: null | string;
+  symbol?: null | string;
+  synced_at?: null | string;
+  telegram?: null | string;
+  total_supply?: null | string;
+  twitter?: null | string;
+  updated_at?: null | string;
+  volume_24h?: null | string;
+  website?: null | string;
+};
+
+export type IntentsMeta = {
+  contract: string;
+  token: null | string;
+  type: string;
 };
 
 export type MTEvent = {
@@ -300,6 +306,45 @@ export type MTEvent = {
   shard_id: number;
   standard: string;
   token_id: string;
+};
+
+export type MTMeta = {
+  contract: string;
+  modified_at?: null | string;
+  name?: null | string;
+  spec?: null | string;
+};
+
+export type MTBaseMeta = {
+  base_uri?: null | string;
+  contract: string;
+  copies?: null | string;
+  decimals?: null | number;
+  icon?: null | string;
+  modified_at?: null | string;
+  name?: null | string;
+  reference?: null | string;
+  reference_hash?: null | string;
+  symbol?: null | string;
+  token: string;
+};
+
+export type MTTokenMeta = {
+  contract: string;
+  copies?: null | string;
+  description?: null | string;
+  expires_at?: null | string;
+  extra?: JsonValue | null;
+  issued_at?: null | string;
+  media?: null | string;
+  media_hash?: null | string;
+  modified_at?: null | string;
+  reference?: null | string;
+  reference_hash?: null | string;
+  starts_at?: null | string;
+  title?: null | string;
+  token: string;
+  updated_at?: null | string;
 };
 
 export type MultichainSignature = {
@@ -346,39 +391,39 @@ export type NFTEvent = {
 };
 
 export type NFTMeta = {
-  base_uri: null | string;
+  base_uri?: null | string;
   contract: string;
-  created_at: null | string;
-  description: null | string;
-  facebook: null | string;
-  icon: null | string;
-  name: string;
-  reddit: null | string;
-  reference: null | string;
-  reference_hash: null | string;
-  spec: null | string;
-  symbol: string;
-  telegram: null | string;
-  twitter: null | string;
-  updated_at: null | string;
-  website: null | string;
+  created_at?: null | string;
+  description?: null | string;
+  facebook?: null | string;
+  icon?: null | string;
+  name?: null | string;
+  reddit?: null | string;
+  reference?: null | string;
+  reference_hash?: null | string;
+  spec?: null | string;
+  symbol?: null | string;
+  telegram?: null | string;
+  twitter?: null | string;
+  updated_at?: null | string;
+  website?: null | string;
 };
 
 export type NFTTokenMeta = {
   contract: string;
-  copies: null | number;
-  description: null | string;
-  expires_at: null | string;
-  extra: null | string;
-  issued_at: null | string;
-  media: null | string;
-  media_hash: null | string;
-  reference: null | string;
-  reference_hash: null | string;
-  starts_at: null | string;
-  title: null | string;
+  copies?: null | number;
+  description?: null | string;
+  expires_at?: null | string;
+  extra?: null | string;
+  issued_at?: null | string;
+  media?: null | string;
+  media_hash?: null | string;
+  reference?: null | string;
+  reference_hash?: null | string;
+  starts_at?: null | string;
+  title?: null | string;
   token: string;
-  updated_at: null | string;
+  updated_at?: null | string;
 };
 
 export type Receipt = {
