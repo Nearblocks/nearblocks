@@ -288,7 +288,7 @@ export default function ExplorerSelector() {
                   <span className={styles.tag}>Recommended</span>
 
                   <Image
-                    src="https://nearblocks.io/images/nearblocksblack.svg"
+                    src="/images/nearblocksblack.svg"
                     style={imageStyle}
                     width={216}
                     height={45}
@@ -326,7 +326,7 @@ export default function ExplorerSelector() {
               <div className={styles.footerText}>
                 <a href="https://github.com/Nearblocks/nearblocks/blob/main/apps/explorer-selector/src/components/ExplorerSelector.tsx">
                   <Image
-                    src="https://nearblocks.io/images/github_icon.svg"
+                    src="/images/github_icon.svg"
                     style={footerImageStyle}
                     width={51}
                     height={45}
