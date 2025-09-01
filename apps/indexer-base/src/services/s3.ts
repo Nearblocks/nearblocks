@@ -29,7 +29,7 @@ const s3Client = new S3Client({
       info: () => {},
       warn: console.warn,
     },
-    requestTimeout: 10000,
+    requestTimeout: 60000,
   }),
 });
 
