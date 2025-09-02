@@ -153,3 +153,28 @@ export const updateNFTTokenMeta = async (contract: string, token: string) => {
     await upsertError(contract, 'nft', token);
   }
 };
+
+export const syncExistingNFT = async () => {
+  await dbEvents.manyOrNone(`
+    INSERT INTO
+      nft_meta (contract)
+    SELECT DISTINCT
+      contract_account_id
+    FROM
+      nft_events
+    ON CONFLICT (contract) DO NOTHING
+  `);
+};
+
+export const syncExistingNFTToken = async () => {
+  await dbEvents.manyOrNone(`
+    INSERT INTO
+      nft_token_meta (contract, token)
+    SELECT DISTINCT
+      contract_account_id,
+      token_id
+    FROM
+      nft_events
+    ON CONFLICT (contract, token) DO NOTHING
+  `);
+};

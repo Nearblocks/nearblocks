@@ -178,3 +178,76 @@ export const updateMTTokenMeta = async (contract: string, token: string) => {
     await upsertError(contract, 'mt', token);
   }
 };
+
+export const syncExistingMT = async () => {
+  await dbEvents.manyOrNone(`
+    INSERT INTO
+      mt_meta (contract)
+    SELECT DISTINCT
+      contract_account_id
+    FROM
+      mt_events
+    ON CONFLICT (contract) DO NOTHING
+  `);
+};
+
+export const syncExistingMTToken = async () => {
+  await dbEvents.manyOrNone(`
+    WITH
+      tokens AS (
+        SELECT DISTINCT
+          contract_account_id AS contract,
+          token_id AS token
+        FROM
+          mt_events
+      ),
+      base_meta AS (
+        INSERT INTO
+          mt_base_meta (contract, token)
+        SELECT
+          contract,
+          token
+        FROM
+          tokens
+        ON CONFLICT (contract, token) DO NOTHING
+      )
+    INSERT INTO
+      mt_token_meta (contract, token)
+    SELECT
+      contract,
+      token
+    FROM
+      tokens
+    ON CONFLICT (contract, token) DO NOTHING
+  `);
+};
+
+export const syncExistingIntents = async () => {
+  await dbEvents.manyOrNone(`
+    WITH
+      contracts AS (
+        SELECT DISTINCT
+          contract_account_id AS contract,
+          token_id AS token_id,
+          split_part(token_id, ':', 1) AS type,
+          substring(
+            token_id
+            from
+              position(':' in token_id) + 1
+          ) AS token
+        FROM
+          mt_events me
+        WHERE
+          contract_account_id = 'intents.near'
+      )
+    INSERT INTO
+      intents_meta (contract, type, token)
+    SELECT
+      contract,
+      type,
+      token
+    FROM
+      contracts
+    ON CONFLICT (contract, type, token) DO NOTHING
+  `);
+};

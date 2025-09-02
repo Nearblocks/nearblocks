@@ -5,7 +5,11 @@ import { logger as log } from 'nb-logger';
 import { pgp } from '#libs/pgp';
 import sentry from '#libs/sentry';
 
-cron.schedule('*/15 * * * * *', './jobs/meta.js', { noOverlap: true }); // 15s
+cron.schedule('*/15 * * * * *', './jobs/meta.js', { noOverlap: true }); // every 15s
+// cron.schedule('0 0 * * *', './jobs/metaExisting.js', {
+//   maxExecutions: 1,
+//   noOverlap: true,
+// }); // only once
 
 const onSignal = async (signal: number | string) => {
   try {

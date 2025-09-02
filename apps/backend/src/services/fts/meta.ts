@@ -77,3 +77,15 @@ export const updateFTMeta = async (contract: string) => {
     await upsertError(contract, 'ft', null);
   }
 };
+
+export const syncExistingFT = async () => {
+  await dbEvents.manyOrNone(`
+    INSERT INTO
+      ft_meta (contract)
+    SELECT DISTINCT
+      contract_account_id
+    FROM
+      ft_events
+    ON CONFLICT (contract) DO NOTHING
+  `);
+};
