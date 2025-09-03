@@ -1,6 +1,12 @@
 import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
-import { EventCause, EventStandard, EventType, FTEvent } from 'nb-types';
+import {
+  EventCause,
+  EventStandard,
+  EventType,
+  FTEvent,
+  FTMeta,
+} from 'nb-types';
 import { retry } from 'nb-utils';
 
 import {
@@ -127,8 +133,11 @@ export const storeFTEvents = async (
       EventStandard.FT,
       eventData,
     );
+    const meta: FTMeta[] = eventData.map((event) => ({
+      contract: event.contract_account_id,
+    }));
 
-    await saveFTData(knex, eventData);
+    await Promise.all([saveFTData(knex, eventData), saveFTMeta(knex, meta)]);
   }
 };
 
@@ -186,6 +195,12 @@ export const saveFTData = async (knex: Knex, data: FTEvent[]) => {
       .insert(data)
       .onConflict(['block_timestamp', 'shard_id', 'event_type', 'event_index'])
       .ignore();
+  });
+};
+
+export const saveFTMeta = async (knex: Knex, data: FTMeta[]) => {
+  await retry(async () => {
+    await knex('ft_meta').insert(data).onConflict(['contract']).ignore();
   });
 };
 

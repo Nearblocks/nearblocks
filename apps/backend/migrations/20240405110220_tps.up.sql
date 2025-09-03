@@ -1,9 +1,0 @@
-CREATE TABLE tps (
-  date BIGINT NOT NULL,
-  txns INT NOT NULL,
-  shards JSONB NOT NULL,
-  PRIMARY KEY (date)
-);
-
-ALTER TABLE stats
-ADD tps INTEGER NULL;

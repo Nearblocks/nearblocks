@@ -23,6 +23,26 @@ export const isExecutionSuccess = (status: ExecutionStatus) => {
   return false;
 };
 
+export const parseIntentsToken = (str: string) => {
+  if (!str) return null;
+
+  const regex = /^(nep141|nep171|nep245):([^:]+)(?::(.+))?$/;
+  const match = str.match(regex);
+
+  if (!match) return null;
+
+  const [, type, contract, token] = match;
+
+  if (type === 'nep141' && token) return null;
+  if (type !== 'nep141' && !token) return null;
+
+  return {
+    contract,
+    token: token || null,
+    type,
+  };
+};
+
 export const monitorProgress = async (): Promise<void> => {
   let lastBlock: number | undefined;
 

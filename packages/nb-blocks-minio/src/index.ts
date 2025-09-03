@@ -56,6 +56,8 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
         .orderBy('block_height')
         .limit(limit);
 
+      blocks.pop();
+
       return blocks;
     },
     { exponential: true, logger: retryLogger, retries: 5 },
