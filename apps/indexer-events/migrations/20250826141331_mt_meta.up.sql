@@ -58,11 +58,23 @@ CREATE INDEX fm_contract_modified_idx ON ft_meta (contract)
 WHERE
   modified_at IS NULL;
 
-CREATE INDEX nm_contract_token_modified_idx ON nft_meta (contract, token_id)
+CREATE INDEX nm_contract_modified_idx ON nft_meta (contract)
 WHERE
   modified_at IS NULL;
 
-CREATE INDEX mm_contract_token_modified_idx ON mt_meta (contract, token_id)
+CREATE INDEX ntm_contract_token_modified_idx ON nft_token_meta (contract, token)
+WHERE
+  modified_at IS NULL;
+
+CREATE INDEX mm_contract_modified_idx ON mt_meta (contract)
+WHERE
+  modified_at IS NULL;
+
+CREATE INDEX mbm_contract_token_modified_idx ON mt_base_meta (contract, token)
+WHERE
+  modified_at IS NULL;
+
+CREATE INDEX mtm_contract_token_modified_idx ON mt_token_meta (contract, token)
 WHERE
   modified_at IS NULL;
 
