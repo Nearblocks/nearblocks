@@ -1,27 +1,27 @@
 import { Router } from 'express';
 
-import request from 'nb-schemas/dist/fts/request.js';
+import request from 'nb-schemas/dist/nfts/request.js';
 
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
-import contract from '#routes/v3/fts/contract';
-import service from '#services/v3/fts/index';
+import contract from '#routes/v3/nfts/contract';
+import service from '#services/v3/nfts/index';
 
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/fts', bearerAuth, rateLimiter, route);
+  app.use('/nfts', bearerAuth, rateLimiter, route);
 
   contract(app);
 
   /**
    * @openapi
-   * /v3/fts/txns:
+   * /v3/nfts/txns:
    *   get:
-   *     summary: Get all token transfers
+   *     summary: Get all nft transfers
    *     tags:
-   *       - V3 / FTs
+   *       - V3 / NFTs
    *     parameters:
    *       - in: query
    *         name: cursor
@@ -44,11 +44,11 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/fts/txns/count:
+   * /v3/nfts/txns/count:
    *   get:
-   *     summary: Get token transfers count
+   *     summary: Get nft transfers count
    *     tags:
-   *       - V3 / FTs
+   *       - V3 / NFTs
    *     responses:
    *       200:
    *         description: Success response

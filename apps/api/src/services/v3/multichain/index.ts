@@ -56,13 +56,17 @@ const txns = responseHandler(
       start: after ? BigInt(after) : config.baseStart,
     });
 
+    if (!signatures.length) {
+      return { data: [] };
+    }
+
     const queries = signatures.map((signature) => {
       return pgp.as.format(sql.signatureTxn, signature);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
     const txns = await dbBase.manyOrNone<MCTxn>(unionQuery);
 
-    // Lengths don't match, it means receipts are missing due to slower indexing.
+    // If lengths don't match, it means receipts are missing (maybe delayed).
     if (txns.length !== signatures.length) {
       const merged = unionWith(
         txns,

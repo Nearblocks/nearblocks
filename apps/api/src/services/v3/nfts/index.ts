@@ -1,8 +1,8 @@
 import { unionWith } from 'es-toolkit';
 
-import type { FTTxn, FTTxnCount, FTTxnsReq } from 'nb-schemas';
-import request from 'nb-schemas/dist/fts/request.js';
-import response from 'nb-schemas/dist/fts/response.js';
+import type { NFTTxn, NFTTxnCount, NFTTxnsReq } from 'nb-schemas';
+import request from 'nb-schemas/dist/nfts/request.js';
+import response from 'nb-schemas/dist/nfts/response.js';
 
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
@@ -13,20 +13,20 @@ import {
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
-import sql from '#sql/fts';
+import sql from '#sql/nfts';
 
 const txns = responseHandler(
   response.txns,
-  async (req: RequestValidator<FTTxnsReq>) => {
+  async (req: RequestValidator<NFTTxnsReq>) => {
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
     const eventsQuery: WindowListQuery<
-      Omit<FTTxn, 'block' | 'transaction_hash'>
+      Omit<NFTTxn, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
-      return dbEvents.manyOrNone<Omit<FTTxn, 'block' | 'transaction_hash'>>(
+      return dbEvents.manyOrNone<Omit<NFTTxn, 'block' | 'transaction_hash'>>(
         sql.txns,
         {
           after: start,
@@ -56,7 +56,7 @@ const txns = responseHandler(
       return pgp.as.format(sql.txn, event);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<FTTxn>(unionQuery);
+    const txns = await dbBase.manyOrNone<NFTTxn>(unionQuery);
 
     // If lengths don't match, it means receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
@@ -64,15 +64,14 @@ const txns = responseHandler(
         txns,
         events,
         (a, b) =>
-          `${a.block_timestamp}${a.shard_id}${a.event_type}${a.event_index}` ===
-          `${b.block_timestamp}${b.shard_id}${b.event_type}${b.event_index}`,
+          `${a.block_timestamp}${a.shard_id}${a.event_index}` ===
+          `${b.block_timestamp}${b.shard_id}${b.event_index}`,
       );
 
       return paginateData(merged, limit, (txn) => ({
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
-        type: txn.event_type,
       }));
     }
 
@@ -80,13 +79,12 @@ const txns = responseHandler(
       index: txn.event_index,
       shard: txn.shard_id,
       timestamp: txn.block_timestamp,
-      type: txn.event_type,
     }));
   },
 );
 
 const count = responseHandler(response.count, async () => {
-  const txns = await dbEvents.one<FTTxnCount>(sql.txnCount);
+  const txns = await dbEvents.one<NFTTxnCount>(sql.txnCount);
 
   return { data: txns };
 });

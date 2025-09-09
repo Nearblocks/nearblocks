@@ -5,6 +5,7 @@ import blocks from '#routes/v3/blocks';
 import fts from '#routes/v3/fts/index';
 import keys from '#routes/v3/keys';
 import multichain from '#routes/v3/multichain/index';
+import nfts from '#routes/v3/nfts/index';
 import search from '#routes/v3/search';
 import txns from '#routes/v3/txns';
 
@@ -16,6 +17,7 @@ const routes = () => {
   fts(app);
   keys(app);
   multichain(app);
+  nfts(app);
   search(app);
   txns(app);
 
