@@ -9,12 +9,7 @@ jobs:
     strategy:
       matrix:
         service:
-          [
-            indexer-balance,
-            indexer-base,
-            indexer-events,
-            indexer-receipts
-          ]
+          [indexer-balance, indexer-base, indexer-events, indexer-receipts]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4

@@ -4,6 +4,7 @@ import config from '#config';
 import { server } from '#libs/http';
 import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
+import { monitorProgress } from '#libs/utils';
 import { syncData } from '#services/stream';
 
 (async () => {
@@ -13,7 +14,7 @@ import { syncData } from '#services/stream';
       'initializing receipts indexer...',
     );
     logger.info('syncing blockchain data...');
-    await syncData();
+    await Promise.all([syncData(), monitorProgress()]);
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);

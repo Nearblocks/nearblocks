@@ -6,7 +6,7 @@ import { dbRead, dbWrite, streamConfig } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeBalance } from '#services/balance';
 
-const indexerKey = 'balance';
+const indexerKey = config.indexerKey;
 const s3Config = {
   credentials: {
     accessKeyId: config.s3AccessKey,

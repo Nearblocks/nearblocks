@@ -3,13 +3,14 @@ import { logger } from 'nb-logger';
 import config from '#config';
 import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
+import { monitorProgress } from '#libs/utils';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
     logger.info('syncing data...');
-    await syncData();
+    await Promise.all([syncData(), monitorProgress()]);
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);

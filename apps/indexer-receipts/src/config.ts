@@ -30,6 +30,7 @@ const config: Config = {
   dbUrl: env.DATABASE_URL,
   dbUrlRead: env.DATABASE_URL_READ,
   delta: 10,
+  indexerKey: 'receipts',
   insertLimit: 2500,
   network: env.NETWORK,
   s3AccessKey: env.S3_ACCESS_KEY,

@@ -9,9 +9,12 @@ import {
   AccessKeyPermissionKind,
   ActionKind,
   ExecutionOutcomeStatus,
+  JsonValue,
   ReceiptKind,
 } from 'nb-types';
+import { sleep } from 'nb-utils';
 
+import config from '#config';
 import {
   isAccessKeyFunctionCallPermission,
   isAddKeyAction,
@@ -27,6 +30,7 @@ import {
   isUseGlobalContractAction,
   isUseGlobalContractByAccountIdAction,
 } from '#libs/guards';
+import { dbRead } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { AccessKeyPermission, ReceiptAction, RlpJson } from '#types/types';
 
@@ -277,4 +281,26 @@ export const difference = <T>(arr1: T[], arr2: T[]): T[] => {
 
 export const getExecutionResult = (status: ExecutionStatus) => {
   return jsonStringify(Object.values(status)[0]);
+};
+
+export const monitorProgress = async (): Promise<void> => {
+  let lastBlock: JsonValue | undefined;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const settings = await dbRead('settings')
+      .where({ key: config.indexerKey })
+      .first();
+    const currentBlock = settings?.value?.sync;
+
+    if (lastBlock && currentBlock && lastBlock === currentBlock) {
+      throw new Error('indexing stalled...');
+    }
+
+    if (currentBlock) {
+      lastBlock = currentBlock;
+    }
+
+    await sleep(30_000); // 30s
+  }
 };

@@ -13,6 +13,7 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbUrlRead: string;
+  indexerKey: string;
   network: Network;
   s3AccessKey: string;
   s3Bucket: string;

@@ -28,6 +28,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   dbUrlRead: env.DATABASE_URL_READ,
+  indexerKey: 'balance',
   network: env.NETWORK,
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,

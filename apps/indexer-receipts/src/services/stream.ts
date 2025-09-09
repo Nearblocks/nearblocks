@@ -10,7 +10,7 @@ import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 
-const indexerKey = 'receipts';
+const indexerKey = config.indexerKey;
 const s3Config = {
   credentials: {
     accessKeyId: config.s3AccessKey,
