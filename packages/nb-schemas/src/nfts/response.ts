@@ -11,12 +11,20 @@ const block = v.object({
 });
 
 const meta = v.object({
+  base_uri: v.nullable(v.string()),
   contract: v.string(),
-  decimals: v.nullable(v.number()),
   icon: v.nullable(v.string()),
   name: v.nullable(v.string()),
   reference: v.nullable(v.string()),
   symbol: v.nullable(v.string()),
+});
+
+const tokenMeta = v.object({
+  contract: v.string(),
+  media: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  title: v.nullable(v.string()),
+  token: v.string(),
 });
 
 const txn = v.object({
@@ -32,6 +40,8 @@ const txn = v.object({
   meta: v.optional(meta),
   receipt_id: v.string(),
   shard_id: v.number(),
+  token_id: v.string(),
+  token_meta: v.optional(tokenMeta),
   transaction_hash: v.optional(v.string()),
 });
 
@@ -48,11 +58,12 @@ const contractTxn = v.object({
   contract_account_id: v.string(),
   delta_amount: v.string(),
   event_index: v.number(),
-  event_type: v.number(),
   involved_account_id: v.nullable(v.string()),
   meta: v.optional(meta),
   receipt_id: v.string(),
   shard_id: v.number(),
+  token_id: v.string(),
+  token_meta: v.optional(tokenMeta),
   transaction_hash: v.optional(v.string()),
 });
 
@@ -74,15 +85,15 @@ const contractTxnsResponse = responseSchema(
 );
 const contractTxnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
-export type FTTxn = v.InferOutput<typeof txn>;
-export type FTTxnCount = v.InferOutput<typeof txnCount>;
-export type FTContractTxn = v.InferOutput<typeof contractTxn>;
-export type FTContractTxnCount = v.InferOutput<typeof contractTxnCount>;
+export type NFTTxn = v.InferOutput<typeof txn>;
+export type NFTTxnCount = v.InferOutput<typeof txnCount>;
+export type NFTContractTxn = v.InferOutput<typeof contractTxn>;
+export type NFTContractTxnCount = v.InferOutput<typeof contractTxnCount>;
 
-export type FTTxnsRes = v.InferOutput<typeof txnsResponse>;
-export type FTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
-export type FTContractTxnsRes = v.InferOutput<typeof contractTxnsResponse>;
-export type FTContractTxnCountRes = v.InferOutput<
+export type NFTTxnsRes = v.InferOutput<typeof txnsResponse>;
+export type NFTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
+export type NFTContractTxnsRes = v.InferOutput<typeof contractTxnsResponse>;
+export type NFTContractTxnCountRes = v.InferOutput<
   typeof contractTxnCountResponse
 >;
 

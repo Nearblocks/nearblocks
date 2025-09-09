@@ -28,9 +28,9 @@ const cursor = v.object({
   type: v.number(),
 });
 
-export type FTTxnsReq = v.InferOutput<typeof txns>;
-export type FTTxnsCursor = v.InferOutput<typeof cursor>;
-export type FTContractTxnsReq = v.InferOutput<typeof contractTxns>;
-export type FTContractTxnCountReq = v.InferOutput<typeof contractTxnCount>;
+export type NFTTxnsReq = v.InferOutput<typeof txns>;
+export type NFTTxnsCursor = v.InferOutput<typeof cursor>;
+export type NFTContractTxnsReq = v.InferOutput<typeof contractTxns>;
+export type NFTContractTxnCountReq = v.InferOutput<typeof contractTxnCount>;
 
 export default { contractTxnCount, contractTxns, cursor, txns };
