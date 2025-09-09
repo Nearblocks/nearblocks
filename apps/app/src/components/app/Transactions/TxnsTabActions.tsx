@@ -35,8 +35,8 @@ const TxnsTabActions = ({
   stats,
   tab,
   txn,
-  status,
   apiTxnActionsData,
+  hasReceipts,
 }: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
@@ -140,11 +140,11 @@ const TxnsTabActions = ({
         setRpcError(true);
       }
     };
-    if (!txn) {
+    if (!txn || hasReceipts === false) {
       checkTxnExistence();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, hash, rpcUrl]);
+  }, [txn, hash, rpcUrl, hasReceipts]);
 
   useEffect(() => {
     const fetchTransactionStatus = async () => {
@@ -269,9 +269,9 @@ const TxnsTabActions = ({
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}
-                    status={status}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
+                    hasReceipts={hasReceipts}
                   />
                 )}
                 {tab === 'execution' && (
@@ -282,6 +282,7 @@ const TxnsTabActions = ({
                     txn={txn ? txn : rpcData}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
+                    hasReceipts={hasReceipts}
                   />
                 )}
                 {tab === 'enhanced' && (
@@ -292,6 +293,7 @@ const TxnsTabActions = ({
                     statsData={stats}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
+                    hasReceipts={hasReceipts}
                   />
                 )}
                 {tab === 'tree' && (
@@ -301,6 +303,7 @@ const TxnsTabActions = ({
                     txn={txn ? txn : rpcData}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
+                    hasReceipts={hasReceipts}
                   />
                 )}
                 {tab === 'summary' && (
@@ -313,6 +316,7 @@ const TxnsTabActions = ({
                     txn={txn ? txn : rpcData}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
+                    hasReceipts={hasReceipts}
                   />
                 )}
               </>

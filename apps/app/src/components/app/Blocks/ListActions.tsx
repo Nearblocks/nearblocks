@@ -22,6 +22,7 @@ const ListActions = ({
   error,
   setUrl,
   totalCount,
+  hasReceipts,
 }: any) => {
   const [showAge, setShowAge] = useState(true);
   const [page, setPage] = useState(1);
@@ -112,21 +113,25 @@ const ListActions = ({
       thClassName:
         'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
-    {
-      cell: (row: BlocksInfo) => (
-        <span>
-          {row?.receipts_agg?.count
-            ? localFormat(row?.receipts_agg?.count)
-            : row?.receipts_agg?.count ?? ''}
-        </span>
-      ),
-      header: <span>{t('block.receipts') || 'RECEIPTS'}</span>,
-      key: 'count',
-      tdClassName:
-        'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
-      thClassName:
-        'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
-    },
+    ...(hasReceipts
+      ? [
+          {
+            cell: (row: BlocksInfo) => (
+              <span>
+                {row?.receipts_agg?.count
+                  ? localFormat(row?.receipts_agg?.count)
+                  : row?.receipts_agg?.count ?? ''}
+              </span>
+            ),
+            header: <span>{t('block.receipts') || 'RECEIPTS'}</span>,
+            key: 'count',
+            tdClassName:
+              'px-6 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+            thClassName:
+              'px-6 py-2 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
+          },
+        ]
+      : []),
     {
       cell: (row: BlocksInfo) => (
         <span>

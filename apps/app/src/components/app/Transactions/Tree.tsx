@@ -18,16 +18,19 @@ interface Props {
   txn: TransactionInfo;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
+  hasReceipts: boolean;
 }
 
 const Tree = (props: Props) => {
-  const { hash, rpcTxn, txn, apiTxnActionsData, shouldUseRpc } = props;
+  const { hash, rpcTxn, txn, apiTxnActionsData, shouldUseRpc, hasReceipts } =
+    props;
 
   const [rpcReceipt, setRpcReceipt] = useState<any>(null);
 
-  const polledReceipt = shouldUseRpc
-    ? rpcReceipt
-    : apiTxnActionsData?.receiptData;
+  const polledReceipt =
+    shouldUseRpc || hasReceipts === false
+      ? rpcReceipt
+      : apiTxnActionsData?.receiptData;
 
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData

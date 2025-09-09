@@ -32,11 +32,19 @@ interface Props {
     }>;
   };
   shouldUseRpc: boolean;
+  hasReceipts: boolean;
 }
 
 const Execution = (props: Props) => {
-  const { hash, rpcTxn, txn, statsData, apiTxnActionsData, shouldUseRpc } =
-    props;
+  const {
+    hash,
+    rpcTxn,
+    txn,
+    statsData,
+    apiTxnActionsData,
+    shouldUseRpc,
+    hasReceipts,
+  } = props;
 
   const [rpcReceipt, setRpcReceipt] = useState<
     any | FailedToFindReceipt | NestedReceiptWithOutcome
@@ -46,9 +54,10 @@ const Execution = (props: Props) => {
     ? apiTxnActionsData?.receiptData
     : rpcReceipt;
 
-  const polledReceipt = shouldUseRpc
-    ? rpcReceipt
-    : apiTxnActionsData?.receiptData;
+  const polledReceipt =
+    shouldUseRpc || hasReceipts === false
+      ? rpcReceipt
+      : apiTxnActionsData?.receiptData;
 
   const [expandAll, setExpandAll] = useState(false);
   const expandAllReceipts = useCallback(

@@ -292,15 +292,19 @@ export default function Details(props: Props) {
                         )} transactions`}
                     </LinkWrapper>
                     &nbsp;
-                    {t?.('block.transactions.2', {
-                      receipts:
-                        localFormat(block?.receipts_agg?.count?.toString()) ||
-                        block?.receipts_agg?.count?.toString() ||
-                        'receipts',
-                    }) ||
-                      `and ${localFormat(
-                        block?.receipts_agg?.count?.toString(),
-                      )} receipts`}
+                    {block?.receipts_agg?.count
+                      ? t?.('block.transactions.2', {
+                          receipts:
+                            localFormat(
+                              block?.receipts_agg?.count?.toString(),
+                            ) ||
+                            block?.receipts_agg?.count?.toString() ||
+                            'receipts',
+                        }) ||
+                        `and ${localFormat(
+                          block?.receipts_agg?.count?.toString(),
+                        )} receipts`
+                      : null}
                   </div>
                 )
               )}
