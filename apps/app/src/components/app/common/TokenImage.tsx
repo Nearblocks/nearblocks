@@ -69,25 +69,22 @@ export const NFTImage = ({
 };
 
 const TokenImage = ({ alt, src, ...rest }: any) => {
-  const onError = (e: any) => {
-    e.target.onError = null;
-    e.target.src = placeholder;
+  const [imgUrl, setImgUrl] = useState<string>(src || placeholder);
+
+  useEffect(() => {
+    if (src && (src?.startsWith('https') || src?.startsWith('data:image/'))) {
+      setImgUrl(src);
+    } else {
+      setImgUrl(placeholder);
+    }
+  }, [src]);
+
+  const onError = () => {
+    setImgUrl(placeholder);
   };
+
   /* eslint-disable @next/next/no-img-element */
-  return (
-    <img
-      alt={alt}
-      src={
-        src
-          ? src.startsWith('https') || src?.startsWith('data:image/')
-            ? src
-            : placeholder
-          : placeholder
-      }
-      {...rest}
-      onError={onError}
-    />
-  );
+  return <img alt={alt} src={imgUrl} {...rest} onError={onError} />;
 };
 
 export default TokenImage;
