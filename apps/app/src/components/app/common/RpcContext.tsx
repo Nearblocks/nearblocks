@@ -10,6 +10,12 @@ import React, {
   useEffect,
 } from 'react';
 
+type RpcStats = {
+  total: number;
+  currentErrors: number;
+  allRpcsFailed: boolean;
+};
+
 type RpcContextType = {
   providers: RpcProvider[];
   rpc: string;
@@ -17,6 +23,7 @@ type RpcContextType = {
   switchRpc: () => void;
   addCustomRpc: (rpc: RpcProvider) => void;
   deleteCustomRpc: (rpcUrl: string) => void;
+  rpcStats: RpcStats;
 };
 
 const RpcContext = createContext<RpcContextType | null>(null);
@@ -135,6 +142,12 @@ export const RpcContextProvider = ({
     switchRpc,
     addCustomRpc,
     deleteCustomRpc,
+    rpcStats: {
+      total: providers.length,
+      currentErrors: errorCountRef.current,
+      allRpcsFailed:
+        providers.length > 0 && errorCountRef.current >= providers.length,
+    },
   };
 
   return <RpcContext.Provider value={value}>{children}</RpcContext.Provider>;
