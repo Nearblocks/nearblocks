@@ -22,11 +22,19 @@ interface Props {
   txn: TransactionInfo;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
+  hasReceipts: boolean;
 }
 
 const Receipt = (props: Props) => {
-  const { hash, statsData, txn, rpcTxn, apiTxnActionsData, shouldUseRpc } =
-    props;
+  const {
+    hash,
+    statsData,
+    txn,
+    rpcTxn,
+    apiTxnActionsData,
+    shouldUseRpc,
+    hasReceipts,
+  } = props;
   const [rpcReceipt, setReceipt] = useState<null | ReceiptsPropsInfo>(null);
 
   function transactionReceipts(txn: RPCTransactionInfo) {
@@ -100,9 +108,10 @@ const Receipt = (props: Props) => {
     ? rpcReceipt
     : apiTxnActionsData?.receiptData;
 
-  const polledReceipt = shouldUseRpc
-    ? rpcReceipt
-    : apiTxnActionsData?.receiptData;
+  const polledReceipt =
+    shouldUseRpc || hasReceipts === false
+      ? rpcReceipt
+      : apiTxnActionsData?.receiptData;
   const txnsPending = txn?.outcomes?.status === null && !rpcTxn?.status;
 
   return (

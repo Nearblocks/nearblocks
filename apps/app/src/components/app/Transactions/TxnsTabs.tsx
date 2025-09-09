@@ -4,6 +4,7 @@ import { nanoToMilli } from '@/utils/app/libs';
 import TxnsTabActions from '@/components/app/Transactions/TxnsTabActions';
 import { processTransactionWithTokens } from '@/utils/near';
 import { ApiTxnData } from '@/utils/types';
+import { isEmpty } from 'lodash';
 
 export default async function TxnsTabs({
   hash,
@@ -20,9 +21,23 @@ export default async function TxnsTabs({
   };
   const data = (await getRequest(`v2/txns/${hash}`, {}, requestOptions)) || {};
   const stats = (await getRequest(`v1/stats`, {}, options)) || [];
-  const syncData = (await getRequest(`v1/sync/status`, {}, options)) || [];
   const receipt =
     (await getRequest(`v2/txns/${hash}/receipts`, {}, options)) || [];
+
+  let hasReceipts = true;
+
+  if (isEmpty(receipt?.receipts?.[0]?.receipt_tree)) {
+    const receiptIndexerHealth =
+      (await getRequest('v1/health/indexer-receipts')) || {};
+    if (
+      data?.txns?.[0]?.block?.block_height &&
+      receiptIndexerHealth?.height &&
+      data?.txns?.[0]?.block?.block_height > receiptIndexerHealth?.height
+    ) {
+      hasReceipts = false;
+    }
+  }
+
   const txn = data?.txns?.[0];
   let price: null | number = null;
   if (txn?.block?.block_timestamp) {
@@ -50,8 +65,6 @@ export default async function TxnsTabs({
 
   const tab = searchParams?.tab || 'overview';
 
-  const balanceIndexerStatus =
-    syncData && syncData?.status?.indexers?.base?.sync;
   const txnData: ApiTxnData = await processTransactionWithTokens(txn, receipt);
   return (
     <TxnsTabActions
@@ -61,8 +74,8 @@ export default async function TxnsTabs({
       stats={stats}
       tab={tab}
       txn={txn}
-      status={balanceIndexerStatus}
       apiTxnActionsData={txnData}
+      hasReceipts={hasReceipts}
     />
   );
 }

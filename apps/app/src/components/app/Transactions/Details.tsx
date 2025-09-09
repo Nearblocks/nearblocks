@@ -76,9 +76,9 @@ interface Props {
     }>;
   };
   txn: TransactionInfo;
-  status: boolean;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
+  hasReceipts: boolean;
 }
 
 const Details = (props: Props) => {
@@ -90,9 +90,9 @@ const Details = (props: Props) => {
     rpcTxn,
     statsData,
     txn,
-    status,
     apiTxnActionsData,
     shouldUseRpc,
+    hasReceipts,
   } = props;
   const [more, setMore] = useState(false);
   const [utc, setUtc] = useState(true);
@@ -467,7 +467,9 @@ const Details = (props: Props) => {
   }, [apiSubActions, rpcSubActions, filteredLogs]);
 
   const subAction =
-    apiSubActions?.length > 0 && !shouldUseRpc ? apiSubActions : rpcSubActions;
+    (apiSubActions?.length === 0 && shouldUseRpc) || hasReceipts === false
+      ? rpcSubActions
+      : apiSubActions;
 
   return (
     <>
@@ -529,14 +531,14 @@ const Details = (props: Props) => {
                 </Tooltip>
                 <div>{t ? t('txnDetails.status.text.0') : 'Status'}</div>
               </div>
-              {loading ? (
+              {hasReceipts === false && !rpcTxn.status ? (
                 <div className="w-full md:w-3/4">
                   <Loader wrapperClassName="flex w-14" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
                   <div className="flex items-center flex-wrap gap-2">
-                    {!status ? (
+                    {hasReceipts === false ? (
                       <RpcTxnStatus
                         showLabel
                         status={rpcTxn.status}
@@ -894,7 +896,9 @@ const Details = (props: Props) => {
                                 key={i}
                                 event={event}
                                 allActionLog={
-                                  !shouldUseRpc ? apiAllActions : rpcAllActions
+                                  shouldUseRpc || hasReceipts === false
+                                    ? rpcAllActions
+                                    : apiAllActions
                                 }
                                 isInteracted
                                 tokenMetadata={tokenMetadata}
