@@ -1,6 +1,11 @@
 import { unionWith } from 'es-toolkit';
 
-import type { FTTxn, FTTxnCount, FTTxnsReq } from 'nb-schemas';
+import type {
+  FTContractTxn,
+  FTContractTxnCount,
+  FTContractTxnCountReq,
+  FTContractTxnsReq,
+} from 'nb-schemas';
 import request from 'nb-schemas/dist/fts/request.js';
 import response from 'nb-schemas/dist/fts/response.js';
 
@@ -16,30 +21,37 @@ import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/fts';
 
 const txns = responseHandler(
-  response.txns,
-  async (req: RequestValidator<FTTxnsReq>) => {
+  response.contractTxns,
+  async (req: RequestValidator<FTContractTxnsReq>) => {
+    const contract = req.validator.contract;
+    const affected = req.validator.affected;
+    const involved = req.validator.involved;
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
+    console.log({ req });
+
     const eventsQuery: WindowListQuery<
-      Omit<FTTxn, 'block' | 'transaction_hash'>
+      Omit<FTContractTxn, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
-      return dbEvents.manyOrNone<Omit<FTTxn, 'block' | 'transaction_hash'>>(
-        sql.txns,
-        {
-          after: start,
-          before: end,
-          cursor: {
-            index: cursor?.index,
-            shard: cursor?.shard,
-            timestamp: cursor?.timestamp,
-            type: cursor?.type,
-          },
-          limit,
+      return dbEvents.manyOrNone<
+        Omit<FTContractTxn, 'block' | 'transaction_hash'>
+      >(sql.contractTxns, {
+        affected,
+        contract,
+        cursor: {
+          index: cursor?.index,
+          shard: cursor?.shard,
+          timestamp: cursor?.timestamp,
+          type: cursor?.type,
         },
-      );
+        end,
+        involved,
+        limit,
+        start,
+      });
     };
 
     const events = await rollingWindowList(eventsQuery, {
@@ -53,10 +65,10 @@ const txns = responseHandler(
     }
 
     const queries = events.map((event) => {
-      return pgp.as.format(sql.txn, event);
+      return pgp.as.format(sql.contractTxn, event);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<FTTxn>(unionQuery);
+    const txns = await dbBase.manyOrNone<FTContractTxn>(unionQuery);
 
     // If lengths don't match, it means receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
@@ -85,10 +97,21 @@ const txns = responseHandler(
   },
 );
 
-const count = responseHandler(response.count, async () => {
-  const txns = await dbEvents.one<FTTxnCount>(sql.txnCount);
+const count = responseHandler(
+  response.contractTxnCount,
+  async (req: RequestValidator<FTContractTxnCountReq>) => {
+    const contract = req.validator.contract;
+    const affected = req.validator.affected;
+    const involved = req.validator.involved;
 
-  return { data: txns };
-});
+    const txns = await dbEvents.one<FTContractTxnCount>(sql.contractTxnCount, {
+      affected,
+      contract,
+      involved,
+    });
+
+    return { data: txns };
+  },
+);
 
 export default { count, txns };
