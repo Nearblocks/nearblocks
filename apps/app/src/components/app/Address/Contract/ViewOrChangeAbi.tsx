@@ -21,6 +21,7 @@ import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
 import FaChevronDown from '@/components/app/Icons/FaChevronDown';
+import { formatLargeNumber } from '@/utils/app/libs';
 
 interface Props {
   id: string;
@@ -68,7 +69,8 @@ const ViewOrChangeAbi = (props: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [fields, setFields] = useState<FieldType[]>([]);
   const [result, setResult] = useState<null | string>('');
-  const [loading, setLoading] = useState(false);
+  const [readLoading, setReadLoading] = useState(false);
+  const [writeLoading, setWriteLoading] = useState(false);
   const [hideQuery, setHideQuery] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
   const [options, setOptions] = useState({
@@ -139,7 +141,7 @@ const ViewOrChangeAbi = (props: Props) => {
       setResult(result);
     };
 
-    setLoading(true);
+    setReadLoading(true);
 
     try {
       const args = mapFeilds(fields);
@@ -150,10 +152,17 @@ const ViewOrChangeAbi = (props: Props) => {
         rpcUrl: rpc,
       });
       if (response?.success) {
+        let formattedData = response?.data;
+        if (typeof response?.data === 'number') {
+          formattedData = formatLargeNumber(response?.data);
+        }
+
         resetState(
           response?.data?.transaction_outcome?.id ?? null,
           null,
-          JSON.stringify(response.data, null, 2),
+          typeof formattedData === 'string'
+            ? formattedData
+            : JSON.stringify(formattedData, null, 2),
         );
       } else {
         const errorMsg =
@@ -167,12 +176,12 @@ const ViewOrChangeAbi = (props: Props) => {
     } catch {
       resetState(null, 'An unknown error occurred');
     } finally {
-      setLoading(false);
+      setReadLoading(false);
     }
   };
 
   const onWrite = async () => {
-    setLoading(true);
+    setWriteLoading(true);
 
     try {
       if (!wallet) return;
@@ -197,7 +206,7 @@ const ViewOrChangeAbi = (props: Props) => {
       setError(error?.message || 'An unknown error occurred');
       setResult(null);
     } finally {
-      setLoading(false);
+      setWriteLoading(false);
     }
   };
 
@@ -404,21 +413,21 @@ const ViewOrChangeAbi = (props: Props) => {
           {!hideQuery && method?.kind === 'view' && (
             <button
               className="bg-green-500 dark:bg-green-250 hover:bg-green-400 dark:text-neargray-10 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-              disabled={loading}
+              disabled={readLoading || writeLoading}
               onClick={onRead}
               type="submit"
             >
-              Query
+              {!readLoading ? 'Query' : 'Loading ..'}
             </button>
           )}
           {method?.kind === 'call' && (
             <button
               className="bg-green-500 dark:bg-green-250 hover:bg-green-400 dark:text-neargray-10 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-              disabled={loading || !signedAccountId}
+              disabled={readLoading || writeLoading || !signedAccountId}
               onClick={onWrite}
               type="submit"
             >
-              Write
+              {!writeLoading ? 'Write' : 'Loading ..'}
             </button>
           )}
         </div>
