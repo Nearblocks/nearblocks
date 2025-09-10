@@ -29,7 +29,9 @@ export default async function TxnsTabs({
   if (isEmpty(receipt?.receipts?.[0]?.receipt_tree)) {
     const receiptIndexerHealth =
       (await getRequest('v1/health/indexer-receipts')) || {};
-    if (
+    if (!receiptIndexerHealth?.height) {
+      hasReceipts = false;
+    } else if (
       data?.txns?.[0]?.block?.block_height &&
       receiptIndexerHealth?.height &&
       data?.txns?.[0]?.block?.block_height > receiptIndexerHealth?.height
