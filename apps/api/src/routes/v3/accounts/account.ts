@@ -2,16 +2,10 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/request.js';
 
-import { bearerAuth } from '#middlewares/passport';
-import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
 import accounts from '#services/v3/accounts/index';
 
-const route = Router();
-
-const routes = (app: Router) => {
-  app.use('/accounts', bearerAuth, rateLimiter, route);
-
+const routes = (route: Router) => {
   /**
    * @openapi
    * /v3/accounts/{account}:
