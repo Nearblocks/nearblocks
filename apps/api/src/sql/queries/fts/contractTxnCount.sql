@@ -11,11 +11,11 @@ FROM
       WHERE
         contract_account_id = %L
         AND (
-          %L::BIGINT IS NULL
+          %L::TEXT IS NULL
           OR affected_account_id = %L
         )
         AND (
-          %L::BIGINT IS NULL
+          %L::TEXT IS NULL
           OR involved_account_id = %L
         )
         AND EXISTS (

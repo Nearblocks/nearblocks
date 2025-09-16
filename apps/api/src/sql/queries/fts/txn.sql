@@ -7,7 +7,7 @@ SELECT
   ${block_timestamp}::TEXT AS block_timestamp,
   ${shard_id}::SMALLINT AS shard_id,
   ${event_type}::SMALLINT AS event_type,
-  ${event_index}::INT AS event_index,
+  ${event_index}::INTEGER AS event_index,
   ${meta}::JSONB AS meta,
   r.receipt_id,
   t.transaction_hash,

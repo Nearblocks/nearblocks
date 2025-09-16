@@ -35,7 +35,6 @@ const txn = v.object({
   contract_account_id: v.string(),
   delta_amount: v.string(),
   event_index: v.number(),
-  event_type: v.number(),
   involved_account_id: v.nullable(v.string()),
   meta: v.optional(meta),
   receipt_id: v.string(),
@@ -73,15 +72,11 @@ const contractTxnCount = v.object({
 });
 
 const txnsResponse = responseSchema(
-  v.array(
-    v.omit(txn, ['block_timestamp', 'shard_id', 'event_type', 'event_index']),
-  ),
+  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'event_index'])),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 const contractTxnsResponse = responseSchema(
-  v.array(
-    v.omit(txn, ['block_timestamp', 'shard_id', 'event_type', 'event_index']),
-  ),
+  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'event_index'])),
 );
 const contractTxnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
