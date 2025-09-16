@@ -5,18 +5,13 @@ import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import knex from '#libs/knex';
-import { blockGauge, blocksHistogram, dataSourceGauge } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { checkFastnear } from '#libs/utils';
-import { storeAccessKeys } from '#services/accessKey';
-import { storeAccounts } from '#services/account';
-import { storeBlock } from '#services/block';
-import { storeChunks } from '#services/chunk';
 import { uploadJson } from '#services/s3';
-import { storeTransactions } from '#services/transaction';
 import { DataSource } from '#types/enum';
 
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+const indexerKey = 's3-indexer';
 let source = config.dataSource;
 let shouldSwitchSource = false;
 const lakeConfig: types.LakeConfig = {
@@ -53,21 +48,19 @@ export const syncData = async () => {
   // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
-      dataSourceGauge
-        .labels(config.network)
-        .set(source === DataSource.FAST_NEAR ? 1 : 0);
       logger.info({ data_source: source });
 
-      let startBlockHeight = config.startBlockHeight;
-      const block = await knex('blocks')
-        .orderBy('block_height', 'desc')
+      const settings = await knex('settings')
+        .where({ key: indexerKey })
         .first();
+      const block = settings?.value?.sync;
+      let startBlockHeight = config.startBlockHeight;
 
       if (source === DataSource.FAST_NEAR) {
         if (!startBlockHeight && block) {
-          const next = +block.block_height - config.delta;
+          const next = +block - config.delta;
           startBlockHeight = next;
-          logger.info(`last synced block: ${block.block_height}`);
+          logger.info(`last synced block: ${block}`);
           logger.info(`syncing from block: ${next}`);
         }
 
@@ -92,9 +85,9 @@ export const syncData = async () => {
         });
       } else {
         if (!startBlockHeight && block) {
-          const next = +block.block_height - config.delta;
+          const next = +block - config.delta;
           lakeConfig.startBlockHeight = next;
-          logger.info(`last synced block: ${block.block_height}`);
+          logger.info(`last synced block: ${block}`);
           logger.info(`syncing from block: ${next}`);
         }
 
@@ -125,25 +118,24 @@ export const onMessage = async (message: Message) => {
     const start = performance.now();
 
     await Promise.race([
-      Promise.all([
-        storeBlock(knex, message),
-        storeChunks(knex, message),
-        storeTransactions(knex, message),
-        storeAccounts(knex, message),
-        storeAccessKeys(knex, message),
-        uploadJson(message),
-      ]),
+      uploadJson(message),
       new Promise((_, reject) =>
         setTimeout(
-          () => reject(new Error('Block processing timed out after 20s')),
+          () => reject(new Error('S3 upload timed out after 20s')),
           20_000,
         ),
       ),
     ]);
 
     const time = performance.now() - start;
-    blockGauge.labels(config.network).set(message.block.header.height);
-    blocksHistogram.labels(config.network).observe(time);
+
+    await knex('settings')
+      .insert({
+        key: indexerKey,
+        value: { sync: message.block.header.height },
+      })
+      .onConflict('key')
+      .merge();
 
     logger.info({ block: message.block.header.height, db: `${time} ms` });
   } catch (error) {
