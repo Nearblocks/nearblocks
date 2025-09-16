@@ -71,6 +71,14 @@ WHERE
       nft.event_index
     ) < (p.block_timestamp, p.shard_id, p.event_index)
   )
+  AND (
+    ${after}::BIGINT IS NULL
+    OR nft.block_timestamp > ${after}
+  )
+  AND (
+    ${before}::BIGINT IS NULL
+    OR nft.block_timestamp < ${before}
+  )
 ORDER BY
   block_timestamp DESC,
   shard_id DESC,

@@ -9,6 +9,7 @@ import type {
 import request from 'nb-schemas/dist/nfts/request.js';
 import response from 'nb-schemas/dist/nfts/response.js';
 
+import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -25,7 +26,8 @@ const txns = responseHandler(
   async (req: RequestValidator<NFTContractTxnsReq>) => {
     const contract = req.validator.contract;
     const affected = req.validator.affected;
-    const involved = req.validator.involved;
+    const after = req.validator.after_ts;
+    const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
       ? cursors.decode(request.cursor, req.validator.cursor)
@@ -38,24 +40,27 @@ const txns = responseHandler(
         Omit<NFTContractTxn, 'block' | 'transaction_hash'>
       >(sql.contractTxns, {
         affected,
+        after: start,
+        before: end,
         contract,
         cursor: {
           index: cursor?.index,
           shard: cursor?.shard,
           timestamp: cursor?.timestamp,
-          type: cursor?.type,
         },
-        end,
-        involved,
         limit,
-        start,
       });
     };
 
     const events = await rollingWindowList(eventsQuery, {
-      end: cursor?.timestamp ? BigInt(cursor.timestamp) : undefined,
+      end: cursor?.timestamp
+        ? BigInt(cursor.timestamp)
+        : before
+        ? BigInt(before)
+        : undefined,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
+      start: after ? BigInt(after) : config.baseStart,
     });
 
     if (!events.length) {
@@ -68,7 +73,7 @@ const txns = responseHandler(
     const unionQuery = queries.join('\nUNION ALL\n');
     const txns = await dbBase.manyOrNone<NFTContractTxn>(unionQuery);
 
-    // If lengths don't match, it means receipts are missing (maybe delayed).
+    // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
       const merged = unionWith(
         txns,
@@ -98,12 +103,14 @@ const count = responseHandler(
   async (req: RequestValidator<NFTContractTxnCountReq>) => {
     const contract = req.validator.contract;
     const affected = req.validator.affected;
-    const involved = req.validator.involved;
+    const after = req.validator.after_ts;
+    const before = req.validator.before_ts;
 
     const txns = await dbEvents.one<NFTContractTxnCount>(sql.contractTxnCount, {
       affected,
+      after,
+      before,
       contract,
-      involved,
     });
 
     return { data: txns };

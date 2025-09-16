@@ -7,6 +7,8 @@ SELECT
   ts.transaction_hash,
   ts.receiver_account_id,
   ts.signer_account_id,
+  ts.receipt_conversion_tokens_burnt,
+  ts.receipt_conversion_gas_burnt,
   COALESCE(b.block, '{}'::JSONB) AS block,
   COALESCE(a.actions, '[]'::JSONB) AS actions,
   COALESCE(o.outcomes, '{}'::JSONB) AS outcomes,
@@ -69,7 +71,9 @@ FROM
     SELECT
       JSONB_BUILD_OBJECT(
         'deposit',
-        COALESCE(SUM((ar.args ->> 'deposit')::NUMERIC), 0)::TEXT
+        COALESCE(SUM((ar.args ->> 'deposit')::NUMERIC), 0)::TEXT,
+        'gas_attached',
+        COALESCE(SUM((ar.args ->> 'gas')::NUMERIC), 0)::TEXT
       ) AS actions_agg
     FROM
       action_receipt_actions ar
@@ -130,6 +134,10 @@ FROM
         'transaction_fee',
         (
           COALESCE(ts.receipt_conversion_tokens_burnt, 0) + COALESCE(SUM(eo.tokens_burnt), 0)
+        )::TEXT,
+        'gas_used',
+        (
+          COALESCE(ts.receipt_conversion_gas_burnt, 0) + COALESCE(SUM(eo.gas_burnt), 0)
         )::TEXT
       ) AS outcomes_agg
     FROM

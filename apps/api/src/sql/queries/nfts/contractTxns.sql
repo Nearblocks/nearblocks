@@ -63,7 +63,12 @@ FROM
       AND ntm.token = nft.token_id
   ) tm ON TRUE
 WHERE
-  (
+  nft.contract_account_id = ${contract}
+  AND (
+    ${affected}::BIGINT IS NULL
+    OR nft.affected_account_id = ${affected}
+  )
+  AND (
     p.block_timestamp IS NULL
     OR (
       nft.block_timestamp,
@@ -72,17 +77,12 @@ WHERE
     ) < (p.block_timestamp, p.shard_id, p.event_index)
   )
   AND (
-    ${start}::BIGINT IS NULL
-    OR nft.block_timestamp > ${start}
+    ${after}::BIGINT IS NULL
+    OR nft.block_timestamp > ${after}
   )
   AND (
-    ${end}::BIGINT IS NULL
-    OR nft.block_timestamp < ${end}
-  )
-  AND nft.contract_account_id = ${contract}
-  AND (
-    ${affected}::BIGINT IS NULL
-    OR nft.affected_account_id = ${affected}
+    ${before}::BIGINT IS NULL
+    OR nft.block_timestamp < ${before}
   )
   AND (
     ${involved}::BIGINT IS NULL

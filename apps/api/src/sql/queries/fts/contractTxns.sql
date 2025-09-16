@@ -58,21 +58,17 @@ WHERE
     )
   )
   AND (
-    ${start}::BIGINT IS NULL
-    OR ft.block_timestamp > ${start}
+    ${after}::BIGINT IS NULL
+    OR ft.block_timestamp > ${after}
   )
   AND (
-    ${end}::BIGINT IS NULL
-    OR ft.block_timestamp < ${end}
+    ${before}::BIGINT IS NULL
+    OR ft.block_timestamp < ${before}
   )
   AND ft.contract_account_id = ${contract}
   AND (
-    ${affected}::BIGINT IS NULL
+    ${affected}::TEXT IS NULL
     OR ft.affected_account_id = ${affected}
-  )
-  AND (
-    ${involved}::BIGINT IS NULL
-    OR ft.involved_account_id = ${involved}
   )
 ORDER BY
   block_timestamp DESC,

@@ -1,13 +1,13 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
-  NFTTxn,
-  NFTTxnCount,
-  NFTTxnCountReq,
-  NFTTxnsReq,
+  AccountFTTxn,
+  AccountFTTxnCount,
+  AccountFTTxnCountReq,
+  AccountFTTxnsReq,
 } from 'nb-schemas';
-import request from 'nb-schemas/dist/nfts/request.js';
-import response from 'nb-schemas/dist/nfts/response.js';
+import request from 'nb-schemas/dist/accounts/fts/request.js';
+import response from 'nb-schemas/dist/accounts/fts/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
@@ -19,34 +19,42 @@ import {
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
-import sql from '#sql/nfts';
+import sql from '#sql/accounts';
 
-const txns = responseHandler(
-  response.txns,
-  async (req: RequestValidator<NFTTxnsReq>) => {
+const fts = responseHandler(
+  response.fts,
+  async (req: RequestValidator<AccountFTTxnsReq>) => {
+    const account = req.validator.account;
+    const contract = req.validator.contract;
+    const involved = req.validator.involved;
+    const cause = req.validator.cause;
+    const limit = req.validator.limit;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
-    const limit = req.validator.limit;
     const cursor = req.validator.cursor
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;
 
     const eventsQuery: WindowListQuery<
-      Omit<NFTTxn, 'block' | 'transaction_hash'>
+      Omit<AccountFTTxn, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
-      return dbEvents.manyOrNone<Omit<NFTTxn, 'block' | 'transaction_hash'>>(
-        sql.txns,
-        {
-          after: start,
-          before: end,
-          cursor: {
-            index: cursor?.index,
-            shard: cursor?.shard,
-            timestamp: cursor?.timestamp,
-          },
-          limit,
+      return dbEvents.manyOrNone<
+        Omit<AccountFTTxn, 'block' | 'transaction_hash'>
+      >(sql.fts.txns, {
+        account,
+        after: start,
+        before: end,
+        cause,
+        contract,
+        cursor: {
+          index: cursor?.index,
+          shard: cursor?.shard,
+          timestamp: cursor?.timestamp,
+          type: cursor?.type,
         },
-      );
+        involved,
+        limit,
+      });
     };
 
     const events = await rollingWindowList(eventsQuery, {
@@ -65,10 +73,10 @@ const txns = responseHandler(
     }
 
     const queries = events.map((event) => {
-      return pgp.as.format(sql.txn, event);
+      return pgp.as.format(sql.fts.txn, event);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<NFTTxn>(unionQuery);
+    const txns = await dbBase.manyOrNone<AccountFTTxn>(unionQuery);
 
     // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
@@ -76,14 +84,15 @@ const txns = responseHandler(
         txns,
         events,
         (a, b) =>
-          `${a.block_timestamp}${a.shard_id}${a.event_index}` ===
-          `${b.block_timestamp}${b.shard_id}${b.event_index}`,
+          `${a.block_timestamp}${a.shard_id}${a.event_type}${a.event_index}` ===
+          `${b.block_timestamp}${b.shard_id}${b.event_type}${b.event_index}`,
       );
 
       return paginateData(merged, limit, (txn) => ({
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
+        type: txn.event_type,
       }));
     }
 
@@ -91,22 +100,32 @@ const txns = responseHandler(
       index: txn.event_index,
       shard: txn.shard_id,
       timestamp: txn.block_timestamp,
+      type: txn.event_type,
     }));
   },
 );
 
 const count = responseHandler(
   response.count,
-  async (req: RequestValidator<NFTTxnCountReq>) => {
+  async (req: RequestValidator<AccountFTTxnCountReq>) => {
+    const account = req.validator.account;
+    const contract = req.validator.contract;
+    const involved = req.validator.involved;
+    const cause = req.validator.cause;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
-    const txns = await dbEvents.one<NFTTxnCount>(sql.txnCount, {
+
+    const estimated = await dbEvents.one<AccountFTTxnCount>(sql.fts.estimate, {
+      account,
       after,
       before,
+      cause,
+      contract,
+      involved,
     });
 
-    return { data: txns };
+    return { data: estimated };
   },
 );
 
-export default { count, txns };
+export default { count, fts };

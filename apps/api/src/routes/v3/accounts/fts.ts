@@ -1,28 +1,33 @@
 import { Router } from 'express';
 
-import request from 'nb-schemas/dist/multichain/request.js';
+import request from 'nb-schemas/dist/accounts/fts/request.js';
 
-import { bearerAuth } from '#middlewares/passport';
-import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
-import service from '#services/v3/multichain/index';
+import service from '#services/v3/accounts/fts';
 
-const route = Router();
-
-const routes = (app: Router) => {
-  app.use('/multichain', bearerAuth, rateLimiter, route);
-
+const routes = (route: Router) => {
   /**
    * @openapi
-   * /v3/multichain/signatures:
+   * /v3/accounts/{account}/fts:
    *   get:
-   *     summary: Get all multichain signature txns
+   *     summary: Get account fts
    *     tags:
-   *       - V3 / Multichain
+   *       - V3 / Accounts
    *     parameters:
-   *       - in: query
+   *       - in: path
    *         name: account
-   *         description: Account ID to filter results by
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: contract
+   *         description: Contract ID to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: involved
+   *         description: Involved account to filter results by
    *         schema:
    *           type: string
    *       - in: query
@@ -56,19 +61,30 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/signatures', validate(request.txns), service.txns);
+  route.get('/:account/fts', validate(request.fts), service.fts);
 
   /**
    * @openapi
-   * /v3/multichain/signatures/count:
+   * /v3/accounts/{account}/fts/count:
    *   get:
-   *     summary: Get estimated multichain signature txns count
+   *     summary: Get estimated account fts count
    *     tags:
-   *       - V3 / Multichain
+   *       - V3 / Accounts
    *     parameters:
-   *       - in: query
+   *       - in: path
    *         name: account
-   *         description: Account ID to filter results by
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: contract
+   *         description: Contract ID to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: involved
+   *         description: Involved account to filter results by
    *         schema:
    *           type: string
    *       - in: query
@@ -89,7 +105,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/signatures/count', validate(request.count), service.count);
+  route.get('/:account/fts/count', validate(request.count), service.count);
 };
 
 export default routes;

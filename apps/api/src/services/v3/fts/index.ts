@@ -1,9 +1,10 @@
 import { unionWith } from 'es-toolkit';
 
-import type { FTTxn, FTTxnCount, FTTxnsReq } from 'nb-schemas';
+import type { FTTxn, FTTxnCount, FTTxnCountReq, FTTxnsReq } from 'nb-schemas';
 import request from 'nb-schemas/dist/fts/request.js';
 import response from 'nb-schemas/dist/fts/response.js';
 
+import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -18,6 +19,8 @@ import sql from '#sql/fts';
 const txns = responseHandler(
   response.txns,
   async (req: RequestValidator<FTTxnsReq>) => {
+    const after = req.validator.after_ts;
+    const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
       ? cursors.decode(request.cursor, req.validator.cursor)
@@ -43,9 +46,14 @@ const txns = responseHandler(
     };
 
     const events = await rollingWindowList(eventsQuery, {
-      end: cursor?.timestamp ? BigInt(cursor.timestamp) : undefined,
+      end: cursor?.timestamp
+        ? BigInt(cursor.timestamp)
+        : before
+        ? BigInt(before)
+        : undefined,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
+      start: after ? BigInt(after) : config.baseStart,
     });
 
     if (!events.length) {
@@ -58,7 +66,7 @@ const txns = responseHandler(
     const unionQuery = queries.join('\nUNION ALL\n');
     const txns = await dbBase.manyOrNone<FTTxn>(unionQuery);
 
-    // If lengths don't match, it means receipts are missing (maybe delayed).
+    // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
       const merged = unionWith(
         txns,
@@ -85,10 +93,19 @@ const txns = responseHandler(
   },
 );
 
-const count = responseHandler(response.count, async () => {
-  const txns = await dbEvents.one<FTTxnCount>(sql.txnCount);
+const count = responseHandler(
+  response.count,
+  async (req: RequestValidator<FTTxnCountReq>) => {
+    const after = req.validator.after_ts;
+    const before = req.validator.before_ts;
 
-  return { data: txns };
-});
+    const txns = await dbEvents.one<FTTxnCount>(sql.txnCount, {
+      after,
+      before,
+    });
+
+    return { data: txns };
+  },
+);
 
 export default { count, txns };

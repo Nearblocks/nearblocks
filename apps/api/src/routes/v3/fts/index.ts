@@ -24,6 +24,20 @@ const routes = (app: Router) => {
    *       - V3 / FTs
    *     parameters:
    *       - in: query
+   *         name: after_ts
+   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
+   *       - in: query
+   *         name: before_ts
+   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
+   *       - in: query
    *         name: cursor
    *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
    *         schema:
@@ -49,11 +63,26 @@ const routes = (app: Router) => {
    *     summary: Get token transfers count
    *     tags:
    *       - V3 / FTs
+   *     parameters:
+   *       - in: query
+   *         name: after_ts
+   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
+   *       - in: query
+   *         name: before_ts
+   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', service.count);
+  route.get('/txns/count', validate(request.count), service.count);
 
   return app;
 };

@@ -52,10 +52,10 @@ const latest = responseHandler(
 const txns = responseHandler(
   response.txns,
   async (req: RequestValidator<TxnsReq>) => {
-    const limit = req.validator.limit;
     const block = req.validator.block;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
+    const limit = req.validator.limit;
     const cursor = req.validator.cursor
       ? cursors.decode(request.cursor, req.validator.cursor)
       : null;

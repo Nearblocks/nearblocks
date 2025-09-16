@@ -15,7 +15,8 @@ txns_selected AS (
     t.signer_account_id,
     t.included_in_block_hash,
     t.converted_into_receipt_id,
-    t.receipt_conversion_tokens_burnt
+    t.receipt_conversion_tokens_burnt,
+    t.receipt_conversion_gas_burnt
   FROM
     transactions t
     JOIN params p ON TRUE

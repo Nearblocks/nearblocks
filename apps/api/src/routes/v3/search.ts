@@ -22,7 +22,7 @@ const routes = (app: Router) => {
    *     parameters:
    *       - in: query
    *         name: keyword
-   *         description: Txn hash | account id | block hash | block height | receipt id | token contract
+   *         description: Txn hash / account id / contract id / block hash / block height / receipt id / token contract ...
    *         schema:
    *           type: string
    *     responses:
@@ -60,7 +60,7 @@ const routes = (app: Router) => {
    *     parameters:
    *       - in: query
    *         name: keyword
-   *         description: Block hash or height
+   *         description: Block hash / block height
    *         schema:
    *           type: string
    *     responses:
