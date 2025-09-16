@@ -66,7 +66,7 @@ const txns = responseHandler(
     const unionQuery = queries.join('\nUNION ALL\n');
     const txns = await dbBase.manyOrNone<MCTxn>(unionQuery);
 
-    // If lengths don't match, it means receipts are missing (maybe delayed).
+    // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== signatures.length) {
       const merged = unionWith(
         txns,
