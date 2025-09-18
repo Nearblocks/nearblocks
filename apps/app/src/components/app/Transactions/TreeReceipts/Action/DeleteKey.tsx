@@ -15,8 +15,10 @@ const DeleteKey = (props: TransactionActionInfo) => {
       <div className="py-1">
         <FaKey className="inline-flex text-red-400 mr-1" />{' '}
         {t ? t('txnDetails.actions.deleteKey.0') : 'Key'} (
-        <span className="font-bold">{shortenHex(args.public_key)}</span>){' '}
-        {t ? t('txnDetails.actions.deleteKey.1') : 'deleted'}
+        <span className="font-bold">
+          {shortenHex(args?.public_key || args?.publicKey)}
+        </span>
+        ) {t ? t('txnDetails.actions.deleteKey.1') : 'deleted'}
       </div>
       <div className="mt-3 bg-gray-100 dark:bg-black-200 overflow-auto py-3 rounded-lg">
         <TreeNode node={action} path="root" />

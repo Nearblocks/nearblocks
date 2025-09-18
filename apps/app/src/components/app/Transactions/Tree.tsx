@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { mapRpcActionToAction } from '@/utils/near';
-import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+import { ApiTxnData, TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
@@ -11,10 +11,11 @@ import FileSlash from '@/components/app/Icons/FileSlash';
 import Skeleton, { Loader } from '@/components/app/skeleton/common/Skeleton';
 import TreeReceipt from '@/components/app/Transactions/TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from '@/components/app/Transactions/TreeReceipts/TreeReceiptDetails';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 interface Props {
   hash: string;
-  rpcTxn: RPCTransactionInfo;
+  rpcTxn: RpcTransactionResponse;
   txn: TransactionInfo;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
@@ -28,7 +29,7 @@ const Tree = (props: Props) => {
   const [rpcReceipt, setRpcReceipt] = useState<any>(null);
 
   const polledReceipt =
-    shouldUseRpc || hasReceipts === false
+    shouldUseRpc || hasReceipts === false || !apiTxnActionsData?.receiptData
       ? rpcReceipt
       : apiTxnActionsData?.receiptData;
 
@@ -36,24 +37,35 @@ const Tree = (props: Props) => {
     ? apiTxnActionsData?.receiptData
     : rpcReceipt;
 
-  const [show, setShow] = useState<any>(receipt?.receipt_id);
+  const [show, setShow] = useState<any>(
+    receipt?.receipt_id || receipt?.receiptId,
+  );
 
-  function transactionReceipts(txn: RPCTransactionInfo) {
-    const actions: any =
+  function transactionReceipts(txn: RpcTransactionResponse) {
+    const actions: ReturnType<typeof mapRpcActionToAction>[] | undefined =
       txn?.transaction?.actions &&
       txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
-    const receipts = txn?.receipts;
-    const receiptsOutcome = txn?.receipts_outcome;
+    const receipts = 'receipts' in txn ? txn?.receipts : [];
+    const receiptsOutcome = txn?.receiptsOutcome;
 
     if (
       receipts?.length === 0 ||
-      receipts?.[0]?.receipt_id !== receiptsOutcome?.[0]?.id
+      receipts?.[0]?.receiptId !== receiptsOutcome?.[0]?.id
     ) {
       receipts?.unshift({
-        predecessor_id: txn?.transaction?.signer_id,
-        receipt: actions,
-        receipt_id: receiptsOutcome?.[0]?.id,
-        receiver_id: txn?.transaction?.receiver_id,
+        predecessorId: txn?.transaction?.signerId,
+        receipt: {
+          Action: {
+            actions: txn?.transaction?.actions || [],
+            gasPrice: '0',
+            inputDataIds: [],
+            outputDataReceivers: [],
+            signerId: txn?.transaction?.signerId || '',
+            signerPublicKey: txn?.transaction?.publicKey || '',
+          },
+        },
+        receiptId: receiptsOutcome?.[0]?.id,
+        receiverId: txn?.transaction?.receiverId,
       });
     }
 
@@ -67,34 +79,33 @@ const Tree = (props: Props) => {
 
     receipts &&
       receipts?.forEach((receiptItem) => {
-        receiptsByIdMap?.set(receiptItem?.receipt_id, {
+        receiptsByIdMap?.set(receiptItem?.receiptId, {
           ...receiptItem,
           actions:
-            receiptItem?.receipt_id === receiptsOutcome[0]?.id
+            receiptItem?.receiptId === receiptsOutcome[0]?.id
               ? actions
-              : receiptItem?.receipt?.Action?.actions &&
-                receiptItem?.receipt?.Action?.actions?.map((receipt) =>
+              : receiptItem?.receipt && 'Action' in receiptItem.receipt
+              ? receiptItem.receipt.Action?.actions?.map((receipt) =>
                   mapRpcActionToAction(receipt),
-                ),
+                )
+              : undefined,
         });
       });
 
-    const collectReceipts = (receiptHash: any) => {
+    const collectReceipts = (receiptHash: string) => {
       const receipt = receiptsByIdMap?.get(receiptHash);
       const receiptOutcome = receiptOutcomesByIdMap?.get(receiptHash);
-
       return {
         ...receipt,
         ...receiptOutcome,
         outcome: {
           ...receiptOutcome?.outcome,
           outgoing_receipts:
-            receiptOutcome?.outcome?.receipt_ids &&
-            receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
+            receiptOutcome?.outcome?.receiptIds &&
+            receiptOutcome?.outcome?.receiptIds?.map(collectReceipts),
         },
       };
     };
-
     return collectReceipts(receiptsOutcome?.[0]?.id);
   }
 
@@ -102,7 +113,7 @@ const Tree = (props: Props) => {
     if (!isEmpty(rpcTxn)) {
       const receipt = transactionReceipts(rpcTxn);
       setRpcReceipt(receipt);
-      setShow(receipt?.receipt_id || null);
+      setShow(receipt?.receiptId || null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn, apiTxnActionsData?.receiptData]);

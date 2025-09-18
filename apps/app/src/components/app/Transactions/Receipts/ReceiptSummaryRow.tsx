@@ -97,16 +97,20 @@ const ReceiptSummaryRow = (props: Props) => {
               {formatActionKind(action.action_kind)}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
-              {action.args?.method_name}
+              {action?.args?.method_name || action?.args?.methodName}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
-              {polledReceipt?.predecessor_id ? (
+              {polledReceipt?.predecessor_id || polledReceipt?.predecessorId ? (
                 <div className="word-break">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
-                    href={`/address/${polledReceipt?.predecessor_id}`}
+                    href={`/address/${
+                      polledReceipt?.predecessor_id ||
+                      polledReceipt?.predecessorId
+                    }`}
                   >
-                    {polledReceipt?.predecessor_id}
+                    {polledReceipt?.predecessor_id ||
+                      polledReceipt?.predecessorId}
                   </Link>
                 </div>
               ) : (
@@ -119,13 +123,15 @@ const ReceiptSummaryRow = (props: Props) => {
               </div>
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium">
-              {polledReceipt?.receiver_id ? (
+              {polledReceipt?.receiver_id || polledReceipt?.receiverId ? (
                 <div className="word-break">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline inline-block truncate max-w-[120px] font-medium"
-                    href={`/address/${polledReceipt?.receiver_id}`}
+                    href={`/address/${
+                      polledReceipt?.receiver_id || polledReceipt?.receiverId
+                    }`}
                   >
-                    {polledReceipt?.receiver_id}
+                    {polledReceipt?.receiver_id || polledReceipt?.receiverId}
                   </Link>
                 </div>
               ) : (

@@ -11,9 +11,9 @@ import {
   ApiTxnData,
   FailedToFindReceipt,
   NestedReceiptWithOutcome,
-  RPCTransactionInfo,
   TransactionInfo,
 } from '@/utils/types';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
@@ -23,7 +23,7 @@ import TransactionReceipt from '@/components/app/Transactions/Receipts/Transacti
 
 interface Props {
   hash: string;
-  rpcTxn: RPCTransactionInfo;
+  rpcTxn: RpcTransactionResponse;
   txn: TransactionInfo;
   apiTxnActionsData: ApiTxnData;
   statsData: {
@@ -55,7 +55,7 @@ const Execution = (props: Props) => {
     : rpcReceipt;
 
   const polledReceipt =
-    shouldUseRpc || hasReceipts === false
+    shouldUseRpc || hasReceipts === false || !apiTxnActionsData?.receiptData
       ? rpcReceipt
       : apiTxnActionsData?.receiptData;
 
@@ -65,15 +65,18 @@ const Execution = (props: Props) => {
     [setExpandAll],
   );
 
-  function transactionReceipts(txn: RPCTransactionInfo) {
+  function transactionReceipts(txn: RpcTransactionResponse) {
     const receiptsMap =
-      txn?.receipts_outcome &&
-      txn?.receipts_outcome?.reduce((mapping, receiptOutcome) => {
+      txn?.receiptsOutcome &&
+      txn?.receiptsOutcome?.reduce((mapping, receiptOutcome) => {
         const receipt = parseReceipt
           ? parseReceipt(
-              txn?.receipts?.find(
-                (rpcReceipt) => rpcReceipt?.receipt_id === receiptOutcome?.id,
-              ),
+              'receipts' in txn
+                ? txn?.receipts?.find(
+                    (rpcReceipt) =>
+                      rpcReceipt?.receiptId === receiptOutcome?.id,
+                  )
+                : undefined,
               receiptOutcome,
               txn?.transaction,
             )
@@ -86,7 +89,7 @@ const Execution = (props: Props) => {
 
     const receipts = collectNestedReceiptWithOutcomeOld
       ? collectNestedReceiptWithOutcomeOld(
-          txn?.transaction_outcome?.outcome?.receipt_ids?.[0],
+          txn?.transactionOutcome?.outcome?.receiptIds?.[0],
           receiptsMap,
         )
       : '';

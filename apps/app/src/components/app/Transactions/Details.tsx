@@ -199,12 +199,12 @@ const Details = (props: Props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcTxn]);
-
   const processedTxn = {
     ...txn,
     outcomes: convertNumericStringsToNumbers(txn.outcomes),
   };
   const apiErrorMessage = txnErrorMessage(processedTxn);
+
   const errorMessage =
     apiErrorMessage && !shouldUseRpc ? apiErrorMessage : rpcErrorMessage;
 
@@ -319,7 +319,6 @@ const Details = (props: Props) => {
     apiFilteredLogs?.length > 0 && !shouldUseRpc
       ? apiFilteredLogs
       : rpcFilteredLogs;
-
   const rpcMainTxnsActions =
     rpcMainActions &&
     rpcMainActions?.map((txn) => {
@@ -343,7 +342,7 @@ const Details = (props: Props) => {
       } else {
         return {
           ...txn,
-          logs: [...txn.logs, ...filteredNepLogs],
+          logs: [...txn?.logs, ...filteredNepLogs],
         };
       }
     });
@@ -467,10 +466,9 @@ const Details = (props: Props) => {
   }, [apiSubActions, rpcSubActions, filteredLogs]);
 
   const subAction =
-    (apiSubActions?.length === 0 && shouldUseRpc) || hasReceipts === false
+    apiSubActions?.length === 0 || shouldUseRpc || hasReceipts === false
       ? rpcSubActions
       : apiSubActions;
-
   return (
     <>
       {!txn ? (
@@ -531,9 +529,10 @@ const Details = (props: Props) => {
                 </Tooltip>
                 <div>{t ? t('txnDetails.status.text.0') : 'Status'}</div>
               </div>
-              {hasReceipts === false && !rpcTxn.status ? (
+              {(!txn?.outcomes?.status && !rpcTxn.status) ||
+              (hasReceipts === false && !rpcTxn?.status) ? (
                 <div className="w-full md:w-3/4">
-                  <Loader wrapperClassName="flex w-14" />
+                  <Loader wrapperClassName="flex w-24" />
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">

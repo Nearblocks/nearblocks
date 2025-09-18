@@ -1,6 +1,8 @@
 import { decodeArgs, encodeArgs } from '@/utils/app/near';
 import { AccessInfo } from '@/utils/types';
 import { BlockResult } from 'near-api-js/lib/providers/provider';
+import { NearRpcClient, experimentalTxStatus } from '@near-js/jsonrpc-client';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 type QueryResponse = {
   data?: any;
@@ -316,35 +318,62 @@ const useRpc = () => {
     if (cacheRef.current[cacheKey]) {
       return cacheRef.current[cacheKey];
     }
+    try {
+      const client = new NearRpcClient({
+        endpoint: rpcUrl,
+      });
 
-    const { data, error, statusCode } = await fetchJsonRpc(
-      rpcUrl,
-      {
-        tx_hash: hash,
-        sender_account_id: signer,
-        wait_until: 'NONE',
-      },
-      'EXPERIMENTAL_tx_status',
-    );
+      const result: RpcTransactionResponse = await experimentalTxStatus(
+        client,
+        {
+          txHash: hash,
+          senderAccountId: signer,
+          waitUntil: 'NONE',
+        },
+      );
 
-    if (statusCode === 200) {
-      const result = data?.result;
-      if (result && result?.final_execution_status !== 'NONE') {
-        cacheRef.current[cacheKey] = result;
-        return { success: true, data: result, statusCode };
+      if (result && result.finalExecutionStatus !== 'NONE') {
+        const successResult = {
+          success: true,
+          data: result as RpcTransactionResponse,
+          statusCode: 200,
+        };
+
+        cacheRef.current[cacheKey] = successResult;
+
+        return successResult;
       } else {
         return {
           success: false,
-          error: data?.error ?? data?.result,
-          statusCode,
+          error: result || 'Transaction status unknown',
+          statusCode: 200,
         };
       }
+    } catch (error: any) {
+      if (
+        error.name === 'REQUEST_VALIDATION_ERROR' ||
+        error.code === -32700 ||
+        (error.message && error.message.includes('Parse error'))
+      ) {
+        const notFoundResult = {
+          success: false,
+          error: 'Transaction not found',
+          statusCode: 400,
+          isNotFound: true,
+          shouldRetry: false,
+        };
+
+        cacheRef.current[cacheKey] = notFoundResult;
+        return notFoundResult;
+      }
+
+      console.error('Error fetching transaction status:', error);
+      return {
+        success: false,
+        error: error.message || 'Request failed',
+        statusCode: error.statusCode || 500,
+      };
     }
-    return {
-      success: false,
-      error: error || data?.error || 'Request failed',
-      statusCode,
-    };
   };
 
   const getContractMetadata = async (rpcUrl: string, accountId: string) => {

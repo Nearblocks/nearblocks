@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { mapRpcActionToAction } from '@/utils/near';
-import { ApiTxnData, RPCTransactionInfo, TransactionInfo } from '@/utils/types';
+import { ApiTxnData, TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
@@ -12,12 +12,13 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import FileSlash from '@/components/app/Icons/FileSlash';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import ReceiptSummaryRow from '@/components/app/Transactions/Receipts/ReceiptSummaryRow';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 interface Props {
   hash: string;
   loading: boolean;
   price: string;
-  rpcTxn: RPCTransactionInfo;
+  rpcTxn: RpcTransactionResponse;
   statsData: {
     stats: Array<{
       near_price: string;
@@ -46,30 +47,29 @@ const ReceiptSummary = (props: Props) => {
   const [rpcReceipt, setRpcReceipt] = useState<any>(null);
 
   const polledReceipt =
-    shouldUseRpc || hasReceipts === false
+    shouldUseRpc || hasReceipts === false || !apiTxnActionsData?.receiptData
       ? rpcReceipt
       : apiTxnActionsData?.receiptData;
-
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData
     : rpcReceipt;
 
-  function transactionReceipts(txn: RPCTransactionInfo) {
+  function transactionReceipts(txn: RpcTransactionResponse) {
     const actions: any =
       txn?.transaction?.actions &&
       txn?.transaction?.actions?.map((txn) => mapRpcActionToAction(txn));
-    const receipts = txn?.receipts;
-    const receiptsOutcome = txn?.receipts_outcome;
+    const receipts = 'receipts' in txn ? txn?.receipts : [];
+    const receiptsOutcome = txn?.receiptsOutcome;
 
     if (
       receipts?.length === 0 ||
-      receipts?.[0]?.receipt_id !== receiptsOutcome?.[0]?.id
+      receipts?.[0]?.receiptId !== receiptsOutcome?.[0]?.id
     ) {
       receipts?.unshift({
-        predecessor_id: txn?.transaction?.signer_id,
+        predecessorId: txn?.transaction?.signerId,
         receipt: actions,
-        receipt_id: receiptsOutcome?.[0]?.id,
-        receiver_id: txn?.transaction?.receiver_id,
+        receiptId: receiptsOutcome?.[0]?.id,
+        receiverId: txn?.transaction?.receiverId,
       });
     }
 
@@ -83,15 +83,16 @@ const ReceiptSummary = (props: Props) => {
 
     receipts &&
       receipts?.forEach((receiptItem) => {
-        receiptsByIdMap?.set(receiptItem?.receipt_id, {
+        receiptsByIdMap?.set(receiptItem?.receiptId, {
           ...receiptItem,
           actions:
-            receiptItem?.receipt_id === receiptsOutcome[0]?.id
+            receiptItem?.receiptId === receiptsOutcome[0]?.id
               ? actions
-              : receiptItem?.receipt?.Action?.actions &&
-                receiptItem?.receipt?.Action?.actions.map((receipt) =>
+              : receiptItem?.receipt && 'Action' in receiptItem.receipt
+              ? receiptItem.receipt.Action?.actions?.map((receipt) =>
                   mapRpcActionToAction(receipt),
-                ),
+                )
+              : undefined,
         });
       });
 
@@ -105,8 +106,8 @@ const ReceiptSummary = (props: Props) => {
         outcome: {
           ...receiptOutcome?.outcome,
           outgoing_receipts:
-            receiptOutcome?.outcome?.receipt_ids &&
-            receiptOutcome?.outcome?.receipt_ids?.map(collectReceipts),
+            receiptOutcome?.outcome?.receiptIds &&
+            receiptOutcome?.outcome?.receiptIds?.map(collectReceipts),
         },
       };
     };
