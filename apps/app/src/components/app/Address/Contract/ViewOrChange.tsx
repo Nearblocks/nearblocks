@@ -23,6 +23,7 @@ import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
 import FaChevronDown from '@/components/app/Icons/FaChevronDown';
+import { formatLargeNumber } from '@/utils/app/libs';
 
 interface Props {
   id: string;
@@ -79,6 +80,8 @@ const ViewOrChange = (props: Props) => {
   const [fields, setFields] = useState<FieldType[]>([]);
   const [result, setResult] = useState<null | string>(null);
   const [loading, setLoading] = useState(false);
+  const [readLoading, setReadLoading] = useState(false);
+  const [writeLoading, setWriteLoading] = useState(false);
   const [hideQuery, _setHideQuery] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
   const [options, setOptions] = useState({
@@ -151,7 +154,7 @@ const ViewOrChange = (props: Props) => {
       setResult(result);
     };
 
-    setLoading(true);
+    setReadLoading(true);
     try {
       const args = mapFeilds(fields);
       const response = await viewMethod({
@@ -161,10 +164,17 @@ const ViewOrChange = (props: Props) => {
         rpcUrl: rpc,
       });
       if (response?.success) {
+        let formattedData = response?.data;
+        if (typeof response?.data === 'number') {
+          formattedData = formatLargeNumber(response?.data);
+        }
+
         resetState(
           response?.data?.transaction_outcome?.id ?? null,
           null,
-          JSON.stringify(response?.data, null, 2),
+          typeof formattedData === 'string'
+            ? formattedData
+            : JSON.stringify(formattedData, null, 2),
         );
       } else {
         const errorMsg =
@@ -177,7 +187,7 @@ const ViewOrChange = (props: Props) => {
     } catch {
       resetState(null, 'An unknown error occurred');
     } finally {
-      setLoading(false);
+      setReadLoading(false);
     }
   };
 
@@ -190,7 +200,7 @@ const ViewOrChange = (props: Props) => {
       }
     }
 
-    setLoading(true);
+    setWriteLoading(true);
 
     try {
       if (!wallet) return;
@@ -215,7 +225,7 @@ const ViewOrChange = (props: Props) => {
       setError(error?.message || 'An unknown error occurred');
       setResult(null);
     } finally {
-      setLoading(false);
+      setWriteLoading(false);
     }
   };
 
@@ -302,14 +312,15 @@ const ViewOrChange = (props: Props) => {
           </div>
           <div className="flex mb-2">
             <button
-              className="mx-3 px-3 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 py-1 text-xs font-medium rounded-md text-white"
+              className="mx-3 px-3 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 py-1 text-xs font-medium rounded-md text-white disabled:opacity-70 disabled:cursor-not-allowed"
+              disabled={loading || readLoading || writeLoading}
               onClick={onAdd}
             >
               Add
             </button>
             <button
               className="flex ml-2 mr-1 bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-              disabled={loading}
+              disabled={loading || readLoading || writeLoading}
               onClick={onDetect}
             >
               Auto detect
@@ -466,10 +477,10 @@ const ViewOrChange = (props: Props) => {
           {!hideQuery && (
             <button
               className="bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-              disabled={loading}
+              disabled={loading || readLoading || writeLoading}
               onClick={onRead}
             >
-              Query
+              {!readLoading ? 'Query' : 'Loading ..'}
             </button>
           )}
           {!hideQuery && (
@@ -488,10 +499,12 @@ const ViewOrChange = (props: Props) => {
           )}
           <button
             className="bg-green-500 dark:bg-green-250 dark:text-neargray-10 hover:bg-green-400 text-white text-xs px-3 py-1.5 rounded focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed"
-            disabled={loading || !signedAccountId}
+            disabled={
+              loading || readLoading || writeLoading || !signedAccountId
+            }
             onClick={onWrite}
           >
-            Write
+            {!writeLoading ? 'Write' : 'Loading ..'}
           </button>
         </div>
         {error && (
