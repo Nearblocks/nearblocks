@@ -1,4 +1,5 @@
 import { Readable } from 'stream';
+import { text } from 'stream/consumers';
 
 import * as Minio from 'minio';
 
@@ -19,27 +20,28 @@ export type BlockStreamConfig = {
 };
 
 const withTimeout = async <T>(
-  promiseFactory: (signal: AbortSignal) => Promise<T>,
+  promise: Promise<T>,
   timeout: number,
+  onTimeout?: () => void,
 ): Promise<T> => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => {
-    controller.abort();
-  }, timeout);
+  let timer: NodeJS.Timeout | undefined;
 
-  try {
-    try {
-      return await promiseFactory(controller.signal);
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Promise timed out after ${timeout} ms`);
-    }
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      if (onTimeout) {
+        try {
+          onTimeout();
+        } catch (error) {
+          logger.error(error);
+        }
+      }
+      reject(new Error(`Promise timed out after ${timeout} ms`));
+    }, timeout);
+  });
 
-    throw error;
-  }
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
 };
 
 const retryLogger = (attempt: number, error: unknown) => {
@@ -54,7 +56,8 @@ const fetchBlocks = (knex: Knex, start: number, limit: number) => {
         .select('block_height')
         .where('block_height', '>', start)
         .orderBy('block_height')
-        .limit(limit);
+        .limit(limit)
+        .timeout(10_000, { cancel: true });
 
       blocks.pop();
 
@@ -68,62 +71,13 @@ const fetchJson = async (
   minioClient: Minio.Client,
   bucket: string,
   block: number,
-  signal?: AbortSignal,
 ) => {
   return retry(
     async () => {
-      if (signal?.aborted) {
-        throw new Error('Operation aborted');
-      }
+      const stream = await minioClient.getObject(bucket, `${block}.json`);
 
-      const objectName = `${block}.json`;
-      const stream = await minioClient.getObject(bucket, objectName);
-
-      return new Promise<string>((resolve, reject) => {
-        const chunks: Uint8Array[] = [];
-
-        const cleanup = () => {
-          stream.destroy();
-          chunks.length = 0;
-        };
-
-        const abortHandler = () => {
-          cleanup();
-          reject(new Error('Operation aborted'));
-        };
-
-        if (signal) {
-          signal.addEventListener('abort', abortHandler);
-        }
-
-        stream.on('data', (chunk: Uint8Array) => {
-          if (signal?.aborted) {
-            cleanup();
-            return;
-          }
-          chunks.push(chunk);
-        });
-        stream.on('error', (error) => {
-          if (signal) {
-            signal.removeEventListener('abort', abortHandler);
-          }
-          cleanup();
-          reject(error);
-        });
-        stream.on('end', () => {
-          if (signal) {
-            signal.removeEventListener('abort', abortHandler);
-          }
-
-          const data = Buffer.concat(chunks).toString('utf8');
-          chunks.length = 0;
-
-          if (!data) {
-            reject(new Error(`Empty response: block: ${block}`));
-          }
-
-          resolve(data);
-        });
+      return withTimeout(text(stream), 60_000, () => {
+        stream.destroy(new Error(`fetch timed out: block:${block}`));
       });
     },
     { exponential: true, logger: retryLogger, retries: 3 },
@@ -141,42 +95,26 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
     let start = config.start;
 
-    try {
-      while (!isDestroyed) {
-        const blocks = await withTimeout(
-          () => fetchBlocks(knex, start, limit),
-          10_000,
-        );
+    while (!isDestroyed) {
+      const blocks = await withTimeout(fetchBlocks(knex, start, limit), 10_000);
 
-        if (blocks.length === 0) {
-          await sleep(100);
-          continue;
-        }
-
-        const jsons = await Promise.all(
-          blocks.map((block) =>
-            withTimeout(
-              (signal) =>
-                fetchJson(
-                  minioClient,
-                  config.s3Bucket,
-                  block.block_height,
-                  signal,
-                ),
-              60_000,
-            ),
-          ),
-        );
-
-        for (const json of jsons) {
-          const parsed: Message = JSON.parse(json);
-
-          yield parsed;
-          start = parsed.block.header.height;
-        }
+      if (blocks.length === 0) {
+        await sleep(100);
+        continue;
       }
-    } finally {
-      await knex.destroy();
+
+      const jsons = await Promise.all(
+        blocks.map((block) =>
+          fetchJson(minioClient, config.s3Bucket, block.block_height),
+        ),
+      );
+
+      for (const json of jsons) {
+        const parsed: Message = JSON.parse(json);
+
+        yield parsed;
+        start = parsed.block.header.height;
+      }
     }
   }
 
