@@ -11,8 +11,8 @@ import {
   Action,
   FunctionCallActionView,
   ReceiptsPropsInfo,
-  RPCTransactionInfo,
 } from '@/utils/types';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
@@ -31,7 +31,7 @@ interface Props {
       near_price: string;
     }>;
   };
-  rpcTxn: RPCTransactionInfo;
+  rpcTxn: RpcTransactionResponse;
 }
 
 const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
@@ -235,9 +235,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
       'SuccessReceiptId' in status);
 
   useEffect(() => {
-    if (rpcTxn && rpcTxn?.receipts?.length > 0) {
+    if ('receipts' in rpcTxn && rpcTxn?.receipts?.length > 0) {
       const receiptToFind: any = rpcTxn?.receipts?.find(
-        (item: any) => item?.receipt_id === receipt?.id,
+        (item: any) => item?.receiptId === receipt?.id,
       );
       if (receiptToFind) {
         setReceiptKey(receiptToFind);
@@ -528,33 +528,41 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                       >
                         {receipt?.predecessor_id || receipt?.predecessorId}
                       </Link>
-                      {(receiptKey?.receipt?.Action?.signer_public_key &&
-                        receiptKey?.receipt?.Action?.signer_id) ||
-                        (receipt?.predecessor_id && receipt?.public_key && (
-                          <Tooltip
-                            tooltip={'Access key used for this receipt'}
-                            className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                          >
-                            <span>
-                              &nbsp;
-                              <Link
-                                href={`/address/${
-                                  receipt?.predecessor_id ||
-                                  receiptKey?.receipt?.Action?.signer_id
-                                }?tab=accesskeys`}
-                                className="text-green-500 dark:text-green-250 hover:no-underline"
-                              >
-                                (
-                                {shortenAddress(
-                                  receipt?.public_key ||
-                                    receiptKey?.receipt?.Action
-                                      ?.signer_public_key,
-                                )}
-                                )
-                              </Link>
-                            </span>
-                          </Tooltip>
-                        ))}
+
+                      {(((receiptKey?.receipt?.Action?.signer_public_key ||
+                        receiptKey?.receipt?.Action?.signerPublicKey) &&
+                        (receiptKey?.receipt?.Action?.signer_id ||
+                          receiptKey?.receipt?.Action?.signerId)) ||
+                        ((receipt?.predecessor_id || receipt?.predecessorId) &&
+                          (receipt?.public_key || receipt?.publicKey))) && (
+                        <Tooltip
+                          tooltip="Access key used for this receipt"
+                          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                        >
+                          <span>
+                            &nbsp;
+                            <Link
+                              href={`/address/${
+                                receipt?.predecessor_id ||
+                                receipt?.predecessorId ||
+                                receiptKey?.receipt?.Action?.signer_id ||
+                                receiptKey?.receipt?.Action?.signerId
+                              }?tab=accesskeys`}
+                              className="text-green-500 dark:text-green-250 hover:no-underline"
+                            >
+                              (
+                              {shortenAddress(
+                                receipt?.public_key ||
+                                  receipt?.publicKey ||
+                                  receiptKey?.receipt?.Action
+                                    ?.signer_public_key ||
+                                  receiptKey?.receipt?.Action?.signerPublicKey,
+                              )}
+                              )
+                            </Link>
+                          </span>
+                        </Tooltip>
+                      )}
                     </div>
                   </td>
                 </tr>

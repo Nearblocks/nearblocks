@@ -3,6 +3,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
 import { supportedNetworks } from './app/config';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 export type NextPageWithLayout<T = any> = NextPage<T> & {
   getLayout?: (page: ReactElement<any>) => ReactNode;
@@ -418,11 +419,11 @@ export type GasProfileInfo = {
 };
 
 export type OutcomePropsInfo = {
-  executor_id: string;
-  gas_burnt: string;
+  executorId: string;
+  gasBurnt: string;
   logs: [];
   metadata: {
-    gas_profile: GasProfileInfo[];
+    gasProfile: GasProfileInfo[];
     version: string;
   };
   outgoing_receipts: {
@@ -435,7 +436,7 @@ export type OutcomePropsInfo = {
     }[];
     outcome: OutcomePropsInfo;
   };
-  receipt_ids: string[];
+  receiptIds: string[];
   status: {
     Failure: {
       ActionError: {
@@ -448,11 +449,11 @@ export type OutcomePropsInfo = {
       };
     };
   };
-  tokens_burnt: string;
+  tokensBurnt: string;
 };
 
 export type OutcomeInfo = {
-  block_hash: string;
+  blockHash: string;
   id: string;
   outcome: OutcomePropsInfo;
   proof: {
@@ -462,21 +463,21 @@ export type OutcomeInfo = {
 };
 
 export type ReceiptsInfo = {
-  predecessor_id: string;
+  predecessorId: string;
   receipt: {
     Action: {
       actions: {
         FunctionCall: FunctionCallInfo;
       }[];
-      gas_price: string;
-      input_data_ids: [];
-      output_data_receivers: [];
-      signer_id: string;
-      signer_public_key: string;
+      gasPrice: string;
+      inputDataIds: [];
+      outputDataReceivers: [];
+      signerId: string;
+      signerPublicKey: string;
     };
   };
-  receipt_id: string;
-  receiver_id: string;
+  receiptId: string;
+  receiverId: string;
 };
 
 export type InfoStatus = {
@@ -506,10 +507,10 @@ export type TransInfo = {
 
 export type RPCTransactionInfo = {
   receipts: ReceiptsInfo[];
-  receipts_outcome: OutcomeInfo[];
+  receiptsOutcome: OutcomeInfo[];
   status: InfoStatus;
   transaction: TransInfo;
-  transaction_outcome: OutcomeInfo;
+  transactionOutcome: OutcomeInfo;
 };
 
 export type TransactionLog = {
@@ -577,17 +578,31 @@ export type ActionPropsInfo = {
   receiver?: string;
 };
 export type ArgsPropsInfo = {
-  access_key: {
+  accessKey: {
     permission: {
       FunctionCall: {
         method_names: [];
+        methodNames: [];
+        receiverId: string;
         receiver_id: string;
       };
       permission_kind: string;
     };
   };
+  access_key: {
+    permission:
+      | string
+      | {
+          FunctionCall: {
+            method_names: [];
+            receiver_id: string;
+          };
+          permission_kind: string;
+        };
+  };
   args: string;
   args_base64: string;
+  beneficiaryId: string;
   beneficiary_id: string;
   args_json: {
     holding_account_id?: string;
@@ -598,26 +613,49 @@ export type ArgsPropsInfo = {
     fee_account_id?: string;
     receiver_id?: string;
   };
+  delegateAction: {
+    actions: {
+      FunctionCall: {
+        args: string;
+        deposit: string;
+        gas: string;
+        methodName: string;
+      };
+    }[];
+    max_block_height: string;
+    nonce: string;
+    publicKey: string;
+    public_key: string;
+    receiverId: string;
+    sender_id: string;
+    senderId: string;
+  };
   delegate_action: {
     actions: {
       FunctionCall: {
         args: string;
         deposit: string;
         gas: string;
-        method_name: string;
+        methodName: string;
       };
     }[];
     max_block_height: string;
     nonce: string;
+    publicKey: string;
     public_key: string;
+    receiverId: string;
     receiver_id: string;
     sender_id: string;
+    senderId: string;
   };
   deposit: string;
+  methodName: string;
   method_name: string;
+  publicKey: string;
   public_key: string;
   stake: string;
   sender_id: string;
+  senderId: string;
 };
 
 export type TransactionActionInfo = {
@@ -908,65 +946,65 @@ type ActionErrorKind =
   | 'DelegateActionInvalidSignature'
   | {
       CreateAccountNotAllowed: {
-        account_id: AccountId;
-        predecessor_id: AccountId;
+        accountId: AccountId;
+        predecessorId: AccountId;
       };
     }
   | {
       CreateAccountOnlyByRegistrar: {
-        account_id: AccountId;
-        predecessor_id: AccountId;
-        registrar_account_id: AccountId;
+        accountId: AccountId;
+        predecessorId: AccountId;
+        registrarAccountId: AccountId;
       };
     }
   | {
       DelegateActionNonceTooLarge: {
-        delegate_nonce: Nonce;
-        upper_bound: Nonce;
+        delegateNonce: Nonce;
+        upperBound: Nonce;
       };
     }
   | {
       DelegateActionSenderDoesNotMatchTxReceiver: {
-        receiver_id: AccountId;
-        sender_id: AccountId;
+        receiverId: AccountId;
+        senderId: AccountId;
       };
     }
   | {
       InsufficientStake: {
-        account_id: AccountId;
-        minimum_stake: Balance;
+        accountId: AccountId;
+        minimumStake: Balance;
         stake: Balance;
       };
     }
   | {
       TriesToStake: {
-        account_id: AccountId;
+        accountId: AccountId;
         balance: Balance;
         locked: Balance;
         stake: Balance;
       };
     }
-  | { AccountAlreadyExists: { account_id: AccountId } }
-  | { AccountDoesNotExist: { account_id: AccountId } }
-  | { ActorNoPermission: { account_id: AccountId; actor_id: AccountId } }
-  | { AddKeyAlreadyExists: { account_id: AccountId; public_key: PublicKey } }
+  | { AccountAlreadyExists: { accountId: AccountId } }
+  | { AccountDoesNotExist: { accountId: AccountId } }
+  | { ActorNoPermission: { accountId: AccountId; actorId: AccountId } }
+  | { AddKeyAlreadyExists: { accountId: AccountId; publicKey: PublicKey } }
   | { DelegateActionAccessKeyError: InvalidAccessKeyError }
-  | { DelegateActionInvalidNonce: { ak_nonce: Nonce; delegate_nonce: Nonce } }
-  | { DeleteAccountStaking: { account_id: AccountId } }
-  | { DeleteAccountWithLargeState: { account_id: AccountId } }
-  | { DeleteKeyDoesNotExist: { account_id: AccountId; public_key: PublicKey } }
+  | { DelegateActionInvalidNonce: { akNonce: Nonce; delegateNonce: Nonce } }
+  | { DeleteAccountStaking: { accountId: AccountId } }
+  | { DeleteAccountWithLargeState: { accountId: AccountId } }
+  | { DeleteKeyDoesNotExist: { accountId: AccountId; publicKey: PublicKey } }
   | { FunctionCallError: FunctionCallError }
-  | { LackBalanceForState: { account_id: AccountId; amount: Balance } }
+  | { LackBalanceForState: { accountId: AccountId; amount: Balance } }
   | { NewReceiptValidationError: NewReceiptValidationError }
-  | { OnlyImplicitAccountCreationAllowed: { account_id: AccountId } }
-  | { TriesToUnstake: { account_id: AccountId } };
+  | { OnlyImplicitAccountCreationAllowed: { accountId: AccountId } }
+  | { TriesToUnstake: { accountId: AccountId } };
 
 export type InvalidTxError =
   | {
       NotEnoughBalance: {
         balance: Balance;
         cost: Balance;
-        signer_id: AccountId;
+        signerId: AccountId;
       };
     }
   | { ActionsValidation: unknown }
@@ -975,14 +1013,14 @@ export type InvalidTxError =
   | { InvalidAccessKeyError: InvalidAccessKeyError }
   | { InvalidChain: unknown }
   // https://docs.rs/near-primitives/0.12.0/near_primitives/errors/enum.InvalidTxError.html#variant.InvalidSignature
-  | { InvalidNonce: { ak_nonce: Nonce; tx_nonce: Nonce } }
-  | { InvalidReceiverId: { receiver_id: String } }
+  | { InvalidNonce: { akNonce: Nonce; txNonce: Nonce } }
+  | { InvalidReceiverId: { receiverId: String } }
   | { InvalidSignature: unknown }
-  | { InvalidSignerId: { signer_id: String } }
-  | { LackBalanceForState: { amount: Balance; signer_id: AccountId } }
-  | { NonceTooLarge: { tx_nonce: Nonce; upper_bound: Nonce } }
+  | { InvalidSignerId: { signerId: String } }
+  | { LackBalanceForState: { amount: Balance; signerId: AccountId } }
+  | { NonceTooLarge: { txNonce: Nonce; upperBound: Nonce } }
   // https://docs.rs/near-primitives/0.12.0/near_primitives/errors/enum.ActionsValidationError.html
-  | { SignerDoesNotExist: { signer_id: AccountId } }
+  | { SignerDoesNotExist: { signerId: AccountId } }
   | { TransactionSizeExceeded: { limit: U64; size: U64 } };
 
 export type TxExecutionError =
@@ -1061,7 +1099,7 @@ export type DeleteKeyActionView = {
 };
 export type DeleteAccountActionView = {
   DeleteAccount: {
-    beneficiary_id: AccountId;
+    beneficiaryId: AccountId;
   };
 };
 export type DelegateActionView = {
@@ -1107,10 +1145,10 @@ type ReceiptEnumView =
     };
 
 export type ReceiptView = {
-  predecessor_id: AccountId;
+  predecessorId: AccountId;
   receipt: ReceiptEnumView;
-  receipt_id: CryptoHash;
-  receiver_id: AccountId;
+  receiptId: CryptoHash;
+  receiverId: AccountId;
 };
 
 export type FailedToFindReceipt = { id: string };
@@ -1194,14 +1232,14 @@ export type RPCNewReceiptValidationError =
   | {
       NumberInputDataDependenciesExceeded: {
         limit: U64;
-        number_of_input_data_dependencies: U64;
+        numberOfInputDataDependencies: U64;
       };
     }
   | { ActionsValidation: ActionsValidation }
-  | { InvalidDataReceiverId: { account_id: String } }
-  | { InvalidPredecessorId: { account_id: String } }
-  | { InvalidReceiverId: { account_id: String } }
-  | { InvalidSignerId: { account_id: String } }
+  | { InvalidDataReceiverId: { accountId: String } }
+  | { InvalidPredecessorId: { accountId: String } }
+  | { InvalidReceiverId: { accountId: String } }
+  | { InvalidSignerId: { accountId: String } }
   | { ReturnedValueLengthExceeded: { length: U64; limit: U64 } }
   | {};
 
@@ -1227,7 +1265,7 @@ export type CompilationError =
   | UnknownError;
 
 export type RPCCompilationError =
-  | { CodeDoesNotExist: { account_id: AccountId } }
+  | { CodeDoesNotExist: { accountId: AccountId } }
   // https://docs.rs/near-vm-errors/0.12.0/near_vm_errors/enum.PrepareError.html
   | { PrepareError: unknown }
   | { UnsupportedCompiler: { msg: String } }
@@ -1286,27 +1324,27 @@ export type RPCInvalidAccessKeyError =
   | 'RequiresFullAccess'
   | {
       AccessKeyNotFound: {
-        account_id: AccountId;
-        public_key: PublicKey;
+        accountId: AccountId;
+        publicKey: PublicKey;
       };
     }
   | {
       MethodNameMismatch: {
-        method_name: String;
+        methodName: String;
       };
     }
   | {
       NotEnoughAllowance: {
-        account_id: AccountId;
+        accountId: AccountId;
         allowance: Balance;
         cost: Balance;
-        public_key: PublicKey;
+        publicKey: PublicKey;
       };
     }
   | {
       ReceiverMismatch: {
-        ak_receiver: String;
-        tx_receiver: AccountId;
+        akReceiver: String;
+        txReceiver: AccountId;
       };
     }
   | InvalidAccessKeyError;
@@ -1559,7 +1597,7 @@ export type TransactionReceiptInfo = {
       near_price: string;
     }>;
   };
-  rpcTxn: RPCTransactionInfo;
+  rpcTxn: RpcTransactionResponse;
   polledReceipt: any;
   polledFellowOutgoingReceipts?: any;
 };

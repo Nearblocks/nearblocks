@@ -60,19 +60,20 @@ const Actions = (props: ActionPropsInfo) => {
         return <Transfer action={props?.action} />;
       case 'Delegate':
       case 'DELEGATE_ACTION':
+        const delegate =
+          props?.action?.args?.delegate_action?.actions ||
+          props?.action?.args?.delegateAction?.actions;
         const delegateAction: any | DelegateActionView =
-          props?.action?.args?.delegate_action?.actions &&
-          props?.action?.args?.delegate_action?.actions?.map(
-            (txn: ActionType | any) => {
-              const action = mapRpcActionToAction(txn);
-              return {
-                ...action,
-                from: props?.action?.from,
-                receiptId: props?.action?.receiptId,
-                to: props?.action?.to,
-              };
-            },
-          );
+          delegate &&
+          delegate?.map((txn: ActionType | any) => {
+            const action = mapRpcActionToAction(txn);
+            return {
+              ...action,
+              from: props?.action?.from,
+              receiptId: props?.action?.receiptId,
+              to: props?.action?.to,
+            };
+          });
 
         return (
           delegateAction &&
@@ -81,7 +82,10 @@ const Actions = (props: ActionPropsInfo) => {
               <Actions
                 action={subAction}
                 key={i}
-                receiver={props?.action?.args?.delegate_action?.receiver_id}
+                receiver={
+                  props?.action?.args?.delegate_action?.receiver_id ||
+                  props?.action?.args?.delegateAction?.receiverId
+                }
               />
             </div>
           ))

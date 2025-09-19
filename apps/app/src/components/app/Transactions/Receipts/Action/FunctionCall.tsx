@@ -86,9 +86,12 @@ const FunctionCall = (props: TransactionActionInfo) => {
 
     return pretty;
   }
-
-  const isAuroraSubmit =
-    args?.method_name === 'submit' || args?.method_name === 'submit_with_args';
+  const isSubmit =
+    args?.methodName === 'submit' || args?.method_name === 'submit';
+  const isSubmitWithArgs =
+    args?.methodName === 'submit_with_args' ||
+    args?.method_name === 'submit_with_args';
+  const isAuroraSubmit = isSubmit || isSubmitWithArgs;
   const modifiedData =
     isAuroraSubmit && receiver?.includes('aurora')
       ? { tx_bytes_b64: args.args_base64 || args.args }
@@ -102,7 +105,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
     <div className="py-1">
       <FaCode className="inline-flex text-yellow-500 mr-1" />
       {t ? t('txnDetails.actions.functionCall.0') : 'Called method'}
-      <span className="font-bold mx-1">{args?.method_name}</span>
+      <span className="font-bold mx-1">
+        {args?.method_name || args?.methodName}
+      </span>
       {t ? t('txnDetails.actions.functionCall.1') : 'in contract'}
       <Link
         href={`/address/${receiver}`}
@@ -110,11 +115,11 @@ const FunctionCall = (props: TransactionActionInfo) => {
       >
         {shortenAddress(receiver)}
       </Link>
-      {args?.method_name === 'rlp_execute' ||
+      {(args?.method_name || args?.methodName) === 'rlp_execute' ||
       (isAuroraSubmit && receiver?.includes('aurora')) ? (
         <RlpTransaction
           pretty={modifiedData}
-          method={args?.method_name}
+          method={args?.method_name || args?.methodName}
           receiver={receiver}
         />
       ) : (

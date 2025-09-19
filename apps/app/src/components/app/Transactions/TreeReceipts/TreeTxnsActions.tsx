@@ -104,8 +104,8 @@ const TreeTxnsActions = (props: TransActionProps) => {
     case 'DELEGATE':
     case 'DELEGATE_ACTION':
       const delegateAction: any | DelegateActionView =
-        action?.args?.delegate_action?.actions &&
-        action?.args?.delegate_action?.actions?.map((txn: ActionType) =>
+        action?.args?.delegateAction?.actions &&
+        action?.args?.delegateAction?.actions?.map((txn: ActionType) =>
           mapRpcActionToAction(txn),
         );
       function filterObject(obj: any) {

@@ -13,9 +13,9 @@ const DeleteAccount = (props: TransactionActionInfo) => {
       {t ? t('txnDetails.actions.deleteAccount.0') : 'Delete account'} (
       <Link
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline"
-        href={`/address/${props.receiver}`}
+        href={`/address/${props?.receiver}`}
       >
-        {shortenAddress(props.receiver)}
+        {shortenAddress(props?.receiver)}
       </Link>
       ){' '}
       {t
@@ -23,9 +23,13 @@ const DeleteAccount = (props: TransactionActionInfo) => {
         : 'and transfer remaining funds to'}
       <Link
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-0.5"
-        href={`/address/${props.args.beneficiary_id}`}
+        href={`/address/${
+          props?.args?.beneficiary_id || props?.args?.beneficiaryId
+        }`}
       >
-        {shortenAddress(props.args.beneficiary_id)}
+        {shortenAddress(
+          props?.args?.beneficiary_id || props?.args?.beneficiaryId,
+        )}
       </Link>
     </div>
   );

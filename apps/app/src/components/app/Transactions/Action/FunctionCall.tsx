@@ -27,11 +27,15 @@ const FunctionCall = (props: ActionPropsInfo) => {
           <Tooltip
             className={'left-1/2 ml-5 max-w-max'}
             position="bottom"
-            tooltip={props.action.args.method_name}
+            tooltip={
+              props?.action?.args?.method_name ||
+              props?.action?.args?.methodName
+            }
           >
             <span className="bg-blue-900/10 text-xs text-nearblue-600 dark:text-neargray-10 rounded-xl px-2 py-0.5 max-w-[240px] inline-flex truncate">
               <span className="block truncate">
-                {props.action.args.method_name}
+                {props?.action?.args?.method_name ||
+                  props?.action?.args?.methodName}
               </span>
             </span>
           </Tooltip>

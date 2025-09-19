@@ -12,7 +12,6 @@ import {
   calculateTotalGas,
   txnFee,
 } from '@/utils/near';
-import { ExecutionOutcomeWithIdView } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FileSlash from '@/components/app/Icons/FileSlash';
@@ -23,6 +22,7 @@ import ReceiptSummary from '@/components/app/Transactions/ReceiptSummary';
 import Tree from '@/components/app/Transactions/Tree';
 import { revalidateTxn } from '@/utils/app/actions';
 import { useConfig } from '@/hooks/app/useConfig';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 export type RpcProvider = {
   name: string;
@@ -40,9 +40,9 @@ const TxnsTabActions = ({
 }: any) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
+  const [isTransactionNotFound, setIsTransactionNotFound] = useState(false);
   const [rpcTxn, setRpcTxn] = useState<any>({});
   const [rpcData, setRpcData] = useState<any>({});
-  const [allRpcProviderError, setAllRpcProviderError] = useState(false);
   const retryCount = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useIntlRouter();
@@ -55,7 +55,7 @@ const TxnsTabActions = ({
     (networkId === 'testnet' && txn?.block?.block_height <= 192373963) ||
     (networkId === 'mainnet' && txn?.block?.block_height <= 143997621);
 
-  const { rpc: rpcUrl, switchRpc } = useRpcProvider();
+  const { rpc: rpcUrl, switchRpc, rpcStats } = useRpcProvider();
 
   useEffect(() => {
     if (txn != null && txn?.outcomes?.status === null) {
@@ -75,31 +75,62 @@ const TxnsTabActions = ({
   }, [txn, router, retryCount]);
 
   useEffect(() => {
-    if (rpcError) {
+    if (rpcError && !isTransactionNotFound) {
       try {
         switchRpc();
       } catch (error) {
         setRpcError(true);
-        setAllRpcProviderError(true);
         console.error('Failed to switch RPC:', error);
       }
     }
-  }, [txn, rpcError, switchRpc]);
+  }, [txn, rpcError, isTransactionNotFound, switchRpc]);
 
   useEffect(() => {
     const checkTxnExistence = async () => {
       try {
         setRpcError(false);
-        const res = await transactionStatus(rpcUrl, hash, 'bowen', cacheRef);
+        setIsTransactionNotFound(false);
+
+        const res: {
+          success: boolean;
+          data: RpcTransactionResponse;
+          statusCode: number;
+          isNotFound: boolean;
+          shouldRetry: boolean;
+        } = await transactionStatus(rpcUrl, hash, 'bowen', cacheRef);
+
+        if (res?.isNotFound) {
+          setIsTransactionNotFound(true);
+          return;
+        }
+
         if (res?.success) {
           const txnExists = res?.data;
-          const status = txnExists.status?.Failure ? false : true;
+          let status: boolean | null = null;
+
+          if (
+            txnExists.status &&
+            typeof txnExists.status === 'object' &&
+            'SuccessValue' in txnExists.status
+          ) {
+            status = true;
+          } else if (
+            txnExists.status &&
+            typeof txnExists.status === 'object' &&
+            'Failure' in txnExists.status
+          ) {
+            status = false;
+            console.error('Error:', txnExists.status.Failure);
+          } else {
+            status = null;
+          }
+
           let block: any = {};
 
           if (txnExists) {
             block = await getBlockDetails(
               rpcUrl,
-              txnExists.transaction_outcome.block_hash,
+              txnExists?.transactionOutcome?.blockHash,
             );
           }
           const modifiedTxns = {
@@ -109,32 +140,32 @@ const TxnsTabActions = ({
             },
             block: { block_height: block?.header.height },
             block_timestamp: block?.header.timestamp_nanosec,
-            included_in_block_hash: txnExists.transaction_outcome.block_hash,
+            included_in_block_hash: txnExists.transactionOutcome?.blockHash,
             outcomes: { status: status },
             outcomes_agg: {
               gas_used: calculateGasUsed(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.gas_burnt ?? '0',
+                txnExists?.receiptsOutcome ?? [],
+                String(txnExists?.transactionOutcome?.outcome?.gasBurnt) ?? '0',
               ),
               transaction_fee: txnFee(
-                (txnExists?.receipts_outcome as ExecutionOutcomeWithIdView[]) ??
-                  [],
-                txnExists?.transaction_outcome.outcome.tokens_burnt ?? '0',
+                txnExists?.receiptsOutcome ?? [],
+                txnExists?.transactionOutcome?.outcome?.tokensBurnt ?? '0',
               ),
             },
             receipt_conversion_gas_burnt:
-              txnExists.transaction_outcome.outcome.gas_burnt.toString(),
+              txnExists?.transactionOutcome?.outcome?.gasBurnt?.toString(),
             receipt_conversion_tokens_burnt:
-              txnExists.transaction_outcome.outcome.tokens_burnt,
-            receiver_account_id: txnExists.transaction.receiver_id,
-            signer_account_id: txnExists.transaction.signer_id,
-            transaction_hash: txnExists.transaction_outcome.id,
+              txnExists?.transactionOutcome?.outcome?.tokensBurnt,
+            receiver_account_id: txnExists?.transaction?.receiverId,
+            signer_account_id: txnExists?.transaction?.signerId,
+            transaction_hash: txnExists?.transactionOutcome?.id,
           };
           setRpcTxn(txnExists);
           setRpcData(modifiedTxns);
         } else {
-          setRpcError(true);
+          if (res?.shouldRetry !== false) {
+            setRpcError(true);
+          }
         }
       } catch (error) {
         setRpcError(true);
@@ -156,9 +187,14 @@ const TxnsTabActions = ({
           txn.signer_account_id,
           cacheRef,
         );
+        if (res?.isNotFound) {
+          setIsTransactionNotFound(true);
+          return;
+        }
+
         if (res?.success) {
           setRpcTxn(res?.data);
-        } else {
+        } else if (res?.shouldRetry !== false) {
           setRpcError(true);
         }
       } catch {
@@ -217,7 +253,18 @@ const TxnsTabActions = ({
   return (
     <>
       <div className="container-xxl mx-auto px-5 -z">
-        {rpcError && !txn && allRpcProviderError ? (
+        {isTransactionNotFound ? (
+          <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
+            <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
+              <ErrorMessage
+                icons={<FileSlash />}
+                message="Transaction hash not found. Invalid transaction hash entered."
+                mutedText={hash || ''}
+                errorBg
+              />
+            </div>
+          </div>
+        ) : rpcError && !txn && rpcStats?.allRpcsFailed ? (
           <div className="bg-white dark:bg-black-600 soft-shadow rounded-xl pb-1 px-5">
             <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid dark:divide-black-200 divide-gray-200 !divide-y">
               <ErrorMessage

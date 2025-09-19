@@ -6406,7 +6406,7 @@
     randombytes "2.1.0"
     secp256k1 "5.0.1"
 
-"@near-js/jsonrpc-client@1.3.4":
+"@near-js/jsonrpc-client@1.3.4", "@near-js/jsonrpc-client@^1.3.4":
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/@near-js/jsonrpc-client/-/jsonrpc-client-1.3.4.tgz#bda71dd72c3c03e44e6e8887549c562f27e12ac5"
   integrity sha512-z8jV+y6vWJfoANTwtI8IgVA1+8d7ZfyQ/W+wfC2tCyK/dVJkUEkKy33QneMWzhoPFnAxVe/fa1p8cmiYhswCKw==

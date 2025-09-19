@@ -73,14 +73,23 @@ const TransactionActions = (props: TransActionProps) => {
     case 'DELEGATE':
     case 'DELEGATE_ACTION':
       const delegateAction: any | DelegateActionView =
-        action?.args?.delegate_action?.actions &&
-        action?.args?.delegate_action?.actions?.map((txn: ActionType) =>
+        action?.args?.delegateAction?.actions &&
+        action?.args?.delegateAction?.actions?.map((txn: ActionType) =>
           mapRpcActionToAction(txn),
         );
-      const publicKey =
-        action?.args?.public_key || action?.args?.delegate_action?.public_key;
-      const senderId =
-        action?.args?.sender_id || action?.args?.delegate_action?.sender_id;
+      const regularPublicKey =
+        action?.args?.public_key || action?.args?.publicKey;
+      const delegatePublicKey =
+        action?.args?.delegateAction?.public_key ||
+        action?.args?.delegateAction?.publicKey;
+      const regularSenderId = action?.args?.sender_id || action?.args?.senderId;
+      const delegateSenderId =
+        action?.args?.delegateAction?.sender_id ||
+        action?.args?.delegateAction?.senderId;
+
+      const publicKey = regularPublicKey || delegatePublicKey;
+      const senderId = regularSenderId || delegateSenderId;
+
       return (
         <div className="py-1">
           <Delegate className="inline-flex text-yellow-500" />
@@ -115,7 +124,10 @@ const TransactionActions = (props: TransActionProps) => {
                 <TransactionActions
                   key={i}
                   action={subAction}
-                  receiver={action?.args?.delegate_action?.receiver_id}
+                  receiver={
+                    action?.args?.delegate_action?.receiver_id ||
+                    action?.args?.delegateAction?.receiverId
+                  }
                 />
               </div>
             ))}

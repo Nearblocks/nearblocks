@@ -8,16 +8,20 @@ import { CopyButton } from '@/components/app/common/CopyButton';
 
 const AddKey = (props: TransactionActionInfo) => {
   const t = useTranslations();
-  if (typeof props.args.access_key?.permission !== 'object') {
+
+  const accessKey = props.args.accessKey || props.args.access_key;
+  const publicKey = props.args.publicKey || props.args.public_key;
+
+  if (typeof accessKey?.permission !== 'object') {
     return (
       <div className="py-1">
         <FaKey className="inline-flex text-emerald-400 mr-1" />{' '}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">
-          {shortenHex(props.args.public_key)}
-          {props.args.public_key && (
+          {shortenHex(publicKey)}
+          {publicKey && (
             <span className="ml-0.5">
-              <CopyButton textToCopy={props.args.public_key} />
+              <CopyButton textToCopy={publicKey} />
             </span>
           )}
         </span>
@@ -29,23 +33,21 @@ const AddKey = (props: TransactionActionInfo) => {
           {shortenAddress(props.receiver)}
         </Link>
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
-        <span className="font-bold ml-1">
-          {props.args.access_key?.permission}
-        </span>
+        <span className="font-bold ml-1">{accessKey?.permission}</span>
       </div>
     );
   }
 
-  if (props.args.access_key.permission.permission_kind) {
+  if (accessKey.permission.permission_kind) {
     return (
       <div className="py-1">
         <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">
-          {shortenHex(props.args.public_key)}
-          {props.args.public_key && (
+          {shortenHex(publicKey)}
+          {publicKey && (
             <span className="ml-0.5">
-              <CopyButton textToCopy={props.args.public_key} />
+              <CopyButton textToCopy={publicKey} />
             </span>
           )}
         </span>
@@ -58,21 +60,25 @@ const AddKey = (props: TransactionActionInfo) => {
         </Link>
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}{' '}
         <span className="font-bold ml-1">
-          {props.args.access_key.permission.permission_kind}
+          {accessKey.permission.permission_kind}
         </span>
       </div>
     );
   }
+
+  const functionCall = accessKey.permission.FunctionCall;
+  const receiverId = functionCall?.receiver_id || functionCall?.receiverId;
+  const methodNames = functionCall?.method_names || functionCall?.methodNames;
 
   return (
     <div className="py-1">
       <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
       {t ? t('txnDetails.actions.addKey.1') : 'Access key'} (
       <span className="font-bold">
-        {shortenHex(props.args.public_key)}
-        {props.args.public_key && (
+        {shortenHex(publicKey)}
+        {publicKey && (
           <span className="ml-0.5">
-            <CopyButton textToCopy={props.args.public_key} />
+            <CopyButton textToCopy={publicKey} />
           </span>
         )}
       </span>
@@ -82,22 +88,16 @@ const AddKey = (props: TransactionActionInfo) => {
       </span>
       <Link
         className="text-green-500 dark:text-green-250 font-bold hover:no-underline mr-1"
-        href={`/address/${props.args.access_key.permission.FunctionCall.receiver_id}`}
+        href={`/address/${receiverId}`}
       >
-        {shortenAddress(
-          props.args.access_key.permission.FunctionCall.receiver_id,
-        )}
+        {shortenAddress(receiverId)}
       </Link>
       {t ? t('txnDetails.actions.addKey.4') : 'with permission'}
       <span className="mx-1">
         {t ? t('txnDetails.actions.addKey.5') : 'to call'}
       </span>
       <span className="font-bold">
-        {props.args.access_key.permission.FunctionCall.method_names.length > 0
-          ? props.args.access_key.permission.FunctionCall.method_names.join(
-              ', ',
-            )
-          : 'any'}{' '}
+        {methodNames && methodNames.length > 0 ? methodNames.join(', ') : 'any'}{' '}
       </span>
       {t ? t('txnDetails.actions.addKey.6') : 'methods'}
     </div>

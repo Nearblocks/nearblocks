@@ -31,12 +31,12 @@ const TreeReceipt = (props: Props) => {
       {receipt?.actions && (
         <div
           className={`relative ${
-            show === receipt?.receipt_id
+            show === (receipt?.receipt_id || receipt?.receiptId)
               ? '!text-white bg-green-500 dark:bg-green-900'
               : 'text-green-500 '
           } !border-2 !border-solid !border-green-600 dark:!border-green-250 dark:text-green-250 !rounded-lg cursor-pointer`}
           onClick={() => {
-            setShow(receipt?.receipt_id);
+            setShow(receipt?.receipt_id || receipt?.receiptId);
           }}
         >
           {!isSuccess && (
@@ -51,7 +51,8 @@ const TreeReceipt = (props: Props) => {
             >
               {formatActionKind(action.action_kind)}
               <br />
-              {action.args?.method_name && ` (${action?.args?.method_name})`}
+              {(action?.args?.method_name || action.args?.methodName) &&
+                ` (${action?.args?.method_name || action?.args?.methodName})`}
             </p>
           ))}
         </div>
@@ -59,7 +60,7 @@ const TreeReceipt = (props: Props) => {
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <ul>
           {receipt?.outcome?.outgoing_receipts?.map((rpcTxn: any) => (
-            <Fragment key={rpcTxn?.receipt_id}>
+            <Fragment key={rpcTxn?.receipt_id || rpcTxn?.receiptId}>
               <li>
                 <TreeReceipt
                   receipt={rpcTxn}

@@ -34,7 +34,7 @@ const TreeReceiptDetails = (props: Props) => {
 
   return (
     <>
-      {show === polledReceipt?.receipt_id && (
+      {show === (polledReceipt?.receipt_id || polledReceipt?.receiptId) && (
         <>
           {!polledReceipt ? (
             <div className="w-full">
@@ -71,13 +71,17 @@ const TreeReceiptDetails = (props: Props) => {
                         <Tooltip
                           className="left-1/2 max-w-[200px]"
                           position="top"
-                          tooltip={receipt.predecessor_id}
+                          tooltip={
+                            receipt.predecessor_id || receipt.predecessorId
+                          }
                         >
                           <Link
                             className="text-green-500 dark:text-green-250 font-medium block truncate"
-                            href={`/address/${receipt?.predecessor_id}`}
+                            href={`/address/${
+                              receipt.predecessor_id || receipt.predecessorId
+                            }`}
                           >
-                            {receipt.predecessor_id}
+                            {receipt.predecessor_id || receipt.predecessorId}
                           </Link>
                         </Tooltip>
                       </div>
@@ -88,13 +92,15 @@ const TreeReceiptDetails = (props: Props) => {
                         <Tooltip
                           className="left-1/2 max-w-[200px]"
                           position="top"
-                          tooltip={receipt.receiver_id}
+                          tooltip={receipt?.receiver_id || receipt.receiverId}
                         >
                           <Link
                             className="text-green-500 dark:text-green-250 font-medium block truncate"
-                            href={`/address/${receipt?.receiver_id}`}
+                            href={`/address/${
+                              receipt?.receiver_id || receipt?.receiverId
+                            }`}
                           >
-                            {receipt.receiver_id}
+                            {receipt?.receiver_id || receipt.receiverId}
                           </Link>
                         </Tooltip>
                       </div>
@@ -103,7 +109,7 @@ const TreeReceiptDetails = (props: Props) => {
                       <TreeTxnsActions
                         action={action}
                         key={i}
-                        receiver={receipt?.receiver_id}
+                        receiver={receipt?.receiver_id || receipt?.receiverId}
                       />
                     </div>
                   </Fragment>
@@ -151,7 +157,7 @@ const TreeReceiptDetails = (props: Props) => {
               const childRpcReceipt =
                 polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
               return (
-                <Fragment key={rcpt?.receipt_id}>
+                <Fragment key={rcpt?.receipt_id || rcpt?.receiptId}>
                   <TreeReceiptDetails
                     receipt={rcpt}
                     show={show}

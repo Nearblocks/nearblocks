@@ -100,7 +100,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     try {
       decoded = Buffer.from(args, 'base64');
     } catch (e) {
-      return '';
+      return 'The arguments are empty';
     }
 
     let pretty = '';

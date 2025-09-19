@@ -64,7 +64,7 @@ const ReceiptRow = (props: Props) => {
     const parts = hash.split('#');
     const id = parts.length > 1 ? parts[1] : null;
 
-    if (id && receipt?.receipt_id === id) {
+    if (id && (receipt?.receipt_id || receipt?.receiptId) === id) {
       requestAnimationFrame(() => {
         setTimeout(() => {
           rowRef.current?.scrollIntoView({
@@ -77,13 +77,13 @@ const ReceiptRow = (props: Props) => {
 
   useEffect(() => {
     if (
-      receipt?.block_hash &&
-      receipt.block_hash !== lastBlockHash.current &&
+      (receipt?.block_hash || receipt?.blockHash) &&
+      (receipt?.block_hash || receipt?.blockHash) !== lastBlockHash.current &&
       !receipt?.block_height
     ) {
-      lastBlockHash.current = receipt.block_hash;
+      lastBlockHash.current = receipt.block_hash || receipt?.blockHash;
 
-      getBlockDetails(rpc, receipt?.block_hash)
+      getBlockDetails(rpc, receipt?.block_hash || receipt?.blockHash)
         .then((resp: any) => {
           setBlock(resp?.header);
         })
@@ -209,7 +209,7 @@ const ReceiptRow = (props: Props) => {
             </div>
           ) : (
             <div className="w-full md:w-3/4 font-semibold word-break">
-              {receipt?.receipt_id ? receipt?.receipt_id : ''}
+              {receipt?.receipt_id || receipt?.receiptId}
             </div>
           )}
         </div>
@@ -259,7 +259,7 @@ const ReceiptRow = (props: Props) => {
             <div className="w-full md:w-3/4 word-break font-semibold">
               <Link
                 className="text-green-500 dark:text-green-250 hover:no-underline"
-                href={`/blocks/${receipt.block_hash}`}
+                href={`/blocks/${receipt.block_hash || receipt?.blockHash}`}
               >
                 {localFormat(receipt?.block_height || block?.height)}
               </Link>
@@ -292,38 +292,47 @@ const ReceiptRow = (props: Props) => {
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-sm" />
               </div>
-            ) : receipt?.predecessor_id ? (
+            ) : receipt?.predecessor_id || receipt?.predecessorId ? (
               <div className="w-full md:w-3/4 word-break h-6">
                 <AddressOrTxnsLink
                   copy
-                  currentAddress={receipt?.predecessor_id}
+                  currentAddress={
+                    receipt?.predecessor_id || receipt?.predecessorId
+                  }
                 />
-                {(receipt?.receipt?.Action?.signer_public_key &&
-                  receipt?.receipt?.Action?.signer_id) ||
-                  (receipt?.predecessor_id && receipt?.public_key && (
-                    <Tooltip
-                      tooltip={'Access key used for this receipt'}
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                    >
-                      <span>
-                        &nbsp;
-                        <Link
-                          href={`/address/${
-                            receipt?.predecessor_id ||
-                            receipt?.receipt?.Action?.signer_id
-                          }?tab=accesskeys`}
-                          className="text-green-500 dark:text-green-250 hover:no-underline"
-                        >
-                          (
-                          {shortenAddress(
-                            receipt?.public_key ||
-                              receipt?.receipt?.Action?.signer_public_key,
-                          )}
-                          )
-                        </Link>
-                      </span>
-                    </Tooltip>
-                  ))}
+                {(((receipt?.receipt?.Action?.signer_public_key ||
+                  receipt?.receipt?.Action?.signerPublicKey) &&
+                  (receipt?.receipt?.Action?.signer_id ||
+                    receipt?.receipt?.Action?.signerId)) ||
+                  ((receipt?.predecessor_id || receipt?.predecessorId) &&
+                    (receipt?.public_key || receipt?.publicKey))) && (
+                  <Tooltip
+                    tooltip="Access key used for this receipt"
+                    className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
+                  >
+                    <span>
+                      &nbsp;
+                      <Link
+                        href={`/address/${
+                          receipt?.predecessor_id ||
+                          receipt?.predecessorId ||
+                          receipt?.receipt?.Action?.signer_id ||
+                          receipt?.receipt?.Action?.signerId
+                        }?tab=accesskeys`}
+                        className="text-green-500 dark:text-green-250 hover:no-underline"
+                      >
+                        (
+                        {shortenAddress(
+                          receipt?.public_key ||
+                            receipt?.publicKey ||
+                            receipt?.receipt?.Action?.signer_public_key ||
+                            receipt?.receipt?.Action?.signerPublicKey,
+                        )}
+                        )
+                      </Link>
+                    </span>
+                  </Tooltip>
+                )}
               </div>
             ) : (
               ''
@@ -345,9 +354,12 @@ const ReceiptRow = (props: Props) => {
               <div className="w-full md:w-3/4">
                 <Loader wrapperClassName="flex w-72 max-w-xs" />
               </div>
-            ) : receipt?.receiver_id ? (
+            ) : receipt?.receiver_id || receipt?.receiverId ? (
               <div className="w-full md:w-3/4 word-break h-6">
-                <AddressOrTxnsLink copy currentAddress={receipt?.receiver_id} />
+                <AddressOrTxnsLink
+                  copy
+                  currentAddress={receipt?.receiver_id || receipt?.receiverId}
+                />
               </div>
             ) : (
               ''
@@ -372,16 +384,22 @@ const ReceiptRow = (props: Props) => {
             <div className="w-full md:w-3/4">
               <Loader wrapperClassName="flex w-36" />
             </div>
-          ) : receipt?.outcome?.gas_burnt ? (
+          ) : receipt?.outcome?.gas_burnt || receipt?.outcome?.gasBurnt ? (
             <div className="w-full items-center text-xs flex md:w-3/4 break-words h-6">
               <div className="bg-orange-50  dark:bg-black-200 rounded-md px-2 py-1">
                 <span className="text-xs mr-2">🔥 </span>
-                {receipt?.outcome?.gas_burnt
-                  ? convertToMetricPrefix(receipt?.outcome?.gas_burnt) + 'gas'
+                {receipt?.outcome?.gas_burnt || receipt?.outcome?.gasBurnt
+                  ? convertToMetricPrefix(
+                      receipt?.outcome?.gas_burnt || receipt?.outcome?.gasBurnt,
+                    ) + 'gas'
                   : ''}
                 <span className="text-gray-300 px-1">|</span>{' '}
-                {receipt?.outcome?.tokens_burnt
-                  ? yoctoToNear(receipt?.outcome?.tokens_burnt, true)
+                {receipt?.outcome?.tokens_burnt || receipt?.outcome?.tokensBurnt
+                  ? yoctoToNear(
+                      receipt?.outcome?.tokens_burnt ||
+                        receipt?.outcome?.tokensBurnt,
+                      true,
+                    )
                   : ''}{' '}
                 Ⓝ
               </div>
@@ -414,7 +432,9 @@ const ReceiptRow = (props: Props) => {
                   <TransactionActions
                     action={action}
                     key={i}
-                    receiver={polledReceipt?.receiver_id}
+                    receiver={
+                      polledReceipt?.receiver_id || polledReceipt?.receiverId
+                    }
                   />
                 ))}
             </div>
@@ -545,7 +565,9 @@ const ReceiptRow = (props: Props) => {
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
             const matchingRpcReceipt =
               polledReceipt?.outcome?.outgoing_receipts?.find(
-                (rpcRcpt: any) => rpcRcpt?.receipt_id === rcpt?.receipt_id,
+                (rpcRcpt: any) =>
+                  (rpcRcpt?.receipt_id || rpcRcpt?.receiptId) ===
+                  (rcpt?.receipt_id || rcpt?.receiptId),
               );
             return (
               <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
