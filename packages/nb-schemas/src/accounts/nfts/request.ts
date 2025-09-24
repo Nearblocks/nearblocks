@@ -11,6 +11,7 @@ const txns = v.object({
   cursor: cursorSchema,
   involved: v.optional(v.string()),
   limit: limitSchema,
+  token: v.optional(v.string()),
 });
 
 const count = v.object({
@@ -20,17 +21,17 @@ const count = v.object({
   cause: v.optional(v.string()),
   contract: v.optional(v.string()),
   involved: v.optional(v.string()),
+  token: v.optional(v.string()),
 });
 
 const cursor = v.object({
   index: v.number(),
   shard: v.number(),
   timestamp: v.string(),
-  type: v.number(),
 });
 
-export type AccountFTTxnsReq = v.InferOutput<typeof txns>;
-export type AccountFTTxnCountReq = v.InferOutput<typeof count>;
-export type AccountFTTxnsCursor = v.InferOutput<typeof cursor>;
+export type AccountNFTTxnsReq = v.InferOutput<typeof txns>;
+export type AccountNFTTxnCountReq = v.InferOutput<typeof count>;
+export type AccountNFTTxnsCursor = v.InferOutput<typeof cursor>;
 
 export default { count, cursor, txns };

@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import { ActionKind, ExecutionOutcomeStatus } from 'nb-types';
+import { ActionKind, EventCause, ExecutionOutcomeStatus } from 'nb-types';
 
 import type { JsonData } from '../common.js';
 import { jsonSchema, responseSchema } from '../common.js';
@@ -113,6 +113,61 @@ const txnReceipt: v.GenericSchema<TxnReceipts> = v.object({
   receiver_account_id: v.string(),
 });
 
+const ftMeta = v.object({
+  contract: v.string(),
+  decimals: v.nullable(v.number()),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
+});
+
+const txnFT = v.object({
+  affected_account_id: v.string(),
+  block_timestamp: v.string(),
+  cause: v.enum(EventCause),
+  contract_account_id: v.string(),
+  delta_amount: v.string(),
+  event_index: v.number(),
+  event_type: v.number(),
+  involved_account_id: v.nullable(v.string()),
+  meta: v.optional(ftMeta),
+  receipt_id: v.string(),
+  shard_id: v.number(),
+});
+
+const nftMeta = v.object({
+  base_uri: v.nullable(v.string()),
+  contract: v.string(),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
+});
+
+const nftTokenMeta = v.object({
+  contract: v.string(),
+  media: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  title: v.nullable(v.string()),
+  token: v.string(),
+});
+
+const txnNFT = v.object({
+  affected_account_id: v.string(),
+  block_timestamp: v.string(),
+  cause: v.enum(EventCause),
+  contract_account_id: v.string(),
+  delta_amount: v.number(),
+  event_index: v.number(),
+  involved_account_id: v.nullable(v.string()),
+  meta: v.optional(nftMeta),
+  receipt_id: v.string(),
+  shard_id: v.number(),
+  token_id: v.string(),
+  token_meta: v.optional(nftTokenMeta),
+});
+
 const txnResponse = responseSchema(
   v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk']),
 );
@@ -121,18 +176,32 @@ const txnsResponse = responseSchema(
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 const txnReceiptsResponse = responseSchema(txnReceipt);
+const txnFTsResponse = responseSchema(
+  v.array(
+    v.omit(txnFT, ['block_timestamp', 'shard_id', 'event_index', 'event_type']),
+  ),
+);
+const txnNFTsResponse = responseSchema(
+  v.array(v.omit(txnNFT, ['block_timestamp', 'shard_id', 'event_index'])),
+);
 
 export type Txn = v.InferOutput<typeof txn>;
 export type TxnCount = v.InferOutput<typeof txnCount>;
 // export type TxnReceipt = v.InferOutput<typeof txnReceipt>;
+export type TxnFT = v.InferOutput<typeof txnFT>;
+export type TxnNFT = v.InferOutput<typeof txnNFT>;
 
 export type TxnRes = v.InferOutput<typeof txnResponse>;
 export type TxnsRes = v.InferOutput<typeof txnsResponse>;
 export type TxnCountRes = v.InferOutput<typeof txnCountResponse>;
 export type TxnReceiptsRes = v.InferOutput<typeof txnReceiptsResponse>;
+export type TxnFTsRes = v.InferOutput<typeof txnFTsResponse>;
+export type TxnNFTsRes = v.InferOutput<typeof txnNFTsResponse>;
 
 export default {
   count: txnCountResponse,
+  fts: txnFTsResponse,
+  nfts: txnNFTsResponse,
   receipts: txnReceiptsResponse,
   txn: txnResponse,
   txns: txnsResponse,
