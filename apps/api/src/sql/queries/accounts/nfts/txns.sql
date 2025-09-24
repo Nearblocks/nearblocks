@@ -63,10 +63,10 @@ FROM
       AND ntm.token = nft.token_id
   ) tm ON TRUE
 WHERE
-  nft.contract_account_id = ${contract}
+  affected_account_id = ${account}
   AND (
-    ${affected}::BIGINT IS NULL
-    OR nft.affected_account_id = ${affected}
+    ${contract}::TEXT IS NULL
+    OR nft.contract_account_id = ${contract}
   )
   AND (
     p.block_timestamp IS NULL
@@ -83,6 +83,18 @@ WHERE
   AND (
     ${before}::BIGINT IS NULL
     OR nft.block_timestamp < ${before}
+  )
+  AND (
+    ${token}::TEXT IS NULL
+    OR nft.token_id = ${token}
+  )
+  AND (
+    ${involved}::TEXT IS NULL
+    OR nft.involved_account_id = ${involved}
+  )
+  AND (
+    ${cause}::TEXT IS NULL
+    OR nft.cause = ${cause}
   )
 ORDER BY
   block_timestamp DESC,

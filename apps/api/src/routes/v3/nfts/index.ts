@@ -82,7 +82,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', service.count);
+  route.get('/txns/count', validate(request.count), service.count);
 
   return app;
 };

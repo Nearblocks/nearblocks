@@ -31,6 +31,14 @@ const receipts = v.object({
   hash: v.string(),
 });
 
+const fts = v.object({
+  hash: v.string(),
+});
+
+const nfts = v.object({
+  hash: v.string(),
+});
+
 const cursor = v.object({
   index: v.number(),
   shard: v.number(),
@@ -42,6 +50,8 @@ export type TxnsReq = v.InferOutput<typeof txns>;
 export type TxnCountReq = v.InferOutput<typeof count>;
 export type TxnReq = v.InferOutput<typeof txn>;
 export type TxnReceiptsReq = v.InferOutput<typeof receipts>;
+export type TxnFTsReq = v.InferOutput<typeof fts>;
+export type TxnNFTsReq = v.InferOutput<typeof nfts>;
 export type TxnsCursor = v.InferOutput<typeof cursor>;
 
-export default { count, cursor, latest, receipts, txn, txns };
+export default { count, cursor, fts, latest, nfts, receipts, txn, txns };

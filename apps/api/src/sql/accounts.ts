@@ -12,6 +12,11 @@ export default {
     count: sql('queries/accounts/keys/count.sql'),
     keys: sql('queries/accounts/keys/keys.sql'),
   },
+  nfts: {
+    estimate: sql('queries/accounts/nfts/estimate.sql'),
+    txn: sql('queries/accounts/nfts/txn.sql'),
+    txns: sql('queries/accounts/nfts/txns.sql'),
+  },
   receipts: {
     cte: sql('queries/accounts/receipts/cte.sql'),
     cteUnion: sql('queries/accounts/receipts/cteUnion.sql'),
