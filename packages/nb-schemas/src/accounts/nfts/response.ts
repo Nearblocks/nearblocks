@@ -11,12 +11,20 @@ const block = v.object({
 });
 
 const meta = v.object({
+  base_uri: v.nullable(v.string()),
   contract: v.string(),
-  decimals: v.nullable(v.number()),
   icon: v.nullable(v.string()),
   name: v.nullable(v.string()),
   reference: v.nullable(v.string()),
   symbol: v.nullable(v.string()),
+});
+
+const tokenMeta = v.object({
+  contract: v.string(),
+  media: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  title: v.nullable(v.string()),
+  token: v.string(),
 });
 
 const txn = v.object({
@@ -27,11 +35,12 @@ const txn = v.object({
   contract_account_id: v.string(),
   delta_amount: v.string(),
   event_index: v.number(),
-  event_type: v.number(),
   involved_account_id: v.nullable(v.string()),
   meta: v.optional(meta),
   receipt_id: v.string(),
   shard_id: v.number(),
+  token_id: v.string(),
+  token_meta: v.optional(tokenMeta),
   transaction_hash: v.optional(v.string()),
 });
 
@@ -41,17 +50,15 @@ const txnCount = v.object({
 });
 
 const txnsResponse = responseSchema(
-  v.array(
-    v.omit(txn, ['block_timestamp', 'shard_id', 'event_type', 'event_index']),
-  ),
+  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'event_index'])),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
-export type AccountFTTxn = v.InferOutput<typeof txn>;
-export type AccountFTTxnCount = v.InferOutput<typeof txnCount>;
+export type AccountNFTTxn = v.InferOutput<typeof txn>;
+export type AccountNFTTxnCount = v.InferOutput<typeof txnCount>;
 
-export type AccountFTTxnsRes = v.InferOutput<typeof txnsResponse>;
-export type AccountFTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
+export type AccountNFTTxnsRes = v.InferOutput<typeof txnsResponse>;
+export type AccountNFTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
 
 export default {
   count: txnCountResponse,

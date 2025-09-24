@@ -43,7 +43,12 @@ FROM
       fm.contract = ft.contract_account_id
   ) m ON TRUE
 WHERE
-  (
+  ft.contract_account_id = ${contract}
+  AND (
+    ${affected}::TEXT IS NULL
+    OR ft.affected_account_id = ${affected}
+  )
+  AND (
     p.block_timestamp IS NULL
     OR (
       ft.block_timestamp,
@@ -64,11 +69,6 @@ WHERE
   AND (
     ${before}::BIGINT IS NULL
     OR ft.block_timestamp < ${before}
-  )
-  AND ft.contract_account_id = ${contract}
-  AND (
-    ${affected}::TEXT IS NULL
-    OR ft.affected_account_id = ${affected}
   )
 ORDER BY
   block_timestamp DESC,
