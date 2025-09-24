@@ -1,13 +1,13 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
-  AccountFTTxn,
-  AccountFTTxnCount,
-  AccountFTTxnCountReq,
-  AccountFTTxnsReq,
+  AccountNFTTxn,
+  AccountNFTTxnCount,
+  AccountNFTTxnCountReq,
+  AccountNFTTxnsReq,
 } from 'nb-schemas';
-import request from 'nb-schemas/dist/accounts/fts/request.js';
-import response from 'nb-schemas/dist/accounts/fts/response.js';
+import request from 'nb-schemas/dist/accounts/nfts/request.js';
+import response from 'nb-schemas/dist/accounts/nfts/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
@@ -23,9 +23,10 @@ import sql from '#sql/accounts';
 
 const txns = responseHandler(
   response.txns,
-  async (req: RequestValidator<AccountFTTxnsReq>) => {
+  async (req: RequestValidator<AccountNFTTxnsReq>) => {
     const account = req.validator.account;
     const contract = req.validator.contract;
+    const token = req.validator.token;
     const involved = req.validator.involved;
     const cause = req.validator.cause;
     const limit = req.validator.limit;
@@ -36,11 +37,11 @@ const txns = responseHandler(
       : null;
 
     const eventsQuery: WindowListQuery<
-      Omit<AccountFTTxn, 'block' | 'transaction_hash'>
+      Omit<AccountNFTTxn, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
       return dbEvents.manyOrNone<
-        Omit<AccountFTTxn, 'block' | 'transaction_hash'>
-      >(sql.fts.txns, {
+        Omit<AccountNFTTxn, 'block' | 'transaction_hash'>
+      >(sql.nfts.txns, {
         account,
         after: start,
         before: end,
@@ -50,10 +51,10 @@ const txns = responseHandler(
           index: cursor?.index,
           shard: cursor?.shard,
           timestamp: cursor?.timestamp,
-          type: cursor?.type,
         },
         involved,
         limit,
+        token,
       });
     };
 
@@ -73,10 +74,10 @@ const txns = responseHandler(
     }
 
     const queries = events.map((event) => {
-      return pgp.as.format(sql.fts.txn, event);
+      return pgp.as.format(sql.nfts.txn, event);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<AccountFTTxn>(unionQuery);
+    const txns = await dbBase.manyOrNone<AccountNFTTxn>(unionQuery);
 
     // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
@@ -84,15 +85,14 @@ const txns = responseHandler(
         txns,
         events,
         (a, b) =>
-          `${a.block_timestamp}${a.shard_id}${a.event_type}${a.event_index}` ===
-          `${b.block_timestamp}${b.shard_id}${b.event_type}${b.event_index}`,
+          `${a.block_timestamp}${a.shard_id}${a.event_index}` ===
+          `${b.block_timestamp}${b.shard_id}${b.event_index}`,
       );
 
       return paginateData(merged, limit, (txn) => ({
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
-        type: txn.event_type,
       }));
     }
 
@@ -100,29 +100,33 @@ const txns = responseHandler(
       index: txn.event_index,
       shard: txn.shard_id,
       timestamp: txn.block_timestamp,
-      type: txn.event_type,
     }));
   },
 );
 
 const count = responseHandler(
   response.count,
-  async (req: RequestValidator<AccountFTTxnCountReq>) => {
+  async (req: RequestValidator<AccountNFTTxnCountReq>) => {
     const account = req.validator.account;
     const contract = req.validator.contract;
+    const token = req.validator.token;
     const involved = req.validator.involved;
     const cause = req.validator.cause;
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<AccountFTTxnCount>(sql.fts.estimate, {
-      account,
-      after,
-      before,
-      cause,
-      contract,
-      involved,
-    });
+    const estimated = await dbEvents.one<AccountNFTTxnCount>(
+      sql.nfts.estimate,
+      {
+        account,
+        after,
+        before,
+        cause,
+        contract,
+        involved,
+        token,
+      },
+    );
 
     return { data: estimated };
   },

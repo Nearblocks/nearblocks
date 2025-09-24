@@ -2,6 +2,10 @@ import type {
   Txn,
   TxnCount,
   TxnCountReq,
+  TxnFT,
+  TxnFTsReq,
+  TxnNFT,
+  TxnNFTsReq,
   TxnReceipts,
   TxnReceiptsReq,
   TxnReq,
@@ -13,7 +17,7 @@ import response from 'nb-schemas/dist/txns/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
-import { dbBase, pgp } from '#libs/pgp';
+import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
 import {
   paginateData,
@@ -166,6 +170,16 @@ const receipts = responseHandler(
   async (req: RequestValidator<TxnReceiptsReq>) => {
     const hash = req.validator.hash;
 
+    if (hash.startsWith('0x')) {
+      const receipts = await rollingWindow((start, end) => {
+        const cte = pgp.as.format(sql.rlpCte, { end, hash, start });
+
+        return dbBase.oneOrNone<TxnReceipts>(sql.receipts, { cte });
+      });
+
+      return { data: receipts };
+    }
+
     const receipts = await rollingWindow((start, end) => {
       const cte = pgp.as.format(sql.txnCte, { end, hash, start });
 
@@ -176,4 +190,118 @@ const receipts = responseHandler(
   },
 );
 
-export default { count, latest, receipts, txn, txns };
+const fts = responseHandler(
+  response.fts,
+  async (req: RequestValidator<TxnFTsReq>) => {
+    const hash = req.validator.hash;
+
+    if (hash.startsWith('0x')) {
+      const receipts = await rollingWindow<
+        Pick<TxnFT, 'block_timestamp' | 'receipt_id'>[]
+      >(async (start, end) => {
+        const receipts = await dbBase.any<TxnFT>(sql.eventsRlp, {
+          end,
+          hash,
+          start,
+        });
+
+        return receipts.length ? receipts : null;
+      });
+
+      if (!receipts || !receipts.length) {
+        return { data: [] };
+      }
+
+      const queries = receipts.map((receipt) => {
+        return pgp.as.format(sql.ft, receipt);
+      });
+      const unionQuery = queries.join('\nUNION ALL\n');
+      const fts = await dbEvents.manyOrNone<TxnFT>(unionQuery);
+
+      return { data: fts };
+    }
+
+    const receipts = await rollingWindow<
+      Pick<TxnFT, 'block_timestamp' | 'receipt_id'>[]
+    >(async (start, end) => {
+      const receipts = await dbBase.any<TxnFT>(sql.events, {
+        end,
+        hash,
+        start,
+      });
+
+      return receipts.length ? receipts : null;
+    });
+
+    if (!receipts || !receipts.length) {
+      return { data: [] };
+    }
+
+    const queries = receipts.map((receipt) => {
+      return pgp.as.format(sql.ft, receipt);
+    });
+    const unionQuery = queries.join('\nUNION ALL\n');
+    const fts = await dbEvents.manyOrNone<TxnFT>(unionQuery);
+
+    return { data: fts };
+  },
+);
+
+const nfts = responseHandler(
+  response.nfts,
+  async (req: RequestValidator<TxnNFTsReq>) => {
+    const hash = req.validator.hash;
+
+    if (hash.startsWith('0x')) {
+      const receipts = await rollingWindow<
+        Pick<TxnNFT, 'block_timestamp' | 'receipt_id'>[]
+      >(async (start, end) => {
+        const receipts = await dbBase.any<TxnNFT>(sql.eventsRlp, {
+          end,
+          hash,
+          start,
+        });
+
+        return receipts.length ? receipts : null;
+      });
+
+      if (!receipts || !receipts.length) {
+        return { data: [] };
+      }
+
+      const queries = receipts.map((receipt) => {
+        return pgp.as.format(sql.nft, receipt);
+      });
+      const unionQuery = queries.join('\nUNION ALL\n');
+      const nfts = await dbEvents.manyOrNone<TxnNFT>(unionQuery);
+
+      return { data: nfts };
+    }
+
+    const receipts = await rollingWindow<
+      Pick<TxnNFT, 'block_timestamp' | 'receipt_id'>[]
+    >(async (start, end) => {
+      const receipts = await dbBase.any<TxnNFT>(sql.events, {
+        end,
+        hash,
+        start,
+      });
+
+      return receipts.length ? receipts : null;
+    });
+
+    if (!receipts || !receipts.length) {
+      return { data: [] };
+    }
+
+    const queries = receipts.map((receipt) => {
+      return pgp.as.format(sql.nft, receipt);
+    });
+    const unionQuery = queries.join('\nUNION ALL\n');
+    const nfts = await dbEvents.manyOrNone<TxnNFT>(unionQuery);
+
+    return { data: nfts };
+  },
+);
+
+export default { count, fts, latest, nfts, receipts, txn, txns };

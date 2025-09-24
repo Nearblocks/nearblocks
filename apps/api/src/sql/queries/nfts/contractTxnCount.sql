@@ -7,7 +7,7 @@ FROM
       'SELECT
         block_timestamp
       FROM
-        ft_events
+        nft_events
       WHERE
         contract_account_id = %L
         AND (
@@ -16,21 +16,18 @@ FROM
         )
         AND (
           %L::BIGINT IS NULL
-          OR involved_account_id = %L
+          OR block_timestamp > %L
         )
-        AND EXISTS (
-          SELECT
-            1
-          FROM
-            ft_meta fm
-          WHERE
-            fm.contract = %L
+        AND (
+          %L::BIGINT IS NULL
+          OR block_timestamp < %L
         )',
       ${contract},
       ${affected},
       ${affected},
-      ${involved},
-      ${involved},
-      ${contract}
+      ${after},
+      ${after},
+      ${before},
+      ${before}
     )
   )

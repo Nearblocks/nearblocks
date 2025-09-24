@@ -15,22 +15,19 @@ FROM
           OR affected_account_id = %L
         )
         AND (
-          %L::TEXT IS NULL
-          OR involved_account_id = %L
+          %L::BIGINT IS NULL
+          OR block_timestamp > %L
         )
-        AND EXISTS (
-          SELECT
-            1
-          FROM
-            ft_meta fm
-          WHERE
-            fm.contract = %L
+        AND (
+          %L::BIGINT IS NULL
+          OR block_timestamp < %L
         )',
       ${contract},
       ${affected},
       ${affected},
-      ${involved},
-      ${involved},
-      ${contract}
+      ${after},
+      ${after},
+      ${before},
+      ${before}
     )
   )

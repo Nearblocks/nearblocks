@@ -7,12 +7,16 @@ FROM
       'SELECT
         affected_account_id
       FROM
-        ft_events fe
+        nft_events ne
       WHERE
         affected_account_id = %L
         AND (
           %L::TEXT IS NULL
           OR contract_account_id = %L
+        )
+        AND (
+          %L::TEXT IS NULL
+          OR token_id = %L
         )
         AND (
           %L::TEXT IS NULL
@@ -33,6 +37,8 @@ FROM
       ${account},
       ${contract},
       ${contract},
+      ${token},
+      ${token},
       ${involved},
       ${involved},
       ${cause},

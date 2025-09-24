@@ -125,7 +125,7 @@ const routes = (app: Router) => {
    *       - in: path
    *         name: hash
    *         required: true
-   *         description: Txn hash to retrieve
+   *         description: Txn hash or RLP hash to retrieve
    *         schema:
    *           type: string
    *     responses:
@@ -145,7 +145,7 @@ const routes = (app: Router) => {
    *       - in: path
    *         name: hash
    *         required: true
-   *         description: Txn hash to retrieve receipts for
+   *         description: Txn hash or RLP hash to retrieve receipts for
    *         schema:
    *           type: string
    *     responses:
@@ -153,6 +153,46 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/:hash/receipts', validate(request.receipts), service.receipts);
+
+  /**
+   * @openapi
+   * /v3/txns/{hash}/fts:
+   *   get:
+   *     summary: Get txn ft events
+   *     tags:
+   *       - V3 / Txns
+   *     parameters:
+   *       - in: path
+   *         name: hash
+   *         required: true
+   *         description: Txn hash or RLP hash to retrieve ft events for
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:hash/fts', validate(request.fts), service.fts);
+
+  /**
+   * @openapi
+   * /v3/txns/{hash}/nfts:
+   *   get:
+   *     summary: Get txn nft events
+   *     tags:
+   *       - V3 / Txns
+   *     parameters:
+   *       - in: path
+   *         name: hash
+   *         required: true
+   *         description: Txn hash or RLP hash to retrieve nft events for
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:hash/nfts', validate(request.nfts), service.nfts);
 };
 
 export default routes;
