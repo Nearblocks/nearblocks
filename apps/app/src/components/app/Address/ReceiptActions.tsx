@@ -461,7 +461,7 @@ const ReceiptActions = ({ dataPromise, countPromise }: TxnsProps) => {
         <span>
           <Link
             className="text-green-500  dark:text-green-250 hover:no-underline"
-            href={`/blocks/${row.included_in_block_hash}`}
+            href={`/blocks/${row.block?.block_hash}`}
           >
             {row.block?.block_height
               ? localFormat(row.block?.block_height)
