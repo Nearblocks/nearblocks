@@ -497,7 +497,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                     {(receipt?.block_height || block) && (
                       <Link
                         className="text-green-500 dark:text-green-250 font-medium"
-                        href={`/blocks/${receipt?.outcome?.blockHash}`}
+                        href={`/blocks/${
+                          receipt?.block_hash || receipt?.outcome?.blockHash
+                        }`}
                       >
                         {!loading &&
                           (receipt?.block_height || block?.height) &&
