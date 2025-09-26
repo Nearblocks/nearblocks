@@ -39,6 +39,12 @@ export const getRpcProviders = async () => {
       ]
     : [
         {
+          name: 'FastNEAR (Archival)',
+          url: `https://archival-rpc.testnet.fastnear.com${
+            fastNearRpcKey ? `?apiKey=${fastNearRpcKey}` : ''
+          }`,
+        },
+        {
           name: 'NEAR (Archival)',
           url: 'https://archival-rpc.testnet.near.org',
         },
