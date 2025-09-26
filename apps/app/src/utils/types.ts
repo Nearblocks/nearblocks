@@ -662,6 +662,7 @@ export type TransactionActionInfo = {
   action?: any;
   args: ArgsPropsInfo;
   receiver: string;
+  rpcAction?: any;
 };
 
 export type ReceiptsPropsInfo = {
@@ -823,6 +824,10 @@ export type Token = {
 
 export type TransActionProps = {
   action: {
+    action_kind: string;
+    args: ArgsPropsInfo;
+  };
+  rpcAction?: {
     action_kind: string;
     args: ArgsPropsInfo;
   };
@@ -1600,6 +1605,8 @@ export type TransactionReceiptInfo = {
   rpcTxn: RpcTransactionResponse;
   polledReceipt: any;
   polledFellowOutgoingReceipts?: any;
+  rpcReceipt: any;
+  rpcRootReceipt?: any;
 };
 
 export type ReceiptKindInfo = {
@@ -1609,6 +1616,7 @@ export type ReceiptKindInfo = {
   onClick?: any;
   receipt?: any;
   receiver: string;
+  rpcAction: any;
 };
 export type CommentItem = {
   accountId: string;

@@ -6,11 +6,14 @@ import { ReceiptKindInfo } from '@/utils/types';
 
 import FaTimesCircle from '@/components/app/Icons/FaTimesCircle';
 import RlpTransaction from '@/components/app/Transactions/Receipts/RlpTransaction';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { isValidJson } from '@/utils/app/libs';
 import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
+import Tooltip from '@/components/app/common/Tooltip';
 import { displayGlobalContractArgs, encodeArgs } from '@/utils/app/near';
+import { useRpcTrigger } from '@/components/app/common/RpcTriggerContext';
+import { isEmpty } from 'lodash';
 
 const backgroundColorClasses: Record<string, string> = {
   addKey: 'bg-indigo-50 dark:bg-indigo-900',
@@ -42,11 +45,19 @@ const backgroundColorClasses: Record<string, string> = {
 };
 
 const ReceiptKind = (props: ReceiptKindInfo) => {
-  const { action, isTxTypeActive, onClick, receipt, receiver, polledAction } =
-    props;
+  const {
+    action,
+    isTxTypeActive,
+    onClick,
+    receipt,
+    receiver,
+    polledAction,
+    rpcAction,
+  } = props;
   const t = useTranslations();
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
+  const { setShouldFetchRpc } = useRpcTrigger();
 
   const args =
     polledAction?.args?.args ||
@@ -127,7 +138,26 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
 
   const decodedData = args;
   const jsonStringifiedData = displayArgs(decodedData);
-  const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
+
+  const getRpcActionArg = () => {
+    if (!rpcAction) return null;
+
+    const targetMethod = action?.args?.method_name || action?.args?.methodName;
+
+    const matchingRpc = Array.isArray(rpcAction)
+      ? rpcAction?.find((ra: any) => {
+          const raMethod = ra?.args?.methodName || ra?.args?.method_name;
+          return raMethod && targetMethod && raMethod === targetMethod;
+        })
+      : null;
+
+    const chosen = matchingRpc || rpcAction?.[0];
+
+    return chosen?.args?.args || chosen?.args?.actions?.[0]?.args?.args || null;
+  };
+
+  const rpcActionArg = getRpcActionArg();
+  const actionLogData = viewMode === 'raw' ? rpcActionArg : jsonStringifiedData;
   const status = receipt?.outcome?.status;
   const isSuccess =
     status &&
@@ -150,6 +180,21 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     return globalContractKinds.includes(actionKind);
   };
 
+  const onRawClick = () => {
+    setViewMode('raw');
+    if (isEmpty(rpcActionArg)) {
+      setShouldFetchRpc(true);
+    } else {
+      setShouldFetchRpc(false);
+    }
+  };
+
+  useEffect(() => {
+    if (rpcActionArg) {
+      setShouldFetchRpc(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcActionArg]);
   return (
     <div className="pb-3">
       <div
@@ -217,26 +262,36 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
             <>
               <div className="relative w-full pt-1">
                 <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
-                  <button
-                    onClick={() => setViewMode('auto')}
-                    className={`px-3 py-1 rounded-l-lg text-sm ${
-                      viewMode === 'auto'
-                        ? 'bg-gray-500 text-white'
-                        : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
-                    }`}
+                  <Tooltip
+                    className="whitespace-nowrap"
+                    tooltip={<span>Smart formatted view (pretty JSON)</span>}
                   >
-                    Auto
-                  </button>
-                  <button
-                    onClick={() => setViewMode('raw')}
-                    className={`px-3 py-1 rounded-r-lg text-sm ${
-                      viewMode === 'raw'
-                        ? 'bg-gray-500 text-white'
-                        : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
-                    }`}
+                    <button
+                      onClick={() => setViewMode('auto')}
+                      className={`px-3 py-1 rounded-l-lg text-sm ${
+                        viewMode === 'auto'
+                          ? 'bg-gray-500 text-white'
+                          : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                      }`}
+                    >
+                      Auto
+                    </button>
+                  </Tooltip>
+                  <Tooltip
+                    className="whitespace-nowrap"
+                    tooltip={<span>Original RPC args as sent to chain</span>}
                   >
-                    Raw
-                  </button>
+                    <button
+                      onClick={() => onRawClick()}
+                      className={`px-3 py-1 rounded-r-lg text-sm ${
+                        viewMode === 'raw'
+                          ? 'bg-gray-500 text-white'
+                          : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                      }`}
+                    >
+                      Raw
+                    </button>
+                  </Tooltip>
                   <button
                     onClick={() => setIsExpanded((prev) => !prev)}
                     className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
@@ -253,7 +308,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
                     !isExpanded ? 'h-[8rem]' : ''
                   }`}
                 >
-                  {actionLogData}
+                  {!actionLogData ? 'Loading...' : actionLogData}
                 </div>
               </div>
             </>
@@ -297,6 +352,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
                   key={subaction.delegateIndex || index}
                   receipt={receipt}
                   receiver={receiver}
+                  rpcAction={rpcAction}
                 />
               ))}
           </div>

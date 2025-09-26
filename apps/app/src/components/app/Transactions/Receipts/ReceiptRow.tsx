@@ -30,10 +30,11 @@ interface Props {
       near_price: string;
     }>;
   };
+  rpcReceipt: any | ReceiptsPropsInfo;
 }
 
 const ReceiptRow = (props: Props) => {
-  const { borderFlag, receipt, statsData, polledReceipt } = props;
+  const { borderFlag, receipt, statsData, polledReceipt, rpcReceipt } = props;
   const t = useTranslations();
   const [pageHash] = useHash();
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
@@ -428,15 +429,18 @@ const ReceiptRow = (props: Props) => {
           ) : polledReceipt?.actions ? (
             <div className="w-full md:w-3/4 word-break space-y-4">
               {polledReceipt &&
-                polledReceipt?.actions?.map((action: any, i: number) => (
-                  <TransactionActions
-                    action={action}
-                    key={i}
-                    receiver={
-                      polledReceipt?.receiver_id || polledReceipt?.receiverId
-                    }
-                  />
-                ))}
+                polledReceipt?.actions?.map((action: any, i: number) => {
+                  return (
+                    <TransactionActions
+                      action={action}
+                      key={i}
+                      receiver={
+                        polledReceipt?.receiver_id || polledReceipt?.receiverId
+                      }
+                      rpcAction={rpcReceipt?.actions}
+                    />
+                  );
+                })}
             </div>
           ) : (
             ''
@@ -563,11 +567,16 @@ const ReceiptRow = (props: Props) => {
       {receipt?.outcome?.outgoing_receipts?.length > 0 && (
         <div className="pb-4">
           {receipt?.outcome?.outgoing_receipts?.map((rcpt: any) => {
-            const matchingRpcReceipt =
+            const matchingReceipt =
               polledReceipt?.outcome?.outgoing_receipts?.find(
                 (rpcRcpt: any) =>
                   (rpcRcpt?.receipt_id || rpcRcpt?.receiptId) ===
                   (rcpt?.receipt_id || rcpt?.receiptId),
+              );
+            const matchingRpcReceipt =
+              rpcReceipt?.outcome?.outgoing_receipts?.find(
+                (rpcRcpt: any) =>
+                  rpcRcpt?.id === rcpt?.receipt_id || rcpt?.receiptId,
               );
             return (
               <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
@@ -576,7 +585,8 @@ const ReceiptRow = (props: Props) => {
                     borderFlag
                     receipt={rcpt}
                     statsData={statsData}
-                    polledReceipt={matchingRpcReceipt}
+                    polledReceipt={matchingReceipt}
+                    rpcReceipt={matchingRpcReceipt}
                   />
                 </div>
               </div>

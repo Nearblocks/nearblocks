@@ -49,7 +49,6 @@ const Execution = (props: Props) => {
   const [rpcReceipt, setRpcReceipt] = useState<
     any | FailedToFindReceipt | NestedReceiptWithOutcome
   >(null);
-
   const receipt = apiTxnActionsData?.receiptData
     ? apiTxnActionsData?.receiptData
     : rpcReceipt;
@@ -184,6 +183,8 @@ const Execution = (props: Props) => {
                     polledReceipt={polledReceipt}
                     statsData={statsData}
                     rpcTxn={rpcTxn}
+                    rpcReceipt={rpcReceipt}
+                    rpcRootReceipt={rpcReceipt}
                   />
                 )}
               </div>
