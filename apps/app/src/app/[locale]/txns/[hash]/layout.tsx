@@ -7,6 +7,7 @@ import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaCheckCircle from '@/components/app/Icons/FaCheckCircle';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
+import { RpcTriggerProvider } from '@/components/app/common/RpcTriggerContext';
 
 export async function generateMetadata(props: {
   params: Promise<{ hash: string; locale: string }>;
@@ -63,33 +64,35 @@ export default async function TxnsLayout(props: {
 
   return (
     <RpcContextProvider rpcProviders={rpcProviders}>
-      <div className="md:flex items-center justify-between container-xxl mx-auto px-5">
-        <div className="flex justify-between dark:text-neargray-10 border-b w-full dark:border-black-200">
-          <h1 className="py-4 space-x-2 text-lg leading-8 font-medium dark:text-neargray-10 text-nearblue-600">
-            {t ? t('txnDetails.heading') : 'Transaction Details'}
-          </h1>
-          <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs gap-x-2">
-            <RpcMenu positionClass="right-0" />
-            <ActionMenuPopover positionClass="right-0">
-              <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2 flex h-full w-full">
-                <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center text-xs">
-                  <a
-                    className={`inline-flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
-                    href={`https://nearvalidate.org/txns/${hash}?network=${networkId}`}
-                    target="_blank"
-                  >
-                    Validate Transaction
-                    <span className="w-4 ml-3 dark:text-green-250 inline-flex">
-                      <FaCheckCircle />
-                    </span>
-                  </a>
-                </span>
-              </li>
-            </ActionMenuPopover>
-          </ul>
+      <RpcTriggerProvider>
+        <div className="md:flex items-center justify-between container-xxl mx-auto px-5">
+          <div className="flex justify-between dark:text-neargray-10 border-b w-full dark:border-black-200">
+            <h1 className="py-4 space-x-2 text-lg leading-8 font-medium dark:text-neargray-10 text-nearblue-600">
+              {t ? t('txnDetails.heading') : 'Transaction Details'}
+            </h1>
+            <ul className="flex relative md:pt-0 pt-2 items-center text-gray-500 text-xs gap-x-2">
+              <RpcMenu positionClass="right-0" />
+              <ActionMenuPopover positionClass="right-0">
+                <li className=" hover:bg-gray-100 dark:hover:bg-black-200 rounded-md whitespace-nowrap text-nearblue-600 dark:text-neargray-10 dark:hover:text-green-250 p-1 pl-2 flex h-full w-full">
+                  <span className="hover:text-green-400 dark:hover:text-green-250 flex items-center text-xs">
+                    <a
+                      className={`inline-flex items-center whitespace-nowrap hover:text-green-400 dark:text-neargray-10 dark:hover:text-green-250`}
+                      href={`https://nearvalidate.org/txns/${hash}?network=${networkId}`}
+                      target="_blank"
+                    >
+                      Validate Transaction
+                      <span className="w-4 ml-3 dark:text-green-250 inline-flex">
+                        <FaCheckCircle />
+                      </span>
+                    </a>
+                  </span>
+                </li>
+              </ActionMenuPopover>
+            </ul>
+          </div>
         </div>
-      </div>
-      {children}
+        {children}
+      </RpcTriggerProvider>
     </RpcContextProvider>
   );
 }

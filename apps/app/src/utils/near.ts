@@ -863,11 +863,12 @@ export function parseReceipt(
 
   const receipt = receiptData;
   return {
-    actions:
-      'Action' in receipt.receipt
-        ? receipt.receipt.Action.actions &&
-          receipt.receipt.Action.actions.map(mapRpcActionToAction1)
-        : [],
+    actions: Array.isArray(receipt.receipt)
+      ? receipt.receipt.map(mapRpcActionToAction1)
+      : 'Action' in receipt.receipt
+      ? receipt.receipt.Action.actions &&
+        receipt.receipt.Action.actions.map(mapRpcActionToAction1)
+      : [],
     id: receipt.receiptId,
     predecessorId: receipt.predecessorId,
     receiverId: receipt.receiverId,

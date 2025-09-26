@@ -24,7 +24,7 @@ import UseGlobalContract from '@/components/app/Transactions/Receipts/Action/Use
 import UseGlobalContractByAccountId from '@/components/app/Transactions/Receipts/Action/UseGlobalContractByAccountId';
 
 const TransactionActions = (props: TransActionProps) => {
-  const { action, receiver } = props;
+  const { action, receiver, rpcAction } = props;
   switch (action.action_kind) {
     case 'ADD_KEY':
     case 'AddKey':
@@ -62,7 +62,13 @@ const TransactionActions = (props: TransActionProps) => {
       );
     case 'FUNCTION_CALL':
     case 'FunctionCall':
-      return <FunctionCall args={action.args} receiver={receiver} />;
+      return (
+        <FunctionCall
+          args={action.args}
+          receiver={receiver}
+          rpcAction={rpcAction}
+        />
+      );
     case 'STAKE':
     case 'Stake':
       return <Stake args={action.args} receiver={receiver} />;
@@ -128,6 +134,7 @@ const TransactionActions = (props: TransActionProps) => {
                     action?.args?.delegate_action?.receiver_id ||
                     action?.args?.delegateAction?.receiverId
                   }
+                  rpcAction={rpcAction}
                 />
               </div>
             ))}

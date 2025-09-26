@@ -148,6 +148,7 @@ const Receipt = (props: Props) => {
               receipt={receipt}
               statsData={statsData}
               polledReceipt={polledReceipt}
+              rpcReceipt={rpcReceipt}
             />
           )}
         </div>

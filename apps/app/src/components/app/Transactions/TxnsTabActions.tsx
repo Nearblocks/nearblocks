@@ -23,6 +23,7 @@ import Tree from '@/components/app/Transactions/Tree';
 import { revalidateTxn } from '@/utils/app/actions';
 import { useConfig } from '@/hooks/app/useConfig';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { useRpcTrigger } from '@/components/app/common/RpcTriggerContext';
 
 export type RpcProvider = {
   name: string;
@@ -48,6 +49,7 @@ const TxnsTabActions = ({
   const router = useIntlRouter();
   const { networkId } = useConfig();
   const cacheRef = useRef<Record<string, Promise<any>>>({});
+  const { shouldFetchRpc, setShouldFetchRpc } = useRpcTrigger();
 
   // temporary use rpc data for blocks before 192373963 and api data for latest blocks - testnet
   // temporary use rpc data for blocks before 143997621 and api data for latest blocks - mainnet
@@ -98,7 +100,6 @@ const TxnsTabActions = ({
           isNotFound: boolean;
           shouldRetry: boolean;
         } = await transactionStatus(rpcUrl, hash, 'bowen', cacheRef);
-
         if (res?.isNotFound) {
           setIsTransactionNotFound(true);
           return;
@@ -162,6 +163,7 @@ const TxnsTabActions = ({
           };
           setRpcTxn(txnExists);
           setRpcData(modifiedTxns);
+          setShouldFetchRpc(false);
         } else {
           if (res?.shouldRetry !== false) {
             setRpcError(true);
@@ -171,11 +173,11 @@ const TxnsTabActions = ({
         setRpcError(true);
       }
     };
-    if (!txn || hasReceipts === false) {
+    if (!txn || hasReceipts === false || shouldFetchRpc) {
       checkTxnExistence();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn, hash, rpcUrl, hasReceipts]);
+  }, [txn, hash, rpcUrl, hasReceipts, shouldFetchRpc]);
 
   useEffect(() => {
     const fetchTransactionStatus = async () => {

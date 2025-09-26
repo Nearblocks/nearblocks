@@ -7,17 +7,20 @@ import { TransactionActionInfo } from '@/utils/types';
 
 import RlpTransaction from '@/components/app/Transactions/Receipts/RlpTransaction';
 import { isValidJson, shortenAddress } from '@/utils/app/libs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
+import Tooltip from '@/components/app/common/Tooltip';
 import { encodeArgs } from '@/utils/app/near';
+import { useRpcTrigger } from '@/components/app/common/RpcTriggerContext';
+import { isEmpty } from 'lodash';
 
 const FunctionCall = (props: TransactionActionInfo) => {
   const t = useTranslations();
-  const { args, receiver } = props;
+  const { args, receiver, rpcAction } = props;
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
-
+  const { setShouldFetchRpc } = useRpcTrigger();
   function parseNestedJSON(obj: any): any {
     if (typeof obj !== 'object' || obj === null) return obj;
 
@@ -100,7 +103,41 @@ const FunctionCall = (props: TransactionActionInfo) => {
   const decodedData =
     args?.args_base64 || args?.args || encodeArgs(args?.args_json);
   const jsonStringifiedData = displayArgs(decodedData);
-  const actionLogData = viewMode === 'raw' ? decodedData : jsonStringifiedData;
+  const getRpcActionArg = () => {
+    if (!rpcAction) return null;
+
+    const targetMethod = args?.method_name || args?.methodName;
+
+    const matchingRpc = Array.isArray(rpcAction)
+      ? rpcAction?.find((ra: any) => {
+          const raMethod = ra?.args?.methodName || ra?.args?.method_name;
+          return raMethod && targetMethod && raMethod === targetMethod;
+        })
+      : null;
+
+    const chosen = matchingRpc || rpcAction?.[0];
+
+    return chosen?.args?.args || chosen?.args?.actions?.[0]?.args?.args || null;
+  };
+  const rpcActionArg = getRpcActionArg();
+
+  const actionLogData = viewMode === 'raw' ? rpcActionArg : jsonStringifiedData;
+
+  const onRawClick = () => {
+    setViewMode('raw');
+    if (isEmpty(rpcActionArg)) {
+      setShouldFetchRpc(true);
+    } else {
+      setShouldFetchRpc(false);
+    }
+  };
+
+  useEffect(() => {
+    if (rpcAction?.args?.args) {
+      setShouldFetchRpc(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rpcAction?.args?.args]);
   return (
     <div className="py-1">
       <FaCode className="inline-flex text-yellow-500 mr-1" />
@@ -126,26 +163,36 @@ const FunctionCall = (props: TransactionActionInfo) => {
         <>
           <div className="relative w-full pt-1">
             <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
-              <button
-                onClick={() => setViewMode('auto')}
-                className={`px-3 py-1 rounded-l-lg text-sm ${
-                  viewMode === 'auto'
-                    ? 'bg-gray-500 text-white'
-                    : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
-                }`}
+              <Tooltip
+                className="whitespace-nowrap"
+                tooltip={<span>Smart formatted view (pretty JSON)</span>}
               >
-                Auto
-              </button>
-              <button
-                onClick={() => setViewMode('raw')}
-                className={`px-3 py-1 rounded-r-lg text-sm ${
-                  viewMode === 'raw'
-                    ? 'bg-gray-500 text-white'
-                    : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
-                }`}
+                <button
+                  onClick={() => setViewMode('auto')}
+                  className={`px-3 py-1 rounded-l-lg text-sm ${
+                    viewMode === 'auto'
+                      ? 'bg-gray-500 text-white'
+                      : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                  }`}
+                >
+                  Auto
+                </button>
+              </Tooltip>
+              <Tooltip
+                className="whitespace-nowrap"
+                tooltip={<span>Original RPC args as sent to chain</span>}
               >
-                Raw
-              </button>
+                <button
+                  onClick={() => onRawClick()}
+                  className={`px-3 py-1 rounded-r-lg text-sm ${
+                    viewMode === 'raw'
+                      ? 'bg-gray-500 text-white'
+                      : 'bg-gray-200 dark:bg-black-300 text-gray-700 dark:text-neargray-10'
+                  }`}
+                >
+                  Raw
+                </button>
+              </Tooltip>
               <button
                 onClick={() => setIsExpanded((prev) => !prev)}
                 className="bg-gray-700 dark:bg-gray-500 bg-opacity-10 hover:bg-opacity-100 group rounded-full p-1.5 w-7 h-7 ml-1.5"
@@ -162,7 +209,9 @@ const FunctionCall = (props: TransactionActionInfo) => {
                 !isExpanded ? 'h-[8rem]' : ''
               }`}
             >
-              {typeof actionLogData === 'object'
+              {!actionLogData
+                ? 'Loading...'
+                : typeof actionLogData === 'object'
                 ? JSON.stringify(actionLogData)
                 : actionLogData}
             </div>
