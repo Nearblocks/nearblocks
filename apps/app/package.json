@@ -58,7 +58,7 @@
     "lodash": "^4.17.21",
     "near-api-js": "6.0.1",
     "nearblocks-trans-next-intl": "https://github.com/Nearblocks/translations.git#2f7a01608ecd4ac1122200043169bec0feb0f1ce",
-    "next": "15.0.3",
+    "next": "^15.5.4",
     "next-intl": "^3.25.1",
     "next-runtime-env": "^3.2.2",
     "next-themes": "^0.3.0",
