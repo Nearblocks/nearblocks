@@ -48,7 +48,10 @@ const nextConfig = {
     ];
   },
   generateBuildId: async () => {
-    return process.env.GITHUB_SHA || 'nearblocks';
+    return (
+      `build-${Date.now()}-${Math.random().toString(36).substring(2, 10)}` ||
+      'nearblocks'
+    );
   },
 };
 
