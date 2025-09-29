@@ -10,7 +10,9 @@ FROM --platform=$BUILDPLATFORM base AS installer
 RUN apk add --no-cache git python3 py3-pip make g++
 WORKDIR /app
 ARG GITHUB_SHA
+ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 ENV GITHUB_SHA=$GITHUB_SHA
+ENV NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 ENV NEXT_TELEMETRY_DISABLED 1
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/yarn.lock ./yarn.lock
