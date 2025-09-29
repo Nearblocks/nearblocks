@@ -34,7 +34,8 @@
         "NEXT_PUBLIC_REOWN_PROJECT_ID",
         "NEXT_PUBLIC_USER_AUTH_URL",
         "FASTNEAR_RPC_KEY",
-        "API_BETA_URL"
+        "API_BETA_URL",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY"
       ]
     },
     "pages:build": {
