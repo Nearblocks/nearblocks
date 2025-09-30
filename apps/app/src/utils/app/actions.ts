@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { notFound, redirect, RedirectType } from 'next/navigation';
 import { SearchResult, Status, StatusInfo, UserToken } from '../types';
 import { getUserDataFromToken } from './libs';
-import { getRequest } from './api';
+import { getRequest, getRequestBeta } from './api';
 import { revalidateTag } from 'next/cache';
 import { getMessages } from 'next-intl/server';
 import { providers } from 'near-api-js';
@@ -58,9 +58,16 @@ export async function handleFilterAndKeyword(
     if (keyword.includes('.')) {
       keyword = keyword.toLowerCase();
     }
+    const [v1Result, v3Result] = await Promise.allSettled([
+      getRequest(`v1/search${filter}?keyword=${keyword}`),
+      filter === '' || filter === '/accounts'
+        ? getRequestBeta(`v3/search?keyword=${keyword}`)
+        : Promise.resolve(null),
+    ]);
 
-    const res = await getRequest(`v1/search${filter}?keyword=${keyword}`);
-    if (!res) return res;
+    const res = v1Result.status === 'fulfilled' ? v1Result.value : null;
+    const resV3 = v3Result.status === 'fulfilled' ? v3Result.value : null;
+    if (!res && !resV3) return { data: null };
     const data: SearchResult = {
       accounts: [],
       blocks: [],
@@ -92,6 +99,22 @@ export async function handleFilterAndKeyword(
 
     if (res?.mtTokens?.length) {
       data.mtTokens = res?.mtTokens;
+    }
+
+    if (
+      resV3 &&
+      Array.isArray(resV3?.data?.accounts) &&
+      (filter === '' || filter === '/accounts')
+    ) {
+      const accounts = Array.isArray(data?.accounts) ? [...data?.accounts] : [];
+      const existing = new Set(accounts.map((a: any) => a.account_id));
+      for (const acc of resV3.data.accounts) {
+        if (acc?.account_id && !existing.has(acc.account_id)) {
+          accounts.push({ account_id: acc.account_id });
+          existing.add(acc.account_id);
+        }
+      }
+      data.accounts = accounts;
     }
     const hasValidData = Object.values(data).some(
       (value) => Array.isArray(value) && value.length > 0,
