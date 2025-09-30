@@ -47,11 +47,11 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   const { aurorablocksUrl } = useConfig();
   const isAuroraSubmit = method === 'submit' || method === 'submit_with_args';
   const decoded =
-    isAuroraSubmit && receiver?.includes('aurora')
+    isAuroraSubmit && receiver === 'aurora'
       ? pretty
       : pretty && Buffer.from(pretty, 'base64');
   const parsed =
-    isAuroraSubmit && receiver?.includes('aurora')
+    isAuroraSubmit && receiver === 'aurora'
       ? decoded
       : decoded && jsonParser(decoded?.toString());
 
@@ -146,7 +146,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
   };
 
   const getDisplayData = () => {
-    if (isAuroraSubmit && receiver?.includes('aurora')) {
+    if (isAuroraSubmit && receiver === 'aurora') {
       if (!displayedArgs) return {};
 
       try {
@@ -184,7 +184,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
                     <td className="border px-4 py-2">
                       {key === 'hash' &&
                       isAuroraSubmit &&
-                      receiver?.includes('aurora') ? (
+                      receiver === 'aurora' ? (
                         <a
                           className="text-green-500 dark:text-green-250 hover:no-underline"
                           href={`${aurorablocksUrl}/tx/${value}`}
@@ -206,7 +206,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
             </tbody>
           </table>
         </div>
-      ) : isAuroraSubmit && receiver?.includes('aurora') && format === 'rlp' ? (
+      ) : isAuroraSubmit && receiver === 'aurora' && format === 'rlp' ? (
         <div
           className="table-container overflow-auto border rounded-lg bg-gray-100 dark:bg-black-200 dark:border-black-200 p-3 mt-3 resize-y"
           style={{ height: '150px' }}
@@ -215,9 +215,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
             Object.entries(getDisplayData()).map(([key, value]) => (
               <p className="mb-2" key={key}>
                 {key}:{' '}
-                {key === 'hash' &&
-                isAuroraSubmit &&
-                receiver?.includes('aurora') ? (
+                {key === 'hash' && isAuroraSubmit && receiver === 'aurora' ? (
                   <a
                     className="text-green-500 dark:text-green-250 hover:no-underline"
                     href={`${aurorablocksUrl}/tx/${value}`}
@@ -243,7 +241,7 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
           rows={4}
           style={{ height: '150px' }}
           value={
-            isAuroraSubmit && receiver?.includes('aurora')
+            isAuroraSubmit && receiver === 'aurora'
               ? JSON.stringify(getDisplayData(), null, 2)
               : displayedArgs || ''
           }
