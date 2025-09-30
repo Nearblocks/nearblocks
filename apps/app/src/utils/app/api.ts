@@ -18,50 +18,39 @@ export const getRequest = async (
     ? `${apiUrl}${path}${queryParams ? `?${queryParams}` : ''}`
     : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
-  const MAX_RETRIES = 3;
   const TIMEOUT = 10000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+  try {
+    const headers = new Headers({
+      Authorization: `Bearer ${fetchKey}`,
+    });
 
-    try {
-      const headers = new Headers({
-        Authorization: `Bearer ${fetchKey}`,
-      });
+    const mergedOptions: RequestInit = {
+      headers,
+      signal: controller.signal,
+      ...options,
+    };
+    const response = await fetch(url, useBase ? mergedOptions : {});
+    clearTimeout(timeoutId);
 
-      const mergedOptions: RequestInit = {
-        headers,
-        signal: controller.signal,
-        ...options,
-      };
-      const response = await fetch(url, useBase ? mergedOptions : {});
-      clearTimeout(timeoutId);
-
-      if (response.status !== 200) {
-        throw new Error(`${response.statusText}`);
-      }
-
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        const isJson = contentType?.includes('json');
-        return isJson ? response.json() : response.text();
-      }
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-
-      console.error(`Error on attempt ${attempt + 1} - ${url}:`, error);
-
-      const delay = Math.pow(2, attempt) * 300;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      if (attempt === MAX_RETRIES - 1) {
-        return {
-          message: 'Error',
-          status: 500,
-          error,
-        };
-      }
+    if (response.status !== 200) {
+      throw new Error(`${response.statusText}`);
     }
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      const isJson = contentType?.includes('json');
+      return isJson ? response.json() : response.text();
+    }
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    return {
+      message: 'Error',
+      status: 500,
+      error,
+    };
   }
 };
 
@@ -80,50 +69,39 @@ export const getRequestBeta = async (
     ? `${apiUrlBeta}${path}${queryParams ? `?${queryParams}` : ''}`
     : `${path}${queryParams ? `?${queryParams}` : ''}`;
 
-  const MAX_RETRIES = 3;
   const TIMEOUT = 10000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+  try {
+    const headers = new Headers({
+      Authorization: `Bearer ${fetchKey}`,
+    });
 
-    try {
-      const headers = new Headers({
-        Authorization: `Bearer ${fetchKey}`,
-      });
+    const mergedOptions: RequestInit = {
+      headers,
+      signal: controller.signal,
+      ...options,
+    };
+    const response = await fetch(url, useBase ? mergedOptions : {});
+    clearTimeout(timeoutId);
 
-      const mergedOptions: RequestInit = {
-        headers,
-        signal: controller.signal,
-        ...options,
-      };
-      const response = await fetch(url, useBase ? mergedOptions : {});
-      clearTimeout(timeoutId);
-
-      if (response.status !== 200) {
-        throw new Error(`${response.statusText}`);
-      }
-
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        const isJson = contentType?.includes('json');
-        return isJson ? response.json() : response.text();
-      }
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-
-      console.error(`Error on attempt ${attempt + 1} - ${url}:`, error);
-
-      const delay = Math.pow(2, attempt) * 300;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      if (attempt === MAX_RETRIES - 1) {
-        return {
-          message: 'Error',
-          status: 500,
-          error,
-        };
-      }
+    if (response.status !== 200) {
+      throw new Error(`${response.statusText}`);
     }
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      const isJson = contentType?.includes('json');
+      return isJson ? response.json() : response.text();
+    }
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    return {
+      message: 'Error',
+      status: 500,
+      error,
+    };
   }
 };
 
