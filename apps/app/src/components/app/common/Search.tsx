@@ -362,11 +362,11 @@ const BaseSearch = ({
             <>
               {result?.accounts?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.address') || 'Account'}
                   </h3>
                   {result?.accounts?.map((address: any) => (
-                    <div className="px-2 py-2" key={address.account_id}>
+                    <div className="px-2 py-1" key={address.account_id}>
                       <div
                         className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
                         key={address.account_id}
@@ -385,107 +385,112 @@ const BaseSearch = ({
               )}
               {result?.txns?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.txns') || 'Txns'}
                   </h3>
                   {result.txns.map((txn: any) => (
-                    <div
-                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={txn.transaction_hash}
-                      onClick={() =>
-                        onSelect({
-                          path: txn.transaction_hash,
-                          type: 'txn',
-                        })
-                      }
-                    >
-                      {shortenHex(txn.transaction_hash)}
+                    <div className="px-2 py-1" key={txn.transaction_hash}>
+                      <div
+                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                        onClick={() =>
+                          onSelect({
+                            path: txn.transaction_hash,
+                            type: 'txn',
+                          })
+                        }
+                      >
+                        {shortenHex(txn.transaction_hash)}
+                      </div>
                     </div>
                   ))}
                 </>
               )}
               {result?.receipts?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.receipts') || 'Receipts'}
                   </h3>
                   {result.receipts.map((receipt: any) => (
-                    <div
-                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={receipt.receipt_id}
-                      onClick={() =>
-                        onSelect({
-                          path: receipt.originated_from_transaction_hash,
-                          type: 'receipt',
-                        })
-                      }
-                    >
-                      {shortenHex(receipt.receipt_id)}
+                    <div className="px-2 py-1" key={receipt.receipt_id}>
+                      <div
+                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                        onClick={() =>
+                          onSelect({
+                            path: receipt.originated_from_transaction_hash,
+                            type: 'receipt',
+                          })
+                        }
+                      >
+                        {shortenHex(receipt.receipt_id)}
+                      </div>
                     </div>
                   ))}
                 </>
               )}
               {result?.blocks?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.blocks') || 'Blocks'}
                   </h3>
                   {result.blocks.map((block: any) => (
-                    <div
-                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={block.block_hash}
-                      onClick={() =>
-                        onSelect({
-                          path: block.block_hash,
-                          type: 'block',
-                        })
-                      }
-                    >
-                      #{localFormat(block.block_height)} (0x
-                      {shortenHex(block.block_hash)})
+                    <div className="px-2 py-1" key={block.block_hash}>
+                      <div
+                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                        onClick={() =>
+                          onSelect({
+                            path: block.block_hash,
+                            type: 'block',
+                          })
+                        }
+                      >
+                        #{localFormat(block.block_height)} (0x
+                        {shortenHex(block.block_hash)})
+                      </div>
                     </div>
                   ))}
                 </>
               )}
               {result?.tokens?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className=" mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.tokens') || 'Tokens'}
                   </h3>
                   {result.tokens.map((token: any) => (
-                    <div
-                      className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                      key={token.contract}
-                      onClick={() =>
-                        onSelect({
-                          path: token.contract,
-                          type: 'token',
-                        })
-                      }
-                    >
-                      {shortenAddress(token.contract)}
+                    <div className="px-2 py-1" key={token.contract}>
+                      <div
+                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                        onClick={() =>
+                          onSelect({
+                            path: token.contract,
+                            type: 'token',
+                          })
+                        }
+                      >
+                        {shortenAddress(token.contract)}
+                      </div>
                     </div>
                   ))}
                 </>
               )}
               {result?.mtTokens?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 px-2 py-2 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className=" mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     Multi Tokens
                   </h3>
                   {result?.mtTokens?.map(
                     (token: { contract: string; token_id: string }) => (
-                      <div
-                        className="px-2 py-2 m-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                        key={token.contract}
-                        onClick={() =>
-                          onSelect({
-                            path: `${token?.contract}:${token?.token_id}`,
-                            type: 'mt_token',
-                          })
-                        }
-                      >
-                        {shortenAddress(token.token_id)}
+                      <div className="px-2 py-1" key={token.contract}>
+                        <div
+                          className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
+                          onClick={() =>
+                            onSelect({
+                              path: `${token?.contract}:${token?.token_id}`,
+                              type: 'mt_token',
+                            })
+                          }
+                        >
+                          {shortenAddress(token.token_id)}
+                        </div>
                       </div>
                     ),
                   )}
