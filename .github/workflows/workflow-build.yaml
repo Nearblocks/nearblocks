@@ -69,7 +69,7 @@ jobs:
           cache-to: type=inline
           build-args: |
             GITHUB_SHA=${{ github.sha }}
-            ${{ matrix.service == 'app' && format('NEXT_SERVER_ACTIONS_ENCRYPTION_KEY={0}', secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY) || '' }}
+            NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
 
       - name: Get new image digest
         run: |
