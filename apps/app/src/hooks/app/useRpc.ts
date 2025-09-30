@@ -426,6 +426,33 @@ const useRpc = () => {
     }
   };
 
+  const getVerifierDataByHash = async (
+    rpcUrl: string,
+    codeHash: string,
+    verifierAccountId: string,
+  ) => {
+    try {
+      const { data, statusCode, error } = await fetchJsonRpc(rpcUrl, {
+        account_id: verifierAccountId,
+        args_base64: encodeArgs({ code_hash: codeHash }),
+        finality: 'optimistic',
+        method_name: 'get_contract_by_code_hash',
+        request_type: 'call_function',
+      });
+
+      if (statusCode === 200 && data) {
+        const result = data.result?.result;
+        return result ? decodeArgs(result) : null;
+      } else {
+        console.error('Error fetching verifier data by hash:', error);
+        return null;
+      }
+    } catch (fetchError) {
+      console.error('Error fetching verifier data by hash:', fetchError);
+      return null;
+    }
+  };
+
   const viewMethod = async ({
     args = {},
     contractId,
@@ -476,6 +503,7 @@ const useRpc = () => {
     getRewardFeeFraction,
     getValidators,
     getVerifierData,
+    getVerifierDataByHash,
     transactionStatus,
     viewAccessKey,
     viewMethod,

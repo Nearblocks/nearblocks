@@ -57,7 +57,7 @@ const Verifier: React.FC<ContractFormProps> = ({
   );
 
   const { rpc, switchRpc } = useRpcProvider();
-  const { getContractMetadata, getVerifierData } = useRpc();
+  const { getContractMetadata, getVerifierData, getVerifierDataByHash } = useRpc();
 
   useEffect(() => {
     if (rpcError) {
@@ -97,15 +97,31 @@ const Verifier: React.FC<ContractFormProps> = ({
       setLoading(true);
 
       try {
-        const verifierResponse = await getVerifierData(
+        // Check account-specific verification first
+        const byAccount = await getVerifierData(
           rpc,
           accountId as string,
           selectedVerifier,
         );
 
-        if (verifierResponse && onChainCodeHash) {
-          setVerified(onChainCodeHash === verifierResponse.code_hash);
+        let isVerified = false;
+        if (byAccount && onChainCodeHash) {
+          isVerified = onChainCodeHash === byAccount.code_hash;
         }
+
+        // If not verified for this account, check global verification by code hash
+        if (!isVerified && onChainCodeHash) {
+          const byHash = await getVerifierDataByHash(
+            rpc,
+            onChainCodeHash,
+            selectedVerifier,
+          );
+          if (byHash && byHash.code_hash === onChainCodeHash) {
+            isVerified = true;
+          }
+        }
+
+        setVerified(isVerified);
       } catch (error) {
         console.error('Error fetching or updating verifier data:', error);
         setError('Failed to fetch verifier data');

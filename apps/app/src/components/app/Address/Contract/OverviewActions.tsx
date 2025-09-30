@@ -74,7 +74,7 @@ const OverviewActions = (props: Props) => {
 
   const [statusLoading, setStatusLoading] = useState(true);
   const [error, setError] = useState<null | string>(null);
-  const { getContractMetadata, getVerifierData } = useRpc();
+  const { getContractMetadata, getVerifierData, getVerifierDataByHash } = useRpc();
   const [verificationData, setVerificationData] = useState<
     Record<string, VerificationData>
   >({});
@@ -114,11 +114,33 @@ const OverviewActions = (props: Props) => {
   useEffect(() => {
     const fetchVerifierData = async () => {
       try {
-        const verifierDataPromises = verifiers.map((verifierAccountId) =>
-          getVerifierData(rpc, accountId as string, verifierAccountId),
-        );
+        const verifierResponses = await Promise.all(
+          verifiers.map(async (verifierAccountId) => {
+            // First try account-specific verification
+            const byAccount = await getVerifierData(
+              rpc,
+              accountId as string,
+              verifierAccountId,
+            );
 
-        const verifierResponses = await Promise.all(verifierDataPromises);
+            const onChainHash = contractData?.onChainCodeHash;
+
+            // If not verified by account, try by code hash (global verification)
+            if (
+              (!byAccount || !onChainHash || byAccount?.code_hash !== onChainHash) &&
+              onChainHash
+            ) {
+              const byHash = await getVerifierDataByHash(
+                rpc,
+                onChainHash,
+                verifierAccountId,
+              );
+              return byHash || byAccount;
+            }
+
+            return byAccount;
+          }),
+        );
 
         const verificationData = verifiers.reduce<
           Record<string, VerificationData>
