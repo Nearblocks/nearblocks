@@ -76,7 +76,7 @@ const createWeb3Modal = (config: Web3ModalConfig) => {
     enableWalletConnect: true,
     allowUnsupportedChain: true,
     features: {
-      analytics: true,
+      analytics: false,
       email: false, // Smart accounts (Safe contract) not available on NEAR Protocol, only EOA.
       onramp: false,
       socials: false, // Smart accounts (Safe contract) not available on NEAR Protocol, only EOA.
