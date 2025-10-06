@@ -25,6 +25,26 @@ const routes = (route: Router) => {
    *         description: Success response
    */
   route.get('/:account', validate(request.account), accounts.account);
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/balance:
+   *   get:
+   *     summary: Get account balance
+   *     tags:
+   *       - V3 / Accounts
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account/balance', validate(request.balance), accounts.balance);
 };
 
 export default routes;
