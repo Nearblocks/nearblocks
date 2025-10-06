@@ -627,3 +627,15 @@ export const cleanNestedObject = (obj: any): any => {
 
   return obj;
 };
+
+export const formatLargeNumber = (value: number) => {
+  if (typeof value === 'number') {
+    return value.toLocaleString('fullwide', { useGrouping: false });
+  }
+  if (typeof value === 'string' && /^-?\d+\.?\d*e[+-]?\d+$/i.test(value)) {
+    const num = parseFloat(value);
+    return num.toLocaleString('fullwide', { useGrouping: false });
+  }
+
+  return value;
+};
