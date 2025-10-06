@@ -73,7 +73,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
 
   const isAuroraSubmit =
     ['submit', 'submit_with_args'].includes(methodName) &&
-    receiver.includes('aurora');
+    receiver === 'aurora';
 
   const modifiedData = isAuroraSubmit
     ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
@@ -264,7 +264,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
                 <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
                   <Tooltip
                     className="whitespace-nowrap"
-                    tooltip={<span>Smart formatted view (pretty JSON)</span>}
+                    tooltip={<span>Human-readable</span>}
                   >
                     <button
                       onClick={() => setViewMode('auto')}
