@@ -16,7 +16,20 @@ WITH
 SELECT
   ac.account_id,
   COALESCE(c.created, '{}'::JSONB) AS created,
-  COALESCE(d.deleted, '{}'::JSONB) AS deleted
+  COALESCE(d.deleted, '{}'::JSONB) AS deleted,
+  CASE
+    WHEN NOT EXISTS (
+      SELECT
+        1
+      FROM
+        access_keys
+      WHERE
+        account_id = ${account}
+        AND permission_kind = 'FULL_ACCESS'
+        AND deleted_by_block_timestamp IS NULL
+    ) THEN TRUE
+    ELSE FALSE
+  END AS locked
 FROM
   account_selected ac
   LEFT JOIN LATERAL (
