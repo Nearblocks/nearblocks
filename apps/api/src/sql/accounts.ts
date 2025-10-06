@@ -3,6 +3,12 @@ import { sql } from '#sql/index';
 export default {
   account: sql('queries/accounts/account.sql'),
   balance: sql('queries/accounts/balance.sql'),
+  contracts: {
+    action: sql('queries/accounts/contracts/action.sql'),
+    contract: sql('queries/accounts/contracts/contract.sql'),
+    deployments: sql('queries/accounts/contracts/deployments.sql'),
+    deploymentTxn: sql('queries/accounts/contracts/deploymentTxn.sql'),
+  },
   fts: {
     estimate: sql('queries/accounts/fts/estimate.sql'),
     txn: sql('queries/accounts/fts/txn.sql'),
