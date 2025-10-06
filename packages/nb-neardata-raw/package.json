@@ -11,7 +11,7 @@
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
   "devDependencies": {
-    "axios": "1.6.2",
+    "axios": "1.12.0",
     "eslint-config-custom-node": "*",
     "nb-logger": "*",
     "nb-tsconfig": "*",
