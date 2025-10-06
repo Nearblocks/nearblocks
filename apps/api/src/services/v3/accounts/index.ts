@@ -1,4 +1,9 @@
-import type { Account, AccountReq } from 'nb-schemas';
+import type {
+  Account,
+  AccountBalance,
+  AccountBalanceReq,
+  AccountReq,
+} from 'nb-schemas';
 import response from 'nb-schemas/dist/accounts/response.js';
 
 import { dbBalance, dbBase } from '#libs/pgp';
@@ -11,22 +16,23 @@ const account = responseHandler(
   async (req: RequestValidator<AccountReq>) => {
     const account = req.validator.account;
 
-    const [accounts, balance] = await Promise.all([
-      dbBase.oneOrNone<Pick<Account, 'account_id' | 'created' | 'deleted'>>(
-        sql.account,
-        { account },
-      ),
-      dbBalance.oneOrNone<Omit<Account, 'created' | 'deleted'>>(sql.balance, {
-        account,
-      }),
-    ]);
+    const data = await dbBase.oneOrNone<Account>(sql.account, { account });
 
-    if (!accounts || !balance) {
-      return { data: null };
-    }
-
-    return { data: { ...accounts, ...balance } };
+    return { data };
   },
 );
 
-export default { account };
+const balance = responseHandler(
+  response.balance,
+  async (req: RequestValidator<AccountBalanceReq>) => {
+    const account = req.validator.account;
+
+    const data = await dbBalance.oneOrNone<AccountBalance>(sql.balance, {
+      account,
+    });
+
+    return { data };
+  },
+);
+
+export default { account, balance };

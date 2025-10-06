@@ -85,3 +85,15 @@ export const dbMultichain = pgp({
   // TODO: remove before merge
   statement_timeout: 10 * 60 * 100, // 10s
 });
+
+/**
+ * Contract database connection.
+ */
+export const dbContract = pgp({
+  application_name: 'api-contract',
+  connectionString: config.dbUrlContract,
+  max: 20,
+  ssl: ssl?.ca ? ssl : false,
+  // TODO: remove before merge
+  statement_timeout: 10 * 60 * 100, // 10s
+});
