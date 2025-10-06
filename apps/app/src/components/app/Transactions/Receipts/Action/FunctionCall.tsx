@@ -96,13 +96,31 @@ const FunctionCall = (props: TransactionActionInfo) => {
     args?.method_name === 'submit_with_args';
   const isAuroraSubmit = isSubmit || isSubmitWithArgs;
   const modifiedData =
-    isAuroraSubmit && receiver?.includes('aurora')
+    isAuroraSubmit && receiver === 'aurora'
       ? { tx_bytes_b64: args.args_base64 || args.args }
       : args.args_base64 || args.args || encodeArgs(args?.args_json);
 
   const decodedData =
     args?.args_base64 || args?.args || encodeArgs(args?.args_json);
   const jsonStringifiedData = displayArgs(decodedData);
+  const extractArgsFromChosen = (chosen: any): any => {
+    if (!chosen) return null;
+
+    if (chosen.args?.args) {
+      return chosen.args.args;
+    }
+
+    if (chosen.args?.actions?.[0]?.args?.args) {
+      return chosen.args.actions[0].args.args;
+    }
+
+    if (chosen.args?.delegateAction?.actions?.[0]?.FunctionCall?.args) {
+      return chosen.args.delegateAction.actions[0].FunctionCall.args;
+    }
+
+    return null;
+  };
+
   const getRpcActionArg = () => {
     if (!rpcAction) return null;
 
@@ -117,7 +135,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
 
     const chosen = matchingRpc || rpcAction?.[0];
 
-    return chosen?.args?.args || chosen?.args?.actions?.[0]?.args?.args || null;
+    return extractArgsFromChosen(chosen);
   };
   const rpcActionArg = getRpcActionArg();
 
@@ -153,7 +171,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
         {shortenAddress(receiver)}
       </Link>
       {(args?.method_name || args?.methodName) === 'rlp_execute' ||
-      (isAuroraSubmit && receiver?.includes('aurora')) ? (
+      (isAuroraSubmit && receiver === 'aurora') ? (
         <RlpTransaction
           pretty={modifiedData}
           method={args?.method_name || args?.methodName}
@@ -165,7 +183,7 @@ const FunctionCall = (props: TransactionActionInfo) => {
             <div className="absolute top-2 mt-1 sm:!mr-4 right-2 flex">
               <Tooltip
                 className="whitespace-nowrap"
-                tooltip={<span>Smart formatted view (pretty JSON)</span>}
+                tooltip={<span>Human-readable</span>}
               >
                 <button
                   onClick={() => setViewMode('auto')}
