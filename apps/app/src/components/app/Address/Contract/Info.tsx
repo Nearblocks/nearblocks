@@ -182,12 +182,9 @@ const Info = ({ data }: Props) => {
             ) : (
               <div className="w-full md:w-3/4 break-words">
                 {rpcAccountInfo?.global_contract_hash && (
-                  <Link
-                    className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/address/${rpcAccountInfo?.global_contract_hash}`}
-                  >
+                  <div className="w-full md:w-3/4 break-words">
                     {rpcAccountInfo?.global_contract_hash}
-                  </Link>
+                  </div>
                 )}
               </div>
             )}
