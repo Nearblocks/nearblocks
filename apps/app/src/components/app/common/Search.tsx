@@ -149,6 +149,8 @@ const BaseSearch = ({
     setResult({});
     setKeyword('');
     setIsOpen(false);
+    setIsLoading(false);
+
     const searchInput = document.getElementsByClassName(
       'search',
     )[0] as HTMLInputElement;
@@ -173,10 +175,12 @@ const BaseSearch = ({
   useEffect(() => {
     const fetchData = async () => {
       if (!keyword) return;
+      setIsLoading(true);
       try {
         const cachedResults = await getSearchResults(keyword, filter);
         if (cachedResults) {
           setResult(cachedResults);
+          setIsLoading(false);
         }
         const data = await handleFilterAndKeyword(keyword, filter);
         setResult(data?.data ?? {});
@@ -207,6 +211,8 @@ const BaseSearch = ({
         }
       } catch (error) {
         console.error('Error in fetchData:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -222,11 +228,16 @@ const BaseSearch = ({
 
   const handleChange = (event: any) => {
     const { value: nextValue } = event.target;
-    if (nextValue === '') {
+    const sanitized = nextValue.replace(/[\s,]/g, '');
+    if (sanitized === '') {
       setResult({});
       debouncedSave.cancel();
+      setKeyword('');
+      setIsLoading(false);
+      return;
     }
-    debouncedSave(nextValue.replace(/[\s,]/g, ''));
+    setIsLoading(true);
+    debouncedSave(sanitized);
   };
 
   const onFilter = (event: any) => setFilter(event.target.value);
@@ -262,6 +273,10 @@ const BaseSearch = ({
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
+
+    if (isLoading) {
+      return;
+    }
 
     const text = (
       document.getElementsByClassName('search')[0] as HTMLInputElement
