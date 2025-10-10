@@ -17,6 +17,7 @@ import { AddressHoverProvider } from '@/components/app/common/HoverContextProvid
 import Header from '@/components/app/Layouts/Header';
 import Footer from '@/components/app/Layouts/Footer';
 import { locales } from '@/utils/app/config';
+import { useConfig } from '@/hooks/app/useConfig';
 
 const fallbackMessages = {
   header: {
@@ -89,6 +90,7 @@ const ErrorContent = ({ reset }: { reset: () => void }) => (
 export default function ErrorLayout({ reset }: { reset: () => void }) {
   const wallet = useWallet();
   const [messages, setMessages] = useState<any>(null);
+  const { networkId } = useConfig();
 
   const [signedAccountId, setSignedAccountId] = useState<any>(null);
   const theme = Cookies.get('theme') || 'light';
@@ -117,12 +119,12 @@ export default function ErrorLayout({ reset }: { reset: () => void }) {
   useEffect(() => {
     const initWallet = async () => {
       if (wallet && !wallet.selector) {
-        const accountId = await wallet.startUp(setSignedAccountId);
+        const accountId = await wallet.startUp(setSignedAccountId, networkId);
         setSignedAccountId(accountId);
       }
     };
     initWallet();
-  }, [wallet]);
+  }, [wallet, networkId]);
 
   return (
     <NextIntlClientProvider

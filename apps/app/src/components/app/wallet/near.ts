@@ -16,11 +16,6 @@ import { providers } from 'near-api-js';
 const THIRTY_TGAS = '30000000000000';
 const NO_DEPOSIT = '0';
 
-interface WalletConfig {
-  wagmiConfig: any;
-  web3Modal: any;
-}
-
 export class Wallet {
   /**
    * Makes a call to a contract
@@ -103,7 +98,6 @@ export class Wallet {
   networkId: string;
   // eslint-disable-next-line
   selector: any; // Make sure this is initialized later
-  walletConfig?: WalletConfig; // Store wallet config
 
   /**
    * Signs and sends transactions
@@ -148,22 +142,27 @@ export class Wallet {
   };
 
   /**
-   * Set the wallet config (wagmi and web3modal instances)
-   */
-  setWalletConfig = (config: WalletConfig) => {
-    this.walletConfig = config;
-  };
-
-  /**
    * To be called when the website loads
    * @param {Function} accountChangeHook - a function that is called when the user signs in or out
    * @returns {Promise<string>} - the accountId of the signed-in user
    */
   // eslint-disable-next-line
-  startUp = async (accountChangeHook: (arg0: any) => void) => {
-    if (!this.walletConfig) {
-      console.error('Wallet config not set. Call setWalletConfig first.');
-      return '';
+  startUp = async (accountChangeHook: (arg0: any) => void, network: string) => {
+    let currentWagmiAdapter: any;
+    let currentWeb3Modal: any;
+
+    if (network === 'testnet') {
+      const { wagmiAdapterTestnet, web3ModalTestnet } = await import(
+        '@/components/app/wallet/web3modalTestnet'
+      );
+      currentWagmiAdapter = wagmiAdapterTestnet;
+      currentWeb3Modal = web3ModalTestnet;
+    } else {
+      const { wagmiAdapterMainnet, web3ModalMainnet } = await import(
+        '@/components/app/wallet/web3modalMainnet'
+      );
+      currentWagmiAdapter = wagmiAdapterMainnet;
+      currentWeb3Modal = web3ModalMainnet;
     }
 
     // Initialize the wallet selector
@@ -172,8 +171,8 @@ export class Wallet {
         setupBitteWallet(),
         setupCoin98Wallet(),
         setupEthereumWallets({
-          wagmiConfig: this.walletConfig.wagmiConfig as any,
-          web3Modal: this.walletConfig.web3Modal as any,
+          wagmiConfig: currentWagmiAdapter.wagmiConfig as any,
+          web3Modal: currentWeb3Modal as any,
         }),
         setupLedger(),
         setupMintbaseWallet(),

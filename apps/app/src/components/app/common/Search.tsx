@@ -173,22 +173,32 @@ const BaseSearch = ({
     result?.mtTokens?.length > 0;
 
   useEffect(() => {
+    let isActive = true;
+
     const fetchData = async () => {
-      if (!keyword) return;
+      if (!keyword) {
+        setResult({});
+        setIsLoading(false);
+        return;
+      }
       setIsLoading(true);
       try {
         const cachedResults = await getSearchResults(keyword, filter);
+        if (!isActive) return;
         if (cachedResults) {
           setResult(cachedResults);
           setIsLoading(false);
+          return;
         }
         const data = await handleFilterAndKeyword(keyword, filter);
+        if (!isActive) return;
         setResult(data?.data ?? {});
         if (data?.data) {
           setSearchResults(data?.keyword, filter, data?.data);
         } else {
           if (indexers?.base && !indexers?.base?.sync) {
             const rpcData = await rpcSearch(keyword);
+            if (!isActive) return;
             if (filter !== '/tokens') {
               setResult(rpcData?.data ?? {});
               if (rpcData?.data) {
@@ -197,6 +207,7 @@ const BaseSearch = ({
             }
           } else {
             const fallbackRpcData = await rpcSearch(keyword);
+            if (!isActive) return;
             if (filter !== '/tokens') {
               setResult(fallbackRpcData?.data ?? {});
               if (fallbackRpcData?.data) {
@@ -210,13 +221,19 @@ const BaseSearch = ({
           }
         }
       } catch (error) {
+        if (!isActive) return;
         console.error('Error in fetchData:', error);
       } finally {
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchData();
+    return () => {
+      isActive = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, keyword]);
 
