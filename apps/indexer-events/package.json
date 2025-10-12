@@ -19,7 +19,8 @@
     "@sentry/node": "7.120.0",
     "axios": "1.7.8",
     "borsh": "2.0.0",
-    "envalid": "8.0.0"
+    "envalid": "8.0.0",
+    "hwp": "^0.4.1"
   },
   "devDependencies": {
     "@types/node": "~22.10",
