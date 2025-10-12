@@ -33,4 +33,4 @@ WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 COPY --from=neon-builder /app/index.node ./node_modules/nb-json/index.node
 
-CMD ["node", "--max-old-space-size=4096", "apps/indexer-receipts/dist/index.js"]
+CMD ["node", "apps/indexer-receipts/dist/index.js"]

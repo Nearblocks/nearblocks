@@ -41,7 +41,7 @@ export const syncData = async () => {
 
   for await (const message of stream as AsyncIterable<Message>) {
     // Temp batch processing
-    const concurrency = message.block.header.height - startBlock > 100 ? 25 : 1;
+    const concurrency = message.block.header.height - startBlock > 500 ? 250 : 1;
     prepareCache(message);
     messages.push(message);
 
@@ -80,7 +80,7 @@ export const onMessage = async (startBlock: number, message: Message) => {
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
-    if (message.block.header.height > startBlock + 25) {
+    if (message.block.header.height > startBlock + 250) {
       process.exit();
     }
   }
