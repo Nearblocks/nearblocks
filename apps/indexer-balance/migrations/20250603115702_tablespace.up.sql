@@ -6,4 +6,6 @@ SET
   );
 
 SELECT
-  add_compression_policy ('balance_events', BIGINT '3196800000000000'); -- 37d in ns
+  add_compression_policy ('balance_events', BIGINT '3196800000000000');
+
+-- 37d in ns
