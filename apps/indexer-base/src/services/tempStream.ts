@@ -19,7 +19,7 @@ export const syncData = async () => {
 
   if (!startBlockHeight && latestBlock) {
     logger.info(`last synced block: ${latestBlock}`);
-    startBlockHeight = +latestBlock - 25;
+    startBlockHeight = +latestBlock - 100;
   }
 
   const startBlock = startBlockHeight || 0;
@@ -28,7 +28,7 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    limit: 25,
+    limit: 100,
     s3Bucket: config.s3Bucket,
     s3Config: s3Config,
     start: startBlock,
