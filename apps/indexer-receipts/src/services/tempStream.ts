@@ -41,7 +41,8 @@ export const syncData = async () => {
 
   for await (const message of stream as AsyncIterable<Message>) {
     // Temp batch processing
-    const concurrency = message.block.header.height - startBlock > 500 ? 250 : 1;
+    const concurrency =
+      message.block.header.height - startBlock > 500 ? 250 : 1;
     prepareCache(message);
     messages.push(message);
 

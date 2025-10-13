@@ -54,7 +54,6 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
     isAuroraSubmit && receiver === 'aurora'
       ? decoded
       : decoded && jsonParser(decoded?.toString());
-
   const [format, setFormat] = useState('rlp');
   const [displayedArgs, setDisplayedArgs] = useState(
     parsed && jsonStringify(decodeTransaction(parsed), null, 2),
@@ -122,8 +121,40 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
       return decodeSubmitTransaction(parsed);
     } else if (method === 'submit_with_args') {
       return decodeSubmitWithArgsTransaction(parsed);
+    } else if (method === 'rlp_execute') {
+      return decodeRlpExecuteTransaction(parsed);
     }
     return parsed;
+  }
+
+  function decodeRlpExecuteTransaction(data: any) {
+    try {
+      if (!data || typeof data !== 'object') {
+        return data;
+      }
+
+      const { tx_bytes_b64, ...rest } = data;
+
+      if (!tx_bytes_b64 || !isBase64(tx_bytes_b64)) {
+        return data;
+      }
+
+      const input = ethers?.utils?.base64?.decode(tx_bytes_b64);
+      const txData = ethers?.utils?.parseTransaction(input);
+      const parsed = {
+        ...txData,
+        gasLimit: txData?.gasLimit?.toString(),
+        gasPrice: txData?.gasPrice?.toString(),
+        value: txData?.value?.toString(),
+      };
+      return {
+        ...rest,
+        tx_bytes_b64: parsed,
+      };
+    } catch (error) {
+      console.error('Failed to parse rlp_execute transaction:', error);
+      return data;
+    }
   }
 
   const handleFormatChange = (event: any) => {
@@ -137,7 +168,10 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
         break;
       case 'table':
         const tableData = decodeTransaction(parsed);
-        transformedArgs = tableData && jsonStringify(tableData, null, 2);
+        transformedArgs =
+          method === 'rlp_execute'
+            ? tableData?.tx_bytes_b64
+            : jsonStringify(tableData, null, 2);
         break;
       default:
         transformedArgs = parsed && jsonStringify(parsed, null, 2);
