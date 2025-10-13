@@ -66,18 +66,18 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     polledAction?.args;
 
   const methodName = action?.args?.method_name || action?.args?.methodName;
-
-  const isSubmitOrRlp = ['rlp_execute', 'submit', 'submit_with_args'].includes(
-    methodName,
-  );
-
-  const isAuroraSubmit =
-    ['submit', 'submit_with_args'].includes(methodName) &&
-    receiver === 'aurora';
-
-  const modifiedData = isAuroraSubmit
-    ? { tx_bytes_b64: action?.args.args_base64 || action?.args.args }
-    : action?.args.args_base64 || action?.args.args;
+  const isSubmit = methodName === 'submit';
+  const isSubmitWithArgs = methodName === 'submit_with_args';
+  const isAuroraSubmit = isSubmit || isSubmitWithArgs;
+  const modifiedData =
+    isAuroraSubmit && receiver === 'aurora'
+      ? {
+          tx_bytes_b64:
+            polledAction?.args.args_base64 || polledAction?.args.args,
+        }
+      : polledAction?.args.args_base64 ||
+        polledAction?.args.args ||
+        encodeArgs(polledAction?.args?.args_json);
 
   function parseNestedJSON(obj: any): any {
     if (typeof obj !== 'object' || obj === null) return obj;
@@ -142,7 +142,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
   const getRpcActionArg = () => {
     if (!rpcAction) return null;
 
-    const targetMethod = action?.args?.method_name || action?.args?.methodName;
+    const targetMethod = methodName;
 
     const matchingRpc = Array.isArray(rpcAction)
       ? rpcAction?.find((ra: any) => {
@@ -195,6 +195,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpcActionArg]);
+
   return (
     <div className="pb-3">
       <div
@@ -225,9 +226,7 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
         ) : null}
         {action?.kind === 'functionCall' ||
         action?.action_kind === 'FUNCTION_CALL' ? (
-          <div className="inline-flex text-sm">{`'${
-            action?.args?.method_name || action?.args?.methodName
-          }'`}</div>
+          <div className="inline-flex text-sm">{`'${methodName}'`}</div>
         ) : null}
         {onClick ? (
           <div className="ml-2">{isTxTypeActive ? '-' : '+'}</div>
@@ -252,9 +251,10 @@ const ReceiptKind = (props: ReceiptKindInfo) => {
       {isTxTypeActive ? (
         action?.kind === 'functionCall' ||
         action?.action_kind === 'FUNCTION_CALL' ? (
-          isSubmitOrRlp || isAuroraSubmit ? (
+          methodName === 'rlp_execute' ||
+          (isAuroraSubmit && receiver === 'aurora') ? (
             <RlpTransaction
-              method={action?.args?.method_name || action?.args?.methodName}
+              method={methodName}
               pretty={modifiedData}
               receiver={receiver}
             />
