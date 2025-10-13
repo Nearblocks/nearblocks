@@ -19,7 +19,6 @@ import { handleFilterAndKeyword } from '@/utils/app/actions';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
 import Cookies from 'js-cookie';
 import Notice from '@/components/app/common/Notice';
-import { useWeb3Modal } from '@/hooks/app/useWeb3modal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -43,7 +42,6 @@ const LayoutActions = ({
   const [signedAccountId, setSignedAccountId] = useState('');
   const wallet = useWallet();
   const { networkId } = useConfig();
-  const web3ModalInstances = useWeb3Modal();
   const searchParams = useSearchParams();
   const router = useIntlRouter();
   const query = searchParams?.get('q');
@@ -74,20 +72,15 @@ const LayoutActions = ({
   }, [signedAccountId, isLoading]);
 
   useEffect(() => {
-    if (wallet && web3ModalInstances) {
-      wallet.setWalletConfig({
-        wagmiConfig: web3ModalInstances.wagmiAdapter.wagmiConfig,
-        web3Modal: web3ModalInstances.web3Modal,
-      });
-
+    if (wallet) {
       wallet
-        .startUp(setSignedAccountId)
+        .startUp(setSignedAccountId, networkId)
         .catch((error) => {
           console.error('Error during wallet startup:', error);
         })
         .finally(() => setIsLoading(false));
     }
-  }, [wallet, web3ModalInstances]);
+  }, [wallet, networkId]);
 
   useEffect(() => {
     const redirect = (route: any) => {
