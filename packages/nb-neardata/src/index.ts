@@ -9,6 +9,7 @@ import { Message } from './type.js';
 export * from './type.js';
 
 export type BlockStreamConfig = {
+  apiKey: string;
   limit?: number;
   network: string;
   start: number;
@@ -54,13 +55,20 @@ export const camelCaseKeys = <T>(obj: T): T => {
   return newObj as T;
 };
 
-const fetchBlock = async (url: string, block: number): Promise<Message> => {
+const fetchBlock = async (
+  apiKey: string,
+  url: string,
+  block: number,
+): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await fetch(`${url}/v0/block/${block}`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(30000),
-      });
+      const response = await fetch(
+        `${url}/v0/block/${block}?apiKey=${apiKey}`,
+        {
+          method: 'GET',
+          signal: AbortSignal.timeout(30000),
+        },
+      );
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -78,13 +86,16 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
   );
 };
 
-const fetchFinal = async (url: string): Promise<Message> => {
+const fetchFinal = async (apiKey: string, url: string): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await fetch(`${url}/v0/last_block/final`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(30000),
-      });
+      const response = await fetch(
+        `${url}/v0/last_block/final?apiKey=${apiKey}`,
+        {
+          method: 'GET',
+          signal: AbortSignal.timeout(30000),
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`status: ${response.status}`);
@@ -99,6 +110,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
+  const apiKey = config.apiKey;
   const url = config.url ?? endpoint(config.network);
   const limit = config.limit ?? 10;
   let finalFetch = 0;
@@ -130,7 +142,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
       if ((!finalFetch || block - finalFetch >= 10) && remaining >= 10) {
         finalFetch = block;
-        const final = (await fetchFinal(url)).block.header.height;
+        const final = (await fetchFinal(apiKey, url)).block.header.height;
         const promises: Promise<Message>[] = [];
         const concurrency = Math.min(limit, final - block, remaining - 5);
 
@@ -138,7 +150,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
         if (concurrency > 0) {
           for (let i = 0; i < concurrency; i++) {
-            promises.push(fetchBlock(url, block + i));
+            promises.push(fetchBlock(apiKey, url, block + i));
           }
 
           const results = await Promise.all(promises);
@@ -157,7 +169,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
         }
       }
 
-      const result = await fetchBlock(url, block);
+      const result = await fetchBlock(apiKey, url, block);
 
       if (!result) {
         block++;

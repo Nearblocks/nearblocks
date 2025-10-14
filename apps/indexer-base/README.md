@@ -7,6 +7,7 @@ Base indexer works with basic information about blocks 🧱, transactions 💸, 
 ```
 DATABASE_URL=
 NETWORK=mainnet
+FASTNEAR_API_KEY=
 NEARLAKE_ACCESS_KEY=
 NEARLAKE_SECRET_KEY=
 S3_ENDPOINT=

@@ -11,6 +11,7 @@ export interface Config {
   delta: number;
   disableAutoSwitch: boolean;
   disableS3Upload: boolean;
+  fastnearApiKey: string;
   fastnearEndpoint?: string;
   genesisFile: string;
   genesisHeight: number;

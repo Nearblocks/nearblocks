@@ -72,6 +72,7 @@ export const syncData = async () => {
         }
 
         const stream = streamBlock({
+          apiKey: config.fastnearApiKey,
           limit: 50,
           network: config.network,
           start: startBlockHeight || config.genesisHeight,
