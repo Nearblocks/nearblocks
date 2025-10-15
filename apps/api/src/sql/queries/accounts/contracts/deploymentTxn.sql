@@ -19,5 +19,3 @@ FROM
 WHERE
   r.receipt_id = ${receipt_id}::TEXT
   AND r.included_in_block_timestamp = ${block_timestamp}::BIGINT
-LIMIT
-  2;

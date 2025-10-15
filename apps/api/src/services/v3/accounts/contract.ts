@@ -10,11 +10,11 @@ import type {
 } from 'nb-schemas';
 import response from 'nb-schemas/dist/accounts/response.js';
 
-import { getProvider } from '#libs/near.js';
+import { getProvider } from '#libs/near';
 import { dbBase, dbContract, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
-import { rollingWindow } from '#libs/response.js';
-import { abiSchema } from '#libs/utils.js';
+import { rollingWindow } from '#libs/response';
+import { abiSchema } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
