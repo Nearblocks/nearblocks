@@ -268,7 +268,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                 return `${log}`;
               }
             }
-            return `${log}`;
+            return JSON.stringify(log);
           })
           .join('\n\n')
       : logs
@@ -322,7 +322,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                 }
               }
             }
-            return `${log}`;
+            return JSON.stringify(log, null, 2);
           })
           .join('\n\n');
 
