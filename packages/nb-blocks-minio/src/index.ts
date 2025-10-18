@@ -72,21 +72,16 @@ const fetchJson = async (
   bucket: string,
   block: number,
 ) => {
-  try {
-    return await retry(
-      async () => {
-        const stream = await minioClient.getObject(bucket, `${block}.json`);
+  return retry(
+    async () => {
+      const stream = await minioClient.getObject(bucket, `${block}.json`);
 
-        return withTimeout(text(stream), 60_000, () => {
-          stream.destroy(new Error(`fetch timed out: block:${block}`));
-        });
-      },
-      { exponential: true, logger: retryLogger, retries: 3 },
-    );
-  } catch (error) {
-    logger.error(`fetchJson final failure for block ${block}:`, error);
-    throw error;
-  }
+      return withTimeout(text(stream), 60_000, () => {
+        stream.destroy(new Error(`fetch timed out: block:${block}`));
+      });
+    },
+    { exponential: true, logger: retryLogger, retries: 3 },
+  );
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
@@ -102,10 +97,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
     while (!isDestroyed) {
       try {
-        const blocks = await withTimeout(
-          fetchBlocks(knex, start, limit),
-          10_000,
-        );
+        const blocks = await withTimeout(fetchBlocks(knex, start, limit), 10_000);
 
         if (blocks.length === 0) {
           await sleep(100);
@@ -113,21 +105,9 @@ export const streamBlock = (config: BlockStreamConfig) => {
         }
 
         const jsons = await Promise.all(
-          blocks.map(async (block) => {
-            try {
-              return await fetchJson(
-                minioClient,
-                config.s3Bucket,
-                block.block_height,
-              );
-            } catch (error) {
-              logger.error(
-                `Failed to fetch block ${block.block_height} after retries:`,
-                error,
-              );
-              throw error; // Ensure error propagates
-            }
-          }),
+          blocks.map((block) =>
+            fetchJson(minioClient, config.s3Bucket, block.block_height),
+          ),
         );
 
         for (const json of jsons) {
@@ -137,8 +117,9 @@ export const streamBlock = (config: BlockStreamConfig) => {
           start = parsed.block.header.height;
         }
       } catch (error) {
-        logger.error(`Fatal error processing blocks from ${start}:`, error);
-        process.exit(1);
+        logger.error(`Error processing blocks from ${start}:`, error);
+        isDestroyed = true;
+        throw error;
       }
     }
   }
