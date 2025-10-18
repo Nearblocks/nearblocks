@@ -72,16 +72,21 @@ const fetchJson = async (
   bucket: string,
   block: number,
 ) => {
-  return retry(
-    async () => {
-      const stream = await minioClient.getObject(bucket, `${block}.json`);
+  try {
+    return await retry(
+      async () => {
+        const stream = await minioClient.getObject(bucket, `${block}.json`);
 
-      return withTimeout(text(stream), 60_000, () => {
-        stream.destroy(new Error(`fetch timed out: block:${block}`));
-      });
-    },
-    { exponential: true, logger: retryLogger, retries: 3 },
-  );
+        return withTimeout(text(stream), 60_000, () => {
+          stream.destroy(new Error(`fetch timed out: block:${block}`));
+        });
+      },
+      { exponential: true, logger: retryLogger, retries: 3 },
+    );
+  } catch (error) {
+    logger.error(`fetchJson failed for block ${block}, exiting:`, error);
+    process.exit(1);
+  }
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
@@ -131,14 +136,14 @@ export const streamBlock = (config: BlockStreamConfig) => {
       readable.destroy();
     }
 
-    process.exit();
+    process.exit(1);
   };
 
   readable.on('end', cleanup);
   readable.on('close', cleanup);
   readable.on('error', (error) => {
     logger.error(error);
-    process.exit();
+    process.exit(1);
   });
 
   return readable;
