@@ -96,30 +96,24 @@ export const streamBlock = (config: BlockStreamConfig) => {
     let start = config.start;
 
     while (!isDestroyed) {
-      try {
-        const blocks = await withTimeout(fetchBlocks(knex, start, limit), 10_000);
+      const blocks = await withTimeout(fetchBlocks(knex, start, limit), 10_000);
 
-        if (blocks.length === 0) {
-          await sleep(100);
-          continue;
-        }
+      if (blocks.length === 0) {
+        await sleep(100);
+        continue;
+      }
 
-        const jsons = await Promise.all(
-          blocks.map((block) =>
-            fetchJson(minioClient, config.s3Bucket, block.block_height),
-          ),
-        );
+      const jsons = await Promise.all(
+        blocks.map((block) =>
+          fetchJson(minioClient, config.s3Bucket, block.block_height),
+        ),
+      );
 
-        for (const json of jsons) {
-          const parsed: Message = JSON.parse(json);
+      for (const json of jsons) {
+        const parsed: Message = JSON.parse(json);
 
-          yield parsed;
-          start = parsed.block.header.height;
-        }
-      } catch (error) {
-        logger.error(`Error processing blocks from ${start}:`, error);
-        isDestroyed = true;
-        throw error;
+        yield parsed;
+        start = parsed.block.header.height;
       }
     }
   }
@@ -137,14 +131,14 @@ export const streamBlock = (config: BlockStreamConfig) => {
       readable.destroy();
     }
 
-    process.exit(1);
+    process.exit();
   };
 
   readable.on('end', cleanup);
   readable.on('close', cleanup);
   readable.on('error', (error) => {
-    logger.error('Stream error:', error);
-    process.exit(1);
+    logger.error(error);
+    process.exit();
   });
 
   return readable;
