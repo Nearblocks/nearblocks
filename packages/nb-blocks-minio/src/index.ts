@@ -76,7 +76,8 @@ const fetchJson = async (
     async () => {
       const stream = await minioClient.getObject(bucket, `${block}.json`);
 
-      return withTimeout(text(stream), 60_000, () => {
+      // TODO revert timeout to 60 seconds after backfill
+      return withTimeout(text(stream), 180_000, () => {
         stream.destroy(new Error(`fetch timed out: block:${block}`));
         logger.error(`Force exit after timeout on block ${block}`);
         process.exit(1);
