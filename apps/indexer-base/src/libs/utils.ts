@@ -4,6 +4,7 @@ import { snakeCase, toUpper } from 'lodash-es';
 import { logger } from 'nb-logger';
 import { ExecutionStatus, Message } from 'nb-neardata';
 import { ExecutionOutcomeStatus, Network } from 'nb-types';
+import { sleep } from 'nb-utils';
 
 import config from '#config';
 import knex from '#libs/knex';
@@ -65,4 +66,24 @@ export const checkFastnear = async () => {
   if (!block) throw new Error('No block');
   if (block.block_height - latestBlock.block.header.height > 100)
     throw new Error('Not in sync');
+};
+
+export const monitorProgress = async (): Promise<void> => {
+  let lastBlock: number | undefined;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const block = await knex('blocks').orderBy('block_height', 'desc').first();
+    const currentBlock = block?.block_height;
+
+    if (lastBlock && currentBlock && lastBlock === +currentBlock) {
+      throw new Error(`indexing stalled... block: ${currentBlock}`);
+    }
+
+    if (currentBlock) {
+      lastBlock = +currentBlock;
+    }
+
+    await sleep(30_000); // 30s
+  }
 };

@@ -125,14 +125,20 @@ export const streamBlock = (config: BlockStreamConfig) => {
   });
 
   const fetchBlocks = async () => {
-    if (isFetching) return;
+    if (isFetching) {
+      logger.warn({ block, fetching: false });
+      return;
+    }
 
     isFetching = true;
 
     try {
       const remaining = highWaterMark - readable.readableLength;
 
-      if (remaining < 5) return;
+      if (remaining < 5) {
+        logger.warn({ block, remaining });
+        return;
+      }
 
       logger.warn({
         fetchingBlock: block,
@@ -140,7 +146,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
         queueSize: readable.readableLength,
       });
 
-      if ((!finalFetch || block - finalFetch >= 10) && remaining >= 10) {
+      if ((!finalFetch || block - finalFetch >= 25) && remaining >= 10) {
         finalFetch = block;
         const final = (await fetchFinal(apiKey, url)).block.header.height;
         const promises: Promise<Message>[] = [];
@@ -160,6 +166,12 @@ export const streamBlock = (config: BlockStreamConfig) => {
               const message: Message = camelCaseKeys(result);
 
               if (!readable.push(message)) {
+                logger.warn({
+                  block,
+                  concurrency,
+                  push: false,
+                  results: results.length,
+                });
                 return;
               }
 
@@ -172,23 +184,27 @@ export const streamBlock = (config: BlockStreamConfig) => {
       const result = await fetchBlock(apiKey, url, block);
 
       if (!result) {
+        logger.warn({ block, result: false });
         block++;
         return;
       }
 
       if (!readable.push(camelCaseKeys(result))) {
+        logger.warn({ block, push: false });
         return;
       }
 
       block++;
     } catch (error) {
+      logger.warn({ block, destroy: true });
       readable.destroy(error as Error);
     } finally {
+      logger.warn({ block, finally: false });
       isFetching = false;
     }
   };
 
-  const interval = setInterval(fetchBlocks, 100);
+  const interval = setInterval(fetchBlocks, 250);
 
   readable.on('close', () => clearInterval(interval));
 

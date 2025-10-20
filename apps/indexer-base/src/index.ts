@@ -4,6 +4,7 @@ import config from '#config';
 import { server } from '#libs/http';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
+import { monitorProgress } from '#libs/utils';
 import { syncCollidedTxns } from '#services/collidedTxns';
 import { syncGenesis } from '#services/genesis';
 import { syncData } from '#services/stream';
@@ -16,7 +17,7 @@ import { syncData } from '#services/stream';
     logger.info('syncing collided txn data...');
     await syncCollidedTxns();
     logger.info('syncing blockchain data...');
-    await syncData();
+    await Promise.all([syncData(), monitorProgress()]);
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);
