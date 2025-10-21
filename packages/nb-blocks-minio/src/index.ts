@@ -79,8 +79,6 @@ const fetchJson = async (
       // TODO revert timeout to 60 seconds after backfill
       return withTimeout(text(stream), 180_000, () => {
         stream.destroy(new Error(`fetch timed out: block:${block}`));
-        logger.error(`Force exit after timeout on block ${block}`);
-        process.exit(1);
       });
     },
     { exponential: true, logger: retryLogger, retries: 3 },
