@@ -106,8 +106,11 @@ const BaseSearch = ({
   const [filter, setFilter] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { getSearchResults, setSearchResults, clearSearchHistory } =
-    useSearchHistory();
+  const {
+    getSearchResults,
+    setSearchResults,
+    //  clearSearchHistory
+  } = useSearchHistory();
   const containerRef: any = useRef<HTMLDivElement>(null);
   const indexers = useStatsStore((state) => state.syncStatus);
   const isLocale = (value: null | string): any => {
@@ -328,15 +331,15 @@ const BaseSearch = ({
     }
   };
 
-  const handleClearHistory = async () => {
-    await clearSearchHistory();
-    reset();
-    toast.success(
-      <div className="whitespace-nowrap text-sm">
-        Search history cleared successfully
-      </div>,
-    );
-  };
+  // const handleClearHistory = async () => {
+  //   await clearSearchHistory();
+  //   reset();
+  //   toast.success(
+  //     <div className="whitespace-nowrap text-sm">
+  //       Search history cleared successfully
+  //     </div>,
+  //   );
+  // };
 
   return (
     <form
@@ -529,12 +532,12 @@ const BaseSearch = ({
                 </>
               )}
             </>
-            <div
+            {/* <div
               onClick={handleClearHistory}
               className="items-center flex justify-center text-xs bg-gray-100 hover:bg-neargray-700 dark:hover:bg-black-200 dark:bg-black-500 cursor-pointer focus:outline-none border dark:border-black-200 text-nearblue-600 dark:text-neargray-10 m-2 px-2 py-1 rounded m"
             >
               Clear Search History
-            </div>
+            </div> */}
           </div>
         )}
       </div>
