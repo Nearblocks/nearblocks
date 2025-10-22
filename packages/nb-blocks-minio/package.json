@@ -1,6 +1,6 @@
 {
   "name": "nb-blocks-minio",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "eslint-config-custom-node": "*",
-    "minio": "~8.0.5",
+    "minio": "8.0.4",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-tsconfig": "*",
