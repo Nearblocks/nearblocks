@@ -1,5 +1,9 @@
 import { getRequest } from '@/utils/app/api';
 import AccountOverviewActions from '@/components/app/Address/AccountOverviewActions';
+import {
+  intentsTokenPricesApiUrl,
+  refFinanceTokenPricesApiUrl,
+} from '@/utils/app/config';
 
 export default async function AccountOverview({ id }: any) {
   const accountData = getRequest(`v1/account/${id}`);
@@ -14,6 +18,22 @@ export default async function AccountOverview({ id }: any) {
     {},
     false,
   );
+  const intentsTokenPrices = intentsTokenPricesApiUrl
+    ? getRequest(
+        intentsTokenPricesApiUrl,
+        {},
+        { next: { revalidate: 90 } },
+        false,
+      )
+    : Promise.resolve([]);
+  const refTokenPrices = refFinanceTokenPricesApiUrl
+    ? getRequest(
+        refFinanceTokenPricesApiUrl,
+        {},
+        { next: { revalidate: 90 } },
+        false,
+      )
+    : Promise.resolve([]);
 
   return (
     <AccountOverviewActions
@@ -24,6 +44,8 @@ export default async function AccountOverview({ id }: any) {
       statsDataPromise={statsData}
       tokenDataPromise={tokenData}
       syncDataPromise={syncData}
+      intentsTokenPricesPromise={intentsTokenPrices}
+      refTokenPricesPromise={refTokenPrices}
     />
   );
 }

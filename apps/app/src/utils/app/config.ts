@@ -24,6 +24,12 @@ export const apiUrl: string =
 
 export const apiUrlBeta: string | undefined = process.env.API_BETA_URL;
 
+export const intentsTokenPricesApiUrl: string =
+  networkId === 'mainnet' ? 'https://1click.chaindefuser.com/v0/tokens' : '';
+
+export const refFinanceTokenPricesApiUrl: string =
+  networkId === 'mainnet' ? 'https://indexer.ref.finance/list-token-price' : '';
+
 export const appUrl =
   process.env.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
     ? process.env.NEXT_PUBLIC_MAINNET_URL

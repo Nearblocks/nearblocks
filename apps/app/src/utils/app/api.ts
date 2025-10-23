@@ -32,7 +32,7 @@ export const getRequest = async (
       signal: controller.signal,
       ...options,
     };
-    const response = await fetch(url, useBase ? mergedOptions : {});
+    const response = await fetch(url, useBase ? mergedOptions : options);
     clearTimeout(timeoutId);
 
     if (response.status !== 200) {
