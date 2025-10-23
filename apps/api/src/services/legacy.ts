@@ -25,7 +25,7 @@ const supply = catchAsync(
       `,
     );
 
-    let circulatingSupply = rows?.[0]?.circulating_supply;
+    let circulatingSupply = rows?.[0]?.total_supply;
     if (unit === 'near') {
       circulatingSupply = (+yoctoToNear(circulatingSupply)).toFixed();
 
@@ -41,7 +41,7 @@ const supply = catchAsync(
     }
 
     return res.status(200).json({
-      circulating_supply_in_yoctonear: rows?.[0]?.circulating_supply,
+      circulating_supply_in_yoctonear: rows?.[0]?.total_supply,
       timestamp: msToNsTime(dayjs.utc().startOf('day').valueOf()),
     });
   },
