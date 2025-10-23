@@ -26,7 +26,7 @@ const jobs: Bree.JobOptions[] = [
   { cron: '*/15 * * * * *', hasSeconds: true, name: 'stats' }, // every 15s
   // { cron: '1 0 * * *', name: 'daily-stats', timeout: '5s' }, // every day at 00:01:00
   { cron: '1 0 * * *', name: 'daily-stats-new', timeout: '15s' }, // every day at 00:01:00
-  { cron: '0 */12 * * *', name: 'circulating-supply', timeout: '30s' }, // run every 12h for now
+  // { cron: '0 */12 * * *', name: 'circulating-supply', timeout: '30s' }, // run every 12h for now
   { cron: '* * * * *', name: 'ft-meta' }, // every minute
   { cron: '* * * * *', name: 'ft-market-data' }, // every minute
   { cron: '* * * * *', name: 'ft-market-search' }, // every minute
