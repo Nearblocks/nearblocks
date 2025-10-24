@@ -2247,3 +2247,23 @@ export type RpcProvider = {
   url: string;
   isCustom?: boolean;
 };
+
+export type IntentsTokenPrices = {
+  assetId: string;
+  decimals: number;
+  blockchain: string;
+  symbol: string;
+  price: number;
+  priceUpdatedAt: string;
+  contractAddress?: string;
+};
+
+export type RefFinanceTokenPrice = {
+  price: string;
+  symbol: string;
+  decimal: number;
+};
+
+export type RefFinanceTokenPrices = {
+  [contractAddress: string]: RefFinanceTokenPrice;
+};

@@ -7,12 +7,21 @@ import {
 } from '@/components/ui/popover';
 import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat, truncateString } from '@/utils/libs';
-import { Inventory, InventoryInfo, mts, TokenListInfo } from '@/utils/types';
+import {
+  Inventory,
+  InventoryInfo,
+  mts,
+  TokenListInfo,
+  IntentsTokenPrices,
+} from '@/utils/types';
 
 import ArrowDown from '@/components/app/Icons/ArrowDown';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { priceFormat } from '@/utils/app/libs';
 import Big from 'big.js';
+import { useMemo } from 'react';
+
+const NEP141_PREFIX = 'nep141:';
 
 interface Props {
   appUrl?: string;
@@ -26,6 +35,7 @@ interface Props {
   loading?: boolean;
   spamTokens?: string[];
   mtsData: mts;
+  intentsTokenPrices?: IntentsTokenPrices[];
 }
 
 const TokenHoldings = (props: Props) => {
@@ -33,6 +43,24 @@ const TokenHoldings = (props: Props) => {
   const ft = props?.ft?.tokens?.filter((token) => token?.contract !== 'aurora'); // The 'aurora' token has been removed from the list of tokens due to its role as a proxy contract for the ETH bridge on the NEAR
   const nfts = props?.data?.nfts || [];
   const inventoryData: Inventory = props?.mtsData?.inventory;
+
+  const priceMap = useMemo(() => {
+    const map = new Map<string, number>();
+    if (props?.intentsTokenPrices && Array.isArray(props?.intentsTokenPrices)) {
+      props?.intentsTokenPrices?.forEach((token: IntentsTokenPrices) => {
+        if (token?.contractAddress) {
+          map?.set(token?.contractAddress, token?.price);
+        }
+        if (token?.assetId) {
+          const cleanAssetId = token?.assetId?.startsWith(NEP141_PREFIX)
+            ? token?.assetId?.substring(NEP141_PREFIX?.length).split(':')[0]
+            : token?.assetId;
+          map?.set(cleanAssetId, token?.price);
+        }
+      });
+    }
+    return map;
+  }, [props?.intentsTokenPrices]);
 
   const mt = (inventoryData?.mts || [])?.map((token) => {
     const rawAmount = token?.amount;
@@ -48,6 +76,15 @@ const TokenHoldings = (props: Props) => {
         ? Big(rawAmount).div(Big(10).pow(decimals)).toString()
         : '0';
 
+    const contractFromTokenId = token?.token_id?.startsWith(NEP141_PREFIX)
+      ? token?.token_id.substring(NEP141_PREFIX?.length).split(':')[0]
+      : token?.contract;
+    const priceFromApi =
+      priceMap.get(contractFromTokenId) || priceMap.get(token?.contract) || 0;
+    const amountUsd =
+      priceFromApi > 0 && humanReadableAmount !== '0'
+        ? Big(humanReadableAmount).mul(Big(priceFromApi)).toString()
+        : '0';
     return {
       contract: token?.contract,
       mt_meta: {
@@ -57,7 +94,7 @@ const TokenHoldings = (props: Props) => {
           ? token?.meta?.symbol
           : token?.meta?.base?.symbol,
         icon: token?.meta?.icon ? token?.meta?.icon : token?.meta?.base?.icon,
-        price: '0',
+        price: priceFromApi > 0 ? String(priceFromApi) : '0',
         decimals: token?.meta?.decimals
           ? token?.meta?.decimals
           : token?.meta?.base?.decimals,
@@ -68,7 +105,7 @@ const TokenHoldings = (props: Props) => {
         media: token?.meta?.token?.media,
       },
       rpcAmount: humanReadableAmount,
-      amountUsd: '0',
+      amountUsd: amountUsd,
       token_id: token.token_id,
     };
   });

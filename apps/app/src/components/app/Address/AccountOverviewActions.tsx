@@ -5,7 +5,12 @@ import React, { use, useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
-import { FtInfo, TokenListInfo } from '@/utils/types';
+import {
+  FtInfo,
+  TokenListInfo,
+  IntentsTokenPrices,
+  RefFinanceTokenPrices,
+} from '@/utils/types';
 import TokenHoldings from '@/components/app/common/TokenHoldings';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 import { useParams } from 'next/navigation';
@@ -21,6 +26,8 @@ const AccountOverviewActions = ({
   statsDataPromise,
   tokenDataPromise,
   mtsDataPromise,
+  intentsTokenPricesPromise,
+  refTokenPricesPromise,
 }: {
   accountDataPromise: Promise<any>;
   inventoryDataPromise: Promise<any>;
@@ -30,6 +37,8 @@ const AccountOverviewActions = ({
   statsDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
   syncDataPromise: Promise<any>;
+  intentsTokenPricesPromise: Promise<IntentsTokenPrices[]>;
+  refTokenPricesPromise: Promise<RefFinanceTokenPrices>;
 }) => {
   const account = use(accountDataPromise);
   const stats = use(statsDataPromise);
@@ -37,6 +46,8 @@ const AccountOverviewActions = ({
   const inventory = use(inventoryDataPromise);
   const spam = use(spamTokensPromise);
   const mtsData = use(mtsDataPromise);
+  const intentsTokenPrices = use(intentsTokenPricesPromise);
+  const refTokenPrices = use(refTokenPricesPromise);
   const accountData = account?.account?.[0];
   const statsData = stats?.stats?.[0];
   const tokenData = token?.contracts?.[0];
@@ -77,11 +88,18 @@ const AccountOverviewActions = ({
               ? Big(amount).div(Big(10).pow(+ft.ft_meta.decimals))
               : Big(0);
           }
-          if (ft?.ft_meta?.price) {
-            sum = rpcAmount.mul(Big(ft?.ft_meta?.price));
+          const refPrice = refTokenPrices?.[ft?.contract]?.price;
+          const tokenPrice = refPrice || ft?.ft_meta?.price;
+
+          if (tokenPrice) {
+            sum = rpcAmount.mul(Big(tokenPrice));
             total = total.add(sum);
             return pricedTokens.push({
               ...ft,
+              ft_meta: {
+                ...ft?.ft_meta,
+                price: tokenPrice,
+              },
               amountUsd: sum?.toString(),
               rpcAmount: rpcAmount?.toString(),
             });
@@ -116,7 +134,7 @@ const AccountOverviewActions = ({
     };
     loadBalances();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, params?.id]);
+  }, [inventoryData?.fts, params?.id, refTokenPrices]);
 
   return (
     <div className="w-full">
@@ -195,6 +213,7 @@ const AccountOverviewActions = ({
                 loading={loading}
                 spamTokens={spamTokens?.blacklist}
                 mtsData={mtsData}
+                intentsTokenPrices={intentsTokenPrices}
               />
             </div>
           </div>
