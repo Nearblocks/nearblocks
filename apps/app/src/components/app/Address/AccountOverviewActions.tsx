@@ -70,13 +70,14 @@ const AccountOverviewActions = ({
     const loadBalances = async () => {
       // Temporary deduplication for eth.bridge.near contracts
       // Remove after API v3 migration completes
-      const fts = inventoryData?.fts.filter(
-        (token: TokenListInfo) =>
-          !(
-            token?.ft_meta?.price === null &&
-            token?.contract === 'eth.bridge.near'
-          ),
-      );
+      const fts =
+        inventoryData?.fts?.filter(
+          (token: TokenListInfo) =>
+            !(
+              token?.ft_meta?.price === null &&
+              token?.contract === 'eth.bridge.near'
+            ),
+        ) ?? [];
       let total = Big(0);
       const tokens: TokenListInfo[] = [];
       const pricedTokens: TokenListInfo[] = [];
