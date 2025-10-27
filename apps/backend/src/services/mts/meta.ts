@@ -1,16 +1,19 @@
-import { viewFunctionAsJson } from '@near-js/jsonrpc-client/no-validation';
-
 import { logger } from 'nb-logger';
 
 import dayjs from '#libs/dayjs';
 import { upsertError } from '#libs/events';
-import { dbEvents, pgp } from '#libs/pgp';
-import { rpc } from '#libs/rpc';
-import { encodeArgs } from '#libs/utils';
-import { MTContractMetadata, MTTokenMetadataInfo } from '#types/types';
+import { dbEvents } from '#libs/knex';
+import { fetchMTMeta, fetchMTTokenMeta } from '#libs/near';
+import {
+  MetaContract,
+  MetaContractToken,
+  MTContractMetadata,
+  MTTokenMetadataInfo,
+  Raw,
+} from '#types/types';
 
 export const syncMTMeta = async () => {
-  const mts = await dbEvents.manyOrNone(`
+  const { rows: mts } = await dbEvents.raw<Raw<MetaContract>>(`
     SELECT
       contract
     FROM
@@ -35,8 +38,47 @@ export const syncMTMeta = async () => {
   await Promise.all(mts.map((mt) => updateMTMeta(mt.contract)));
 };
 
+export const refreshMTMeta = async () => {
+  const { rows: mts } = await dbEvents.raw<Raw<MetaContract>>(
+    `
+      SELECT
+        contract
+      FROM
+        mt_meta
+      WHERE
+        modified_at < ?
+      ORDER BY
+        modified_at ASC
+      LIMIT
+        10
+    `,
+    [dayjs.utc().subtract(7, 'day').toISOString()],
+  );
+
+  await Promise.all(
+    mts.map(async (mt) => {
+      const meta = await fetchMTMeta(mt.contract);
+
+      if (meta) {
+        await updateMeta(mt.contract, meta);
+      } else {
+        await dbEvents.raw(
+          `
+            UPDATE mt_meta
+            SET
+              modified_at = ?
+            WHERE
+              contract = ?
+          `,
+          [dayjs.utc().toISOString(), mt.contract],
+        );
+      }
+    }),
+  );
+};
+
 export const syncMTTokenMeta = async () => {
-  const mts = await dbEvents.manyOrNone(`
+  const { rows: mts } = await dbEvents.raw<Raw<MetaContractToken>>(`
     SELECT
       contract,
       token
@@ -64,190 +106,130 @@ export const syncMTTokenMeta = async () => {
 
 export const updateMTMeta = async (contract: string) => {
   try {
-    const meta = await viewFunctionAsJson<MTContractMetadata>(rpc, {
-      accountId: contract,
-      methodName: 'mt_metadata_contract',
-    });
+    const meta = await fetchMTMeta(contract);
 
-    if (meta?.name) {
-      const data = {
-        contract,
-        modified_at: dayjs.utc().toISOString(),
-        name: meta.name,
-        spec: meta.spec,
-      };
-
-      try {
-        const columns = new pgp.helpers.ColumnSet(Object.keys(data), {
-          table: 'mt_meta',
-        });
-
-        await dbEvents.none(
-          pgp.helpers.insert(data, columns) +
-            ` ON CONFLICT (contract) DO UPDATE SET ` +
-            columns.assignColumns({ from: 'EXCLUDED', skip: ['contract'] }),
-        );
-      } catch (error) {
-        logger.error(error);
-      }
+    if (meta) {
+      await updateMeta(contract, meta);
     } else {
       await upsertError(contract, 'mt', null);
     }
   } catch (error) {
+    logger.error(`tokenMeta: updateMTMeta: ${contract}`);
     logger.error(error);
     await upsertError(contract, 'mt', null);
   }
 };
 
+const updateMeta = async (contract: string, meta: MTContractMetadata) => {
+  const data = {
+    modified_at: dayjs.utc().toISOString(),
+    name: meta.name,
+    spec: meta.spec,
+  };
+
+  try {
+    await dbEvents('mt_meta').where('contract', contract).update(data);
+  } catch (error) {
+    logger.error(`tokenMeta: updateMeta: ${contract}`);
+    logger.error(error);
+  }
+};
+
 export const updateMTTokenMeta = async (contract: string, token: string) => {
   try {
-    const metas = await viewFunctionAsJson<MTTokenMetadataInfo[]>(rpc, {
-      accountId: contract,
-      argsBase64: encodeArgs({ token_ids: [token] }),
-      methodName: 'mt_metadata_token_all',
-    });
-    const meta = metas?.[0];
+    const meta = await fetchMTTokenMeta(contract, token);
 
-    if (meta?.base && meta?.token) {
-      const baseData = {
-        base_uri: meta.base.base_uri,
-        contract,
-        copies: meta.base.copies,
-        decimals: meta.base.decimals,
-        icon: meta.base.icon,
-        modified_at: dayjs.utc().toISOString(),
-        name: meta.base.name,
-        reference: meta.base.reference,
-        reference_hash: meta.base.reference_hash,
-        symbol: meta.base.symbol,
-        token: meta.base.id,
-      };
-      const tokenData = {
-        contract,
-        description: meta.token.description,
-        expires_at: meta.token.expires_at,
-        extra: meta.token.extra,
-        issued_at: meta.token.issued_at,
-        media: meta.token.media,
-        media_hash: meta.token.media_hash,
-        modified_at: dayjs.utc().toISOString(),
-        reference: meta.token.reference,
-        reference_hash: meta.token.reference_hash,
-        starts_at: meta.token.starts_at,
-        title: meta.token.title,
-        token,
-        updated_at: meta.token.updated_at,
-      };
-
-      try {
-        const baseColumns = new pgp.helpers.ColumnSet(Object.keys(baseData), {
-          table: 'mt_base_meta',
-        });
-        const tokenColumns = new pgp.helpers.ColumnSet(Object.keys(tokenData), {
-          table: 'mt_token_meta',
-        });
-
-        return await dbEvents.tx(async (tx) => {
-          await Promise.all([
-            tx.none(
-              pgp.helpers.insert(baseData, baseColumns) +
-                ` ON CONFLICT (contract, token) DO UPDATE SET ` +
-                baseColumns.assignColumns({
-                  from: 'EXCLUDED',
-                  skip: ['contract', 'token'],
-                }),
-            ),
-            tx.none(
-              pgp.helpers.insert(tokenData, tokenColumns) +
-                ` ON CONFLICT (contract, token) DO UPDATE SET ` +
-                tokenColumns.assignColumns({
-                  from: 'EXCLUDED',
-                  skip: ['contract', 'token'],
-                }),
-            ),
-          ]);
-        });
-      } catch (error) {
-        logger.error(error);
-      }
+    if (meta) {
+      await updateTokenMeta(contract, token, meta);
     } else {
       await upsertError(contract, 'mt', token);
     }
   } catch (error) {
+    logger.error(`tokenMeta: updateMTTokenMeta: ${contract}: ${token}`);
     logger.error(error);
     await upsertError(contract, 'mt', token);
   }
 };
 
-export const syncExistingMT = async () => {
-  await dbEvents.manyOrNone(`
-    INSERT INTO
-      mt_meta (contract)
-    SELECT DISTINCT
-      contract_account_id
-    FROM
-      mt_events
-    ON CONFLICT (contract) DO NOTHING
-  `);
+const updateTokenMeta = async (
+  contract: string,
+  token: string,
+  meta: MTTokenMetadataInfo,
+) => {
+  const baseData = {
+    base_uri: meta.base.base_uri,
+    copies: meta.base.copies,
+    decimals: meta.base.decimals,
+    icon: meta.base.icon,
+    modified_at: dayjs.utc().toISOString(),
+    name: meta.base.name,
+    reference: meta.base.reference,
+    reference_hash: meta.base.reference_hash,
+    symbol: meta.base.symbol,
+  };
+  const tokenData = {
+    description: meta.token.description,
+    expires_at: meta.token.expires_at,
+    extra: meta.token.extra,
+    issued_at: meta.token.issued_at,
+    media: meta.token.media,
+    media_hash: meta.token.media_hash,
+    modified_at: dayjs.utc().toISOString(),
+    reference: meta.token.reference,
+    reference_hash: meta.token.reference_hash,
+    starts_at: meta.token.starts_at,
+    title: meta.token.title,
+    updated_at: meta.token.updated_at,
+  };
+
+  try {
+    await dbEvents.transaction(async (tx) => {
+      return Promise.all([
+        tx('mt_base_meta')
+          .where('contract', contract)
+          .where('token', token)
+          .update(baseData),
+        tx('mt_token_meta')
+          .where('contract', contract)
+          .where('token', token)
+          .update(tokenData),
+      ]);
+    });
+  } catch (error) {
+    logger.error(`tokenMeta: updateTokenMeta: ${contract}: ${token}`);
+    logger.error(error);
+  }
 };
 
-export const syncExistingMTToken = async () => {
-  await dbEvents.manyOrNone(`
-    WITH
-      tokens AS (
-        SELECT DISTINCT
-          contract_account_id AS contract,
-          token_id AS token
-        FROM
-          mt_events
-      ),
-      base_meta AS (
-        INSERT INTO
-          mt_base_meta (contract, token)
-        SELECT
-          contract,
-          token
-        FROM
-          tokens
-        ON CONFLICT (contract, token) DO NOTHING
-      )
-    INSERT INTO
-      mt_token_meta (contract, token)
-    SELECT
-      contract,
-      token
-    FROM
-      tokens
-    ON CONFLICT (contract, token) DO NOTHING
-  `);
-};
-
-export const syncExistingIntents = async () => {
-  await dbEvents.manyOrNone(`
-    WITH
-      contracts AS (
-        SELECT DISTINCT
-          contract_account_id AS contract,
-          token_id AS token_id,
-          split_part(token_id, ':', 1) AS type,
-          substring(
-            token_id
-            from
-              position(':' in token_id) + 1
-          ) AS token
-        FROM
-          mt_events me
-        WHERE
-          contract_account_id = 'intents.near'
-      )
-    INSERT INTO
-      intents_meta (contract, type, token)
-    SELECT
-      contract,
-      type,
-      token
-    FROM
-      contracts
-    ON CONFLICT (contract, type, token) DO NOTHING
-  `);
+export const resetMTMeta = async (contracts: string[]) => {
+  try {
+    await dbEvents.transaction(async (tx) => {
+      return Promise.all([
+        tx.raw(
+          `
+            UPDATE mt_meta
+            SET
+              modified_at = NULL
+            WHERE
+              contract = ANY(?)
+              AND modified_at IS NOT NULL
+          `,
+          [contracts],
+        ),
+        tx.raw(
+          `
+            DELETE FROM errored_contracts
+            WHERE
+              contract = ANY(?)
+              AND type = ?
+              AND token IS NULL
+          `,
+          [contracts, 'mt'],
+        ),
+      ]);
+    });
+  } catch (error) {
+    logger.error(`tokenMetaReset: resetMTMeta: ${contracts.join(',')}`);
+    logger.error(error);
+  }
 };

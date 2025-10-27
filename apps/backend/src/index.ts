@@ -1,19 +1,20 @@
-import cron from 'node-cron';
-
 import { logger as log } from 'nb-logger';
 
-import { pgp } from '#libs/pgp';
+import { scheduleJobs } from '#cron';
+import { dbBase, dbContracts, dbEvents } from '#libs/knex';
 import sentry from '#libs/sentry';
 
-cron.schedule('*/15 * * * * *', './jobs/meta.js', { noOverlap: true }); // every 15s
-// cron.schedule('0 0 * * *', './jobs/metaExisting.js', {
-//   maxExecutions: 1,
-//   noOverlap: true,
-// }); // only once
+// schedule cron jobs
+scheduleJobs();
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([pgp.end(), sentry.close(1000)]);
+    await Promise.all([
+      dbBase.destroy(),
+      dbContracts.destroy(),
+      dbEvents.destroy(),
+      sentry.close(1000),
+    ]);
   } catch (error) {
     log.error(error);
   }
