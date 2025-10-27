@@ -1,14 +1,15 @@
 import { Fragment } from 'react';
 
-import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
+import { ReceiptsPropsInfo } from '@/utils/types';
 
 import FaTimesCircle from '@/components/app/Icons/FaTimesCircle';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;
   setShow: (id: string) => any | void;
   show: string;
-  txn: TransactionInfo;
+  txn: Txn;
 }
 
 const TreeReceipt = (props: Props) => {

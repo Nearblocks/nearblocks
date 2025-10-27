@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 import { Link } from '@/i18n/routing';
-import { getRequest } from '@/utils/app/api';
+import { getRequest, getRequestBeta } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
 import FAQ from '@/components/app/Tokens/FT/FAQ';
@@ -31,12 +31,18 @@ export default async function TokenTabs({
     },
     info: { api: `v1/fts/${id}` },
     transfers: {
-      api: `v1/fts/${id}/txns`,
+      api: `v3/fts/${id}/txns`,
     },
   };
 
   const tabApi = tabApiUrls[selectedTab as TabType];
   const fetchUrl = `${tabApi?.api}`;
+
+  const fetchData = (url: string, params: any, opts?: RequestInit) => {
+    return url.startsWith('v3')
+      ? getRequestBeta(url, params, opts)
+      : getRequest(url, params, opts);
+  };
 
   const [
     dataResult,
@@ -47,9 +53,9 @@ export default async function TokenTabs({
     accountDetails,
     contractResult,
   ] = await Promise.all([
-    getRequest(fetchUrl, searchParams, { next: { revalidate: 10 } }),
-    getRequest(
-      `v1/fts/${id}/txns/count${
+    fetchData(fetchUrl, searchParams, { next: { revalidate: 10 } }),
+    getRequestBeta(
+      `v3/fts/${id}/txns/count${
         searchParams?.a ? `?account=${searchParams.a}` : ''
       }`,
     ),
@@ -61,9 +67,9 @@ export default async function TokenTabs({
   ]);
   const holder = dataResult?.holders || [];
   const holders = holdersCount?.holders?.[0]?.count;
-  const txns = dataResult?.txns || [];
-  const txnCursor = dataResult?.cursor;
-  const transfers = transferCount?.txns?.[0]?.count;
+  const txns = dataResult?.data || [];
+  const txnCursor = dataResult?.meta?.cursor;
+  const transfers = transferCount?.data?.count;
   const token: Token = tokenDetails?.contracts?.[0];
   const status = syncDetails?.status?.aggregates?.ft_holders || {
     height: '0',
@@ -72,7 +78,6 @@ export default async function TokenTabs({
   };
   const account = accountDetails?.account?.[0];
   const contract = contractResult?.deployments?.[0];
-
   const tabs = [
     { label: 'Transfers', message: 'fts.ft.transfers', name: 'transfers' },
     { label: 'Holders', message: 'fts.ft.holders', name: 'holders' },
@@ -89,8 +94,8 @@ export default async function TokenTabs({
       },
     );
 
-  if (dataResult.message === 'Error') {
-    throw new Error(`Server Error : ${dataResult.error}`);
+  if (dataResult.errors && dataResult.errors.length > 0) {
+    throw new Error(`Server Error : ${dataResult.errors[0].message}`);
   }
 
   return (

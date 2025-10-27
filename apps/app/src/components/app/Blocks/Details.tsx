@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import useRpc from '@/hooks/app/useRpc';
@@ -14,7 +14,6 @@ import {
   localFormat,
 } from '@/utils/app/libs';
 import { gasPrice } from '@/utils/near';
-import { BlocksInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FileSlash from '@/components/app/Icons/FileSlash';
@@ -25,31 +24,34 @@ import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
 import Timestamp from '@/components/app/common/Timestamp';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import { BlockRes } from 'nb-schemas';
+import { BlocksInfo, StatusInfo } from '@/utils/types';
+
+interface RPCBlockData {
+  data: BlocksInfo;
+}
+
 interface Props {
-  data: any;
-  loading?: any;
-  price: any;
+  hashDataPromise: Promise<BlockRes>;
+  priceDataPromise: Promise<{ stats: StatusInfo[] }>;
 }
 
-interface BlockData {
-  blocks: BlocksInfo[];
-}
-
-export default function Details(props: Props) {
+export default function Details({ hashDataPromise, priceDataPromise }: Props) {
+  const data = use(hashDataPromise);
+  const price = use(priceDataPromise);
   const t = useTranslations();
-  const { data, price } = props;
   const nearPrice = price?.stats?.[0]?.near_price;
   const { networkId } = useConfig();
   const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
-  const [blockInfo, setBlockInfo] = useState<BlockData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [blockInfo, setBlockInfo] = useState<RPCBlockData | null>(null);
+  const [isLoading, setIsLoading] = useState(!data?.data);
   const [utc, setUtc] = useState(true);
   const params = useParams<{ hash: string }>();
 
   useEffect(() => {
     const fetchBlockData = async () => {
-      if (!data || data?.blocks?.length === 0 || data?.message === 'Error') {
+      if (!data?.data || data?.errors) {
         setIsLoading(true);
         try {
           const res = await getBlockDetails(rpc, params?.hash);
@@ -61,21 +63,19 @@ export default function Details(props: Props) {
             used = res.chunks.reduce((acc, curr) => acc + curr.gas_used, 0);
 
             const rpcBlockData = {
-              blocks: [
-                {
-                  author_account_id: res?.author,
-                  block_hash: res?.header?.hash,
-                  block_height: res?.header?.height,
-                  block_timestamp: res?.header?.timestamp,
-                  chunks_agg: {
-                    gas_limit: limit,
-                    gas_used: used,
-                    shards: res?.header?.chunks_included,
-                  },
-                  gas_price: res?.header?.gas_price,
-                  prev_block_hash: res?.header?.prev_hash,
+              data: {
+                author_account_id: res?.author,
+                block_hash: res?.header?.hash,
+                block_height: res?.header?.height,
+                block_timestamp: res?.header?.timestamp,
+                chunks_agg: {
+                  gas_limit: limit.toString(),
+                  gas_used: used.toString(),
+                  count: res?.header?.chunks_included,
                 },
-              ],
+                gas_price: res?.header?.gas_price,
+                prev_block_hash: res?.header?.prev_hash,
+              },
             };
 
             setBlockInfo(rpcBlockData as any);
@@ -107,11 +107,8 @@ export default function Details(props: Props) {
       {props.children}
     </Link>
   );
-
   const block =
-    !data || data?.blocks?.length === 0 || data?.message === 'Error'
-      ? blockInfo?.blocks?.[0]
-      : data?.blocks?.[0];
+    data?.data && !data?.errors ? data.data : blockInfo?.data ?? null;
 
   const { utcTime, localTime } = convertTimestampToTimes(
     block?.block_timestamp,
@@ -425,7 +422,6 @@ export default function Details(props: Props) {
               )}
             </div>
             {networkId === 'mainnet' && (
-              // && date
               <div className="flex flex-wrap p-4">
                 <div className="w-full md:w-1/4 mb-2 md:mb-0">
                   {t('block.price') || 'Price'}
@@ -451,8 +447,8 @@ export default function Details(props: Props) {
                 </div>
               ) : (
                 <div className="w-full md:w-3/4 break-words">
-                  {block?.chunks_agg?.shards?.toString() &&
-                    localFormat(block?.chunks_agg?.shards?.toString())}
+                  {block?.chunks_agg?.count?.toString() &&
+                    localFormat(block?.chunks_agg?.count?.toString())}
                 </div>
               )}
             </div>

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { mapRpcActionToAction } from '@/utils/near';
-import { ApiTxnData, TransactionInfo } from '@/utils/types';
+import { ApiTxnData } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
@@ -13,6 +13,7 @@ import FileSlash from '@/components/app/Icons/FileSlash';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import ReceiptSummaryRow from '@/components/app/Transactions/Receipts/ReceiptSummaryRow';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   hash: string;
@@ -24,7 +25,7 @@ interface Props {
       near_price: string;
     }>;
   };
-  txn: TransactionInfo;
+  txn: Txn;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
   hasReceipts: boolean;

@@ -7,8 +7,7 @@ import { useState } from 'react';
 
 import { Link, useIntlRouter, usePathname } from '@/i18n/routing';
 import { localFormat } from '@/utils/libs';
-import { tokenAmount } from '@/utils/near';
-import { FilterKind, TransactionInfo } from '@/utils/types';
+import { FilterKind } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Filters from '@/components/app/common/Filters';
@@ -22,13 +21,15 @@ import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { FTTxn } from 'nb-schemas';
+import { tokenAmount } from '@/utils/near';
 
 interface Props {
   count: number;
   cursor: string;
   error: boolean;
   tab: string;
-  txns: TransactionInfo[];
+  txns: FTTxn[];
 }
 
 const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
@@ -49,9 +50,9 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
 
   const columns = [
     {
-      cell: (row: TransactionInfo) => (
+      cell: () => (
         <>
-          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
+          <TxnStatus showLabel={false} status={true} />
         </>
       ),
       header: '',
@@ -60,7 +61,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -84,11 +85,11 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'px-5 py-3 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <>
           <Link
             className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-            href={`/blocks/${row?.included_in_block_hash}`}
+            href={`/blocks/${row?.block?.block_hash}`}
           >
             {row?.block?.block_height
               ? localFormat(row?.block?.block_height)
@@ -104,7 +105,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -125,7 +126,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: FTTxn) => {
         return Number(row.delta_amount) < 0 ? (
           <>
             {row?.affected_account_id ? (
@@ -180,7 +181,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) =>
+      cell: (row: FTTxn) =>
         row?.involved_account_id === row?.affected_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
             {t ? t('txnSelf') : 'Self'}
@@ -195,7 +196,7 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
       tdClassName: 'text-center',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: FTTxn) => {
         return Number(row.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
@@ -250,13 +251,13 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <>
           {row?.delta_amount
             ? localFormat(
                 tokenAmount(
                   Big(row.delta_amount).abs().toString(),
-                  row?.ft?.decimals,
+                  row?.meta?.decimals,
                   true,
                 ),
               )
@@ -271,9 +272,12 @@ const Transfers = ({ count, cursor, error, tab, txns }: Props) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <span>
-          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp
+            showAge={showAge}
+            timestamp={row?.block?.block_timestamp}
+          />
         </span>
       ),
       header: (

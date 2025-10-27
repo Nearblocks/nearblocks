@@ -10,9 +10,9 @@ const block = v.object({
   block_timestamp: v.optional(v.string()),
 });
 
-const txnList = v.object({
+const txn = v.object({
   account_id: v.string(),
-  block,
+  block: v.optional(block),
   block_timestamp: v.string(),
   dest_address: v.nullable(v.string()),
   dest_chain: v.nullable(v.enum(DestinationChain)),
@@ -20,7 +20,7 @@ const txnList = v.object({
   event_index: v.number(),
   public_key: v.string(),
   receipt_id: v.string(),
-  transaction_hash: v.string(),
+  transaction_hash: v.optional(v.string()),
 });
 
 const txnCount = v.object({
@@ -28,16 +28,18 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const txnsResponse = responseSchema(v.array(v.omit(txnList, ['event_index'])));
-const txnsCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnsResponse = responseSchema(
+  v.array(v.omit(txn, ['block_timestamp', 'event_index'])),
+);
+const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
-export type McTxns = v.InferOutput<typeof txnList>;
-export type McTxnCount = v.InferOutput<typeof txnCount>;
+export type MCTxn = v.InferOutput<typeof txn>;
+export type MCTxnCount = v.InferOutput<typeof txnCount>;
 
-export type McTxnsRes = v.InferOutput<typeof txnsResponse>;
-export type McTxnsCountRes = v.InferOutput<typeof txnsCountResponse>;
+export type MCTxnsRes = v.InferOutput<typeof txnsResponse>;
+export type MCTxnCountRes = v.InferOutput<typeof txnCountResponse>;
 
 export default {
-  count: txnsCountResponse,
+  count: txnCountResponse,
   txns: txnsResponse,
 };

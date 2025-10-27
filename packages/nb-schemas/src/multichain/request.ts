@@ -21,8 +21,8 @@ const cursor = v.object({
   timestamp: v.string(),
 });
 
-export type McTxnsReq = v.InferOutput<typeof txns>;
-export type McTxnsCountReq = v.InferOutput<typeof count>;
-export type McTxnsCursor = v.InferOutput<typeof cursor>;
+export type MCTxnsReq = v.InferOutput<typeof txns>;
+export type MCTxnCountReq = v.InferOutput<typeof count>;
+export type MCTxnsCursor = v.InferOutput<typeof cursor>;
 
 export default { count, cursor, txns };

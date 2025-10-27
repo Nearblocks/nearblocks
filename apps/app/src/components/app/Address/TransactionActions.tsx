@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/popover';
 import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
 import { txnMethod } from '@/utils/app/near';
-import { isAction, localFormat, yoctoToNear } from '@/utils/libs';
+import { localFormat, yoctoToNear } from '@/utils/libs';
 import { FilterKind, TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
@@ -25,36 +25,34 @@ import Clock from '@/components/app/Icons/Clock';
 import Download from '@/components/app/Icons/Download';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Filter from '@/components/app/Icons/Filter';
-import SortIcon from '@/components/app/Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { AccountTxn, AccountTxnCountRes, AccountTxnsRes } from 'nb-schemas';
 
 interface TxnsProps {
-  dataPromise: Promise<any>;
-  countPromise: Promise<any>;
+  dataPromise: Promise<AccountTxnsRes>;
+  countPromise: Promise<AccountTxnCountRes>;
 }
 
 const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
-  const data = use(dataPromise);
-  const countData = use(countPromise);
-  if (data?.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
+  const { data: txns, errors, meta } = use(dataPromise);
+  const { data: countData } = use(countPromise);
+  if (errors && errors.length > 0) {
+    throw new Error(`Server Error : ${errors[0].message}`);
   }
-  const count = countData?.txns?.[0]?.count;
-  const cursor = data?.cursor;
-  const error = !data || data === null;
-  const txns = data?.txns;
+  const count = countData?.count;
+  const cursor = meta?.cursor;
+  const error = !txns || txns === null;
   const router = useIntlRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const params = useParams<{ id: string }>();
-  const order = searchParams?.get('order');
   const [page, setPage] = useState(1);
   const initialForm = {
-    action: searchParams?.get('action') || '',
-    from: searchParams?.get('from') || '',
-    method: searchParams?.get('method') || '',
-    to: searchParams?.get('to') || '',
+    signer: searchParams?.get('signer') || '',
+    receiver: searchParams?.get('receiver') || '',
+    after_ts: searchParams?.get('after_ts') || '',
+    before_ts: searchParams?.get('before_ts') || '',
   };
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
@@ -67,23 +65,6 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    if (name === 'type') {
-      if (isAction(value)) {
-        return setForm((state) => ({
-          ...state,
-          action: value,
-          method: '',
-        }));
-      }
-
-      return setForm((state) => ({
-        ...state,
-        action: '',
-        method: value,
-      }));
-    }
-
     return setForm((f) => ({ ...f, [name]: value }));
   };
 
@@ -92,27 +73,18 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
 
     setPage(1);
 
-    const { action, from, method, to } = form;
+    const { signer, receiver, after_ts, before_ts } = form;
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
       ...updatedQuery,
-      ...(action && { action }),
-      ...(method && { method }),
-      ...(from && { from }),
-      ...(to && { to }),
+      ...(signer && { signer }),
+      ...(receiver && { receiver }),
+      ...(after_ts && { after_ts }),
+      ...(before_ts && { before_ts }),
     };
 
     const newQueryString = QueryString.stringify(queryParams);
-    router.push(`${pathname}?${newQueryString}`);
-  };
-
-  const onOrder = () => {
-    const currentOrder = searchParams?.get('order') || 'desc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-    const newParams = { ...currentParams, order: newOrder };
-    const newQueryString = QueryString.stringify(newParams);
-
     router.push(`${pathname}?${newQueryString}`);
   };
 
@@ -122,22 +94,15 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
     setPage(1);
     const { cursor, page, ...restQuery } = currentParams;
 
-    if (name === 'type') {
-      setForm((prev) => ({ ...prev, action: '', method: '' }));
-      const { action, method, ...newQuery } = restQuery;
-      const newQueryString = QueryString.stringify(newQuery);
-      router.push(`${pathname}?${newQueryString}`);
-    } else {
-      setForm((f) => ({ ...f, [name]: '' }));
-      const { [name]: _, ...newQuery } = restQuery;
-      const newQueryString = QueryString.stringify(newQuery);
-      router.push(`${pathname}?${newQueryString}`);
-    }
+    setForm((f) => ({ ...f, [name]: '' }));
+    const { [name]: _, ...newQuery } = restQuery;
+    const newQueryString = QueryString.stringify(newQuery);
+    router.push(`${pathname}?${newQueryString}`);
   };
 
   const onAllClear = () => {
     setForm(initialForm);
-    const { action, block, cursor, from, method, page, to, ...newQuery } =
+    const { cursor, page, signer, receiver, after_ts, before_ts, ...newQuery } =
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
@@ -145,7 +110,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
 
   const columns: any = [
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <>
           <TxnStatus showLabel={false} status={row.outcomes.status} />
         </>
@@ -156,7 +121,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'pl-5 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -180,7 +145,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -203,7 +168,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           {row.actions_agg?.deposit
             ? yoctoToNear(row.actions_agg?.deposit, true)
@@ -219,7 +184,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           {row.outcomes_agg?.transaction_fee
             ? yoctoToNear(row.outcomes_agg?.transaction_fee, true)
@@ -235,7 +200,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -274,12 +239,12 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
                   className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-                  name="from"
+                  name="signer"
                   onChange={onChange}
                   placeholder={
                     t ? t('filter.placeholder') : 'Search by address e.g. Ⓝ..'
                   }
-                  value={form.from}
+                  value={form.signer}
                 />
                 <div className="flex">
                   <button
@@ -291,7 +256,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
                   </button>
                   <button
                     className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
-                    name="from"
+                    name="signer"
                     onClick={onClear}
                     type="button"
                   >
@@ -327,7 +292,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
       key: '',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -366,12 +331,12 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
               <form className="flex flex-col" onSubmit={onFilter}>
                 <input
                   className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-                  name="to"
+                  name="receiver"
                   onChange={onChange}
                   placeholder={
                     t('filter.placeholder') || 'Search by address e.g. Ⓝ..'
                   }
-                  value={form.to}
+                  value={form.receiver}
                 />
                 <div className="flex">
                   <button
@@ -383,7 +348,7 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
                   </button>
                   <button
                     className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
-                    name="to"
+                    name="receiver"
                     onClick={onClear}
                     type="button"
                   >
@@ -400,11 +365,11 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'px-4 py-2 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-44',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
           <Link
             className="text-green-500  dark:text-green-250 hover:no-underline"
-            href={`/blocks/${row.included_in_block_hash}`}
+            href={`/blocks/${row.block?.block_hash}`}
           >
             {row.block?.block_height
               ? localFormat(row.block?.block_height)
@@ -420,9 +385,12 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountTxn) => (
         <span>
-          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp
+            showAge={showAge}
+            timestamp={row?.block?.block_timestamp}
+          />
         </span>
       ),
       header: (
@@ -450,11 +418,6 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
               )}
             </button>
           </Tooltip>
-          <button className="px-2" onClick={onOrder} type="button">
-            <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
-              <SortIcon order={order as string} />
-            </div>
-          </button>
         </div>
       ),
       key: 'block_timestamp',
@@ -465,10 +428,10 @@ const TransactionActions = ({ dataPromise, countPromise }: TxnsProps) => {
   ];
 
   const modifiedFilter = getFilteredQueryParams(currentParams, [
-    FilterKind.ACTION,
-    FilterKind.METHOD,
-    FilterKind.FROM,
-    FilterKind.TO,
+    FilterKind.SIGNER,
+    FilterKind.RECEIVER,
+    FilterKind.AFTER_TS,
+    FilterKind.BEFORE_TS,
   ]);
 
   return (

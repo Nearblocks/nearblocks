@@ -1,16 +1,17 @@
 import { Fragment } from 'react';
 import { Link } from '@/i18n/routing';
-import { ReceiptsPropsInfo, TransactionInfo } from '@/utils/types';
+import { ReceiptsPropsInfo } from '@/utils/types';
 import Tooltip from '@/components/app/common/Tooltip';
 import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
 import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
 import TreeTxnsActions from '@/components/app/Transactions/TreeReceipts/TreeTxnsActions';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   receipt: any | ReceiptsPropsInfo;
   polledReceipt: any | ReceiptsPropsInfo;
   show: any | string;
-  txn: TransactionInfo;
+  txn: Txn;
 }
 
 const TreeReceiptDetails = (props: Props) => {

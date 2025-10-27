@@ -34,15 +34,7 @@ import {
   txnErrorMessage,
   txnLogs,
 } from '@/utils/near';
-import {
-  ApiTxnData,
-  FtsInfo,
-  InventoryInfo,
-  MtEventLogData,
-  NftsInfo,
-  TransactionInfo,
-  TransactionLog,
-} from '@/utils/types';
+import { ApiTxnData, MtEventLogData, TransactionLog } from '@/utils/types';
 
 import DynamicAd from '@/components/app/DynamicAd';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
@@ -63,19 +55,24 @@ import ArrowDownDouble from '@/components/app/Icons/ArrowDownDouble';
 import RpcTxnStatus from '@/components/app/common/RpcStatus';
 import useScrollToTop from '@/hooks/app/useScrollToTop';
 import Timestamp from '@/components/app/common/Timestamp';
+import { Txn, TxnFT, TxnNFT, TxnReceipts } from 'nb-schemas';
+import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
 interface Props {
   hash: string;
   isContract: boolean;
   loading: boolean;
   price: string;
-  rpcTxn: any;
+  rpcTxn: RpcTransactionResponse;
   statsData: {
     stats: Array<{
       near_price: string;
     }>;
   };
-  txn: TransactionInfo;
+  txn: Txn;
+  receipt: TxnReceipts;
+  txnFTs: TxnFT[];
+  txnNFTs: TxnNFT[];
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
   hasReceipts: boolean;
@@ -90,6 +87,9 @@ const Details = (props: Props) => {
     rpcTxn,
     statsData,
     txn,
+    receipt,
+    txnFTs,
+    txnNFTs,
     apiTxnActionsData,
     shouldUseRpc,
     hasReceipts,
@@ -120,57 +120,39 @@ const Details = (props: Props) => {
     apiAllActions,
     apiSubActions,
   } = apiTxnActionsData;
+
   const { fts, nfts } = useMemo(() => {
-    function tokensTransfers(receipts: InventoryInfo[]) {
-      let fts: FtsInfo[] = [];
-      let nfts: NftsInfo[] = [];
+    function filterTransferTokens(ftTokens: TxnFT[], nftTokens: TxnNFT[]) {
+      const fts: TxnFT[] = [];
+      const nfts: TxnNFT[] = [];
+      ftTokens?.forEach((ft) => {
+        if (!ft?.meta) return;
+        if (ft.cause === 'TRANSFER') {
+          if (Number(ft.delta_amount) < 0) {
+            fts.push(ft);
+          }
+        } else {
+          fts.push(ft);
+        }
+      });
+      nftTokens?.forEach((nft) => {
+        if (!nft?.meta || !nft?.token_meta) return;
 
-      receipts &&
-        receipts?.forEach(
-          (receipt) =>
-            receipt?.fts?.forEach((ft) => {
-              if (ft?.ft_meta && ft.cause === 'TRANSFER') {
-                if (ft?.ft_meta && Number(ft?.delta_amount) < 0) fts?.push(ft);
-              } else {
-                if (ft?.ft_meta) fts?.push(ft);
-              }
-            }),
-        );
-      receipts &&
-        receipts?.forEach(
-          (receipt) =>
-            receipt?.nfts?.forEach((nft) => {
-              if (
-                nft?.nft_meta &&
-                nft?.nft_token_meta &&
-                nft?.cause === 'TRANSFER'
-              ) {
-                if (
-                  nft?.nft_meta &&
-                  nft?.nft_token_meta &&
-                  Number(nft?.delta_amount) < 0
-                )
-                  nfts?.push(nft);
-              } else {
-                if (nft?.nft_meta && nft?.nft_token_meta) nfts?.push(nft);
-              }
-            }),
-        );
-
-      return {
-        fts,
-        nfts,
-      };
+        if (nft.cause === 'TRANSFER') {
+          if (Number(nft.delta_amount) < 0) {
+            nfts.push(nft);
+          }
+        } else {
+          nfts.push(nft);
+        }
+      });
+      return { fts, nfts };
     }
-
-    if (txn?.receipts?.length) {
-      return tokensTransfers(txn?.receipts);
+    if (txnFTs?.length || txnNFTs?.length) {
+      return filterTransferTokens(txnFTs, txnNFTs);
     }
-
     return { fts: [], nfts: [] };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [txn]);
+  }, [txnFTs, txnNFTs]);
 
   function absoluteValue(number: string) {
     return new Big(number).abs().toString();
@@ -267,17 +249,33 @@ const Details = (props: Props) => {
     }
   }, [rpcLogs, rpcSubActions, apiLogs, apiSubActions]);
 
-  const FailedReceipts = ({ data }: any) => {
-    const failedReceiptCount = (
-      data?.receipts ||
-      data?.receipts_outcome ||
-      []
-    ).filter(
-      (receipt: any) =>
-        receipt?.outcome?.status_key === 'FAILURE' ||
-        receipt?.outcome?.status?.Failure,
-    ).length;
+  const countFailedReceipts = (receipt: TxnReceipts): number => {
+    let count = 0;
+    if (
+      receipt?.outcome?.status_key === 'FAILURE' ||
+      receipt?.outcome?.status === false
+    ) {
+      count += 1;
+    }
 
+    if (receipt?.receipts && Array.isArray(receipt.receipts)) {
+      for (const nestedReceipt of receipt.receipts) {
+        count += countFailedReceipts(nestedReceipt);
+      }
+    }
+
+    return count;
+  };
+
+  const FailedReceipts = ({ data }: { data: any }) => {
+    let failedReceiptCount = 0;
+    if (data?.receiptsOutcome && Array.isArray(data.receiptsOutcome)) {
+      failedReceiptCount = (data?.receiptsOutcome || []).filter(
+        (receipt: any) => receipt?.outcome?.status?.Failure,
+      ).length;
+    } else {
+      failedReceiptCount = countFailedReceipts(data);
+    }
     if (failedReceiptCount === 0) {
       return null;
     }
@@ -548,7 +546,9 @@ const Details = (props: Props) => {
                       <TxnStatus
                         showLabel
                         status={txn?.outcomes?.status}
-                        showReceipt={<FailedReceipts data={txn || rpcTxn} />}
+                        showReceipt={
+                          <FailedReceipts data={receipt || rpcTxn} />
+                        }
                       />
                     )}
                     <div className="w-full max-w-xl">
@@ -574,7 +574,7 @@ const Details = (props: Props) => {
                 </Tooltip>
                 {t ? t('txnDetails.block.text.0') : 'Block Height'}
               </div>
-              {!txn?.included_in_block_hash && !txn?.block?.block_hash ? (
+              {!txn?.block?.block_hash ? (
                 <div className="w-full md:w-3/4">
                   <Loader wrapperClassName="flex w-14" />
                 </div>
@@ -582,9 +582,7 @@ const Details = (props: Props) => {
                 <div className="w-full md:w-3/4 font-semibold break-words">
                   <Link
                     className="text-green-500 dark:text-green-250 hover:no-underline"
-                    href={`/blocks/${
-                      txn?.block?.block_hash || txn?.included_in_block_hash
-                    }`}
+                    href={`/blocks/${txn?.block?.block_hash}`}
                   >
                     {txn?.block?.block_height
                       ? localFormat(txn?.block?.block_height)
@@ -664,7 +662,7 @@ const Details = (props: Props) => {
                 </Tooltip>
                 Shard Number
               </div>
-              {!txn?.shard_id ? (
+              {txn?.shard_id == null ? (
                 <div className="w-full md:w-3/4">
                   <Loader wrapperClassName="flex w-full max-w-sm" />
                 </div>

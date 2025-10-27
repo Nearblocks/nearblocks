@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { mapRpcActionToAction } from '@/utils/near';
-import { ApiTxnData, TransactionInfo } from '@/utils/types';
+import { ApiTxnData } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
@@ -12,11 +12,12 @@ import Skeleton, { Loader } from '@/components/app/skeleton/common/Skeleton';
 import TreeReceipt from '@/components/app/Transactions/TreeReceipts/TreeReceipt';
 import TreeReceiptDetails from '@/components/app/Transactions/TreeReceipts/TreeReceiptDetails';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   hash: string;
   rpcTxn: RpcTransactionResponse;
-  txn: TransactionInfo;
+  txn: Txn;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
   hasReceipts: boolean;

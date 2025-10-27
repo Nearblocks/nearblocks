@@ -7,7 +7,6 @@ import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { getTimeAgoString, localFormat, nanoToMilli } from '@/utils/libs';
 import { tokenAmount } from '@/utils/near';
-import { TransactionInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import TxnStatus from '@/components/app/common/Status';
@@ -20,19 +19,15 @@ import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import Timestamp from '@/components/app/common/Timestamp';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import { FTTxn, FTTxnCountRes, FTTxnsRes } from 'nb-schemas';
 interface ListProps {
-  data: {
-    cursor: string;
-    txns: TransactionInfo[];
-  };
+  data: FTTxnsRes;
   error: boolean;
   status: {
     height: string;
     sync: boolean;
   };
-  totalCount: {
-    txns: { count: string }[];
-  };
+  totalCount: FTTxnCountRes;
 }
 
 const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
@@ -43,9 +38,9 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
   const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
   const [timestamp, setTimeStamp] = useState('');
-  const tokens = data?.txns;
-  const cursor = data?.cursor;
-  const count = totalCount?.txns?.[0]?.count || 0;
+  const tokens = data?.data;
+  const cursor = data?.meta?.cursor;
+  const count = totalCount?.data?.count || 0;
 
   useEffect(() => {
     const fetchTimeStamp = async (height: string) => {
@@ -71,9 +66,9 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
 
   const columns: any = [
     {
-      cell: (row: TransactionInfo) => (
+      cell: () => (
         <>
-          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
+          <TxnStatus showLabel={false} status={true} />
         </>
       ),
       header: <span></span>,
@@ -82,7 +77,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'pl-5 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <Tooltip
           className={'left-1/2 max-w-[200px]'}
           position="top"
@@ -104,7 +99,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'px-5 py-4 whitespace-nowrap text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -125,7 +120,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: FTTxn) => {
         return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.affected_account_id ? (
@@ -180,7 +175,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: FTTxn) => {
         return row?.involved_account_id === row?.affected_account_id ? (
           <span className="uppercase rounded w-10 py-2 h-6 inline-flex items-center justify-center bg-green-200 text-white text-sm font-semibold">
             {t('txns:txnSelf')}
@@ -196,7 +191,7 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
       tdClassName: 'text-center',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: FTTxn) => {
         return Number(row?.delta_amount) < 0 ? (
           <span>
             {row?.involved_account_id ? (
@@ -251,13 +246,13 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <span>
-          {row?.delta_amount
+          {!isNaN(+row.delta_amount)
             ? localFormat(
                 tokenAmount(
                   Big(row.delta_amount).abs().toString(),
-                  row?.ft?.decimals,
+                  row?.meta?.decimals,
                   true,
                 ),
               )
@@ -272,39 +267,39 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: FTTxn) => {
         return (
-          row?.ft && (
+          row?.meta && (
             <div className="flex flex-row items-center">
               <span className="inline-flex mr-1">
                 <TokenImage
-                  alt={row?.ft?.name}
+                  alt={row?.meta?.name}
                   className="w-4 h-4"
-                  src={row?.ft?.icon}
+                  src={row?.meta?.icon}
                 />
               </span>
               <Tooltip
                 className={'max-w-[200px] left-1/2 whitespace-nowrap'}
                 position="top"
-                tooltip={row?.ft?.name}
+                tooltip={row?.meta?.name}
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-block truncate whitespace-nowrap">
                   <Link
                     className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                    href={`/token/${row?.ft?.contract}`}
+                    href={`/token/${row?.meta?.contract}`}
                   >
-                    {row?.ft?.name}
+                    {row?.meta?.name}
                   </Link>
                 </div>
               </Tooltip>
-              {row?.ft?.symbol && (
+              {row?.meta?.symbol && (
                 <Tooltip
                   className={'max-w-[200px] left-1/2'}
                   position="top"
-                  tooltip={row?.ft?.symbol}
+                  tooltip={row?.meta?.symbol}
                 >
                   <div className="text-sm text-gray-400 max-w-[80px] inline-block truncate whitespace-nowrap">
-                    &nbsp; {row?.ft?.symbol}
+                    &nbsp; {row?.meta?.symbol}
                   </div>
                 </Tooltip>
               )}
@@ -320,9 +315,12 @@ const FTTransfersActions = ({ data, error, status, totalCount }: ListProps) => {
         'px-5 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: FTTxn) => (
         <span>
-          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp
+            showAge={showAge}
+            timestamp={row?.block?.block_timestamp}
+          />
         </span>
       ),
       header: (

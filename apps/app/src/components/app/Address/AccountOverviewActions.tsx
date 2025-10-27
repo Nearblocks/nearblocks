@@ -17,9 +17,10 @@ import { useParams } from 'next/navigation';
 import { useAddressRpc } from '../common/AddressRpcProvider';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import { AccountBalanceRes } from 'nb-schemas';
 
 const AccountOverviewActions = ({
-  accountDataPromise,
+  accountBalancePromise,
   inventoryDataPromise,
   loading = false,
   spamTokensPromise,
@@ -29,7 +30,7 @@ const AccountOverviewActions = ({
   intentsTokenPricesPromise,
   refTokenPricesPromise,
 }: {
-  accountDataPromise: Promise<any>;
+  accountBalancePromise: Promise<AccountBalanceRes>;
   inventoryDataPromise: Promise<any>;
   loading?: boolean;
   mtsDataPromise: Promise<any>;
@@ -40,7 +41,7 @@ const AccountOverviewActions = ({
   intentsTokenPricesPromise: Promise<IntentsTokenPrices[]>;
   refTokenPricesPromise: Promise<RefFinanceTokenPrices>;
 }) => {
-  const account = use(accountDataPromise);
+  const { data: accountBalance } = use(accountBalancePromise);
   const stats = use(statsDataPromise);
   const token = use(tokenDataPromise);
   const inventory = use(inventoryDataPromise);
@@ -48,7 +49,6 @@ const AccountOverviewActions = ({
   const mtsData = use(mtsDataPromise);
   const intentsTokenPrices = use(intentsTokenPricesPromise);
   const refTokenPrices = use(refTokenPricesPromise);
-  const accountData = account?.account?.[0];
   const statsData = stats?.stats?.[0];
   const tokenData = token?.contracts?.[0];
   const inventoryData = inventory?.inventory;
@@ -60,9 +60,7 @@ const AccountOverviewActions = ({
   const { ftBalanceOf } = useRpc();
   const params = useParams<{ id: string }>();
 
-  const balance = accountData?.amount
-    ? accountData?.amount
-    : accountView?.amount;
+  const balance = accountBalance?.amount ?? accountView?.amount;
   const nearPrice = statsData?.near_price ?? '';
   const { rpc: rpcUrl } = useRpcProvider();
 

@@ -24,6 +24,8 @@ import { revalidateTxn } from '@/utils/app/actions';
 import { useConfig } from '@/hooks/app/useConfig';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 import { useRpcTrigger } from '@/components/app/common/RpcTriggerContext';
+import { Txn, TxnFT, TxnNFT, TxnReceipts } from 'nb-schemas';
+import { ApiTxnData } from '@/utils/types';
 
 export type RpcProvider = {
   name: string;
@@ -36,9 +38,23 @@ const TxnsTabActions = ({
   stats,
   tab,
   txn,
+  receipt,
+  txnFTs,
+  txnNFTs,
   apiTxnActionsData,
   hasReceipts,
-}: any) => {
+}: {
+  hash: string;
+  price: number | null;
+  stats: any;
+  tab: any;
+  txn: Txn;
+  receipt: TxnReceipts;
+  txnFTs: TxnFT[];
+  txnNFTs: TxnNFT[];
+  apiTxnActionsData: ApiTxnData;
+  hasReceipts: boolean;
+}) => {
   const { getBlockDetails, transactionStatus } = useRpc();
   const [rpcError, setRpcError] = useState(false);
   const [isTransactionNotFound, setIsTransactionNotFound] = useState(false);
@@ -53,9 +69,14 @@ const TxnsTabActions = ({
 
   // temporary use rpc data for blocks before 192373963 and api data for latest blocks - testnet
   // temporary use rpc data for blocks before 143997621 and api data for latest blocks - mainnet
-  const shouldUseRpc =
-    (networkId === 'testnet' && txn?.block?.block_height <= 192373963) ||
-    (networkId === 'mainnet' && txn?.block?.block_height <= 143997621);
+  const shouldUseRpc = !!(
+    (networkId === 'testnet' &&
+      txn?.block?.block_height &&
+      Number(txn.block.block_height) <= 192373963) ||
+    (networkId === 'mainnet' &&
+      txn?.block?.block_height &&
+      Number(txn.block.block_height) <= 143997621)
+  );
 
   const { rpc: rpcUrl, switchRpc, rpcStats } = useRpcProvider();
 
@@ -318,6 +339,9 @@ const TxnsTabActions = ({
                     rpcTxn={rpcTxn}
                     statsData={stats}
                     txn={txn ? txn : rpcData}
+                    receipt={receipt}
+                    txnFTs={txnFTs}
+                    txnNFTs={txnNFTs}
                     apiTxnActionsData={apiTxnActionsData}
                     shouldUseRpc={shouldUseRpc}
                     hasReceipts={hasReceipts}

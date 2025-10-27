@@ -16,19 +16,23 @@ import TokenImage from '@/components/app/common/TokenImage';
 import { useParams } from 'next/navigation';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useAddressRpc } from '../common/AddressRpcProvider';
+import { AccountBalanceRes } from 'nb-schemas';
 const AccountMoreInfoActions = ({
   accountDataPromise,
+  accountBalancePromise,
   deploymentDataPromise,
   nftTokenDataPromise,
   tokenDataPromise,
   syncDataPromise,
 }: {
   accountDataPromise: Promise<any>;
+  accountBalancePromise: Promise<AccountBalanceRes>;
   deploymentDataPromise: Promise<any>;
   nftTokenDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
   syncDataPromise: Promise<any>;
 }) => {
+  const { data: accountBalance } = use(accountBalancePromise);
   const account = use(accountDataPromise);
   const deployment = use(deploymentDataPromise);
   const nftToken = use(nftTokenDataPromise);
@@ -42,7 +46,7 @@ const AccountMoreInfoActions = ({
   const [accountData, setAccountData] = useState<AccountContractInfo>(
     account?.account?.[0],
   );
-
+  const [accountBalanceInfo, setAccountBalanceInfo] = useState(accountBalance);
   const {
     account: accountView,
     contractInfo,
@@ -53,29 +57,35 @@ const AccountMoreInfoActions = ({
   const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
-    if (
-      (status &&
-        accountData &&
-        accountView &&
-        !accountData?.storage_usage &&
-        accountView?.storage_usage) ||
-      (!accountData?.code_hash && accountView?.code_hash)
-    ) {
-      setAccountData((prevData) => ({
-        ...prevData,
-        storage_usage: accountView?.storage_usage,
-        code_hash: accountView?.code_hash,
-      }));
+    if (status && accountData && accountView) {
+      if (!accountBalanceInfo?.storage_usage && accountView?.storage_usage) {
+        setAccountBalanceInfo((prevData) =>
+          prevData
+            ? {
+                ...prevData,
+                storage_usage: accountView?.storage_usage,
+              }
+            : null,
+        );
+      }
+      if (!accountData?.code_hash && accountView?.code_hash) {
+        setAccountData((prevData) => ({
+          ...prevData,
+          code_hash: accountView?.code_hash,
+        }));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountView, status]);
 
   const isContract = !!contractInfo;
   const accountInfo = status ? accountData : accountView;
-  const stakedBalace = status ? accountData?.locked : accountView?.locked;
+  const stakedBalace = status
+    ? accountBalance?.amount_staked
+    : accountView?.locked;
   const tokenTracker = tokenData?.name || nftTokenData?.name;
   const storageUsed = status
-    ? accountData?.storage_usage
+    ? accountBalanceInfo?.storage_usage
     : accountView?.storage_usage;
 
   interface TokenTrackerRowProps {
@@ -156,7 +166,7 @@ const AccountMoreInfoActions = ({
                 {t('storageUsed') || 'Storage used'}:
               </div>
               <div className="w-20 h-5">
-                {isLoading ? (
+                {isLoading && storageUsed == null ? (
                   <Skeleton className="h-4 w-16" />
                 ) : storageUsed != null ? (
                   weight(storageUsed)
@@ -286,9 +296,11 @@ const AccountMoreInfoActions = ({
                   accountData?.deleted?.transaction_hash ? (
                     <div className="flex whitespace-nowrap">
                       <span className="mr-1">
-                        {getTimeAgoString(
-                          nanoToMilli(accountData.deleted.block_timestamp),
-                        )}
+                        {accountData.deleted.block_timestamp
+                          ? getTimeAgoString(
+                              nanoToMilli(accountData.deleted.block_timestamp),
+                            )
+                          : ''}
                       </span>
                       {!deploymentData?.receipt_predecessor_account_id && (
                         <span>
@@ -309,9 +321,11 @@ const AccountMoreInfoActions = ({
                   ) : accountData?.created?.transaction_hash ? (
                     <div className="flex whitespace-nowrap">
                       <span className="xl:ml-1">
-                        {getTimeAgoString(
-                          nanoToMilli(accountData.created.block_timestamp),
-                        )}
+                        {accountData.created.block_timestamp
+                          ? getTimeAgoString(
+                              nanoToMilli(accountData.created.block_timestamp),
+                            )
+                          : ''}
                       </span>
                       {!deploymentData?.receipt_predecessor_account_id && (
                         <span className="ml-1">

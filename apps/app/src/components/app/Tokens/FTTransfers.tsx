@@ -1,16 +1,16 @@
 import QueryString from 'qs';
 
-import { getRequest } from '@/utils/app/api';
+import { getRequest, getRequestBeta } from '@/utils/app/api';
 
 import FTTransfersActions from '@/components/app/Tokens/FTTransfersActions';
 
 const Transfers = async ({ searchParams }: any) => {
-  const apiUrl = 'v1/fts/txns';
+  const apiUrl = 'v3/fts/txns';
   const fetchUrl = `${apiUrl}?${QueryString.stringify(searchParams)}`;
 
   const [data, dataCount, syncDetails] = await Promise.all([
-    getRequest(fetchUrl),
-    getRequest('v1/fts/txns/count'),
+    getRequestBeta(fetchUrl),
+    getRequestBeta('v3/fts/txns/count'),
     getRequest('v1/sync/status'),
   ]);
 
@@ -18,8 +18,8 @@ const Transfers = async ({ searchParams }: any) => {
     height: 0,
     sync: true,
   };
-  if (data.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
+  if (data.errors) {
+    throw new Error(`Server Error : ${data?.errors[0].message}`);
   }
   return (
     <FTTransfersActions

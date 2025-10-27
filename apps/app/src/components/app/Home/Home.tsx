@@ -3,10 +3,11 @@ import { ErrorBoundary } from 'react-error-boundary';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Search from '@/components/app/common/Search';
 import FaInbox from '@/components/app/Icons/FaInbox';
-import HomeLatestBlocks from '@/components/app/Home/LatestBlocks';
-import HomeLatestTxns from '@/components/app/Home/LatestTxns';
 import HomeOverview from '@/components/app/Home/Overview';
 import { networkId } from '@/utils/app/config';
+import LatestBlocks from '@/components/app/Blocks/Latest';
+import { getRequestBeta } from '@/utils/app/api';
+import LatestTransactions from '../Transactions/Latest';
 
 export default async function Home({
   locale,
@@ -79,7 +80,11 @@ export default async function Home({
                     </div>
                   }
                 >
-                  <HomeLatestBlocks />
+                  <div className="relative ">
+                    <LatestBlocks
+                      blocksPromise={getRequestBeta('v3/blocks/latest')}
+                    />
+                  </div>
                 </ErrorBoundary>
               </div>
             </div>
@@ -97,7 +102,9 @@ export default async function Home({
                     </div>
                   }
                 >
-                  <HomeLatestTxns />
+                  <LatestTransactions
+                    txnsPromise={getRequestBeta('v3/txns/latest')}
+                  />
                 </ErrorBoundary>
               </div>
             </div>

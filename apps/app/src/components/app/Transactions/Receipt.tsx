@@ -1,6 +1,6 @@
 'use client';
 
-import { ApiTxnData, TransactionInfo } from '@/utils/types';
+import { ApiTxnData } from '@/utils/types';
 import { ReceiptsPropsInfo } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
@@ -11,6 +11,7 @@ import { mapRpcActionToAction } from '@/utils/app/near';
 import { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   hash: string;
@@ -20,7 +21,7 @@ interface Props {
       near_price: string;
     }>;
   };
-  txn: TransactionInfo;
+  txn: Txn;
   apiTxnActionsData: ApiTxnData;
   shouldUseRpc: boolean;
   hasReceipts: boolean;

@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { use } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -12,18 +12,23 @@ import {
   shortenHex,
   yoctoToNear,
 } from '@/utils/libs';
-import { TransactionInfo } from '@/utils/types';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
-
+import { TxnsRes } from 'nb-schemas';
 interface Props {
-  error: boolean;
-  txns: TransactionInfo[];
+  txnsPromise: Promise<TxnsRes>;
 }
 
-const LatestTransactions = ({ error, txns }: Props) => {
+const LatestTransactions = ({ txnsPromise }: Props) => {
+  const data = use(txnsPromise);
+  const error = data?.errors;
+  const txns = data?.data ?? [];
   const t = useTranslations();
+
+  if (error) {
+    throw new Error('Error fetching latest Transactions');
+  }
 
   return (
     <>
@@ -84,7 +89,7 @@ const LatestTransactions = ({ error, txns }: Props) => {
           )}
           {txns?.length > 0 && (
             <div className="px-3 divide-y dark:divide-black-200 h-80 lg:overflow-visible overflow-y-scroll">
-              {txns?.map((txn: TransactionInfo) => {
+              {txns?.map((txn) => {
                 return (
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
@@ -107,9 +112,9 @@ const LatestTransactions = ({ error, txns }: Props) => {
                           className="text-gray-400 text-xs truncate"
                           suppressHydrationWarning
                         >
-                          {txn?.block_timestamp
+                          {txn?.block?.block_timestamp
                             ? getTimeAgoString(
-                                nanoToMilli(txn?.block_timestamp),
+                                nanoToMilli(txn?.block?.block_timestamp),
                               )
                             : ''}
                         </div>

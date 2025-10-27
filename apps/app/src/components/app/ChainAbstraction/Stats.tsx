@@ -8,14 +8,14 @@ import MiniChart from '@/components/app/Charts/MiniChart';
 import BarChart from '@/components/app/Icons/BarChart';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { use } from 'react';
-import { McTxnsCountRes } from 'nb-schemas';
+import { MCTxnCountRes } from 'nb-schemas';
 import { DestinationChain } from 'nb-types';
 
 interface StatsProps {
   dataChartPromise: Promise<any>;
   error: boolean;
-  txns24HrCountPromise: Promise<McTxnsCountRes>;
-  txnsTotalCountPromise: Promise<McTxnsCountRes>;
+  txns24HrCountPromise: Promise<MCTxnCountRes>;
+  txnsTotalCountPromise: Promise<MCTxnCountRes>;
 }
 
 const Stats = ({

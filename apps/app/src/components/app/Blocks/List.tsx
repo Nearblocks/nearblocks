@@ -1,27 +1,22 @@
-import { getRequest } from '@/utils/app/api';
+import { getRequest, getRequestBeta } from '@/utils/app/api';
 
 import ListActions from '@/components/app/Blocks/ListActions';
+import { Suspense } from 'react';
+import ListSkeleton from '../skeleton/blocks/list';
 
 const List = async ({ cursor }: { cursor: string }) => {
-  const data = await getRequest('v1/blocks', { cursor });
-  const dataCount = await getRequest('v1/blocks/count');
-  const receiptIndexerHealth =
-    (await getRequest('v1/health/indexer-receipts')) || {};
-  if (data.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
-  }
-
-  const firstBlock = data?.blocks?.[0];
-  const hasReceipts =
-    firstBlock?.block_height > receiptIndexerHealth?.height ? false : true;
+  const dataPromise = getRequestBeta('v3/blocks', { cursor });
+  const countPromise = getRequestBeta('v3/blocks/count');
+  const receiptIndexerHealth = getRequest('v1/health/indexer-receipts');
 
   return (
-    <ListActions
-      data={data}
-      error={!data}
-      totalCount={dataCount}
-      hasReceipts={hasReceipts}
-    />
+    <Suspense fallback={<ListSkeleton />}>
+      <ListActions
+        dataPromise={dataPromise}
+        countPromise={countPromise}
+        receiptIndexerHealthPromise={receiptIndexerHealth}
+      />
+    </Suspense>
   );
 };
 export default List;

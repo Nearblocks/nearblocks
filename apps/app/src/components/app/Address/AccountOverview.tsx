@@ -1,4 +1,4 @@
-import { getRequest } from '@/utils/app/api';
+import { getRequest, getRequestBeta } from '@/utils/app/api';
 import AccountOverviewActions from '@/components/app/Address/AccountOverviewActions';
 import {
   intentsTokenPricesApiUrl,
@@ -6,7 +6,7 @@ import {
 } from '@/utils/app/config';
 
 export default async function AccountOverview({ id }: any) {
-  const accountData = getRequest(`v1/account/${id}`);
+  const accountBalance = getRequestBeta(`v3/accounts/${id}/balance`);
   const statsData = getRequest('v1/stats');
   const tokenData = getRequest(`v1/fts/${id}`);
   const inventoryData = getRequest(`v1/account/${id}/inventory`);
@@ -37,7 +37,7 @@ export default async function AccountOverview({ id }: any) {
 
   return (
     <AccountOverviewActions
-      accountDataPromise={accountData}
+      accountBalancePromise={accountBalance}
       inventoryDataPromise={inventoryData}
       mtsDataPromise={mtsData}
       spamTokensPromise={spamList}

@@ -7,7 +7,7 @@ import {
   nanoToMilli,
   shortenAddress,
 } from '@/utils/libs';
-import { tokenAmount } from '@/utils/near';
+import { tokenAmount } from '@/utils/app/near';
 import {
   AccountInfo,
   DeploymentsInfo,

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/popover';
 import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
 import { localFormat, truncateString } from '@/utils/libs';
-import { FilterKind, TransactionInfo } from '@/utils/types';
+import { FilterKind } from '@/utils/types';
 
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Filters from '@/components/app/common/Filters';
@@ -24,40 +24,44 @@ import Clock from '@/components/app/Icons/Clock';
 import Download from '@/components/app/Icons/Download';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import Filter from '@/components/app/Icons/Filter';
-import SortIcon from '@/components/app/Icons/SortIcon';
 import { getFilteredQueryParams } from '@/utils/app/libs';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import { CopyButton } from '@/components/app/common/CopyButton';
 import Timestamp from '@/components/app/common/Timestamp';
+import {
+  AccountNFTTxn,
+  AccountNFTTxnCountRes,
+  AccountNFTTxnsRes,
+} from 'nb-schemas';
 
 interface NftTokenTxnsProps {
-  dataPromise: Promise<any>;
-  countPromise: Promise<any>;
+  dataPromise: Promise<AccountNFTTxnsRes>;
+  countPromise: Promise<AccountNFTTxnCountRes>;
 }
 
 const NFTTransactionActions = ({
   dataPromise,
   countPromise,
 }: NftTokenTxnsProps) => {
-  const data = use(dataPromise);
-  const countData = use(countPromise);
-  if (data?.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
+  const { data: txns, errors, meta } = use(dataPromise);
+  const { data: countData } = use(countPromise);
+  if (errors && errors.length > 0) {
+    throw new Error(`Server Error : ${errors[0].message}`);
   }
-  const count = countData?.txns?.[0]?.count;
-  const cursor = data?.cursor;
-  const error = !data || data === null;
-  const txns = data?.txns;
+  const count = countData?.count;
+  const cursor = meta?.cursor;
+  const error = !txns || txns === null;
   const router = useIntlRouter();
   const pathname = usePathname();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
-  const order = searchParams?.get('order');
   const [page, setPage] = useState(1);
   const initialForm = {
-    event: searchParams?.get('event') || '',
+    token: searchParams?.get('token') || '',
     involved: searchParams?.get('involved') || '',
     contract: searchParams?.get('contract') || '',
+    after_ts: searchParams?.get('after_ts') || '',
+    before_ts: searchParams?.get('before_ts') || '',
   };
   const [form, setForm] = useState(initialForm);
   const [showAge, setShowAge] = useState(true);
@@ -73,28 +77,21 @@ const NFTTransactionActions = ({
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const onOrder = () => {
-    const currentOrder = searchParams?.get('order') || 'desc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-    const newParams = { ...currentParams, order: newOrder };
-    const newQueryString = QueryString.stringify(newParams);
-
-    router.push(`${pathname}?${newQueryString}`);
-  };
-
   const onFilter = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setPage(1);
 
-    const { event, involved, contract } = form;
+    const { token, involved, contract, after_ts, before_ts } = form;
     const { cursor, page, ...updatedQuery } = currentParams;
 
     const queryParams = {
       ...updatedQuery,
-      ...(event && { event }),
+      ...(token && { token }),
       ...(involved && { involved }),
       ...(contract && { contract }),
+      ...(after_ts && { after_ts }),
+      ...(before_ts && { before_ts }),
     };
 
     const newQueryString = QueryString.stringify(queryParams);
@@ -107,32 +104,33 @@ const NFTTransactionActions = ({
     setPage(1);
     const { cursor, page, ...restQuery } = currentParams;
 
-    if (name === 'type') {
-      setForm((prev) => ({ ...prev, action: '', method: '' }));
-      const { action, method, ...newQuery } = restQuery;
-      const newQueryString = QueryString.stringify(newQuery);
-      router.push(`${pathname}?${newQueryString}`);
-    } else {
-      setForm((f) => ({ ...f, [name]: '' }));
-      const { [name]: _, ...newQuery } = restQuery;
-      const newQueryString = QueryString.stringify(newQuery);
-      router.push(`${pathname}?${newQueryString}`);
-    }
+    setForm((f) => ({ ...f, [name]: '' }));
+    const { [name]: _, ...newQuery } = restQuery;
+    const newQueryString = QueryString.stringify(newQuery);
+    router.push(`${pathname}?${newQueryString}`);
   };
 
   const onAllClear = () => {
     setForm(initialForm);
-    const { cursor, event, involved, contract, page, ...newQuery } =
-      currentParams;
+    const {
+      cursor,
+      token,
+      involved,
+      contract,
+      after_ts,
+      before_ts,
+      page,
+      ...newQuery
+    } = currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
   };
 
   const columns = [
     {
-      cell: (row: TransactionInfo) => (
+      cell: () => (
         <>
-          <TxnStatus showLabel={false} status={row?.outcomes?.status} />
+          <TxnStatus showLabel={false} status={true} />
         </>
       ),
       header: '',
@@ -141,7 +139,7 @@ const NFTTransactionActions = ({
         'pl-5 py-4 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -165,7 +163,7 @@ const NFTTransactionActions = ({
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10  uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -178,59 +176,15 @@ const NFTTransactionActions = ({
           </Tooltip>
         </span>
       ),
-      header: (
-        <PopoverRoot>
-          <PopoverTrigger
-            asChild
-            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
-          >
-            <button>
-              {t('type') || 'METHOD'}{' '}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
-            marginTop={-1.5}
-            roundedBottom={'lg'}
-            roundedTop={'none'}
-            width={'48'}
-          >
-            <form className="flex flex-col" onSubmit={onFilter}>
-              <input
-                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-gray-500 dark:text-neargray-10  text-xs"
-                name="event"
-                onChange={onChange}
-                placeholder="Search by method"
-                value={form.event}
-              />
-              <div className="flex">
-                <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
-                  type="submit"
-                >
-                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t('filter.filter') || 'Filter'}
-                </button>
-                <button
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
-                  name="event"
-                  onClick={onClear}
-                  type="button"
-                >
-                  {t('filter.clear') || 'Clear'}
-                </button>
-              </div>
-            </form>
-          </PopoverContent>
-        </PopoverRoot>
-      ),
+      header: <>{t('type') || 'METHOD'}</>,
       key: 'cause',
       tdClassName:
         'px-4 py-2 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10',
+      thClassName:
+        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <>
           {row?.affected_account_id ? (
             <Tooltip
@@ -259,7 +213,7 @@ const NFTTransactionActions = ({
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10  uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <>
           {row.involved_account_id === row.affected_account_id ? (
             <span className="uppercase rounded !min-w-[37px] px-1 h-6 flex items-center justify-center whitespace-nowrap bg-green-200 dark:bg-nearblue-650/[0.15] dark:text-neargray-650 dark:border dark:border-nearblue-650/[0.25] text-white text-xs font-semibold">
@@ -281,7 +235,7 @@ const NFTTransactionActions = ({
       tdClassName: 'text-center',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <>
           {row.involved_account_id ? (
             <Tooltip
@@ -358,7 +312,7 @@ const NFTTransactionActions = ({
         'text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <Tooltip
           className={'left-1/2 max-w-[200px]'}
           position="top"
@@ -367,7 +321,7 @@ const NFTTransactionActions = ({
           <span>
             <Link
               className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-              href={`/nft-token/${row?.nft?.contract}/${encodeURIComponent(
+              href={`/nft-token/${row?.meta?.contract}/${encodeURIComponent(
                 row?.token_id,
               )}`}
             >
@@ -376,48 +330,93 @@ const NFTTransactionActions = ({
           </span>
         </Tooltip>
       ),
-      header: <>Token ID</>,
+      header: (
+        <PopoverRoot>
+          <PopoverTrigger
+            asChild
+            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
+          >
+            <button>
+              Token ID
+              <Filter className="h-4 w-4 fill-current ml-2" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="bg-white dark:bg-black-600 shadow-lg border dark:border-black-200 p-2 z-20"
+            marginTop={-1.5}
+            roundedBottom={'lg'}
+            roundedTop={'none'}
+            width={'48'}
+          >
+            <form className="flex flex-col" onSubmit={onFilter}>
+              <input
+                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
+                name="token"
+                onChange={onChange}
+                placeholder="Search by token ID"
+                value={form.token}
+              />
+              <div className="flex">
+                <button
+                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
+                  type="submit"
+                >
+                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
+                  {t('filter.filter') || 'Filter'}
+                </button>
+                <button
+                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
+                  name="token"
+                  onClick={onClear}
+                  type="button"
+                >
+                  {t('filter.clear') || 'Clear'}
+                </button>
+              </div>
+            </form>
+          </PopoverContent>
+        </PopoverRoot>
+      ),
       key: 'token_id',
       tdClassName:
         'px-4 py-3 items-center my-2 text-sm text-nearblue-600 dark:text-neargray-10',
-      thClassName:
-        'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase whitespace-nowrap tracking-wider',
+      thClassName: '',
     },
     {
-      cell: (row: TransactionInfo) => {
+      cell: (row: AccountNFTTxn) => {
         return (
-          row?.nft && (
+          row?.meta && (
             <div className="flex flex-row items-center">
               <span className="inline-flex mr-1">
                 <TokenImage
-                  alt={row?.nft?.name}
+                  alt={row?.meta?.name}
                   className="w-4 h-4"
-                  src={row?.nft?.icon}
+                  src={row?.meta?.icon}
                 />
               </span>
               <Tooltip
                 className={'left-1/2 max-w-[200px] whitespace-nowrap'}
                 position="top"
-                tooltip={row?.nft?.name}
+                tooltip={row?.meta?.name}
               >
                 <div className="text-sm text-nearblue-600 dark:text-neargray-10 max-w-[110px] inline-flex truncate whitespace-nowrap">
                   <Link
                     className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                    href={`/nft-token/${row?.nft?.contract}`}
+                    href={`/nft-token/${row?.meta?.contract}`}
                   >
-                    {row?.nft?.name}
+                    {row?.meta?.name}
                   </Link>
                 </div>
               </Tooltip>
-              <CopyButton textToCopy={row?.nft?.contract} />
-              {row?.nft?.symbol && (
+              <CopyButton textToCopy={row?.meta?.contract} />
+              {row?.meta?.symbol && (
                 <Tooltip
                   className={'left-1/2 max-w-[200px]'}
                   position="top"
-                  tooltip={row?.nft?.symbol}
+                  tooltip={row?.meta?.symbol}
                 >
                   <div className="text-sm text-nearblue-700 max-w-[80px] inline-flex truncate whitespace-nowrap">
-                    &nbsp; {row?.nft?.symbol}
+                    &nbsp; {row?.meta?.symbol}
                   </div>
                 </Tooltip>
               )}
@@ -479,9 +478,12 @@ const NFTTransactionActions = ({
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10  uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: AccountNFTTxn) => (
         <span>
-          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp
+            showAge={showAge}
+            timestamp={row?.block?.block_timestamp}
+          />
         </span>
       ),
       header: (
@@ -509,12 +511,6 @@ const NFTTransactionActions = ({
               )}
             </button>
           </Tooltip>
-
-          <button className="px-2" onClick={onOrder} type="button">
-            <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
-              <SortIcon order={order as string} />
-            </div>
-          </button>
         </div>
       ),
       key: 'block_timestamp',
@@ -525,9 +521,11 @@ const NFTTransactionActions = ({
   ];
 
   const modifiedFilter = getFilteredQueryParams(currentParams, [
-    FilterKind.EVENT,
+    FilterKind.TOKEN,
     FilterKind.INVOLVED,
     FilterKind.CONTRACT,
+    FilterKind.AFTER_TS,
+    FilterKind.BEFORE_TS,
   ]);
 
   return (

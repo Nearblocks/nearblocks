@@ -4,6 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { ValidatorEpochData, ValidatorTelemetry } from 'nb-types';
 import { supportedNetworks } from './app/config';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { JsonData } from 'nb-schemas/src/common';
 
 export type NextPageWithLayout<T = any> = NextPage<T> & {
   getLayout?: (page: ReactElement<any>) => ReactNode;
@@ -131,7 +132,7 @@ export type BlocksInfo = {
   chunks_agg: {
     gas_limit: string;
     gas_used: string;
-    shards: string;
+    count: string;
   };
   gas_price: string;
   prev_block_hash: string;
@@ -1910,6 +1911,12 @@ export enum FilterKind {
   CONTRACT = 'contract',
   A = 'a',
   ACCOUNT = 'account',
+  AFTER_TS = 'after_ts',
+  BEFORE_TS = 'before_ts',
+  SIGNER = 'signer',
+  RECEIVER = 'receiver',
+  PREDECESSOR = 'predecessor',
+  TOKEN = 'token',
 }
 
 export type Account = {
@@ -2152,7 +2159,7 @@ export type ReceiptAction = {
   to: string;
   receiptId: string;
   action_kind: string;
-  args: Record<string, any>;
+  args: JsonData;
 };
 
 export type FTToken = {

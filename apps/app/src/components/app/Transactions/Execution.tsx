@@ -11,7 +11,6 @@ import {
   ApiTxnData,
   FailedToFindReceipt,
   NestedReceiptWithOutcome,
-  TransactionInfo,
 } from '@/utils/types';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
 
@@ -20,11 +19,12 @@ import FaHourglassStart from '@/components/app/Icons/FaHourglassStart';
 import FileSlash from '@/components/app/Icons/FileSlash';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import TransactionReceipt from '@/components/app/Transactions/Receipts/TransactionReceipt';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   hash: string;
   rpcTxn: RpcTransactionResponse;
-  txn: TransactionInfo;
+  txn: Txn;
   apiTxnActionsData: ApiTxnData;
   statsData: {
     stats: Array<{

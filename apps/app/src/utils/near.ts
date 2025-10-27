@@ -5,7 +5,6 @@ import {
   ActionError,
   ActionInfo,
   ActionType,
-  ApiTransaction,
   FailedToFindReceipt,
   InvalidTxError,
   NestedReceiptWithOutcome,
@@ -16,13 +15,10 @@ import {
   ParsedReceipt,
   ProcessedTokenMeta,
   ReceiptAction,
-  ReceiptApiResponse,
-  ReceiptTree,
   RPCCompilationError,
   RPCFunctionCallError,
   RPCInvalidAccessKeyError,
   RPCNewReceiptValidationError,
-  TransactionInfo,
   TransactionLog,
   TransformedReceipt,
   TxExecutionError,
@@ -32,6 +28,9 @@ import { isValidJson, parseEventJson } from './libs';
 import { getRequest } from './app/api';
 import { cleanNestedObject } from './app/libs';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { Txn, TxnReceipts } from 'nb-schemas';
+import { ExecutionOutcomeStatus } from 'nb-types';
+import { JsonData } from 'nb-schemas/src/common';
 
 export function localFormat(number: string) {
   const bigNumber = Big(number);
@@ -79,10 +78,15 @@ export function decodeArgs(args: string[]) {
   return JSON.parse(Buffer.from(args, 'base64')?.toString());
 }
 
-export function tokenAmount(amount: string, decimal: string, format: boolean) {
+export function tokenAmount(
+  amount: string,
+  decimal: number | null | undefined,
+  format: boolean,
+) {
   if (amount === undefined || amount === null) return 'N/A';
   // @ts-ignore
-  const near = Big(amount).div(Big(10).pow(decimal));
+  const near =
+    decimal != null ? Big(amount).div(Big(10).pow(decimal)) : Big(amount);
 
   const formattedValue = format
     ? near.toFixed(8).replace(/\.?0+$/, '')
@@ -151,24 +155,34 @@ export function txnLogs(txn: RpcTransactionResponse): TransactionLog[] {
   return txLogs;
 }
 
-export function apiTxnLogs(txn: any): TransactionLog[] {
+export function apiTxnLogs(txn: TxnReceipts): TransactionLog[] {
   let txLogs: TransactionLog[] = [];
 
-  const outcomes = txn?.receipts || [];
+  function extractLogs(receipt: TxnReceipts | null): void {
+    if (!receipt || !receipt.outcome) return;
 
-  for (let i = 0; i < outcomes?.length; i++) {
-    const outcome = outcomes[i];
-    let logs = outcome?.outcome?.logs || [];
+    const logs = receipt.outcome.logs;
 
-    if (logs?.length > 0) {
-      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
-        contract: outcome?.outcome?.executor_account_id || '',
-        logs: parseEventJson(log),
-        receiptId: outcome?.receipt_id,
-      }));
+    if (Array.isArray(logs) && logs.length > 0) {
+      const mappedLogs: TransactionLog[] = logs
+        .filter((log): log is string => typeof log === 'string')
+        .map((log: string) => ({
+          contract: receipt.outcome?.executor_account_id || '',
+          logs: parseEventJson(log),
+          receiptId: receipt.receipt_id,
+        }));
+
       txLogs = [...txLogs, ...mappedLogs];
     }
+
+    if (receipt.receipts && receipt.receipts.length > 0) {
+      for (const subReceipt of receipt.receipts) {
+        extractLogs(subReceipt);
+      }
+    }
   }
+
+  extractLogs(txn);
   return txLogs;
 }
 
@@ -413,52 +427,58 @@ export function apiRemainingLogs(
   return allRemainingLogs;
 }
 
-export function apiTxnActionLogs(txn: ApiTransaction): TransactionLog[] {
+export function apiTxnActionLogs(receipt: TxnReceipts): TransactionLog[] {
   let txLogs: TransactionLog[] = [];
+  function extractLogs(receipt: TxnReceipts): void {
+    if (!receipt || !receipt.outcome) return;
+    const logs = receipt.outcome.logs;
+    if (Array.isArray(logs) && logs.length > 0) {
+      const mappedLogs: TransactionLog[] = logs
+        .filter((log): log is string => typeof log === 'string')
+        .map((log: string) => ({
+          contract: receipt.outcome?.executor_account_id || '',
+          logs: parseEventJson(log),
+          receiptId: receipt.receipt_id,
+        }));
 
-  const outcomes = txn?.receipts || [];
-
-  for (let i = 0; i < outcomes?.length; i++) {
-    const outcome = outcomes[i];
-    let logs = outcome?.outcome?.logs || [];
-    if (logs?.length > 0) {
-      const mappedLogs: TransactionLog[] = logs?.map((log: string) => ({
-        contract: outcome?.outcome?.executor_account_id || '',
-        logs: parseEventJson(log),
-        receiptId: outcome?.receipt_id,
-      }));
       txLogs = [...txLogs, ...mappedLogs];
     }
+    if (receipt.receipts && receipt.receipts.length > 0) {
+      for (const subReceipt of receipt.receipts) {
+        extractLogs(subReceipt);
+      }
+    }
   }
+  extractLogs(receipt);
   return txLogs;
 }
 
 export function processApiActions(
-  apiData: ReceiptApiResponse | null,
+  receipt: TxnReceipts,
   allAction: boolean = true,
 ): ReceiptAction[] {
-  const txActions: any = [];
-  const receiptTree = apiData?.receipts?.[0];
+  const txActions: ReceiptAction[] = [];
 
-  function processReceipt(receipt: any, isTopLevel = false) {
-    const from = receipt?.predecessor_account_id;
-    const to = receipt?.receiver_account_id;
-    const receiptId = receipt?.receipt_id;
+  function processReceipt(receipt: TxnReceipts, isTopLevel: boolean = false) {
+    if (!receipt) return;
+    const from = receipt.predecessor_account_id;
+    const to = receipt.receiver_account_id;
+    const receiptId = receipt.receipt_id;
 
     if (from === 'system') return;
 
     const actions = receipt?.actions || [];
 
     if (!isTopLevel) {
-      for (let i = 0; i < actions?.length; i++) {
+      for (let i = 0; i < actions.length; i++) {
         const action = actions[i];
 
         txActions.push({
           from,
           to,
           receiptId,
-          action_kind: action?.action_kind,
-          args: action?.args,
+          action_kind: action.action,
+          args: action.args,
         });
       }
     }
@@ -469,37 +489,41 @@ export function processApiActions(
     }
   }
 
-  if (receiptTree && receiptTree?.receipt_tree) {
-    processReceipt(receiptTree?.receipt_tree, allAction);
-  }
+  processReceipt(receipt, allAction);
 
   return txActions;
 }
 
-export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
+export function apiMainTxnsActions(
+  txn: Txn,
+  receipt: TxnReceipts,
+): ActionInfo[] {
   const txActions: ActionInfo[] = [];
 
-  const transaction = apiTxn?.actions || [];
-  const firstReceipt = apiTxn?.receipts?.[0];
-  const from = apiTxn?.signer_account_id;
-  const to = apiTxn?.receiver_account_id;
-  const receipt = firstReceipt?.receipt_id;
-  const args = apiTxn?.actions_agg;
-  const logs =
-    firstReceipt?.outcome?.logs?.map((log: string) => ({
-      logs: parseEventJson(log),
-      contract: to,
-      receiptId: receipt,
-    })) || [];
+  const transaction = receipt?.actions || [];
+  const from = txn?.signer_account_id;
+  const to = txn?.receiver_account_id;
+  const receiptId = receipt?.receipt_id;
+  const args = txn?.actions_agg;
+  const logs = Array.isArray(receipt?.outcome?.logs)
+    ? receipt.outcome.logs
+        .filter((log): log is string => typeof log === 'string')
+        .map((log) => ({
+          logs: parseEventJson(log),
+          contract: to,
+          receiptId: receiptId,
+        }))
+    : [];
+
   const actionsLog =
-    apiTxn?.actions?.map((action: any) => {
+    receipt?.actions?.map((action) => {
       const actionInfo = processApiAction(action);
 
       return {
         ...actionInfo,
         args: {
           deposit: actionInfo?.args?.deposit || 0,
-          gas: actionInfo?.args?.gas || apiTxn?.actions_agg?.gas_attached || 0,
+          gas: actionInfo?.args?.gas || txn?.actions_agg?.gas_attached || 0,
           method_name: actionInfo?.args?.method_name,
           args: actionInfo?.args?.args,
         },
@@ -511,7 +535,7 @@ export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
     txActions.push({
       to,
       from,
-      receiptId: receipt,
+      receiptId: receiptId,
       logs,
       actionsLog,
       ...action,
@@ -521,68 +545,88 @@ export function apiMainTxnsActions(apiTxn: ApiTransaction): ActionInfo[] {
 }
 
 export const transformReceiptData = (
-  apiData: ReceiptApiResponse | null,
+  receipt: TxnReceipts,
 ): TransformedReceipt | null => {
-  if (!apiData || !apiData.receipts || !apiData.receipts.length) {
+  if (!receipt) {
     return null;
   }
 
-  const transformReceipt = (
-    receiptTree: ReceiptTree,
-  ): TransformedReceipt | null => {
-    if (!receiptTree) return null;
-    const outgoingReceipts = receiptTree?.receipts
-      ? receiptTree?.receipts
-          .map((childReceipt) => transformReceipt(childReceipt))
-          .filter((receipt): receipt is TransformedReceipt => receipt !== null)
-      : [];
+  const convertStatus = (
+    status_key?: ExecutionOutcomeStatus,
+    result?: JsonData | null,
+  ) => {
+    const resultStr = typeof result === 'string' ? result : '';
 
-    const actions = receiptTree?.actions?.map((action) => ({
-      ...action,
-      args: {
-        ...action?.args,
-        deposit: action?.args?.deposit || '0',
-      },
-    }));
-    const receipt: TransformedReceipt = {
-      receipt_id: receiptTree?.receipt_id,
-      predecessor_id: receiptTree?.predecessor_account_id,
-      receiver_id: receiptTree?.receiver_account_id,
-      block_hash: receiptTree?.block?.block_hash,
-      block_height: receiptTree?.block?.block_height || null,
-      actions: cleanNestedObject(actions),
-      outcome: {
-        logs: cleanNestedObject(receiptTree?.outcome?.logs) || [],
-        status: convertStatus(
-          receiptTree?.outcome?.status_key,
-          receiptTree?.outcome?.result,
-        ),
-        gas_burnt: receiptTree?.outcome?.gas_burnt,
-        tokens_burnt: receiptTree?.outcome?.tokens_burnt,
-        executor_account_id: receiptTree?.outcome?.executor_account_id,
-        outgoing_receipts: outgoingReceipts,
-      },
-      public_key: receiptTree?.public_key,
-    };
-
-    return receipt;
-  };
-
-  const convertStatus = (status_key: string, result: string) => {
     switch (status_key) {
       case 'SUCCESS_VALUE':
-        return { SuccessValue: result || '' };
+        return { SuccessValue: resultStr };
       case 'SUCCESS_RECEIPT_ID':
-        return { SuccessReceiptId: result || '' };
+        return { SuccessReceiptId: resultStr };
       case 'FAILURE':
-        return { Failure: { error_message: result } };
+        return { Failure: { error_message: resultStr } };
       default:
-        return { SuccessValue: result || '' };
+        return { SuccessValue: resultStr };
     }
   };
 
-  const rootReceipt = apiData?.receipts?.[0].receipt_tree;
-  return transformReceipt(rootReceipt);
+  const transformReceipt = (
+    receipt: TxnReceipts,
+  ): TransformedReceipt | null => {
+    if (!receipt) return null;
+    const outgoingReceipts =
+      receipt.receipts && receipt.receipts.length > 0
+        ? receipt.receipts
+            .map((childReceipt) => transformReceipt(childReceipt))
+            .filter((r): r is TransformedReceipt => r !== null)
+        : [];
+
+    const actions = receipt.actions?.map((action) => {
+      const argsObj =
+        action.args &&
+        typeof action.args === 'object' &&
+        !Array.isArray(action.args)
+          ? action.args
+          : {};
+
+      return {
+        ...action,
+        action_kind: action.action,
+        args: {
+          ...argsObj,
+          deposit: argsObj.deposit || '0',
+        },
+      };
+    });
+
+    const blockHeight = receipt.block?.block_height
+      ? Number(receipt.block.block_height)
+      : null;
+
+    const transformedReceipt: TransformedReceipt = {
+      receipt_id: receipt.receipt_id,
+      predecessor_id: receipt.predecessor_account_id,
+      receiver_id: receipt.receiver_account_id,
+      block_hash: receipt.block?.block_hash,
+      block_height: blockHeight,
+      actions: cleanNestedObject(actions),
+      outcome: {
+        logs: cleanNestedObject(receipt.outcome?.logs) || [],
+        status: convertStatus(
+          receipt.outcome?.status_key,
+          receipt.outcome?.result,
+        ),
+        gas_burnt: receipt.outcome?.gas_burnt,
+        tokens_burnt: receipt.outcome?.tokens_burnt,
+        executor_account_id: receipt.outcome?.executor_account_id,
+        outgoing_receipts: outgoingReceipts,
+      },
+      public_key: receipt.public_key,
+    };
+
+    return transformedReceipt;
+  };
+
+  return transformReceipt(receipt);
 };
 
 function processApiAction(action: any, args?: any) {
@@ -754,14 +798,14 @@ async function processTokenMetadata(
 }
 
 export async function processTransactionWithTokens(
-  apiTxn: ApiTransaction,
-  receipt: ReceiptApiResponse,
+  txn: Txn,
+  receipt: TxnReceipts,
 ) {
-  const apiLogs = apiTxnLogs(apiTxn);
-  const apiMainActions = apiMainTxnsActions(apiTxn);
+  const apiLogs = apiTxnLogs(receipt);
+  const apiMainActions = apiMainTxnsActions(txn, receipt);
   const apiSubActions = processApiActions(receipt);
   const apiAllActions = processApiActions(receipt, false);
-  const apiActionLogs = apiTxnActionLogs(apiTxn);
+  const apiActionLogs = apiTxnActionLogs(receipt);
   const receiptData = transformReceiptData(receipt);
   const tokenMetadata = await processTokenMetadata(apiLogs || []);
   return {
@@ -797,11 +841,11 @@ export function valueFromObj(obj: Obj): string | undefined {
   return undefined;
 }
 
-export function txnErrorMessage(txn: TransactionInfo | RpcTransactionResponse) {
+export function txnErrorMessage(txn: Txn | RpcTransactionResponse) {
   let kind: string | object | undefined;
 
   if ('outcomes' in txn) {
-    kind = txn.outcomes?.result?.ActionError?.kind;
+    kind = txn.outcomes?.status_key;
   }
 
   if ('status' in txn) {

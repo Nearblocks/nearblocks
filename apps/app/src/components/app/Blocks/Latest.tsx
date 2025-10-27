@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { use } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -11,17 +11,25 @@ import {
   localFormat,
   nanoToMilli,
 } from '@/utils/libs';
-import { BlocksInfo } from '@/utils/types';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
+import { Block, BlocksRes } from 'nb-schemas';
 
 interface Props {
-  blocks: BlocksInfo[];
-  error: boolean;
+  blocksPromise: Promise<BlocksRes>;
 }
 
-const LatestBlocks = ({ blocks, error }: Props) => {
+const LatestBlocks = ({ blocksPromise }: Props) => {
+  const data = use(blocksPromise);
+  const blocks = data?.data;
+  const blocksLength = blocks?.length || 0;
+  const error = data?.errors;
+
+  if (error) {
+    throw new Error('Error fetching latest blocks');
+  }
+
   const t = useTranslations();
 
   return (
@@ -33,12 +41,12 @@ const LatestBlocks = ({ blocks, error }: Props) => {
               {t ? t('homePage.error') : 'Error!'}
             </div>
           )}
-          {!error && blocks?.length === 0 && (
+          {!error && blocksLength === 0 && (
             <div className="flex items-center h-16 mx-3 py-2 text-nearblue-700 text-xs">
               {t ? t('homePage.noBlocks') : 'No blocks found'}
             </div>
           )}
-          {error && blocks?.length === 0 && (
+          {error && blocksLength === 0 && (
             <div className="px-3 divide-y dark:divide-black-200 h-80">
               {[...Array(5)].map((_, i) => (
                 <div
@@ -81,9 +89,9 @@ const LatestBlocks = ({ blocks, error }: Props) => {
               ))}
             </div>
           )}
-          {blocks?.length > 0 && (
+          {blocksLength > 0 && (
             <div className="px-3 divide-y dark:divide-black-200 h-80 lg:overflow-visible overflow-y-scroll">
-              {blocks?.map((block: BlocksInfo) => {
+              {blocks?.map((block: Block) => {
                 return (
                   <div
                     className="grid grid-cols-2 md:grid-cols-3 gap-2 lg:gap-3 py-3"
@@ -128,7 +136,7 @@ const LatestBlocks = ({ blocks, error }: Props) => {
                       </Link>
                       <div className="text-nearblue-700 text-sm ">
                         {block?.transactions_agg?.count
-                          ? localFormat(block?.transactions_agg?.count)
+                          ? localFormat(String(block?.transactions_agg?.count))
                           : block?.transactions_agg?.count ?? ''}{' '}
                         txns{' '}
                       </div>
@@ -155,12 +163,12 @@ const LatestBlocks = ({ blocks, error }: Props) => {
           )}
         </PerfectScrollbar>
       </div>
-      {error && blocks?.length === 0 && (
+      {error && blocksLength === 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Skeleton className="h-10" />
         </div>
       )}
-      {blocks && blocks?.length > 0 && (
+      {blocks && blocksLength > 0 && (
         <div className="border-t dark:border-black-200 px-2 py-3 text-nearblue-600 dark:text-neargray-10">
           <Link href="/blocks">
             <span className="block dark:text-white text-center border border-green-900/10 bg-green-500 dark:bg-black-600/[0.75] hover:bg-green-400 font-medium dark:hover:text-green-250 text-white text-[13px] py-2 rounded w-full focus:outline-none hover:no-underline cursor-pointer">

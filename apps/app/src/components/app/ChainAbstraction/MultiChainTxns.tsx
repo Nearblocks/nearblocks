@@ -24,14 +24,14 @@ import FaInbox from '@/components/app/Icons/FaInbox';
 import Filter from '@/components/app/Icons/Filter';
 import Near from '@/components/app/Icons/Near';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-import { McTxnCount, McTxns } from 'nb-schemas';
+import { MCTxnCount, MCTxn } from 'nb-schemas';
 import { useNetworkIcons } from '@/hooks/app/useNetworkIcons';
 import { FilterKind } from '@/utils/types';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 interface MultiChainTxnsProps {
-  dataPromise: Promise<{ data: McTxns[]; meta?: { cursor?: string } }>;
-  countPromise: Promise<McTxnCount>;
+  dataPromise: Promise<{ data: MCTxn[]; meta?: { cursor?: string } }>;
+  countPromise: Promise<MCTxnCount>;
   isTab: boolean;
   tab: string;
 }
@@ -136,7 +136,7 @@ const MultiChainTxns = ({
 
   const columns: any = [
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.receipt_id && row?.transaction_hash ? (
           <Tooltip
             className={'left-20 max-w-[200px]'}
@@ -163,7 +163,7 @@ const MultiChainTxns = ({
         'pl-6 pr-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.transaction_hash ? (
           <span>
             <Tooltip
@@ -199,7 +199,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.account_id ? (
           <span>
             <Tooltip
@@ -286,7 +286,7 @@ const MultiChainTxns = ({
       thClassName: 'px-4 py-4',
     },
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.dest_txn ? (
           <span>
             <Tooltip
@@ -331,7 +331,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.dest_address ? (
           <span>
             <Tooltip
@@ -379,7 +379,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.block?.block_hash && row?.block?.block_height ? (
           <span>
             <Link
@@ -402,7 +402,7 @@ const MultiChainTxns = ({
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: McTxns) =>
+      cell: (row: MCTxn) =>
         row?.block?.block_timestamp ? (
           <span>
             <Timestamp

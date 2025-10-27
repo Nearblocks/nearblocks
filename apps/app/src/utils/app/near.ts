@@ -21,6 +21,7 @@ import {
   TxExecutionError,
 } from '@/utils/types';
 import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import { ActionKind } from 'nb-types';
 
 export function localFormat(number: string) {
   const bigNumber = Big(number);
@@ -80,7 +81,7 @@ export function tokenAmount(amount: string, decimal: string, format: boolean) {
   return formattedValue;
 }
 export const txnMethod = (
-  actions: { action: string; method: string }[],
+  actions: { action: string | ActionKind; method: string | null }[],
   t?: (key: string, p?: any) => string | undefined,
 ) => {
   const count = actions?.length || 0;

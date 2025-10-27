@@ -1,11 +1,10 @@
-import { getRequest } from '@/utils/app/api';
+import { getRequestBeta } from '@/utils/app/api';
 
 import TransactionActions from '@/components/app/Address/TransactionActions';
 
 const Transactions = async ({ id, searchParams }: any) => {
-  const data = getRequest(`v1/account/${id}/txns-only`, searchParams);
-  const count = getRequest(`v1/account/${id}/txns-only/count`, searchParams);
-
+  const data = getRequestBeta(`v3/accounts/${id}/txns`, searchParams);
+  const count = getRequestBeta(`v3/accounts/${id}/txns/count`, searchParams);
   return <TransactionActions dataPromise={data} countPromise={count} />;
 };
 export default Transactions;

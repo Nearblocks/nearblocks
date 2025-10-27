@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 import { Link } from '@/i18n/routing';
-import { getRequest } from '@/utils/app/api';
+import { getRequest, getRequestBeta } from '@/utils/app/api';
 import { Token } from '@/utils/types';
 
 import NFTHolders from '@/components/app/Tokens/NFT/NFTHolders';
@@ -35,7 +35,7 @@ export default async function NFTTokenTab({
         searchParams.per_page = '24';
       },
     },
-    transfers: { api: `v1/nfts/${id}/txns`, count: `v1/nfts/${id}/txns/count` },
+    transfers: { api: `v3/nfts/${id}/txns`, count: `v3/nfts/${id}/txns/count` },
   };
 
   const tabApi = tabApiUrls[tab as TabType];
@@ -45,17 +45,23 @@ export default async function NFTTokenTab({
   const countUrl = tabApi?.count ? `${tabApi?.count}` : '';
   const [dataResult, dataCount, tokenDetails, syncDetails, holdersDetails] =
     await Promise.all([
-      getRequest(fetchUrl, searchParams, options),
-      getRequest(countUrl, {}, options),
+      fetchUrl.startsWith('v3')
+        ? getRequestBeta(fetchUrl, searchParams, options)
+        : getRequest(fetchUrl, searchParams, options),
+      countUrl
+        ? countUrl.startsWith('v3')
+          ? getRequestBeta(countUrl, {}, options)
+          : getRequest(countUrl, {}, options)
+        : Promise.resolve(null),
       getRequest(`v1/nfts/${id}`, {}, options),
       getRequest(`v1/sync/status`, {}, options),
       getRequest(`v1/nfts/${id}/holders/count`, {}, options),
     ]);
   const holder = dataResult?.holders || [];
   const holders = holdersDetails?.holders?.[0]?.count;
-  const txns = dataResult?.txns || [];
-  const txnCursor = dataResult?.cursor;
-  const transferCount = dataCount?.txns?.[0]?.count;
+  const txns = dataResult?.data || [];
+  const txnCursor = dataResult?.meta?.cursor;
+  const transferCount = dataCount?.data?.count;
   const token: Token = tokenDetails?.contracts?.[0];
   const status = syncDetails?.status?.aggregates.ft_holders || {
     height: '0',

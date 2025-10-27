@@ -8,12 +8,12 @@ import {
   Action,
   FunctionCallActionView,
   ReceiptsPropsInfo,
-  TransactionInfo,
 } from '@/utils/types';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import TxnsReceiptStatus from '@/components/app/common/TxnsReceiptStatus';
 import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
+import { Txn } from 'nb-schemas';
 
 interface Props {
   borderFlag?: boolean;
@@ -25,7 +25,7 @@ interface Props {
       near_price: string;
     }>;
   };
-  txn: TransactionInfo;
+  txn: Txn;
 }
 
 const ReceiptSummaryRow = (props: Props) => {
@@ -36,7 +36,10 @@ const ReceiptSummaryRow = (props: Props) => {
   const currentPrice = statsData?.stats?.[0]?.near_price || 0;
 
   function formatActionKind(actionKind: string) {
-    return actionKind.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return actionKind
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/_/g, ' ')
+      .toLowerCase();
   }
 
   const getGasAttached = (actions: Action[]): string => {
@@ -71,11 +74,12 @@ const ReceiptSummaryRow = (props: Props) => {
       status.SuccessValue !== undefined) ||
       'SuccessReceiptId' in status);
 
+  const receiptId = receipt?.receipt_id || receipt?.id || '';
   return (
     <>
       {polledReceipt &&
         polledReceipt?.actions?.map((action: any, i: number) => (
-          <tr key={i}>
+          <tr key={`${receiptId}-action-${i}`}>
             <td className="pl-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
               <TxnsReceiptStatus status={isSuccess} />
             </td>
@@ -83,17 +87,17 @@ const ReceiptSummaryRow = (props: Props) => {
               <Tooltip
                 className={'left-1/2 max-w-[200px]'}
                 position="top"
-                tooltip={receipt.receipt_id || receipt.id}
+                tooltip={receiptId}
               >
                 <Link
                   className={`truncate max-w-[120px] inline-block text-green-500 dark:text-green-250 hover:no-underline whitespace-nowrap`}
-                  href={`?tab=execution#${receipt.receipt_id || receipt.id}`}
+                  href={`?tab=execution#${receiptId}`}
                 >
-                  {receipt.receipt_id || receipt.id}
+                  {receiptId}
                 </Link>
               </Tooltip>
             </td>
-            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
+            <td className="px-6 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap capitalize">
               {formatActionKind(action.action_kind)}
             </td>
             <td className="px-4 py-4 text-sm text-nearblue-600 dark:text-neargray-10 font-medium whitespace-nowrap">
@@ -165,8 +169,10 @@ const ReceiptSummaryRow = (props: Props) => {
             (rcpt: any, index: number) => {
               const childRpcReceipt =
                 polledReceipt?.outcome?.outgoing_receipts?.[index] || null;
+              const childReceiptId =
+                rcpt?.receipt_id || `${receiptId}-child-${index}`;
               return (
-                <Fragment key={rcpt?.receipt_id}>
+                <Fragment key={childReceiptId}>
                   <ReceiptSummaryRow
                     borderFlag={true}
                     price={price}

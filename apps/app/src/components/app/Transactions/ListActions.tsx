@@ -4,21 +4,10 @@ import { Link, usePathname, useIntlRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import QueryString from 'qs';
 import React, { useState } from 'react';
-
-import {
-  PopoverContent,
-  PopoverRoot,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  getFilteredQueryParams,
-  isAction,
-  localFormat,
-} from '@/utils/app/libs';
+import { getFilteredQueryParams, localFormat } from '@/utils/app/libs';
 import { txnMethod } from '@/utils/app/near';
 import { yoctoToNear } from '@/utils/libs';
-import { FilterKind, TransactionInfo } from '@/utils/types';
-
+import { FilterKind } from '@/utils/types';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import Filters from '@/components/app/common/Filters';
 import TxnStatus from '@/components/app/common/Status';
@@ -28,124 +17,45 @@ import Tooltip from '@/components/app/common/Tooltip';
 import Clock from '@/components/app/Icons/Clock';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import FaLongArrowAltRight from '@/components/app/Icons/FaLongArrowAltRight';
-import Filter from '@/components/app/Icons/Filter';
-import SortIcon from '@/components/app/Icons/SortIcon';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
-
+import { TxnCountRes, Txn, TxnsRes } from 'nb-schemas';
 interface ListProps {
   error: boolean;
-  txnsCount: {
-    txns: { count: string }[];
-  };
-  txnsData: {
-    cursor: string;
-    txns: TransactionInfo[];
-  };
+  txnsCount: TxnCountRes;
+  txnsData: TxnsRes;
 }
 
 const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
   const router = useIntlRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const order = searchParams?.get('order');
   const [showAge, setShowAge] = useState(true);
-  const initialForm = {
-    action: searchParams?.get('action') || '',
-    from: searchParams?.get('from') || '',
-    method: searchParams?.get('method') || '',
-    to: searchParams?.get('to') || '',
-  };
-  const [form, setForm] = useState(initialForm);
   const [page, setPage] = useState(1);
   const t = useTranslations();
   const errorMessage = t('noTxns') || ' No transactions found!';
 
-  const count = txnsCount?.txns[0]?.count;
-  const txns = txnsData?.txns;
-  let cursor = txnsData?.cursor;
+  const count = txnsCount?.data?.count;
+  const txns = txnsData?.data;
+  let cursor = txnsData?.meta?.cursor;
 
   const currentParams = QueryString.parse(searchParams?.toString() || '');
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === 'type') {
-      if (isAction(value)) {
-        setForm((prev) => ({ ...prev, action: value, method: '' }));
-      } else {
-        setForm((prev) => ({ ...prev, action: '', method: value }));
-      }
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
   const toggleShowAge = () => setShowAge((prev) => !prev);
-
-  const onFilter = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    setPage(1);
-
-    const { action, from, method, to } = form;
-    const { cursor, page, ...updatedQuery } = currentParams;
-
-    const queryParams = {
-      ...updatedQuery,
-      ...(action && { action }),
-      ...(method && { method }),
-      ...(from && { from }),
-      ...(to && { to }),
-    };
-
-    const newQueryString = QueryString.stringify(queryParams);
-    router.push(`${pathname}?${newQueryString}`);
-    router.refresh();
-  };
-
-  const onClear = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { name } = e.currentTarget;
-
-    setPage(1);
-    const { cursor, page, ...restQuery } = currentParams;
-
-    if (name === 'type') {
-      setForm((prev) => ({ ...prev, action: '', method: '' }));
-      const { action, method, ...newQuery } = restQuery;
-      const newQueryString = QueryString.stringify(newQuery);
-      router.push(`${pathname}?${newQueryString}`);
-    } else {
-      setForm((f) => ({ ...f, [name]: '' }));
-      const { [name]: _, ...newQuery } = restQuery;
-      const newQueryString = QueryString.stringify(newQuery);
-      router.push(`${pathname}?${newQueryString}`);
-    }
-  };
   const onAllClear = () => {
-    setForm(initialForm);
-    const { action, block, cursor, from, method, page, to, ...newQuery } =
+    const { block, cursor, page, after_ts, before_ts, ...newQuery } =
       currentParams;
     const newQueryString = QueryString.stringify(newQuery);
     router.push(`${pathname}?${newQueryString}`);
   };
 
-  const onOrder = () => {
-    const currentOrder = searchParams?.get('order') || 'desc';
-    const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
-    const newParams = { order: newOrder };
-    const newQueryString = QueryString.stringify(newParams);
-    router.push(`${pathname}?${newQueryString}`);
-  };
-
   const modifiedFilter = getFilteredQueryParams(currentParams, [
-    FilterKind.ACTION,
-    FilterKind.METHOD,
-    FilterKind.FROM,
-    FilterKind.TO,
     FilterKind.BLOCK,
+    FilterKind.AFTER_TS,
+    FilterKind.BEFORE_TS,
   ]);
 
   const columns: any = [
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <>
           <TxnStatus showLabel={false} status={row?.outcomes?.status} />
         </>
@@ -156,7 +66,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         'pl-4 py-3 whitespace-nowrap text-sm text-nearblue-600 dark:text-neargray-10 w-12',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -183,7 +93,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         'px-4 py-4 text-left whitespace-nowrap  text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -199,52 +109,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <PopoverRoot positioning={{ sameWidth: true }}>
-          <PopoverTrigger
-            asChild
-            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
-            suppressHydrationWarning={true}
-          >
-            <button>
-              {t('type') || 'METHOD'}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="bg-white absolute dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
-            marginTop={-1.5}
-            roundedBottom={'lg'}
-            roundedTop={'none'}
-            width={'48'}
-          >
-            <form className="flex flex-col" onSubmit={onFilter}>
-              <input
-                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-                name="type"
-                onChange={onChange}
-                placeholder="Search by method"
-                value={form.action || form.method}
-              />
-              <div className="flex">
-                <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 text-white dark:text-black text-xs mr-2"
-                  type="submit"
-                >
-                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t('filter.filter') || 'Filter'}
-                </button>
-                <button
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
-                  name="type"
-                  onClick={onClear}
-                  type="button"
-                >
-                  {t('filter.clear') || 'Clear'}
-                </button>
-              </div>
-            </form>
-          </PopoverContent>
-        </PopoverRoot>
+        <span className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+          {t('type') || 'METHOD'}
+        </span>
       ),
       key: 'actions',
       tdClassName:
@@ -252,7 +119,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       thClassName: 'px-1.5',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           {row?.actions_agg?.deposit
             ? yoctoToNear(row?.actions_agg?.deposit, true)
@@ -272,7 +139,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           {row?.outcomes_agg?.transaction_fee
             ? yoctoToNear(row?.outcomes_agg?.transaction_fee, true)
@@ -290,7 +157,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         'px-4 py-4 text-left whitespace-nowrap text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -310,54 +177,9 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <PopoverRoot positioning={{ sameWidth: true }}>
-          <PopoverTrigger
-            asChild
-            className="flex relative items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
-            suppressHydrationWarning={true}
-          >
-            <button>
-              {t('from') || 'FROM'}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
-            marginTop={-1.5}
-            roundedBottom={'lg'}
-            roundedTop={'none'}
-            width={48}
-          >
-            <form onSubmit={onFilter}>
-              <input
-                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600  dark:text-neargray-10 text-xs"
-                name="from"
-                onChange={onChange}
-                placeholder={
-                  t('filter.placeholder') || 'Search by address e.g. Ⓝ..'
-                }
-                value={form.from}
-              />
-              <div className="flex">
-                <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 dark:text-black h-7 text-white text-xs mr-2"
-                  type="submit"
-                >
-                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t('filter.filter') || 'Filter'}
-                </button>
-                <button
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
-                  name="from"
-                  onClick={onClear}
-                  type="button"
-                >
-                  {t('filter.clear') || 'Clear'}
-                </button>
-              </div>
-            </form>
-          </PopoverContent>
-        </PopoverRoot>
+        <span className="flex relative items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+          {t('from') || 'FROM'}
+        </span>
       ),
       key: 'signer_account_id',
       tdClassName:
@@ -374,7 +196,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
       key: '',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           <Tooltip
             className={'left-1/2 max-w-[200px]'}
@@ -394,65 +216,20 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <PopoverRoot positioning={{ sameWidth: true }}>
-          <PopoverTrigger
-            asChild
-            className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider focus:outline-none"
-            suppressHydrationWarning={true}
-          >
-            <button>
-              {t('to') || 'To'}
-              <Filter className="h-4 w-4 fill-current ml-2" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            className="bg-white dark:bg-black-600 dark:border-black-200 shadow-lg border p-2 z-20"
-            marginTop={-1.5}
-            roundedBottom={'lg'}
-            roundedTop={'none'}
-            width={48}
-          >
-            <form onSubmit={onFilter}>
-              <input
-                className="border dark:border-black-200 focus:outline-blue dark:focus:outline-none dark:focus:ring-2 dark:focus:ring-gray-800 rounded h-8 mb-2 px-2 text-nearblue-600 dark:text-neargray-10 text-xs"
-                name="to"
-                onChange={onChange}
-                placeholder={
-                  t('filter.placeholder') || 'Search by address e.g. Ⓝ..'
-                }
-                value={form.to}
-              />
-              <div className="flex">
-                <button
-                  className="flex items-center justify-center flex-1 rounded bg-green-500 dark:bg-green-250 h-7 dark:text-black text-white text-xs mr-2"
-                  type="submit"
-                >
-                  <Filter className="h-3 w-3 fill-current mr-2" />{' '}
-                  {t('filter.filter') || 'Filter'}
-                </button>
-                <button
-                  className="flex-1 rounded bg-gray-300 dark:bg-black-200 dark:text-neargray-10 text-xs h-7"
-                  name="to"
-                  onClick={onClear}
-                  type="button"
-                >
-                  {t('filter.clear') || 'Clear'}
-                </button>
-              </div>
-            </form>
-          </PopoverContent>
-        </PopoverRoot>
+        <span className="flex items-center px-4 py-4 text-left text-xs font-semibold text-nearblue-600  dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
+          {t('to') || 'To'}
+        </span>
       ),
       key: 'receiver_account_id',
       tdClassName:
         'px-4 py-3 text-sm text-nearblue-600 dark:text-neargray-10 font-medium w-48',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
           <Link
             className="text-green-500 dark:text-green-250 hover:no-underline font-medium"
-            href={`/blocks/${row?.included_in_block_hash}`}
+            href={`/blocks/${row?.block?.block_hash}`}
           >
             {row?.block?.block_height
               ? localFormat(row?.block?.block_height)
@@ -461,8 +238,7 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         </span>
       ),
       header: (
-        <span suppressHydrationWarning={true}>
-          {' '}
+        <span className="flex items-center text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider focus:outline-none">
           {t('blockHeight') || ' BLOCK HEIGHT'}
         </span>
       ),
@@ -473,9 +249,12 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
         'px-4 py-4 text-left text-xs font-semibold text-nearblue-600 dark:text-neargray-10 uppercase tracking-wider whitespace-nowrap',
     },
     {
-      cell: (row: TransactionInfo) => (
+      cell: (row: Txn) => (
         <span>
-          <Timestamp showAge={showAge} timestamp={row?.block_timestamp} />
+          <Timestamp
+            showAge={showAge}
+            timestamp={row?.block?.block_timestamp}
+          />
         </span>
       ),
       header: (
@@ -501,11 +280,6 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
               )}
             </button>
           </Tooltip>
-          <button className="px-2" onClick={onOrder} type="button">
-            <div className="text-nearblue-600 dark:text-neargray-10 font-semibold">
-              <SortIcon order={order as string} />
-            </div>
-          </button>
         </div>
       ),
       key: 'block_timestamp',
@@ -525,11 +299,13 @@ const ListActions = ({ error, txnsCount, txnsData }: ListProps) => {
           >
             {modifiedFilter && Object.keys(modifiedFilter).length > 0
               ? count &&
+                Array.isArray(txns) &&
                 txns?.length > 0 &&
                 `${`A total of ${localFormat(
                   count.toString(),
                 )} transactions found`}`
               : count &&
+                Array.isArray(txns) &&
                 txns?.length > 0 &&
                 `${
                   t('txnsListing', {

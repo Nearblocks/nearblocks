@@ -1,14 +1,14 @@
-import { getRequest } from '@/utils/app/api';
+import { getRequestBeta } from '@/utils/app/api';
 
 import ListActions from '@/components/app/Transactions/ListActions';
 
 const List = async ({ searchParams }: any) => {
   const [data, count] = await Promise.all([
-    getRequest(`v1/txns`, searchParams),
-    getRequest(`v1/txns/count`, searchParams),
+    getRequestBeta(`v3/txns`, searchParams),
+    getRequestBeta(`v3/txns/count`, searchParams),
   ]);
-  if (data.message === 'Error') {
-    throw new Error(`Server Error : ${data.error}`);
+  if (data?.errors) {
+    throw new Error(`Server Error :  ${data?.errors[0].message}`);
   }
 
   return <ListActions error={!data} txnsCount={count} txnsData={data} />;
