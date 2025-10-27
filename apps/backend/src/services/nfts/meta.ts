@@ -1,16 +1,19 @@
-import { viewFunctionAsJson } from '@near-js/jsonrpc-client/no-validation';
-
 import { logger } from 'nb-logger';
 
 import dayjs from '#libs/dayjs';
 import { upsertError } from '#libs/events';
-import { dbEvents, pgp } from '#libs/pgp';
-import { rpc } from '#libs/rpc';
-import { encodeArgs } from '#libs/utils';
-import { NFTMetadata, NFTTokenInfo } from '#types/types';
+import { dbEvents } from '#libs/knex';
+import { fetchNFTMeta, fetchNFTTokenMeta } from '#libs/near';
+import {
+  MetaContract,
+  MetaContractToken,
+  NFTMetadata,
+  NFTTokenInfo,
+  Raw,
+} from '#types/types';
 
 export const syncNFTMeta = async () => {
-  const nfts = await dbEvents.manyOrNone(`
+  const { rows: nfts } = await dbEvents.raw<Raw<MetaContract>>(`
     SELECT
       contract
     FROM
@@ -35,8 +38,47 @@ export const syncNFTMeta = async () => {
   await Promise.all(nfts.map((nft) => updateNFTMeta(nft.contract)));
 };
 
+export const refreshNFTMeta = async () => {
+  const { rows: nfts } = await dbEvents.raw<Raw<MetaContract>>(
+    `
+      SELECT
+        contract
+      FROM
+        nft_meta
+      WHERE
+        modified_at < ?
+      ORDER BY
+        modified_at ASC
+      LIMIT
+        10
+    `,
+    [dayjs.utc().subtract(7, 'day').toISOString()],
+  );
+
+  await Promise.all(
+    nfts.map(async (nft) => {
+      const meta = await fetchNFTMeta(nft.contract);
+
+      if (meta) {
+        await updateMeta(nft.contract, meta);
+      } else {
+        await dbEvents.raw(
+          `
+            UPDATE nft_meta
+            SET
+              modified_at = ?
+            WHERE
+              contract = ?
+          `,
+          [dayjs.utc().toISOString(), nft.contract],
+        );
+      }
+    }),
+  );
+};
+
 export const syncNFTTokenMeta = async () => {
-  const nfts = await dbEvents.manyOrNone(`
+  const { rows: nfts } = await dbEvents.raw<Raw<MetaContractToken>>(`
     SELECT
       contract,
       token
@@ -66,115 +108,113 @@ export const syncNFTTokenMeta = async () => {
 
 export const updateNFTMeta = async (contract: string) => {
   try {
-    const meta = await viewFunctionAsJson<NFTMetadata>(rpc, {
-      accountId: contract,
-      methodName: 'nft_metadata',
-    });
+    const meta = await fetchNFTMeta(contract);
 
-    if (meta?.name) {
-      const data = {
-        base_uri: meta.base_uri,
-        contract,
-        icon: meta.icon,
-        modified_at: dayjs.utc().toISOString(),
-        name: meta.name,
-        reference: meta.reference,
-        reference_hash: meta.reference_hash,
-        spec: meta.spec,
-        symbol: meta.symbol,
-      };
-
-      try {
-        const columns = new pgp.helpers.ColumnSet(Object.keys(data), {
-          table: 'nft_meta',
-        });
-
-        await dbEvents.none(
-          pgp.helpers.insert(data, columns) +
-            ` ON CONFLICT (contract) DO UPDATE SET ` +
-            columns.assignColumns({ from: 'EXCLUDED', skip: ['contract'] }),
-        );
-      } catch (error) {
-        logger.error(error);
-      }
+    if (meta) {
+      await updateMeta(contract, meta);
     } else {
       await upsertError(contract, 'nft', null);
     }
   } catch (error) {
+    logger.error(`tokenMeta: updateNFTMeta: ${contract}`);
     logger.error(error);
     await upsertError(contract, 'nft', null);
   }
 };
 
+const updateMeta = async (contract: string, meta: NFTMetadata) => {
+  const data = {
+    base_uri: meta.base_uri,
+    icon: meta.icon,
+    modified_at: dayjs.utc().toISOString(),
+    name: meta.name,
+    reference: meta.reference,
+    reference_hash: meta.reference_hash,
+    spec: meta.spec,
+    symbol: meta.symbol,
+  };
+
+  try {
+    await dbEvents('nft_meta').where('contract', contract).update(data);
+  } catch (error) {
+    logger.error(`tokenMeta: updateMeta: ${contract}`);
+    logger.error(error);
+  }
+};
+
 export const updateNFTTokenMeta = async (contract: string, token: string) => {
   try {
-    const meta = await viewFunctionAsJson<NFTTokenInfo>(rpc, {
-      accountId: contract,
-      argsBase64: encodeArgs({ token_id: token }),
-      methodName: 'nft_token',
-    });
+    const meta = await fetchNFTTokenMeta(contract, token);
 
-    if (meta?.metadata) {
-      const data = {
-        contract,
-        copies: meta.metadata.copies,
-        description: meta.metadata.description,
-        extra: meta.metadata.extra,
-        media: meta.metadata.media,
-        media_hash: meta.metadata.media_hash,
-        modified_at: dayjs.utc().toISOString(),
-        reference: meta.metadata.reference,
-        reference_hash: meta.metadata.reference_hash,
-        title: meta.metadata.title,
-        token,
-      };
-
-      try {
-        const columns = new pgp.helpers.ColumnSet(Object.keys(data), {
-          table: 'nft_token_meta',
-        });
-
-        await dbEvents.none(
-          pgp.helpers.insert(data, columns) +
-            ` ON CONFLICT (contract, token) DO UPDATE SET ` +
-            columns.assignColumns({
-              from: 'EXCLUDED',
-              skip: ['contract', 'token'],
-            }),
-        );
-      } catch (error) {
-        logger.error(error);
-      }
+    if (meta) {
+      await updateTokenMeta(contract, token, meta);
     } else {
       await upsertError(contract, 'nft', token);
     }
   } catch (error) {
+    logger.error(`tokenMeta: updateNFTTokenMeta: ${contract}: ${token}`);
     logger.error(error);
     await upsertError(contract, 'nft', token);
   }
 };
 
-export const syncExistingNFT = async () => {
-  await dbEvents.manyOrNone(`
-    INSERT INTO
-      nft_meta (contract)
-    SELECT DISTINCT
-      contract_account_id
-    FROM
-      nft_events
-    ON CONFLICT (contract) DO NOTHING
-  `);
+const updateTokenMeta = async (
+  contract: string,
+  token: string,
+  meta: NFTTokenInfo,
+) => {
+  const data = {
+    copies: meta.metadata.copies,
+    description: meta.metadata.description,
+    extra: meta.metadata.extra,
+    media: meta.metadata.media,
+    media_hash: meta.metadata.media_hash,
+    modified_at: dayjs.utc().toISOString(),
+    reference: meta.metadata.reference,
+    reference_hash: meta.metadata.reference_hash,
+    title: meta.metadata.title,
+  };
+
+  try {
+    await dbEvents('nft_token_meta')
+      .where('contract', contract)
+      .where('token', token)
+      .update(data);
+  } catch (error) {
+    logger.error(`tokenMeta: updateTokenMeta: ${contract}: ${token}`);
+    logger.error(error);
+  }
 };
 
-export const syncExistingNFTToken = async () => {
-  await dbEvents.manyOrNone(`
-    INSERT INTO
-      nft_token_meta (contract, token)
-    SELECT DISTINCT
-      contract_account_id,
-      token_id
-    FROM
-      nft_events
-    ON CONFLICT (contract, token) DO NOTHING
-  `);
+export const resetNFTMeta = async (contracts: string[]) => {
+  try {
+    await dbEvents.transaction(async (tx) => {
+      return Promise.all([
+        tx.raw(
+          `
+            UPDATE nft_meta
+            SET
+              modified_at = NULL
+            WHERE
+              contract = ANY(?)
+              AND modified_at IS NOT NULL
+          `,
+          [contracts],
+        ),
+        tx.raw(
+          `
+            DELETE FROM errored_contracts
+            WHERE
+              contract = ANY(?)
+              AND type = ?
+              AND token IS NULL
+          `,
+          [contracts, 'nft'],
+        ),
+      ]);
+    });
+  } catch (error) {
+    logger.error(`tokenMetaReset: resetNFTMeta: ${contracts.join(',')}`);
+    logger.error(error);
+  }
 };
