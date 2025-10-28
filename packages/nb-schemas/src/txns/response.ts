@@ -169,7 +169,7 @@ const txnNFT = v.object({
 });
 
 const txnResponse = responseSchema(
-  v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk']),
+  v.omit(txn, ['block_timestamp', 'index_in_chunk']),
 );
 const txnsResponse = responseSchema(
   v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk'])),

@@ -41,6 +41,7 @@ const block = v.object({
 const deployment = v.object({
   block,
   block_timestamp: v.string(),
+  predecessor_account_id: v.string(),
   receipt_id: v.string(),
   transaction_hash: v.string(),
 });
