@@ -39,7 +39,7 @@ export const syncStats = async () => {
     const date = start.clone().add(day, 'day');
 
     await dayStats(date);
-    await sleep(100000);
+    await sleep(1000);
   }
 };
 

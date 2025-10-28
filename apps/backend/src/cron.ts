@@ -20,8 +20,13 @@ export const scheduleJobs = () => {
     // Validator jobs
     cron.schedule('0 * * * * *', './jobs/nodes.js', options); // 1m
     cron.schedule('0 */15 * * * *', './jobs/pools.js', options); // 15m
-    cron.schedule('0 * * * *', './jobs/protocol.js', options); // 1h
-    cron.schedule('0 0 * * *', './jobs/genesis.js', options); // 1d
+    cron.schedule('0 0 * * * *', './jobs/protocol.js', options); // 1h
+    cron.schedule('0 0 0 * * *', './jobs/genesis.js', options); // 1d
+
+    // View refresher jobs
+    cron.schedule('0 */15 * * * *', './jobs/refreshTokenList.js', options); // 15m
+    cron.schedule('0 0 * * * *', './jobs/refreshStakingPools.js', options); // 1h
+    cron.schedule('0 0 0 * * *', './jobs/refreshEthAccounts.js', options); // 1d
   } catch (error) {
     //
   }
