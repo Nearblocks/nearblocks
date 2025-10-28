@@ -13,6 +13,7 @@ import ArrowDown from '@/components/app/Icons/ArrowDown';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
 import { contractCode } from '@/utils/app/actions';
+import { isEmpty } from 'lodash';
 
 type contractData = {
   message: string;
@@ -33,7 +34,7 @@ type OnChainResponse = {
 const Verifier: React.FC<ContractFormProps> = ({
   accountId,
   network,
-  selectedVerifier,
+  selectedVerifier: propVerifier,
   contractPromise,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -45,9 +46,13 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [verified, setVerified] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState(false);
   const { verifierConfig } = useConfig();
+  const verifiers = verifierConfig.map((config) => config.accountId);
+  const [selectedVerifier, setSelectedVerifier] = useState<string>(
+    verifiers.includes(propVerifier) ? propVerifier : verifiers[0],
+  );
   const contractData = use(contractPromise);
   const contractError =
-    contractData?.message === 'Error' || !contractData?.contract;
+    contractData?.message === 'Error' || isEmpty(contractData?.contract);
   const contractOnChainHash =
     !contractError && contractData?.contract?.[0]?.hash
       ? contractData?.contract?.[0]?.hash
@@ -55,6 +60,10 @@ const Verifier: React.FC<ContractFormProps> = ({
   const [onChainCodeHash, setOnChainCodeHash] = useState<null | string>(
     contractOnChainHash,
   );
+
+  const handleVerifierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedVerifier(e.target.value);
+  };
 
   const { rpc, switchRpc } = useRpcProvider();
   const { getContractMetadata, getVerifierData } = useRpc();
@@ -87,7 +96,7 @@ const Verifier: React.FC<ContractFormProps> = ({
         setError('Failed to fetch contract data');
       }
     };
-    if (accountId) fetchData();
+    if (accountId && !contractError) fetchData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accountId]);
@@ -116,7 +125,7 @@ const Verifier: React.FC<ContractFormProps> = ({
     if (onChainCodeHash) fetchVerifierData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, onChainCodeHash]);
+  }, [accountId, onChainCodeHash, selectedVerifier]);
 
   const allFieldsExist =
     contractMetadata?.build_info?.build_environment &&
@@ -145,10 +154,12 @@ const Verifier: React.FC<ContractFormProps> = ({
       );
 
       if (!verifier) {
-        throw new Error('Verifier configuration not found.');
+        console.error('Verifier configuration not found.');
+        setApiLoading(false);
+        return;
       }
 
-      const verifierApiUrl: string = verifier?.verifierApiUrl || '';
+      const verifierApiUrl = verifier.verifierApiUrl;
 
       const response = await fetch(verifierApiUrl, {
         body: JSON.stringify({
@@ -238,6 +249,29 @@ const Verifier: React.FC<ContractFormProps> = ({
       )}
 
       <div className="w-full py-5 px-6 bg-white dark:bg-black-600  mt-4 soft-shadow rounded-xl text-neargray-600 dark:text-neargray-10">
+        <div className="flex flex-col rounded-md mb-4">
+          <p className="font-semibold text-sm mb-1">Contract Verifier</p>
+          <div className="relative w-full">
+            <select
+              className="appearance-none w-full h-10 px-3 py-1.5 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200 text-sm cursor-pointer"
+              onChange={handleVerifierChange}
+              value={selectedVerifier}
+            >
+              {verifiers.map((verifier) => (
+                <option
+                  className="text-gray-600 dark:text-neargray-10 bg-white dark:bg-black-600"
+                  key={verifier}
+                  value={verifier}
+                >
+                  {verifier}
+                </option>
+              ))}
+            </select>
+            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <ArrowDown className="w-4 h-4 fill-current text-gray-500" />
+            </span>
+          </div>
+        </div>
         <form onSubmit={submitForm}>
           {error && (
             <ErrorMessage
