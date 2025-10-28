@@ -1,4 +1,5 @@
 SELECT
+  r.predecessor_account_id,
   t.transaction_hash,
   JSONB_BUILD_OBJECT(
     'block_hash',

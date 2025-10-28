@@ -97,7 +97,7 @@ FROM
         FROM
           txn_selected t
       )
-      AND r.originated_from_transaction_hash = ts.converted_into_receipt_id
+      AND r.receipt_id = ts.converted_into_receipt_id
   ) aa ON TRUE
   LEFT JOIN LATERAL (
     SELECT
