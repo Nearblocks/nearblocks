@@ -2,6 +2,38 @@ import * as v from 'valibot';
 
 import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 
+export const FTListSort = {
+  CHANGE: 'change_24h',
+  HOLDERS: 'holders',
+  MARKET_CAP: 'market_cap',
+  NAME: 'name',
+  ONCHAIN_MARKET_CAP: 'onchain_market_cap',
+  PRICE: 'price',
+  VOLUME: 'volume_24h',
+} as const;
+
+export const FTListOrder = {
+  ASC: 'asc',
+  DESC: 'desc',
+} as const;
+
+const list = v.object({
+  cursor: cursorSchema,
+  limit: limitSchema,
+  order: v.optional(v.enum(FTListOrder), 'desc'),
+  search: v.optional(v.string()),
+  sort: v.optional(v.enum(FTListSort), 'onchain_market_cap'),
+});
+
+const count = v.object({
+  search: v.optional(v.string()),
+});
+
+const cursor = v.object({
+  contract: v.string(),
+  sort: v.enum(FTListSort),
+});
+
 const txns = v.object({
   after_ts: tsSchema,
   before_ts: tsSchema,
@@ -9,9 +41,20 @@ const txns = v.object({
   limit: limitSchema,
 });
 
-const count = v.object({
+const txnCount = v.object({
   after_ts: tsSchema,
   before_ts: tsSchema,
+});
+
+const txnsCursor = v.object({
+  index: v.number(),
+  shard: v.number(),
+  timestamp: v.string(),
+  type: v.number(),
+});
+
+const contract = v.object({
+  contract: v.string(),
 });
 
 const contractTxns = v.object({
@@ -30,17 +73,49 @@ const contractTxnCount = v.object({
   contract: v.string(),
 });
 
-const cursor = v.object({
-  index: v.number(),
-  shard: v.number(),
-  timestamp: v.string(),
-  type: v.number(),
+const contractHolders = v.object({
+  contract: v.string(),
+  cursor: cursorSchema,
+  limit: limitSchema,
 });
 
+const contractHolderCount = v.object({
+  contract: v.string(),
+});
+
+const contractHoldersCursor = v.object({
+  account: v.string(),
+  amount: v.string(),
+});
+
+export type FTListReq = v.InferOutput<typeof list>;
+export type FTCountReq = v.InferOutput<typeof count>;
+export type FTCursor = v.InferOutput<typeof cursor>;
 export type FTTxnsReq = v.InferOutput<typeof txns>;
-export type FTTxnsCursor = v.InferOutput<typeof cursor>;
-export type FTTxnCountReq = v.InferOutput<typeof count>;
+export type FTTxnsCursor = v.InferOutput<typeof txnsCursor>;
+export type FTTxnCountReq = v.InferOutput<typeof txnCount>;
+export type FTContractReq = v.InferOutput<typeof contract>;
 export type FTContractTxnsReq = v.InferOutput<typeof contractTxns>;
 export type FTContractTxnCountReq = v.InferOutput<typeof contractTxnCount>;
+export type FTContractHoldersReq = v.InferOutput<typeof contractHolders>;
+export type FTContractHolderCountReq = v.InferOutput<
+  typeof contractHolderCount
+>;
+export type FTContractHoldersCursorReq = v.InferOutput<
+  typeof contractHoldersCursor
+>;
 
-export default { contractTxnCount, contractTxns, count, cursor, txns };
+export default {
+  contract,
+  contractHolderCount,
+  contractHolders,
+  contractHoldersCursor,
+  contractTxnCount,
+  contractTxns,
+  count,
+  cursor,
+  list,
+  txnCount,
+  txns,
+  txnsCursor,
+};

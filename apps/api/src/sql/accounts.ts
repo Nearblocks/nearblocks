@@ -2,6 +2,12 @@ import { sql } from '#sql/index';
 
 export default {
   account: sql('queries/accounts/account.sql'),
+  assets: {
+    ftCount: sql('queries/accounts/assets/ftCount.sql'),
+    fts: sql('queries/accounts/assets/fts.sql'),
+    nftCount: sql('queries/accounts/assets/nftCount.sql'),
+    nfts: sql('queries/accounts/assets/nfts.sql'),
+  },
   balance: sql('queries/accounts/balance.sql'),
   contracts: {
     action: sql('queries/accounts/contracts/action.sql'),
