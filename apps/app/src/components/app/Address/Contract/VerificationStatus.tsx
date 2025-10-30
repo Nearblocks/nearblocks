@@ -37,8 +37,9 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
   const handleVerifierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedVerifier(e.target.value);
   };
-  const isNEP330 = contractMetadata?.standards?.[0]?.standard === 'nep330';
-
+  const isNEP330 = contractMetadata?.standards?.some(
+    (standard) => standard.standard.toLowerCase() === 'nep330',
+  );
   const verifiedCount = verifiers.filter(
     (verifier) => verificationData[verifier]?.status === 'verified',
   ).length;
