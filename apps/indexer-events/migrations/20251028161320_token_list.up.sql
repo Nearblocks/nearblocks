@@ -67,7 +67,7 @@ SELECT
     WHERE
       contract = nft_meta.contract
   ) AS holders,
-  COALESCE(transfers_count, 0) AS transfers_day
+  COALESCE(transfers_count, 0) AS transfers_24h
 FROM
   nft_meta
   LEFT JOIN day_transfers ON nft_meta.contract = day_transfers.contract_account_id
