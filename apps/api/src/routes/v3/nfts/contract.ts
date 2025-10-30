@@ -14,6 +14,26 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/nfts/:contract:
+   *   get:
+   *     summary: Get nft info
+   *     tags:
+   *       - V3 / NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:contract', validate(request.contract), service.contract);
+
+  /**
+   * @openapi
    * /v3/nfts/:contract/txns:
    *   get:
    *     summary: Get nft transfers
@@ -104,7 +124,68 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/txns/count',
     validate(request.contractTxnCount),
-    service.count,
+    service.txnCount,
+  );
+
+  /**
+   * @openapi
+   * /v3/nfts/{contract}/holders:
+   *   get:
+   *     summary: Get nft holders
+   *     tags:
+   *       - V3 / NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/holders',
+    validate(request.contractHolders),
+    service.holders,
+  );
+
+  /**
+   * @openapi
+   * /v3/nfts/{contract}/holders/count:
+   *   get:
+   *     summary: Get nft holders count
+   *     tags:
+   *       - V3 / NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/holders/count',
+    validate(request.contractHolderCount),
+    service.holderCount,
   );
 };
 

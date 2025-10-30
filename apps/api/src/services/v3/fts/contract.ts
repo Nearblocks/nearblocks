@@ -1,6 +1,12 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
+  FTContract,
+  FTContractHolderCount,
+  FTContractHolderCountReq,
+  FTContractHolders,
+  FTContractHoldersReq,
+  FTContractReq,
   FTContractTxn,
   FTContractTxnCount,
   FTContractTxnCountReq,
@@ -21,6 +27,19 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/fts';
 
+const contract = responseHandler(
+  response.contract,
+  async (req: RequestValidator<FTContractReq>) => {
+    const contract = req.validator.contract;
+
+    const data = await dbEvents.oneOrNone<FTContract>(sql.contract, {
+      contract,
+    });
+
+    return { data };
+  },
+);
+
 const txns = responseHandler(
   response.contractTxns,
   async (req: RequestValidator<FTContractTxnsReq>) => {
@@ -30,7 +49,7 @@ const txns = responseHandler(
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+      ? cursors.decode(request.txnsCursor, req.validator.cursor)
       : null;
 
     const eventsQuery: WindowListQuery<
@@ -101,7 +120,7 @@ const txns = responseHandler(
   },
 );
 
-const count = responseHandler(
+const txnCount = responseHandler(
   response.contractTxnCount,
   async (req: RequestValidator<FTContractTxnCountReq>) => {
     const contract = req.validator.contract;
@@ -120,4 +139,43 @@ const count = responseHandler(
   },
 );
 
-export default { count, txns };
+const holders = responseHandler(
+  response.contractHolders,
+  async (req: RequestValidator<FTContractHoldersReq>) => {
+    const contract = req.validator.contract;
+    const limit = req.validator.limit;
+    const cursor = req.validator.cursor
+      ? cursors.decode(request.contractHoldersCursor, req.validator.cursor)
+      : null;
+
+    const data = await dbEvents.manyOrNone<FTContractHolders>(sql.holders, {
+      contract,
+      cursor: {
+        account: cursor?.account,
+        amount: cursor?.amount,
+      },
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
+    });
+
+    return paginateData(data, limit, (holder) => ({
+      account: holder.account,
+      amount: holder.amount,
+    }));
+  },
+);
+
+const holderCount = responseHandler(
+  response.contractHolderCount,
+  async (req: RequestValidator<FTContractHolderCountReq>) => {
+    const contract = req.validator.contract;
+
+    const data = await dbEvents.one<FTContractHolderCount>(sql.holderCount, {
+      contract,
+    });
+
+    return { data };
+  },
+);
+
+export default { contract, holderCount, holders, txnCount, txns };

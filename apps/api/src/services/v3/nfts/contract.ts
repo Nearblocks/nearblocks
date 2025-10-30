@@ -1,6 +1,12 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
+  NFTContract,
+  NFTContractHolderCount,
+  NFTContractHolderCountReq,
+  NFTContractHolders,
+  NFTContractHoldersReq,
+  NFTContractReq,
   NFTContractTxn,
   NFTContractTxnCount,
   NFTContractTxnCountReq,
@@ -21,6 +27,19 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/nfts';
 
+const contract = responseHandler(
+  response.contract,
+  async (req: RequestValidator<NFTContractReq>) => {
+    const contract = req.validator.contract;
+
+    const data = await dbEvents.oneOrNone<NFTContract>(sql.contract, {
+      contract,
+    });
+
+    return { data };
+  },
+);
+
 const txns = responseHandler(
   response.txns,
   async (req: RequestValidator<NFTContractTxnsReq>) => {
@@ -30,7 +49,7 @@ const txns = responseHandler(
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+      ? cursors.decode(request.txnCursor, req.validator.cursor)
       : null;
 
     const eventsQuery: WindowListQuery<
@@ -98,7 +117,7 @@ const txns = responseHandler(
   },
 );
 
-const count = responseHandler(
+const txnCount = responseHandler(
   response.count,
   async (req: RequestValidator<NFTContractTxnCountReq>) => {
     const contract = req.validator.contract;
@@ -117,4 +136,43 @@ const count = responseHandler(
   },
 );
 
-export default { count, txns };
+const holders = responseHandler(
+  response.contractHolders,
+  async (req: RequestValidator<NFTContractHoldersReq>) => {
+    const contract = req.validator.contract;
+    const limit = req.validator.limit;
+    const cursor = req.validator.cursor
+      ? cursors.decode(request.contractHoldersCursor, req.validator.cursor)
+      : null;
+
+    const data = await dbEvents.manyOrNone<NFTContractHolders>(sql.holders, {
+      contract,
+      cursor: {
+        account: cursor?.account,
+        quantity: cursor?.quantity,
+      },
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
+    });
+
+    return paginateData(data, limit, (holder) => ({
+      account: holder.account,
+      quantity: holder.quantity,
+    }));
+  },
+);
+
+const holderCount = responseHandler(
+  response.contractHolderCount,
+  async (req: RequestValidator<NFTContractHolderCountReq>) => {
+    const contract = req.validator.contract;
+
+    const data = await dbEvents.one<NFTContractHolderCount>(sql.holderCount, {
+      contract,
+    });
+
+    return { data };
+  },
+);
+
+export default { contract, holderCount, holders, txnCount, txns };

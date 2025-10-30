@@ -1,6 +1,10 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
+  NFTCount,
+  NFTCountReq,
+  NFTList,
+  NFTListReq,
   NFTTxn,
   NFTTxnCount,
   NFTTxnCountReq,
@@ -21,6 +25,50 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/nfts';
 
+const list = responseHandler(
+  response.list,
+  async (req: RequestValidator<NFTListReq>) => {
+    const search = req.validator.search;
+    const sort = req.validator.sort;
+    const order = req.validator.order;
+    const limit = req.validator.limit;
+    const cursor = req.validator.cursor
+      ? cursors.decode(request.cursor, req.validator.cursor)
+      : null;
+
+    const list = await dbEvents.manyOrNone<NFTList>(sql.list, {
+      cursor: {
+        contract: cursor?.contract,
+        sort: cursor?.sort,
+      },
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
+      order,
+      order_by: order === 'desc' ? 'NULLS LAST' : 'NULLS FIRST',
+      search: search ? `%${search}%` : null,
+      sort,
+    });
+
+    return paginateData(list, limit, (token) => ({
+      contract: token.contract,
+      sort,
+    }));
+  },
+);
+
+const count = responseHandler(
+  response.count,
+  async (req: RequestValidator<NFTCountReq>) => {
+    const search = req.validator.search;
+
+    const txns = await dbEvents.one<NFTCount>(sql.count, {
+      search: search ? `%${search}%` : null,
+    });
+
+    return { data: txns };
+  },
+);
+
 const txns = responseHandler(
   response.txns,
   async (req: RequestValidator<NFTTxnsReq>) => {
@@ -28,7 +76,7 @@ const txns = responseHandler(
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+      ? cursors.decode(request.txnCursor, req.validator.cursor)
       : null;
 
     const eventsQuery: WindowListQuery<
@@ -95,8 +143,8 @@ const txns = responseHandler(
   },
 );
 
-const count = responseHandler(
-  response.count,
+const txnCount = responseHandler(
+  response.txnCount,
   async (req: RequestValidator<NFTTxnCountReq>) => {
     const after = req.validator.after_ts;
     const before = req.validator.before_ts;
@@ -109,4 +157,4 @@ const count = responseHandler(
   },
 );
 
-export default { count, txns };
+export default { count, list, txnCount, txns };

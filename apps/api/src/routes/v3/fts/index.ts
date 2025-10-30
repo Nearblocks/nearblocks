@@ -17,6 +17,71 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/fts:
+   *   get:
+   *     summary: Get top tokens
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cursor
+   *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 25
+   *       - in: query
+   *         name: sort
+   *         description: Sort field
+   *         schema:
+   *           type: string
+   *           enum: [change_24h, holders, market_cap, name, onchain_market_cap, price, volume_24h]
+   *           default: onchain_market_cap
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/', validate(request.list), service.list);
+
+  /**
+   * @openapi
+   * /v3/fts/count:
+   *   get:
+   *     summary: Get top tokens count
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/count', validate(request.count), service.count);
+
+  /**
+   * @openapi
    * /v3/fts/txns:
    *   get:
    *     summary: Get all token transfers
@@ -82,7 +147,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validate(request.count), service.count);
+  route.get('/txns/count', validate(request.txnCount), service.txnCount);
 
   return app;
 };
