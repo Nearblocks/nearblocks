@@ -1,3 +1,4 @@
+export type * from './assets/index.js';
 export type * from './fts/index.js';
 export type * from './keys/index.js';
 export type * from './nfts/index.js';
