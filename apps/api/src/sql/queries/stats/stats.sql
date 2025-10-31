@@ -1,0 +1,17 @@
+SELECT
+  avg_block_time,
+  change_24h,
+  circulating_supply,
+  gas_price,
+  market_cap,
+  near_btc_price,
+  near_price,
+  nodes_online,
+  total_supply,
+  total_txns,
+  tps,
+  volume_24h
+FROM
+  stats
+LIMIT
+  1

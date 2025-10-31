@@ -21,7 +21,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top nfts
    *     tags:
-   *       - NFTs
+   *       - V3 / NFTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -67,7 +67,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top nfts count
    *     tags:
-   *       - NFTs
+   *       - V3 / NFTs
    *     parameters:
    *       - in: query
    *         name: search

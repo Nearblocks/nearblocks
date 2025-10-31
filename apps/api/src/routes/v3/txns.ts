@@ -85,6 +85,14 @@ const routes = (app: Router) => {
    *           type: string
    *           minLength: 19
    *           maxLength: 19
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 25
    *     responses:
    *       200:
    *         description: Success response
