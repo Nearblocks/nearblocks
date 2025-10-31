@@ -7,6 +7,7 @@ import keys from '#routes/v3/keys';
 import multichain from '#routes/v3/multichain/index';
 import nfts from '#routes/v3/nfts/index';
 import search from '#routes/v3/search';
+import stats from '#routes/v3/stats';
 import txns from '#routes/v3/txns';
 
 const routes = () => {
@@ -19,6 +20,7 @@ const routes = () => {
   multichain(app);
   nfts(app);
   search(app);
+  stats(app);
   txns(app);
 
   return app;

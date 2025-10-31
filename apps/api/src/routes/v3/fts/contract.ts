@@ -14,7 +14,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/fts/:contract:
+   * /v3/fts/{contract}:
    *   get:
    *     summary: Get token info
    *     tags:
@@ -34,7 +34,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/fts/:contract/txns:
+   * /v3/fts/{contract}/txns:
    *   get:
    *     summary: Get token transfers
    *     tags:
@@ -86,7 +86,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/fts/:contract/txns/count:
+   * /v3/fts/{contract}/txns/count:
    *   get:
    *     summary: Get token transfers count
    *     tags:
