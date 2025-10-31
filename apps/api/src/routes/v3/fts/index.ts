@@ -21,7 +21,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top tokens
    *     tags:
-   *       - FTs
+   *       - V3 / FTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -67,7 +67,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top tokens count
    *     tags:
-   *       - FTs
+   *       - V3 / FTs
    *     parameters:
    *       - in: query
    *         name: search

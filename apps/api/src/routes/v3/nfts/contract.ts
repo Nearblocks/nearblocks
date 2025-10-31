@@ -14,7 +14,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/nfts/:contract:
+   * /v3/nfts/{contract}:
    *   get:
    *     summary: Get nft info
    *     tags:
@@ -34,7 +34,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/nfts/:contract/txns:
+   * /v3/nfts/{contract}/txns:
    *   get:
    *     summary: Get nft transfers
    *     tags:
@@ -86,7 +86,7 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/nfts/:contract/txns/count:
+   * /v3/nfts/{contract}/txns/count:
    *   get:
    *     summary: Get nft transfers count
    *     tags:

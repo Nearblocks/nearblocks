@@ -15,7 +15,7 @@ SELECT
   nft.involved_account_id,
   nft.token_id,
   nft.cause,
-  nft.delta_amount,
+  nft.delta_amount::TEXT,
   m.meta,
   tm.token_meta
 FROM
