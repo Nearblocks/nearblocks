@@ -14,7 +14,6 @@ import SearchIcon from '@/components/app/Icons/SearchIcon';
 import { Spinner } from '@/components/app/common/Spinner';
 import useStatsStore from '@/stores/app/syncStats';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
-import useSearchHistory from '@/hooks/app/useSearchHistory';
 import { locales } from '@/utils/app/config';
 
 export const SearchToast = (networkId: NetworkId) => {
@@ -102,12 +101,12 @@ const BaseSearch = ({
   onRedirect: (newPath: string, pathname?: string) => Promise<void>;
 }) => {
   const [keyword, setKeyword] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [result, setResult] = useState<any>({});
   const [filter, setFilter] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { getSearchResults, setSearchResults, clearSearchHistory } =
-    useSearchHistory();
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const containerRef: any = useRef<HTMLDivElement>(null);
   const indexers = useStatsStore((state) => state.syncStatus);
   const isLocale = (value: null | string): any => {
@@ -117,6 +116,67 @@ const BaseSearch = ({
   const { networkId } = useConfig();
 
   const homeSearch = pathname && isLocale(pathname) ? pathname : '/';
+
+  type SearchResultItem = {
+    type: string;
+    data: SearchResult;
+    value: string;
+  };
+
+  const flatResults = React.useMemo(() => {
+    const items: SearchResultItem[] = [];
+    if (result?.accounts?.length) {
+      result.accounts.forEach((acc: any) =>
+        items.push({ type: 'address', data: acc, value: acc.account_id }),
+      );
+    }
+    if (result?.txns?.length) {
+      result.txns.forEach((txn: any) =>
+        items.push({ type: 'txn', data: txn, value: txn.transaction_hash }),
+      );
+    }
+    if (result?.receipts?.length) {
+      result.receipts.forEach((receipt: any) =>
+        items.push({
+          type: 'receipt',
+          data: receipt,
+          value: receipt.originated_from_transaction_hash,
+        }),
+      );
+    }
+    if (result?.blocks?.length) {
+      result.blocks.forEach((block: any) =>
+        items.push({ type: 'block', data: block, value: block.block_height }),
+      );
+    }
+    if (result?.tokens?.length) {
+      result.tokens.forEach((token: any) =>
+        items.push({ type: 'token', data: token, value: token.contract }),
+      );
+    }
+    if (result?.mtTokens?.length) {
+      result.mtTokens.forEach((token: any) =>
+        items.push({
+          type: 'mt_token',
+          data: token,
+          value: `${token.contract}:${token.token_id}`,
+        }),
+      );
+    }
+    return items;
+  }, [result]);
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [result]);
+
+  useEffect(() => {
+    if (selectedIndex >= 0 && flatResults[selectedIndex]) {
+      setInputValue(flatResults[selectedIndex].value);
+    } else if (selectedIndex === -1) {
+      setInputValue(keyword);
+    }
+  }, [selectedIndex, flatResults, keyword]);
 
   const redirect = async (route: SearchRoute | null) => {
     const newPath =
@@ -148,15 +208,10 @@ const BaseSearch = ({
   const reset = () => {
     setResult({});
     setKeyword('');
+    setInputValue('');
     setIsOpen(false);
     setIsLoading(false);
-
-    const searchInput = document.getElementsByClassName(
-      'search',
-    )[0] as HTMLInputElement;
-    if (searchInput) {
-      searchInput.value = '';
-    }
+    setSelectedIndex(-1);
   };
 
   useEffect(() => {
@@ -183,41 +238,36 @@ const BaseSearch = ({
       }
       setIsLoading(true);
       try {
-        const cachedResults = await getSearchResults(keyword, filter);
-        if (!isActive) return;
-        if (cachedResults) {
-          setResult(cachedResults);
-          setIsLoading(false);
-          return;
-        }
         const data = await handleFilterAndKeyword(keyword, filter);
         if (!isActive) return;
-        setResult(data?.data ?? {});
         if (data?.data) {
-          setSearchResults(data?.keyword, filter, data?.data);
+          if (isActive) {
+            setResult(data.data);
+            setIsLoading(false);
+          }
+          return;
+        }
+        const dataV3 = await handleFilterAndKeyword(keyword, filter, 'v3');
+        if (!isActive) return;
+
+        if (dataV3?.data) {
+          if (isActive) {
+            setResult(dataV3.data);
+            setIsLoading(false);
+          }
+          return;
+        }
+        if (indexers?.base && !indexers?.base?.sync) {
+          const rpcData = await rpcSearch(keyword);
+          if (!isActive) return;
+          if (filter !== '/tokens' && isActive) {
+            setResult(rpcData?.data ?? {});
+          }
         } else {
-          if (indexers?.base && !indexers?.base?.sync) {
-            const rpcData = await rpcSearch(keyword);
-            if (!isActive) return;
-            if (filter !== '/tokens') {
-              setResult(rpcData?.data ?? {});
-              if (rpcData?.data) {
-                setSearchResults(rpcData?.keyword, filter, rpcData?.data);
-              }
-            }
-          } else {
-            const fallbackRpcData = await rpcSearch(keyword);
-            if (!isActive) return;
-            if (filter !== '/tokens') {
-              setResult(fallbackRpcData?.data ?? {});
-              if (fallbackRpcData?.data) {
-                setSearchResults(
-                  fallbackRpcData.keyword,
-                  filter,
-                  fallbackRpcData.data,
-                );
-              }
-            }
+          const fallbackRpcData = await rpcSearch(keyword);
+          if (!isActive) return;
+          if (filter !== '/tokens' && isActive) {
+            setResult(fallbackRpcData?.data ?? {});
           }
         }
       } catch (error) {
@@ -245,6 +295,7 @@ const BaseSearch = ({
 
   const handleChange = (event: any) => {
     const { value: nextValue } = event.target;
+    setInputValue(nextValue);
     const sanitized = nextValue.replace(/[\s,]/g, '');
     if (sanitized === '') {
       setResult({});
@@ -255,6 +306,37 @@ const BaseSearch = ({
     }
     setIsLoading(true);
     debouncedSave(sanitized);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen || !flatResults.length) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        setSelectedIndex((prev) => Math.min(prev + 1, flatResults.length - 1));
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        setSelectedIndex((prev) => Math.max(-1, prev - 1));
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (selectedIndex >= 0 && flatResults[selectedIndex]) {
+          const selected = flatResults[selectedIndex];
+          setInputValue(selected.value);
+          setKeyword(selected.value);
+          onSelect({ path: selected.value, type: selected.type });
+        } else {
+          onSubmit(event);
+        }
+        break;
+      case 'Escape':
+        event.preventDefault();
+        setIsOpen(false);
+        setSelectedIndex(-1);
+        break;
+    }
   };
 
   const onFilter = (event: any) => setFilter(event.target.value);
@@ -294,48 +376,45 @@ const BaseSearch = ({
     if (isLoading) {
       return;
     }
-
-    const text = (
-      document.getElementsByClassName('search')[0] as HTMLInputElement
-    ).value;
-    const query = text.replace(/[\s,]/g, '');
-
+    const query = inputValue.replace(/[\s,]/g, '');
     if (!query) {
       return toast.error(SearchToast(networkId));
     }
-
-    const cachedResults = await getSearchResults(query, filter);
-    if (cachedResults) {
-      return redirect(getSearchRoute(cachedResults));
+    setIsLoading(true);
+    const data = await handleFilterAndKeyword(query, filter);
+    const route = data?.data && getSearchRoute(data?.data);
+    if (route) {
+      return redirect(route);
     } else {
-      setIsLoading(true);
-      const data = await handleFilterAndKeyword(query, filter);
-      const route = data?.data && getSearchRoute(data?.data);
-      if (route) {
-        setSearchResults(data?.keyword, filter, data?.data);
-        return redirect(route);
+      const rpcData = await rpcSearch(query);
+      const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
+      if (rpcRoute) {
+        return redirect(rpcRoute);
       } else {
-        const rpcData = await rpcSearch(query);
-        const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
-        if (rpcRoute) {
-          setSearchResults(rpcData?.keyword, filter, rpcData?.data);
-          return redirect(rpcRoute);
-        } else {
-          setIsLoading(false);
-          return toast.error(SearchToast(networkId));
-        }
+        setIsLoading(false);
+        return toast.error(SearchToast(networkId));
       }
     }
   };
 
-  const handleClearHistory = async () => {
-    await clearSearchHistory();
-    reset();
-    toast.success(
-      <div className="whitespace-nowrap text-sm">
-        Search history cleared successfully
-      </div>,
-    );
+  const getItemIndex = (type: string, index: number) => {
+    let count = 0;
+    const typeMap: { [key: string]: string } = {
+      accounts: 'address',
+      txns: 'txn',
+      receipts: 'receipt',
+      blocks: 'block',
+      tokens: 'token',
+      mtTokens: 'mt_token',
+    };
+
+    for (const [key, val] of Object.entries(typeMap)) {
+      if (val === type) {
+        return count + index;
+      }
+      count += result[key]?.length || 0;
+    }
+    return -1;
   };
 
   return (
@@ -382,37 +461,45 @@ const BaseSearch = ({
           } bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
           disabled={disabled}
           id="searchInput"
+          value={inputValue}
           onChange={handleChange}
           onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
           autoComplete="off"
           placeholder={
             t('search.placeholder') || 'Search by Account ID / Txn Hash / Block'
           }
         />
         {isOpen && showResults && (
-          <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-3 shadow border dark:border-black-200">
+          <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-2 shadow border dark:border-black-200">
             <>
               {result?.accounts?.length > 0 && (
                 <>
                   <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.address') || 'Account'}
                   </h3>
-                  {result?.accounts?.map((address: any) => (
-                    <div className="px-2 py-1" key={address.account_id}>
-                      <div
-                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate"
-                        key={address.account_id}
-                        onClick={() =>
-                          onSelect({
-                            path: address.account_id,
-                            type: 'address',
-                          })
-                        }
-                      >
-                        {shortenAddress(address.account_id)}
+                  {result?.accounts?.map((address: any, idx: number) => {
+                    const itemIdx = getItemIndex('address', idx);
+                    return (
+                      <div className="px-2 py-1" key={address.account_id}>
+                        <div
+                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate ${
+                            selectedIndex === itemIdx
+                              ? 'bg-gray-100 dark:bg-black-200'
+                              : ''
+                          }`}
+                          onClick={() =>
+                            onSelect({
+                              path: address.account_id,
+                              type: 'address',
+                            })
+                          }
+                        >
+                          {shortenAddress(address.account_id)}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
               {result?.txns?.length > 0 && (
@@ -420,21 +507,28 @@ const BaseSearch = ({
                   <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.txns') || 'Txns'}
                   </h3>
-                  {result.txns.map((txn: any) => (
-                    <div className="px-2 py-1" key={txn.transaction_hash}>
-                      <div
-                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                        onClick={() =>
-                          onSelect({
-                            path: txn.transaction_hash,
-                            type: 'txn',
-                          })
-                        }
-                      >
-                        {shortenHex(txn.transaction_hash)}
+                  {result.txns.map((txn: any, idx: number) => {
+                    const itemIdx = getItemIndex('txn', idx);
+                    return (
+                      <div className="px-2 py-1" key={txn.transaction_hash}>
+                        <div
+                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                            selectedIndex === itemIdx
+                              ? 'bg-gray-100 dark:bg-black-200'
+                              : ''
+                          }`}
+                          onClick={() =>
+                            onSelect({
+                              path: txn.transaction_hash,
+                              type: 'txn',
+                            })
+                          }
+                        >
+                          {shortenHex(txn.transaction_hash)}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
               {result?.receipts?.length > 0 && (
@@ -442,21 +536,28 @@ const BaseSearch = ({
                   <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.receipts') || 'Receipts'}
                   </h3>
-                  {result.receipts.map((receipt: any) => (
-                    <div className="px-2 py-1" key={receipt.receipt_id}>
-                      <div
-                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                        onClick={() =>
-                          onSelect({
-                            path: receipt.originated_from_transaction_hash,
-                            type: 'receipt',
-                          })
-                        }
-                      >
-                        {shortenHex(receipt.receipt_id)}
+                  {result.receipts.map((receipt: any, idx: number) => {
+                    const itemIdx = getItemIndex('receipt', idx);
+                    return (
+                      <div className="px-2 py-1" key={receipt.receipt_id}>
+                        <div
+                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                            selectedIndex === itemIdx
+                              ? 'bg-gray-100 dark:bg-black-200'
+                              : ''
+                          }`}
+                          onClick={() =>
+                            onSelect({
+                              path: receipt.originated_from_transaction_hash,
+                              type: 'receipt',
+                            })
+                          }
+                        >
+                          {shortenHex(receipt.receipt_id)}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
               {result?.blocks?.length > 0 && (
@@ -464,22 +565,29 @@ const BaseSearch = ({
                   <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.blocks') || 'Blocks'}
                   </h3>
-                  {result.blocks.map((block: any) => (
-                    <div className="px-2 py-1" key={block.block_hash}>
-                      <div
-                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                        onClick={() =>
-                          onSelect({
-                            path: block.block_hash,
-                            type: 'block',
-                          })
-                        }
-                      >
-                        #{localFormat(block.block_height)} (0x
-                        {shortenHex(block.block_hash)})
+                  {result.blocks.map((block: any, idx: number) => {
+                    const itemIdx = getItemIndex('block', idx);
+                    return (
+                      <div className="px-2 py-1" key={block.block_hash}>
+                        <div
+                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                            selectedIndex === itemIdx
+                              ? 'bg-gray-100 dark:bg-black-200'
+                              : ''
+                          }`}
+                          onClick={() =>
+                            onSelect({
+                              path: block.block_hash,
+                              type: 'block',
+                            })
+                          }
+                        >
+                          #{localFormat(block.block_height)} (0x
+                          {shortenHex(block.block_hash)})
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
               {result?.tokens?.length > 0 && (
@@ -487,21 +595,28 @@ const BaseSearch = ({
                   <h3 className=" mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
                     {t('search.list.tokens') || 'Tokens'}
                   </h3>
-                  {result.tokens.map((token: any) => (
-                    <div className="px-2 py-1" key={token.contract}>
-                      <div
-                        className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                        onClick={() =>
-                          onSelect({
-                            path: token.contract,
-                            type: 'token',
-                          })
-                        }
-                      >
-                        {shortenAddress(token.contract)}
+                  {result.tokens.map((token: any, idx: number) => {
+                    const itemIdx = getItemIndex('token', idx);
+                    return (
+                      <div className="px-2 py-1" key={token.contract}>
+                        <div
+                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                            selectedIndex === itemIdx
+                              ? 'bg-gray-100 dark:bg-black-200'
+                              : ''
+                          }`}
+                          onClick={() =>
+                            onSelect({
+                              path: token.contract,
+                              type: 'token',
+                            })
+                          }
+                        >
+                          {shortenAddress(token.contract)}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </>
               )}
               {result?.mtTokens?.length > 0 && (
@@ -510,31 +625,35 @@ const BaseSearch = ({
                     Multi Tokens
                   </h3>
                   {result?.mtTokens?.map(
-                    (token: { contract: string; token_id: string }) => (
-                      <div className="px-2 py-1" key={token.contract}>
-                        <div
-                          className="px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate"
-                          onClick={() =>
-                            onSelect({
-                              path: `${token?.contract}:${token?.token_id}`,
-                              type: 'mt_token',
-                            })
-                          }
-                        >
-                          {shortenAddress(token.token_id)}
+                    (
+                      token: { contract: string; token_id: string },
+                      idx: number,
+                    ) => {
+                      const itemIdx = getItemIndex('mt_token', idx);
+                      return (
+                        <div className="px-2 py-1" key={token.contract}>
+                          <div
+                            className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                              selectedIndex === itemIdx
+                                ? 'bg-gray-100 dark:bg-black-200'
+                                : ''
+                            }`}
+                            onClick={() =>
+                              onSelect({
+                                path: `${token?.contract}:${token?.token_id}`,
+                                type: 'mt_token',
+                              })
+                            }
+                          >
+                            {shortenAddress(token.token_id)}
+                          </div>
                         </div>
-                      </div>
-                    ),
+                      );
+                    },
                   )}
                 </>
               )}
             </>
-            <div
-              onClick={handleClearHistory}
-              className="items-center flex justify-center text-xs bg-gray-100 hover:bg-neargray-700 dark:hover:bg-black-200 dark:bg-black-500 cursor-pointer focus:outline-none border dark:border-black-200 text-nearblue-600 dark:text-neargray-10 m-2 px-2 py-1 rounded m"
-            >
-              Clear Search History
-            </div>
           </div>
         )}
       </div>

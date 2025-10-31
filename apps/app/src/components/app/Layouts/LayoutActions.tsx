@@ -16,7 +16,6 @@ import { useConfig } from '@/hooks/app/useConfig';
 import { rpcSearch } from '@/utils/app/rpc';
 import { usePathname, useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
-import useSearchHistory from '@/hooks/app/useSearchHistory';
 import Cookies from 'js-cookie';
 import Notice from '@/components/app/common/Notice';
 
@@ -45,7 +44,6 @@ const LayoutActions = ({
   const searchParams = useSearchParams();
   const router = useIntlRouter();
   const query = searchParams?.get('q');
-  const { getSearchResults, setSearchResults } = useSearchHistory();
   const [accountName, setAccountName] = useState<undefined | string>(accountId);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,24 +97,19 @@ const LayoutActions = ({
       }
     };
     const loadResults = async (keyword: string) => {
-      const cachedResults = await getSearchResults(keyword, '');
-      if (cachedResults) {
-        return redirect(getSearchRoute(cachedResults));
+      const data = await handleFilterAndKeyword(keyword, '');
+      const route = data?.data && getSearchRoute(data?.data);
+
+      if (route) {
+        return redirect(route);
       } else {
-        const data = await handleFilterAndKeyword(keyword, '');
-        const route = data?.data && getSearchRoute(data?.data);
-        if (route) {
-          setSearchResults(data?.keyword, '', data?.data);
-          return redirect(route);
+        const rpcData = await rpcSearch(keyword);
+        const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
+
+        if (rpcRoute) {
+          return redirect(rpcRoute);
         } else {
-          const rpcData = await rpcSearch(keyword);
-          const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
-          if (rpcRoute) {
-            setSearchResults(rpcData?.keyword, '', rpcData?.data);
-            return redirect(rpcRoute);
-          } else {
-            return toast.error(SearchToast(networkId));
-          }
+          return toast.error(SearchToast(networkId));
         }
       }
     };
