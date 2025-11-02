@@ -9,6 +9,7 @@ import { revalidateTag } from 'next/cache';
 import { getMessages } from 'next-intl/server';
 import { providers } from 'near-api-js';
 import { getRpcProviders } from './rpc';
+import { isEmpty } from 'lodash';
 interface ExportParams {
   exportType: string;
   id: string;
@@ -50,7 +51,8 @@ type SearchResponse = { data: SearchResult; keyword: string } | { data: null };
 
 export async function handleFilterAndKeyword(
   keyword: string,
-  filter: string,
+  filter?: string,
+  apiVersion: 'v1' | 'v3' = 'v1',
 ): Promise<SearchResponse> {
   'use server';
 
@@ -58,69 +60,34 @@ export async function handleFilterAndKeyword(
     if (keyword.includes('.')) {
       keyword = keyword.toLowerCase();
     }
-    const [v1Result, v3Result] = await Promise.allSettled([
-      getRequest(`v1/search${filter}?keyword=${keyword}`),
-      filter === '' || filter === '/accounts'
-        ? getRequestBeta(`v3/search?keyword=${keyword}`)
-        : Promise.resolve(null),
-    ]);
+    const res =
+      apiVersion === 'v3'
+        ? (await getRequestBeta(`v3/search?keyword=${keyword}`)).data
+        : await getRequest(`v1/search${filter}?keyword=${keyword}`);
+    if (!res) return { data: null };
 
-    const res = v1Result.status === 'fulfilled' ? v1Result.value : null;
-    const resV3 = v3Result.status === 'fulfilled' ? v3Result.value : null;
-    if (!res && !resV3) return { data: null };
-    const data: SearchResult = {
-      accounts: [],
-      blocks: [],
-      receipts: [],
-      txns: [],
-      tokens: [],
-      mtTokens: [],
-    };
+    const keys: (keyof SearchResult)[] = [
+      'accounts',
+      'blocks',
+      'receipts',
+      'txns',
+      'tokens',
+      'fts',
+      'nfts',
+      'mtTokens',
+    ];
 
-    if (res?.blocks?.length) {
-      data.blocks = res.blocks;
-    }
+    const data = keys.reduce((acc, key) => {
+      acc[key] = !isEmpty(res?.[key]) ? res[key] : [];
+      return acc;
+    }, {} as SearchResult);
 
-    if (res?.txns?.length) {
-      data.txns = res.txns;
-    }
-
-    if (res?.receipts?.length) {
-      data.receipts = res.receipts;
-    }
-
-    if (res?.accounts?.length) {
-      data.accounts = res.accounts;
-    }
-
-    if (res?.tokens?.length) {
-      data.tokens = res.tokens;
-    }
-
-    if (res?.mtTokens?.length) {
-      data.mtTokens = res?.mtTokens;
-    }
-
-    if (
-      resV3 &&
-      Array.isArray(resV3?.data?.accounts) &&
-      (filter === '' || filter === '/accounts')
-    ) {
-      const accounts = Array.isArray(data?.accounts) ? [...data?.accounts] : [];
-      const existing = new Set(accounts.map((a: any) => a.account_id));
-      for (const acc of resV3.data.accounts) {
-        if (acc?.account_id && !existing.has(acc.account_id)) {
-          accounts.push({ account_id: acc.account_id });
-          existing.add(acc.account_id);
-        }
-      }
-      data.accounts = accounts;
-    }
     const hasValidData = Object.values(data).some(
       (value) => Array.isArray(value) && value.length > 0,
     );
+
     return hasValidData ? { data, keyword } : { data: null };
-  } catch (error) {
+  } catch {
     return { data: null };
   }
 }

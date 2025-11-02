@@ -56,11 +56,11 @@ const menus = [
         link: '/node-explorer',
         title: 'header.menu.nodeExplorer',
       },
-      {
-        fallbackText: 'Multichain Txns',
-        id: 6,
-        link: '/multichain-txns',
-      },
+      // {
+      //   fallbackText: 'Multichain Txns',
+      //   id: 6,
+      //   link: '/multichain-txns',
+      // },
     ],
     title: 'header.menu.blockchain',
   },

@@ -391,6 +391,8 @@ export type SearchResult = {
     receipt_id: string;
   }>;
   tokens: Array<{ contract: string }>;
+  fts?: Array<{ contract: string }>;
+  nfts?: Array<{ contract: string }>;
   mtTokens: Array<{ contract: string; token_id: string }>;
   txns?: Array<{ transaction_hash: string }>;
 };
