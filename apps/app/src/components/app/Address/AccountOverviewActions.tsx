@@ -143,7 +143,7 @@ const AccountOverviewActions = ({
     };
     loadBalances();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, params?.id, refTokenPrices]);
+  }, [inventoryData?.fts, params?.id, refTokenPrices, rpcUrl]);
 
   return (
     <div className="w-full">
