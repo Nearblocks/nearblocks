@@ -27,6 +27,7 @@ const AccountTabsActions = ({ children }: { children: React.ReactNode }) => {
       message: t('multi-chainTxns'),
       name: 'multichaintxns',
     }, */
+    { label: 'Analytics', message: 'Analytics', name: 'analytics' },
     { label: 'Access Keys', message: t('accessKeys'), name: 'accesskeys' },
     { label: 'Contract', message: t('contract'), name: 'contract' },
   ];
