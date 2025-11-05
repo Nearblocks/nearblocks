@@ -1,11 +1,17 @@
 'use client';
 import Big from 'big.js';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 import useRpc from '@/hooks/app/useRpc';
 import { Link } from '@/i18n/routing';
 import { dollarFormat, localFormat } from '@/utils/libs';
-import { FtInfo, FtsInfo, InventoryInfo, TokenListInfo } from '@/utils/types';
+import {
+  FtInfo,
+  FtsInfo,
+  InventoryInfo,
+  TokenListInfo,
+  RefFinanceTokenPrices,
+} from '@/utils/types';
 
 import FaAddressBook from '@/components/app/Icons/FaAddressBook';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
@@ -15,14 +21,21 @@ interface Props {
   id: string;
   inventoryData: InventoryInfo;
   tokenFilter?: string;
+  refTokenPricesPromise: Promise<RefFinanceTokenPrices>;
 }
 
-export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
+export default function TokenFilter({
+  id,
+  inventoryData,
+  tokenFilter,
+  refTokenPricesPromise,
+}: Props) {
   const modifiedId = id === 'eth.bridge.near' ? 'aurora' : id;
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const { rpc } = useRpcProvider();
   const { ftBalanceOf } = useRpc();
   const [inventoryLoading, setInventoryLoading] = useState(true);
+  const refTokenPrices = use(refTokenPricesPromise);
 
   useEffect(() => {
     function loadBalances() {
@@ -62,17 +75,23 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
             let rpcAmount = Big(0);
 
             if (amount) {
-              rpcAmount = ftrslt.ft_meta?.decimals
-                ? Big(amount).div(Big(10).pow(+ftrslt.ft_meta?.decimals))
-                : Big(0);
+              const decimals = ftrslt.ft_meta?.decimals ?? 0;
+              rpcAmount = Big(amount).div(Big(10).pow(Number(decimals)));
             }
 
-            if (ftrslt.ft_meta?.price) {
-              sum = rpcAmount.mul(Big(ftrslt.ft_meta?.price));
+            const refPrice = refTokenPrices?.[ftrslt?.contract]?.price;
+            const tokenPrice = refPrice ?? ftrslt.ft_meta?.price;
+
+            if (tokenPrice) {
+              sum = rpcAmount.mul(Big(String(tokenPrice)));
               total = total.add(sum);
 
               return pricedTokens.push({
                 ...ftrslt,
+                ft_meta: {
+                  ...ftrslt?.ft_meta,
+                  price: tokenPrice,
+                },
                 amountUsd: sum.toString(),
                 rpcAmount: rpcAmount.toString(),
               });
@@ -99,7 +118,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
     loadBalances();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, modifiedId, tokenFilter]);
+  }, [inventoryData?.fts, modifiedId, tokenFilter, refTokenPrices]);
 
   const filterToken: TokenListInfo = ft?.tokens?.length
     ? ft?.tokens[0]
@@ -156,7 +175,7 @@ export default function TokenFilter({ id, inventoryData, tokenFilter }: Props) {
                     <span>
                       {filterToken?.ft_meta?.price && (
                         <div className="text-gray-400 ml-2">
-                          @{filterToken?.ft_meta?.price}
+                          @{dollarFormat(String(filterToken?.ft_meta?.price))}
                         </div>
                       )}
                     </span>
