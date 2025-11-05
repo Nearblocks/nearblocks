@@ -18,7 +18,7 @@ import { usePathname, useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import Cookies from 'js-cookie';
 import Notice from '@/components/app/common/Notice';
-
+import useSearchHistory from '@/hooks/app/useSearchHistory';
 interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
@@ -46,6 +46,7 @@ const LayoutActions = ({
   const query = searchParams?.get('q');
   const [accountName, setAccountName] = useState<undefined | string>(accountId);
   const [isLoading, setIsLoading] = useState(true);
+  const { getSearchResults, setSearchResults } = useSearchHistory();
 
   useEffect(() => {
     const manageAccountSession = () => {
@@ -97,19 +98,24 @@ const LayoutActions = ({
       }
     };
     const loadResults = async (keyword: string) => {
-      const data = await handleFilterAndKeyword(keyword, '');
-      const route = data?.data && getSearchRoute(data?.data);
-
-      if (route) {
-        return redirect(route);
+      const cachedResults = await getSearchResults(keyword, '');
+      if (cachedResults) {
+        return redirect(getSearchRoute(cachedResults));
       } else {
-        const rpcData = await rpcSearch(keyword);
-        const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
-
-        if (rpcRoute) {
-          return redirect(rpcRoute);
+        const data = await handleFilterAndKeyword(keyword, '');
+        const route = data?.data && getSearchRoute(data?.data);
+        if (route) {
+          await setSearchResults(data?.keyword, '', data?.data);
+          return redirect(route);
         } else {
-          return toast.error(SearchToast(networkId));
+          const rpcData = await rpcSearch(keyword);
+          const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
+          if (rpcRoute) {
+            await setSearchResults(rpcData?.keyword, '', rpcData?.data);
+            return redirect(rpcRoute);
+          } else {
+            return toast.error(SearchToast(networkId));
+          }
         }
       }
     };
