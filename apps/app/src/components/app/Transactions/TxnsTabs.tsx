@@ -14,15 +14,12 @@ export default async function TxnsTabs({
   locale: string;
   searchParams: any;
 }) {
-  const options: RequestInit = { next: { revalidate: 10 } };
   const requestOptions: RequestInit = {
-    cache: 'force-cache',
     next: { tags: [`txn-${hash}`] },
   };
   const data = (await getRequest(`v2/txns/${hash}`, {}, requestOptions)) || {};
-  const stats = (await getRequest(`v1/stats`, {}, options)) || [];
-  const receipt =
-    (await getRequest(`v2/txns/${hash}/receipts`, {}, options)) || [];
+  const stats = (await getRequest(`v1/stats`)) || [];
+  const receipt = (await getRequest(`v2/txns/${hash}/receipts`)) || [];
 
   let hasReceipts = true;
 
@@ -50,7 +47,7 @@ export default async function TxnsTabs({
 
     if (currentDt > blockDt) {
       const priceData =
-        (await getRequest(`v1/stats/price?date=${blockDt}`, {}, options)) || {};
+        (await getRequest(`v1/stats/price?date=${blockDt}`)) || {};
       price = priceData?.stats?.[0]?.near_price || null;
     }
   }

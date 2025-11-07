@@ -529,9 +529,7 @@ const Details = (props: Props) => {
                 </Tooltip>
                 <div>{t ? t('txnDetails.status.text.0') : 'Status'}</div>
               </div>
-              {(txn?.outcomes?.status === undefined &&
-                rpcTxn.status === undefined) ||
-              (hasReceipts === false && !rpcTxn?.status) ? (
+              {hasReceipts === false && !rpcTxn?.status ? (
                 <div className="w-full md:w-3/4">
                   <Loader wrapperClassName="flex w-24" />
                 </div>
