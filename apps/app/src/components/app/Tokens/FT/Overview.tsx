@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 
 import { getRequest } from '@/utils/app/api';
 import { Token } from '@/utils/types';
+import { refFinanceTokenPricesApiUrl } from '@/utils/app/config';
 
 import OverviewActions from '@/components/app/Tokens/FT/OverviewActions';
 import TokenFilter from '@/components/app/Tokens/FT/TokenFilter';
@@ -36,6 +37,15 @@ const Overview = async ({ id, searchParams }: any) => {
   const inventoryData = inventoryDataPromise?.inventory;
   const theme = (await cookies()).get('theme')?.value || 'light';
 
+  const refTokenPrices = refFinanceTokenPricesApiUrl
+    ? getRequest(
+        refFinanceTokenPricesApiUrl,
+        {},
+        { next: { revalidate: 90 } },
+        false,
+      )
+    : Promise.resolve({});
+
   if (tokenResult.message === 'Error') {
     throw new Error(`Server Error : ${tokenResult.error}`);
   }
@@ -57,6 +67,7 @@ const Overview = async ({ id, searchParams }: any) => {
           id={id}
           inventoryData={inventoryData}
           tokenFilter={searchParams?.a}
+          refTokenPricesPromise={refTokenPrices}
         />
       )}
     </>

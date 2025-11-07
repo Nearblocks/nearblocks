@@ -93,12 +93,11 @@ const AccountOverviewActions = ({
             console.error('Error in loadBalances:', error);
           });
           if (amount) {
-            rpcAmount = ft?.ft_meta?.decimals
-              ? Big(amount).div(Big(10).pow(+ft.ft_meta.decimals))
-              : Big(0);
+            const decimals = ft?.ft_meta?.decimals ?? 0;
+            rpcAmount = Big(amount).div(Big(10).pow(Number(decimals)));
           }
           const refPrice = refTokenPrices?.[ft?.contract]?.price;
-          const tokenPrice = refPrice || ft?.ft_meta?.price;
+          const tokenPrice = refPrice ?? ft?.ft_meta?.price;
 
           if (tokenPrice) {
             sum = rpcAmount.mul(Big(tokenPrice));
