@@ -15,6 +15,7 @@ import { Spinner } from '@/components/app/common/Spinner';
 import useStatsStore from '@/stores/app/syncStats';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import { locales } from '@/utils/app/config';
+import useSearchHistory from '@/hooks/app/useSearchHistory';
 
 export const SearchToast = (networkId: NetworkId) => {
   if (networkId === 'testnet') {
@@ -107,8 +108,17 @@ const BaseSearch = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showHistory, setShowHistory] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<
+    Array<{ query: string; filter: string; results: SearchResult }>
+  >([]);
   const containerRef: any = useRef<HTMLDivElement>(null);
+  const isSubmittingRef = useRef(false);
+  const isUserEditingRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const indexers = useStatsStore((state) => state.syncStatus);
+  const { getSearchResults, setSearchResults, getRecentSearches } =
+    useSearchHistory();
   const isLocale = (value: null | string): any => {
     return routing?.locales?.includes(value as any);
   };
@@ -168,15 +178,32 @@ const BaseSearch = ({
 
   useEffect(() => {
     setSelectedIndex(-1);
-  }, [result]);
+  }, [result, showHistory]);
 
   useEffect(() => {
-    if (selectedIndex >= 0 && flatResults[selectedIndex]) {
+    if (isUserEditingRef.current) return;
+    if (showHistory && selectedIndex >= 0 && searchHistory[selectedIndex]) {
+      setInputValue(searchHistory[selectedIndex].query);
+    } else if (
+      !showHistory &&
+      selectedIndex >= 0 &&
+      flatResults[selectedIndex]
+    ) {
       setInputValue(flatResults[selectedIndex].value);
     } else if (selectedIndex === -1) {
       setInputValue(keyword);
     }
-  }, [selectedIndex, flatResults, keyword]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndex, flatResults, keyword, searchHistory]);
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      const history = await getRecentSearches();
+      setSearchHistory(history);
+    };
+    loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const redirect = async (route: SearchRoute | null) => {
     const newPath =
@@ -205,18 +232,14 @@ const BaseSearch = ({
     }
   };
 
-  const reset = () => {
+  useEffect(() => {
     setResult({});
     setKeyword('');
     setInputValue('');
     setIsOpen(false);
     setIsLoading(false);
     setSelectedIndex(-1);
-  };
-
-  useEffect(() => {
-    setIsLoading(false);
-    reset();
+    inputRef.current?.blur();
   }, [pathname]);
 
   const showResults =
@@ -231,6 +254,7 @@ const BaseSearch = ({
     let isActive = true;
 
     const fetchData = async () => {
+      if (isSubmittingRef.current) return;
       if (!keyword) {
         setResult({});
         setIsLoading(false);
@@ -238,6 +262,13 @@ const BaseSearch = ({
       }
       setIsLoading(true);
       try {
+        const cachedResults = await getSearchResults(keyword, filter);
+        if (!isActive) return;
+        if (cachedResults) {
+          setResult(cachedResults);
+          setIsLoading(false);
+          return;
+        }
         const data = await handleFilterAndKeyword(keyword, filter);
         if (!isActive) return;
         if (data?.data) {
@@ -289,12 +320,16 @@ const BaseSearch = ({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSave = useCallback(
-    debounce((nextValue) => setKeyword(nextValue), 500),
+    debounce((nextValue) => {
+      setKeyword(nextValue);
+      isUserEditingRef.current = false;
+    }, 500),
     [],
   );
 
   const handleChange = (event: any) => {
     const { value: nextValue } = event.target;
+    isUserEditingRef.current = true;
     setInputValue(nextValue);
     const sanitized = nextValue.replace(/[\s,]/g, '');
     if (sanitized === '') {
@@ -302,23 +337,72 @@ const BaseSearch = ({
       debouncedSave.cancel();
       setKeyword('');
       setIsLoading(false);
+      setShowHistory(true);
+      isUserEditingRef.current = false;
       return;
     }
-    setIsLoading(true);
+    setShowHistory(false);
+    setSelectedIndex(-1);
     debouncedSave(sanitized);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    // Handle history navigation
+    if (isOpen && showHistory && searchHistory.length > 0) {
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          isUserEditingRef.current = false;
+          setSelectedIndex((prev) =>
+            prev + 1 >= searchHistory.length ? -1 : prev + 1,
+          );
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          isUserEditingRef.current = false;
+          setSelectedIndex((prev) =>
+            prev === -1 ? searchHistory.length - 1 : prev - 1,
+          );
+          break;
+        case 'Enter':
+          event.preventDefault();
+          if (selectedIndex >= 0 && searchHistory[selectedIndex]) {
+            const historyItem = searchHistory[selectedIndex];
+            const route = getSearchRoute(historyItem.results);
+            redirect(route);
+          }
+          break;
+        case 'Escape':
+          event.preventDefault();
+          setIsOpen(false);
+          setSelectedIndex(-1);
+          setShowHistory(false);
+          break;
+      }
+      return;
+    }
+
+    // Handle search results navigation
     if (!isOpen || !flatResults.length) return;
 
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        setSelectedIndex((prev) => Math.min(prev + 1, flatResults.length - 1));
+        setSelectedIndex((prev) => {
+          const maxIndex = showHistory
+            ? searchHistory.length - 1
+            : flatResults.length - 1;
+          return prev >= maxIndex ? -1 : prev + 1;
+        });
         break;
       case 'ArrowUp':
         event.preventDefault();
-        setSelectedIndex((prev) => Math.max(-1, prev - 1));
+        setSelectedIndex((prev) => {
+          const maxIndex = showHistory
+            ? searchHistory.length - 1
+            : flatResults.length - 1;
+          return prev === -1 ? maxIndex : prev - 1;
+        });
         break;
       case 'Enter':
         event.preventDefault();
@@ -335,6 +419,7 @@ const BaseSearch = ({
         event.preventDefault();
         setIsOpen(false);
         setSelectedIndex(-1);
+        setShowHistory(false);
         break;
     }
   };
@@ -351,13 +436,14 @@ const BaseSearch = ({
         !containerRef.current.contains(event.target)
       ) {
         setIsOpen(false);
+        setShowHistory(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === '/') {
         event.preventDefault();
-        document.getElementById('searchInput')?.focus();
+        inputRef.current?.focus();
       }
     };
 
@@ -372,25 +458,38 @@ const BaseSearch = ({
 
   const onSubmit = async (event: any) => {
     event.preventDefault();
+    debouncedSave.cancel();
+    isSubmittingRef.current = true;
+    setIsLoading(true);
 
-    if (isLoading) {
-      return;
-    }
     const query = inputValue.replace(/[\s,]/g, '');
     if (!query) {
+      isSubmittingRef.current = false;
       return toast.error(SearchToast(networkId));
     }
-    setIsLoading(true);
+
+    const cachedResults = await getSearchResults(query, filter);
+    if (cachedResults) {
+      const route = getSearchRoute(cachedResults);
+      isSubmittingRef.current = false;
+      return redirect(route);
+    }
+
     const data = await handleFilterAndKeyword(query, filter);
     const route = data?.data && getSearchRoute(data?.data);
     if (route) {
+      await setSearchResults(query, filter, data.data);
+      isSubmittingRef.current = false;
       return redirect(route);
     } else {
       const rpcData = await rpcSearch(query);
       const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
       if (rpcRoute) {
+        await setSearchResults(query, filter, rpcData.data);
+        isSubmittingRef.current = false;
         return redirect(rpcRoute);
       } else {
+        isSubmittingRef.current = false;
         setIsLoading(false);
         return toast.error(SearchToast(networkId));
       }
@@ -460,17 +559,48 @@ const BaseSearch = ({
             disabled ? 'opacity-100' : ''
           } bg-white dark:bg-black-600 dark:text-neargray-10 w-full h-full text-sm px-4 py-3 outline-none dark:border-black-200 border-l border-t border-b md:border-l-0 rounded-l-lg rounded-r-none md:rounded-l-none`}
           disabled={disabled}
-          id="searchInput"
+          ref={inputRef}
           value={inputValue}
           onChange={handleChange}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsOpen(true);
+            if (inputValue === '' && searchHistory.length > 0) {
+              setShowHistory(true);
+            }
+          }}
           onKeyDown={handleKeyDown}
           autoComplete="off"
           placeholder={
             t('search.placeholder') || 'Search by Account ID / Txn Hash / Block'
           }
         />
-        {isOpen && showResults && (
+
+        {isOpen && showHistory && searchHistory.length > 0 && !keyword && (
+          <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-2 shadow border dark:border-black-200">
+            <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+              Recent Searches
+            </h3>
+            {searchHistory.map((item, idx) => (
+              <div className="px-2 py-1" key={idx}>
+                <div
+                  className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate ${
+                    selectedIndex === idx ? 'bg-gray-100 dark:bg-black-200' : ''
+                  }`}
+                  onClick={() => {
+                    const historyItem = searchHistory[idx];
+                    const route = getSearchRoute(historyItem.results);
+                    redirect(route);
+                  }}
+                >
+                  {shortenAddress(item.query)}{' '}
+                  {item.filter && `(${item.filter})`}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isOpen && showResults && !showHistory && (
           <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-2 shadow border dark:border-black-200">
             <>
               {result?.accounts?.length > 0 && (
