@@ -621,15 +621,15 @@ async function processTokenMetadata(
         processedTokens.push({
           contractId,
           metadata: {
-            name: contract.name || '',
-            symbol: contract.symbol || '',
-            decimals: contract.decimals || 0,
-            price: contract.price || '0',
-            marketCap: contract.onchain_market_cap || '0',
-            volume24h: contract.volume_24h || '0',
-            description: contract.description || '',
-            website: contract.website || '',
-            icon: contract.icon,
+            name: contract?.name || '',
+            symbol: contract?.symbol || '',
+            decimals: contract?.decimals || 0,
+            price: contract?.price || '0',
+            marketCap: contract?.onchain_market_cap || '0',
+            volume24h: contract?.volume_24h || '0',
+            description: contract?.description || '',
+            website: contract?.website || '',
+            icon: contract?.icon,
           },
         });
 
@@ -650,21 +650,22 @@ async function processTokenMetadata(
     try {
       const res = await getRequest(`v2/mts/contract/${contractId}/${tokenId}`);
       const tokenData = res?.contracts?.[0];
-      const base = tokenData.base;
-      const token = tokenData.token;
+      if (!tokenData) return;
+      const base = tokenData?.base;
+      const token = tokenData?.token;
 
       processedTokens.push({
         contractId: contractId,
         metadata: {
-          name: base.name || '',
-          symbol: base.symbol || '',
-          decimals: base.decimals || 0,
+          name: base?.name || '',
+          symbol: base?.symbol || '',
+          decimals: base?.decimals || 0,
           price: '0',
           marketCap: '0',
           volume24h: '0',
-          description: token.description || '',
+          description: token?.description || '',
           website: '',
-          icon: token.media || base.icon || '',
+          icon: token?.media || base?.icon || '',
           tokenId: uniqueKey,
         },
       });

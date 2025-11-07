@@ -293,20 +293,48 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                       const parsed = JSON.parse(normalized);
                       return JSON.stringify(parsed, null, 2);
                     } catch (normalizeError) {
-                      const possibleJson = jsonPart.match(/\{.*\}/);
-                      if (possibleJson) {
-                        try {
-                          const parsed = JSON.parse(possibleJson[0]);
-                          return JSON.stringify(parsed, null, 2);
-                        } catch (matchError) {
-                          console.error(
-                            'All parsing attempts failed:',
-                            matchError,
-                          );
-                          return `${log}`;
+                      try {
+                        let fixed = jsonPart;
+                        const matches = fixed.match(/"[^"]+":"(\{[^]*?\})"/g);
+
+                        if (matches) {
+                          matches.forEach((match) => {
+                            const colonIndex = match.indexOf('":"');
+                            const key = match.substring(0, colonIndex + 2);
+                            const nestedJson = match.substring(
+                              colonIndex + 3,
+                              match.length - 1,
+                            );
+                            const escapedJson = nestedJson.replace(/"/g, '\\"');
+                            const replacement = `${key}"${escapedJson}"`;
+                            const escapedMatch = match.replace(
+                              /[.*+?^${}()|[\]\\]/g,
+                              '\\$&',
+                            );
+                            fixed = fixed.replaceAll(
+                              new RegExp(escapedMatch, 'g'),
+                              replacement,
+                            );
+                          });
                         }
+                        const parsed = JSON.parse(fixed);
+                        return JSON.stringify(parsed, null, 2);
+                      } catch (fixError) {
+                        const possibleJson = jsonPart.match(/\{.*\}/);
+                        if (possibleJson && possibleJson[0]) {
+                          try {
+                            const parsed = JSON.parse(possibleJson[0]);
+                            return JSON.stringify(parsed, null, 2);
+                          } catch (matchError) {
+                            console.error(
+                              'All parsing attempts failed:',
+                              matchError,
+                            );
+                            return `${log}`;
+                          }
+                        }
+                        return `${log}`;
                       }
-                      return `${log}`;
                     }
                   }
                 } catch (error) {
