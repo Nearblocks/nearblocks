@@ -60,7 +60,10 @@ const TxnsTabActions = ({
   const { rpc: rpcUrl, switchRpc, rpcStats } = useRpcProvider();
 
   useEffect(() => {
-    if (txn != null && txn?.outcomes?.status === null) {
+    if (
+      txn != null &&
+      (txn?.outcomes?.status === null || txn?.outcomes?.status === undefined)
+    ) {
       const delay = Math.min(1000 * 2 ** retryCount.current, 150000);
       timeoutRef.current = setTimeout(() => {
         revalidateTxn(hash);
