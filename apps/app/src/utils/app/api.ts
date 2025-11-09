@@ -46,6 +46,12 @@ export const getRequest = async (
     }
   } catch (error: any) {
     clearTimeout(timeoutId);
+    if (
+      error?.name === 'AbortError' ||
+      error?.message === 'The operation was aborted.'
+    ) {
+      console.error(`API call aborted (timeout): ${url}`);
+    }
     return {
       message: 'Error',
       status: 500,
@@ -97,6 +103,12 @@ export const getRequestBeta = async (
     }
   } catch (error: any) {
     clearTimeout(timeoutId);
+    if (
+      error?.name === 'AbortError' ||
+      error?.message === 'The operation was aborted.'
+    ) {
+      console.error(`API call aborted (timeout): ${url}`);
+    }
     return {
       message: 'Error',
       status: 500,
