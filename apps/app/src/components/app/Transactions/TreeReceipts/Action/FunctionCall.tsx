@@ -32,11 +32,11 @@ const FunctionCall = (props: TransactionActionInfo) => {
       try {
         const msgObj = JSON.parse(pretty.msg);
         pretty.msg = msgObj;
-      } catch (error) {
-        console.error('Error parsing JSON in "msg" property:', error);
+      } catch {
+        const stringified = JSON.stringify(pretty.msg);
+        pretty.msg = JSON.parse(stringified);
       }
     }
-
     return pretty;
   }
 
