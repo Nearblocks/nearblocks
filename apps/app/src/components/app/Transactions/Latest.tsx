@@ -5,6 +5,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import { Link } from '@/i18n/routing';
+import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
 import {
   getTimeAgoString,
   nanoToMilli,
@@ -118,21 +119,21 @@ const LatestTransactions = ({ error, txns }: Props) => {
                     <div className="col-span-2 md:col-span-1 px-2 order-2 md:order-1 text-sm">
                       <div className="whitespace-nowrap truncate dark:text-white">
                         {t ? t('homePage.txnFrom') : 'From'}{' '}
-                        <Link
+                        <AddressOrTxnsLink
+                          noHover
+                          currentAddress={txn?.signer_account_id}
+                          name={shortenAddress(txn?.signer_account_id ?? '')}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                          href={`/address/${txn?.signer_account_id}`}
-                        >
-                          {shortenAddress(txn?.signer_account_id ?? '')}
-                        </Link>
+                        />
                       </div>
                       <div className="whitespace-nowrap truncate dark:text-white">
                         {t ? t('homePage.txnTo') : 'To'}{' '}
-                        <Link
+                        <AddressOrTxnsLink
+                          noHover
+                          currentAddress={txn?.receiver_account_id}
+                          name={shortenAddress(txn?.receiver_account_id ?? '')}
                           className="text-green-500 dark:text-green-250 font-medium hover:no-underline"
-                          href={`/address/${txn?.receiver_account_id}`}
-                        >
-                          {shortenAddress(txn?.receiver_account_id ?? '')}
-                        </Link>
+                        />
                       </div>
                     </div>
                     <div className="text-right order-1 md:order-2 overflow-hidden">

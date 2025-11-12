@@ -58,7 +58,6 @@ export default function TabSkeletion() {
                         : `/address/${params.id}?tab=${name}`
                     }
                     key={name}
-                    prefetch={true}
                     scroll={false}
                   >
                     <h2 className="relative font-semibold">

@@ -161,14 +161,13 @@ export async function handleExport({
 export const getLatestStats = async (): Promise<StatusInfo> => {
   'use server';
   const statsDetails = await getRequest(`v1/stats`);
-  return statsDetails?.stats?.[0];
+  return statsDetails?.stats?.[0] || {};
 };
 
 export const getSyncStatus = async (): Promise<Status> => {
   'use server';
   const sync = await getRequest('v1/sync/status');
-  const syncStatus = sync?.status;
-  return syncStatus;
+  return sync?.status || {};
 };
 
 export const revalidateTxn = async (hash: string) => {
