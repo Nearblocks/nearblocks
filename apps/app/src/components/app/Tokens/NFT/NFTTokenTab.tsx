@@ -98,7 +98,6 @@ export default async function NFTTokenTab({
                     : `/nft-token/${id}?tab=${name}`
                 }
                 key={name}
-                prefetch={true}
               >
                 <h2>{label}</h2>
               </Link>

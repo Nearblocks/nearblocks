@@ -48,7 +48,6 @@ function TxnsTabsSkeleton({ hash, tab }: { hash: string; tab: string }) {
                           : `/txns/${hash}?tab=${name}`
                       }
                       key={name}
-                      prefetch={true}
                     >
                       <h2 className="!relative font-semibold">
                         {label}

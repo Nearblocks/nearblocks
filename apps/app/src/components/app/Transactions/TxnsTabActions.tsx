@@ -294,7 +294,6 @@ const TxnsTabActions = ({
                             : `/txns/${hash}?tab=${name}`
                         }
                         key={name}
-                        prefetch={true}
                       >
                         <h2 className="!relative font-semibold">
                           {label}

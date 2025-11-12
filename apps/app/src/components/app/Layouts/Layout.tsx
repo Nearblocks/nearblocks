@@ -26,8 +26,8 @@ const Layout = async ({ children, locale }: LayoutProps) => {
   const theme = (await cookies()).get('theme')?.value || 'light';
   const signedAccountId = await getCookie('signedAccountId');
   const network = networkId;
-  const stats = await getLatestStats();
-  const syncStatus = await getSyncStatus();
+  const stats = getLatestStats();
+  const syncStatus = getSyncStatus();
 
   return (
     <html
@@ -86,8 +86,8 @@ const Layout = async ({ children, locale }: LayoutProps) => {
                 <ToastContainer />
                 <LayoutActions
                   theme={theme}
-                  stats={stats}
-                  sync={syncStatus}
+                  statsPromise={stats}
+                  syncPromise={syncStatus}
                   accountId={signedAccountId}
                   locale={locale}
                 >

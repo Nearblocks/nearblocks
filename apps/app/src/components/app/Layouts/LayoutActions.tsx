@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 import Provider from '@/components/Layouts/Provider';
 import useWallet from '@/hooks/app/useWallet';
@@ -23,8 +23,8 @@ interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
   theme: string;
-  stats: StatusInfo;
-  sync: Status;
+  statsPromise: Promise<StatusInfo>;
+  syncPromise: Promise<Status>;
   accountId?: string;
   locale: string;
 }
@@ -34,9 +34,11 @@ const LayoutActions = ({
   theme,
   accountId,
   locale,
-  stats,
-  sync,
+  statsPromise,
+  syncPromise,
 }: LayoutProps) => {
+  const stats = use(statsPromise);
+  const sync = use(syncPromise);
   const pathname = usePathname();
   const [signedAccountId, setSignedAccountId] = useState('');
   const wallet = useWallet();
