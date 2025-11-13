@@ -16,27 +16,25 @@ import TokenImage from '@/components/app/common/TokenImage';
 import { useParams } from 'next/navigation';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import { useAddressRpc } from '../common/AddressRpcProvider';
+import useStatsStore from '@/stores/app/syncStats';
 const AccountMoreInfoActions = ({
   accountDataPromise,
   deploymentDataPromise,
   nftTokenDataPromise,
   tokenDataPromise,
-  syncDataPromise,
 }: {
   accountDataPromise: Promise<any>;
   deploymentDataPromise: Promise<any>;
   nftTokenDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
-  syncDataPromise: Promise<any>;
 }) => {
   const account = use(accountDataPromise);
   const deployment = use(deploymentDataPromise);
   const nftToken = use(nftTokenDataPromise);
   const ftToken = use(tokenDataPromise);
-  const syncData = use(syncDataPromise);
-
+  const indexers = useStatsStore((state) => state.syncStatus);
   const deploymentData = deployment?.deployments?.[0];
-  const status = syncData && syncData?.status?.indexers?.balance?.sync;
+  const status = indexers?.balance && indexers?.balance?.sync;
   const tokenData = ftToken?.contracts?.[0];
   const nftTokenData = nftToken?.contracts?.[0];
   const [accountData, setAccountData] = useState<AccountContractInfo>(

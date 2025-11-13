@@ -1,7 +1,7 @@
-import { Suspense } from 'react';
-
 import AccountTabs from '@/components/app/Address/AccountTabs';
-import TabSkeletion from '@/components/app/skeleton/address/tab';
+import { AddressRpcProvider } from '@/components/app/common/AddressRpcProvider';
+import Balance from '@/components/app/Address/Balance';
+import { getRequest } from '@/utils/app/api';
 
 export default async function AddressIndex(props: {
   params: Promise<{ id: string; locale: string }>;
@@ -22,14 +22,13 @@ export default async function AddressIndex(props: {
 
   const { id: address } = params;
   const id = address?.toLowerCase();
-
-  const { cursor, page, ...rest } = searchParams;
+  const contractPromise = getRequest(`v1/account/${id}/contract`);
 
   return (
-    <>
-      <Suspense fallback={<TabSkeletion />} key={JSON.stringify(rest)}>
-        <AccountTabs id={id} searchParams={searchParams} />
-      </Suspense>
-    </>
+    <AddressRpcProvider contractPromise={contractPromise} accountId={id}>
+      <Balance id={id} />
+      <div className="py-2"></div>
+      <AccountTabs id={id} searchParams={searchParams} />
+    </AddressRpcProvider>
   );
 }

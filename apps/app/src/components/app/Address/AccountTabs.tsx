@@ -11,6 +11,8 @@ import TableSummary from '@/components/app/common/TableSummary';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import { ErrorBoundary } from 'react-error-boundary';
+import { Suspense } from 'react';
+import TabPanelGeneralSkeleton from '../skeleton/address/dynamicTab';
 
 export default async function AccountTabs({
   id,
@@ -46,25 +48,33 @@ export default async function AccountTabs({
     <AccountTabsActions>
       {tab === 'txns' ? (
         <ErrorBoundary fallback={fallbackError}>
-          <Transactions id={id} searchParams={searchParams} />
+          <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
+            <Transactions id={id} searchParams={searchParams} />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
 
       {tab === 'receipts' ? (
         <ErrorBoundary fallback={fallbackError}>
-          <Receipts id={id} searchParams={searchParams} />
+          <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
+            <Receipts id={id} searchParams={searchParams} />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
 
       {tab === 'tokentxns' ? (
         <ErrorBoundary fallback={fallbackError}>
-          <TokenTransactions id={id} searchParams={searchParams} />
+          <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
+            <TokenTransactions id={id} searchParams={searchParams} />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
 
       {tab === 'nfttokentxns' ? (
         <ErrorBoundary fallback={fallbackError}>
-          <NFTTransactions id={id} searchParams={searchParams} />
+          <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
+            <NFTTransactions id={id} searchParams={searchParams} />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
 
@@ -76,13 +86,17 @@ export default async function AccountTabs({
 
       {tab === 'accesskeys' ? (
         <ErrorBoundary fallback={fallbackError}>
-          <AccessKeys id={id} searchParams={searchParams} />
+          <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
+            <AccessKeys id={id} searchParams={searchParams} />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
 
       {tab === 'contract' ? (
         <ErrorBoundary fallback={fallbackError}>
-          <Overview id={id} searchParams={searchParams} />
+          <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
+            <Overview id={id} searchParams={searchParams} />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
     </AccountTabsActions>

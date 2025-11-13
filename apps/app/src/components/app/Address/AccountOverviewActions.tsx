@@ -1,7 +1,8 @@
 'use client';
+
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
-import React, { use, useEffect, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
@@ -17,13 +18,15 @@ import { useParams } from 'next/navigation';
 import { useAddressRpc } from '../common/AddressRpcProvider';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import useStatsStore from '@/stores/app/syncStats';
+
+type BalanceCache = Record<string, FtInfo>;
 
 const AccountOverviewActions = ({
   accountDataPromise,
   inventoryDataPromise,
   loading = false,
   spamTokensPromise,
-  statsDataPromise,
   tokenDataPromise,
   mtsDataPromise,
   intentsTokenPricesPromise,
@@ -34,14 +37,11 @@ const AccountOverviewActions = ({
   loading?: boolean;
   mtsDataPromise: Promise<any>;
   spamTokensPromise: Promise<any>;
-  statsDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
-  syncDataPromise: Promise<any>;
   intentsTokenPricesPromise: Promise<IntentsTokenPrices[]>;
   refTokenPricesPromise: Promise<RefFinanceTokenPrices>;
 }) => {
   const account = use(accountDataPromise);
-  const stats = use(statsDataPromise);
   const token = use(tokenDataPromise);
   const inventory = use(inventoryDataPromise);
   const spam = use(spamTokensPromise);
@@ -49,10 +49,10 @@ const AccountOverviewActions = ({
   const intentsTokenPrices = use(intentsTokenPricesPromise);
   const refTokenPrices = use(refTokenPricesPromise);
   const accountData = account?.account?.[0];
-  const statsData = stats?.stats?.[0];
+  const statsData = useStatsStore((state) => state.latestStats);
   const tokenData = token?.contracts?.[0];
   const inventoryData = inventory?.inventory;
-  const spamTokens = JSON.parse(spam);
+  const spamTokens = typeof spam === 'string' ? JSON.parse(spam) : null;
   const { account: accountView } = useAddressRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
@@ -63,10 +63,18 @@ const AccountOverviewActions = ({
   const balance = accountData?.amount
     ? accountData?.amount
     : accountView?.amount;
-  const nearPrice = statsData?.near_price ?? '';
+  const nearPrice = statsData?.near_price;
   const { rpc: rpcUrl } = useRpcProvider();
 
+  const cacheRef = useRef<BalanceCache>({});
+
   useEffect(() => {
+    const cacheKey = `${params?.id}_${rpcUrl}`;
+    if (cacheRef.current[cacheKey]) {
+      setFT(cacheRef.current[cacheKey]);
+      return;
+    }
+
     const loadBalances = async () => {
       // Temporary deduplication for eth.bridge.near contracts
       // Remove after API v3 migration completes
@@ -135,10 +143,13 @@ const AccountOverviewActions = ({
         if (first?.gt(second)) return -1;
         return 0;
       });
-      setFT({
+
+      const result = {
         amount: total.toString(),
         tokens: [...pricedTokens, ...tokens],
-      });
+      };
+      cacheRef.current[cacheKey] = result;
+      setFT(result);
     };
     loadBalances();
     // eslint-disable-next-line react-hooks/exhaustive-deps
