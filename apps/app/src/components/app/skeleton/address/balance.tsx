@@ -12,15 +12,16 @@ export default function BalanceSkeleton({
   ftPromise,
   nftPromise,
 }: {
-  deploymentPromise: Promise<any>;
-  ftPromise: Promise<any>;
-  nftPromise: Promise<any>;
+  deploymentPromise?: Promise<any>;
+  ftPromise?: Promise<any>;
+  nftPromise?: Promise<any>;
   error?: boolean;
 }) {
-  const deployment = use(deploymentPromise);
+  const deployment = deploymentPromise ? use(deploymentPromise) : null;
   const deploymentInfo = deployment?.deployments?.[0];
-  const ft = use(ftPromise);
-  const nft = use(nftPromise);
+
+  const ft = ftPromise ? use(ftPromise) : null;
+  const nft = nftPromise ? use(nftPromise) : null;
   const tokenTracker =
     (ft?.contracts?.[0]?.name ? 'token' : null) ||
     (nft?.contracts?.[0]?.name ? 'nft' : null);

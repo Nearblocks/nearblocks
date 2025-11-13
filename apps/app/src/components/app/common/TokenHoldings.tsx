@@ -111,9 +111,13 @@ const TokenHoldings = (props: Props) => {
   });
   if (ft?.length === 0 && mt?.length === 0 && nfts?.length === 0) {
     return (
-      <select className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200">
-        <option>N/A</option>
-      </select>
+      <div
+        className="appearance-none w-full h-8 text-xs px-2 outline-none rounded bg-white dark:bg-black-600 border dark:border-black-200 flex items-center"
+        suppressHydrationWarning
+        role="status"
+      >
+        N/A
+      </div>
     );
   }
   const ftAmount = props?.ft?.amount ?? 0;

@@ -6,11 +6,6 @@ import { appUrl, networkId } from '@/utils/app/config';
 import RpcMenu from '@/components/app/Layouts/RpcMenu';
 import ActionMenuPopover from '@/components/app/common/ActionMenuPopover';
 import FaDoubleCheck from '@/components/app/Icons/FaDoubleCheck';
-import { AddressRpcProvider } from '@/components/app/common/AddressRpcProvider';
-import { getRequest } from '@/utils/app/api';
-import { Suspense } from 'react';
-import BalanceSkeleton from '@/components/app/skeleton/address/balance';
-import Balance from '@/components/app/Address/Balance';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
 
@@ -56,18 +51,6 @@ export default async function AddressLayout(props: {
 
   const { children } = props;
 
-  const options: RequestInit = {
-    cache: 'no-store',
-  };
-  const contractPromise = getRequest(`v1/account/${id}/contract`, {}, options);
-
-  const deploymentInfo = getRequest(
-    `v1/account/${id}/contract/deployments`,
-    {},
-    options,
-  );
-  const tokenDetails = getRequest(`v1/fts/${id}`, {}, options);
-  const nftTokenData = getRequest(`v1/nfts/${id}`, {}, options);
   const rpcProviders = await getRpcProviders();
 
   return (
@@ -116,23 +99,7 @@ export default async function AddressLayout(props: {
             </div>
           </div>
         </div>
-        <div className="py-2">
-          <AddressRpcProvider contractPromise={contractPromise} accountId={id}>
-            <Suspense
-              fallback={
-                <BalanceSkeleton
-                  deploymentPromise={deploymentInfo}
-                  ftPromise={tokenDetails}
-                  nftPromise={nftTokenData}
-                />
-              }
-            >
-              <Balance id={id} />
-            </Suspense>
-            <div className="py-2"></div>
-            {children}
-          </AddressRpcProvider>
-        </div>
+        <div className="py-2">{children}</div>
       </div>
     </RpcContextProvider>
   );
