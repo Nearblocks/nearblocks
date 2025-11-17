@@ -10,7 +10,7 @@ import {
   weight,
   yoctoToNear,
 } from '@/utils/app/libs';
-import { AccountContractInfo } from '@/utils/types';
+import { AccountContractInfo, Status } from '@/utils/types';
 
 import TokenImage from '@/components/app/common/TokenImage';
 import { useParams } from 'next/navigation';
@@ -22,19 +22,23 @@ const AccountMoreInfoActions = ({
   deploymentDataPromise,
   nftTokenDataPromise,
   tokenDataPromise,
+  syncDataPromise,
 }: {
   accountDataPromise: Promise<any>;
   deploymentDataPromise: Promise<any>;
   nftTokenDataPromise: Promise<any>;
   tokenDataPromise: Promise<any>;
+  syncDataPromise: Promise<{ status: Status }>;
 }) => {
   const account = use(accountDataPromise);
   const deployment = use(deploymentDataPromise);
   const nftToken = use(nftTokenDataPromise);
   const ftToken = use(tokenDataPromise);
+  const syncData = use(syncDataPromise);
   const indexers = useStatsStore((state) => state.syncStatus);
   const deploymentData = deployment?.deployments?.[0];
-  const status = indexers?.balance && indexers?.balance?.sync;
+  const status =
+    indexers?.balance?.sync ?? syncData?.status?.indexers?.balance?.sync;
   const tokenData = ftToken?.contracts?.[0];
   const nftTokenData = nftToken?.contracts?.[0];
   const [accountData, setAccountData] = useState<AccountContractInfo>(

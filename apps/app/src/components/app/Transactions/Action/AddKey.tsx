@@ -7,6 +7,8 @@ import { TransactionActionInfo } from '@/utils/types';
 
 import FaRight from '@/components/app/Icons/FaRight';
 import { AddressOrTxnsLink } from '@/components/app/common/HoverContextProvider';
+import { CopyButton } from '../../common/CopyButton';
+import Tooltip from '../../common/Tooltip';
 
 const AddKey = (props: TransactionActionInfo) => {
   const params = useParams();
@@ -83,9 +85,23 @@ const AddKey = (props: TransactionActionInfo) => {
         )}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
         <span className="font-bold">
-          {shortenHex(props.args.public_key || props.args.publicKey)}
+          <Tooltip
+            tooltip={props.args.public_key || props.args.publicKey}
+            position="top"
+            className={
+              'left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+            }
+            showArrow
+          >
+            {shortenHex(props.args.public_key || props.args.publicKey)}
+            <span>
+              <CopyButton
+                textToCopy={props.args.public_key || props.args.publicKey}
+              />
+            </span>
+          </Tooltip>
         </span>
-        ){t ? t('txnDetails.actions.addKey.2') : 'added for'}{' '}
+        ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}{' '}
         <AddressOrTxnsLink currentAddress={props.receiver} />
         {t ? t('txnDetails.actions.addKey.4') : 'with permission'}{' '}
         <span className="font-bold ml-1">

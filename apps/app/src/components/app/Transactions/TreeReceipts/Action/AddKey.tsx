@@ -7,6 +7,7 @@ import { TransactionActionInfo } from '@/utils/types';
 import { CopyButton } from '@/components/app/common/CopyButton';
 
 import TreeNode from '@/components/app/Transactions/TreeReceipts/TreeNode';
+import Tooltip from '@/components/app/common/Tooltip';
 
 const AddKey = (props: TransactionActionInfo) => {
   const { action } = props;
@@ -53,10 +54,21 @@ const AddKey = (props: TransactionActionInfo) => {
           <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
           {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
           <span className="font-bold">
-            {shortenHex(publicKey)}
             {publicKey && (
-              <span className="ml-0.5">
-                <CopyButton textToCopy={publicKey} />
+              <span>
+                <Tooltip
+                  tooltip={publicKey}
+                  position="top"
+                  className={
+                    'left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+                  }
+                  showArrow
+                >
+                  {shortenHex(publicKey)}
+                </Tooltip>
+                <span className="ml-0.5">
+                  <CopyButton textToCopy={publicKey} />
+                </span>
               </span>
             )}
           </span>
