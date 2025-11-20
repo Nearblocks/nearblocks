@@ -179,7 +179,9 @@ export const calculateAPY = (
   prevEpochTimestamp: string,
   totalSupply: string,
 ) => {
-  const maxInflationRate = 0.05;
+  // Inflation changed to 2.5% (https://github.com/near/nearcore/releases/tag/2.9.0)
+  // TODO see if this could be pulled dynamically
+  const maxInflationRate = 0.025;
   const epochLength =
     Big(epochTimestamp).minus(prevEpochTimestamp).toNumber() / 1e9;
   const secondsInYear = 31536000;
