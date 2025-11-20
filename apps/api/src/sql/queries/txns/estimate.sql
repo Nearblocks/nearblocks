@@ -11,14 +11,8 @@ FROM
       WHERE
         (
           %L::BIGINT IS NULL
-          OR block_timestamp > %L
-        )
-        AND (
-          %L::BIGINT IS NULL
           OR block_timestamp < %L
         )',
-      ${after},
-      ${after},
       ${before},
       ${before}
     )

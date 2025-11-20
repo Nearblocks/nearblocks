@@ -24,18 +24,39 @@ receipts_selected AS (
       AND (
         p.included_in_block_timestamp IS NULL
         OR (
-          r.included_in_block_timestamp,
-          r.shard_id,
-          r.index_in_chunk
-        ) < (
-          p.included_in_block_timestamp,
-          p.shard_id,
-          p.index_in_chunk
+          (
+            ${direction} = 'desc'
+            AND (
+              r.included_in_block_timestamp,
+              r.shard_id,
+              r.index_in_chunk
+            ) < (
+              p.included_in_block_timestamp,
+              p.shard_id,
+              p.index_in_chunk
+            )
+          )
+          OR (
+            ${direction} = 'asc'
+            AND (
+              r.included_in_block_timestamp,
+              r.shard_id,
+              r.index_in_chunk
+            ) > (
+              p.included_in_block_timestamp,
+              p.shard_id,
+              p.index_in_chunk
+            )
+          )
         )
       )
       AND (
-        ${after}::BIGINT IS NULL
-        OR r.included_in_block_timestamp > ${after}
+        ${start}::BIGINT IS NULL
+        OR r.included_in_block_timestamp >= ${start}
+      )
+      AND (
+        ${end}::BIGINT IS NULL
+        OR r.included_in_block_timestamp <= ${end}
       )
       AND (
         ${before}::BIGINT IS NULL
@@ -91,18 +112,39 @@ receipts_selected AS (
       AND (
         p.included_in_block_timestamp IS NULL
         OR (
-          r.included_in_block_timestamp,
-          r.shard_id,
-          r.index_in_chunk
-        ) < (
-          p.included_in_block_timestamp,
-          p.shard_id,
-          p.index_in_chunk
+          (
+            ${direction} = 'desc'
+            AND (
+              r.included_in_block_timestamp,
+              r.shard_id,
+              r.index_in_chunk
+            ) < (
+              p.included_in_block_timestamp,
+              p.shard_id,
+              p.index_in_chunk
+            )
+          )
+          OR (
+            ${direction} = 'asc'
+            AND (
+              r.included_in_block_timestamp,
+              r.shard_id,
+              r.index_in_chunk
+            ) > (
+              p.included_in_block_timestamp,
+              p.shard_id,
+              p.index_in_chunk
+            )
+          )
         )
       )
       AND (
-        ${after}::BIGINT IS NULL
-        OR r.included_in_block_timestamp > ${after}
+        ${start}::BIGINT IS NULL
+        OR r.included_in_block_timestamp >= ${start}
+      )
+      AND (
+        ${end}::BIGINT IS NULL
+        OR r.included_in_block_timestamp <= ${end}
       )
       AND (
         ${before}::BIGINT IS NULL
@@ -126,9 +168,9 @@ receipts_selected AS (
           )
       )
     ORDER BY
-      r.included_in_block_timestamp DESC,
-      r.shard_id DESC,
-      r.index_in_chunk DESC
+      r.included_in_block_timestamp ${direction:raw},
+      r.shard_id ${direction:raw},
+      r.index_in_chunk ${direction:raw}
     LIMIT
       ${limit}
   )

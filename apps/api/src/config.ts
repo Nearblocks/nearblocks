@@ -41,13 +41,18 @@ const env = cleanEnv(process.env, {
   TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
 });
 
+const baseStart =
+  env.NETWORK === Network.MAINNET ? 1595350551591948000n : 1596166782911378000n;
+const balanceStart =
+  env.NETWORK === Network.MAINNET ? 1595368210762782796n : 1617306016933517888n;
+const eventsStart =
+  env.NETWORK === Network.MAINNET ? 1613604394034862539n : 1636002073366363339n;
+
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
   apiUrl: env.API_URL,
-  baseStart:
-    env.NETWORK === Network.MAINNET
-      ? 1595350551591948000n
-      : 1596166782911378000n,
+  balanceStart,
+  baseStart,
   campaignsPublicUrl: env.CAMPAIGNS_PUBLIC_URL,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
@@ -59,6 +64,7 @@ const config: Config = {
   dbUrlMultichain: env.DB_URL_MULTICHAIN,
   dbUrlStaking: env.DB_URL_STAKING,
   dbWriteUrlBase: env.DB_WRITE_URL_BASE,
+  eventsStart,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryRows: 5000,

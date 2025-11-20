@@ -15,16 +15,10 @@ FROM
         )
         AND (
           %L::BIGINT IS NULL
-          OR block_timestamp > %L
-        )
-        AND (
-          %L::BIGINT IS NULL
           OR block_timestamp < %L
         )',
       ${signer},
       ${receiver},
-      ${after},
-      ${after},
       ${before},
       ${before}
     )

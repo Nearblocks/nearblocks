@@ -15,10 +15,6 @@ FROM
         )
         AND (
           %L::BIGINT IS NULL
-          OR r.included_in_block_timestamp > %L
-        )
-        AND (
-          %L::BIGINT IS NULL
           OR r.included_in_block_timestamp < %L
         )
         AND EXISTS (
@@ -41,8 +37,6 @@ FROM
       ',
       ${predecessor},
       ${receiver},
-      ${after},
-      ${after},
       ${before},
       ${before},
       ${action},

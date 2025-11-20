@@ -8,6 +8,7 @@ import type {
 import request from 'nb-schemas/dist/blocks/request.js';
 import response from 'nb-schemas/dist/blocks/response.js';
 
+import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase } from '#libs/pgp';
 import redis from '#libs/redis';
@@ -15,6 +16,7 @@ import {
   paginateData,
   rollingWindow,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -30,12 +32,13 @@ const latest = responseHandler(
       (start, end) => {
         return dbBase.manyOrNone<Block>(sql.blocks, {
           cursor: { timestamp: null },
+          direction: 'desc',
           end,
           limit,
           start,
         });
       },
-      { limit },
+      { limit, start: config.baseStart },
     );
 
     const blocks = await redis.cache<Block[]>(
@@ -52,13 +55,19 @@ const blocks = responseHandler(
   response.blocks,
   async (req: RequestValidator<BlocksReq>) => {
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const blocksQuery: WindowListQuery<Block> = (start, end, limit) => {
       return dbBase.manyOrNone<Block>(sql.blocks, {
         cursor: { timestamp: cursor?.timestamp },
+        direction,
         end,
         limit,
         start,
@@ -66,14 +75,20 @@ const blocks = responseHandler(
     };
 
     const blocks = await rollingWindowList<Block>(blocksQuery, {
-      end: cursor?.timestamp ? BigInt(cursor.timestamp) : undefined,
+      direction,
+      end: windowEnd(cursor?.timestamp),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
+      start: config.baseStart,
     });
 
-    return paginateData(blocks, limit, (txn) => ({
-      timestamp: txn.block_timestamp,
-    }));
+    return paginateData(
+      blocks,
+      limit,
+      direction,
+      (txn) => ({ timestamp: txn.block_timestamp }),
+      !!cursor,
+    );
   },
 );
 
@@ -90,14 +105,17 @@ const block = responseHandler(
     const hash = input.length >= 43 ? input : null;
     const height = !isNaN(+input) ? +input : null;
 
-    const block = await rollingWindow((start, end) => {
-      return dbBase.oneOrNone<Block>(sql.block, {
-        end,
-        hash,
-        height,
-        start,
-      });
-    });
+    const block = await rollingWindow(
+      (start, end) => {
+        return dbBase.oneOrNone<Block>(sql.block, {
+          end,
+          hash,
+          height,
+          start,
+        });
+      },
+      { start: config.baseStart },
+    );
 
     return { data: block };
   },

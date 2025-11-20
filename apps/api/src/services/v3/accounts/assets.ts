@@ -23,9 +23,14 @@ const fts = responseHandler(
   async (req: RequestValidator<AccountAssetFTsReq>) => {
     const account = req.validator.account;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.ftsCursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.ftsCursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.ftsCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const fts = await dbEvents.manyOrNone<AccountAssetFT>(sql.assets.fts, {
       account,
@@ -33,14 +38,21 @@ const fts = responseHandler(
         amount: cursor?.amount,
         contract: cursor?.contract,
       },
+      direction,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
     });
 
-    return paginateData(fts, limit, (ft) => ({
-      amount: ft.amount,
-      contract: ft.contract,
-    }));
+    return paginateData(
+      fts,
+      limit,
+      direction,
+      (ft) => ({
+        amount: ft.amount,
+        contract: ft.contract,
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -62,9 +74,14 @@ const nfts = responseHandler(
   async (req: RequestValidator<AccountAssetNFTsReq>) => {
     const account = req.validator.account;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.nftsCursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.nftsCursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.nftsCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const nfts = await dbEvents.manyOrNone<AccountAssetNFT>(sql.assets.nfts, {
       account,
@@ -72,14 +89,21 @@ const nfts = responseHandler(
         contract: cursor?.contract,
         token: cursor?.token,
       },
+      direction,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
     });
 
-    return paginateData(nfts, limit, (nft) => ({
-      contract: nft.contract,
-      token: nft.token,
-    }));
+    return paginateData(
+      nfts,
+      limit,
+      direction,
+      (nft) => ({
+        contract: nft.contract,
+        token: nft.token,
+      }),
+      !!cursor,
+    );
   },
 );
 

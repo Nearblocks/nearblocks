@@ -12,7 +12,14 @@ WITH
     WHERE
       (
         ${cursor.timestamp}::BIGINT IS NULL
-        OR block_timestamp < ${cursor.timestamp}
+        OR (
+          ${direction} = 'desc'
+          AND block_timestamp < ${cursor.timestamp}
+        )
+        OR (
+          ${direction} = 'asc'
+          AND block_timestamp > ${cursor.timestamp}
+        )
       )
       AND (
         ${start}::BIGINT IS NULL
@@ -23,7 +30,7 @@ WITH
         OR block_timestamp <= ${end} -- rolling window end
       )
     ORDER BY
-      block_timestamp DESC
+      block_timestamp ${direction:raw}
     LIMIT
       ${limit}
   )

@@ -40,8 +40,13 @@ const routes = (app: Router) => {
    *           minLength: 19
    *           maxLength: 19
    *       - in: query
-   *         name: cursor
-   *         description: Page cursor. Pass the value returned from the previous request to retrieve the next page of results
+   *         name: next
+   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: prev
+   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
    *         schema:
    *           type: string
    *       - in: query

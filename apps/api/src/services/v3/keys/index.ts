@@ -14,24 +14,36 @@ const keys = responseHandler(
   async (req: RequestValidator<AccessKeysReq>) => {
     const key = req.validator.key;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const keys = await dbBase.manyOrNone<AccessKey>(sql.keys, {
       cursor: {
         account: cursor?.account,
         timestamp: cursor?.timestamp,
       },
+      direction,
       key,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
     });
 
-    return paginateData(keys, limit, (key) => ({
-      account: key.account_id,
-      timestamp: key.action_timestamp,
-    }));
+    return paginateData(
+      keys,
+      limit,
+      direction,
+      (key) => ({
+        account: key.account_id,
+        timestamp: key.action_timestamp,
+      }),
+      !!cursor,
+    );
   },
 );
 

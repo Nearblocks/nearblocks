@@ -1,26 +1,32 @@
-import config from '#config';
 import cursors, { CursorObject } from '#libs/cursors';
 
 export type WindowListQuery<T> = (
   start: string,
   end: string,
   limit?: number,
+  direction?: 'asc' | 'desc',
 ) => Promise<T[]>;
 
 export type WindowQuery<T> = (start: string, end: string) => Promise<null | T>;
 
 export type WindowListOptions = {
+  direction?: 'asc' | 'desc';
   end?: bigint;
   limit?: number;
-  start?: bigint;
+  start: bigint;
 };
 
-export type WindowOptions = { start?: bigint };
+export type WindowOptions = {
+  start: bigint;
+};
 
 export type PaginatedResponse<T> = {
   data: null | T[];
-  meta?: { cursor: string };
+  meta?: { next_page?: string; prev_page?: string };
 };
+
+const NOW = BigInt(Date.now()) * 1_000_000n; // Current time in ns
+const WINDOW_SIZE = BigInt(60 * 60 * 24 * 30 * 12) * 1_000_000_000n; // 1yr in ns
 
 /**
  * Collects results by repeatedly querying over rolling time windows, moving backwards in time.
@@ -32,20 +38,39 @@ export type PaginatedResponse<T> = {
  * @param options - Optional settings, including start time, end time, and result limit.
  * @returns An array of results up to the specified limit.
  */
-const WINDOW_SIZE = BigInt(60 * 60 * 24 * 30 * 12) * 1_000_000_000n; // 1yr in ns
-
 export const rollingWindowList = async <T>(
   queryFn: WindowListQuery<T>,
-  options: WindowListOptions = {},
+  options: WindowListOptions,
 ): Promise<T[]> => {
-  const {
-    end = BigInt(Date.now()) * 1_000_000n,
-    limit = 1,
-    start = config.baseStart,
-  } = options;
+  const { direction = 'desc', end = NOW, limit = 1, start } = options;
   const windowSize = WINDOW_SIZE;
   const results: T[] = [];
+  let startNs = start;
   let endNs = end;
+
+  if (direction === 'asc') {
+    while (startNs < end && results.length < limit) {
+      const windowEnd = startNs + windowSize < end ? startNs + windowSize : end;
+      const remaining = limit - results.length;
+
+      const batch = await queryFn(
+        startNs.toString(),
+        windowEnd.toString(),
+        remaining,
+        direction,
+      );
+
+      if (batch?.length) {
+        results.push(...batch.slice(0, remaining));
+      }
+
+      if (batch?.length < remaining) break;
+
+      startNs = windowEnd;
+    }
+
+    return results;
+  }
 
   while (endNs > start && results.length < limit) {
     const windowStart = endNs - windowSize > start ? endNs - windowSize : start;
@@ -55,6 +80,7 @@ export const rollingWindowList = async <T>(
       windowStart.toString(),
       endNs.toString(),
       remaining,
+      direction,
     );
 
     if (batch?.length) {
@@ -78,11 +104,11 @@ export const rollingWindowList = async <T>(
  */
 export const rollingWindow = async <T>(
   queryFn: WindowQuery<T>,
-  options: WindowOptions = {},
+  options: WindowOptions,
 ): Promise<null | T> => {
-  const { start = config.baseStart } = options;
+  const { start } = options;
   const windowSize = WINDOW_SIZE;
-  let endNs = BigInt(Date.now()) * 1_000_000n;
+  let endNs = NOW;
 
   while (endNs > start) {
     const startNs = endNs - windowSize;
@@ -100,6 +126,16 @@ export const rollingWindow = async <T>(
   return null;
 };
 
+export const windowEnd = (timestamp?: string, before?: string) => {
+  const cursorTs = timestamp ? BigInt(timestamp) : undefined;
+  const beforeTs = before ? BigInt(before) - 1n : undefined;
+
+  if (!cursorTs) return beforeTs;
+  if (!beforeTs) return cursorTs;
+
+  return cursorTs < beforeTs ? cursorTs : beforeTs;
+};
+
 /**
  * Paginates an array of items using cursor-based pagination.
  * Expects the input array to contain up to limit+1 items, where the extra item is used to determine if there is a next page.
@@ -113,18 +149,30 @@ export const rollingWindow = async <T>(
 export const paginateData = <T, C extends CursorObject>(
   items: null | T[],
   limit: number,
+  direction: 'asc' | 'desc',
   cursorExtractor: (item: T) => C,
+  hasCursor: boolean,
 ): PaginatedResponse<T> => {
-  if (!items) return { data: [] };
+  if (!items || items.length === 0) return { data: [] };
 
   const hasMore = items.length > limit;
+  const ordered = direction === 'asc' ? [...items].reverse() : items;
+  const data = hasMore ? ordered.slice(0, limit) : ordered;
 
-  if (!hasMore) return { data: items };
+  const meta: Record<string, string> = {};
 
-  const sliced = items.slice(0, limit);
-  const lastItem = sliced[limit - 1];
-  const cursor = cursorExtractor(lastItem);
-  const next = cursors.encode(cursor);
+  if (data.length > 0) {
+    const first = data[0];
+    const last = data[data.length - 1];
 
-  return { data: sliced, meta: { cursor: next } };
+    if (direction === 'desc') {
+      if (hasMore) meta.next_page = cursors.encode(cursorExtractor(last));
+      if (hasCursor) meta.prev_page = cursors.encode(cursorExtractor(first));
+    } else {
+      if (hasMore) meta.prev_page = cursors.encode(cursorExtractor(first));
+      meta.next_page = cursors.encode(cursorExtractor(last));
+    }
+  }
+
+  return Object.keys(meta).length > 0 ? { data, meta } : { data };
 };

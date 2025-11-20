@@ -21,11 +21,24 @@ WITH
     WHERE
       (
         p.block_timestamp IS NULL
-        OR (ms.block_timestamp, ms.event_index) < (p.block_timestamp, p.event_index)
+        OR (
+          (
+            ${direction} = 'desc'
+            AND (ms.block_timestamp, ms.event_index) < (p.block_timestamp, p.event_index)
+          )
+          OR (
+            ${direction} = 'asc'
+            AND (ms.block_timestamp, ms.event_index) > (p.block_timestamp, p.event_index)
+          )
+        )
       )
       AND (
-        ${after}::BIGINT IS NULL
-        OR ms.block_timestamp > ${after}
+        ${start}::BIGINT IS NULL
+        OR ms.block_timestamp >= ${start}
+      )
+      AND (
+        ${end}::BIGINT IS NULL
+        OR ms.block_timestamp <= ${end}
       )
       AND (
         ${before}::BIGINT IS NULL
@@ -36,8 +49,8 @@ WITH
         OR ms.account_id = ${account}
       )
     ORDER BY
-      block_timestamp DESC,
-      event_index DESC
+      block_timestamp ${direction:raw},
+      event_index ${direction:raw}
     LIMIT
       ${limit}
   )
@@ -78,5 +91,5 @@ FROM
       AND mt."timestamp" <= ss.block_timestamp + 3600000000000 -- 1hr in ns
   ) rs ON TRUE
 ORDER BY
-  ss.block_timestamp DESC,
-  ss.event_index DESC
+  ss.block_timestamp ${direction:raw},
+  ss.event_index ${direction:raw}

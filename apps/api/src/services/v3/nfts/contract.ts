@@ -21,6 +21,7 @@ import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -45,12 +46,16 @@ const txns = responseHandler(
   async (req: RequestValidator<NFTContractTxnsReq>) => {
     const contract = req.validator.contract;
     const affected = req.validator.affected;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.txnCursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.txnCursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.txnCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const eventsQuery: WindowListQuery<
       Omit<NFTContractTxn, 'block' | 'transaction_hash'>
@@ -59,27 +64,25 @@ const txns = responseHandler(
         Omit<NFTContractTxn, 'block' | 'transaction_hash'>
       >(sql.contractTxns, {
         affected,
-        after: start,
-        before: end,
+        before,
         contract,
         cursor: {
           index: cursor?.index,
           shard: cursor?.shard,
           timestamp: cursor?.timestamp,
         },
+        direction,
+        end,
         limit,
+        start,
       });
     };
 
     const events = await rollingWindowList(eventsQuery, {
-      end: cursor?.timestamp
-        ? BigInt(cursor.timestamp)
-        : before
-        ? BigInt(before)
-        : undefined,
+      end: windowEnd(cursor?.timestamp, before),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: after ? BigInt(after) : config.baseStart,
+      start: config.eventsStart,
     });
 
     if (!events.length) {
@@ -102,18 +105,30 @@ const txns = responseHandler(
           `${b.block_timestamp}${b.shard_id}${b.event_index}`,
       );
 
-      return paginateData(merged, limit, (txn) => ({
+      return paginateData(
+        merged,
+        limit,
+        direction,
+        (txn) => ({
+          index: txn.event_index,
+          shard: txn.shard_id,
+          timestamp: txn.block_timestamp,
+        }),
+        !!cursor,
+      );
+    }
+
+    return paginateData(
+      txns,
+      limit,
+      direction,
+      (txn) => ({
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
-      }));
-    }
-
-    return paginateData(txns, limit, (txn) => ({
-      index: txn.event_index,
-      shard: txn.shard_id,
-      timestamp: txn.block_timestamp,
-    }));
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -122,12 +137,10 @@ const txnCount = responseHandler(
   async (req: RequestValidator<NFTContractTxnCountReq>) => {
     const contract = req.validator.contract;
     const affected = req.validator.affected;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
     const txns = await dbEvents.one<NFTContractTxnCount>(sql.contractTxnCount, {
       affected,
-      after,
       before,
       contract,
     });
@@ -141,9 +154,14 @@ const holders = responseHandler(
   async (req: RequestValidator<NFTContractHoldersReq>) => {
     const contract = req.validator.contract;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.contractHoldersCursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.contractHoldersCursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.contractHoldersCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const data = await dbEvents.manyOrNone<NFTContractHolders>(sql.holders, {
       contract,
@@ -155,10 +173,16 @@ const holders = responseHandler(
       limit: limit + 1,
     });
 
-    return paginateData(data, limit, (holder) => ({
-      account: holder.account,
-      quantity: holder.quantity,
-    }));
+    return paginateData(
+      data,
+      limit,
+      direction,
+      (holder) => ({
+        account: holder.account,
+        quantity: holder.quantity,
+      }),
+      !!cursor,
+    );
   },
 );
 

@@ -10,6 +10,7 @@ import type {
 } from 'nb-schemas';
 import response from 'nb-schemas/dist/accounts/response.js';
 
+import config from '#config';
 import { getProvider } from '#libs/near';
 import { dbBase, dbContract, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
@@ -37,27 +38,33 @@ const deployments = responseHandler(
   async (req: RequestValidator<ContractReq>) => {
     const account = req.validator.account;
 
-    const first = await rollingWindow((start, end) => {
-      return dbContract.oneOrNone<
-        Pick<ContractDeployment, 'block_timestamp' | 'receipt_id'>
-      >(sql.contracts.deployments, {
-        account,
-        end,
-        order: 'ASC',
-        start,
-      });
-    });
+    const first = await rollingWindow(
+      (start, end) => {
+        return dbContract.oneOrNone<
+          Pick<ContractDeployment, 'block_timestamp' | 'receipt_id'>
+        >(sql.contracts.deployments, {
+          account,
+          end,
+          order: 'ASC',
+          start,
+        });
+      },
+      { start: config.baseStart },
+    );
 
-    const last = await rollingWindow((start, end) => {
-      return dbContract.oneOrNone<
-        Pick<ContractDeployment, 'block_timestamp' | 'receipt_id'>
-      >(sql.contracts.deployments, {
-        account,
-        end,
-        order: 'DESC',
-        start,
-      });
-    });
+    const last = await rollingWindow(
+      (start, end) => {
+        return dbContract.oneOrNone<
+          Pick<ContractDeployment, 'block_timestamp' | 'receipt_id'>
+        >(sql.contracts.deployments, {
+          account,
+          end,
+          order: 'DESC',
+          start,
+        });
+      },
+      { start: config.baseStart },
+    );
 
     if (!first && !last) {
       return { data: [] };
