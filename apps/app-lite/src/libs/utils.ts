@@ -38,3 +38,45 @@ export const shortenAddress = (address: string) => {
 
   return `${string.slice(0, 10)}...${string.slice(-7)}`;
 };
+
+export const shortenString = (
+  string: string,
+  prefixLen?: number,
+  suffixLen?: number,
+  minLen?: number,
+) => {
+  const text = String(string);
+  const prefix = prefixLen ?? 6;
+  const suffix = suffixLen ?? 7;
+  const threshold = minLen ?? 15;
+  if (text.length <= threshold) return text;
+  return `${text.slice(0, prefix)}...${text.slice(-suffix)}`;
+};
+
+export const nsToDateTime = (value: number | string, format: string) => {
+  const date = new Date(Number(value) / 1e6);
+
+  const year = date.getUTCFullYear().toString();
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const hour = date.getUTCHours().toString().padStart(2, '0');
+  const minute = date.getUTCMinutes().toString().padStart(2, '0');
+  const second = date.getUTCSeconds().toString().padStart(2, '0');
+
+  const replacements: { [key: string]: string } = {
+    DD: day,
+    HH: hour,
+    mm: minute,
+    MM: month,
+    ss: second,
+    YYYY: year,
+  };
+
+  let formatted = format;
+
+  for (const [token, value] of Object.entries(replacements)) {
+    formatted = formatted.replace(token, value);
+  }
+
+  return formatted;
+};
