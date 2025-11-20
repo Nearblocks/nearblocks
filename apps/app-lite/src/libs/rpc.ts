@@ -67,6 +67,21 @@ export const getAccount = async (rpc: RPC, accountId: string) => {
   }
 };
 
+export const getAccountAccessKeys = async (rpc: RPC, accountId: string) => {
+  try {
+    const { data } = await rpc.query({
+      account_id: accountId,
+      finality: 'final',
+      request_type: 'view_access_key_list',
+    });
+
+    return data as RpcResponse<RpcResultAccount>;
+  } catch (error) {
+    console.log({ error });
+    return;
+  }
+};
+
 export const getBlock = async (rpc: RPC, blockId: number | string) => {
   try {
     const { data } = await rpc.query({ block_id: blockId }, 'block');
