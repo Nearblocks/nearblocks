@@ -15,6 +15,7 @@ import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -30,11 +31,15 @@ const txns = responseHandler(
     const involved = req.validator.involved;
     const cause = req.validator.cause;
     const limit = req.validator.limit;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const eventsQuery: WindowListQuery<
       Omit<AccountNFTTxn, 'block' | 'transaction_hash'>
@@ -43,8 +48,7 @@ const txns = responseHandler(
         Omit<AccountNFTTxn, 'block' | 'transaction_hash'>
       >(sql.nfts.txns, {
         account,
-        after: start,
-        before: end,
+        before,
         cause,
         contract,
         cursor: {
@@ -52,21 +56,20 @@ const txns = responseHandler(
           shard: cursor?.shard,
           timestamp: cursor?.timestamp,
         },
+        direction,
+        end,
         involved,
         limit,
+        start,
         token,
       });
     };
 
     const events = await rollingWindowList(eventsQuery, {
-      end: cursor?.timestamp
-        ? BigInt(cursor.timestamp)
-        : before
-        ? BigInt(before)
-        : undefined,
+      end: windowEnd(cursor?.timestamp, before),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: after ? BigInt(after) : config.baseStart,
+      start: config.eventsStart,
     });
 
     if (!events.length) {
@@ -89,18 +92,30 @@ const txns = responseHandler(
           `${b.block_timestamp}${b.shard_id}${b.event_index}`,
       );
 
-      return paginateData(merged, limit, (txn) => ({
+      return paginateData(
+        merged,
+        limit,
+        direction,
+        (txn) => ({
+          index: txn.event_index,
+          shard: txn.shard_id,
+          timestamp: txn.block_timestamp,
+        }),
+        !!cursor,
+      );
+    }
+
+    return paginateData(
+      txns,
+      limit,
+      direction,
+      (txn) => ({
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
-      }));
-    }
-
-    return paginateData(txns, limit, (txn) => ({
-      index: txn.event_index,
-      shard: txn.shard_id,
-      timestamp: txn.block_timestamp,
-    }));
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -112,14 +127,12 @@ const count = responseHandler(
     const token = req.validator.token;
     const involved = req.validator.involved;
     const cause = req.validator.cause;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
     const estimated = await dbEvents.one<AccountNFTTxnCount>(
       sql.nfts.estimate,
       {
         account,
-        after,
         before,
         cause,
         contract,

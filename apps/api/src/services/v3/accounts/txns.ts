@@ -13,6 +13,7 @@ import { dbBase, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -26,11 +27,15 @@ const txns = responseHandler(
     const signer = req.validator.signer;
     const receiver = req.validator.receiver;
     const limit = req.validator.limit;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     if (signer && receiver && signer !== account && receiver !== account) {
       return { data: [] };
@@ -40,16 +45,18 @@ const txns = responseHandler(
       const cte = pgp.as.format(
         signer || receiver ? sql.txns.cte : sql.txns.cteUnion,
         {
-          after: start,
-          before: end,
+          before,
           cursor: {
             index: cursor?.index,
             shard: cursor?.shard,
             timestamp: cursor?.timestamp,
           },
+          direction,
+          end,
           limit,
           receiver: receiver || account,
           signer: signer || account,
+          start,
         },
       );
 
@@ -57,21 +64,23 @@ const txns = responseHandler(
     };
 
     const txns = await rollingWindowList(txnsQuery, {
-      end: cursor?.timestamp
-        ? BigInt(cursor.timestamp)
-        : before
-        ? BigInt(before)
-        : undefined,
+      end: windowEnd(cursor?.timestamp, before),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: after ? BigInt(after) : config.baseStart,
+      start: config.baseStart,
     });
 
-    return paginateData(txns, limit, (txn) => ({
-      index: txn.index_in_chunk,
-      shard: txn.shard_id,
-      timestamp: txn.block_timestamp,
-    }));
+    return paginateData(
+      txns,
+      limit,
+      direction,
+      (txn) => ({
+        index: txn.index_in_chunk,
+        shard: txn.shard_id,
+        timestamp: txn.block_timestamp,
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -81,7 +90,6 @@ const count = responseHandler(
     const account = req.validator.account;
     const signer = req.validator.signer;
     const receiver = req.validator.receiver;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
     if (signer && receiver && signer !== account && receiver !== account) {
@@ -89,7 +97,6 @@ const count = responseHandler(
     }
 
     const estimated = await dbBase.one<AccountTxnCount>(sql.txns.estimate, {
-      after,
       before,
       receiver: receiver || account,
       signer: signer || account,

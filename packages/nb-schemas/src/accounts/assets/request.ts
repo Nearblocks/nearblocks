@@ -4,8 +4,9 @@ import { cursorSchema, limitSchema } from '../../common.js';
 
 const fts = v.object({
   account: v.string(),
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const ftCount = v.object({
@@ -19,8 +20,9 @@ const ftsCursor = v.object({
 
 const nfts = v.object({
   account: v.string(),
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const nftCount = v.object({

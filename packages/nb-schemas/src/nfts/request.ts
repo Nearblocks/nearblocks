@@ -15,9 +15,10 @@ export const NFTListOrder = {
 } as const;
 
 const list = v.object({
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
   order: v.optional(v.enum(NFTListOrder), 'desc'),
+  prev: cursorSchema,
   search: v.optional(v.string()),
   sort: v.optional(v.enum(NFTListSort), 'transfers_24h'),
 });
@@ -32,14 +33,13 @@ const cursor = v.object({
 });
 
 const txns = v.object({
-  after_ts: tsSchema,
   before_ts: tsSchema,
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const txnCount = v.object({
-  after_ts: tsSchema,
   before_ts: tsSchema,
 });
 
@@ -55,24 +55,24 @@ const contract = v.object({
 
 const contractTxns = v.object({
   affected: v.optional(v.string()),
-  after_ts: tsSchema,
   before_ts: tsSchema,
   contract: v.string(),
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const contractTxnCount = v.object({
   affected: v.optional(v.string()),
-  after_ts: tsSchema,
   before_ts: tsSchema,
   contract: v.string(),
 });
 
 const contractHolders = v.object({
   contract: v.string(),
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const contractHolderCount = v.object({

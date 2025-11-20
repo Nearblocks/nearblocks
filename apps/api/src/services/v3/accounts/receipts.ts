@@ -13,6 +13,7 @@ import { dbBase, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -26,13 +27,17 @@ const receipts = responseHandler(
     const predecessor = req.validator.predecessor;
     const receiver = req.validator.receiver;
     const limit = req.validator.limit;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
     const action = req.validator.action;
     const method = req.validator.method;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     if (
       predecessor &&
@@ -52,17 +57,19 @@ const receipts = responseHandler(
         predecessor || receiver ? sql.receipts.cte : sql.receipts.cteUnion,
         {
           action,
-          after: start,
-          before: end,
+          before,
           cursor: {
             index: cursor?.index,
             shard: cursor?.shard,
             timestamp: cursor?.timestamp,
           },
+          direction,
+          end,
           limit,
           method,
           predecessor: predecessor || account,
           receiver: receiver || account,
+          start,
         },
       );
 
@@ -70,21 +77,23 @@ const receipts = responseHandler(
     };
 
     const receipts = await rollingWindowList(receiptsQuery, {
-      end: cursor?.timestamp
-        ? BigInt(cursor.timestamp)
-        : before
-        ? BigInt(before)
-        : undefined,
+      end: windowEnd(cursor?.timestamp, before),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: after ? BigInt(after) : config.baseStart,
+      start: config.baseStart,
     });
 
-    return paginateData(receipts, limit, (receipt) => ({
-      index: receipt.index_in_chunk,
-      shard: receipt.shard_id,
-      timestamp: receipt.included_in_block_timestamp,
-    }));
+    return paginateData(
+      receipts,
+      limit,
+      direction,
+      (receipt) => ({
+        index: receipt.index_in_chunk,
+        shard: receipt.shard_id,
+        timestamp: receipt.included_in_block_timestamp,
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -94,7 +103,6 @@ const count = responseHandler(
     const account = req.validator.account;
     const predecessor = req.validator.predecessor;
     const receiver = req.validator.receiver;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
     const action = req.validator.action;
     const method = req.validator.method;
@@ -112,7 +120,6 @@ const count = responseHandler(
       sql.receipts.estimate,
       {
         action,
-        after,
         before,
         method,
         predecessor: predecessor || account,

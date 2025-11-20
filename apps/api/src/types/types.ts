@@ -15,6 +15,7 @@ export type RequestValidator<T> = Required<RequestValidators<T>>;
 export type Config = {
   apiAccessKey: string;
   apiUrl: string;
+  balanceStart: bigint;
   baseStart: bigint;
   campaignsPublicUrl: string;
   dbCa: string;
@@ -27,6 +28,7 @@ export type Config = {
   dbUrlMultichain: string;
   dbUrlStaking: string;
   dbWriteUrlBase: string;
+  eventsStart: bigint;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryRows: number;

@@ -10,15 +10,14 @@ const latest = v.object({
 });
 
 const txns = v.object({
-  after_ts: tsSchema,
   before_ts: tsSchema,
   block: v.optional(v.string()),
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const count = v.object({
-  after_ts: tsSchema,
   before_ts: tsSchema,
   block: v.optional(v.string()),
 });

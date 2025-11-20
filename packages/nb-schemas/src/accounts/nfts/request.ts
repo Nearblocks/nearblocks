@@ -4,19 +4,18 @@ import { cursorSchema, limitSchema, tsSchema } from '../../common.js';
 
 const txns = v.object({
   account: v.string(),
-  after_ts: tsSchema,
   before_ts: tsSchema,
   cause: v.optional(v.string()),
   contract: v.optional(v.string()),
-  cursor: cursorSchema,
   involved: v.optional(v.string()),
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
   token: v.optional(v.string()),
 });
 
 const count = v.object({
   account: v.string(),
-  after_ts: tsSchema,
   before_ts: tsSchema,
   cause: v.optional(v.string()),
   contract: v.optional(v.string()),

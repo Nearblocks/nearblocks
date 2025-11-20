@@ -4,15 +4,14 @@ import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 
 const txns = v.object({
   account: v.optional(v.string()),
-  after_ts: tsSchema,
   before_ts: tsSchema,
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const count = v.object({
   account: v.optional(v.string()),
-  after_ts: tsSchema,
   before_ts: tsSchema,
 });
 

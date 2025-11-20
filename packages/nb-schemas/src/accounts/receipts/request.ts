@@ -7,19 +7,18 @@ import { cursorSchema, limitSchema, tsSchema } from '../../common.js';
 const receipts = v.object({
   account: v.string(),
   action: v.optional(v.enum(ActionKind)),
-  after_ts: tsSchema,
   before_ts: tsSchema,
-  cursor: cursorSchema,
   limit: limitSchema,
   method: v.optional(v.string()),
+  next: cursorSchema,
   predecessor: v.optional(v.string()),
+  prev: cursorSchema,
   receiver: v.optional(v.string()),
 });
 
 const count = v.object({
   account: v.string(),
   action: v.optional(v.enum(ActionKind)),
-  after_ts: tsSchema,
   before_ts: tsSchema,
   method: v.optional(v.string()),
   predecessor: v.optional(v.string()),

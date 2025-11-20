@@ -19,6 +19,7 @@ import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -32,15 +33,21 @@ const list = responseHandler(
     const sort = req.validator.sort;
     const order = req.validator.order;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const list = await dbEvents.manyOrNone<FTList>(sql.list, {
       cursor: {
         contract: cursor?.contract,
         sort: cursor?.sort,
       },
+      direction,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
       order,
@@ -49,10 +56,16 @@ const list = responseHandler(
       sort,
     });
 
-    return paginateData(list, limit, (token) => ({
-      contract: token.contract,
-      sort,
-    }));
+    return paginateData(
+      list,
+      limit,
+      direction,
+      (token) => ({
+        contract: token.contract,
+        sort,
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -72,12 +85,16 @@ const count = responseHandler(
 const txns = responseHandler(
   response.txns,
   async (req: RequestValidator<FTTxnsReq>) => {
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.txnsCursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.txnsCursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.txnsCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const eventsQuery: WindowListQuery<
       Omit<FTTxn, 'block' | 'transaction_hash'>
@@ -85,28 +102,26 @@ const txns = responseHandler(
       return dbEvents.manyOrNone<Omit<FTTxn, 'block' | 'transaction_hash'>>(
         sql.txns,
         {
-          after: start,
-          before: end,
+          before,
           cursor: {
             index: cursor?.index,
             shard: cursor?.shard,
             timestamp: cursor?.timestamp,
             type: cursor?.type,
           },
+          direction,
+          end,
           limit,
+          start,
         },
       );
     };
 
     const events = await rollingWindowList(eventsQuery, {
-      end: cursor?.timestamp
-        ? BigInt(cursor.timestamp)
-        : before
-        ? BigInt(before)
-        : undefined,
+      end: windowEnd(cursor?.timestamp, before),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: after ? BigInt(after) : config.baseStart,
+      start: config.eventsStart,
     });
 
     if (!events.length) {
@@ -129,31 +144,41 @@ const txns = responseHandler(
           `${b.block_timestamp}${b.shard_id}${b.event_type}${b.event_index}`,
       );
 
-      return paginateData(merged, limit, (txn) => ({
+      return paginateData(
+        merged,
+        limit,
+        direction,
+        (txn) => ({
+          index: txn.event_index,
+          shard: txn.shard_id,
+          timestamp: txn.block_timestamp,
+          type: txn.event_type,
+        }),
+        !!cursor,
+      );
+    }
+
+    return paginateData(
+      txns,
+      limit,
+      direction,
+      (txn) => ({
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
         type: txn.event_type,
-      }));
-    }
-
-    return paginateData(txns, limit, (txn) => ({
-      index: txn.event_index,
-      shard: txn.shard_id,
-      timestamp: txn.block_timestamp,
-      type: txn.event_type,
-    }));
+      }),
+      !!cursor,
+    );
   },
 );
 
 const txnCount = responseHandler(
   response.txnCount,
   async (req: RequestValidator<FTTxnCountReq>) => {
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
     const txns = await dbEvents.one<FTTxnCount>(sql.txnCount, {
-      after,
       before,
     });
 

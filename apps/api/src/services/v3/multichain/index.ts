@@ -10,6 +10,7 @@ import { dbBase, dbMultichain, pgp } from '#libs/pgp';
 import {
   paginateData,
   rollingWindowList,
+  windowEnd,
   WindowListQuery,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -21,11 +22,15 @@ const txns = responseHandler(
   async (req: RequestValidator<MCTxnsReq>) => {
     const limit = req.validator.limit;
     const account = req.validator.account;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
-    const cursor = req.validator.cursor
-      ? cursors.decode(request.cursor, req.validator.cursor)
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
       : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
 
     const signaturesQuery: WindowListQuery<
       Omit<MCTxn, 'block' | 'transaction_hash'>
@@ -34,26 +39,24 @@ const txns = responseHandler(
         sql.signatures,
         {
           account,
-          after: start,
-          before: end,
+          before,
           cursor: {
             index: cursor?.index,
             timestamp: cursor?.timestamp,
           },
+          direction,
+          end,
           limit,
+          start,
         },
       );
     };
 
     const signatures = await rollingWindowList(signaturesQuery, {
-      end: cursor?.timestamp
-        ? BigInt(cursor.timestamp)
-        : before
-        ? BigInt(before)
-        : undefined,
+      end: windowEnd(cursor?.timestamp, before),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: after ? BigInt(after) : config.baseStart,
+      start: config.baseStart,
     });
 
     if (!signatures.length) {
@@ -76,16 +79,28 @@ const txns = responseHandler(
           `${b.block_timestamp}${b.event_index}`,
       );
 
-      return paginateData(merged, limit, (txn) => ({
-        index: txn.event_index,
-        timestamp: txn.block_timestamp,
-      }));
+      return paginateData(
+        merged,
+        limit,
+        direction,
+        (txn) => ({
+          index: txn.event_index,
+          timestamp: txn.block_timestamp,
+        }),
+        !!cursor,
+      );
     }
 
-    return paginateData(txns, limit, (txn) => ({
-      index: txn.event_index,
-      timestamp: txn.block_timestamp,
-    }));
+    return paginateData(
+      txns,
+      limit,
+      direction,
+      (txn) => ({
+        index: txn.event_index,
+        timestamp: txn.block_timestamp,
+      }),
+      !!cursor,
+    );
   },
 );
 
@@ -93,12 +108,10 @@ const count = responseHandler(
   response.count,
   async (req: RequestValidator<MCTxnCountReq>) => {
     const account = req.validator.account;
-    const after = req.validator.after_ts;
     const before = req.validator.before_ts;
 
     const estimated = await dbMultichain.one<MCTxnCount>(sql.signatureCount, {
       account,
-      after,
       before,
     });
 
@@ -111,7 +124,6 @@ const count = responseHandler(
 
     const txn = await dbMultichain.one<MCTxnCount>(sql.signatureCount, {
       account,
-      after,
       before,
     });
 

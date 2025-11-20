@@ -4,8 +4,9 @@ import { cursorSchema, limitSchema } from '../../common.js';
 
 const keys = v.object({
   account: v.string(),
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const count = v.object({

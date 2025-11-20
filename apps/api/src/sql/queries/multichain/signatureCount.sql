@@ -11,18 +11,12 @@ FROM
       WHERE
         (
           %L::BIGINT IS NULL
-          OR block_timestamp > %L
-        )
-        AND (
-          %L::BIGINT IS NULL
           OR block_timestamp < %L
         )
         AND (
           %L::TEXT IS NULL
           OR ms.account_id = %L
         )',
-      ${after},
-      ${after},
       ${before},
       ${before},
       ${account},

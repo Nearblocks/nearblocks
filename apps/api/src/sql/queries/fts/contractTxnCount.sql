@@ -16,17 +16,11 @@ FROM
         )
         AND (
           %L::BIGINT IS NULL
-          OR block_timestamp > %L
-        )
-        AND (
-          %L::BIGINT IS NULL
           OR block_timestamp < %L
         )',
       ${contract},
       ${affected},
       ${affected},
-      ${after},
-      ${after},
       ${before},
       ${before}
     )

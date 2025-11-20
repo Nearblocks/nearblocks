@@ -23,11 +23,24 @@ txns_selected AS (
   WHERE
     (
       p.block_timestamp IS NULL
-      OR (t.block_timestamp, t.shard_id, t.index_in_chunk) < (p.block_timestamp, p.shard_id, p.index_in_chunk)
+      OR (
+        (
+          ${direction} = 'desc'
+          AND (t.block_timestamp, t.shard_id, t.index_in_chunk) < (p.block_timestamp, p.shard_id, p.index_in_chunk)
+        )
+        OR (
+          ${direction} = 'asc'
+          AND (t.block_timestamp, t.shard_id, t.index_in_chunk) > (p.block_timestamp, p.shard_id, p.index_in_chunk)
+        )
+      )
     )
     AND (
-      ${after}::BIGINT IS NULL
-      OR t.block_timestamp > ${after}
+      ${start}::BIGINT IS NULL
+      OR t.block_timestamp >= ${start}
+    )
+    AND (
+      ${end}::BIGINT IS NULL
+      OR t.block_timestamp <= ${end}
     )
     AND (
       ${before}::BIGINT IS NULL
@@ -38,9 +51,9 @@ txns_selected AS (
       OR t.included_in_block_hash = ${block}
     )
   ORDER BY
-    t.block_timestamp DESC,
-    t.shard_id DESC,
-    t.index_in_chunk DESC
+    t.block_timestamp ${direction:raw},
+    t.shard_id ${direction:raw},
+    t.index_in_chunk ${direction:raw}
   LIMIT
     ${limit}
 )

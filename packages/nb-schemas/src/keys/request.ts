@@ -3,9 +3,10 @@ import * as v from 'valibot';
 import { cursorSchema, limitSchema } from '../common.js';
 
 const keys = v.object({
-  cursor: cursorSchema,
   key: v.string(),
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const cursor = v.object({

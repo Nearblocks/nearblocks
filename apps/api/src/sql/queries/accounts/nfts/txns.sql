@@ -71,14 +71,31 @@ WHERE
   AND (
     p.block_timestamp IS NULL
     OR (
-      nft.block_timestamp,
-      nft.shard_id,
-      nft.event_index
-    ) < (p.block_timestamp, p.shard_id, p.event_index)
+      (
+        ${direction} = 'desc'
+        AND (
+          nft.block_timestamp,
+          nft.shard_id,
+          nft.event_index
+        ) < (p.block_timestamp, p.shard_id, p.event_index)
+      )
+      OR (
+        ${direction} = 'asc'
+        AND (
+          nft.block_timestamp,
+          nft.shard_id,
+          nft.event_index
+        ) > (p.block_timestamp, p.shard_id, p.event_index)
+      )
+    )
   )
   AND (
-    ${after}::BIGINT IS NULL
-    OR nft.block_timestamp > ${after}
+    ${start}::BIGINT IS NULL
+    OR nft.block_timestamp >= ${start}
+  )
+  AND (
+    ${end}::BIGINT IS NULL
+    OR nft.block_timestamp <= ${end}
   )
   AND (
     ${before}::BIGINT IS NULL
@@ -97,8 +114,8 @@ WHERE
     OR nft.cause = ${cause}
   )
 ORDER BY
-  block_timestamp DESC,
-  shard_id DESC,
-  event_index DESC
+  block_timestamp ${direction:raw},
+  shard_id ${direction:raw},
+  event_index ${direction:raw}
 LIMIT
   ${limit}

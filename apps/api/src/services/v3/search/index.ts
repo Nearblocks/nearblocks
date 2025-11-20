@@ -10,6 +10,7 @@ import type {
 } from 'nb-schemas';
 import response from 'nb-schemas/dist/search/response.js';
 
+import config from '#config';
 import { dbBase, dbEvents } from '#libs/pgp';
 import { rollingWindowList } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -54,39 +55,48 @@ const getBlocks = async (keyword: string) => {
       ? +keyword
       : null;
 
-  return rollingWindowList((start, end) => {
-    return dbBase.manyOrNone<SearchBlock>(sql.blocks, {
-      end,
-      hash,
-      height,
-      limit: 1,
-      start,
-    });
-  });
+  return rollingWindowList(
+    (start, end) => {
+      return dbBase.manyOrNone<SearchBlock>(sql.blocks, {
+        end,
+        hash,
+        height,
+        limit: 1,
+        start,
+      });
+    },
+    { start: config.baseStart },
+  );
 };
 
 const getReceipts = async (keyword: string) => {
-  return rollingWindowList((start, end) => {
-    return dbBase.manyOrNone<SearchReceipt>(sql.receipts, {
-      end,
-      limit: 1,
-      receipt: keyword,
-      start,
-    });
-  });
+  return rollingWindowList(
+    (start, end) => {
+      return dbBase.manyOrNone<SearchReceipt>(sql.receipts, {
+        end,
+        limit: 1,
+        receipt: keyword,
+        start,
+      });
+    },
+    { start: config.baseStart },
+  );
 };
 
 const getTxns = async (keyword: string) => {
   const hex = /^0x/i.test(keyword) ? keyword.toLowerCase() : null;
 
-  return rollingWindowList((start, end) => {
-    return dbBase.manyOrNone<SearchTxn>(hex ? sql.rlp : sql.txns, {
-      end,
-      hash: hex ?? keyword,
-      limit: 1,
-      start,
-    });
-  });
+  return rollingWindowList(
+    (start, end) => {
+      return dbBase.manyOrNone<SearchTxn>(hex ? sql.rlp : sql.txns, {
+        end,
+        hash: hex ?? keyword,
+        limit: 1,
+        start,
+      });
+    },
+    { start: config.baseStart },
+  );
 };
 
 const accounts = responseHandler(

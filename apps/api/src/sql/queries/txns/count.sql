@@ -4,10 +4,6 @@ FROM
   transactions
 WHERE
   (
-    ${after}::BIGINT IS NULL
-    OR block_timestamp > ${after}
-  )
-  AND (
     ${before}::BIGINT IS NULL
     OR block_timestamp < ${before}
   )

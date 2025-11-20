@@ -46,29 +46,52 @@ WHERE
   (
     p.block_timestamp IS NULL
     OR (
-      ft.block_timestamp,
-      ft.shard_id,
-      ft.event_type,
-      ft.event_index
-    ) < (
-      p.block_timestamp,
-      p.shard_id,
-      p.event_type,
-      p.event_index
+      (
+        ${direction} = 'desc'
+        AND (
+          ft.block_timestamp,
+          ft.shard_id,
+          ft.event_type,
+          ft.event_index
+        ) < (
+          p.block_timestamp,
+          p.shard_id,
+          p.event_type,
+          p.event_index
+        )
+      )
+      OR (
+        ${direction} = 'asc'
+        AND (
+          ft.block_timestamp,
+          ft.shard_id,
+          ft.event_type,
+          ft.event_index
+        ) > (
+          p.block_timestamp,
+          p.shard_id,
+          p.event_type,
+          p.event_index
+        )
+      )
     )
   )
   AND (
-    ${after}::BIGINT IS NULL
-    OR ft.block_timestamp > ${after}
+    ${start}::BIGINT IS NULL
+    OR ft.block_timestamp >= ${start}
+  )
+  AND (
+    ${end}::BIGINT IS NULL
+    OR ft.block_timestamp <= ${end}
   )
   AND (
     ${before}::BIGINT IS NULL
     OR ft.block_timestamp < ${before}
   )
 ORDER BY
-  block_timestamp DESC,
-  shard_id DESC,
-  event_type DESC,
-  event_index DESC
+  block_timestamp ${direction:raw},
+  shard_id ${direction:raw},
+  event_type ${direction:raw},
+  event_index ${direction:raw}
 LIMIT
   ${limit}
