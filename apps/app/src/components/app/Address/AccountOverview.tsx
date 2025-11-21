@@ -7,6 +7,7 @@ import {
 
 export default async function AccountOverview({ id }: any) {
   const accountData = getRequest(`v1/account/${id}`);
+  const statsData = getRequest('v1/stats');
   const tokenData = getRequest(`v1/fts/${id}`);
   const inventoryData = getRequest(`v1/account/${id}/inventory`);
   const mtsData = getRequest(`v2/account/${id}/inventory/mts`);
@@ -39,6 +40,7 @@ export default async function AccountOverview({ id }: any) {
       inventoryDataPromise={inventoryData}
       mtsDataPromise={mtsData}
       spamTokensPromise={spamList}
+      statsDataPromise={statsData}
       tokenDataPromise={tokenData}
       intentsTokenPricesPromise={intentsTokenPrices}
       refTokenPricesPromise={refTokenPrices}

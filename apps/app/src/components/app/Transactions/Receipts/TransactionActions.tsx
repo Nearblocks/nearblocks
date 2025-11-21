@@ -22,6 +22,7 @@ import DeployGlobalContract from '@/components/app/Transactions/Receipts/Action/
 import DeployGlobalContractByAccountId from '@/components/app/Transactions/Receipts/Action/DeployGlobalContractByAccountId';
 import UseGlobalContract from '@/components/app/Transactions/Receipts/Action/UseGlobalContract';
 import UseGlobalContractByAccountId from '@/components/app/Transactions/Receipts/Action/UseGlobalContractByAccountId';
+import { CopyButton } from '../../common/CopyButton';
 
 const TransactionActions = (props: TransActionProps) => {
   const { action, receiver, rpcAction } = props;
@@ -106,24 +107,31 @@ const TransactionActions = (props: TransActionProps) => {
             className="text-green-500 dark:text-green-250 font-bold hover:no-underline ml-1"
           >
             {shortenAddress(receiver)}
-
-            {publicKey && senderId && (
-              <Tooltip
-                tooltip={'Access key used for this receipt'}
-                className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-              >
-                <span>
-                  &nbsp;
-                  <Link
-                    href={`/address/${senderId}?tab=accesskeys`}
-                    className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
-                  >
-                    ({shortenAddress(publicKey)})
-                  </Link>
-                </span>
-              </Tooltip>
-            )}
           </Link>
+          {publicKey && senderId && (
+            <span>
+              &nbsp; (
+              <Link
+                href={`/address/${senderId}?tab=accesskeys`}
+                className="text-green-500 dark:text-green-250 font-normal hover:no-underline"
+              >
+                <Tooltip
+                  tooltip={publicKey}
+                  position="top"
+                  className={
+                    'left-1/2 sm:-ml-10 w-[calc(100vw-10rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+                  }
+                  showArrow
+                >
+                  {shortenAddress(publicKey)}
+                </Tooltip>
+              </Link>
+              <span>
+                <CopyButton textToCopy={publicKey} />
+              </span>
+              )
+            </span>
+          )}
           {delegateAction &&
             delegateAction.map((subAction: Action | any, i: number) => (
               <div className="flex flex-col" key={i}>
