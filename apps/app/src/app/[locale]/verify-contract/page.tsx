@@ -1,11 +1,13 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
 
-import Verifier from '@/components/app/Address/Contract/Verifier';
 import { appUrl, networkId } from '@/utils/app/config';
-import { getRequest } from '@/utils/app/api';
 import { getRpcProviders } from '@/utils/app/rpc';
 import { RpcContextProvider } from '@/components/app/common/RpcContext';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorMessage from '@/components/app/common/ErrorMessage';
+import FaInbox from '@/components/app/Icons/FaInbox';
+import Verifier from '@/components/app/Address/Contract/Verifier';
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -47,15 +49,19 @@ export default async function VerifyContract(props: {
   const searchParams = await props.searchParams;
   const rpcProviders = await getRpcProviders();
 
-  const options: RequestInit = {
-    cache: 'no-store',
-  };
-
   const { accountId, selectedVerifier } = searchParams;
-  const contractPromise = getRequest(
-    `v1/account/${accountId}/contract`,
-    {},
-    options,
+
+  const errorBoundaryFallback = (
+    <div className="h-96 flex items-center justify-center bg-white rounded-lg">
+      <ErrorMessage
+        icons={<FaInbox />}
+        message={
+          'An error occurred while loading the contract verification form.'
+        }
+        mutedText="Please try again later"
+        reset
+      />
+    </div>
   );
 
   return (
@@ -69,12 +75,13 @@ export default async function VerifyContract(props: {
         </div>
         <div className="w-full max-w-3xl items-center mt-4 space-y-6">
           <RpcContextProvider rpcProviders={rpcProviders}>
-            <Verifier
-              accountId={accountId}
-              network={networkId}
-              selectedVerifier={selectedVerifier}
-              contractPromise={contractPromise}
-            />
+            <ErrorBoundary fallback={errorBoundaryFallback}>
+              <Verifier
+                accountId={accountId}
+                network={networkId}
+                selectedVerifier={selectedVerifier}
+              />
+            </ErrorBoundary>
           </RpcContextProvider>
         </div>
       </div>
