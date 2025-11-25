@@ -11,6 +11,8 @@ import {
   TokenListInfo,
   IntentsTokenPrices,
   RefFinanceTokenPrices,
+  StatusInfo,
+  Status,
 } from '@/utils/types';
 import TokenHoldings from '@/components/app/common/TokenHoldings';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
@@ -19,6 +21,7 @@ import { useAddressRpc } from '../common/AddressRpcProvider';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import useStatsStore from '@/stores/app/syncStats';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
 type BalanceCache = Record<string, FtInfo>;
 
@@ -27,21 +30,27 @@ const AccountOverviewActions = ({
   inventoryDataPromise,
   loading = false,
   spamTokensPromise,
+  statsDataPromise,
   tokenDataPromise,
   mtsDataPromise,
   intentsTokenPricesPromise,
   refTokenPricesPromise,
+  syncDataPromise,
 }: {
   accountDataPromise: Promise<any>;
   inventoryDataPromise: Promise<any>;
   loading?: boolean;
   mtsDataPromise: Promise<any>;
   spamTokensPromise: Promise<any>;
+  statsDataPromise: Promise<{ stats: StatusInfo[] }>;
   tokenDataPromise: Promise<any>;
   intentsTokenPricesPromise: Promise<IntentsTokenPrices[]>;
   refTokenPricesPromise: Promise<RefFinanceTokenPrices>;
+  syncDataPromise: Promise<{ status: Status }>;
 }) => {
   const account = use(accountDataPromise);
+  const syncData = use(syncDataPromise);
+  const stats = use(statsDataPromise);
   const token = use(tokenDataPromise);
   const inventory = use(inventoryDataPromise);
   const spam = use(spamTokensPromise);
@@ -59,11 +68,12 @@ const AccountOverviewActions = ({
   const { networkId } = useConfig();
   const { ftBalanceOf } = useRpc();
   const params = useParams<{ id: string }>();
+  const indexers = useStatsStore((state) => state.syncStatus);
+  const status =
+    indexers?.balance?.sync ?? syncData?.status?.indexers?.balance?.sync;
 
-  const balance = accountData?.amount
-    ? accountData?.amount
-    : accountView?.amount;
-  const nearPrice = statsData?.near_price;
+  const balance = status ? accountData?.amount : accountView?.amount;
+  const nearPrice = statsData?.near_price ?? stats?.stats?.[0]?.near_price;
   const { rpc: rpcUrl } = useRpcProvider();
 
   const cacheRef = useRef<BalanceCache>({});
@@ -185,7 +195,11 @@ const AccountOverviewActions = ({
             </div>
 
             <div className="w-full break-words">
-              {balance != null ? yoctoToNear(balance, true) + ' Ⓝ' : ''}
+              {balance != null ? (
+                yoctoToNear(balance, true) + ' Ⓝ'
+              ) : (
+                <Skeleton className="h-4 w-32" />
+              )}
             </div>
           </div>
           {networkId === 'mainnet' && (
@@ -195,24 +209,17 @@ const AccountOverviewActions = ({
               </div>
 
               <div className="w-full break-words flex items-center">
-                {balance != null && statsData?.near_price && (
+                {balance == null || nearPrice == null ? (
+                  <Skeleton className="h-4 w-32" />
+                ) : (
                   <>
                     <span>
-                      {balance != null && statsData?.near_price
-                        ? '$' +
-                          fiatValue(
-                            yoctoToNear(balance, false),
-                            statsData?.near_price,
-                          ) +
-                          ' '
-                        : ''}
+                      {'$' +
+                        fiatValue(yoctoToNear(balance, false), nearPrice) +
+                        ' '}
                     </span>
                     <span className="text-xs">
-                      (@{' '}
-                      {nearPrice != null
-                        ? '$' + dollarFormat(statsData?.near_price)
-                        : ''}{' '}
-                      / Ⓝ)
+                      (@{'$' + dollarFormat(nearPrice)} / Ⓝ)
                     </span>
                   </>
                 )}
