@@ -23,8 +23,8 @@ export default async function TxnsTabs({
 
   let hasReceipts = true;
 
+  // TODO: temporary hack while we investigate missing local_receipts
   // Fallback to RPC when receipt_tree is null/empty
-  // This occurs when local_receipts data is missing
   if (isEmpty(receipt?.receipts?.[0]?.receipt_tree)) hasReceipts = false;
 
   const txn = data?.txns?.[0];
