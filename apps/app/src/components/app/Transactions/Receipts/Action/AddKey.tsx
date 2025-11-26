@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import { shortenAddress, shortenHex } from '@/utils/libs';
 import { TransactionActionInfo } from '@/utils/types';
 import { CopyButton } from '@/components/app/common/CopyButton';
+import Tooltip from '@/components/app/common/Tooltip';
 
 const AddKey = (props: TransactionActionInfo) => {
   const t = useTranslations();
@@ -17,14 +18,25 @@ const AddKey = (props: TransactionActionInfo) => {
       <div className="py-1">
         <FaKey className="inline-flex text-emerald-400 mr-1" />{' '}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
-        <span className="font-bold">
-          {shortenHex(publicKey)}
-          {publicKey && (
+        {publicKey && (
+          <span>
+            <span className="font-bold">
+              <Tooltip
+                tooltip={publicKey}
+                position="top"
+                className={
+                  'left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+                }
+                showArrow
+              >
+                {shortenHex(publicKey)}
+              </Tooltip>
+            </span>
             <span className="ml-0.5">
               <CopyButton textToCopy={publicKey} />
             </span>
-          )}
-        </span>
+          </span>
+        )}
         ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
@@ -43,14 +55,25 @@ const AddKey = (props: TransactionActionInfo) => {
       <div className="py-1">
         <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
         {t ? t('txnDetails.actions.addKey.0') : 'New key'} (
-        <span className="font-bold">
-          {shortenHex(publicKey)}
-          {publicKey && (
+        {publicKey && (
+          <span>
+            <span className="font-bold">
+              <Tooltip
+                tooltip={publicKey}
+                position="top"
+                className={
+                  'left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+                }
+                showArrow
+              >
+                {shortenHex(publicKey)}
+              </Tooltip>
+            </span>
             <span className="ml-0.5">
               <CopyButton textToCopy={publicKey} />
             </span>
-          )}
-        </span>
+          </span>
+        )}
         ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
         <Link
           className="text-green-500 dark:text-green-250 font-bold hover:no-underline mx-1"
@@ -74,14 +97,23 @@ const AddKey = (props: TransactionActionInfo) => {
     <div className="py-1">
       <FaKey className="inline-flex text-gray-400 dark:text-neargray-10 mr-1" />{' '}
       {t ? t('txnDetails.actions.addKey.1') : 'Access key'} (
-      <span className="font-bold">
-        {shortenHex(publicKey)}
-        {publicKey && (
+      {publicKey && (
+        <span className="font-bold">
+          <Tooltip
+            tooltip={publicKey}
+            position="top"
+            className={
+              'left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+            }
+            showArrow
+          >
+            {shortenHex(publicKey)}
+          </Tooltip>
           <span className="ml-0.5">
             <CopyButton textToCopy={publicKey} />
           </span>
-        )}
-      </span>
+        </span>
+      )}
       ) {t ? t('txnDetails.actions.addKey.2') : 'added for'}
       <span className="mx-1">
         {t ? t('txnDetails.actions.addKey.3') : 'contract'}
