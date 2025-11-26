@@ -23,6 +23,7 @@ import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { networkId } from '@/utils/app/config';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useParams } from 'next/navigation';
+import { CopyButton } from '../../common/CopyButton';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
@@ -568,22 +569,31 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                           receiptKey?.receipt?.Action?.signerId)) ||
                         ((receipt?.predecessor_id || receipt?.predecessorId) &&
                           (receipt?.public_key || receipt?.publicKey))) && (
-                        <Tooltip
-                          tooltip="Access key used for this receipt"
-                          className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                        >
-                          <span>
-                            &nbsp;
-                            <Link
-                              href={`/address/${
-                                receipt?.predecessor_id ||
-                                receipt?.predecessorId ||
-                                receiptKey?.receipt?.Action?.signer_id ||
-                                receiptKey?.receipt?.Action?.signerId
-                              }?tab=accesskeys`}
-                              className="text-green-500 dark:text-green-250 hover:no-underline"
+                        <span>
+                          &nbsp;(
+                          <Link
+                            href={`/address/${
+                              receipt?.predecessor_id ||
+                              receipt?.predecessorId ||
+                              receiptKey?.receipt?.Action?.signer_id ||
+                              receiptKey?.receipt?.Action?.signerId
+                            }?tab=accesskeys`}
+                            className="text-green-500 dark:text-green-250 hover:no-underline"
+                          >
+                            <Tooltip
+                              tooltip={
+                                receipt?.public_key ||
+                                receipt?.publicKey ||
+                                receiptKey?.receipt?.Action
+                                  ?.signer_public_key ||
+                                receiptKey?.receipt?.Action?.signerPublicKey
+                              }
+                              position="top"
+                              className={
+                                'left-1/2 -ml-10 w-[calc(100vw-10rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+                              }
+                              showArrow
                             >
-                              (
                               {shortenAddress(
                                 receipt?.public_key ||
                                   receipt?.publicKey ||
@@ -591,10 +601,21 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                                     ?.signer_public_key ||
                                   receiptKey?.receipt?.Action?.signerPublicKey,
                               )}
-                              )
-                            </Link>
+                            </Tooltip>
+                          </Link>
+                          <span>
+                            <CopyButton
+                              textToCopy={
+                                receipt?.public_key ||
+                                receipt?.publicKey ||
+                                receiptKey?.receipt?.Action
+                                  ?.signer_public_key ||
+                                receiptKey?.receipt?.Action?.signerPublicKey
+                              }
+                            />
                           </span>
-                        </Tooltip>
+                          )
+                        </span>
                       )}
                     </div>
                   </td>
@@ -748,8 +769,9 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                 <tr>
                   <td className="flex items-center py-2 pr-4">
                     <Tooltip
+                      className={'w-36 left-[5.5rem] max-w-[200px]'}
+                      position="top"
                       tooltip={'Deposit value attached with the receipt'}
-                      className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
                     >
                       <div>
                         <Question className="w-4 h-4 fill-current mr-1" />

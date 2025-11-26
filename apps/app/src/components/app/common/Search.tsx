@@ -576,182 +576,196 @@ const BaseSearch = ({
         />
 
         {isOpen && showHistory && searchHistory.length > 0 && !keyword && (
-          <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-2 shadow border dark:border-black-200">
-            <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+          <div className="z-10 absolute left-1 right-0 md:left-0 dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 shadow border dark:border-black-200">
+            <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
               Recent Searches
             </h3>
-            {searchHistory.map((item, idx) => (
-              <div className="px-2 py-1" key={idx}>
-                <div
-                  className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate ${
-                    selectedIndex === idx ? 'bg-gray-100 dark:bg-black-200' : ''
-                  }`}
-                  onClick={() => {
-                    const historyItem = searchHistory[idx];
-                    const route = getSearchRoute(historyItem.results);
-                    redirect(route);
-                  }}
-                >
-                  {shortenAddress(item.query)}{' '}
-                  {item.filter && `(${item.filter})`}
+            <div className="py-0.5">
+              {searchHistory.map((item, idx) => (
+                <div className="px-1 py-0.5" key={idx}>
+                  <div
+                    className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate ${
+                      selectedIndex === idx
+                        ? 'bg-gray-100 dark:bg-black-200'
+                        : ''
+                    }`}
+                    onClick={() => {
+                      const historyItem = searchHistory[idx];
+                      const route = getSearchRoute(historyItem.results);
+                      redirect(route);
+                    }}
+                  >
+                    {shortenAddress(item.query)}{' '}
+                    {item.filter && `(${item.filter})`}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
         {isOpen && showResults && !showHistory && (
-          <div className="z-10 absolute w-full dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 pt-2 shadow border dark:border-black-200">
+          <div className="z-10 absolute left-1 right-0 md:left-0 dark:bg-black-600 text-xs rounded-b-lg bg-gray-50 shadow border dark:border-black-200">
             <>
               {result?.accounts?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
                     {t('search.list.address') || 'Account'}
                   </h3>
-                  {result?.accounts?.map((address: any, idx: number) => {
-                    const itemIdx = getItemIndex('address', idx);
-                    return (
-                      <div className="px-2 py-1" key={address.account_id}>
-                        <div
-                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate ${
-                            selectedIndex === itemIdx
-                              ? 'bg-gray-100 dark:bg-black-200'
-                              : ''
-                          }`}
-                          onClick={() =>
-                            onSelect({
-                              path: address.account_id,
-                              type: 'address',
-                            })
-                          }
-                        >
-                          {shortenAddress(address.account_id)}
+                  <div className="py-0.5">
+                    {result?.accounts?.map((address: any, idx: number) => {
+                      const itemIdx = getItemIndex('address', idx);
+                      return (
+                        <div className="px-1 py-0.5" key={address.account_id}>
+                          <div
+                            className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 cursor-pointer rounded hover:border-gray-500 truncate ${
+                              selectedIndex === itemIdx
+                                ? 'bg-gray-100 dark:bg-black-200'
+                                : ''
+                            }`}
+                            onClick={() =>
+                              onSelect({
+                                path: address.account_id,
+                                type: 'address',
+                              })
+                            }
+                          >
+                            {shortenAddress(address.account_id)}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </>
               )}
               {result?.txns?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
                     {t('search.list.txns') || 'Txns'}
                   </h3>
-                  {result.txns.map((txn: any, idx: number) => {
-                    const itemIdx = getItemIndex('txn', idx);
-                    return (
-                      <div className="px-2 py-1" key={txn.transaction_hash}>
-                        <div
-                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
-                            selectedIndex === itemIdx
-                              ? 'bg-gray-100 dark:bg-black-200'
-                              : ''
-                          }`}
-                          onClick={() =>
-                            onSelect({
-                              path: txn.transaction_hash,
-                              type: 'txn',
-                            })
-                          }
-                        >
-                          {shortenHex(txn.transaction_hash)}
+                  <div className="py-0.5">
+                    {result.txns.map((txn: any, idx: number) => {
+                      const itemIdx = getItemIndex('txn', idx);
+                      return (
+                        <div className="px-1 py-0.5" key={txn.transaction_hash}>
+                          <div
+                            className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                              selectedIndex === itemIdx
+                                ? 'bg-gray-100 dark:bg-black-200'
+                                : ''
+                            }`}
+                            onClick={() =>
+                              onSelect({
+                                path: txn.transaction_hash,
+                                type: 'txn',
+                              })
+                            }
+                          >
+                            {shortenHex(txn.transaction_hash)}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </>
               )}
               {result?.receipts?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
                     {t('search.list.receipts') || 'Receipts'}
                   </h3>
-                  {result.receipts.map((receipt: any, idx: number) => {
-                    const itemIdx = getItemIndex('receipt', idx);
-                    return (
-                      <div className="px-2 py-1" key={receipt.receipt_id}>
-                        <div
-                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
-                            selectedIndex === itemIdx
-                              ? 'bg-gray-100 dark:bg-black-200'
-                              : ''
-                          }`}
-                          onClick={() =>
-                            onSelect({
-                              path: receipt.originated_from_transaction_hash,
-                              type: 'receipt',
-                            })
-                          }
-                        >
-                          {shortenHex(receipt.receipt_id)}
+                  <div className="py-0.5">
+                    {result.receipts.map((receipt: any, idx: number) => {
+                      const itemIdx = getItemIndex('receipt', idx);
+                      return (
+                        <div className="px-1 py-0.5" key={receipt.receipt_id}>
+                          <div
+                            className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                              selectedIndex === itemIdx
+                                ? 'bg-gray-100 dark:bg-black-200'
+                                : ''
+                            }`}
+                            onClick={() =>
+                              onSelect({
+                                path: receipt.originated_from_transaction_hash,
+                                type: 'receipt',
+                              })
+                            }
+                          >
+                            {shortenHex(receipt.receipt_id)}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </>
               )}
               {result?.blocks?.length > 0 && (
                 <>
-                  <h3 className="mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
                     {t('search.list.blocks') || 'Blocks'}
                   </h3>
-                  {result.blocks.map((block: any, idx: number) => {
-                    const itemIdx = getItemIndex('block', idx);
-                    return (
-                      <div className="px-2 py-1" key={block.block_hash}>
-                        <div
-                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
-                            selectedIndex === itemIdx
-                              ? 'bg-gray-100 dark:bg-black-200'
-                              : ''
-                          }`}
-                          onClick={() =>
-                            onSelect({
-                              path: block.block_hash,
-                              type: 'block',
-                            })
-                          }
-                        >
-                          #{localFormat(block.block_height)} (0x
-                          {shortenHex(block.block_hash)})
+                  <div className="py-0.5">
+                    {result.blocks.map((block: any, idx: number) => {
+                      const itemIdx = getItemIndex('block', idx);
+                      return (
+                        <div className="px-1 py-0.5" key={block.block_hash}>
+                          <div
+                            className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                              selectedIndex === itemIdx
+                                ? 'bg-gray-100 dark:bg-black-200'
+                                : ''
+                            }`}
+                            onClick={() =>
+                              onSelect({
+                                path: block.block_hash,
+                                type: 'block',
+                              })
+                            }
+                          >
+                            #{localFormat(block.block_height)} (0x
+                            {shortenHex(block.block_hash)})
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </>
               )}
               {result?.tokens?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
                     {t('search.list.tokens') || 'Tokens'}
                   </h3>
-                  {result.tokens.map((token: any, idx: number) => {
-                    const itemIdx = getItemIndex('token', idx);
-                    return (
-                      <div className="px-2 py-1" key={token.contract}>
-                        <div
-                          className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
-                            selectedIndex === itemIdx
-                              ? 'bg-gray-100 dark:bg-black-200'
-                              : ''
-                          }`}
-                          onClick={() =>
-                            onSelect({
-                              path: token.contract,
-                              type: 'token',
-                            })
-                          }
-                        >
-                          {shortenAddress(token.contract)}
+                  <div className="py-0.5">
+                    {result.tokens.map((token: any, idx: number) => {
+                      const itemIdx = getItemIndex('token', idx);
+                      return (
+                        <div className="px-1 py-0.5" key={token.contract}>
+                          <div
+                            className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                              selectedIndex === itemIdx
+                                ? 'bg-gray-100 dark:bg-black-200'
+                                : ''
+                            }`}
+                            onClick={() =>
+                              onSelect({
+                                path: token.contract,
+                                type: 'token',
+                              })
+                            }
+                          >
+                            {shortenAddress(token.contract)}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </>
               )}
               {result?.mtTokens?.length > 0 && (
                 <>
-                  <h3 className=" mx-2 px-2 py-1.5 text-sm bg-gray-100 dark:text-neargray-10 dark:bg-black-200 rounded">
+                  <h3 className="px-2.5 py-2 text-xs bg-gray-100 dark:text-neargray-10 dark:bg-black-200">
                     Multi Tokens
                   </h3>
                   {result?.mtTokens?.map(
@@ -761,9 +775,9 @@ const BaseSearch = ({
                     ) => {
                       const itemIdx = getItemIndex('mt_token', idx);
                       return (
-                        <div className="px-2 py-1" key={token.contract}>
+                        <div className="px-1 py-0.5" key={token.contract}>
                           <div
-                            className={`px-2 py-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
+                            className={`p-2 hover:bg-gray-100 dark:hover:bg-black-200 dark:text-neargray-10 rounded cursor-pointer hover:border-gray-500 truncate ${
                               selectedIndex === itemIdx
                                 ? 'bg-gray-100 dark:bg-black-200'
                                 : ''

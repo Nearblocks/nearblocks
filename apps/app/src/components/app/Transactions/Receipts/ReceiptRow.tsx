@@ -338,32 +338,50 @@ const ReceiptRow = (props: Props) => {
                     receipt?.receipt?.Action?.signerId)) ||
                   ((receipt?.predecessor_id || receipt?.predecessorId) &&
                     (receipt?.public_key || receipt?.publicKey))) && (
-                  <Tooltip
-                    tooltip="Access key used for this receipt"
-                    className="absolute h-auto max-w-xs bg-black bg-opacity-90 z-10 text-xs text-white px-3 py-2"
-                  >
-                    <span>
-                      &nbsp;
-                      <Link
-                        href={`/address/${
-                          receipt?.predecessor_id ||
-                          receipt?.predecessorId ||
-                          receipt?.receipt?.Action?.signer_id ||
-                          receipt?.receipt?.Action?.signerId
-                        }?tab=accesskeys`}
-                        className="text-green-500 dark:text-green-250 hover:no-underline"
+                  <span>
+                    &nbsp;(
+                    <Link
+                      href={`/address/${
+                        receipt?.predecessor_id ||
+                        receipt?.predecessorId ||
+                        receipt?.receipt?.Action?.signer_id ||
+                        receipt?.receipt?.Action?.signerId
+                      }?tab=accesskeys`}
+                      className="text-green-500 dark:text-green-250 hover:no-underline"
+                    >
+                      <Tooltip
+                        tooltip={
+                          receipt?.public_key ||
+                          receipt?.publicKey ||
+                          receipt?.receipt?.Action?.signer_public_key ||
+                          receipt?.receipt?.Action?.signerPublicKey
+                        }
+                        position="top"
+                        className={
+                          'left-1/2 -ml-10 w-[calc(100vw-10rem)] max-w-[280px] break-all sm:max-w-none sm:break-normal sm:w-max'
+                        }
+                        showArrow
                       >
-                        (
                         {shortenAddress(
                           receipt?.public_key ||
                             receipt?.publicKey ||
                             receipt?.receipt?.Action?.signer_public_key ||
                             receipt?.receipt?.Action?.signerPublicKey,
                         )}
-                        )
-                      </Link>
+                      </Tooltip>
+                    </Link>
+                    <span>
+                      <CopyButton
+                        textToCopy={
+                          receipt?.public_key ||
+                          receipt?.publicKey ||
+                          receipt?.receipt?.Action?.signer_public_key ||
+                          receipt?.receipt?.Action?.signerPublicKey
+                        }
+                      />
                     </span>
-                  </Tooltip>
+                    )
+                  </span>
                 )}
               </div>
             ) : (
