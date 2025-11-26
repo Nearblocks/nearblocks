@@ -118,6 +118,24 @@ const TransactionChart: React.FC<{
       yAxis: {
         gridLineWidth: 0,
         labels: {
+          formatter: function (
+            this: Highcharts.AxisLabelsFormatterContextObject,
+          ): string {
+            const label = this.axis.defaultLabelFormatter.call(this);
+            return label
+              .replace(/([\d\s.]+)k$/i, (_match, num) => {
+                const value = parseFloat(num.replace(/\s/g, ''));
+                if (isNaN(value)) {
+                  return num + 'k';
+                }
+                if (value >= 1000) {
+                  return (value / 1000).toFixed(1) + 'M';
+                }
+                return value + 'k';
+              })
+              .replace(/G$/i, 'B')
+              .replace(/\.0([KMB])$/i, '$1');
+          },
           style: {
             color: theme === 'dark' ? '#e0e0e0' : '#333333',
           },
