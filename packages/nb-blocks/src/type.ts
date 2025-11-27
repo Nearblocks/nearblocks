@@ -50,6 +50,7 @@ export type Shard = {
 export type Chunk = {
   author: string;
   header: ChunkHeader;
+  localReceipts: Receipt[];
   receipts: Receipt[];
   transactions: IndexerTransactionWithOutcome[];
 };

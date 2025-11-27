@@ -37,26 +37,33 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
 
   await Promise.all(
     shardChunks.map(async (shardChunk) => {
-      if (shardChunk.chunk && shardChunk.chunk.receipts.length) {
-        const receipts = await storeChunkReceipts(
-          knex,
-          shardChunk.shardId,
-          shardChunk.chunk.header.chunkHash,
-          shardChunk.header.hash,
-          shardChunk.header.timestampNanosec,
-          shardChunk.chunk.receipts.filter((receipt) =>
-            receiptKinds.includes(Object.keys(receipt.receipt)[0]),
-          ),
-        );
+      if (shardChunk.chunk) {
+        const chunkReceipts = [
+          ...(shardChunk.chunk.receipts || []),
+          ...(shardChunk.chunk.localReceipts || []),
+        ];
 
-        receiptData = receiptData.concat(receipts.receiptData);
-        receiptActionsData = receiptActionsData.concat(
-          receipts.receiptActionsData,
-        );
-        receiptInputData = receiptInputData.concat(receipts.receiptInputData);
-        receiptOutputData = receiptOutputData.concat(
-          receipts.receiptOutputData,
-        );
+        if (chunkReceipts.length) {
+          const receipts = await storeChunkReceipts(
+            knex,
+            shardChunk.shardId,
+            shardChunk.chunk.header.chunkHash,
+            shardChunk.header.hash,
+            shardChunk.header.timestampNanosec,
+            chunkReceipts.filter((receipt) =>
+              receiptKinds.includes(Object.keys(receipt.receipt)[0]),
+            ),
+          );
+
+          receiptData = receiptData.concat(receipts.receiptData);
+          receiptActionsData = receiptActionsData.concat(
+            receipts.receiptActionsData,
+          );
+          receiptInputData = receiptInputData.concat(receipts.receiptInputData);
+          receiptOutputData = receiptOutputData.concat(
+            receipts.receiptOutputData,
+          );
+        }
       }
     }),
   );
