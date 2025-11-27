@@ -23,9 +23,19 @@ export default async function TxnsTabs({
 
   let hasReceipts = true;
 
-  // Fallback to RPC when receipt_tree is null/empty
-  // This occurs when local_receipts data is missing
-  if (isEmpty(receipt?.receipts?.[0]?.receipt_tree)) hasReceipts = false;
+  if (isEmpty(receipt?.receipts?.[0]?.receipt_tree)) {
+    const receiptIndexerHealth =
+      (await getRequest('v1/health/indexer-receipts')) || {};
+    if (!receiptIndexerHealth?.height) {
+      hasReceipts = false;
+    } else if (
+      data?.txns?.[0]?.block?.block_height &&
+      receiptIndexerHealth?.height &&
+      data?.txns?.[0]?.block?.block_height > receiptIndexerHealth?.height
+    ) {
+      hasReceipts = false;
+    }
+  }
 
   const txn = data?.txns?.[0];
   let price: null | number = null;
