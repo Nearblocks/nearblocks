@@ -20,6 +20,7 @@ import FaMinimize from '@/components/app/Icons/FaMinimize';
 import FaExpand from '@/components/app/Icons/FaExpand';
 import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import { useParams } from 'next/navigation';
 
 interface Props {
   borderFlag?: boolean;
@@ -47,6 +48,7 @@ const ReceiptRow = (props: Props) => {
   const [block, setBlock] = useState<{ height: string }>({ height: '' });
   const { rpc } = useRpcProvider();
   const { getBlockDetails } = useRpc();
+  const params = useParams();
 
   const status = receipt?.outcome?.status;
 
@@ -182,6 +184,7 @@ const ReceiptRow = (props: Props) => {
                             console.error(
                               'All parsing attempts failed:',
                               matchError,
+                              params?.hash,
                             );
                             return `${log}`;
                           }

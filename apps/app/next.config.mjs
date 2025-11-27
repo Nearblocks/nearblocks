@@ -7,6 +7,9 @@ const __dirname = import.meta.dirname;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    unoptimized: true,
+  },
   experimental: {
     webpackMemoryOptimizations: true,
   },
