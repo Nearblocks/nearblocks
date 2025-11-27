@@ -22,6 +22,7 @@ import FaExpand from '@/components/app/Icons/FaExpand';
 import { fiatValue, shortenAddress } from '@/utils/app/libs';
 import { networkId } from '@/utils/app/config';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import { useParams } from 'next/navigation';
 
 interface Props {
   receipt: ReceiptsPropsInfo | any;
@@ -41,6 +42,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
   const [receiptKey, setReceiptKey] = useState<any>(null);
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
   const [isExpanded, setIsExpanded] = useState(false);
+  const params = useParams();
   const t = useTranslations();
   const onTab = (index: number) => {
     setHash(hashes[index]);
@@ -329,6 +331,7 @@ const ReceiptInfo = ({ receipt, statsData, rpcTxn, polledReceipt }: Props) => {
                             console.error(
                               'All parsing attempts failed:',
                               matchError,
+                              params?.hash,
                             );
                             return `${log}`;
                           }
