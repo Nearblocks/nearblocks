@@ -52,7 +52,7 @@ const marketData = async (id: string, full = false) => {
 
     return data;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }
@@ -70,7 +70,7 @@ const marketSearch = async (address: string) => {
 
     return coin?.data?.data ? Object.keys(coin?.data?.data)?.[0] : null;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }

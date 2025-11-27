@@ -65,7 +65,7 @@ const marketData = async (id: string, full = false) => {
 
     return data;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }
@@ -95,7 +95,7 @@ const marketHistory = async (
       price: price?.data?.history?.[0]?.rate ?? null,
     };
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }
@@ -122,7 +122,7 @@ const marketSearch = async (contract: string): Promise<null | string> => {
 
     return coin?.data?.code ?? null;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }

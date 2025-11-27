@@ -36,7 +36,7 @@ const marketData = async (contract: string) => {
 
     return data;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }

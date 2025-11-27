@@ -1,3 +1,4 @@
+import { logger } from 'nb-logger';
 import {
   AccountView,
   BlockResult,
@@ -294,6 +295,7 @@ const fetchPoolInfo = async () => {
           mappings.valueMap.set(id, result);
         }
       } catch (e) {
+        logger.warn({ account: id, error: e, failed: true });
         mappings.promisesMap.delete(id);
       }
     };

@@ -12,8 +12,8 @@ import sentry from '#libs/sentry';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), 'jobs');
 
 const logger: Bree.BreeLogger = {
-  error: console.log,
-  info: console.log,
+  error: () => {},
+  info: () => {},
   warn: () => {},
 };
 

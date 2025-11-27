@@ -14,7 +14,7 @@ const coinList = async (): Promise<FTCoin[]> => {
       { timeout: 60000 },
     );
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
   }
 
   const contracts = coin?.data
@@ -61,7 +61,7 @@ const marketData = async (id: string, full = false) => {
 
     return data;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }
@@ -81,7 +81,7 @@ const marketHistory = async (
       price: price?.data?.market_data?.current_price?.usd ?? null,
     };
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }
@@ -104,7 +104,7 @@ const marketSearch = async (address: string): Promise<null | string> => {
 
     return coin?.data?.id ?? null;
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
 
     return null;
   }

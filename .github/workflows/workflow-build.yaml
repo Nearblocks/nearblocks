@@ -8,8 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service:
-          [backend]
+        service: [backend]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
