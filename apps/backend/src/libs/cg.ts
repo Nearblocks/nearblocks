@@ -1,7 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
 
-import { logger } from 'nb-logger';
-
 import config from '#config';
 import { CGCoin, FTCoin, FTMarketData } from '#types/types';
 

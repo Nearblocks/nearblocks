@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-import { logger } from 'nb-logger';
-
 import { FTMarketData } from '#types/types';
 
 const marketData = async (contract: string) => {

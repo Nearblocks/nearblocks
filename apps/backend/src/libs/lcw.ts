@@ -1,8 +1,6 @@
 import { default as axios } from 'axios';
 import Big from 'big.js';
 
-import { logger } from 'nb-logger';
-
 import config from '#config';
 import { FTMarketData } from '#types/types';
 
