@@ -37,6 +37,12 @@ interface Stats {
   volume?: string;
 }
 
+interface StatsResponse {
+  stats?: Stats[];
+}
+
+const ACCOUNT_CODE_HASH = '11111111111111111111111111111111';
+
 const Address: PageLayout = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -53,7 +59,6 @@ const Address: PageLayout = () => {
     stats: true,
   });
   const [error, setError] = useState<null | string>(null);
-  const ACCOUNT_CODE_HASH = '11111111111111111111111111111111';
 
   const value = formatNumber(
     Big(yoctoToNear(address?.amount ?? '0'))
@@ -69,10 +74,9 @@ const Address: PageLayout = () => {
   useEffect(() => {
     if (!apiFetch) return;
     setLoading((state) => ({ ...state, stats: true }));
-    apiFetch(`https://api.nearblocks.io/v1/stats`)
-      .then((response: any) => {
-        console.log({ response });
-        setStats(response?.stats?.[0]);
+    apiFetch<StatsResponse>(`https://api.nearblocks.io/v1/stats`)
+      .then((response: StatsResponse) => {
+        setStats(response?.stats?.[0] ?? null);
       })
       .catch(console.log)
       .finally(() => setLoading((state) => ({ ...state, stats: false })));

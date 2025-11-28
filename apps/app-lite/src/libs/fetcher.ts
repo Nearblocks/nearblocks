@@ -33,7 +33,7 @@ const fetcher = () => {
       return makeRequest()
         .then((response) => response)
         .catch((error) => {
-          if (attempts < retries) {
+          if (attempts < retries - 1) {
             attempts++;
             const delay = 1000 * Math.pow(2, attempts);
 

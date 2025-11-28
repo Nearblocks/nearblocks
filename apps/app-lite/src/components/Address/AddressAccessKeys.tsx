@@ -44,9 +44,9 @@ const AddressAccessKeys = ({ id, rpcUrl }: { id: string; rpcUrl: string }) => {
 
     getAccountAccessKeys(rpcEndpoint, id)
       .then((response: any) => {
+        if (!response) throw new Error('Failed to fetch keys');
         const rawKeys = response?.keys || response?.result?.keys;
 
-        if (!response) throw new Error('Failed to fetch keys');
         if (!rawKeys) return;
 
         const formattedKeys: AccessKey[] = rawKeys?.map((key: any) => {

@@ -25,7 +25,7 @@ const Block: PageLayout = () => {
   const rpcUrl = useRpcStore((state) => state.rpc);
   const providers = useNetworkStore((state) => state.providers);
   const { formatNumber } = formatter();
-  const { yoctoToNear, yoctoToTgas } = convertor();
+  const { gasToTgas, yoctoToNear } = convertor();
 
   const [block, setBlock] = useState<null | RpcResultBlock>(null);
   const [loading, setLoading] = useState(false);
@@ -89,11 +89,6 @@ const Block: PageLayout = () => {
   const header = block?.header;
   const chunks = block?.chunks || [];
 
-  const gasUsed = chunks.reduce((sum, chunk) => sum + (chunk.gas_used || 0), 0);
-  const gasLimit = chunks.reduce(
-    (sum, chunk) => sum + (chunk.gas_limit || 0),
-    0,
-  );
   const shards = header?.chunks_included ?? 0;
 
   const gas = useMemo(() => {
@@ -188,15 +183,14 @@ const Block: PageLayout = () => {
             <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
               <h2 className="font-medium text-sm mb-0.5">Gas Used</h2>
               <div className="font-heading font-medium text-[26px]">
-                {formatNumber(yoctoToTgas(String(gasUsed)), 0)} Tgas
+                {formatNumber(gasToTgas(String(gas?.used)), 0)} Tgas
               </div>
             </div>
 
             <div className="w-full sm:w-1/2 lg:w-1/3 pl-5 mb-6 h-[60px]">
               <h2 className="font-medium text-sm mb-0.5">Gas Price</h2>
               <div className="font-heading font-medium text-[26px]">
-                {formatNumber(yoctoToTgas(header?.gas_price ?? '0'), 4)} Ⓝ /
-                Tgas
+                {formatNumber(gasToTgas(header?.gas_price ?? '0'), 4)} Ⓝ / Tgas
               </div>
             </div>
 
@@ -204,7 +198,7 @@ const Block: PageLayout = () => {
               <h2 className="font-medium text-sm mb-0.5">Gas Limit</h2>
 
               <div className="font-heading font-medium text-[26px]">
-                {formatNumber(yoctoToTgas(String(gasLimit)), 0)} Tgas
+                {formatNumber(gasToTgas(String(gas?.limit)), 0)} Tgas
               </div>
             </div>
 
