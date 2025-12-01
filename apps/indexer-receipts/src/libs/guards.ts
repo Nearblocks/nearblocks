@@ -8,6 +8,7 @@ import {
   DeployContractAction,
   DeployGlobalContractAction,
   DeployGlobalContractByAccountIdAction,
+  DeterministicStateInitAction,
   FunctionCallAction,
   StakeAction,
   TransferAction,
@@ -72,3 +73,8 @@ export const isDeleteAccountAction = (
 
 export const isDelegateAction = (action: Action): action is DelegateAction =>
   (action as DelegateAction).Delegate !== undefined;
+
+export const isDeterministicStateInitAction = (
+  action: Action,
+): action is DeterministicStateInitAction =>
+  (action as DeterministicStateInitAction).DeterministicStateInit !== undefined;

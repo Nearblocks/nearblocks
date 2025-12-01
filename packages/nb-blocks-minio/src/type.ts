@@ -109,6 +109,7 @@ export type ActionReceipt = {
     gasPrice: string;
     inputDataIds: string[];
     outputDataReceivers: DataReceiver[];
+    refundTo?: string;
     signerId: string;
     signerPublicKey: string;
   };
@@ -141,6 +142,7 @@ export type Action =
   | DeployContractAction
   | DeployGlobalContractAction
   | DeployGlobalContractByAccountIdAction
+  | DeterministicStateInitAction
   | FunctionCallAction
   | StakeAction
   | TransferAction
@@ -155,6 +157,7 @@ export type NonDelegateAction =
   | DeployContractAction
   | DeployGlobalContractAction
   | DeployGlobalContractByAccountIdAction
+  | DeterministicStateInitAction
   | FunctionCallAction
   | StakeAction
   | TransferAction
@@ -209,6 +212,14 @@ export type DeployGlobalContractAction = {
 export type DeployGlobalContractByAccountIdAction = {
   DeployGlobalContractByAccountId: {
     code: string;
+  };
+};
+
+export type DeterministicStateInitAction = {
+  DeterministicStateInit: {
+    code: string;
+    data: Record<string, string>;
+    deposit: string;
   };
 };
 

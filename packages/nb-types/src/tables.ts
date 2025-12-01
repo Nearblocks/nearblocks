@@ -437,6 +437,7 @@ export type Receipt = {
   receipt_id: string;
   receipt_kind: ReceiptKind;
   receiver_account_id: string;
+  refund_to_account_id: null | string;
   shard_id: number;
 };
 
