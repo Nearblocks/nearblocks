@@ -173,9 +173,11 @@ const storeChunkReceipts = async (
     }
 
     let publicKey = null;
+    let refundTo = null;
 
     if ('Action' in receipt.receipt) {
       publicKey = receipt.receipt.Action.signerPublicKey;
+      refundTo = receipt.receipt.Action.refundTo || null;
 
       receipt.receipt.Action.inputDataIds.forEach((dataId) => {
         receiptInputData.push(
@@ -250,6 +252,7 @@ const storeChunkReceipts = async (
         txnHash,
         receiptIndex,
         publicKey,
+        refundTo,
       ),
     );
   });
@@ -409,6 +412,7 @@ const getReceiptData = (
   transactionHash: string,
   indexInChunk: number,
   publicKey: null | string,
+  refundTo: null | string,
 ): Receipt => ({
   included_in_block_hash: blockHash,
   included_in_block_timestamp: blockTimestamp,
@@ -420,6 +424,7 @@ const getReceiptData = (
   receipt_id: receipt.receiptId,
   receipt_kind: mapReceiptKind(receipt.receipt),
   receiver_account_id: receipt.receiverId,
+  refund_to_account_id: refundTo,
   shard_id: shardId,
 });
 

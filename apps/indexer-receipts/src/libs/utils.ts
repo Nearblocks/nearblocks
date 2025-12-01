@@ -21,6 +21,7 @@ import {
   isDeployContractAction,
   isDeployGlobalContractAction,
   isDeployGlobalContractByAccountIdAction,
+  isDeterministicStateInitAction,
   isFunctionCallAction,
   isStakeAction,
   isTransferAction,
@@ -211,6 +212,14 @@ export const mapActionKind = (action: Action): ReceiptAction => {
         beneficiary_id: action.DeleteAccount.beneficiaryId,
       }),
       kind: ActionKind.DELETE_ACCOUNT,
+      rlpHash,
+    };
+  }
+
+  if (isDeterministicStateInitAction(action)) {
+    return {
+      args: jsonStringify(action.DeterministicStateInit),
+      kind: ActionKind.DETERMINISTIC_STATE_INIT,
       rlpHash,
     };
   }
