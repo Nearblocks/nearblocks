@@ -1,9 +1,7 @@
 import { Viewport } from 'next';
-
 import '@/styles/globals.css';
-
-import '../../public/common.css';
-
+import '@/styles/common.css';
+import '@/styles/hot-connector.css';
 interface paramTypes {
   children: React.ReactNode;
 }

@@ -3,6 +3,7 @@ import uniqueId from 'lodash/uniqueId';
 import { useContext, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { baseDecode } from 'borsh';
 
 import {
   AccordionItem,
@@ -21,6 +22,7 @@ import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
 import FaChevronDown from '@/components/app/Icons/FaChevronDown';
+import { txnErrorMessage } from '@/utils/app/near';
 
 interface Props {
   id: string;
@@ -28,6 +30,14 @@ interface Props {
   method: any;
   schema: any;
 }
+
+const isValidTxHash = (txHash: string) => {
+  try {
+    return baseDecode(txHash).length === 32;
+  } catch (e) {
+    return false;
+  }
+};
 
 const getValidationSchema = (fields: FieldType[]) => {
   const schemaFields: any = {};
@@ -160,9 +170,9 @@ const ViewOrChangeAbi = (props: Props) => {
           [429, 408].includes(response?.statusCode) ||
           response?.error?.details?.message
             ? t('rpcRateLimitError', { rpcUrl: rpc, icon: '📡' })
-            : response?.error;
+            : JSON.stringify(response?.error, null, 2);
 
-        resetState(null, errorMsg);
+        resetState(null, errorMsg, errorMsg);
       }
     } catch {
       resetState(null, 'An unknown error occurred');
@@ -187,15 +197,20 @@ const ViewOrChangeAbi = (props: Props) => {
         gas: options?.gas,
         method: toSnakeCase(method?.name),
       });
-
-      setError(null);
-      setTxn(response?.transaction_outcome?.id || null);
-      setResult(JSON.stringify(response, null, 2));
+      const hasError = txnErrorMessage(response);
+      if (hasError) {
+        setError(hasError);
+        setTxn(response?.transaction_outcome?.id || null);
+        setResult(JSON.stringify(response, null, 2));
+      } else {
+        setError(null);
+        setTxn(response?.transaction_outcome?.id || null);
+        setResult(JSON.stringify(response, null, 2));
+      }
     } catch (error: any) {
-      console.error('Error calling method:', error);
       setTxn(null);
-      setError(error?.message || 'An unknown error occurred');
-      setResult(null);
+      setError(error?.message);
+      setResult(error?.message);
     } finally {
       setLoading(false);
     }
@@ -280,7 +295,7 @@ const ViewOrChangeAbi = (props: Props) => {
                     (formik.touched[`name_${field.id}`] || showValidation)
                       ? 'border-red-500'
                       : 'dark:border-black-200'
-                  } rounded mb-1 h-9 px-3 w-full outline-none dark:text-neargray-10`}
+                  } rounded mb-1 h-9 px-3 w-full outline-none dark:text-neargray-10 bg-white dark:bg-black-600`}
                   name="name"
                   onChange={onChange(field.id)}
                   placeholder="Argument name"
@@ -379,7 +394,7 @@ const ViewOrChangeAbi = (props: Props) => {
                 Attached deposit
               </span>
               <input
-                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10 bg-white dark:bg-black-600"
                 name="attachedDeposit"
                 onChange={onOptionChange('attachedDeposit')}
                 placeholder="Attached Deposit"
@@ -391,7 +406,7 @@ const ViewOrChangeAbi = (props: Props) => {
                 Gas
               </span>
               <input
-                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10"
+                className="block border dark:border-black-200 rounded my-1 h-9 px-3 w-full outline-none dark:text-neargray-10 bg-white dark:bg-black-600"
                 name="gas"
                 onChange={onOptionChange('gas')}
                 placeholder="Gas"
@@ -422,25 +437,25 @@ const ViewOrChangeAbi = (props: Props) => {
             </button>
           )}
         </div>
-        {error && (
-          <textarea
-            className="block appearance-none outline-none w-full border rounded-lg dark:bg-red-950 dark:bg-opacity-40 dark:text-neargray-10 dark:border-red-400 bg-red-50 border-red-100 p-3 mt-3 resize-y"
-            readOnly
-            rows={6}
-            value={
-              typeof error === 'string' ? error : JSON.stringify(error, null, 2)
-            }
-          />
-        )}
-        {txn && (
-          <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
+        {txn && isValidTxHash(txn) && (
+          <div
+            className={`block appearance-none outline-none w-full border rounded-lg p-3 mt-3 dark:text-neargray-10 ${
+              error
+                ? 'bg-red-50 dark:bg-red-950 dark:bg-opacity-40 border-red-100 dark:border-red-400'
+                : 'bg-green-50 dark:bg-green-900 border-green-100 dark:border-green-200'
+            }`}
+          >
             View txn details:{' '}
             <Tooltip
               className={'left-1/2 max-w-[200px] w-96 mt-3'}
               position="bottom"
               tooltip={txn}
             >
-              <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+              <span
+                className={`truncate max-w-[120px] inline-block align-bottom ${
+                  error ? 'text-red-500' : 'text-green-500 dark:text-green-250'
+                }`}
+              >
                 <Link href={`/txns/${txn}`}>{txn}</Link>
               </span>
             </Tooltip>
@@ -448,7 +463,11 @@ const ViewOrChangeAbi = (props: Props) => {
         )}
         {result && (
           <textarea
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-900 dark:border-green-200 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
+            className={`block appearance-none outline-none w-full border rounded-lg p-3 mt-3 resize-y dark:text-neargray-10 ${
+              error
+                ? 'bg-red-50 dark:bg-red-950 dark:bg-opacity-40 border-red-100 dark:border-red-400'
+                : 'bg-green-50 dark:bg-green-900 border-green-100 dark:border-green-200'
+            }`}
             readOnly
             rows={6}
             value={result}

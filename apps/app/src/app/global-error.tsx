@@ -5,7 +5,7 @@ import ErrorLayout from './ErrorLayout';
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 import '@/styles/globals.css';
-import '../../public/common.css';
+import '@/styles/common.css';
 
 export default function GlobalError({
   error,

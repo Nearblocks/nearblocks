@@ -1,8 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
-
+import { use, useEffect, useState, useRef } from 'react';
 import Provider from '@/components/Layouts/Provider';
 import useWallet from '@/hooks/app/useWallet';
 
@@ -49,39 +48,56 @@ const LayoutActions = ({
   const [accountName, setAccountName] = useState<undefined | string>(accountId);
   const [isLoading, setIsLoading] = useState(true);
   const { getSearchResults, setSearchResults } = useSearchHistory();
+  const lastCookieRef = useRef<string | undefined>(undefined);
 
-  useEffect(() => {
-    const manageAccountSession = () => {
-      if (signedAccountId && signedAccountId.length > 0) {
-        const currentCookie = Cookies.get('signedAccountId');
-        if (currentCookie !== signedAccountId) {
-          Cookies.set('signedAccountId', signedAccountId);
-          setAccountName(signedAccountId);
-        }
-        return;
-      }
-      if (!isLoading && (!signedAccountId || signedAccountId.length === 0)) {
-        Cookies.remove('signedAccountId');
-        setAccountName(undefined);
-      }
-    };
-    manageAccountSession();
-    const interval = setInterval(manageAccountSession, 500);
-
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signedAccountId, isLoading]);
-
+  // Initialize wallet on mount
   useEffect(() => {
     if (wallet) {
       wallet
-        .startUp(setSignedAccountId, networkId)
+        .startUp(networkId)
         .catch((error) => {
           console.error('Error during wallet startup:', error);
         })
         .finally(() => setIsLoading(false));
     }
   }, [wallet, networkId]);
+
+  useEffect(() => {
+    if (!wallet?.initialized || isLoading) return;
+
+    const syncState = () => {
+      const walletAccountId = wallet.accountId;
+
+      if (walletAccountId) {
+        setSignedAccountId(walletAccountId);
+        setAccountName(walletAccountId);
+      } else {
+        setSignedAccountId('');
+        setAccountName(undefined);
+      }
+      lastCookieRef.current = walletAccountId || undefined;
+    };
+
+    syncState();
+
+    const unsubscribe = wallet.selector?.onConnect(() => {
+      syncState();
+    });
+
+    const interval = setInterval(() => {
+      const currentCookie = Cookies.get('signedAccountId');
+      if (currentCookie !== lastCookieRef.current) {
+        lastCookieRef.current = currentCookie;
+        setSignedAccountId(currentCookie || '');
+        setAccountName(currentCookie || undefined);
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe?.();
+    };
+  }, [wallet?.initialized, wallet?.accountId, wallet?.selector, isLoading]);
 
   useEffect(() => {
     const redirect = (route: any) => {

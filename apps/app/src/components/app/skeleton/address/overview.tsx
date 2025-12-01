@@ -106,6 +106,16 @@ const OverviewActionsSkeleton = () => {
           </div>
         </div>
       </TabPanel>
+      <TabPanel>
+        <div className="w-full mt-3">
+          <Loader wrapperClassName="w-full h-64" />
+        </div>
+      </TabPanel>
+      <TabPanel>
+        <div className="w-full mt-3">
+          <Loader wrapperClassName="w-full h-64" />
+        </div>
+      </TabPanel>
     </Tabs>
   );
 };

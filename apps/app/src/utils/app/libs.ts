@@ -2,7 +2,7 @@ import Big from 'big.js';
 import get from 'lodash/get';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { FieldType, GuessableTypeString, UserToken } from '@/utils/types';
-import { QueryParams } from '@near-wallet-selector/core/src/lib/services';
+import type { ParsedQs } from 'qs';
 import dayjs from './dayjs';
 
 const ACCOUNT_ID_REGEX =
@@ -539,7 +539,7 @@ export const isValidAccount = (accountId: string) => {
 };
 
 export function getFilteredQueryParams(
-  query: QueryParams,
+  query: ParsedQs,
   requiredKeys: string[],
 ) {
   const filteredParams = Object.fromEntries(

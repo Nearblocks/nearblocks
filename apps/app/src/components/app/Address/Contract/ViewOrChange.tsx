@@ -13,6 +13,7 @@ import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import { capitalize, isJson, mapFeilds, toSnakeCase } from '@/utils/libs';
 import { FieldType } from '@/utils/types';
+import { baseDecode } from 'borsh';
 
 import Tooltip from '@/components/app/common/Tooltip';
 import CloseCircle from '@/components/app/Icons/CloseCircle';
@@ -23,12 +24,21 @@ import useRpc from '@/hooks/app/useRpc';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
 import { useTranslations } from 'next-intl';
 import FaChevronDown from '@/components/app/Icons/FaChevronDown';
+import { txnErrorMessage } from '@/utils/app/near';
 
 interface Props {
   id: string;
   index: number;
   method: string;
 }
+
+const isValidTxHash = (txHash: string) => {
+  try {
+    return baseDecode(txHash).length === 32;
+  } catch (e) {
+    return false;
+  }
+};
 
 const inputTypes = ['string', 'number', 'boolean', 'null', 'json'];
 
@@ -171,8 +181,8 @@ const ViewOrChange = (props: Props) => {
           [429, 408].includes(response?.statusCode) ||
           response?.error?.details?.message
             ? t('rpcRateLimitError', { rpcUrl: rpc, icon: '📡' })
-            : response?.error;
-        resetState(null, errorMsg);
+            : JSON.stringify(response?.error, null, 2);
+        resetState(null, errorMsg, null);
       }
     } catch {
       resetState(null, 'An unknown error occurred');
@@ -205,14 +215,20 @@ const ViewOrChange = (props: Props) => {
         gas: options?.gas,
         method: toSnakeCase(method),
       });
-
-      setError(null);
-      setTxn(response?.transaction_outcome?.id || null);
-      setResult(JSON.stringify(response, null, 2));
+      const hasError = txnErrorMessage(response);
+      if (hasError) {
+        setError(hasError);
+        setTxn(response?.transaction_outcome?.id || null);
+        setResult(JSON.stringify(response, null, 2));
+      } else {
+        setError(null);
+        setTxn(response?.transaction_outcome?.id || null);
+        setResult(JSON.stringify(response, null, 2));
+      }
     } catch (error: any) {
       console.error('Error calling method:', error);
       setTxn(null);
-      setError(error?.message || 'An unknown error occurred');
+      setError(error?.message);
       setResult(null);
     } finally {
       setLoading(false);
@@ -337,7 +353,7 @@ const ViewOrChange = (props: Props) => {
                     (formik.touched[`name_${field.id}`] || showValidation)
                       ? 'border-red-500'
                       : 'dark:border-black-200'
-                  } rounded mb-1 h-9 px-3 w-full outline-none dark:text-neargray-10`}
+                  } rounded mb-1 h-9 px-3 w-full outline-none dark:text-neargray-10 bg-white dark:bg-black-600`}
                   placeholder="Argument name"
                   value={field.name}
                   onChange={onChange(field.id)}
@@ -504,15 +520,25 @@ const ViewOrChange = (props: Props) => {
             }
           />
         )}
-        {txn && (
-          <div className="block appearance-none outline-none w-full border rounded-lg bg-green-50 border-green-100 p-3 mt-3">
+        {txn && isValidTxHash(txn) && (
+          <div
+            className={`block appearance-none outline-none w-full border rounded-lg p-3 mt-3 dark:text-neargray-10 ${
+              error
+                ? 'bg-red-50 dark:bg-red-950 dark:bg-opacity-40 border-red-100 dark:border-red-400'
+                : 'bg-green-50 dark:bg-green-900 border-green-100 dark:border-green-200'
+            }`}
+          >
             View txn details:{' '}
             <Tooltip
               className={'left-1/2 max-w-[200px] w-96 mt-3'}
               position="bottom"
               tooltip={txn}
             >
-              <span className="truncate max-w-[120px] inline-block align-bottom text-green-500">
+              <span
+                className={`truncate max-w-[120px] inline-block align-bottom ${
+                  error ? 'text-red-500' : 'text-green-500 dark:text-green-250'
+                }`}
+              >
                 <Link href={`/txns/${txn}`}>{txn}</Link>
               </span>
             </Tooltip>
@@ -520,7 +546,11 @@ const ViewOrChange = (props: Props) => {
         )}
         {result && (
           <textarea
-            className="block appearance-none outline-none w-full border rounded-lg bg-green-50 dark:bg-green-900 border-green-100 p-3 mt-3 resize-y dark:text-neargray-10"
+            className={`block appearance-none outline-none w-full border rounded-lg p-3 mt-3 resize-y dark:text-neargray-10 ${
+              error
+                ? 'bg-red-50 dark:bg-red-950 dark:bg-opacity-40 border-red-100 dark:border-red-400'
+                : 'bg-green-50 dark:bg-green-900 border-green-100 dark:border-green-200'
+            }`}
             readOnly
             rows={6}
             value={result}

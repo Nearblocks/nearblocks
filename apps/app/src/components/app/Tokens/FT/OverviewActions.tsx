@@ -26,6 +26,12 @@ import TokenPrice from '@/components/app/Tokens/FT/TokenPrice';
 import { CopyButton } from '@/components/app/common/CopyButton';
 import { shortenAddress } from '@/utils/app/libs';
 
+interface EthereumProvider {
+  providers?: EthereumProvider[];
+  request: (args: { method: string; params?: any }) => Promise<any>;
+  isMetaMask?: boolean;
+}
+
 interface Props {
   holders: string;
   id: string;
@@ -71,32 +77,50 @@ const OverviewActions = ({
   };
 
   const addToMetaMask = async () => {
+    const tokenAddress = token?.nep518_hex_address;
+    const tokenSymbol = token?.symbol;
+    const tokenDecimals = token?.decimals;
+    const tokenImage = token?.icon;
+
+    if (!tokenAddress || !tokenSymbol || tokenDecimals === undefined) {
+      toast.error('Token information is incomplete');
+      return;
+    }
+
+    if (!window.ethereum) {
+      toast.info('Please install MetaMask extension to use this feature.');
+      return;
+    }
+
+    const ethereum = window.ethereum as unknown as EthereumProvider;
+    let metaMaskProvider: EthereumProvider | null = null;
+
+    if (ethereum.providers && ethereum.providers.length > 0) {
+      metaMaskProvider = ethereum.providers.find((p) => p.isMetaMask) || null;
+    } else if (ethereum.isMetaMask) {
+      metaMaskProvider = ethereum;
+    }
+
+    if (!metaMaskProvider) {
+      toast.warning('MetaMask not detected. Try after Refreshing the page.');
+      return;
+    }
+
     try {
-      const tokenAddress = token?.nep518_hex_address;
-      const tokenSymbol = token?.symbol;
-      const tokenDecimals = token?.decimals;
-      const tokenImage = token?.icon;
-
-      if (window.ethereum) {
-        await (window.ethereum as any).request({
-          method: 'wallet_watchAsset',
-          params: {
-            options: {
-              address: tokenAddress,
-              decimals: tokenDecimals,
-              image: tokenImage,
-              symbol: tokenSymbol,
-            },
-            type: 'ERC20',
+      await metaMaskProvider.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: tokenAddress,
+            symbol: tokenSymbol,
+            decimals: tokenDecimals,
+            image: tokenImage,
           },
-        });
+        },
+      });
 
-        toast.success(`${token.name} has been added to your MetaMask!`);
-      } else {
-        toast.info(
-          'Please install MetaMask or another Ethereum wallet to use this feature.',
-        );
-      }
+      toast.success(`${token.name} has been added to your MetaMask!`);
     } catch (error) {
       console.error('Error adding token to MetaMask:', error);
       toast.error('Error adding token to MetaMask. Try again later');

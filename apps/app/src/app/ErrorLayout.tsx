@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/routing';
 import Cookies from 'js-cookie';
 
-import { getMessage, getCookie } from '@/utils/app/actions';
+import { getMessage } from '@/utils/app/actions';
 import useWallet from '@/hooks/app/useWallet';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from 'next-themes';
@@ -102,26 +102,21 @@ export default function ErrorLayout({ reset }: { reset: () => void }) {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        const [messages, signedAccountId] = await Promise.all([
-          getMessage(),
-          getCookie('signedAccountId'),
-        ]);
+        const messages = await getMessage();
         setMessages(messages);
-        setSignedAccountId(signedAccountId);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
     fetchAllData();
   }, []);
 
   useEffect(() => {
     const initWallet = async () => {
-      if (wallet && !wallet.selector) {
-        const accountId = await wallet.startUp(setSignedAccountId, networkId);
-        setSignedAccountId(accountId);
-      }
+      if (!wallet) return;
+      await wallet.startUp(networkId);
+      const accountId = wallet.accountId;
+      setSignedAccountId(accountId || '');
     };
     initWallet();
   }, [wallet, networkId]);

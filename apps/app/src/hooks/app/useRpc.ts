@@ -447,7 +447,10 @@ const useRpc = () => {
     if (statusCode === 200) {
       const result = data?.result?.result;
       if (result && (result instanceof Uint8Array || Array.isArray(result))) {
-        const parsed = JSON.parse(Buffer.from(result).toString());
+        const parsed =
+          result?.length > 0
+            ? JSON.parse(Buffer.from(result).toString())
+            : result;
         return { success: true, data: parsed, statusCode };
       } else {
         return {

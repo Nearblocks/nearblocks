@@ -1,7 +1,8 @@
 import Clipboard from 'clipboard';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useRef, useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Prism as SyntaxHighlighterComponent } from 'react-syntax-highlighter';
+import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import {
   oneDark,
   oneLight,
@@ -26,6 +27,8 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ content, language, name }) => {
   const [copied, setCopied] = useState(false);
   const codeContainerRef = useRef<HTMLDivElement | null>(null);
   const copyButtonRef = useRef<HTMLButtonElement | null>(null);
+  const SyntaxHighlighter =
+    SyntaxHighlighterComponent as unknown as React.ComponentType<SyntaxHighlighterProps>;
 
   const { theme } = useTheme();
 
