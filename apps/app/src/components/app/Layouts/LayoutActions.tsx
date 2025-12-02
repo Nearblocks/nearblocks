@@ -13,12 +13,13 @@ import { Status, StatusInfo } from '@/utils/types';
 import { toast } from 'react-toastify';
 import { getSearchRoute, SearchToast } from '@/components/app/common/Search';
 import { useConfig } from '@/hooks/app/useConfig';
-import { rpcSearch } from '@/utils/app/rpc';
 import { usePathname, useIntlRouter } from '@/i18n/routing';
 import { handleFilterAndKeyword } from '@/utils/app/actions';
 import Cookies from 'js-cookie';
 import Notice from '@/components/app/common/Notice';
 import useSearchHistory from '@/hooks/app/useSearchHistory';
+import { rpcSearchClient } from '@/utils/app/rpcClient';
+
 interface LayoutProps {
   children: React.ReactNode;
   notice?: React.ReactNode;
@@ -110,7 +111,7 @@ const LayoutActions = ({
           await setSearchResults(data?.keyword, '', data?.data);
           return redirect(route);
         } else {
-          const rpcData = await rpcSearch(keyword);
+          const rpcData = await rpcSearchClient(keyword);
           const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
           if (rpcRoute) {
             await setSearchResults(rpcData?.keyword, '', rpcData?.data);
