@@ -20,7 +20,7 @@ const env = cleanEnv(process.env, {
   REDIS_SENTINEL_URLS: str({ default: '' }),
   REDIS_URL: url({ default: '' }),
   RPC_URL: str(),
-  RPC_URL2: str(),
+  RPC_URL_ARCHIVAL: str(),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -45,7 +45,7 @@ const config: Config = {
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
-  rpcUrl2: env.RPC_URL2,
+  rpcUrlArchival: env.RPC_URL_ARCHIVAL,
   sentryDsn,
 };
 

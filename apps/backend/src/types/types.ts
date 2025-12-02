@@ -27,7 +27,7 @@ export interface Config {
   redisSentinelUrls: string;
   redisUrl: string;
   rpcUrl: string;
-  rpcUrl2: string;
+  rpcUrlArchival: string;
   sentryDsn?: string;
 }
 

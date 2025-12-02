@@ -14,7 +14,7 @@ import {
 
 import config from '#config';
 import db from '#libs/knex';
-import RPC from '#libs/near';
+import RPC, { archivalRPC } from '#libs/near';
 import { validator } from '#libs/utils';
 import {
   CachedTimestampMap,
@@ -184,8 +184,18 @@ const mapValidators = (
 };
 
 const fetchStakingPoolInfo = async () => {
-  const data = await db('validator_data').select('mapped_validators').first();
+  const data = await db('validator_data')
+    .select('mapped_validators', 'stake_proposals')
+    .first();
   const validators = data?.mapped_validators as unknown as ValidatorEpochData[];
+
+  const existingStakeProposals =
+    data?.stake_proposals as unknown as CachedTimestampMap<string>;
+  let existingProposalsMap = new Map<string, string>();
+
+  if (existingStakeProposals && Array.isArray(existingStakeProposals)) {
+    existingProposalsMap = new Map(existingStakeProposals);
+  }
 
   if (validators && validators.length > 0) {
     const mappings = {
@@ -207,6 +217,12 @@ const fetchStakingPoolInfo = async () => {
           mappings.valueMap.set(id, result);
         }
       } catch (e) {
+        const previousValue = existingProposalsMap.get(id);
+
+        if (previousValue) {
+          mappings.valueMap.set(id, previousValue);
+        }
+
         mappings.promisesMap.delete(id);
       }
     };
@@ -249,8 +265,18 @@ export const updateStakingPoolStake = async () => {
 };
 
 const fetchPoolInfo = async () => {
-  const data = await db('validator_data').select('mapped_validators').first();
+  const data = await db('validator_data')
+    .select('mapped_validators', 'staking_pool_infos')
+    .first();
   const validators = data?.mapped_validators as unknown as ValidatorEpochData[];
+
+  const existingStakingPoolInfos =
+    data?.staking_pool_infos as unknown as CachedTimestampMap<ValidatorPoolInfo>;
+  let existingInfosMap = new Map<string, ValidatorPoolInfo>();
+
+  if (existingStakingPoolInfos && Array.isArray(existingStakingPoolInfos)) {
+    existingInfosMap = new Map(existingStakingPoolInfos);
+  }
 
   if (validators && validators.length > 0) {
     const mappings = {
@@ -296,6 +322,12 @@ const fetchPoolInfo = async () => {
         }
       } catch (e) {
         logger.warn({ account: id, error: e, failed: true });
+        const previousValue = existingInfosMap.get(id);
+
+        if (previousValue) {
+          mappings.valueMap.set(id, previousValue);
+        }
+
         mappings.promisesMap.delete(id);
       }
     };
@@ -421,7 +453,7 @@ export const validatorsCheck = async () => {
       );
     }
 
-    const { data } = await RPC.query(
+    const { data } = await archivalRPC.query(
       { block_id: validators.epoch_start_height },
       'block',
     );

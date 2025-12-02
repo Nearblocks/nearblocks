@@ -4,12 +4,13 @@ import config from '#config';
 import { FTMetadata, NFTMetadata, NFTTokenInfo } from '#types/types.js';
 
 const near = new RPC(config.rpcUrl);
+export const archivalRPC = new RPC(config.rpcUrlArchival);
 
 export const nearBalance = async (
   account: string,
   block: number | string,
 ): Promise<null | string> => {
-  const { data } = await near.viewAccount(account, block);
+  const { data } = await archivalRPC.viewAccount(account, block);
 
   if (data.result) {
     return data.result.amount;
@@ -24,7 +25,7 @@ export const ftBalance = async (
   account: string,
   block: number | string,
 ) => {
-  const { data } = await near.callFunction(
+  const { data } = await archivalRPC.callFunction(
     contract,
     'ft_balance_of',
     near.encodeArgs({ account_id: account }),

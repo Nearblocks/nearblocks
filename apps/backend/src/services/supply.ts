@@ -11,7 +11,7 @@ export const syncCirculatingSupply = async () => {
     .first();
 
   if (config.network === Network.MAINNET && latestBlock) {
-    const supply = await circulatingSupply(latestBlock, config.rpcUrl2);
+    const supply = await circulatingSupply(latestBlock, config.rpcUrlArchival);
 
     await knex('stats').update({ circulating_supply: supply });
   }
