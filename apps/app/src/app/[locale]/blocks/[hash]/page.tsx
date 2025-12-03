@@ -26,8 +26,8 @@ export default async function Hash(props: {
               <div className="text-sm text-nearblue-600 dark:text-neargray-10 divide-solid divide-gray-200 dark:divide-black-200 divide-y">
                 <ErrorMessage
                   icons={<FileSlash />}
-                  message="Sorry, We are unable to locate this BlockHash"
-                  mutedText={''}
+                  message="Sorry, we are unable to locate this block hash"
+                  mutedText={hash || ''}
                   reset
                 />
               </div>

@@ -6,11 +6,20 @@ interface Props {
   icons: any | SVGElement;
   message: string;
   mutedText: string;
-  reset?: any;
+  reset?: boolean;
+  onReset?: () => void;
   errorBg?: boolean;
 }
-const ErrorMessage = ({ icons, message, mutedText, reset, errorBg }: Props) => {
+const ErrorMessage = ({
+  icons,
+  message,
+  mutedText,
+  reset,
+  onReset,
+  errorBg,
+}: Props) => {
   const { resetBoundary } = useErrorBoundary();
+  const handleReset = onReset || resetBoundary;
 
   return (
     <div className="text-center items-center py-24 text-nearblue-600 dark:text-neargray-10  text-sm font-normal">
@@ -34,8 +43,10 @@ const ErrorMessage = ({ icons, message, mutedText, reset, errorBg }: Props) => {
 
       {reset && (
         <button
-          className="mx-3 px-3.5 mr-1 bg-green dark:bg-green-250 dark:text-neargray-10 py-1.5 text-xs font-medium rounded-md text-white"
-          onClick={() => resetBoundary()}
+          className={`mx-3 px-3.5 mr-1 bg-green dark:bg-green-250 dark:text-neargray-10 py-1.5 text-xs font-medium rounded-md text-white ${
+            mutedText ? 'mt-2' : ''
+          }`}
+          onClick={() => handleReset()}
         >
           Retry
         </button>
