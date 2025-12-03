@@ -122,6 +122,14 @@ const TokenHoldings = (props: Props) => {
   }
   const ftAmount = props?.ft?.amount ?? 0;
 
+  const mtAmount =
+    mt?.reduce((total, token) => {
+      const usdValue = parseFloat(token?.amountUsd || '0');
+      return total + usdValue;
+    }, 0) ?? 0;
+
+  const totalAmount = Big(ftAmount).add(Big(mtAmount)).toString();
+
   function isTokenSpam(tokenName: string) {
     if (props?.spamTokens) {
       for (const spamToken of props?.spamTokens) {
@@ -141,9 +149,10 @@ const TokenHoldings = (props: Props) => {
       >
         <button>
           <span>
-            {ftAmount && (ft?.length || mt?.length || nfts?.length) ? (
+            {(ftAmount || mtAmount) &&
+            (ft?.length || mt?.length || nfts?.length) ? (
               <>
-                {'$' + dollarFormat(String(ftAmount))}
+                {'$' + dollarFormat(String(totalAmount))}
                 <span className="bg-green-500 dark:bg-green-250 text-xs text-white rounded ml-2 px-1 p-0.5">
                   {(ft?.length || 0) + (mt?.length || 0) + (nfts?.length || 0)}
                 </span>
