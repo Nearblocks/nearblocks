@@ -43,7 +43,7 @@
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.2",
     "ahooks": "^3.8.1",
-    "axios": "^1.7.8",
+    "axios": "^1.12.0",
     "big.js": "6.2.2",
     "borsh": "0.7.0",
     "classnames": "^2.5.1",
