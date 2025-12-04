@@ -29,7 +29,7 @@ const routes = (app: Router) => {
    *           default: 1
    *       - in: query
    *         name: per_page
-   *         description: Number of items per page. Each increment of 25 will count towards rate limit.
+   *         description: Number of items per page.
    *         schema:
    *           type: number
    *           minimum: 1
