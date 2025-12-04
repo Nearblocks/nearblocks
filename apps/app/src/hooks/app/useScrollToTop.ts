@@ -4,8 +4,8 @@ interface UseScrollToTopOptions {
   offset?: number;
 }
 
-const useScrollToTop = (
-  ref: RefObject<HTMLElement> | null,
+const useScrollToTop = <T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T | null> | null,
   options: UseScrollToTopOptions = {},
 ) => {
   const { offset = 5 } = options;
