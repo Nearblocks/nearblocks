@@ -122,7 +122,9 @@ const rateLimiter = catchAsync(
     const rateLimit = rateLimiterUnion(selectedPlan, baseUrl);
 
     const perPage = req?.query?.per_page || 25;
-    const consumeCount = Math.ceil(+perPage / 25);
+    // Validators endpoint always counts as 1 query regardless of per_page
+    const consumeCount =
+      baseUrl === '/validators' ? 1 : Math.ceil(+perPage / 25);
 
     try {
       if (keyId) {
@@ -169,7 +171,8 @@ const useFreePlan = async (
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
   const perPage = req?.query?.per_page || 25;
-  const consumeCount = Math.ceil(+perPage / 25);
+  // Validators endpoint always counts as 1 query regardless of per_page
+  const consumeCount = baseUrl === '/validators' ? 1 : Math.ceil(+perPage / 25);
 
   const plan = await getPlan(baseUrl, token);
 
