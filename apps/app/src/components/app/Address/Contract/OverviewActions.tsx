@@ -31,6 +31,7 @@ interface Props {
   accountDataPromise: Promise<any>;
   contractInfoPromise: Promise<any>;
   deploymentsPromise: Promise<any>;
+  sourceScanDataPromise: Promise<any[]>;
 }
 
 type OnChainResponse = {
@@ -39,11 +40,17 @@ type OnChainResponse = {
 };
 
 const OverviewActions = (props: Props) => {
-  const { accountDataPromise, contractInfoPromise, deploymentsPromise } = props;
+  const {
+    accountDataPromise,
+    contractInfoPromise,
+    deploymentsPromise,
+    sourceScanDataPromise,
+  } = props;
 
   const account = use(accountDataPromise);
   const parse = use(contractInfoPromise);
   const deployments = use(deploymentsPromise);
+  const sourceScanResponses = use(sourceScanDataPromise);
 
   const accountId = account?.account?.[0]?.account_id;
   const contractInfo: ContractParseInfo = parse?.contract?.[0]?.contract;
@@ -109,10 +116,16 @@ const OverviewActions = (props: Props) => {
     if (accountId) fetchData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId]);
+  }, [accountId, onChainResponse]);
+
+  const [verifierRawData, setVerifierRawData] = useState<{
+    rpcData: any[];
+    sourceScanData: any[];
+  } | null>(null);
 
   useEffect(() => {
     const fetchVerifierData = async () => {
+      setStatusLoading(true);
       try {
         const verifierDataPromises = verifiers.map((verifierAccountId) =>
           getVerifierData(rpc, accountId as string, verifierAccountId),
@@ -120,34 +133,10 @@ const OverviewActions = (props: Props) => {
 
         const verifierResponses = await Promise.all(verifierDataPromises);
 
-        const verificationData = verifiers.reduce<
-          Record<string, VerificationData>
-        >((acc, verifier, index) => {
-          const data = verifierResponses[index];
-          let status: VerifierStatus = 'notVerified';
-
-          if (
-            data &&
-            contractData?.onChainCodeHash &&
-            contractData?.contractMetadata
-          ) {
-            const hashMatches =
-              contractData?.onChainCodeHash === data?.code_hash;
-            status = hashMatches
-              ? 'verified'
-              : contractData?.contractMetadata?.build_info
-              ? 'mismatch'
-              : 'notVerified';
-          }
-
-          acc[verifier] = {
-            data,
-            status,
-          };
-          return acc;
-        }, {});
-
-        setVerificationData(verificationData);
+        setVerifierRawData({
+          rpcData: verifierResponses,
+          sourceScanData: sourceScanResponses,
+        });
       } catch (error) {
         console.error('Error fetching or updating verifier data:', error);
         setError('Failed to fetch verifier data');
@@ -155,13 +144,62 @@ const OverviewActions = (props: Props) => {
         setStatusLoading(false);
       }
     };
-    if (contractData?.onChainCodeHash && contractData?.contractMetadata) {
+
+    if (contractData?.onChainCodeHash) {
       fetchVerifierData();
     } else {
       setStatusLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountId, contractData]);
+  }, [accountId, contractData?.onChainCodeHash]);
+
+  useEffect(() => {
+    if (!verifierRawData) return;
+
+    const { rpcData, sourceScanData } = verifierRawData;
+
+    const verificationData = verifiers.reduce<Record<string, VerificationData>>(
+      (acc, verifier, index) => {
+        const rpcVerifierData = rpcData[index];
+        const sourceScan = sourceScanData[index];
+        let status: VerifierStatus = 'notVerified';
+        let effectiveData = null;
+        if (
+          sourceScan &&
+          sourceScan.contracts &&
+          sourceScan.contracts.length > 0 &&
+          sourceScan.codeHash === contractData?.onChainCodeHash
+        ) {
+          effectiveData = sourceScan.contracts[0]?.[1];
+        }
+
+        if (!effectiveData && rpcVerifierData) {
+          effectiveData = rpcVerifierData;
+        }
+
+        if (effectiveData && contractData?.onChainCodeHash) {
+          const hashMatches =
+            contractData?.onChainCodeHash === effectiveData?.code_hash;
+          status = hashMatches
+            ? 'verified'
+            : contractData?.contractMetadata?.build_info
+            ? 'mismatch'
+            : 'notVerified';
+        }
+
+        acc[verifier] = {
+          data: effectiveData,
+          status,
+        };
+        return acc;
+      },
+      {},
+    );
+
+    setVerificationData(verificationData);
+    setStatusLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verifierRawData, contractData]);
 
   return (
     <Tabs

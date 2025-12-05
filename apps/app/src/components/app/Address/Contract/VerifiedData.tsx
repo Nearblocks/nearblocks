@@ -58,7 +58,7 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
       setFileDataLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedVerifier, verifierData, contractMetadata, switchRpc]);
+  }, [selectedVerifier, verifierData, contractMetadata]);
 
   const fetchFilesData = async (
     selectedVerifier: string,
@@ -83,10 +83,12 @@ const VerifiedData: React.FC<VerifiedDataProps> = ({
         const data = await fetchStructure(path);
         const files: string[] = [];
         for (const item of data?.structure || []) {
-          const fullPath = `${path}${path ? '/' : ''}${item.name}`;
-          if (item.type === 'file') files.push(fullPath);
-          else if (item.type === 'dir')
+          const fullPath = `${path}${path ? '/' : ''}${item.Name}`;
+          if (item.Type === 2) {
+            files.push(fullPath);
+          } else if (item.Type === 1) {
             files.push(...(await getFiles(fullPath)));
+          }
         }
         return files;
       };
