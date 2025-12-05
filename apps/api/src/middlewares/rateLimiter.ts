@@ -123,7 +123,8 @@ const rateLimiter = catchAsync(
 
     const perPage = req?.query?.per_page || 25;
     // Validators endpoint always counts as 1 query regardless of per_page
-    const consumeCount = baseUrl === '/validators' ? 1 : Math.ceil(+perPage / 25);
+    const consumeCount =
+      baseUrl === '/validators' ? 1 : Math.ceil(+perPage / 25);
 
     try {
       if (keyId) {
