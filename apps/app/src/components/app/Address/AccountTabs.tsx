@@ -17,9 +17,11 @@ import TabPanelGeneralSkeleton from '../skeleton/address/dynamicTab';
 export default async function AccountTabs({
   id,
   searchParams,
+  contractPromise,
 }: {
   id: string;
   searchParams: any;
+  contractPromise: Promise<any>;
 }) {
   const tab = searchParams?.tab || 'txns';
   const fallbackError = (
@@ -95,7 +97,11 @@ export default async function AccountTabs({
       {tab === 'contract' ? (
         <ErrorBoundary fallback={fallbackError}>
           <Suspense fallback={<TabPanelGeneralSkeleton tab={tab} />}>
-            <Overview id={id} searchParams={searchParams} />
+            <Overview
+              id={id}
+              searchParams={searchParams}
+              contractPromise={contractPromise}
+            />
           </Suspense>
         </ErrorBoundary>
       ) : null}

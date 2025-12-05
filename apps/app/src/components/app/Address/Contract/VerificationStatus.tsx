@@ -70,7 +70,7 @@ const VerificationStatus: React.FC<VerificationStatusProps> = ({
   return statusLoading ? (
     <Loader wrapperClassName="w-full md:w-full my-4 " />
   ) : (
-    isNEP330 && (
+    (isNEP330 || verifiedCount > 0) && (
       <div className="flex flex-wrap pt-5 px-1 w-full">
         {verifiers?.length > 0 && (
           <div className="w-full flex items-center justify-between flex-wrap md:gap-y-3 gap-y-2 sm:pb-1 pb-0 ">

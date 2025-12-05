@@ -28,7 +28,11 @@ export default async function AddressIndex(props: {
     <AddressRpcProvider contractPromise={contractPromise} accountId={id}>
       <Balance id={id} />
       <div className="py-2"></div>
-      <AccountTabs id={id} searchParams={searchParams} />
+      <AccountTabs
+        id={id}
+        searchParams={searchParams}
+        contractPromise={contractPromise}
+      />
     </AddressRpcProvider>
   );
 }
