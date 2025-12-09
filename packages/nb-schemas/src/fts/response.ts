@@ -120,16 +120,12 @@ const contractHolderCount = v.object({
 const listResponse = responseSchema(v.array(list));
 const countResponse = responseSchema(count);
 const txnsResponse = responseSchema(
-  v.array(
-    v.omit(txn, ['block_timestamp', 'shard_id', 'event_type', 'event_index']),
-  ),
+  v.array(v.omit(txn, ['shard_id', 'event_type', 'event_index'])),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 const contractResponse = responseSchema(contract);
 const contractTxnsResponse = responseSchema(
-  v.array(
-    v.omit(txn, ['block_timestamp', 'shard_id', 'event_type', 'event_index']),
-  ),
+  v.array(v.omit(txn, ['shard_id', 'event_type', 'event_index'])),
 );
 const contractTxnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 const contractHoldersResponse = responseSchema(v.array(contractHolders));

@@ -28,9 +28,7 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const txnsResponse = responseSchema(
-  v.array(v.omit(txn, ['block_timestamp', 'event_index'])),
-);
+const txnsResponse = responseSchema(v.array(v.omit(txn, ['event_index'])));
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
 export type MCTxn = v.InferOutput<typeof txn>;

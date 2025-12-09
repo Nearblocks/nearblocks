@@ -35,6 +35,11 @@ export default {
     estimate: sql('queries/accounts/receipts/estimate.sql'),
     receipts: sql('queries/accounts/receipts/receipts.sql'),
   },
+  staking: {
+    estimate: sql('queries/accounts/staking/estimate.sql'),
+    txn: sql('queries/accounts/staking/txn.sql'),
+    txns: sql('queries/accounts/staking/txns.sql'),
+  },
   txns: {
     cte: sql('queries/accounts/txns/cte.sql'),
     cteUnion: sql('queries/accounts/txns/cteUnion.sql'),

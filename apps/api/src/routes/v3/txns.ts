@@ -26,13 +26,6 @@ const routes = (app: Router) => {
    *         schema:
    *           type: string
    *       - in: query
-   *         name: after_ts
-   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
-   *         schema:
-   *           type: string
-   *           minLength: 19
-   *           maxLength: 19
-   *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
    *         schema:
@@ -76,13 +69,6 @@ const routes = (app: Router) => {
    *         description: Block hash to filter results by
    *         schema:
    *           type: string
-   *       - in: query
-   *         name: after_ts
-   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
-   *         schema:
-   *           type: string
-   *           minLength: 19
-   *           maxLength: 19
    *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)

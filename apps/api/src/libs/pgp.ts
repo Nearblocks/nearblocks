@@ -97,3 +97,15 @@ export const dbContract = pgp({
   // TODO: remove before merge
   statement_timeout: 10 * 60 * 100, // 10s
 });
+
+/**
+ * Staking database connection.
+ */
+export const dbStaking = pgp({
+  application_name: 'api-staking',
+  connectionString: config.dbUrlStaking,
+  max: 20,
+  ssl: ssl?.ca ? ssl : false,
+  // TODO: remove before merge
+  statement_timeout: 10 * 60 * 100, // 10s
+});

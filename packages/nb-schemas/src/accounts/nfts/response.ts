@@ -50,7 +50,7 @@ const txnCount = v.object({
 });
 
 const txnsResponse = responseSchema(
-  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'event_index'])),
+  v.array(v.omit(txn, ['shard_id', 'event_index'])),
 );
 const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
 
