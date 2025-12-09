@@ -1,16 +1,16 @@
 import { Router } from 'express';
 
-import request from 'nb-schemas/dist/accounts/fts/request.js';
+import request from 'nb-schemas/dist/accounts/staking/request.js';
 
 import { validate } from '#middlewares/validate';
-import service from '#services/v3/accounts/fts';
+import service from '#services/v3/accounts/staking';
 
 const routes = (route: Router) => {
   /**
    * @openapi
-   * /v3/accounts/{account}/ft-txns:
+   * /v3/accounts/{account}/staking-txns:
    *   get:
-   *     summary: Get account ft txns
+   *     summary: Get account staking txns
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -23,11 +23,6 @@ const routes = (route: Router) => {
    *       - in: query
    *         name: contract
    *         description: Contract ID to filter results by
-   *         schema:
-   *           type: string
-   *       - in: query
-   *         name: involved
-   *         description: Involved account to filter results by
    *         schema:
    *           type: string
    *       - in: query
@@ -59,13 +54,13 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/ft-txns', validate(request.txns), service.txns);
+  route.get('/:account/staking-txns', validate(request.txns), service.txns);
 
   /**
    * @openapi
-   * /v3/accounts/{account}/ft-txns/count:
+   * /v3/accounts/{account}/staking-txns/count:
    *   get:
-   *     summary: Get estimated account ft txns count
+   *     summary: Get estimated account staking txns count
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -81,11 +76,6 @@ const routes = (route: Router) => {
    *         schema:
    *           type: string
    *       - in: query
-   *         name: involved
-   *         description: Involved account to filter results by
-   *         schema:
-   *           type: string
-   *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
    *         schema:
@@ -96,7 +86,11 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/ft-txns/count', validate(request.count), service.count);
+  route.get(
+    '/:account/staking-txns/count',
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;

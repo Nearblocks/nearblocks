@@ -94,13 +94,6 @@ const routes = (app: Router) => {
    *       - V3 / NFTs
    *     parameters:
    *       - in: query
-   *         name: after_ts
-   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
-   *         schema:
-   *           type: string
-   *           minLength: 19
-   *           maxLength: 19
-   *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
    *         schema:
@@ -139,13 +132,6 @@ const routes = (app: Router) => {
    *     tags:
    *       - V3 / NFTs
    *     parameters:
-   *       - in: query
-   *         name: after_ts
-   *         description: Timestamp in nanoseconds. Return results after this timestamp (exclusive)
-   *         schema:
-   *           type: string
-   *           minLength: 19
-   *           maxLength: 19
    *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
