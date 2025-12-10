@@ -69,6 +69,8 @@ export const checkFastnear = async () => {
 };
 
 export const monitorProgress = async (): Promise<void> => {
+  if (config.startBlockHeight) return;
+
   let lastBlock: number | undefined;
 
   // eslint-disable-next-line no-constant-condition
