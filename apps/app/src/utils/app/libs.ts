@@ -627,3 +627,23 @@ export const cleanNestedObject = (obj: any): any => {
 
   return obj;
 };
+
+export const formatContractResponseData = (data: any): any => {
+  const type = typeof data;
+  if (type === 'number') {
+    try {
+      const b = Big(data);
+      return b.eq(b.round(0, 0)) ? b.toFixed(0) : b.toFixed();
+    } catch {
+      return data;
+    }
+  }
+  if (
+    type === 'string' ||
+    type === 'boolean' ||
+    (type === 'object' && data !== null)
+  ) {
+    return JSON.stringify(data, null, 2);
+  }
+  return data;
+};
