@@ -14,7 +14,7 @@ const Transfer = (props: TransactionActionInfo) => {
     <div className="py-1">
       <FaArrowAltCircleRight className="inline-flex text-green-400 mr-1" />{' '}
       {t ? t('txnDetails.actions.transfer.0') : 'Transferred'}
-      <span className="font-bold ml-1">
+      <span className="font-bold mx-1">
         {args.deposit ? yoctoToNear(args.deposit, true) : args.deposit ?? ''} Ⓝ
       </span>{' '}
       {t ? t('txnDetails.actions.transfer.1') : 'to'}
