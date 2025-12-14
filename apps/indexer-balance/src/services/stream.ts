@@ -32,8 +32,9 @@ export const syncData = async () => {
 
   const stream = streamBlock({
     dbConfig: streamConfig,
-    s3Bucket: config.s3Bucket,
-    s3Config,
+    ...(config.proxyUrl
+      ? { proxyUrl: config.proxyUrl }
+      : { s3Bucket: config.s3Bucket, s3Config }),
     start: startBlock,
   });
 
