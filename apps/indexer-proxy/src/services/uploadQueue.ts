@@ -83,7 +83,10 @@ export class UploadQueue {
               const sortedHeights = Array.from(this.uploadedBlocks).sort(
                 (a, b) => a - b,
               );
-              const toRemove = sortedHeights.slice(0, UPLOADED_BLOCKS_TRIM_SIZE);
+              const toRemove = sortedHeights.slice(
+                0,
+                UPLOADED_BLOCKS_TRIM_SIZE,
+              );
 
               toRemove.forEach((h) => this.uploadedBlocks.delete(h));
             }

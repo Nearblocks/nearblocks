@@ -97,7 +97,10 @@ export class ProxyServer {
 
         logger.error({ error, height, message: 'Error fetching block' });
 
-        if (error instanceof Error && error.message.includes('Failed to fetch block')) {
+        if (
+          error instanceof Error &&
+          error.message.includes('Failed to fetch block')
+        ) {
           res.status(404).json({ error: `Block ${height} not found` });
         } else if (error instanceof Error) {
           res.status(500).json({ error: error.message });
@@ -148,7 +151,10 @@ export class ProxyServer {
               const result = await this.fetcher.fetch(height);
 
               // Queue for S3 upload if needed
-              if (result.source === 'neardata' || result.source === 'near_lake') {
+              if (
+                result.source === 'neardata' ||
+                result.source === 'near_lake'
+              ) {
                 this.uploadQueue.enqueue(height, result.block);
               }
 

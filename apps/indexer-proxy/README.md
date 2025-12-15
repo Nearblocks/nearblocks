@@ -105,20 +105,20 @@ Prometheus metrics endpoint.
 
 ## Configuration
 
-| Variable                | Description         | Default   |
-| ----------------------- | ------------------- | --------- |
-| `NETWORK`               | mainnet or testnet  | `mainnet` |
-| `PORT`                  | HTTP server port    | `3000`    |
-| `CACHE_MAX_BLOCKS`             | Max blocks in cache     | `5000`    |
-| `CACHE_TTL_MS`                 | Cache TTL (ms)          | `3600000` |
-| `LAKE_AWS_ACCESS_KEY_ID`       | AWS key for NEAR Lake   | -         |
-| `LAKE_AWS_SECRET_ACCESS_KEY`   | AWS secret for NEAR Lake | -         |
-| `S3_BUCKET`                    | S3 bucket name          | -         |
-| `S3_ENDPOINT`           | S3 endpoint URL     | -         |
-| `S3_ACCESS_KEY_ID`      | S3 access key       | -         |
-| `S3_SECRET_ACCESS_KEY`  | S3 secret key       | -         |
-| `S3_UPLOAD_BATCH_SIZE`  | Concurrent uploads  | `10`      |
-| `S3_UPLOAD_MAX_RETRIES` | Max upload retries  | `5`       |
+| Variable                     | Description              | Default   |
+| ---------------------------- | ------------------------ | --------- |
+| `NETWORK`                    | mainnet or testnet       | `mainnet` |
+| `PORT`                       | HTTP server port         | `3000`    |
+| `CACHE_MAX_BLOCKS`           | Max blocks in cache      | `5000`    |
+| `CACHE_TTL_MS`               | Cache TTL (ms)           | `3600000` |
+| `LAKE_AWS_ACCESS_KEY_ID`     | AWS key for NEAR Lake    | -         |
+| `LAKE_AWS_SECRET_ACCESS_KEY` | AWS secret for NEAR Lake | -         |
+| `S3_BUCKET`                  | S3 bucket name           | -         |
+| `S3_ENDPOINT`                | S3 endpoint URL          | -         |
+| `S3_ACCESS_KEY_ID`           | S3 access key            | -         |
+| `S3_SECRET_ACCESS_KEY`       | S3 secret key            | -         |
+| `S3_UPLOAD_BATCH_SIZE`       | Concurrent uploads       | `10`      |
+| `S3_UPLOAD_MAX_RETRIES`      | Max upload retries       | `5`       |
 
 Neardata URL is derived from `NETWORK` (mainnet → https://mainnet.neardata.xyz, testnet → https://testnet.neardata.xyz).
 
