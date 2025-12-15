@@ -5,6 +5,7 @@ import { logger } from 'nb-logger';
 import { config } from '#config.js';
 import { BlockCache } from '#services/cache.js';
 import { BlockFetcher } from '#services/fetcher.js';
+import { LakeService } from '#services/lake.js';
 import { MetricsService } from '#services/metrics.js';
 import { NeardataService } from '#services/neardata.js';
 import { S3Service } from '#services/s3.js';
@@ -35,8 +36,9 @@ const main = async () => {
     const cache = new BlockCache();
     const s3 = new S3Service();
     const neardata = new NeardataService();
+    const lake = new LakeService();
     const uploadQueue = new UploadQueue(s3, metrics);
-    const fetcher = new BlockFetcher(cache, s3, neardata, metrics);
+    const fetcher = new BlockFetcher(cache, s3, neardata, lake, metrics);
     const server = new ProxyServer(fetcher, uploadQueue, metrics);
 
     // Start server
@@ -46,21 +48,25 @@ const main = async () => {
   } catch (error) {
     logger.error({ error, message: 'Failed to start indexer-proxy' });
     Sentry.captureException(error);
+    await Sentry.close(2000);
     process.exit(1);
   }
 };
 
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
-  logger.error({ error, message: 'Uncaught exception' });
-  Sentry.captureException(error);
-  process.exit(1);
+  (async () => {
+    logger.error({ error, message: 'Uncaught exception' });
+    Sentry.captureException(error);
+    await Sentry.close(2000);
+    process.exit(1);
+  })();
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   logger.error({ message: 'Unhandled rejection', promise, reason });
   Sentry.captureException(reason);
-  process.exit(1);
+  // Don't exit on unhandled rejection - log and continue
 });
 
 // Graceful shutdown

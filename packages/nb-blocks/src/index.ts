@@ -107,7 +107,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
   // Validate config: must have either proxyUrl OR (s3Bucket + s3Config)
   if (!config.proxyUrl && (!config.s3Bucket || !config.s3Config)) {
     throw new Error(
-      'BlockStreamConfig must have either proxyUrl OR (s3Bucket + s3Config)',
+      'BlockStreamConfig must have either proxyUrl OR both s3Bucket and s3Config',
     );
   }
 

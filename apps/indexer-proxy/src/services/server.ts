@@ -60,7 +60,13 @@ export class ProxyServer {
         res.set('Content-Type', this.metrics.registry.contentType);
         res.end(await this.metrics.getMetrics());
       } catch (error) {
-        res.status(500).end(error);
+        logger.error({ error, message: 'Error fetching metrics' });
+
+        if (error instanceof Error) {
+          res.status(500).json({ error: error.message });
+        } else {
+          res.status(500).json({ error: 'Internal server error' });
+        }
       }
     });
 
@@ -77,8 +83,8 @@ export class ProxyServer {
 
         const result = await this.fetcher.fetch(height);
 
-        // If block came from neardata, queue it for S3 upload
-        if (result.source === 'neardata') {
+        // If block came from neardata or lake, queue it for S3 upload
+        if (result.source === 'neardata' || result.source === 'near_lake') {
           this.uploadQueue.enqueue(height, result.block);
         }
 
@@ -87,9 +93,13 @@ export class ProxyServer {
           source: result.source,
         });
       } catch (error) {
-        logger.error({ error, message: 'Error fetching block' });
+        const height = parseInt(req.params.height, 10);
 
-        if (error instanceof Error) {
+        logger.error({ error, height, message: 'Error fetching block' });
+
+        if (error instanceof Error && error.message.includes('Failed to fetch block')) {
+          res.status(404).json({ error: `Block ${height} not found` });
+        } else if (error instanceof Error) {
           res.status(500).json({ error: error.message });
         } else {
           res.status(500).json({ error: 'Unknown error' });
@@ -114,13 +124,31 @@ export class ProxyServer {
           return;
         }
 
+        // Validate each height
+        const MAX_BLOCK_HEIGHT = 10_000_000_000;
+        const invalidHeight = heights.find(
+          (h) =>
+            typeof h !== 'number' ||
+            !Number.isInteger(h) ||
+            h <= 0 ||
+            h > MAX_BLOCK_HEIGHT,
+        );
+
+        if (invalidHeight !== undefined) {
+          res.status(400).json({
+            error: `Invalid block height: ${invalidHeight}`,
+          });
+
+          return;
+        }
+
         const results = await Promise.all(
           heights.map(async (height) => {
             try {
               const result = await this.fetcher.fetch(height);
 
               // Queue for S3 upload if needed
-              if (result.source === 'neardata') {
+              if (result.source === 'neardata' || result.source === 'near_lake') {
                 this.uploadQueue.enqueue(height, result.block);
               }
 

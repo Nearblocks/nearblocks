@@ -1,6 +1,6 @@
 import { bool, cleanEnv, num, str, url } from 'envalid';
 
-const rawConfig = cleanEnv(process.env, {
+export const config = cleanEnv(process.env, {
   CACHE_MAX_BLOCKS: num({
     default: 5000,
     desc: 'Maximum blocks in memory cache',
@@ -8,14 +8,6 @@ const rawConfig = cleanEnv(process.env, {
   CACHE_TTL_MS: num({
     default: 3600000,
     desc: 'Cache TTL in milliseconds (default 1 hour)',
-  }),
-  DISK_CACHE_PATH: str({
-    default: '/tmp/block-cache',
-    desc: 'Path for filesystem cache',
-  }),
-  ENABLE_DISK_CACHE: bool({
-    default: false,
-    desc: 'Enable filesystem cache persistence',
   }),
   ENABLE_S3_UPLOAD: bool({
     default: true,
@@ -50,14 +42,3 @@ const rawConfig = cleanEnv(process.env, {
   }),
   SENTRY_DSN: str({ default: '', desc: 'Sentry DSN for error tracking' }),
 });
-
-// Derive NEARDATA_URL from NETWORK
-const NEARDATA_URL =
-  rawConfig.NETWORK === 'mainnet'
-    ? 'https://mainnet.neardata.xyz'
-    : 'https://testnet.neardata.xyz';
-
-export const config = {
-  ...rawConfig,
-  NEARDATA_URL,
-};

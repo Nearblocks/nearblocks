@@ -1,6 +1,6 @@
 import { logger } from 'nb-logger';
 import { camelCaseKeys } from 'nb-neardata';
-import { retry, sleep } from 'nb-utils';
+import { retry } from 'nb-utils';
 
 import { config } from '#config.js';
 import { Message } from '#types/index.js';
@@ -12,11 +12,17 @@ const retryLogger = (attempt: number, error: unknown) => {
   logger.error({ attempt, service: 'neardata' });
 };
 
+const endpoint = (network: string) => {
+  return network === 'mainnet'
+    ? 'https://mainnet.neardata.xyz'
+    : 'https://testnet.neardata.xyz';
+};
+
 export class NeardataService {
   private url: string;
 
   constructor() {
-    this.url = config.NEARDATA_URL;
+    this.url = endpoint(config.NETWORK);
     logger.info({ message: 'Neardata service initialized', url: this.url });
   }
 
@@ -30,10 +36,6 @@ export class NeardataService {
           });
 
           if (!response.ok) {
-            if (response.status === 404) {
-              await sleep(100);
-            }
-
             throw new Error(`status: ${response.status}`);
           }
 

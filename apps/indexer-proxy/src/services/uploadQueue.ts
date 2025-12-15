@@ -8,6 +8,8 @@ import { S3Service } from './s3.js';
 
 const INITIAL_RETRY_DELAY_MS = 1000;
 const MAX_RETRY_DELAY_MS = 60000;
+const MAX_UPLOADED_BLOCKS_TRACKING = 10000;
+const UPLOADED_BLOCKS_TRIM_SIZE = 5000;
 
 export class UploadQueue {
   private metrics: MetricsService;
@@ -77,11 +79,11 @@ export class UploadQueue {
             this.metrics.s3UploadQueueSize.set(this.queue.length);
 
             // Prevent set from growing indefinitely
-            if (this.uploadedBlocks.size > 10000) {
+            if (this.uploadedBlocks.size > MAX_UPLOADED_BLOCKS_TRACKING) {
               const sortedHeights = Array.from(this.uploadedBlocks).sort(
                 (a, b) => a - b,
               );
-              const toRemove = sortedHeights.slice(0, 5000);
+              const toRemove = sortedHeights.slice(0, UPLOADED_BLOCKS_TRIM_SIZE);
 
               toRemove.forEach((h) => this.uploadedBlocks.delete(h));
             }
@@ -144,7 +146,11 @@ export class UploadQueue {
       nextRetry: Date.now(),
     });
 
-    logger.info({ height, queueSize: this.queue.length });
+    logger.info({
+      height,
+      message: 'Enqueued block for S3 upload',
+      queueSize: this.queue.length,
+    });
     this.metrics.s3UploadQueueSize.set(this.queue.length);
 
     // Start processing if not already running

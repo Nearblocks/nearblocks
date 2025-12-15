@@ -3,7 +3,7 @@ FROM node:22-alpine AS base
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
-RUN yarn global add turbo
+RUN yarn global add turbo@2.3.3
 COPY . .
 RUN turbo prune indexer-proxy --docker
 

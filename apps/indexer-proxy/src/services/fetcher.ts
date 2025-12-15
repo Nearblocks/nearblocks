@@ -3,6 +3,7 @@ import { logger } from 'nb-logger';
 import { BlockFetchResult, BlockSource } from '#types/index.js';
 
 import { BlockCache } from './cache.js';
+import { LakeService } from './lake.js';
 import { MetricsService } from './metrics.js';
 import { NeardataService } from './neardata.js';
 import { S3Service } from './s3.js';
@@ -10,6 +11,7 @@ import { S3Service } from './s3.js';
 export class BlockFetcher {
   private cache: BlockCache;
   private inFlightRequests: Map<number, Promise<BlockFetchResult>>;
+  private lake: LakeService;
   private metrics: MetricsService;
   private neardata: NeardataService;
   private s3: S3Service;
@@ -18,11 +20,13 @@ export class BlockFetcher {
     cache: BlockCache,
     s3: S3Service,
     neardata: NeardataService,
+    lake: LakeService,
     metrics: MetricsService,
   ) {
     this.cache = cache;
     this.s3 = s3;
     this.neardata = neardata;
+    this.lake = lake;
     this.inFlightRequests = new Map();
     this.metrics = metrics;
 
@@ -76,6 +80,20 @@ export class BlockFetcher {
         return { block: fromNeardata, source: BlockSource.NEARDATA };
       }
 
+      // 4. Try NEAR Lake as final fallback
+      const fromLake = await this.lake.fetchBlock(height);
+
+      if (fromLake) {
+        logger.info({ height, source: BlockSource.NEAR_LAKE });
+        this.cache.set(height, fromLake);
+        this.metrics.blockFetchBySource.inc({ source: BlockSource.NEAR_LAKE });
+        this.metrics.blockFetchDuration
+          .labels(BlockSource.NEAR_LAKE)
+          .observe((Date.now() - startTime) / 1000);
+
+        return { block: fromLake, source: BlockSource.NEAR_LAKE };
+      }
+
       // All sources failed
       this.metrics.blockFetchErrors.inc({ source: 'all' });
 
@@ -97,7 +115,7 @@ export class BlockFetcher {
       return this.inFlightRequests.get(height)!;
     }
 
-    const promise = this.fetchInternal(height);
+    const promise = Promise.resolve(this.fetchInternal(height));
 
     this.inFlightRequests.set(height, promise);
 

@@ -70,7 +70,7 @@ Indexers are already configured to use the proxy via `PROXY_URL` environment var
 
 ### `GET /block/:height`
 
-Fetch a single block.
+Fetch a single block. Returns 404 if block not found.
 
 **Response:**
 
@@ -109,9 +109,11 @@ Prometheus metrics endpoint.
 | ----------------------- | ------------------- | --------- |
 | `NETWORK`               | mainnet or testnet  | `mainnet` |
 | `PORT`                  | HTTP server port    | `3000`    |
-| `CACHE_MAX_BLOCKS`      | Max blocks in cache | `5000`    |
-| `CACHE_TTL_MS`          | Cache TTL (ms)      | `3600000` |
-| `S3_BUCKET`             | S3 bucket name      | -         |
+| `CACHE_MAX_BLOCKS`             | Max blocks in cache     | `5000`    |
+| `CACHE_TTL_MS`                 | Cache TTL (ms)          | `3600000` |
+| `LAKE_AWS_ACCESS_KEY_ID`       | AWS key for NEAR Lake   | -         |
+| `LAKE_AWS_SECRET_ACCESS_KEY`   | AWS secret for NEAR Lake | -         |
+| `S3_BUCKET`                    | S3 bucket name          | -         |
 | `S3_ENDPOINT`           | S3 endpoint URL     | -         |
 | `S3_ACCESS_KEY_ID`      | S3 access key       | -         |
 | `S3_SECRET_ACCESS_KEY`  | S3 secret key       | -         |
@@ -174,7 +176,7 @@ Request flow:
 2. If not cached, check S3
 3. If not in S3, fetch from Neardata
 4. If Neardata fails, fallback to NEAR Lake
-5. Return block immediately
+5. Return block immediately (or 404 if not found)
 6. Queue block for background S3 upload if fetched from Neardata/Lake
 
 After a crash with pending uploads:
