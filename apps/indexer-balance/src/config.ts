@@ -14,11 +14,12 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  S3_ACCESS_KEY: str(),
+  PROXY_URL: url({ default: '' }),
+  S3_ACCESS_KEY: str({ default: '' }),
   S3_BUCKET: str({ default: 'nearblocks' }),
-  S3_ENDPOINT: url(),
+  S3_ENDPOINT: url({ default: '' }),
   S3_REGION: str({ default: '' }),
-  S3_SECRET_KEY: str(),
+  S3_SECRET_KEY: str({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -30,6 +31,7 @@ const config: Config = {
   dbUrlRead: env.DATABASE_URL_READ,
   indexerKey: 'balance',
   network: env.NETWORK,
+  proxyUrl: env.PROXY_URL,
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,
   s3Endpoint: env.S3_ENDPOINT,

@@ -8,6 +8,7 @@ export type Config = {
   dbUrlRead: string;
   indexerKey: string;
   network: Network;
+  proxyUrl?: string;
   s3AccessKey: string;
   s3Bucket: string;
   s3Endpoint: string;

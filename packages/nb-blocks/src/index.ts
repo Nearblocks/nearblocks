@@ -15,8 +15,9 @@ export * from './type.js';
 export type BlockStreamConfig = {
   dbConfig: KnexConfig | string;
   limit?: number;
-  s3Bucket: string;
-  s3Config: S3ClientConfig;
+  proxyUrl?: string;
+  s3Bucket?: string;
+  s3Config?: S3ClientConfig;
   start: number;
 };
 
@@ -82,9 +83,39 @@ const fetchJson = async (s3: S3Client, bucket: string, block: number) => {
   }
 };
 
+const fetchJsonFromProxy = async (proxyUrl: string, block: number) => {
+  return await retry(
+    async () => {
+      const response = await fetch(`${proxyUrl}/block/${block}`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(60000),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Proxy returned status: ${response.status}`);
+      }
+
+      const data = (await response.json()) as { block: Message };
+
+      return JSON.stringify(data.block);
+    },
+    { exponential: true, logger: retryLogger, retries },
+  );
+};
+
 export const streamBlock = (config: BlockStreamConfig) => {
+  // Validate config: must have either proxyUrl OR (s3Bucket + s3Config)
+  if (!config.proxyUrl && (!config.s3Bucket || !config.s3Config)) {
+    throw new Error(
+      'BlockStreamConfig must have either proxyUrl OR both s3Bucket and s3Config',
+    );
+  }
+
   const knex: Knex = createKnex(config.dbConfig);
-  const s3 = new S3Client({ ...config.s3Config, ...retryConfig });
+  // Only create S3 client if not using proxy
+  const s3 = config.proxyUrl
+    ? null
+    : new S3Client({ ...config.s3Config, ...retryConfig });
   let start = config.start;
   let isFetching = false;
   const limit = config.limit ?? 10;
@@ -115,7 +146,9 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
         const jsons = await Promise.all(
           blocks.map((block) =>
-            fetchJson(s3, config.s3Bucket, block.block_height),
+            config.proxyUrl
+              ? fetchJsonFromProxy(config.proxyUrl, block.block_height)
+              : fetchJson(s3!, config.s3Bucket!, block.block_height),
           ),
         );
 

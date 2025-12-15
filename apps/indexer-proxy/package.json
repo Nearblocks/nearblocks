@@ -1,0 +1,45 @@
+{
+  "name": "indexer-proxy",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.750.0",
+    "@near-lake/framework": "0.1.5",
+    "@sentry/node": "7.74.1",
+    "@smithy/node-http-handler": "4.0.3",
+    "envalid": "8.0.0",
+    "express": "4.21.2",
+    "lru-cache": "11.0.2",
+    "prom-client": "15.1.3"
+  },
+  "devDependencies": {
+    "@types/express": "~5.0",
+    "@types/node": "~22.13",
+    "eslint-config-custom-node": "*",
+    "nb-blocks": "*",
+    "nb-knex": "*",
+    "nb-lake": "*",
+    "nb-logger": "*",
+    "nb-neardata": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "rimraf": "~5.0",
+    "typescript": "~5.8"
+  }
+}
