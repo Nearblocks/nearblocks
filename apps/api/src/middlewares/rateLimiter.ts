@@ -119,7 +119,7 @@ const rateLimiter = catchAsync(
     }
 
     const baseUrl = req.baseUrl;
-    const rateLimit = rateLimiterUnion(selectedPlan, baseUrl);
+    const { limiters, rateLimit } = rateLimiterUnion(selectedPlan, baseUrl);
 
     const perPage = req?.query?.per_page || 25;
     // Validators endpoint always counts as 1 query regardless of per_page
@@ -129,6 +129,11 @@ const rateLimiter = catchAsync(
     try {
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
+
+        if (await isLimitReached(limiters, tokenKey, consumeCount)) {
+          return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+        }
+
         const now = dayjs.utc().toISOString();
         const usageKey = `usage:${keyId}:${now.split('T')[0]}`;
         await ratelimiterRedisClient.hincrby(usageKey, now, consumeCount);
@@ -141,6 +146,10 @@ const rateLimiter = catchAsync(
     }
 
     try {
+      if (await isLimitReached(limiters, id, consumeCount)) {
+        return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+      }
+
       await rateLimit.consume(id, consumeCount);
 
       return next();
@@ -186,10 +195,14 @@ const useFreePlan = async (
   } catch (redisError) {
     logger.error(redisError, 'Error caching user plan in Redis.');
   }
-  const rateLimit = rateLimiterUnion(plan, baseUrl);
+  const { limiters, rateLimit } = rateLimiterUnion(plan, baseUrl);
 
   try {
     if (tokenKey) {
+      if (await isLimitReached(limiters, tokenKey, consumeCount)) {
+        return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+      }
+
       const [, keyId] = tokenKey.split('_');
       const tokenKeyValue = parseInt(keyId, 10);
       const now = dayjs.utc().toISOString();
@@ -204,6 +217,10 @@ const useFreePlan = async (
   }
 
   try {
+    if (await isLimitReached(limiters, key, consumeCount)) {
+      return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+    }
+
     await rateLimit.consume(key, consumeCount);
 
     return next();
@@ -281,6 +298,24 @@ const isValidToken = (apiKey: string): boolean => {
   return /^[A-F0-9]{32}$/i.test(apiKey);
 };
 
+const isLimitReached = async (
+  limiters: RateLimiterRedis[],
+  key: number | string,
+  points: number,
+) => {
+  const limits = await Promise.all(
+    limiters.map((limiter) => limiter.get(key).catch(() => null)),
+  );
+
+  for (const limit of limits) {
+    if (limit && limit.remainingPoints < points) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
   const pointsMinute = plan.limit_per_minute;
   const pointsDay = plan.limit_per_day;
@@ -306,14 +341,20 @@ const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
   });
 
   if (baseUrl === SEARCH_PATH) {
-    return new RateLimiterUnion(minuteRateLimiter, dayRateLimiter);
+    return {
+      limiters: [minuteRateLimiter, dayRateLimiter],
+      rateLimit: new RateLimiterUnion(minuteRateLimiter, dayRateLimiter),
+    };
   }
 
-  return new RateLimiterUnion(
-    minuteRateLimiter,
-    dayRateLimiter,
-    monthRateLimiter,
-  );
+  return {
+    limiters: [minuteRateLimiter, dayRateLimiter, monthRateLimiter],
+    rateLimit: new RateLimiterUnion(
+      minuteRateLimiter,
+      dayRateLimiter,
+      monthRateLimiter,
+    ),
+  };
 };
 
 const getTokenKey = (id: number, kId: number) => `${id}_${kId}`;
