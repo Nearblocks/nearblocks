@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { Link, routing, useIntlRouter } from '@/i18n/routing';
-import { rpcSearch } from '@/utils/app/rpc';
+import { rpcSearchClient } from '@/utils/app/rpcClient';
 import { localFormat, shortenAddress, shortenHex } from '@/utils/libs';
 import { NetworkId, SearchResult, SearchRoute } from '@/utils/types';
 
@@ -289,13 +289,13 @@ const BaseSearch = ({
           return;
         }
         if (indexers?.base && !indexers?.base?.sync) {
-          const rpcData = await rpcSearch(keyword);
+          const rpcData = await rpcSearchClient(keyword);
           if (!isActive) return;
           if (filter !== '/tokens' && isActive) {
             setResult(rpcData?.data ?? {});
           }
         } else {
-          const fallbackRpcData = await rpcSearch(keyword);
+          const fallbackRpcData = await rpcSearchClient(keyword);
           if (!isActive) return;
           if (filter !== '/tokens' && isActive) {
             setResult(fallbackRpcData?.data ?? {});
@@ -482,7 +482,7 @@ const BaseSearch = ({
       isSubmittingRef.current = false;
       return redirect(route);
     } else {
-      const rpcData = await rpcSearch(query);
+      const rpcData = await rpcSearchClient(query);
       const rpcRoute = rpcData?.data && getSearchRoute(rpcData?.data);
       if (rpcRoute) {
         await setSearchResults(query, filter, rpcData.data);
