@@ -464,12 +464,52 @@ const useRpc = () => {
     };
   };
 
+  const getContractCode = async (rpcUrl: string, accountId: string) => {
+    try {
+      const { data, statusCode, error } = await fetchJsonRpc(rpcUrl, {
+        request_type: 'view_code',
+        finality: 'final',
+        account_id: accountId,
+      });
+
+      if (statusCode !== 200 || !data?.result?.code_base64) {
+        console.error('Error fetching contract code:', error);
+        return null;
+      }
+
+      const codeBase64 = data.result.code_base64;
+      const hash = data.result.hash;
+      if (
+        !codeBase64 ||
+        typeof codeBase64 !== 'string' ||
+        codeBase64.length === 0
+      ) {
+        console.error('Invalid code_base64 in response');
+        return null;
+      }
+
+      if (!hash || typeof hash !== 'string' || hash.length === 0) {
+        console.error('Invalid hash in response');
+        return null;
+      }
+
+      return {
+        codeBase64,
+        codeHash: hash,
+      };
+    } catch (fetchError) {
+      console.error('Error fetching contract code:', fetchError);
+      return null;
+    }
+  };
+
   return {
     ftBalanceOf,
     ftMetadata,
     getAccount,
     getAccounts,
     getBlockDetails,
+    getContractCode,
     getContractMetadata,
     getFieldsByPool,
     getNumberOfAccounts,
