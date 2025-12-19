@@ -4,9 +4,7 @@ import config from '#config';
 import { server } from '#libs/http';
 import { dbRead, dbWrite } from '#libs/knex';
 import sentry from '#libs/sentry';
-// import { syncData } from '#services/stream';
-// Temp batch processing
-import { syncData } from '#services/tempStream';
+import { syncData } from '#services/stream';
 
 (async () => {
   try {
