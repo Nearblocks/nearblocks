@@ -4,15 +4,14 @@ import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 
 const txns = v.object({
   account: v.optional(v.string()),
-  after_ts: tsSchema,
   before_ts: tsSchema,
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const count = v.object({
   account: v.optional(v.string()),
-  after_ts: tsSchema,
   before_ts: tsSchema,
 });
 
@@ -21,8 +20,8 @@ const cursor = v.object({
   timestamp: v.string(),
 });
 
-export type McTxnsReq = v.InferOutput<typeof txns>;
-export type McTxnsCountReq = v.InferOutput<typeof count>;
-export type McTxnsCursor = v.InferOutput<typeof cursor>;
+export type MCTxnsReq = v.InferOutput<typeof txns>;
+export type MCTxnCountReq = v.InferOutput<typeof count>;
+export type MCTxnsCursor = v.InferOutput<typeof cursor>;
 
 export default { count, cursor, txns };

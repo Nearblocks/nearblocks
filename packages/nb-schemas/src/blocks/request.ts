@@ -10,8 +10,9 @@ const latest = v.object({
 });
 
 const blocks = v.object({
-  cursor: cursorSchema,
   limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
 });
 
 const block = v.object({

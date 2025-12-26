@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "strictNullChecks": true,
+    "strict": true
+  },
+  "exclude": ["node_modules"],
+  "extends": "nb-tsconfig/nextjs.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+}

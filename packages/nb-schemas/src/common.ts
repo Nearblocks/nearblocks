@@ -18,7 +18,8 @@ export const responseError = v.object({
 });
 
 export const responseMeta = v.object({
-  cursor: v.optional(v.string()),
+  next_page: v.optional(v.string()),
+  prev_page: v.optional(v.string()),
 });
 
 export type ResponseData<T> = T extends v.BaseSchema<
@@ -43,8 +44,8 @@ export const jsonSchema: v.GenericSchema<JsonData> = v.lazy(() =>
     v.number(),
     v.boolean(),
     v.null(),
-    v.record(v.string(), jsonSchema),
     v.array(jsonSchema),
+    v.record(v.string(), jsonSchema),
   ]),
 );
 
