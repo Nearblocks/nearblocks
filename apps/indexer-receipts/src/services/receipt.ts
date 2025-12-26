@@ -307,7 +307,7 @@ const fetchTxnHashesFromDB = async (
   blockTimestamp: string,
   receiptOrDataIds: string[],
 ) => {
-  const timestamp = String(BigInt(blockTimestamp) - 259_200_000_000_000n); // 6 months in ns
+  const timestamp = String(BigInt(blockTimestamp) - 15_552_000_000_000_000n); // 6 months in ns
   const txnHashes: Map<string, string> = new Map();
   const receiptInputs = await knex('action_receipt_input_data')
     .innerJoin(
