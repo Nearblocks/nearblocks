@@ -13,6 +13,7 @@ jobs:
             api,
             api-user,
             app,
+            frontend,
             backend,
             indexer-balance,
             indexer-base,
