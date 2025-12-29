@@ -1,0 +1,1599 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+:root {
+  --color-white-50: oklch(1 0 0 / 0.05);
+  --color-white-100: oklch(1 0 0 / 0.1);
+  --color-white-200: oklch(1 0 0 / 0.2);
+  --color-white-500: oklch(1 0 0 / 0.5);
+  --color-white-950: oklch(1 0 0);
+
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
+
+  --color-teal-50: #effdfa;
+  --color-teal-100: #cbfbf1;
+  --color-teal-200: #98f6e4;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #15b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0e766e;
+  --color-teal-800: #0f5e59;
+  --color-teal-900: #124e4a;
+  --color-teal-950: #042f2e;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fbd44c;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0c;
+  --color-amber-600: #d97708;
+  --color-amber-700: #b4540a;
+  --color-amber-800: #92400d;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451b03;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e1;
+  --color-red-200: #fecaca;
+  --color-red-300: #fda5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2625;
+  --color-red-700: #b91c1b;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1c1d;
+  --color-red-950: #450a0a;
+
+  --color-gray-background: #f5f5f5;
+  --color-gray-foreground: #0a0a0a;
+  --color-teal-background: #0f5e591a;
+  --color-teal-foreground: #0f5e59;
+  --color-red-background: #dc26251a;
+  --color-red-foreground: #dc2625;
+  --color-amber-background: #d977061a;
+  --color-amber-foreground: #d97706;
+  --color-blue-background: #0891b21a;
+  --color-blue-foreground: #0891b2;
+  --color-purple-background: #7c3aed1a;
+  --color-purple-foreground: #7c3aed;
+  --color-pink-background: #db27771a;
+  --color-pink-foreground: #db2777;
+  --color-lime-background: #65a30d1a;
+  --color-lime-foreground: #65a30d;
+
+  --background: var(--color-neutral-100);
+  --foreground: var(--color-neutral-950);
+  --card: var(--color-white-950);
+  --card-foreground: var(--color-neutral-950);
+  --popover: var(--color-white-950);
+  --popover-foreground: var(--color-neutral-950);
+  --primary: var(--color-teal-800);
+  --primary-foreground: var(--color-neutral-50);
+  --secondary: var(--color-neutral-100);
+  --secondary-foreground: var(--color-neutral-950);
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --accent: var(--color-neutral-100);
+  --accent-foreground: var(--color-neutral-900);
+  --destructive: var(--color-red-600);
+  --constructive: var(--color-teal-500);
+  --border: var(--color-neutral-200);
+  --border-secondary: var(--color-neutral-100);
+  --input: var(--color-neutral-200);
+  --ring: var(--color-teal-800);
+  --link: var(--color-teal-800);
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --color-gray-background: #262626;
+  --color-gray-foreground: #d4d4d4;
+  --color-teal-background: #15b8a61a;
+  --color-teal-foreground: #15B8A6;
+  --color-red-background: #ff68681a;
+  --color-red-foreground: #ff6868;
+  --color-amber-background: #ffa63e1a;
+  --color-amber-foreground: #ffa63e;
+  --color-blue-background: #28cbf31a;
+  --color-blue-foreground: #28cbf3;
+  --color-purple-background: #c19dff1a;
+  --color-purple-foreground: #c19dff;
+  --color-pink-background: #ff5fa61a;
+  --color-pink-foreground: #ff5fa6;
+  --color-lime-background: #b4f35a1a;
+  --color-lime-foreground: #b4f35a;
+
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: var(--color-teal-600);
+  --primary-foreground: var(--color-neutral-50);
+  --secondary: var(--color-neutral-700);
+  --secondary-foreground: var(--color-neutral-50);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-neutral-600);
+  --accent-foreground: var(--color-neutral-50);
+  --destructive: var(--color-red-500);
+  --constructive: var(--color-teal-400);
+  --border: var(--color-neutral-700);
+  --border-secondary: var(--color-neutral-800);
+  --input: var(--color-neutral-700);
+  --ring: var(--color-teal-400);
+  --link: var(--color-teal-400);
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+
+  --text-*: initial;
+  --text-headline-xs: 0.75rem;
+  --text-headline-xs--line-height: 120%;
+  --text-headline-xs--font-weight: 500;
+  --text-headline-sm: 0.875rem;
+  --text-headline-sm--line-height: 120%;
+  --text-headline-sm--font-weight: 500;
+  --text-headline-base: 1rem;
+  --text-headline-base--line-height: 120%;
+  --text-headline-base--font-weight: 500;
+  --text-headline-lg: 1.125rem;
+  --text-headline-lg--line-height: 120%;
+  --text-headline-lg--font-weight: 500;
+  --text-headline-xl: 1.25rem;
+  --text-headline-xl--line-height: 120%;
+  --text-headline-xl--font-weight: 500;
+  --text-headline-2xl: 1.5rem;
+  --text-headline-2xl--line-height: 120%;
+  --text-headline-2xl--font-weight: 500;
+  --text-headline-3xl: 2rem;
+  --text-headline-3xl--line-height: 120%;
+  --text-headline-3xl--font-weight: 700;
+  --text-headline-4xl: 2.5rem;
+  --text-headline-4xl--line-height: 120%;
+  --text-headline-4xl--font-weight: 700;
+  --text-headline-5xl: 3rem;
+  --text-headline-5xl--line-height: 120%;
+  --text-headline-5xl--font-weight: 700;
+  --text-body-xs: 0.75rem;
+  --text-body-xs--line-height: 160%;
+  --text-body-xs--font-weight: 400;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 160%;
+  --text-body-sm--font-weight: 400;
+  --text-body-base: 1rem;
+  --text-body-base--line-height: 160%;
+  --text-body-base--font-weight: 400;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 160%;
+  --text-body-lg--font-weight: 400;
+  --text-body-xl: 1.25rem;
+  --text-body-xl--line-height: 160%;
+  --text-body-xl--font-weight: 400;
+
+  --color-*: initial;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-constructive: var(--constructive);
+  --color-border: var(--border);
+  --color-border-secondary: var(--border-secondary);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-link: var(--link);
+
+  --color-white-50: var(--color-white-50);
+  --color-white-100: var(--color-white-100);
+  --color-white-200: var(--color-white-200);
+  --color-white-500: var(--color-white-500);
+  --color-white-950: var(--color-white-950);
+
+  --color-neutral-50: var(--color-neutral-50);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-300: var(--color-neutral-300);
+  --color-neutral-400: var(--color-neutral-400);
+  --color-neutral-500: var(--color-neutral-500);
+  --color-neutral-600: var(--color-neutral-600);
+  --color-neutral-700: var(--color-neutral-700);
+  --color-neutral-800: var(--color-neutral-800);
+  --color-neutral-900: var(--color-neutral-900);
+  --color-neutral-950: var(--color-neutral-950);
+
+  --color-teal-50: var(--color-teal-50);
+  --color-teal-100: var(--color-teal-100);
+  --color-teal-200: var(--color-teal-200);
+  --color-teal-300: var(--color-teal-300);
+  --color-teal-400: var(--color-teal-400);
+  --color-teal-500: var(--color-teal-500);
+  --color-teal-600: var(--color-teal-600);
+  --color-teal-700: var(--color-teal-700);
+  --color-teal-800: var(--color-teal-800);
+  --color-teal-900: var(--color-teal-900);
+  --color-teal-950: var(--color-teal-950);
+
+  --color-amber-50: var(--color-amber-50);
+  --color-amber-100: var(--color-amber-100);
+  --color-amber-200: var(--color-amber-200);
+  --color-amber-300: var(--color-amber-300);
+  --color-amber-400: var(--color-amber-400);
+  --color-amber-500: var(--color-amber-500);
+  --color-amber-600: var(--color-amber-600);
+  --color-amber-700: var(--color-amber-700);
+  --color-amber-800: var(--color-amber-800);
+  --color-amber-900: var(--color-amber-900);
+  --color-amber-950: var(--color-amber-950);
+
+  --color-red-50: var(--color-red-50);
+  --color-red-100: var(--color-red-100);
+  --color-red-200: var(--color-red-200);
+  --color-red-300: var(--color-red-300);
+  --color-red-400: var(--color-red-400);
+  --color-red-500: var(--color-red-500);
+  --color-red-600: var(--color-red-600);
+  --color-red-700: var(--color-red-700);
+  --color-red-800: var(--color-red-800);
+  --color-red-900: var(--color-red-900);
+  --color-red-950: var(--color-red-950);
+
+  --color-gray-background: var(--color-gray-background);
+  --color-gray-foreground: var(--color-gray-foreground);
+  --color-teal-background: var(--color-teal-background);
+  --color-teal-foreground: var(--color-teal-foreground);
+  --color-red-background: var(--color-red-background);
+  --color-red-foreground: var(--color-red-foreground);
+  --color-amber-background: var(--color-amber-background);
+  --color-amber-foreground: var(--color-amber-foreground);
+  --color-blue-background: var(--color-blue-background);
+  --color-blue-foreground: var(--color-blue-foreground);
+  --color-purple-background: var(--color-purple-background);
+  --color-purple-foreground: var(--color-purple-foreground);
+  --color-pink-background: var(--color-pink-background);
+  --color-pink-foreground: var(--color-pink-foreground);
+  --color-lime-background: var(--color-lime-background);
+  --color-lime-foreground: var(--color-lime-foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@utility container {
+  width: 100%;
+  max-width: initial;
+
+  @media (width >= 80rem) {
+    max-width: 85rem;
+  }
+
+  @media (width >= 96rem) {
+    max-width: 96rem;
+  }
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/* https://code.highcharts.com/css/highcharts.css */
+:root,
+.highcharts-light {
+    /* Colors for data series and points */
+    --highcharts-color-0: var(--color-teal-foreground);
+    --highcharts-color-1: var(--color-purple-foreground);
+    --highcharts-color-2: var(--color-lime-foreground);
+    --highcharts-color-3: var(--color-amber-foreground);
+    --highcharts-color-4: var(--color-blue-foreground);
+    --highcharts-color-5: var(--color-pink-foreground);
+    --highcharts-color-6: var(--color-gray-foreground);
+    --highcharts-color-7: var(--color-red-foreground);
+
+    /* Chart background, point stroke for markers and columns etc */
+    --highcharts-background-color: var(--card);
+
+    /*
+    Neutral colors, grayscale by default. The default colors are defined by
+    mixing the background-color with neutral, with a weight corresponding to
+    the number in the name.
+
+    https://www.highcharts.com/samples/highcharts/css/palette-helper
+    */
+
+    /* Strong text. */
+    --highcharts-neutral-color-100: #000000;
+
+    /* Main text, axis labels and some strokes. */
+    --highcharts-neutral-color-80: #333333;
+
+    /* Axis title, connector fallback. */
+    --highcharts-neutral-color-60: #666666;
+
+    /* Credits text, export menu stroke. */
+    --highcharts-neutral-color-40: #999999;
+
+    /* Disabled texts, button strokes, crosshair etc. */
+    --highcharts-neutral-color-20: #cccccc;
+
+    /* Grid lines etc. */
+    --highcharts-neutral-color-10: #e6e6e6;
+
+    /* Minor grid lines etc. */
+    --highcharts-neutral-color-5: #f2f2f2;
+
+    /* Tooltip background, button fills, map null points. */
+    --highcharts-neutral-color-3: #f7f7f7;
+
+    /*
+    Highlights, shades of blue by default
+    */
+
+    /* Drilldown clickable labels, color axis max color. */
+    --highcharts-highlight-color-100: #0022ff;
+
+    /* Selection marker, menu hover, button hover, chart border, navigator
+    series. */
+    --highcharts-highlight-color-80: #334eff;
+
+    /* Navigator mask fill. */
+    --highcharts-highlight-color-60: #667aff;
+
+    /* Ticks and axis line. */
+    --highcharts-highlight-color-20: #ccd3ff;
+
+    /* Pressed button, color axis min color. */
+    --highcharts-highlight-color-10: #e6e9ff;
+
+    /* Indicators */
+    --highcharts-positive-color: #06b535;
+    --highcharts-negative-color: #f21313;
+
+    /* Transparent colors for annotations */
+    --highcharts-annotation-color-0: rgba(130, 170, 255, 0.4);
+    --highcharts-annotation-color-1: rgba(139, 191, 216, 0.4);
+    --highcharts-annotation-color-2: rgba(150, 216, 192, 0.4);
+    --highcharts-annotation-color-3: rgba(156, 229, 161, 0.4);
+    --highcharts-annotation-color-4: rgba(162, 241, 130, 0.4);
+    --highcharts-annotation-color-5: rgba(169, 255, 101, 0.4);
+}
+
+.highcharts-dark {
+    /* Colors for data series and points */
+    --highcharts-color-0: var(--color-teal-foreground);
+    --highcharts-color-1: var(--color-purple-foreground);
+    --highcharts-color-2: var(--color-lime-foreground);
+    --highcharts-color-3: var(--color-amber-foreground);
+    --highcharts-color-4: var(--color-blue-foreground);
+    --highcharts-color-5: var(--color-pink-foreground);
+    --highcharts-color-6: var(--color-gray-foreground);
+    --highcharts-color-7: var(--color-red-foreground);
+
+    /* UI colors */
+    --highcharts-background-color: var(--card);
+
+    /* Neutral color variations */
+    --highcharts-neutral-color-100: #ffffff;
+    --highcharts-neutral-color-80: #d0d0d0;
+    --highcharts-neutral-color-60: #a1a1a1;
+    --highcharts-neutral-color-40: #727272;
+    --highcharts-neutral-color-20: #434343;
+    --highcharts-neutral-color-10: #2c2c2c;
+    --highcharts-neutral-color-5: #202020;
+    --highcharts-neutral-color-3: #1b1b1b;
+
+    /* Highlight color variations */
+    --highcharts-highlight-color-100: #2caffe;
+    --highcharts-highlight-color-80: #2790cf;
+    --highcharts-highlight-color-60: #2271a0;
+    --highcharts-highlight-color-20: #193343;
+    --highcharts-highlight-color-10: #16242b;
+}
+
+.highcharts-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    line-height: normal;
+    z-index: 0; /* #1072 */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    user-select: none;
+    touch-action: manipulation;
+    outline: none;
+}
+
+.highcharts-no-touch-action {
+    touch-action: none;
+}
+
+.highcharts-root {
+    display: block;
+}
+
+.highcharts-root text {
+    stroke-width: 0;
+}
+
+.highcharts-strong {
+    font-weight: bold;
+}
+
+.highcharts-emphasized {
+    font-style: italic;
+}
+
+.highcharts-anchor {
+    cursor: pointer;
+}
+
+.highcharts-background {
+    fill: var(--highcharts-background-color);
+}
+
+.highcharts-plot-border,
+.highcharts-plot-background {
+    fill: none;
+}
+
+.highcharts-label-box {
+    fill: none;
+}
+
+.highcharts-label text {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 0.8em;
+}
+
+.highcharts-button-box {
+    fill: inherit;
+}
+
+.highcharts-tracker-line {
+    stroke-linejoin: round;
+    stroke: rgba(192, 192, 192, 0.0001);
+    stroke-width: 22;
+    fill: none;
+}
+
+.highcharts-tracker-area {
+    fill: rgba(192, 192, 192, 0.0001);
+    stroke-width: 0;
+}
+
+/* Titles */
+.highcharts-title {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.highcharts-subtitle {
+    fill: var(--highcharts-neutral-color-60);
+    font-size: 0.8em;
+}
+
+/* Axes */
+.highcharts-axis-line {
+    fill: none;
+    stroke: var(--highcharts-neutral-color-80);
+}
+
+.highcharts-yaxis .highcharts-axis-line {
+    stroke-width: 0;
+}
+
+.highcharts-axis-title {
+    fill: var(--highcharts-neutral-color-60);
+    font-size: 0.8em;
+}
+
+.highcharts-axis-labels {
+    fill: var(--highcharts-neutral-color-80);
+    cursor: default;
+    font-size: 0.8em;
+}
+
+.highcharts-grid-line {
+    fill: none;
+    stroke: var(--highcharts-neutral-color-10);
+}
+
+.highcharts-xaxis-grid .highcharts-grid-line {
+    stroke-width: 0;
+}
+
+.highcharts-tick {
+    stroke: var(--highcharts-neutral-color-80);
+}
+
+.highcharts-yaxis .highcharts-tick {
+    stroke-width: 0;
+}
+
+.highcharts-minor-grid-line {
+    stroke: var(--highcharts-neutral-color-5);
+}
+
+.highcharts-crosshair-thin {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+.highcharts-crosshair-category {
+    stroke: var(--highcharts-highlight-color-20);
+    stroke-opacity: 0.25;
+}
+
+/* Credits */
+.highcharts-credits {
+    cursor: pointer;
+    fill: var(--highcharts-neutral-color-40);
+    font-size: 0.6em;
+    transition: fill 250ms, font-size 250ms;
+}
+
+.highcharts-credits:hover {
+    fill: var(--highcharts-neutral-color-100);
+    font-size: 0.7em;
+}
+
+/* Tooltip */
+.highcharts-tooltip {
+    cursor: default;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: stroke 150ms;
+}
+
+.highcharts-tooltip .highcharts-tracker {
+    fill: none;
+    stroke: none;
+}
+
+.highcharts-tooltip text,
+.highcharts-tooltip foreignObject span {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 0.8em;
+}
+
+.highcharts-tooltip .highcharts-header {
+    font-size: 0.8em;
+}
+
+.highcharts-tooltip-box {
+    stroke-width: 0;
+    fill: var(--highcharts-background-color);
+}
+
+.highcharts-tooltip-box .highcharts-label-box {
+    fill: var(--highcharts-background-color);
+}
+
+div.highcharts-tooltip {
+    filter: none;
+    font-size: 0.8em;
+}
+
+.highcharts-selection-marker {
+    fill: var(--highcharts-highlight-color-80);
+    fill-opacity: 0.25;
+}
+
+.highcharts-graph {
+    fill: none;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.highcharts-empty-series {
+    stroke-width: 1px;
+    fill: none;
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+.highcharts-state-hover .highcharts-graph {
+    stroke-width: 3;
+}
+
+.highcharts-point-inactive {
+    opacity: 0.2;
+    transition: opacity 50ms; /* quick in */
+}
+
+.highcharts-series-inactive {
+    opacity: 0.2;
+    transition: opacity 50ms; /* quick in */
+}
+
+.highcharts-state-hover path {
+    transition: stroke-width 50ms; /* quick in */
+}
+
+.highcharts-state-normal path {
+    transition: stroke-width 250ms; /* slow out */
+}
+
+/* Legend hover affects points and series */
+g.highcharts-series,
+.highcharts-point,
+.highcharts-markers,
+.highcharts-data-labels {
+    transition: opacity 250ms;
+}
+
+.highcharts-legend-series-active g.highcharts-series:not(.highcharts-series-hover),
+.highcharts-legend-point-active .highcharts-point:not(.highcharts-point-hover, .highcharts-point-select),
+.highcharts-legend-series-active .highcharts-markers:not(.highcharts-series-hover),
+.highcharts-legend-series-active .highcharts-data-labels:not(.highcharts-series-hover) {
+    opacity: 0.2;
+}
+
+/* Series options */
+
+/* Default colors */
+.highcharts-color-0 {
+    fill: var(--highcharts-color-0);
+    stroke: var(--highcharts-color-0);
+}
+
+.highcharts-color-1 {
+    fill: var(--highcharts-color-1);
+    stroke: var(--highcharts-color-1);
+}
+
+.highcharts-color-2 {
+    fill: var(--highcharts-color-2);
+    stroke: var(--highcharts-color-2);
+}
+
+.highcharts-color-3 {
+    fill: var(--highcharts-color-3);
+    stroke: var(--highcharts-color-3);
+}
+
+.highcharts-color-4 {
+    fill: var(--highcharts-color-4);
+    stroke: var(--highcharts-color-4);
+}
+
+.highcharts-color-5 {
+    fill: var(--highcharts-color-5);
+    stroke: var(--highcharts-color-5);
+}
+
+.highcharts-color-6 {
+    fill: var(--highcharts-color-6);
+    stroke: var(--highcharts-color-6);
+}
+
+.highcharts-color-7 {
+    fill: var(--highcharts-color-7);
+    stroke: var(--highcharts-color-7);
+}
+
+.highcharts-color-8 {
+    fill: var(--highcharts-color-8);
+    stroke: var(--highcharts-color-8);
+}
+
+.highcharts-color-9 {
+    fill: var(--highcharts-color-9);
+    stroke: var(--highcharts-color-9);
+}
+
+/* Various series-specific */
+.highcharts-area {
+    fill-opacity: 0.75;
+    stroke-width: 0;
+}
+
+.highcharts-markers {
+    stroke-width: 1px;
+    stroke: var(--highcharts-background-color);
+}
+
+.highcharts-a11y-markers-hidden .highcharts-point:not(.highcharts-point-hover, .highcharts-a11y-marker-visible),
+.highcharts-a11y-marker-hidden {
+    opacity: 0;
+}
+
+.highcharts-point {
+    stroke-width: 1px;
+}
+
+.highcharts-dense-data .highcharts-point {
+    stroke-width: 0;
+}
+
+.highcharts-data-label text,
+.highcharts-data-label span,
+text.highcharts-data-label {
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
+.highcharts-data-label-box {
+    fill: none;
+    stroke-width: 0;
+}
+
+.highcharts-data-label text,
+text.highcharts-data-label {
+    fill: var(--highcharts-neutral-color-80);
+}
+
+.highcharts-data-label-connector {
+    fill: none;
+}
+
+.highcharts-data-label-hidden {
+    pointer-events: none;
+}
+
+.highcharts-halo {
+    fill-opacity: 0.25;
+    stroke-width: 0;
+}
+
+.highcharts-series-label text {
+    fill: inherit;
+    font-weight: bold;
+}
+
+.highcharts-series:not(.highcharts-pie-series) .highcharts-point-select,
+.highcharts-markers .highcharts-point-select {
+    fill: var(--highcharts-neutral-color-20);
+    stroke: var(--highcharts-neutral-color-100);
+}
+
+.highcharts-column-series path.highcharts-point,
+.highcharts-bar-series path.highcharts-point {
+    /* path to prevent stroke on 3D columns and bars */
+    stroke: var(--highcharts-background-color);
+}
+
+.highcharts-column-series .highcharts-point,
+.highcharts-bar-series .highcharts-point {
+    transition: fill-opacity 250ms;
+}
+
+.highcharts-column-series .highcharts-point-hover,
+.highcharts-bar-series .highcharts-point-hover {
+    fill-opacity: 0.75;
+    transition: fill-opacity 50ms;
+}
+
+.highcharts-pie-series .highcharts-point {
+    stroke-linejoin: round;
+    stroke: var(--highcharts-background-color);
+}
+
+.highcharts-pie-series .highcharts-point-hover {
+    fill-opacity: 0.75;
+    transition: fill-opacity 50ms;
+}
+
+.highcharts-funnel-series .highcharts-point {
+    stroke-linejoin: round;
+    stroke: var(--highcharts-background-color);
+}
+
+.highcharts-funnel-series .highcharts-point-hover {
+    fill-opacity: 0.75;
+    transition: fill-opacity 50ms;
+}
+
+.highcharts-funnel-series .highcharts-point-select {
+    fill: inherit;
+    stroke: inherit;
+}
+
+.highcharts-pyramid-series .highcharts-point {
+    stroke-linejoin: round;
+    stroke: var(--highcharts-background-color);
+}
+
+.highcharts-pyramid-series .highcharts-point-hover {
+    fill-opacity: 0.75;
+    transition: fill-opacity 50ms;
+}
+
+.highcharts-pyramid-series .highcharts-point-select {
+    fill: inherit;
+    stroke: inherit;
+}
+
+.highcharts-solidgauge-series .highcharts-point {
+    stroke-width: 0;
+}
+
+.highcharts-treemap-series .highcharts-point {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-10);
+    transition: stroke 250ms, fill 250ms, fill-opacity 250ms;
+}
+
+.highcharts-treemap-series .highcharts-point-hover {
+    stroke: var(--highcharts-neutral-color-40);
+    transition: stroke 25ms, fill 25ms, fill-opacity 25ms;
+}
+
+.highcharts-treemap-series .highcharts-above-level {
+    display: none;
+}
+
+.highcharts-treemap-series .highcharts-internal-node {
+    fill: none;
+}
+
+.highcharts-treemap-series .highcharts-internal-node-interactive {
+    fill-opacity: 0.15;
+    cursor: pointer;
+}
+
+.highcharts-treemap-series .highcharts-internal-node-interactive:hover {
+    fill-opacity: 0.75;
+}
+
+.highcharts-vector-series .highcharts-point {
+    fill: none;
+    stroke-width: 2px;
+}
+
+.highcharts-windbarb-series .highcharts-point {
+    fill: none;
+    stroke-width: 2px;
+}
+
+.highcharts-lollipop-stem {
+    stroke: var(--highcharts-neutral-color-100);
+}
+
+.highcharts-focus-border {
+    fill: none;
+    stroke-width: 2px;
+}
+
+.highcharts-legend-item-hidden .highcharts-focus-border {
+    fill: none !important;
+}
+
+/* Legend */
+.highcharts-legend-box {
+    fill: none;
+    stroke-width: 0;
+}
+
+.highcharts-legend-item > text,
+.highcharts-legend-item span {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 0.8em;
+    cursor: pointer;
+    stroke-width: 0;
+}
+
+.highcharts-legend-item:hover text {
+    fill: var(--highcharts-neutral-color-100);
+}
+
+.highcharts-legend-item-hidden * {
+    fill: var(--highcharts-neutral-color-60) !important;
+    stroke: var(--highcharts-neutral-color-60) !important;
+    transition: fill 250ms;
+    text-decoration: line-through;
+}
+
+.highcharts-legend-nav-active {
+    fill: var(--highcharts-highlight-color-100);
+    cursor: pointer;
+}
+
+.highcharts-legend-nav-inactive {
+    fill: var(--highcharts-neutral-color-20);
+}
+
+circle.highcharts-legend-nav-active,
+circle.highcharts-legend-nav-inactive { /* tracker */
+    fill: rgba(192, 192, 192, 0.0001);
+}
+
+.highcharts-legend-title-box {
+    fill: none;
+    stroke-width: 0;
+}
+
+/* Bubble legend */
+.highcharts-bubble-legend-symbol {
+    stroke-width: 2;
+    fill-opacity: 0.5;
+}
+
+.highcharts-bubble-legend-connectors {
+    stroke-width: 1;
+}
+
+.highcharts-bubble-legend-labels {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 0.7em;
+}
+
+/* Loading */
+.highcharts-loading {
+    position: absolute;
+    background-color: var(--highcharts-background-color);
+    opacity: 0.5;
+    text-align: center;
+    z-index: 10;
+    transition: opacity 250ms;
+}
+
+.highcharts-loading-hidden {
+    height: 0 !important;
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity 250ms, height 250ms step-end;
+}
+
+.highcharts-loading-inner {
+    font-weight: bold;
+    position: relative;
+    top: 45%;
+}
+
+/* Plot bands and polar pane backgrounds */
+.highcharts-plot-band,
+.highcharts-pane {
+    fill: var(--highcharts-neutral-color-100);
+    fill-opacity: 0.05;
+}
+
+.highcharts-plot-line {
+    fill: none;
+    stroke: var(--highcharts-neutral-color-40);
+    stroke-width: 1px;
+}
+
+.highcharts-plot-line-label {
+    font-size: 0.8em;
+}
+
+/* Highcharts More and modules */
+.highcharts-boxplot-box {
+    fill: var(--highcharts-background-color);
+}
+
+.highcharts-boxplot-median {
+    stroke-width: 2px;
+}
+
+.highcharts-bubble-series .highcharts-point {
+    fill-opacity: 0.5;
+}
+
+.highcharts-errorbar-series .highcharts-point {
+    stroke: var(--highcharts-neutral-color-100);
+}
+
+.highcharts-gauge-series .highcharts-data-label-box {
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 1px;
+}
+
+.highcharts-gauge-series .highcharts-dial {
+    fill: var(--highcharts-neutral-color-100);
+    stroke-width: 0;
+}
+
+.highcharts-polygon-series .highcharts-graph {
+    fill: inherit;
+    stroke-width: 0;
+}
+
+.highcharts-waterfall-series .highcharts-graph {
+    stroke: var(--highcharts-neutral-color-80);
+    stroke-dasharray: 1, 3;
+}
+
+.highcharts-sankey-series .highcharts-point {
+    stroke-width: 0;
+}
+
+.highcharts-sankey-series .highcharts-link {
+    transition: fill 250ms, fill-opacity 250ms;
+    fill-opacity: 0.5;
+}
+
+.highcharts-sankey-series .highcharts-point-hover.highcharts-link {
+    transition: fill 50ms, fill-opacity 50ms;
+    fill-opacity: 1;
+}
+
+.highcharts-venn-series .highcharts-point {
+    fill-opacity: 0.75;
+    stroke: var(--highcharts-neutral-color-20);
+    transition: stroke 250ms, fill-opacity 250ms;
+}
+
+.highcharts-venn-series .highcharts-point-hover {
+    fill-opacity: 1;
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+.highcharts-timeline-series .highcharts-graph {
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+/* Highstock */
+.highcharts-navigator-mask-outside {
+    fill-opacity: 0;
+}
+
+.highcharts-navigator-mask-inside {
+    fill: var(--highcharts-highlight-color-60); /* navigator.maskFill option */
+    fill-opacity: 0.25;
+    cursor: ew-resize;
+}
+
+.highcharts-navigator-outline {
+    stroke: var(--highcharts-neutral-color-40);
+    fill: none;
+}
+
+.highcharts-navigator-handle {
+    stroke: var(--highcharts-neutral-color-40);
+    fill: var(--highcharts-neutral-color-5);
+    cursor: ew-resize;
+}
+
+.highcharts-navigator-series {
+    fill: var(--highcharts-highlight-color-80);
+    stroke: var(--highcharts-highlight-color-80);
+}
+
+.highcharts-navigator-series .highcharts-graph {
+    stroke-width: 1px;
+}
+
+.highcharts-navigator-series .highcharts-area {
+    fill-opacity: 0.05;
+}
+
+.highcharts-navigator-xaxis .highcharts-axis-line {
+    stroke-width: 0;
+}
+
+.highcharts-navigator-xaxis .highcharts-grid-line {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-10);
+}
+
+.highcharts-navigator-xaxis.highcharts-axis-labels {
+    fill: var(--highcharts-neutral-color-100);
+    font-size: 0.7em;
+    opacity: 0.6;
+}
+
+.highcharts-navigator-yaxis .highcharts-grid-line {
+    stroke-width: 0;
+}
+
+.highcharts-scrollbar-thumb {
+    fill: var(--highcharts-neutral-color-20);
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 0;
+}
+
+.highcharts-scrollbar-button {
+    fill: var(--highcharts-neutral-color-10);
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 1px;
+}
+
+.highcharts-scrollbar-arrow {
+    fill: var(--highcharts-neutral-color-60);
+}
+
+.highcharts-scrollbar-rifles {
+    stroke: none;
+    stroke-width: 1px;
+}
+
+.highcharts-scrollbar-track {
+    fill: rgba(255, 255, 255, 0.001);
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 1px;
+}
+
+.highcharts-button {
+    fill: var(--highcharts-neutral-color-3);
+    stroke: var(--highcharts-neutral-color-20);
+    cursor: default;
+    stroke-width: 1px;
+    transition: fill 250ms;
+}
+
+.highcharts-button text {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 0.8em;
+}
+
+.highcharts-button-hover {
+    transition: fill 0ms;
+    fill: var(--highcharts-neutral-color-10);
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+.highcharts-button-hover text {
+    fill: var(--highcharts-neutral-color-80);
+}
+
+.highcharts-button-pressed {
+    font-weight: bold;
+    fill: var(--highcharts-highlight-color-10);
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+.highcharts-button-pressed text {
+    fill: var(--highcharts-neutral-color-80);
+    font-weight: bold;
+}
+
+.highcharts-button-disabled text {
+    fill: var(--highcharts-neutral-color-80);
+}
+
+.highcharts-range-selector-buttons .highcharts-button {
+    stroke-width: 0;
+}
+
+.highcharts-range-label rect {
+    fill: none;
+}
+
+.highcharts-range-label text {
+    fill: var(--highcharts-neutral-color-60);
+}
+
+.highcharts-range-input rect {
+    fill: none;
+}
+
+.highcharts-range-input text {
+    fill: var(--highcharts-neutral-color-80);
+    font-size: 0.8em;
+}
+
+.highcharts-range-input {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-20);
+}
+
+input.highcharts-range-selector {
+    position: absolute;
+    border: 0;
+    width: 1px; /* Chrome needs a pixel to see it */
+    height: 1px;
+    padding: 0;
+    text-align: center;
+    left: -9em; /* #4798 */
+}
+
+.highcharts-crosshair-label text {
+    fill: var(--highcharts-background-color);
+    font-size: 1.7em;
+}
+
+.highcharts-crosshair-label .highcharts-label-box {
+    fill: inherit;
+}
+
+.highcharts-candlestick-series .highcharts-point {
+    stroke: var(--highcharts-neutral-color-100);
+    stroke-width: 1px;
+}
+
+.highcharts-candlestick-series .highcharts-point-up {
+    fill: var(--highcharts-background-color);
+}
+
+.highcharts-renko-series .highcharts-point-down,
+.highcharts-hollowcandlestick-series .highcharts-point-down {
+    fill: var(--highcharts-negative-color);
+    stroke: var(--highcharts-negative-color);
+}
+
+.highcharts-renko-series .highcharts-point-up,
+.highcharts-hollowcandlestick-series .highcharts-point-down-bearish-up {
+    fill: var(--highcharts-positive-color);
+    stroke: var(--highcharts-positive-color);
+}
+
+.highcharts-hollowcandlestick-series .highcharts-point-up {
+    fill: transparent;
+    stroke: var(--highcharts-positive-color);
+}
+
+.highcharts-ohlc-series .highcharts-point-hover {
+    stroke-width: 3px;
+}
+
+.highcharts-flags-series .highcharts-point .highcharts-label-box {
+    stroke: var(--highcharts-neutral-color-40);
+    fill: var(--highcharts-background-color);
+    transition: fill 250ms;
+}
+
+.highcharts-flags-series .highcharts-point-hover .highcharts-label-box {
+    stroke: var(--highcharts-neutral-color-100);
+    fill: var(--highcharts-highlight-color-20);
+}
+
+.highcharts-flags-series .highcharts-point text {
+    fill: var(--highcharts-neutral-color-100);
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+/* Highcharts Maps */
+.highcharts-map-series .highcharts-point {
+    transition: fill 500ms, fill-opacity 500ms, stroke-width 250ms;
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: inherit;
+}
+
+.highcharts-map-series .highcharts-point-hover {
+    transition: fill 0ms, fill-opacity 0ms;
+    fill-opacity: 0.5;
+}
+
+.highcharts-mapline-series .highcharts-point {
+    fill: none;
+}
+
+.highcharts-heatmap-series .highcharts-point {
+    stroke-width: 0;
+}
+
+.highcharts-map-navigation {
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.highcharts-map-navigation.highcharts-button {
+    fill: var(--highcharts-background-color);
+    stroke: var(--highcharts-neutral-color-10);
+}
+
+.highcharts-map-navigation.highcharts-button:hover {
+    fill: var(--highcharts-neutral-color-10);
+}
+
+.highcharts-map-navigation.highcharts-button .highcharts-button-symbol {
+    stroke-width: 2px;
+}
+
+.highcharts-mapview-inset-border {
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 1px;
+    fill: none;
+}
+
+.highcharts-coloraxis {
+    stroke-width: 0;
+}
+
+.highcharts-coloraxis-marker {
+    fill: var(--highcharts-neutral-color-40);
+}
+
+.highcharts-null-point {
+    fill: var(--highcharts-neutral-color-3);
+}
+
+/* 3d charts */
+.highcharts-3d-frame {
+    fill: transparent;
+}
+
+/* Exporting module */
+.highcharts-contextbutton {
+    /* Fill is needed to capture hover */
+    fill: var(--highcharts-background-color);
+    stroke: none;
+    stroke-linecap: round;
+}
+
+.highcharts-contextbutton:hover {
+    fill: var(--highcharts-neutral-color-10);
+    stroke: var(--highcharts-neutral-color-10);
+}
+
+.highcharts-button-symbol {
+    stroke: var(--highcharts-neutral-color-60);
+    stroke-width: 3px;
+}
+
+.highcharts-menu {
+    border: none;
+    background: var(--highcharts-background-color);
+    border-radius: 3px;
+    padding: 0.5em;
+    box-shadow: 3px 3px 10px #888888;
+}
+
+.highcharts-menu-item {
+    background: none;
+    border-radius: 3px;
+    color: var(--highcharts-neutral-color-80);
+    cursor: pointer;
+    font-size: 0.8em;
+    list-style-type: none;
+    padding: 0.5em;
+    transition: background 250ms, color 250ms;
+}
+
+.highcharts-menu-item:hover {
+    background: var(--highcharts-neutral-color-5);
+}
+
+/* Breadcrumbs */
+.highcharts-breadcrumbs-button {
+    fill: none;
+    stroke-width: 0;
+    cursor: pointer;
+}
+
+.highcharts-breadcrumbs-separator {
+    fill: var(--highcharts-neutral-color-60);
+}
+
+/* Drilldown module */
+.highcharts-drilldown-point {
+    cursor: pointer;
+}
+
+.highcharts-drilldown-data-label text,
+text.highcharts-drilldown-data-label,
+.highcharts-drilldown-axis-label {
+    cursor: pointer;
+    fill: var(--highcharts-highlight-color-100);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* No-data module */
+.highcharts-no-data text {
+    font-weight: bold;
+    font-size: 0.8em;
+    fill: var(--highcharts-neutral-color-60);
+}
+
+/* Drag-panes module */
+.highcharts-axis-resizer {
+    cursor: ns-resize;
+    stroke: var(--highcharts-neutral-color-100);
+    stroke-width: 2px;
+}
+
+/* Bullet type series */
+.highcharts-bullet-target {
+    stroke-width: 0;
+}
+
+/* Lineargauge type series */
+.highcharts-lineargauge-target {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-80);
+}
+
+.highcharts-lineargauge-target-line {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-80);
+}
+
+/* Advanced annotations module */
+.highcharts-fibonacci-background-0,
+.highcharts-pitchfork-inner-background,
+.highcharts-measure-background {
+    fill: var(--highcharts-annotation-color-0);
+}
+
+.highcharts-fibonacci-background-1 {
+    fill: var(--highcharts-annotation-color-1);
+}
+
+.highcharts-fibonacci-background-2 {
+    fill: var(--highcharts-annotation-color-2);
+}
+
+.highcharts-fibonacci-background-3,
+.highcharts-pitchfork-outer-background {
+    fill: var(--highcharts-annotation-color-3);
+}
+
+.highcharts-fibonacci-background-4 {
+    fill: var(--highcharts-annotation-color-4);
+}
+
+.highcharts-fibonacci-background-5 {
+    fill: var(--highcharts-annotation-color-5);
+}
+
+.highcharts-fibonacci-line {
+    stroke: var(--highcharts-neutral-color-40);
+}
+
+.highcharts-crooked-lines,
+.highcharts-tunnel-lines,
+.highcharts-infinity-lines,
+.highcharts-timecycles-lines,
+.highcharts-fibonacci-timezones-lines,
+.highcharts-pitchfork-lines,
+.highcharts-vertical-line,
+.highcharts-measure-crosshair-x,
+.highcharts-measure-crosshair-y {
+    stroke: var(--highcharts-neutral-color-100);
+    stroke-opacity: 0.75;
+    fill: none;
+}
+
+.highcharts-measure-crosshair-x,
+.highcharts-measure-crosshair-y {
+    stroke-dasharray: 1, 3;
+}
+
+.highcharts-tunnel-background {
+    fill: var(--highcharts-color-0);
+}
+
+.highcharts-annotation-shapes {
+    cursor: move;
+}
+
+.highcharts-basic-shape {
+    fill: var(--highcharts-neutral-color-100);
+    stroke: var(--highcharts-neutral-color-100);
+    opacity: 0.74;
+}
+
+/* Annotations module */
+
+.highcharts-annotation-label-box {
+    stroke-width: 1px;
+    stroke: var(--highcharts-neutral-color-100);
+    fill: var(--highcharts-neutral-color-100);
+    fill-opacity: 0.75;
+}
+
+.highcharts-annotation-label text {
+    fill: var(--highcharts-neutral-color-10);
+    font-size: 0.8em;
+}
+
+/* A11y module */
+.highcharts-a11y-proxy-element {
+    border-width: 0;
+    background-color: transparent;
+    cursor: pointer;
+    outline: none;
+    opacity: 0.001;
+    z-index: 999;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: block;
+    position: absolute;
+}
+
+.highcharts-a11y-proxy-group li {
+    list-style: none;
+}
+
+.highcharts-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip: rect(1px, 1px, 1px, 1px);
+    margin-top: -3px;
+    opacity: 0.01;
+}
+
+.highcharts-a11y-invisible {
+    visibility: hidden;
+}
+
+.highcharts-a11y-proxy-container,
+.highcharts-a11y-proxy-container-before,
+.highcharts-a11y-proxy-container-after {
+    position: absolute;
+    white-space: nowrap;
+}
+
+g.highcharts-series,
+.highcharts-markers,
+.highcharts-point {
+    outline: none;
+}
+
+/* Gantt */
+.highcharts-treegrid-node-collapsed,
+.highcharts-treegrid-node-expanded {
+    cursor: pointer;
+}
+
+.highcharts-point-connecting-path {
+    fill: none;
+}
+
+.highcharts-grid-axis .highcharts-tick {
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 1px;
+}
+
+.highcharts-grid-axis .highcharts-axis-line {
+    stroke: var(--highcharts-neutral-color-20);
+    stroke-width: 1px;
+}
+
+.highcharts-gantt-series .highcharts-partfill-overlay {
+    fill: hsla(0, 0%, 0%, 0.3);
+    stroke: hsla(0, 0%, 0%, 0.3);
+}
