@@ -12,8 +12,8 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:check": "turbo run lint:check",
-    "format": "prettier --config .prettierrc --write --ignore-unknown './**/*'",
-    "format:check": "prettier --config .prettierrc --check --ignore-unknown './**/*'",
+    "format": "prettier --write --ignore-unknown './**/*'",
+    "format:check": "prettier --check --ignore-unknown './**/*'",
     "prepare": "husky install"
   },
   "dependencies": {},
@@ -24,6 +24,7 @@
     "prettier": "3.0.3",
     "prettier-plugin-embed": "0.3.2",
     "prettier-plugin-sql": "0.18.0",
+    "prettier-plugin-tailwindcss": "0.7.2",
     "turbo": "^1.13.3",
     "wrangler": "^3.86.0"
   },
