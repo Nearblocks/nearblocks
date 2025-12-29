@@ -452,8 +452,8 @@ export const isJson = (string: string) => {
 
   try {
     JSON.parse(str);
-    return false;
-  } catch (e) {
+    return true;
+  } catch {
     return false;
   }
 };
@@ -461,7 +461,11 @@ export const isJson = (string: string) => {
 const strToType = (str: string, type: GuessableTypeString): unknown => {
   switch (type) {
     case 'json':
-      return JSON.parse(str);
+      try {
+        return JSON.parse(str);
+      } catch {
+        return str + '';
+      }
     case 'number':
       return Number(str);
     case 'boolean':
@@ -681,21 +685,23 @@ export function parseNestedJSON(obj: any): any {
 export const parseEventJson = (log: string) => {
   if (!log?.startsWith('EVENT_JSON:')) return log;
 
-  const jsonString = log.replace('EVENT_JSON:', '').trim();
+  let jsonString = log.replace('EVENT_JSON:', '').trim();
 
   if (typeof jsonString !== 'string') {
     throw new Error('jsonString is not a valid string');
   }
 
   if (!isValidJson(jsonString)) {
-    const fixedJsonString = jsonString.replace(/\\"/g, '"');
+    jsonString = jsonString.replace(/\\"/g, '"');
 
-    if (isValidJson(fixedJsonString)) {
-      return JSON.parse(fixedJsonString);
-    } else {
+    if (!isValidJson(jsonString)) {
       return null;
     }
   }
 
-  return JSON.parse(jsonString);
+  try {
+    return JSON.parse(jsonString);
+  } catch {
+    return null;
+  }
 };

@@ -463,7 +463,11 @@ export const isJson = (string: string) => {
 const strToType = (str: string, type: GuessableTypeString): unknown => {
   switch (type) {
     case 'json':
-      return JSON.parse(str);
+      try {
+        return JSON.parse(str);
+      } catch {
+        return str + '';
+      }
     case 'number':
       return Number(str);
     case 'boolean':

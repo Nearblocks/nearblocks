@@ -2,7 +2,7 @@
 
 import Big from 'big.js';
 import { useTranslations } from 'next-intl';
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
@@ -61,7 +61,6 @@ const AccountOverviewActions = ({
   const statsData = useStatsStore((state) => state.latestStats);
   const tokenData = token?.contracts?.[0];
   const inventoryData = inventory?.inventory;
-  const spamTokens = typeof spam === 'string' ? JSON.parse(spam) : null;
   const { account: accountView } = useAddressRpc();
   const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
@@ -77,6 +76,17 @@ const AccountOverviewActions = ({
   const { rpc: rpcUrl } = useRpcProvider();
 
   const cacheRef = useRef<BalanceCache>({});
+
+  const spamTokens = useMemo(() => {
+    if (typeof spam === 'string') {
+      try {
+        return JSON.parse(spam);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }, [spam]);
 
   useEffect(() => {
     const cacheKey = `${params?.id}_${rpcUrl}`;
