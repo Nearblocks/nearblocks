@@ -75,8 +75,12 @@ export function encodeArgs(args: object) {
 
 export function decodeArgs(args: string[]) {
   if (!args || typeof args === 'undefined') return {};
-  // @ts-ignore
-  return JSON.parse(Buffer.from(args, 'base64')?.toString());
+  try {
+    // @ts-ignore
+    return JSON.parse(Buffer.from(args, 'base64').toString());
+  } catch {
+    return {};
+  }
 }
 
 export function tokenAmount(amount: string, decimal: string, format: boolean) {

@@ -28,11 +28,15 @@ const useSearchHistory = () => {
     for (const request of keys) {
       const response = await cache.match(request);
       if (response) {
-        const data = await response.json();
-        entries.push({
-          key: request.url,
-          timestamp: data.timestamp || 0,
-        });
+        try {
+          const data = await response.json();
+          entries.push({
+            key: request.url,
+            timestamp: data.timestamp || 0,
+          });
+        } catch {
+          //
+        }
       }
     }
 
@@ -72,8 +76,12 @@ const useSearchHistory = () => {
       const response = await cache.match(request);
 
       if (response) {
-        const data = await response.json();
-        return data.results;
+        try {
+          const data = await response.json();
+          return data.results;
+        } catch {
+          return null;
+        }
       }
     }
 
@@ -90,13 +98,17 @@ const useSearchHistory = () => {
         keys.map(async (request) => {
           const response = await cache.match(request);
           if (response) {
-            const data = await response.json();
-            return {
-              query: data.query,
-              filter: data.filter,
-              results: data.results,
-              timestamp: data.timestamp || 0,
-            };
+            try {
+              const data = await response.json();
+              return {
+                query: data.query,
+                filter: data.filter,
+                results: data.results,
+                timestamp: data.timestamp || 0,
+              };
+            } catch {
+              return null;
+            }
           }
           return null;
         }),
