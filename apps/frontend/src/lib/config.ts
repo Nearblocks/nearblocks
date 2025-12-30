@@ -52,10 +52,26 @@ export type Config = z.infer<typeof configSchema>;
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
+let cachedServerConfig: null | ServerEnv = null;
+
 export const getServerConfig = (): ServerEnv => {
-  return serverEnvSchema.parse({ ...process.env });
+  if (!cachedServerConfig) {
+    cachedServerConfig = serverEnvSchema.parse({ ...process.env });
+  }
+
+  return cachedServerConfig;
 };
 
+let cachedRuntimeConfig: Config | null = null;
+
 export const getRuntimeConfig = (theme: string): Config => {
-  return configSchema.parse({ ...process.env, providers, theme });
+  if (!cachedRuntimeConfig) {
+    cachedRuntimeConfig = configSchema.parse({
+      ...process.env,
+      providers,
+      theme,
+    });
+  }
+
+  return cachedRuntimeConfig;
 };
