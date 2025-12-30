@@ -32,10 +32,6 @@ export const pgp = pgpromise({
       logger.error(e.ctx);
     }
   },
-  // TODO: remove before merge
-  query(e) {
-    logger.warn(e.query);
-  },
 });
 
 /**
@@ -46,8 +42,6 @@ export const dbBase = pgp({
   connectionString: config.dbUrlBase,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
-  // TODO: remove before merge
-  statement_timeout: 10 * 60 * 100, // 10s
 });
 
 /**
@@ -58,20 +52,16 @@ export const dbBalance = pgp({
   connectionString: config.dbUrlBalance,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
-  // TODO: remove before merge
-  statement_timeout: 10 * 60 * 100, // 10s
 });
 
 /**
  * Events database connection.
  */
 export const dbEvents = pgp({
-  application_name: 'api-balance',
+  application_name: 'api-events',
   connectionString: config.dbUrlEvents,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
-  // TODO: remove before merge
-  statement_timeout: 10 * 60 * 100, // 10s
 });
 
 /**
@@ -82,8 +72,6 @@ export const dbMultichain = pgp({
   connectionString: config.dbUrlMultichain,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
-  // TODO: remove before merge
-  statement_timeout: 10 * 60 * 100, // 10s
 });
 
 /**
@@ -94,8 +82,6 @@ export const dbContract = pgp({
   connectionString: config.dbUrlContract,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
-  // TODO: remove before merge
-  statement_timeout: 10 * 60 * 100, // 10s
 });
 
 /**
@@ -106,6 +92,4 @@ export const dbStaking = pgp({
   connectionString: config.dbUrlStaking,
   max: 20,
   ssl: ssl?.ca ? ssl : false,
-  // TODO: remove before merge
-  statement_timeout: 10 * 60 * 100, // 10s
 });

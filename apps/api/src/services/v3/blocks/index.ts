@@ -42,7 +42,7 @@ const latest = responseHandler(
     );
 
     const blocks = await redis.cache<Block[]>(
-      `blocks:latest:${limit}`,
+      `v3:blocks:latest:${limit}`,
       () => rollingQuery,
       5, // cache results for 5s
     );
