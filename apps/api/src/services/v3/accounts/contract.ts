@@ -115,7 +115,7 @@ const schema = responseHandler(
         }
       })(),
       redis.cache(
-        `contract:${account}:abi`,
+        `v3:contract:${account}:abi`,
         async () => {
           try {
             return await abiSchema(provider, account);

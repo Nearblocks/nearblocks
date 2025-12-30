@@ -45,7 +45,7 @@ const latest = responseHandler(
     );
 
     const txns = await redis.cache<Txn[]>(
-      `txns:latest:${limit}`,
+      `v3:txns:latest:${limit}`,
       () => rollingQuery,
       5, // cache results for 5s
     );
