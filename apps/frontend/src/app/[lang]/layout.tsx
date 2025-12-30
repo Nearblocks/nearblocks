@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     'NEAR Blocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
   icons: {
     apple: '/apple-touch-icon.png',
-    icon: '/icon.svg',
+    icon: { sizes: 'any', type: 'image/svg+xml', url: '/icon.svg' },
     shortcut: { sizes: '32x32', url: '/favicon.ico' },
   },
   title: 'Near Protocol Explorer | NearBlocks',

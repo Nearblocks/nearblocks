@@ -1,10 +1,9 @@
 import 'server-only';
 
-import { getServerConfig, ServerEnv } from './config';
-
-const config: ServerEnv = getServerConfig();
+import { getServerConfig } from './config';
 
 export const fetcher = async <T>(url: string, options?: RequestInit) => {
+  const config = getServerConfig();
   const baseUrl = config.API_URL;
   const apiKey = config.API_ACCESS_KEY;
 

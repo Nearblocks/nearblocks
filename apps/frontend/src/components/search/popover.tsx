@@ -76,8 +76,8 @@ export const SearchPopover = ({
         />
       </PopoverAnchor>
       <PopoverContent
-        align="start"
         className="divide-border w-(--radix-popper-anchor-width) max-w-200 divide-y p-0"
+        onOpenAutoFocus={(event) => event.preventDefault()}
         sideOffset={12}
       >
         {results && results.accounts.length > 0 && (
