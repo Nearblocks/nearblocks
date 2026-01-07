@@ -7,6 +7,7 @@ const ftMeta = v.object({
   decimals: v.nullable(v.number()),
   icon: v.nullable(v.string()),
   name: v.nullable(v.string()),
+  price: v.nullable(v.string()),
   reference: v.nullable(v.string()),
   symbol: v.nullable(v.string()),
 });

@@ -14,7 +14,11 @@ export class Redis {
     this.redis = new IORedis(options);
   }
 
-  async cache(key: RedisKey, callback: () => Promise<unknown>, ttl: number) {
+  async cache<T>(
+    key: RedisKey,
+    callback: () => Promise<T>,
+    ttl: number,
+  ): Promise<T> {
     const prefixedKeys = this.prefixedKeys(key);
     const value = await this.get(prefixedKeys);
 

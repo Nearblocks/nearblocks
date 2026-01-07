@@ -77,7 +77,7 @@ const config: Config = {
   nearlakeRegionName: 'eu-central-1',
   nearlakeSecretKey: env.NEARLAKE_SECRET_KEY,
   network: env.NETWORK,
-  preloadSize: 100, // blocks to preload in nearlake
+  preloadSize: 1000, // blocks to preload in nearlake
   s3AccessKey: env.S3_ACCESS_KEY,
   s3Bucket: env.S3_BUCKET,
   s3Host: env.S3_HOST,

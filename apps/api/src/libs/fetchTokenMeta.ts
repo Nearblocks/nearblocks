@@ -1,6 +1,6 @@
 import { providers } from 'near-api-js';
 
-import { RPCResponse } from '#types/types';
+import { MtMetadata, RPCResponse } from '#types/types';
 
 import { fetchMeta } from './fetchMeta.js';
 import { bytesParse, callFunction } from './near.js';
@@ -41,7 +41,7 @@ interface NftMetadata {
   updated_at?: number;
 }
 
-export type MtMetadata = {
+export type MtTokenMetadata = {
   decimals?: number;
   description?: string;
   extra?: Record<string, unknown>;
@@ -94,7 +94,7 @@ export const fetchMtMetadata = async (
         console.error(`fetchMeta failed for ${contract}:${tokenId}`, error);
       }
 
-      const metadata = await fetchContractMetadata<MtMetadata>(
+      const metadata = await fetchContractMetadata<MtTokenMetadata>(
         provider,
         contract,
         'mt_metadata',

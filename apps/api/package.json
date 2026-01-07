@@ -11,9 +11,9 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
+    "build": "yarn clean && tsc && cpx \"src/**/*.sql\" dist",
     "start": "node dist/index.js",
-    "dev": "nodemon --exec \"yarn build && yarn start\" --watch src --ext ts",
+    "dev": "tsx watch --env-file=.env --include src/sql src/index.ts",
     "lint": "tsc --noEmit && eslint ./ --fix",
     "lint:check": "tsc --noEmit && eslint ./"
   },
@@ -31,6 +31,7 @@
     "csv-stringify": "6.5.1",
     "dayjs": "1.11.12",
     "envalid": "8.0.0",
+    "es-toolkit": "1.39.9",
     "express": "4.19.2",
     "fzstd": "0.1.1",
     "geoip-lite": "1.4.10",
@@ -44,10 +45,12 @@
     "passport-anonymous": "1.0.1",
     "passport-http-bearer": "1.0.1",
     "pg": "8.12.0",
+    "pg-promise": "11.14.0",
     "postgres": "3.4.5",
     "query-string": "9.1.0",
     "rate-limiter-flexible": "3.0.6",
     "swagger-jsdoc": "6.2.8",
+    "valibot": "1.1.0",
     "zod": "3.23.8"
   },
   "devDependencies": {
@@ -65,14 +68,16 @@
     "@types/pg": "~8.11",
     "@types/swagger-jsdoc": "~6.0.4",
     "@types/swagger-ui-express": "~4.1",
+    "cpx": "~1.5.0",
     "nb-logger": "*",
     "nb-near": "*",
     "nb-redis": "*",
+    "nb-schemas": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
-    "nodemon": "~2.0",
     "rimraf": "~5.0",
+    "tsx": "~4.20.3",
     "typescript": "~5.2"
   }
 }

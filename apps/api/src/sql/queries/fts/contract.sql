@@ -1,0 +1,29 @@
+SELECT
+  decimals,
+  price,
+  market_cap,
+  fully_diluted_market_cap,
+  total_supply,
+  circulating_supply,
+  contract,
+  hex_address,
+  name,
+  symbol,
+  icon,
+  spec,
+  reference,
+  reference_hash,
+  description,
+  website,
+  twitter,
+  facebook,
+  telegram,
+  reddit,
+  coingecko_id,
+  coinmarketcap_id,
+  volume_24h,
+  change_24h
+FROM
+  ft_meta
+WHERE
+  contract = ${contract}
