@@ -13,7 +13,9 @@ SELECT
     'icon',
     fm.icon,
     'reference',
-    fm.reference
+    fm.reference,
+    'price',
+    fm.price
   ) AS meta
 FROM
   ft_holders fh
