@@ -17,6 +17,7 @@ import {
   rollingWindowList,
   windowEnd,
   WindowListQuery,
+  windowStart,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
@@ -66,10 +67,11 @@ const txns = responseHandler(
     };
 
     const events = await rollingWindowList(eventsQuery, {
-      end: windowEnd(cursor?.timestamp, before),
+      direction,
+      end: windowEnd(cursor?.timestamp, before, direction),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: config.eventsStart,
+      start: windowStart(config.eventsStart, cursor?.timestamp, direction),
     });
 
     if (!events.length) {

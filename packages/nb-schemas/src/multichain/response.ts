@@ -28,8 +28,8 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const txnsResponse = responseSchema(v.array(v.omit(txn, ['event_index'])));
-const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnsResponse = responseSchema(v.array(txn));
+const txnCountResponse = responseSchema(txnCount);
 
 export type MCTxn = v.InferOutput<typeof txn>;
 export type MCTxnCount = v.InferOutput<typeof txnCount>;

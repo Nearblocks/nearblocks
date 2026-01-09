@@ -15,7 +15,7 @@ SELECT
     'reference',
     fm.reference,
     'price',
-    fm.price
+    fm.price::TEXT
   ) AS meta
 FROM
   ft_holders fh

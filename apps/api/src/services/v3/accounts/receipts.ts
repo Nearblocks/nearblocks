@@ -15,6 +15,7 @@ import {
   rollingWindowList,
   windowEnd,
   WindowListQuery,
+  windowStart,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
@@ -73,14 +74,18 @@ const receipts = responseHandler(
         },
       );
 
-      return dbBase.manyOrNone<AccountReceipt>(sql.receipts.receipts, { cte });
+      return dbBase.manyOrNone<AccountReceipt>(sql.receipts.receipts, {
+        cte,
+        direction,
+      });
     };
 
     const receipts = await rollingWindowList(receiptsQuery, {
-      end: windowEnd(cursor?.timestamp, before),
+      direction,
+      end: windowEnd(cursor?.timestamp, before, direction),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: config.baseStart,
+      start: windowStart(config.baseStart, cursor?.timestamp, direction),
     });
 
     return paginateData(

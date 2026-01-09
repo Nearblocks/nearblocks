@@ -59,9 +59,7 @@ const action = v.object({
 const accountResponse = responseSchema(account);
 const balanceResponse = responseSchema(balance);
 const contractResponse = responseSchema(contract);
-const deploymentResponse = responseSchema(
-  v.array(v.omit(deployment, ['receipt_id', 'block_timestamp'])),
-);
+const deploymentResponse = responseSchema(v.array(deployment));
 const schemaResponse = responseSchema(schema);
 const actionResponse = responseSchema(action);
 

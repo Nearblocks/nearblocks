@@ -126,10 +126,53 @@ export const rollingWindow = async <T>(
   return null;
 };
 
-export const windowEnd = (timestamp?: string, before?: string) => {
+/**
+ * Computes the rolling window start boundary for window-paginated queries.
+ *
+ * For "prev" paging we query in ascending order (newer results), so we set the window start
+ * to the cursor timestamp to avoid scanning earlier time windows that cannot contain results.
+ *
+ * @param start - The configured earliest timestamp (ns) to search from.
+ * @param timestamp - Cursor timestamp (ns) when paging.
+ * @param direction - Sort direction used by the underlying query.
+ * @returns A start timestamp (ns) to use for the rolling window search.
+ */
+export const windowStart = (
+  start: bigint,
+  timestamp?: string,
+  direction: 'asc' | 'desc' = 'desc',
+) => {
+  const cursorTs = timestamp ? BigInt(timestamp) : undefined;
+
+  if (direction !== 'asc' || !cursorTs) return start;
+
+  return cursorTs > start ? cursorTs : start;
+};
+
+/**
+ * Computes the rolling window end boundary for window-paginated queries.
+ *
+ * For "next" paging we query in descending order (older results), so we clamp the end to the
+ * minimum of the cursor timestamp and `before_ts` (exclusive).
+ *
+ * For "prev" paging we query in ascending order (newer results), so clamping the end to the
+ * cursor would produce an empty result set (since the cursor predicate is `>`). In that case,
+ * only `before_ts` (exclusive) is applied.
+ *
+ * @param timestamp - Cursor timestamp (ns) when paging.
+ * @param before - Optional upper bound timestamp (ns), treated as exclusive.
+ * @param direction - Sort direction used by the underlying query.
+ * @returns An end timestamp (ns) to use for the rolling window search.
+ */
+export const windowEnd = (
+  timestamp?: string,
+  before?: string,
+  direction: 'asc' | 'desc' = 'desc',
+) => {
   const cursorTs = timestamp ? BigInt(timestamp) : undefined;
   const beforeTs = before ? BigInt(before) - 1n : undefined;
 
+  if (direction === 'asc') return beforeTs;
   if (!cursorTs) return beforeTs;
   if (!beforeTs) return cursorTs;
 

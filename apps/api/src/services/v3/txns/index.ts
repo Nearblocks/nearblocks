@@ -25,6 +25,7 @@ import {
   rollingWindowList,
   windowEnd,
   WindowListQuery,
+  windowStart,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
@@ -39,7 +40,7 @@ const latest = responseHandler(
       (start, end) => {
         const cte = pgp.as.format(sql.latestCte, { end, limit, start });
 
-        return dbBase.manyOrNone<Txn>(sql.txns, { cte });
+        return dbBase.manyOrNone<Txn>(sql.txns, { cte, direction: 'desc' });
       },
       { limit, start: config.baseStart },
     );
@@ -84,14 +85,15 @@ const txns = responseHandler(
         start,
       });
 
-      return dbBase.manyOrNone<Txn>(sql.txns, { cte });
+      return dbBase.manyOrNone<Txn>(sql.txns, { cte, direction });
     };
 
     const txns = await rollingWindowList(txnsQuery, {
-      end: windowEnd(cursor?.timestamp, before),
+      direction,
+      end: windowEnd(cursor?.timestamp, before, direction),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: config.baseStart,
+      start: windowStart(config.baseStart, cursor?.timestamp, direction),
     });
 
     return paginateData(

@@ -28,10 +28,8 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const txnsResponse = responseSchema(
-  v.array(v.omit(txn, ['shard_id', 'index_in_chunk'])),
-);
-const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnsResponse = responseSchema(v.array(txn));
+const txnCountResponse = responseSchema(txnCount);
 
 export type AccountStakingTxn = v.InferOutput<typeof txn>;
 export type AccountStakingTxnCount = v.InferOutput<typeof txnCount>;
