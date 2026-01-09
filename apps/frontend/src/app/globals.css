@@ -73,7 +73,7 @@
   --color-lime-background: #65a30d1a;
   --color-lime-foreground: #65a30d;
 
-  --background: var(--color-neutral-100);
+  --background: var(--color-neutral-50);
   --foreground: var(--color-neutral-950);
   --card: var(--color-white-950);
   --card-foreground: var(--color-neutral-950);
@@ -306,9 +306,6 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
 

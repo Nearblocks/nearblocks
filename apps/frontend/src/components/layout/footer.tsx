@@ -1,12 +1,17 @@
+'use client';
+
 import { LuArrowUpRight } from 'react-icons/lu';
 import { RiGithubFill, RiTelegram2Line, RiTwitterXLine } from 'react-icons/ri';
 
 import { Link } from '@/components/link';
+import { useLocale } from '@/hooks/use-locale';
 import { CoinGecko } from '@/icons/coingecko';
 import { Logo } from '@/icons/logo';
 import { Separator } from '@/ui/separator';
 
 export const Footer = () => {
+  const { t } = useLocale('layout');
+
   return (
     <footer className="bg-card text-body-xs">
       <div className="container mx-auto px-4">
@@ -15,10 +20,7 @@ export const Footer = () => {
             <Link href="/">
               <Logo className="text-primary h-7.5" />
             </Link>
-            <p className="max-w-85">
-              NEAR Blocks is the leading blockchain explorer dedicated to the
-              NEAR ecosystem. Powered by NEAR Protocol.
-            </p>
+            <p className="max-w-85">{t('footer.description')}</p>
             <div className="flex gap-2">
               <Link
                 className="border-border flex size-6 items-center justify-center rounded-full border"
@@ -50,13 +52,17 @@ export const Footer = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3">Tools</h3>
+            <h3 className="text-headline-sm text-primary pb-3">
+              {t('footer.menu.tools.title')}
+            </h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/advertise">Advertise</Link>
+                <Link href="/advertise">
+                  {t('footer.menu.tools.advertise')}
+                </Link>
               </li>
               <li>
-                <Link href="/apis">NEAR Indexer APIs</Link>
+                <Link href="/apis">{t('footer.menu.tools.apis')}</Link>
               </li>
               <li>
                 <Link
@@ -65,42 +71,53 @@ export const Footer = () => {
                   rel="noreferrer nofollow noopener"
                   target="_blank"
                 >
-                  NEAR Validate <LuArrowUpRight className="size-3" />
+                  {t('footer.menu.tools.nearValidate')}{' '}
+                  <LuArrowUpRight className="size-3" />
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3">Explore</h3>
+            <h3 className="text-headline-sm text-primary pb-3">
+              {t('footer.menu.explore.title')}
+            </h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/blocks">Latest Blocks</Link>
+                <Link href="/blocks">{t('footer.menu.explore.blocks')}</Link>
               </li>
               <li>
-                <Link href="/txns">Latest Transactions</Link>
+                <Link href="/txns">
+                  {t('footer.menu.explore.transactions')}
+                </Link>
               </li>
               <li>
-                <Link href="/charts">Charts & Stats</Link>
+                <Link href="/charts">{t('footer.menu.explore.charts')}</Link>
               </li>
               <li>
-                <Link href="/nodes">Node Explorer</Link>
+                <Link href="/nodes">{t('footer.menu.explore.nodes')}</Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3">Company</h3>
+            <h3 className="text-headline-sm text-primary pb-3">
+              {t('footer.menu.company.title')}
+            </h3>
             <ul className="space-y-1">
               <li>
-                <Link href="/about">About</Link>
+                <Link href="/about">{t('footer.menu.company.about')}</Link>
               </li>
               <li>
-                <Link href="/contact">Contact</Link>
+                <Link href="/contact">{t('footer.menu.company.contact')}</Link>
               </li>
               <li>
-                <Link href="/terms-and-conditions">Terms & Conditions</Link>
+                <Link href="/terms-and-conditions">
+                  {t('footer.menu.company.terms')}
+                </Link>
               </li>
               <li>
-                <Link href="/privacy-policy">Privacy Policy</Link>
+                <Link href="/privacy-policy">
+                  {t('footer.menu.company.privacy')}
+                </Link>
               </li>
               <li>
                 <Link
@@ -109,7 +126,8 @@ export const Footer = () => {
                   rel="noreferrer nofollow noopener"
                   target="_blank"
                 >
-                  Status <LuArrowUpRight className="size-3" />
+                  {t('footer.menu.company.status')}{' '}
+                  <LuArrowUpRight className="size-3" />
                 </Link>
               </li>
             </ul>
@@ -118,18 +136,16 @@ export const Footer = () => {
         <Separator />
         <div className="space-y-1 py-6">
           <p className="text-body-xs text-primary">
-            NearBlocks © {new Date().getFullYear()}
+            {t('footer.copyright')} {new Date().getFullYear()}
           </p>
           <p className="text-body-xs text-muted-foreground flex items-center gap-2">
-            Price feeds aggregated by{' '}
+            {t('footer.disclaimer')}{' '}
             <Link href="https://www.coingecko.com/" target="_blank">
               <CoinGecko className="size-5" />
             </Link>
           </p>
           <p className="text-body-xs text-muted-foreground">
-            NearBlocks is operated full and on its own. NearBlocks is not
-            associated to The NEAR Foundation and every licensed trademark
-            displayed on this website belongs to their respective owners.
+            {t('footer.trademark')}
           </p>
         </div>
       </div>

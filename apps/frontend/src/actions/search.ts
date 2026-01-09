@@ -1,21 +1,13 @@
 'use server';
 
 import {
-  Search,
-  SearchAccount,
   SearchAccountRes,
-  SearchBlock,
   SearchBlockRes,
-  SearchFT,
   SearchFTRes,
-  SearchKey,
   SearchKeyRes,
-  SearchNFT,
   SearchNFTRes,
-  SearchReceipt,
   SearchReceiptRes,
   SearchRes,
-  SearchTxn,
   SearchTxnRes,
 } from 'nb-schemas';
 
@@ -26,7 +18,7 @@ export const search = async (keyword: string) => {
 
   const resp = await fetcher<SearchRes>(`/v3/search?keyword=${keyword}`);
 
-  return resp.data as Search;
+  return resp.data;
 };
 
 export const searchBlocks = async (keyword: string) => {
@@ -36,7 +28,7 @@ export const searchBlocks = async (keyword: string) => {
     `/v3/search/blocks?keyword=${keyword}`,
   );
 
-  return (resp.data || []) as SearchBlock[];
+  return resp.data || [];
 };
 
 export const searchTxns = async (keyword: string) => {
@@ -46,7 +38,7 @@ export const searchTxns = async (keyword: string) => {
     `/v3/search/txns?keyword=${keyword}`,
   );
 
-  return (resp.data || []) as SearchTxn[];
+  return resp.data || [];
 };
 
 export const searchAccounts = async (keyword: string) => {
@@ -56,7 +48,7 @@ export const searchAccounts = async (keyword: string) => {
     `/v3/search/accounts?keyword=${keyword}`,
   );
 
-  return (resp.data || []) as SearchAccount[];
+  return resp.data || [];
 };
 
 export const searchFTs = async (keyword: string) => {
@@ -64,7 +56,7 @@ export const searchFTs = async (keyword: string) => {
 
   const resp = await fetcher<SearchFTRes>(`/v3/search/fts?keyword=${keyword}`);
 
-  return (resp.data || []) as SearchFT[];
+  return resp.data || [];
 };
 
 export const searchNFTs = async (keyword: string) => {
@@ -74,7 +66,7 @@ export const searchNFTs = async (keyword: string) => {
     `/v3/search/nfts?keyword=${keyword}`,
   );
 
-  return (resp.data || []) as SearchNFT[];
+  return resp.data || [];
 };
 
 export const searchKeys = async (keyword: string) => {
@@ -84,7 +76,7 @@ export const searchKeys = async (keyword: string) => {
     `/v3/search/keys?keyword=${keyword}`,
   );
 
-  return (resp.data || []) as SearchKey[];
+  return resp.data || [];
 };
 
 export const searchReceipts = async (keyword: string) => {
@@ -94,5 +86,5 @@ export const searchReceipts = async (keyword: string) => {
     `/v3/search/receipts?keyword=${keyword}`,
   );
 
-  return (resp.data || []) as SearchReceipt[];
+  return resp.data || [];
 };

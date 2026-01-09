@@ -4,33 +4,36 @@ import { Fragment } from 'react';
 import { use } from 'react';
 import { LuBox, LuFuel } from 'react-icons/lu';
 
-import { Block } from 'nb-schemas';
+import { BlocksRes } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimeAgo } from '@/components/time-ago';
+import { useLocale } from '@/hooks/use-locale';
 import { gasFormat, numberFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/ui/card';
 import { ScrollArea } from '@/ui/scroll-area';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  blocksPromise?: Promise<Block[]>;
+  blocksPromise?: Promise<BlocksRes['data']>;
   loading?: boolean;
 };
 
 export const Blocks = ({ blocksPromise, loading }: Props) => {
   const blocks = !loading && blocksPromise ? use(blocksPromise) : null;
+  const { t } = useLocale('home');
 
   return (
-    <div className="bg-card rounded-xl border">
-      <div className="border-b px-4 py-5">
-        <h2 className="text-headline-base">Latest Blocks</h2>
-      </div>
+    <Card>
+      <CardHeader className="border-b py-5">
+        <h2 className="text-headline-base">{t('blocks.title')}</h2>
+      </CardHeader>
       <ScrollArea className="h-101">
-        <div className="@container p-4">
+        <CardContent className="@container p-4">
           <SkeletonSlot
             fallback={
               <>
@@ -51,7 +54,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         </div>
                         <div>
                           <h4 className="flex gap-1">
-                            Author <Skeleton className="w-40" />
+                            {t('blocks.author')} <Skeleton className="w-40" />
                           </h4>
                           <p className="text-body-sm text-muted-foreground mt-0.5">
                             <Skeleton className="w-20" />
@@ -96,7 +99,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         </div>
                         <div>
                           <h4 className="flex gap-1">
-                            Author{' '}
+                            {t('blocks.author')}{' '}
                             <Link
                               className="text-link inline-block w-40 truncate"
                               href={`/address/${block.author_account_id}`}
@@ -128,18 +131,18 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
               </>
             )}
           </SkeletonSlot>
-        </div>
+        </CardContent>
       </ScrollArea>
-      <div className="border-t p-4">
+      <CardFooter className="border-t">
         <Button
           asChild
           className="text-headline-sm w-full"
           size="lg"
           variant="secondary"
         >
-          <Link href="/blocks">View all blocks</Link>
+          <Link href="/blocks">{t('blocks.button')}</Link>
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };

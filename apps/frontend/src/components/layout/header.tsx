@@ -3,6 +3,7 @@
 import { LuMenu, LuX } from 'react-icons/lu';
 
 import { Link } from '@/components/link';
+import { useLocale } from '@/hooks/use-locale';
 import { Logo } from '@/icons/logo';
 import { NavMenu, RouteKey } from '@/types/types';
 import { Button } from '@/ui/button';
@@ -43,15 +44,15 @@ const menu: NavMenu<RouteKey<'layout'>> = [
     menu: [
       { href: '/en', title: 'English' },
       { href: '/es', title: 'Español' },
+      { href: '/fil-ph', title: 'Filipino' },
       { href: '/fr', title: 'Français' },
       { href: '/id', title: 'Bahasa' },
       { href: '/it', title: 'Italiano' },
-      { href: '/jp', title: '日本語' },
-      { href: '/kr', title: '한국어' },
-      { href: '/ph', title: 'Filipino' },
+      { href: '/ja', title: '日本語' },
+      { href: '/ko', title: '한국어' },
       { href: '/ru', title: 'Русский' },
       { href: '/th', title: 'ภาษาไทย' },
-      { href: '/ua', title: 'Українська' },
+      { href: '/uk', title: 'Українська' },
       { href: '/vi', title: 'Tiếng Việt' },
       { href: '/zh-cn', title: '汉语 (Simplified)' },
       { href: '/zh-hk', title: '漢語 (Traditional)' },
@@ -60,6 +61,8 @@ const menu: NavMenu<RouteKey<'layout'>> = [
 ];
 
 export const Header = () => {
+  const { t } = useLocale('layout');
+
   return (
     <header className="bg-card">
       <Popover>
@@ -77,12 +80,12 @@ export const Header = () => {
                   <Button
                     className="group relative"
                     size="icon-xs"
-                    title="Toggle menu"
+                    title={t('header.toggleMenu')}
                     variant="secondary"
                   >
                     <LuMenu className="scale-100 rotate-0 transition-all group-data-[state=open]:scale-0 group-data-[state=open]:-rotate-90" />
                     <LuX className="absolute scale-0 rotate-90 transition-all group-data-[state=open]:scale-100 group-data-[state=open]:rotate-0" />
-                    <span className="sr-only">Toggle menu</span>
+                    <span className="sr-only">{t('header.toggleMenu')}</span>
                   </Button>
                 </PopoverTrigger>
               </div>

@@ -2,18 +2,20 @@
 
 import { Chart } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
-import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
-import { DailyStats } from 'nb-schemas';
+import { DailyStatsRes } from 'nb-schemas';
 
-import { currencyFormat, numberFormat } from '@/lib/format';
+import { useLocale } from '@/hooks/use-locale';
+import { currencyFormat, dateFormat, numberFormat } from '@/lib/format';
 
 type Props = {
-  data: DailyStats[];
+  data: NonNullable<DailyStatsRes['data']>;
 };
 
 export const TxnsChart = ({ data }: Props) => {
+  const { locale, t } = useLocale('home');
+
   const chartData = useMemo(() => {
     return data
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -50,13 +52,17 @@ export const TxnsChart = ({ data }: Props) => {
             };
 
             return `
-              <span style="font-size:10px">${dayjs(point.x).format(
-                'MMMM DD, YYYY',
-              )}</span>
-              <br/>Transactions: <strong>${numberFormat(point.y, {
+              <span style="font-size:10px">${dateFormat(locale, point.x, {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}</span>
+              <br/>${t('chart.transactions')}: <strong>${numberFormat(point.y, {
                 maximumFractionDigits: 0,
               })}</strong>
-              <br/>Price: <strong>${currencyFormat(point.price)}</strong>
+              <br/>${t('chart.price')}: <strong>${currencyFormat(
+                point.price,
+              )}</strong>
             `;
           },
         },
@@ -73,15 +79,10 @@ export const TxnsChart = ({ data }: Props) => {
             formatter: function () {
               const v = this.value as number;
 
-              if (v >= 1_000_000) {
-                return `${(v / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
-              }
-
-              if (v >= 1_000) {
-                return `${(v / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
-              }
-
-              return v.toString();
+              return numberFormat(v, {
+                maximumFractionDigits: 1,
+                notation: 'compact',
+              });
             },
           },
           title: { text: undefined },

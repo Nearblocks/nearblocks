@@ -4,34 +4,37 @@ import { Fragment } from 'react';
 import { use } from 'react';
 import { LuArrowLeftRight } from 'react-icons/lu';
 
-import { Txn } from 'nb-schemas';
+import { TxnsRes } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimeAgo } from '@/components/time-ago';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/ui/card';
 import { ScrollArea } from '@/ui/scroll-area';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  txnsPromise?: Promise<Txn[]>;
+  txnsPromise?: Promise<TxnsRes['data']>;
 };
 
 export const Txns = ({ loading, txnsPromise }: Props) => {
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  const { t } = useLocale('home');
 
   return (
-    <div className="bg-card rounded-xl border">
-      <div className="border-b px-4 py-5">
-        <h2 className="text-headline-base">Latest txns</h2>
-      </div>
+    <Card>
+      <CardHeader className="border-b py-5">
+        <h2 className="text-headline-base">{t('txns.title')}</h2>
+      </CardHeader>
       <ScrollArea className="h-101">
-        <div className="@container p-4">
+        <CardContent className="@container p-4">
           <SkeletonSlot
             fallback={
               <>
@@ -52,10 +55,10 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                         </div>
                         <div>
                           <h4 className="flex gap-1">
-                            From <Skeleton className="w-40" />
+                            {t('txns.from')} <Skeleton className="w-40" />
                           </h4>
-                          <h4 className="flex gap-1 pt-1">
-                            To <Skeleton className="w-40" />
+                          <h4 className="flex gap-1 pt-0.5">
+                            {t('txns.to')} <Skeleton className="w-40" />
                           </h4>
                         </div>
                         <div className="@lg:ml-auto">
@@ -100,7 +103,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                         </div>
                         <div>
                           <h4 className="flex gap-1">
-                            From{' '}
+                            {t('txns.from')}{' '}
                             <Link
                               className="text-link inline-block w-40 truncate"
                               href={`/address/${txn.signer_account_id}`}
@@ -108,8 +111,8 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                               {txn.signer_account_id}
                             </Link>
                           </h4>
-                          <h4 className="flex gap-1 pt-1">
-                            To{' '}
+                          <h4 className="flex gap-1 pt-0.5">
+                            {t('txns.to')}{' '}
                             <Link
                               className="text-link inline-block w-40 truncate"
                               href={`/address/${txn.receiver_account_id}`}
@@ -138,18 +141,18 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
               </>
             )}
           </SkeletonSlot>
-        </div>
+        </CardContent>
       </ScrollArea>
-      <div className="border-t p-4">
+      <CardFooter className="border-t">
         <Button
           asChild
           className="text-headline-sm w-full"
           size="lg"
           variant="secondary"
         >
-          <Link href="/txns">View all transactions</Link>
+          <Link href="/txns">{t('txns.button')}</Link>
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };

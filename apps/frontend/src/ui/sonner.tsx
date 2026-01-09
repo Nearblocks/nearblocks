@@ -12,7 +12,7 @@ import { Toaster as Sonner, type ToasterProps } from 'sonner';
 import { useConfig } from '@/hooks/use-config';
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const config = useConfig();
+  const theme = useConfig((c) => c.theme);
 
   return (
     <Sonner
@@ -32,7 +32,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--normal-text': 'var(--popover-foreground)',
         } as React.CSSProperties
       }
-      theme={config.theme as ToasterProps['theme']}
+      theme={theme as ToasterProps['theme']}
       {...props}
     />
   );

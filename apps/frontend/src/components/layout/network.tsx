@@ -1,18 +1,24 @@
 'use client';
 
 import { useConfig } from '@/hooks/use-config';
+import { useLocale } from '@/hooks/use-locale';
 import { Near } from '@/icons/near';
 import { Button } from '@/ui/button';
 
 export const NetworkSwitcher = () => {
-  const config = useConfig();
-  const url =
-    config.NEXT_PUBLIC_NETWORK_ID === 'mainnet'
-      ? config.NEXT_PUBLIC_TESTNET_URL
-      : config.NEXT_PUBLIC_MAINNET_URL;
+  const networkId = useConfig((c) => c.networkId);
+  const mainnetUrl = useConfig((c) => c.mainnetUrl);
+  const testnetUrl = useConfig((c) => c.testnetUrl);
+  const { t } = useLocale('layout');
+  const url = networkId === 'mainnet' ? testnetUrl : mainnetUrl;
 
   return (
-    <Button asChild size="icon-xs" title="Switch Network" variant="secondary">
+    <Button
+      asChild
+      size="icon-xs"
+      title={t('header.switchNetwork')}
+      variant="secondary"
+    >
       <a href={url} rel="noopener noreferrer" target="_blank">
         <Near />
       </a>

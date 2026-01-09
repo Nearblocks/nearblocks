@@ -1,8 +1,9 @@
 import { useDebounceFn } from 'ahooks';
 import { useState } from 'react';
 
-import { Search } from 'nb-schemas';
+import { SearchRes } from 'nb-schemas';
 
+import { useLocale } from '@/hooks/use-locale';
 import { initialResults, searchKeyword } from '@/lib/search';
 import { Input } from '@/ui/input';
 import { Popover, PopoverAnchor, PopoverContent } from '@/ui/popover';
@@ -23,8 +24,11 @@ export const SearchPopover = ({
   setOpen,
   startTransition,
 }: Props) => {
+  const { t } = useLocale('layout');
   const [keyword, setKeyword] = useState('');
-  const [results, setResults] = useState<null | Search>(initialResults);
+  const [results, setResults] = useState<null | SearchRes['data']>(
+    initialResults,
+  );
 
   const { run } = useDebounceFn(
     (value: string) => {
@@ -71,7 +75,7 @@ export const SearchPopover = ({
           name="keyword"
           onChange={onChange}
           onFocus={onFocus}
-          placeholder="Search by Account ID / Txn Hash / Block"
+          placeholder={t('search.placeholder')}
           value={keyword}
         />
       </PopoverAnchor>
@@ -81,7 +85,7 @@ export const SearchPopover = ({
         sideOffset={12}
       >
         {results && results.accounts.length > 0 && (
-          <SearchItem title="Addresses">
+          <SearchItem title={t('search.addresses')}>
             {results.accounts.map((account) => (
               <SearchLink
                 href={`/address/${account.account_id}`}
@@ -93,7 +97,7 @@ export const SearchPopover = ({
           </SearchItem>
         )}
         {results && results.blocks.length > 0 && (
-          <SearchItem title="Blocks">
+          <SearchItem title={t('search.blocks')}>
             {results.blocks.map((block) => (
               <SearchLink
                 href={`/block/${block.block_hash}`}
@@ -105,7 +109,7 @@ export const SearchPopover = ({
           </SearchItem>
         )}
         {results && results.fts.length > 0 && (
-          <SearchItem title="Tokens">
+          <SearchItem title={t('search.tokens')}>
             {results.fts.map((ft) => (
               <SearchLink href={`/token/${ft.contract}`} key={ft.contract}>
                 {ft.contract}
@@ -114,7 +118,7 @@ export const SearchPopover = ({
           </SearchItem>
         )}
         {results && results.txns.length > 0 && (
-          <SearchItem title="Txns">
+          <SearchItem title={t('search.txns')}>
             {results.txns.map((txn) => (
               <SearchLink
                 href={`/txns/${txn.transaction_hash}`}

@@ -1,21 +1,25 @@
+'use client';
+
 import { use } from 'react';
 import { LuArrowRightLeft, LuGlobe, LuPickaxe } from 'react-icons/lu';
 
-import { DailyStats, Stats } from 'nb-schemas';
+import { DailyStatsRes, StatsRes } from 'nb-schemas';
 
 import { TxnsChart } from '@/components/home/chart';
 import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { Near } from '@/icons/near';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, gasFormat, numberFormat } from '@/lib/format';
+import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  dailyStatsPromise?: Promise<DailyStats[] | null>;
+  dailyStatsPromise?: Promise<DailyStatsRes['data']>;
   loading?: boolean;
-  statsPromise?: Promise<Stats>;
+  statsPromise?: Promise<StatsRes['data']>;
 };
 
 export const Overview = ({
@@ -23,12 +27,13 @@ export const Overview = ({
   loading,
   statsPromise,
 }: Props) => {
+  const { t } = useLocale('home');
   const stats = !loading && statsPromise ? use(statsPromise) : null;
   const dailyStats =
     !loading && dailyStatsPromise ? use(dailyStatsPromise) : null;
 
   return (
-    <div className="bg-card rounded-xl border px-4 py-2">
+    <Card className="px-4 py-2">
       <div className="lg:grid lg:grid-cols-[1fr_auto_1fr_auto] lg:items-stretch xl:grid-cols-[1fr_auto_1fr_auto_1fr]">
         <div className="divide-y">
           <div className="flex items-center gap-4 py-4">
@@ -37,7 +42,7 @@ export const Overview = ({
             </div>
             <div>
               <h3 className="text-body-xs text-muted-foreground uppercase">
-                NEAR Price
+                {t('overview.price')}
               </h3>
               <p className="text-headline-base mt-0.5 flex flex-wrap items-center gap-1">
                 <SkeletonSlot
@@ -70,7 +75,7 @@ export const Overview = ({
             </div>
             <div>
               <h3 className="text-body-xs text-muted-foreground uppercase">
-                Market Cap
+                {t('overview.marketCap')}
               </h3>
               <p className="text-headline-base mt-0.5">
                 <SkeletonSlot
@@ -99,7 +104,7 @@ export const Overview = ({
             <div className="flex grow flex-wrap justify-between gap-2">
               <div>
                 <h3 className="text-body-xs text-muted-foreground uppercase">
-                  Transactions
+                  {t('overview.transactions')}
                 </h3>
                 <p className="text-headline-base mt-0.5 flex items-center gap-1">
                   <SkeletonSlot
@@ -122,7 +127,7 @@ export const Overview = ({
               </div>
               <div className="ml-auto text-right">
                 <h3 className="text-body-xs text-muted-foreground uppercase">
-                  Gas Price
+                  {t('overview.gas')}
                 </h3>
                 <p className="text-headline-base mt-0.5 flex items-center gap-1">
                   <SkeletonSlot
@@ -150,7 +155,7 @@ export const Overview = ({
             <div className="flex grow flex-wrap items-center gap-2">
               <div>
                 <h3 className="text-body-xs text-muted-foreground uppercase">
-                  Active Validators
+                  {t('overview.validators')}
                 </h3>
                 <p className="text-headline-base mt-0.5">
                   <SkeletonSlot
@@ -163,7 +168,7 @@ export const Overview = ({
               </div>
               <div className="ml-auto text-right">
                 <h3 className="text-body-xs text-muted-foreground uppercase">
-                  Avg Block Time
+                  {t('overview.blockTime')}
                 </h3>
                 <p className="text-headline-base mt-0.5">
                   <SkeletonSlot
@@ -188,7 +193,7 @@ export const Overview = ({
         <Separator className="hidden xl:mx-4 xl:block" orientation="vertical" />
         <div className="z-0 col-span-3 pt-2 xl:col-auto">
           <h3 className="text-body-xs text-muted-foreground pb-2 uppercase">
-            Transaction History In 14 Days
+            {t('chart.title')}
           </h3>
           <SkeletonSlot
             fallback={<Skeleton className="h-30 w-full" />}
@@ -198,6 +203,6 @@ export const Overview = ({
           </SkeletonSlot>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

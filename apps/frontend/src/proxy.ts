@@ -5,11 +5,14 @@ import { defaultLocale, supportedLocales } from '@/locales/config';
 
 export const proxy = (request: NextRequest) => {
   const { pathname } = request.nextUrl;
-  const pathnameHasLocale = supportedLocales.some(
+
+  if (pathname.startsWith('/_next/data/')) return NextResponse.next();
+
+  const hasLocale = supportedLocales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  if (pathnameHasLocale) return;
+  if (hasLocale) return NextResponse.next();
 
   request.nextUrl.pathname = `/${defaultLocale}${pathname}`;
 
@@ -18,6 +21,7 @@ export const proxy = (request: NextRequest) => {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|.*\\.(?:jpg|jpeg|png|svg|ico)).*)',
+    '/((?!api(?:/|$)|_next(?:/|$))(?!.*\\.[^/]+$).*)',
+    '/:prefix(address|token|nft-token|mt-token|node-explorer)/:path*',
   ],
 };
