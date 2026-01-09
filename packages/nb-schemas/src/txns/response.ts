@@ -168,22 +168,12 @@ const txnNFT = v.object({
   token_meta: v.optional(nftTokenMeta),
 });
 
-const txnResponse = responseSchema(
-  v.omit(txn, ['block_timestamp', 'index_in_chunk']),
-);
-const txnsResponse = responseSchema(
-  v.array(v.omit(txn, ['block_timestamp', 'shard_id', 'index_in_chunk'])),
-);
-const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnResponse = responseSchema(txn);
+const txnsResponse = responseSchema(v.array(txn));
+const txnCountResponse = responseSchema(txnCount);
 const txnReceiptsResponse = responseSchema(txnReceipt);
-const txnFTsResponse = responseSchema(
-  v.array(
-    v.omit(txnFT, ['block_timestamp', 'shard_id', 'event_index', 'event_type']),
-  ),
-);
-const txnNFTsResponse = responseSchema(
-  v.array(v.omit(txnNFT, ['block_timestamp', 'shard_id', 'event_index'])),
-);
+const txnFTsResponse = responseSchema(v.array(txnFT));
+const txnNFTsResponse = responseSchema(v.array(txnNFT));
 
 export type Txn = v.InferOutput<typeof txn>;
 export type TxnCount = v.InferOutput<typeof txnCount>;

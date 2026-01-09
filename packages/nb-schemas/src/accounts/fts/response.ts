@@ -40,10 +40,8 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const txnsResponse = responseSchema(
-  v.array(v.omit(txn, ['shard_id', 'event_type', 'event_index'])),
-);
-const txnCountResponse = responseSchema(v.omit(txnCount, ['cost']));
+const txnsResponse = responseSchema(v.array(txn));
+const txnCountResponse = responseSchema(txnCount);
 
 export type AccountFTTxn = v.InferOutput<typeof txn>;
 export type AccountFTTxnCount = v.InferOutput<typeof txnCount>;

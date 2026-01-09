@@ -84,7 +84,10 @@ const deployments = responseHandler(
 
     const data =
       await dbBase.manyOrNone<
-        Pick<ContractDeployment, 'block' | 'transaction_hash'>
+        Pick<
+          ContractDeployment,
+          'block' | 'predecessor_account_id' | 'transaction_hash'
+        >
       >(unionQuery);
 
     return { data };

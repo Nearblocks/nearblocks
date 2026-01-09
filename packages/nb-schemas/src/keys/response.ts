@@ -28,7 +28,7 @@ const key = v.object({
   public_key: v.string(),
 });
 
-const keysResponse = responseSchema(v.array(v.omit(key, ['action_timestamp'])));
+const keysResponse = responseSchema(v.array(key));
 
 export type AccessKey = v.InferOutput<typeof key>;
 

@@ -18,6 +18,7 @@ import {
   rollingWindowList,
   windowEnd,
   WindowListQuery,
+  windowStart,
 } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
@@ -76,10 +77,10 @@ const blocks = responseHandler(
 
     const blocks = await rollingWindowList<Block>(blocksQuery, {
       direction,
-      end: windowEnd(cursor?.timestamp),
+      end: windowEnd(cursor?.timestamp, undefined, direction),
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
-      start: config.baseStart,
+      start: windowStart(config.baseStart, cursor?.timestamp, direction),
     });
 
     return paginateData(

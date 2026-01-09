@@ -114,4 +114,4 @@ FROM
       AND included_in_block_hash = bs.block_hash
   ) r ON TRUE
 ORDER BY
-  bs.block_timestamp DESC
+  bs.block_timestamp ${direction:raw}

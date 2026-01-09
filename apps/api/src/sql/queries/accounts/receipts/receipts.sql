@@ -69,6 +69,6 @@ FROM
       AND receipt_id = rs.receipt_id
   ) o ON TRUE
 ORDER BY
-  rs.included_in_block_timestamp DESC,
-  rs.shard_id DESC,
-  rs.index_in_chunk DESC
+  rs.included_in_block_timestamp ${direction:raw},
+  rs.shard_id ${direction:raw},
+  rs.index_in_chunk ${direction:raw}

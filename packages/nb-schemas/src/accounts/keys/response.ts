@@ -31,7 +31,7 @@ const keyCount = v.object({
   count: v.string(),
 });
 
-const keysResponse = responseSchema(v.array(v.omit(key, ['action_timestamp'])));
+const keysResponse = responseSchema(v.array(key));
 const keyCountResponse = responseSchema(keyCount);
 
 export type AccountKey = v.InferOutput<typeof key>;

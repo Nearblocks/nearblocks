@@ -42,16 +42,8 @@ const receiptCount = v.object({
   count: v.string(),
 });
 
-const receiptsResponse = responseSchema(
-  v.array(
-    v.omit(receipt, [
-      'included_in_block_timestamp',
-      'shard_id',
-      'index_in_chunk',
-    ]),
-  ),
-);
-const receiptCountResponse = responseSchema(v.omit(receiptCount, ['cost']));
+const receiptsResponse = responseSchema(v.array(receipt));
+const receiptCountResponse = responseSchema(receiptCount);
 
 export type AccountReceipt = v.InferOutput<typeof receipt>;
 export type AccountReceiptCount = v.InferOutput<typeof receiptCount>;
