@@ -4,7 +4,7 @@ import { merge } from 'es-toolkit/object';
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 
 import type { Locale } from '@/locales/config';
-import { clientTranslator } from '@/locales/translator';
+import { clientTranslator } from '@/locales/dictionaries';
 import type { BaseDictionary } from '@/types/types';
 import type { DeepPartial, Dictionary, Translator } from '@/types/types';
 

@@ -5,14 +5,12 @@ import { cookies } from 'next/headers';
 import { Layout } from '@/components/layout';
 import { getRuntimeConfig } from '@/lib/config';
 import type { Locale } from '@/locales/config';
-import { getDictionary } from '@/locales/dictionaries';
+import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { ConfigProvider } from '@/providers/config';
 import { LocaleProvider } from '@/providers/locale';
-import type { LayoutProps } from '@/types/types';
+import { Theme } from '@/types/enums';
 
 import '../globals.css';
-
-type Props = LayoutProps<{ lang: string }>;
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,17 +25,16 @@ export const metadata: Metadata = {
     icon: { sizes: 'any', type: 'image/svg+xml', url: '/icon.svg' },
     shortcut: { sizes: '32x32', url: '/favicon.ico' },
   },
+  manifest: '/manifest.webmanifest',
   title: 'Near Protocol Explorer | NearBlocks',
 };
 
-const RootLayout = async ({ children, params }: Props) => {
-  const cookieStore = await cookies();
-  const theme = cookieStore.get('theme')?.value ?? 'light';
-  const config = getRuntimeConfig(theme);
-  const { lang } = await params;
-  const locale = lang as Locale;
-
+const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
+  const [{ lang }, cookieStore] = await Promise.all([params, cookies()]);
+  const locale = hasLocale(lang) ? (lang as Locale) : 'en';
   const dictionary = await getDictionary(locale, ['layout']);
+  const theme = cookieStore.get('theme')?.value ?? 'light';
+  const config = getRuntimeConfig(theme as Theme);
 
   return (
     <html
@@ -46,7 +43,7 @@ const RootLayout = async ({ children, params }: Props) => {
       suppressHydrationWarning
     >
       <body
-        className={`bg-background text-foreground font-sans ${inter.variable} overflow-x-hidden antialiased`}
+        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} overflow-x-hidden antialiased`}
       >
         <ConfigProvider value={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>

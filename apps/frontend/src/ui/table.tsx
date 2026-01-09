@@ -3,18 +3,19 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
 const Table = ({ className, ...props }: React.ComponentProps<'table'>) => {
   return (
-    <div
-      className="relative w-full overflow-x-auto"
-      data-slot="table-container"
-    >
-      <table
-        className={cn('text-body-sm w-full caption-bottom', className)}
-        data-slot="table"
-        {...props}
-      />
+    <div className="relative w-full" data-slot="table-container">
+      <ScrollArea className="w-full">
+        <table
+          className={cn('text-body-sm w-full caption-bottom', className)}
+          data-slot="table"
+          {...props}
+        />
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
     </div>
   );
 };
@@ -25,7 +26,7 @@ const TableHeader = ({
 }: React.ComponentProps<'thead'>) => {
   return (
     <thead
-      className={cn('[&_tr]:border-b', className)}
+      className={cn('bg-muted [&_tr]:border-b', className)}
       data-slot="table-header"
       {...props}
     />
@@ -72,7 +73,7 @@ const TableHead = ({ className, ...props }: React.ComponentProps<'th'>) => {
   return (
     <th
       className={cn(
-        'text-foreground h-10 px-2 text-left align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5',
+        'text-foreground text-headline-xs h-12 px-4 py-2 text-left align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5',
         className,
       )}
       data-slot="table-head"
@@ -85,7 +86,7 @@ const TableCell = ({ className, ...props }: React.ComponentProps<'td'>) => {
   return (
     <td
       className={cn(
-        'p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5',
+        'px-4 py-4 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5',
         className,
       )}
       data-slot="table-cell"

@@ -1,4 +1,4 @@
-import { Search } from 'nb-schemas';
+import { SearchRes } from 'nb-schemas';
 
 import {
   search,
@@ -11,7 +11,7 @@ import {
   searchTxns,
 } from '@/actions/search';
 
-export const initialResults: Search = {
+export const initialResults: SearchRes['data'] = {
   accounts: [],
   blocks: [],
   fts: [],
@@ -21,10 +21,7 @@ export const initialResults: Search = {
   txns: [],
 };
 
-export const searchKeyword = async (
-  keyword: string,
-  filter: string,
-): Promise<null | Search> => {
+export const searchKeyword = async (keyword: string, filter: string) => {
   const results = initialResults;
 
   if (filter === 'accounts') {

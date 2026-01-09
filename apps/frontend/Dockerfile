@@ -30,4 +30,4 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/public ./apps/frontend/public
 
-CMD HOSTNAME="0.0.0.0" node apps/frontend/server.js
+CMD ["node", "apps/frontend/server.js"]

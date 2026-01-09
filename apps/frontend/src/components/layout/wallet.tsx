@@ -15,7 +15,11 @@ type Props = {
 };
 
 export const Wallet = ({ className }: Props) => {
-  const config = useConfig();
+  const network = useConfig((c) => c.networkId);
+  const mainnetUrl = useConfig((c) => c.mainnetUrl);
+  const testnetUrl = useConfig((c) => c.testnetUrl);
+  const providers = useConfig((c) => c.providers);
+  const projectId = useConfig((c) => c.reownProjectId);
   const { t } = useLocale('layout');
   const [account, setAccount] = useState<string>();
   const [connector, setConnector] = useState<NearConnector>();
@@ -26,12 +30,8 @@ export const Wallet = ({ className }: Props) => {
 
     const init = async () => {
       try {
-        const network = config.NEXT_PUBLIC_NETWORK_ID;
-        const url =
-          network === 'mainnet'
-            ? config.NEXT_PUBLIC_MAINNET_URL
-            : config.NEXT_PUBLIC_TESTNET_URL;
-        const rpcs = config.providers[network].map((rpc) => rpc.url);
+        const url = network === 'mainnet' ? mainnetUrl : testnetUrl;
+        const rpcs = providers.map((rpc) => rpc.url);
         const walletConnect = SignClient.init({
           metadata: {
             description:
@@ -40,7 +40,7 @@ export const Wallet = ({ className }: Props) => {
             name: 'NearBlocks',
             url,
           },
-          projectId: config.NEXT_PUBLIC_REOWN_PROJECT_ID,
+          projectId,
         });
         const connector = new NearConnector({
           logger: {
@@ -90,7 +90,7 @@ export const Wallet = ({ className }: Props) => {
       isMounted = false;
       cleanup?.();
     };
-  }, [config]);
+  }, [mainnetUrl, network, projectId, providers, testnetUrl]);
 
   const connect = async () => {
     try {

@@ -19,7 +19,7 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
     return (
       <Badge className={cn('h-6', className)} variant="red" {...props}>
         <IoCaretDownCircle />
-        {numberFormat(changeNumber, { maximumFractionDigits: 2 })}
+        {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
       </Badge>
     );
   }
@@ -27,7 +27,7 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
   return (
     <Badge className={cn('h-6', className)} variant="lime" {...props}>
       <IoCaretUpCircle />+
-      {numberFormat(changeNumber, { maximumFractionDigits: 2 })}
+      {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
     </Badge>
   );
 };

@@ -61,7 +61,7 @@ export const MobileMenu = ({ menu }: Props) => {
       </li>
       <MobileNavigationMenuItem>
         <Wallet
-          className={`${mobileNavigationCollapsibleTriggerStyle()} border-border! w-full! justify-center border-1! px-4!`}
+          className={`${mobileNavigationCollapsibleTriggerStyle()} border-border! w-full! justify-center border! px-4!`}
         />
       </MobileNavigationMenuItem>
     </MobileNavigationMenu>

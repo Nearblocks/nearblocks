@@ -1,3 +1,5 @@
+import { AccountAssetFTsRes } from 'nb-schemas';
+
 import type { dictionary } from '@/locales/en';
 
 export type Dictionary = typeof dictionary;
@@ -14,16 +16,6 @@ export type RouteDictionary<R extends RouteNamespace> = Dictionary[R];
 
 export type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
-};
-
-export type PageProps<Params = unknown> = {
-  params: Promise<Params>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export type LayoutProps<Params = unknown> = {
-  children: React.ReactNode;
-  params: Promise<Params>;
 };
 
 type Primitive = bigint | boolean | null | number | string | symbol | undefined;
@@ -83,3 +75,24 @@ type HrefOrMenu<K extends string = string> =
 export type NavMenuItem<K extends string = string> = KeyOrTitle<K> &
   HrefOrMenu<K>;
 export type NavMenu<K extends string = string> = NavMenuItem<K>[];
+
+export type TokensCacheRes = {
+  account_id: string;
+  tokens: null | TokenCache[];
+};
+
+export type TokenCache = {
+  balance: string;
+  contract_id: string;
+};
+
+export type AssetToken = NonNullable<AccountAssetFTsRes['data']>[number] & {
+  price: string;
+};
+
+export type TokenInventory = {
+  amount: number;
+  tokens: AssetToken[];
+};
+
+export type SearchParams = Record<string, string | string[] | undefined>;

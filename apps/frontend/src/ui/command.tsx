@@ -117,7 +117,7 @@ const CommandGroup = ({
   return (
     <CommandPrimitive.Group
       className={cn(
-        'text-foreground **:[[cmdk-group-heading]]:text-muted-foreground **:[[cmdk-group-heading]]:text-body-xs overflow-hidden p-1 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:font-medium',
+        'text-foreground **:[[cmdk-group-heading]]:text-muted-foreground **:[[cmdk-group-heading]]:text-body-xs overflow-hidden p-2 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:font-medium',
         className,
       )}
       data-slot="command-group"
@@ -146,7 +146,7 @@ const CommandItem = ({
   return (
     <CommandPrimitive.Item
       className={cn(
-        "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-body-sm relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-[selected=true]:bg-muted data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground text-body-sm focus:bg-muted relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="command-item"

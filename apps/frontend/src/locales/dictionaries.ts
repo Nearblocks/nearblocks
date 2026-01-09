@@ -1,9 +1,9 @@
 import rosetta from 'rosetta';
-import 'server-only';
 
 import type {
   BaseDictionary,
   DeepPartial,
+  RecursiveKeyOf,
   RouteDictionary,
   RouteKey,
   RouteNamespace,
@@ -15,15 +15,15 @@ import { type Locale, supportedLocales } from './config';
 const dictionaries: Record<Locale, () => Promise<BaseDictionary>> = {
   en: () => import('./en').then((module) => module.dictionary),
   es: () => import('./es').then((module) => module.dictionary),
+  'fil-ph': () => import('./fil-ph').then((module) => module.dictionary),
   fr: () => import('./fr').then((module) => module.dictionary),
   id: () => import('./id').then((module) => module.dictionary),
   it: () => import('./it').then((module) => module.dictionary),
-  jp: () => import('./jp').then((module) => module.dictionary),
-  kr: () => import('./kr').then((module) => module.dictionary),
-  ph: () => import('./ph').then((module) => module.dictionary),
+  ja: () => import('./ja').then((module) => module.dictionary),
+  ko: () => import('./ko').then((module) => module.dictionary),
   ru: () => import('./ru').then((module) => module.dictionary),
   th: () => import('./th').then((module) => module.dictionary),
-  ua: () => import('./ua').then((module) => module.dictionary),
+  uk: () => import('./uk').then((module) => module.dictionary),
   vi: () => import('./vi').then((module) => module.dictionary),
   'zh-cn': () => import('./zh-cn').then((module) => module.dictionary),
   'zh-hk': () => import('./zh-hk').then((module) => module.dictionary),
@@ -61,4 +61,17 @@ export const translator = async <R extends RouteNamespace>(
     i18n.t(`${route}.${key}`, params) as string) as Translator<
     RouteDictionary<R>
   >;
+};
+
+export const clientTranslator = <T extends object>(
+  locale: Locale,
+  dictionary: T,
+): Translator<T> => {
+  const i18n = rosetta<Record<string, unknown>>();
+
+  i18n.set(locale, dictionary as unknown as Record<string, unknown>);
+  i18n.locale(locale);
+
+  return ((key: RecursiveKeyOf<T>, params) =>
+    i18n.t(key, params) as string) as Translator<T>;
 };

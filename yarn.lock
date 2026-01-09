@@ -7052,10 +7052,24 @@
   dependencies:
     "@near-js/jsonrpc-types" "1.3.4"
 
+"@near-js/jsonrpc-client@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@near-js/jsonrpc-client/-/jsonrpc-client-1.5.0.tgz#dde53a26ada1760325176160bc6303b1328decf4"
+  integrity sha512-ZQIgI2NnploENT10PgxMCq7jhtswC75g4RB6XSBskL8sK9iVuqLoFfCHHfSABk6dxUuzFhrJbeDmTONk899Daw==
+  dependencies:
+    "@near-js/jsonrpc-types" "1.5.0"
+
 "@near-js/jsonrpc-types@1.3.4":
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/@near-js/jsonrpc-types/-/jsonrpc-types-1.3.4.tgz#a6582cab1b6962b05d62b1b99947192f51e7f777"
   integrity sha512-2BO9+tJZUdBXeTsssB1lqkxogKt5YllYv9PLRgvK/0pox54PcKPSyDZwQPr361NDQQ3tY+4zK/3C8p+dF90Ctg==
+  dependencies:
+    zod "^4.0.5"
+
+"@near-js/jsonrpc-types@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@near-js/jsonrpc-types/-/jsonrpc-types-1.5.0.tgz#e29ba5ec745d40ac88e4a678393da3e7e2c1cde7"
+  integrity sha512-pgidkMApxPWp/tSgHUpVsn9n9fF1RZmk/A/yM/TEuzuczqMhnnT9I5ow4qmYPQyVMMWFialELT2SGm/LKym8bA==
   dependencies:
     zod "^4.0.5"
 
@@ -30539,7 +30553,7 @@ update-browserslist-db@^1.2.0:
     escalade "^3.2.0"
     picocolors "^1.1.1"
 
-uqr@0.1.2, uqr@^0.1.2:
+uqr@0.1.2, uqr@^0.1.2, uqr@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/uqr/-/uqr-0.1.2.tgz#5c6cd5dcff9581f9bb35b982cb89e2c483a41d7d"
   integrity sha512-MJu7ypHq6QasgF5YRTjqscSzQp/W11zoUk6kvmlH+fmWEs63Y0Eib13hYFwAzagRJcVY8WVnlV+eBDUGMJ5IbA==
@@ -31473,6 +31487,11 @@ zustand@5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.0.tgz#71f8aaecf185592a3ba2743d7516607361899da9"
   integrity sha512-LE+VcmbartOPM+auOjCCLQOsQ05zUTp8RkgwRzefUk+2jISdMMFnxvyTjA4YNWr5ZGXYbVsEMZosttuxUBkojQ==
+
+zustand@~5.0.9:
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.9.tgz#389dcd0309b9c545d7a461bd3c54955962847654"
+  integrity sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==
 
 zwitch@^2.0.0:
   version "2.0.4"

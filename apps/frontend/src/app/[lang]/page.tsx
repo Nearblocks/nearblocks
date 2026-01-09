@@ -9,11 +9,8 @@ import { fetchBlocks, fetchDailyStats, fetchTxns } from '@/data/home';
 import { fetchStats } from '@/data/layout';
 import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
-import type { PageProps } from '@/types/types';
 
-type Props = PageProps<{ lang: string }>;
-
-const Home = async ({ params }: Props) => {
+const Home = async ({ params }: PageProps<'/[lang]'>) => {
   const { lang } = await params;
   const statsPromise = fetchStats();
   const blocksPromise = fetchBlocks();
@@ -26,7 +23,7 @@ const Home = async ({ params }: Props) => {
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>
-      <main className="pb-10">
+      <main className="flex flex-1 flex-col pb-10">
         <Hero />
         <div className="container mx-auto -mt-12.5 px-4">
           <ErrorSuspense fallback={<Overview />}>
