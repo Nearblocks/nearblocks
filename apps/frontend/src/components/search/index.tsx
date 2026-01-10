@@ -46,11 +46,11 @@ export const SearchBar = () => {
       method="post"
       onSubmit={onSubmit}
     >
-      <ButtonGroup className="bg-white-950/15 border-white-950/60 isolate h-12 w-full items-center rounded-xl border backdrop-blur">
-        <ButtonGroup className="hidden pl-1 lg:flex">
+      <ButtonGroup className="isolate h-12 w-full items-center rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+        <ButtonGroup className="hidden pl-1 md:flex">
           <SearchFilter filter={filter} onSelect={onSelect} />
         </ButtonGroup>
-        <ButtonGroupSeparator className="bg-white-950/60 hidden h-8! self-auto sm:flex" />
+        <ButtonGroupSeparator className="hidden h-8! self-auto bg-neutral-200 md:flex dark:bg-neutral-700" />
         <ButtonGroup className="grow">
           <SearchPopover
             filter={filter}
@@ -61,11 +61,11 @@ export const SearchBar = () => {
         </ButtonGroup>
         <ButtonGroup className="pr-2">
           <Button
-            className="bg-white-950! h-8! rounded-lg text-neutral-950"
+            className="h-8! rounded-lg"
             disabled={isPending}
             size="icon-lg"
             type="submit"
-            variant="secondary"
+            variant="default"
           >
             {isPending ? (
               <Spinner className="size-4" />

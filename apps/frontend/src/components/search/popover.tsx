@@ -71,7 +71,7 @@ export const SearchPopover = ({
     <Popover onOpenChange={(open) => setOpen(open)} open={open}>
       <PopoverAnchor asChild>
         <Input
-          className="text-white-950 placeholder:text-white-950/60 h-9 border-0 bg-transparent! shadow-none"
+          className="h-9 border-0 shadow-none [&]:bg-white [&]:dark:bg-neutral-800"
           name="keyword"
           onChange={onChange}
           onFocus={onFocus}

@@ -40,10 +40,10 @@ export const Info = ({
 
   return (
     <Card>
-      <CardHeader className="border-b">
-        <CardTitle>Information</CardTitle>
+      <CardHeader className="border-b py-3">
+        <CardTitle className="text-headline-sm">Information</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-3">
         <List pairsPerRow={2}>
           <ListItem>
             <ListLeft className="min-w-30">Staked Balance:</ListLeft>

@@ -29,49 +29,46 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
 
   return (
     <Card>
-      <CardHeader className="border-b py-5">
-        <h2 className="text-headline-base">{t('blocks.title')}</h2>
+      <CardHeader className="border-b py-3">
+        <h2 className="text-headline-sm font-semibold">{t('blocks.title')}</h2>
       </CardHeader>
-      <ScrollArea className="h-101">
-        <CardContent className="@container p-4">
+      <ScrollArea className="h-[340px]">
+        <CardContent className="@container p-3">
           <SkeletonSlot
             fallback={
               <>
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Fragment key={i}>
-                    <div className="flex items-center gap-4 *:leading-[160%]">
-                      <div className="bg-muted rounded-lg p-3">
-                        <LuBox className="size-6" />
+                    <div className="flex items-center gap-3 *:leading-[140%]">
+                      <div className="bg-muted rounded-lg p-2">
+                        <LuBox className="size-5" />
                       </div>
-                      <div className="text-headline-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-col flex-wrap gap-x-4 gap-y-2 @lg:grid @lg:items-center">
+                      <div className="text-body-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-col flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
-                          <h4 className="text-link">
+                          <h4 className="text-link font-medium">
                             <Skeleton className="w-20" />
                           </h4>
-                          <p className="text-body-sm text-muted-foreground mt-0.5">
+                          <p className="text-body-xs text-muted-foreground mt-0.5">
                             <Skeleton className="w-20" />
                           </p>
                         </div>
                         <div>
-                          <h4 className="flex gap-1">
+                          <h4 className="flex gap-1 font-normal">
                             {t('blocks.author')} <Skeleton className="w-40" />
                           </h4>
-                          <p className="text-body-sm text-muted-foreground mt-0.5">
+                          <p className="text-body-xs text-muted-foreground mt-0.5">
                             <Skeleton className="w-20" />
                           </p>
                         </div>
                         <div className="@lg:ml-auto">
-                          <Badge
-                            className="text-headline-xs h-6"
-                            variant="amber"
-                          >
+                          <Badge className="text-body-xs h-6" variant="amber">
                             <LuFuel />
                             <Skeleton className="w-15" />
                           </Badge>
                         </div>
                       </div>
                     </div>
-                    {i != 9 && <Separator className="my-4" />}
+                    {i != 9 && <Separator className="my-2.5" />}
                   </Fragment>
                 ))}
               </>
@@ -82,23 +79,23 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
               <>
                 {blocks?.map((block, i) => (
                   <Fragment key={block.block_height}>
-                    <div className="flex items-center gap-4 *:leading-[160%]">
-                      <div className="bg-muted rounded-lg p-3">
-                        <LuBox className="size-6" />
+                    <div className="flex items-center gap-3 *:leading-[140%]">
+                      <div className="bg-muted rounded-lg p-2">
+                        <LuBox className="size-5" />
                       </div>
-                      <div className="text-headline-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-wrap gap-x-4 gap-y-2 @lg:grid @lg:items-center">
+                      <div className="text-body-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
-                          <h4 className="text-link">
+                          <h4 className="text-link font-medium">
                             <Link href={`/blocks/${block.block_height}`}>
                               {numberFormat(block.block_height)}
                             </Link>
                           </h4>
-                          <p className="text-body-sm text-muted-foreground mt-0.5">
+                          <p className="text-body-xs text-muted-foreground mt-0.5">
                             <TimeAgo ns={block.block_timestamp} />
                           </p>
                         </div>
                         <div>
-                          <h4 className="flex gap-1">
+                          <h4 className="flex gap-1 font-normal">
                             {t('blocks.author')}{' '}
                             <Link
                               className="text-link inline-block w-40 truncate"
@@ -107,15 +104,12 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                               {block.author_account_id}
                             </Link>
                           </h4>
-                          <p className="text-body-sm text-muted-foreground mt-0.5">
+                          <p className="text-body-xs text-muted-foreground mt-0.5">
                             {block.transactions_agg.count} txns
                           </p>
                         </div>
                         <div className="@lg:ml-auto">
-                          <Badge
-                            className="text-headline-xs h-6"
-                            variant="amber"
-                          >
+                          <Badge className="text-body-xs h-6" variant="amber">
                             <LuFuel />
                             {gasFormat(block.chunks_agg.gas_used, {
                               maximumFractionDigits: 2,
@@ -125,7 +119,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         </div>
                       </div>
                     </div>
-                    {blocks.length != i + 1 && <Separator className="my-4" />}
+                    {blocks.length != i + 1 && <Separator className="my-2.5" />}
                   </Fragment>
                 ))}
               </>

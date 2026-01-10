@@ -96,7 +96,7 @@ const ListLeft = ({ className, ...props }: ListLeftProps) => {
   return (
     <h3
       className={cn(
-        'text-muted-foreground border-b-0 px-1 pt-4 pb-1 xl:py-4',
+        'text-muted-foreground border-b-0 px-1 pt-3 pb-1 xl:py-3',
         'xl:border-b group-data-[last-row=true]/list-item:xl:border-b-0',
         className,
       )}
@@ -112,7 +112,7 @@ const ListRight = ({ className, ...props }: ListRightProps) => {
   return (
     <div
       className={cn(
-        'w-full border-b-0 px-1 pt-0 pb-4 xl:py-4',
+        'w-full border-b-0 px-1 pt-0 pb-3 xl:py-3',
         'xl:border-b group-data-[last-row=true]/list-item:xl:border-b-0',
         className,
       )}

@@ -13,17 +13,17 @@ export const Footer = () => {
   const { t } = useLocale('layout');
 
   return (
-    <footer className="bg-card text-body-xs">
+    <footer className="bg-card text-body-sm">
       <div className="container mx-auto px-4">
         <div className="flex flex-col flex-wrap justify-between gap-6 py-6 md:flex-row lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr]">
           <div className="flex basis-1/1 flex-col gap-4">
             <Link href="/">
-              <Logo className="text-primary h-7.5" />
+              <Logo className="text-primary h-10" />
             </Link>
             <p className="max-w-85">{t('footer.description')}</p>
             <div className="flex gap-2">
               <Link
-                className="border-border flex size-6 items-center justify-center rounded-full border"
+                className="border-border flex size-8 items-center justify-center rounded-full border"
                 href="https://x.com/nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
@@ -32,7 +32,7 @@ export const Footer = () => {
                 <RiTwitterXLine className="text-primary size-4" />
               </Link>
               <Link
-                className="border-border flex size-6 items-center justify-center rounded-full border"
+                className="border-border flex size-8 items-center justify-center rounded-full border"
                 href="https://github.com/Nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
@@ -41,7 +41,7 @@ export const Footer = () => {
                 <RiGithubFill className="text-primary size-4" />
               </Link>
               <Link
-                className="border-border flex size-6 items-center justify-center rounded-full border"
+                className="border-border flex size-8 items-center justify-center rounded-full border"
                 href="https://t.me/nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
@@ -135,16 +135,16 @@ export const Footer = () => {
         </div>
         <Separator />
         <div className="space-y-1 py-6">
-          <p className="text-body-xs text-primary">
+          <p className="text-body-sm text-primary">
             {t('footer.copyright')} {new Date().getFullYear()}
           </p>
-          <p className="text-body-xs text-muted-foreground flex items-center gap-2">
+          <p className="text-body-sm text-muted-foreground flex items-center gap-2">
             {t('footer.disclaimer')}{' '}
             <Link href="https://www.coingecko.com/" target="_blank">
               <CoinGecko className="size-5" />
             </Link>
           </p>
-          <p className="text-body-xs text-muted-foreground">
+          <p className="text-body-sm text-muted-foreground">
             {t('footer.trademark')}
           </p>
         </div>

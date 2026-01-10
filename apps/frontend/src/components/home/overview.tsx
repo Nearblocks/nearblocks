@@ -33,10 +33,10 @@ export const Overview = ({
     !loading && dailyStatsPromise ? use(dailyStatsPromise) : null;
 
   return (
-    <Card className="px-4 py-2">
+    <Card className="px-3 py-3">
       <div className="lg:grid lg:grid-cols-[1fr_auto_1fr_auto] lg:items-stretch xl:grid-cols-[1fr_auto_1fr_auto_1fr]">
         <div className="divide-y">
-          <div className="flex items-center gap-4 py-4">
+          <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
               <Near className="size-6" />
             </div>
@@ -69,7 +69,7 @@ export const Overview = ({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4 py-4">
+          <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
               <LuGlobe className="size-6" />
             </div>
@@ -97,7 +97,7 @@ export const Overview = ({
         <Separator className="lg:hidden" />
         <Separator className="hidden lg:mx-4 lg:block" orientation="vertical" />
         <div className="divide-y">
-          <div className="flex items-center gap-4 py-4">
+          <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
               <LuArrowRightLeft className="size-6" />
             </div>
@@ -148,7 +148,7 @@ export const Overview = ({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-4 py-4">
+          <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
               <LuPickaxe className="size-6" />
             </div>
@@ -191,16 +191,18 @@ export const Overview = ({
         </div>
         <Separator className="col-span-3 my-2 xl:my-0 xl:hidden" />
         <Separator className="hidden xl:mx-4 xl:block" orientation="vertical" />
-        <div className="z-0 col-span-3 pt-2 xl:col-auto">
+        <div className="z-0 col-span-3 min-w-0 xl:col-auto">
           <h3 className="text-body-xs text-muted-foreground pb-2 uppercase">
             {t('chart.title')}
           </h3>
-          <SkeletonSlot
-            fallback={<Skeleton className="h-30 w-full" />}
-            loading={loading || !dailyStats}
-          >
-            {() => <TxnsChart data={dailyStats ?? []} />}
-          </SkeletonSlot>
+          <div className="flex items-start">
+            <SkeletonSlot
+              fallback={<Skeleton className="h-[115px] w-full" />}
+              loading={loading || !dailyStats}
+            >
+              {() => <TxnsChart data={dailyStats ?? []} />}
+            </SkeletonSlot>
+          </div>
         </div>
       </div>
     </Card>

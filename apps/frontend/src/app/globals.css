@@ -24,7 +24,7 @@
   --color-teal-100: #cbfbf1;
   --color-teal-200: #98f6e4;
   --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
+  --color-teal-400: #0d9488;
   --color-teal-500: #15b8a6;
   --color-teal-600: #0d9488;
   --color-teal-700: #0e766e;
@@ -314,11 +314,11 @@
   max-width: initial;
 
   @media (width >= 80rem) {
-    max-width: 85rem;
+    max-width: 87.5rem;
   }
 
   @media (width >= 96rem) {
-    max-width: 96rem;
+    max-width: 87.5rem;
   }
 }
 

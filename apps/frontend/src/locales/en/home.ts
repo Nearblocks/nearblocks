@@ -18,7 +18,7 @@ export const home = {
     transactions: 'Transactions',
     validators: 'Active Validators',
   },
-  title: 'The Near blockchain explorer',
+  title: 'The Near Blockchain Explorer',
   txns: {
     button: 'View all transactions',
     deposit: 'Deposit value',

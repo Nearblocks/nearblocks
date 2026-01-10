@@ -31,7 +31,7 @@ export const TxnsChart = ({ data }: Props) => {
       options={{
         chart: {
           backgroundColor: 'transparent',
-          height: 120,
+          height: 115,
           spacingBottom: 0,
           spacingLeft: 0,
           spacingRight: 10,

@@ -138,7 +138,7 @@ export function DataTable<TData>({
   return (
     <Card className={className}>
       {header && (
-        <CardHeader className="text-body-sm border-b">
+        <CardHeader className="text-body-sm border-b py-3">
           <SkeletonSlot
             fallback={<Skeleton className="w-40" />}
             loading={loading}
@@ -176,7 +176,7 @@ export function DataTable<TData>({
             fallback={
               <TableBody>
                 {[...Array(skeletonRows)].map((_, i) => (
-                  <TableRow className="h-15.5" key={i}>
+                  <TableRow className="h-13.5" key={i}>
                     {columns.map((_, j) => (
                       <TableCell key={j}>
                         <Skeleton className="w-[60%]" />
@@ -193,7 +193,7 @@ export function DataTable<TData>({
                 {data?.map((row, rowIndex) => {
                   const key = getRowKey ? getRowKey(row) : String(rowIndex);
                   return (
-                    <TableRow className="h-15.5" key={key}>
+                    <TableRow className="h-13.5" key={key}>
                       {columns.map((column, colIndex) => (
                         <TableCell key={column.id || colIndex}>
                           {column.cell(row)}

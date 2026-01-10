@@ -37,10 +37,10 @@ export const Overview = ({
 
   return (
     <Card>
-      <CardHeader className="border-b">
-        <CardTitle>Overview</CardTitle>
+      <CardHeader className="border-b py-3">
+        <CardTitle className="text-headline-sm">Overview</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-3">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-20">Balance:</ListLeft>

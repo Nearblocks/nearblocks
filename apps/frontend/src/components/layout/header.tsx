@@ -69,7 +69,7 @@ export const Header = () => {
         <PopoverAnchor>
           <div className="container mx-auto flex h-15 items-center px-4">
             <Link href="/">
-              <Logo className="text-primary h-7.5" />
+              <Logo className="text-primary h-10" />
             </Link>
             <div className="text-headline-sm ml-auto flex gap-2">
               <Menu menu={menu} />
