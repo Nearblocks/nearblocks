@@ -42,11 +42,11 @@ export const SearchBar = () => {
 
   return (
     <form
-      className="text-body-sm mt-4 max-w-200 gap-2"
+      className="gap-2 mt-4 text-body-sm max-w-200"
       method="post"
       onSubmit={onSubmit}
     >
-      <ButtonGroup className="isolate h-12 w-full items-center rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+      <ButtonGroup className="items-center w-full h-12 bg-white border rounded-lg shadow-sm isolate border-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
         <ButtonGroup className="hidden pl-1 md:flex">
           <SearchFilter filter={filter} onSelect={onSelect} />
         </ButtonGroup>
