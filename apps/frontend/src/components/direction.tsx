@@ -38,5 +38,5 @@ export const Direction = ({ address, amount, from, to }: Props) => {
     return <Self />;
   }
 
-  return address === from ? <In /> : <Out />;
+  return address === from ? <Out /> : <In />;
 };
