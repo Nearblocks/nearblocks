@@ -34,6 +34,7 @@
     "class-variance-authority": "~0.7.1",
     "clsx": "~2.1.1",
     "cmdk": "^1.1.1",
+    "dayjs": "1.11.19",
     "es-toolkit": "~1.43.0",
     "highcharts": "~12.4.0",
     "next": "~16.1.1",

@@ -5,7 +5,7 @@ import type { PropsWithChildren } from 'react';
 
 import { Config } from '@/lib/config';
 import { initConfigStore } from '@/stores/config';
-import { initRpcStore } from '@/stores/rpc';
+import { initPreferencesStore } from '@/stores/preferences';
 
 type Props = PropsWithChildren<{
   value: Config;
@@ -16,7 +16,7 @@ export const ConfigContext = createContext<Config | null>(null);
 export const ConfigProvider = ({ children, value }: Props) => {
   useEffect(() => {
     initConfigStore(value);
-    initRpcStore(value.networkId, value.providers);
+    initPreferencesStore(value.networkId, value.providers);
   }, [value]);
 
   return (

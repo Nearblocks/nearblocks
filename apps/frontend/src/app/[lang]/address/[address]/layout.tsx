@@ -85,17 +85,22 @@ const AddressLayout = async ({ children, params }: Props) => {
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/fts`}>
-                  Token Transactions
+                  Token Txns
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/nfts`}>
-                  NFT Token Transactions
+                  NFT Token Txns
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/keys`}>
                   Access Keys
+                </ActiveLink>
+              </TabLink>
+              <TabLink asChild>
+                <ActiveLink href={`/address/${address}/staking`}>
+                  Staking Txns
                 </ActiveLink>
               </TabLink>
               {/* <TabLink asChild>

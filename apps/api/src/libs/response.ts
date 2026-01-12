@@ -25,7 +25,6 @@ export type PaginatedResponse<T> = {
   meta?: { next_page?: string; prev_page?: string };
 };
 
-const NOW = BigInt(Date.now()) * 1_000_000n; // Current time in ns
 const WINDOW_SIZE = BigInt(60 * 60 * 24 * 30 * 12) * 1_000_000_000n; // 1yr in ns
 
 /**
@@ -42,6 +41,7 @@ export const rollingWindowList = async <T>(
   queryFn: WindowListQuery<T>,
   options: WindowListOptions,
 ): Promise<T[]> => {
+  const NOW = BigInt(Date.now()) * 1_000_000n; // Current time in ns
   const { direction = 'desc', end = NOW, limit = 1, start } = options;
   const windowSize = WINDOW_SIZE;
   const results: T[] = [];
@@ -108,7 +108,7 @@ export const rollingWindow = async <T>(
 ): Promise<null | T> => {
   const { start } = options;
   const windowSize = WINDOW_SIZE;
-  let endNs = NOW;
+  let endNs = BigInt(Date.now()) * 1_000_000n; // Current time in ns
 
   while (endNs > start) {
     const startNs = endNs - windowSize;

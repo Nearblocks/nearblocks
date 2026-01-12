@@ -10,14 +10,17 @@ import {
 } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
+import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
 import { FilterClearData, FilterData } from '@/components/table-filter';
-import { TimeAgo } from '@/components/time-ago';
+import { TimestampCell, TimestampToggle } from '@/components/timestamp';
+import { TokenImage } from '@/components/token-image';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn-status';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
@@ -46,19 +49,22 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
   const columns: DataTableColumnDef<AccountNFTTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-[20px]',
+      className: 'w-5',
       header: '',
       id: 'status',
     },
     {
-      cell: (nft) => (
-        <Link className="text-link" href={`/nfts/${nft.receipt_id}`}>
-          <Truncate>
-            <TruncateText text={nft.transaction_hash ?? ''} />
-            <TruncateCopy text={nft.transaction_hash ?? ''} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (nft) =>
+        nft.transaction_hash ? (
+          <Link className="text-link" href={`/txns/${nft.transaction_hash}`}>
+            <Truncate>
+              <TruncateText text={nft.transaction_hash} />
+              <TruncateCopy text={nft.transaction_hash} />
+            </Truncate>
+          </Link>
+        ) : (
+          <Skeleton className="w-30" />
+        ),
       header: 'Txn Hash',
       id: 'txn_hash',
     },
@@ -89,6 +95,12 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
       ),
       header: 'Affected',
       id: 'affected',
+    },
+    {
+      cell: (nft) => <Direction amount={nft.delta_amount} />,
+      className: 'w-20',
+      header: '',
+      id: 'direction',
     },
     {
       cell: (nft) =>
@@ -127,15 +139,22 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
     },
     {
       cell: (nft) => (
-        <Link
-          className="text-link"
-          href={`/nft-token/${nft.contract_account_id}`}
-        >
-          <Truncate>
-            <TruncateText text={nft.contract_account_id} />
-            <TruncateCopy text={nft.contract_account_id} />
-          </Truncate>
-        </Link>
+        <span className="flex items-center gap-1">
+          <TokenImage
+            alt={nft.meta?.name ?? ''}
+            className="m-px size-5 rounded-full border"
+            src={nft.meta?.icon ?? ''}
+          />
+          <Link
+            className="text-link"
+            href={`/nft-token/${nft.contract_account_id}`}
+          >
+            <Truncate>
+              <TruncateText text={nft.contract_account_id} />
+              <TruncateCopy text={nft.contract_account_id} />
+            </Truncate>
+          </Link>
+        </span>
       ),
       enableFilter: true,
       filterName: 'token',
@@ -143,8 +162,14 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
       id: 'token',
     },
     {
-      cell: (nft) => <TimeAgo ns={nft.block?.block_timestamp} />,
-      header: 'Age',
+      cell: (nft) =>
+        nft.block?.block_timestamp ? (
+          <TimestampCell ns={nft.block.block_timestamp} />
+        ) : (
+          <Skeleton className="w-30" />
+        ),
+      className: 'w-42',
+      header: <TimestampToggle />,
       id: 'age',
     },
   ];

@@ -42,7 +42,11 @@ receipts_selected AS (
             r.included_in_block_timestamp,
             r.shard_id,
             r.index_in_chunk
-          ) > (p.block_timestamp, p.shard_id, p.index_in_chunk)
+          ) > (
+            p.included_in_block_timestamp,
+            p.shard_id,
+            p.index_in_chunk
+          )
         )
       )
     )

@@ -6,8 +6,8 @@ type Props = {
   status: boolean | undefined;
 };
 
-const badgeClass = 'size-5 rounded-full p-1';
 const iconClass = 'size-4';
+const badgeClass = 'size-5 rounded-full p-1';
 
 export const TxnStatusIcon = ({ status }: Props) => {
   if (status == null)

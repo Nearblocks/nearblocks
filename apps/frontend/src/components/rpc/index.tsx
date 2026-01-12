@@ -2,7 +2,7 @@
 
 import { LuGlobe, LuPlus } from 'react-icons/lu';
 
-import { useRpc } from '@/stores/rpc';
+import { usePreferences } from '@/stores/preferences';
 import { Button } from '@/ui/button';
 import {
   DropdownMenu,
@@ -14,9 +14,9 @@ import {
 } from '@/ui/dropdown-menu';
 
 export const RpcSelector = () => {
-  const provider = useRpc((s) => s.provider);
-  const providers = useRpc((s) => s.providers);
-  const setProvider = useRpc((s) => s.setProvider);
+  const provider = usePreferences((s) => s.provider);
+  const providers = usePreferences((s) => s.providers);
+  const setProvider = usePreferences((s) => s.setProvider);
 
   return (
     <DropdownMenu>

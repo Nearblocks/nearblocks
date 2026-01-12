@@ -1,5 +1,6 @@
 'use client';
 
+import { ActiveLink } from '@/components/active-link';
 import { useLocale } from '@/hooks/use-locale';
 import { NavMenu, RouteKey } from '@/types/types';
 import {
@@ -13,7 +14,6 @@ import {
 } from '@/ui/navigation-menu';
 import { Separator } from '@/ui/separator';
 
-import { ActiveLink } from '../active-link';
 import { Wallet } from './wallet';
 
 type Props = {
