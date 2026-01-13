@@ -6,7 +6,9 @@ import { LuChevronsUpDown } from 'react-icons/lu';
 
 import { AccountAssetFTsRes } from 'nb-schemas';
 
+import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
+import { TokenImage } from '@/components/token-image';
 import { currencyFormat, numberFormat, toTokenAmount } from '@/lib/format';
 import { mergeTokens, sortTokens } from '@/lib/token';
 import { TokenInventory, TokensCacheRes } from '@/types/types';
@@ -17,9 +19,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { ScrollArea } from '@/ui/scroll-area';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
-
-import { Link } from '../link';
-import { TokenImage } from '../token-image';
 
 type Props = {
   loading?: boolean;
@@ -80,7 +79,7 @@ export const Tokens = ({
               role="combobox"
               variant="outline"
             >
-              {inventory.tokens.length > 1 ? (
+              {inventory.tokens.length > 0 ? (
                 <span className="flex items-center gap-2">
                   {currencyFormat(inventory.amount)}{' '}
                   <Badge variant="teal">
@@ -99,8 +98,8 @@ export const Tokens = ({
       </SkeletonSlot>
       <PopoverContent className="w-(--radix-popper-anchor-width) p-0">
         <Command>
-          <CommandList>
-            <ScrollArea className="h-75">
+          <CommandList className="max-h-none overflow-y-visible">
+            <ScrollArea className="max-h-75">
               <CommandGroup>
                 {inventory.tokens.map((token, index) => (
                   <Fragment key={token.contract}>

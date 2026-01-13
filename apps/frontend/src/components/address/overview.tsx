@@ -4,7 +4,9 @@ import { use } from 'react';
 
 import { AccountAssetFTsRes, AccountBalanceRes, StatsRes } from 'nb-schemas';
 
+import { ErrorSuspense } from '@/components/error-suspense';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
+import { SkeletonSlot } from '@/components/skeleton';
 // import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, nearFiatFormat, nearFormat } from '@/lib/format';
@@ -12,8 +14,6 @@ import { TokensCacheRes } from '@/types/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
-import { ErrorSuspense } from '../error-suspense';
-import { SkeletonSlot } from '../skeleton';
 import { Tokens } from './tokens';
 
 type Props = {
@@ -66,9 +66,11 @@ export const Overview = ({
                 >
                   {() => (
                     <>
-                      {nearFiatFormat(balance!.amount, stats!.near_price)} (@
-                      {currencyFormat(stats!.near_price)} /{' '}
-                      <NearCircle className="size-4" />)
+                      {nearFiatFormat(balance!.amount, stats!.near_price)}{' '}
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        @{currencyFormat(stats!.near_price)} /
+                        <NearCircle className="size-4" />
+                      </span>
                     </>
                   )}
                 </SkeletonSlot>

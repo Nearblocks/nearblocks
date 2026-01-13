@@ -6,13 +6,15 @@ import { use } from 'react';
 import { AccountTxnCount, AccountTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
+import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
 import { FilterClearData, FilterData } from '@/components/table-filter';
-import { TimeAgo } from '@/components/time-ago';
+import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn-status';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
+import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 
@@ -44,7 +46,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
   const columns: DataTableColumnDef<TxnRow>[] = [
     {
       cell: (txn) => <TxnStatusIcon status={txn.outcomes?.status} />,
-      className: 'w-[20px]',
+      className: 'w-5',
       header: '',
       id: 'status',
     },
@@ -66,7 +68,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
           <Truncate>
             <TruncateText
               className="max-w-20"
-              text={txn.actions?.[0]?.method ?? ''}
+              text={actionMethod(txn.actions)}
             />
           </Truncate>
         </Badge>
@@ -88,7 +90,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       cell: (txn) => (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
-          {nearFormat(txn.outcomes_agg?.transaction_fee)}
+          {nearFormat(txn.outcomes_agg?.transaction_fee) ?? '0'}
         </span>
       ),
       header: 'Txn Fee',
@@ -107,6 +109,18 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       filterName: 'signer',
       header: 'From',
       id: 'from',
+    },
+    {
+      cell: (txn) => (
+        <Direction
+          address={address}
+          from={txn.signer_account_id}
+          to={txn.receiver_account_id}
+        />
+      ),
+      className: 'w-20',
+      header: '',
+      id: 'direction',
     },
     {
       cell: (txn) => (
@@ -135,8 +149,9 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       id: 'block',
     },
     {
-      cell: (txn) => <TimeAgo ns={txn.block?.block_timestamp} />,
-      header: 'Age',
+      cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
+      className: 'w-42',
+      header: <TimestampToggle />,
       id: 'age',
     },
   ];

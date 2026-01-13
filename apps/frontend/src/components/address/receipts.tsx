@@ -6,13 +6,15 @@ import { use } from 'react';
 import { AccountReceiptCount, AccountReceiptsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
+import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
 import { FilterClearData, FilterData } from '@/components/table-filter';
-import { TimeAgo } from '@/components/time-ago';
+import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn-status';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
+import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 
@@ -50,7 +52,7 @@ export const Receipts = ({
   const columns: DataTableColumnDef<ReceiptRow>[] = [
     {
       cell: (receipt) => <TxnStatusIcon status={receipt.outcome?.status} />,
-      className: 'w-[20px]',
+      className: 'w-5',
       header: '',
       id: 'status',
     },
@@ -87,7 +89,7 @@ export const Receipts = ({
           <Truncate>
             <TruncateText
               className="max-w-20"
-              text={receipt.actions?.[0]?.method ?? ''}
+              text={actionMethod(receipt.actions)}
             />
           </Truncate>
         </Badge>
@@ -124,6 +126,18 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
+        <Direction
+          address={address}
+          from={receipt.predecessor_account_id}
+          to={receipt.receiver_account_id}
+        />
+      ),
+      className: 'w-20',
+      header: '',
+      id: 'direction',
+    },
+    {
+      cell: (receipt) => (
         <Link
           className="text-link"
           href={`/address/${receipt.receiver_account_id}`}
@@ -152,8 +166,9 @@ export const Receipts = ({
       id: 'block',
     },
     {
-      cell: (receipt) => <TimeAgo ns={receipt.block?.block_timestamp} />,
-      header: 'Age',
+      cell: (receipt) => <TimestampCell ns={receipt.block?.block_timestamp} />,
+      className: 'w-42',
+      header: <TimestampToggle />,
       id: 'age',
     },
   ];

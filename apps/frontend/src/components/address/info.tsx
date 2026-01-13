@@ -10,14 +10,13 @@ import {
 } from 'nb-schemas';
 
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
+import { SkeletonSlot } from '@/components/skeleton';
+import { TimeAgo } from '@/components/time-ago';
 // import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { bytesFormat, nearFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
-
-import { SkeletonSlot } from '../skeleton';
-import { TimeAgo } from '../time-ago';
 
 type Props = {
   accountPromise?: Promise<AccountRes['data']>;
@@ -115,7 +114,9 @@ export const Info = ({
               <p className="flex items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={loading || !account}
+                  loading={
+                    loading || !account || !account?.created?.block_timestamp
+                  }
                 >
                   {() => (
                     <>

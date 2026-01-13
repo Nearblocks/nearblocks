@@ -8,7 +8,7 @@ import { AccountKey, AccountKeyCount, AccountKeysRes } from 'nb-schemas';
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { Link } from '@/components/link';
 import { FilterClearData, FilterData } from '@/components/table-filter';
-import { TimeAgo } from '@/components/time-ago';
+import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
@@ -92,8 +92,9 @@ export const Keys = ({ keyCountPromise, keysPromise, loading }: Props) => {
       id: 'access',
     },
     {
-      cell: (key) => <TimeAgo ns={key.action_timestamp} />,
-      header: 'Age',
+      cell: (key) => <TimestampCell ns={key.action_timestamp} />,
+      className: 'w-42',
+      header: <TimestampToggle />,
       id: 'age',
     },
   ];

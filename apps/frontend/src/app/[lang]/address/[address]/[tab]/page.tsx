@@ -4,11 +4,13 @@ import { FTTxns } from '@/components/address/fts';
 import { Keys } from '@/components/address/keys';
 import { NFTTxns } from '@/components/address/nfts';
 import { Receipts } from '@/components/address/receipts';
+import { StakingTxns } from '@/components/address/staking';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchFTTxnCount, fetchFTTxns } from '@/data/address/fts';
 import { fetchKeyCount, fetchKeys } from '@/data/address/keys';
 import { fetchNFTTxnCount, fetchNFTTxns } from '@/data/address/nfts';
 import { fetchReceiptCount, fetchReceipts } from '@/data/address/receipts';
+import { fetchStaking, fetchStakingCount } from '@/data/address/staking';
 
 type Props = PageProps<'/[lang]/address/[address]/[tab]'>;
 
@@ -18,6 +20,7 @@ const tabs = [
   'fts',
   'nfts',
   'keys',
+  'staking',
   'assets',
   'contract',
 ] as const;
@@ -33,6 +36,8 @@ const Tab = async ({ params, searchParams }: Props) => {
   const nftCountPromise = fetchNFTTxnCount(address, filters);
   const keysPromise = fetchKeys(address, filters);
   const keyCountPromise = fetchKeyCount(address);
+  const stakingPromise = fetchStaking(address, filters);
+  const stakingCountPromise = fetchStakingCount(address, filters);
 
   if (!tab || !tabs.includes(tab as TabType)) {
     notFound();
@@ -67,6 +72,15 @@ const Tab = async ({ params, searchParams }: Props) => {
       return (
         <ErrorSuspense fallback={<Keys loading />}>
           <Keys keyCountPromise={keyCountPromise} keysPromise={keysPromise} />
+        </ErrorSuspense>
+      );
+    case 'staking':
+      return (
+        <ErrorSuspense fallback={<StakingTxns loading />}>
+          <StakingTxns
+            stakingCountPromise={stakingCountPromise}
+            stakingPromise={stakingPromise}
+          />
         </ErrorSuspense>
       );
     default:

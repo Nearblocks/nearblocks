@@ -1,44 +1,3 @@
-/**
- * DataTable - A reusable, composable data table component
- *
- * Features:
- * - Type-safe column definitions
- * - Built-in loading states with skeleton UI
- * - Pagination support
- * - Column filtering
- * - Empty state handling
- * - Customizable headers and cells
- *
- * @example
- * ```tsx
- * type User = { id: string; name: string; email: string };
- *
- * const columns: DataTableColumnDef<User>[] = [
- *   {
- *     id: 'name',
- *     header: 'Name',
- *     cell: (user) => <span>{user.name}</span>,
- *   },
- *   {
- *     id: 'email',
- *     header: 'Email',
- *     enableFilter: true,
- *     filterName: 'email',
- *     cell: (user) => <span>{user.email}</span>,
- *   },
- * ];
- *
- * <DataTable
- *   columns={columns}
- *   data={users}
- *   loading={isLoading}
- *   header={<>Total: {totalCount} users</>}
- *   pagination={meta}
- *   onPaginationNavigate={(type, page) => `/users?${type}=${page}`}
- *   getRowKey={(user) => user.id}
- * />
- * ```
- */
 'use client';
 
 import { ReactNode } from 'react';
@@ -49,7 +8,7 @@ import {
   FilterData,
   TableFilter,
 } from '@/components/table-filter';
-import { Badge } from '@/ui/badge';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter, CardHeader } from '@/ui/card';
 import {
   Pagination,
@@ -71,7 +30,6 @@ import {
 import { EmptyBox } from './empty';
 import { SkeletonSlot } from './skeleton';
 
-// Column definition types
 export type DataTableColumnDef<TData> = {
   cell: (row: TData) => ReactNode;
   className?: string;
@@ -79,6 +37,7 @@ export type DataTableColumnDef<TData> = {
   filterName?: string;
   header?: ((helpers: FilterHelpers) => ReactNode) | ReactNode;
   id?: string;
+  skeletonWidth?: string;
 };
 
 export type FilterHelpers = {
@@ -91,7 +50,6 @@ export type PaginationMeta = {
   prev_page?: null | string;
 };
 
-// Props for the DataTable component
 type DataTableProps<TData> = {
   className?: string;
   columns: DataTableColumnDef<TData>[];
@@ -148,7 +106,7 @@ export function DataTable<TData>({
         </CardHeader>
       )}
       <CardContent className="text-body-sm p-0">
-        <Table>
+        <Table className="xl:table-fixed">
           <TableHeader className="uppercase">
             <TableRow>
               {columns.map((column, index) => (
@@ -176,10 +134,12 @@ export function DataTable<TData>({
             fallback={
               <TableBody>
                 {[...Array(skeletonRows)].map((_, i) => (
-                  <TableRow className="h-13.5" key={i}>
-                    {columns.map((_, j) => (
-                      <TableCell key={j}>
-                        <Skeleton className="w-[60%]" />
+                  <TableRow className="h-15" key={i}>
+                    {columns.map((column, j) => (
+                      <TableCell key={column.id ?? j}>
+                        <Skeleton
+                          className={cn('w-[60%]', column.skeletonWidth)}
+                        />
                       </TableCell>
                     ))}
                   </TableRow>
@@ -193,7 +153,7 @@ export function DataTable<TData>({
                 {data?.map((row, rowIndex) => {
                   const key = getRowKey ? getRowKey(row) : String(rowIndex);
                   return (
-                    <TableRow className="h-13.5" key={key}>
+                    <TableRow className="h-15" key={key}>
                       {columns.map((column, colIndex) => (
                         <TableCell key={column.id || colIndex}>
                           {column.cell(row)}
@@ -226,7 +186,7 @@ export function DataTable<TData>({
             </Pagination>
           </CardFooter>
         }
-        loading={loading || !pagination}
+        loading={loading}
       >
         {() => (
           <>
@@ -266,6 +226,3 @@ export function DataTable<TData>({
     </Card>
   );
 }
-
-// Export helper components for common patterns
-export { Badge };
