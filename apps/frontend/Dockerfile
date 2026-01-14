@@ -24,6 +24,7 @@ RUN adduser -S nextjs -u 1001
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 ENV NODE_ENV=production
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/frontend/.next/standalone ./
