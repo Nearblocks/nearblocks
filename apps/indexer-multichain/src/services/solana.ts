@@ -81,7 +81,8 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
   const block = await retry(runBlock, { onError });
 
   if (!block) {
-    throw new NotFoundError(`${chain}: block not found: ${height}`);
+    logger.info(`${chain}: block missing, skipping: ${height}`);
+    return;
   }
 
   if (!block.transactions?.length) return;
