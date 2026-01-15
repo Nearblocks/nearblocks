@@ -7,6 +7,7 @@ export const rpcCall = async <T>(
   url: string,
   method: string,
   params: unknown[] = [],
+  options: { allowNull?: boolean } = {},
 ): Promise<T> => {
   const payload: SolanaRpcRequest = {
     id: Date.now(),
@@ -33,12 +34,16 @@ export const rpcCall = async <T>(
 
   const json = (await body.json()) as SolanaRpcResponse<T>;
 
-  if (!json.result) {
-    throw new NotFoundError('block not found');
+  if (json.error) {
+    if (options.allowNull && json.error.code === -32009) {
+      return null as T;
+    }
+
+    throw new Error(json.error.message);
   }
 
-  if (json.error) {
-    throw new Error(json.error.message);
+  if (!json.result) {
+    throw new NotFoundError('block not found');
   }
 
   return json.result as T;
@@ -52,8 +57,10 @@ export const getBlock = async (
   url: string,
   slot: number,
 ): Promise<null | SolanaBlock> => {
-  return rpcCall<SolanaBlock>(url, 'getBlock', [
-    slot,
-    { encoding: 'json', maxSupportedTransactionVersion: 0 },
-  ]);
+  return rpcCall<null | SolanaBlock>(
+    url,
+    'getBlock',
+    [slot, { encoding: 'json', maxSupportedTransactionVersion: 0 }],
+    { allowNull: true },
+  );
 };
