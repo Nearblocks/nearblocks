@@ -17,7 +17,7 @@ if (config.redisUrl) {
   }
 }
 
-if (config.redisSentinelName) {
+if (!config.redisUrl && config.redisSentinelName) {
   const urls = config.redisSentinelUrls.split('|').filter((u) => u);
 
   if (urls.length) {

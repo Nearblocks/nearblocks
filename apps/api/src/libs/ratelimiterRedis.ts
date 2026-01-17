@@ -17,7 +17,7 @@ if (config.ratelimiterRedisUrl) {
   }
 }
 
-if (config.ratelimiterRedisSentinelName) {
+if (!config.ratelimiterRedisUrl && config.ratelimiterRedisSentinelName) {
   const urls = config.ratelimiterRedisSentinelUrls.split('|').filter((u) => u);
 
   if (urls.length) {
