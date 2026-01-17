@@ -12,8 +12,9 @@ if (config.redisUrl) {
     port: +url.port,
   };
 
-  if (url.password) {
-    options.password = url.password;
+  const password = url.password || config.redisPassword;
+  if (password) {
+    options.password = password;
   }
 }
 

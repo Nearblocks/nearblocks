@@ -12,8 +12,9 @@ if (config.ratelimiterRedisUrl) {
     port: +url.port,
   };
 
-  if (url.password) {
-    ratelimiterOptions.password = url.password;
+  const password = url.password || config.ratelimiterRedisPassword;
+  if (password) {
+    ratelimiterOptions.password = password;
   }
 }
 
