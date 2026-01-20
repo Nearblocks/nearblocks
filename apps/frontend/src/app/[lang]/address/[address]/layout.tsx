@@ -1,14 +1,14 @@
 import { notFound } from 'next/navigation';
 
-import { ActiveLink } from '@/components/active-link';
 import { Info } from '@/components/address/info';
 import { Overview } from '@/components/address/overview';
 import { AccountQr } from '@/components/address/qr';
 import { Validate } from '@/components/address/validate';
 import { Copy } from '@/components/copy';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { ActiveLink } from '@/components/link';
 import { RpcSelector } from '@/components/rpc';
-import { TabLink } from '@/components/tab-links';
+import { TabBadge, TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
 import {
   fetchAccount,
@@ -90,7 +90,12 @@ const AddressLayout = async ({ children, params }: Props) => {
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/nfts`}>
-                  NFT Token Txns
+                  NFT Txns
+                </ActiveLink>
+              </TabLink>
+              <TabLink asChild>
+                <ActiveLink href={`/address/${address}/staking`}>
+                  Staking Txns
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
@@ -99,15 +104,22 @@ const AddressLayout = async ({ children, params }: Props) => {
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
-                <ActiveLink href={`/address/${address}/staking`}>
-                  Staking Txns
+                <ActiveLink href={`/address/${address}/analytics`}>
+                  Analytics
+                  <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
               </TabLink>
               {/* <TabLink asChild>
+                <ActiveLink href={`/address/${address}/assets`}>
+                  Assets
+                  <TabBadge variant="teal">NEW</TabBadge>
+                </ActiveLink>
+              </TabLink> */}
+              <TabLink asChild>
                 <ActiveLink href={`/address/${address}/contract`}>
                   Contract
                 </ActiveLink>
-              </TabLink> */}
+              </TabLink>
             </TabLinks>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>

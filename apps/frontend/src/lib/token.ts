@@ -1,14 +1,14 @@
-import { AccountAssetFTsRes } from 'nb-schemas';
+import { AccountAssetFT } from 'nb-schemas';
 
-import { AssetToken, TokensCacheRes } from '@/types/types';
+import { AssetToken, TokenCache } from '@/types/types';
 
 import { toTokenPrice } from './format';
 import { tokenBalance } from './rpc';
 
 export const mergeTokens = async (
   account: string,
-  tokens: AccountAssetFTsRes['data'],
-  tokensCache: TokensCacheRes['tokens'],
+  tokens: AccountAssetFT[] | null,
+  tokensCache: null | TokenCache[],
 ) => {
   if (!tokens?.length) {
     return [];

@@ -1,41 +1,55 @@
 import {
+  Account,
+  AccountAssetFT,
   AccountAssetFTsRes,
+  AccountBalance,
   AccountBalanceRes,
   AccountRes,
+  ContractDeployment,
   ContractDeploymentRes,
 } from 'nb-schemas';
 
 import { getServerConfig } from '@/lib/config';
 import { fetcher } from '@/lib/fetcher';
-import { TokensCacheRes } from '@/types/types';
+import { TokenCache, TokensCacheRes } from '@/types/types';
 
-export const fetchAccount = async (account: string) => {
+export const fetchAccount = async (
+  account: string,
+): Promise<Account | null> => {
   const resp = await fetcher<AccountRes>(`/v3/accounts/${account}`);
   return resp.data;
 };
 
-export const fetchBalance = async (account: string) => {
+export const fetchBalance = async (
+  account: string,
+): Promise<AccountBalance | null> => {
   const resp = await fetcher<AccountBalanceRes>(
     `/v3/accounts/${account}/balance`,
   );
   return resp.data;
 };
 
-export const fetchDeployments = async (account: string) => {
+export const fetchDeployments = async (
+  account: string,
+): Promise<ContractDeployment[] | null> => {
   const resp = await fetcher<ContractDeploymentRes>(
     `/v3/accounts/${account}/contract/deployments`,
   );
   return resp.data;
 };
 
-export const fetchTokens = async (account: string) => {
+export const fetchTokens = async (
+  account: string,
+): Promise<AccountAssetFT[] | null> => {
   const resp = await fetcher<AccountAssetFTsRes>(
     `/v3/accounts/${account}/assets/fts?limit=100`,
   );
   return resp.data;
 };
 
-export const fetchTokenCache = async (account: string) => {
+export const fetchTokenCache = async (
+  account: string,
+): Promise<null | TokenCache[]> => {
   try {
     const config = getServerConfig();
     const apiKey = config.NEXT_PUBLIC_FASTNEAR_RPC_KEY;

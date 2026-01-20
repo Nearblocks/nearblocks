@@ -4,14 +4,14 @@ import { useParams } from 'next/navigation';
 import { Fragment, use, useEffect, useState } from 'react';
 import { LuChevronsUpDown } from 'react-icons/lu';
 
-import { AccountAssetFTsRes } from 'nb-schemas';
+import { AccountAssetFT } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
-import { TokenImage } from '@/components/token-image';
+import { TokenImage } from '@/components/token';
 import { currencyFormat, numberFormat, toTokenAmount } from '@/lib/format';
 import { mergeTokens, sortTokens } from '@/lib/token';
-import { TokenInventory, TokensCacheRes } from '@/types/types';
+import { TokenCache, TokenInventory } from '@/types/types';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@/ui/command';
@@ -22,8 +22,8 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  tokenCachePromise?: Promise<TokensCacheRes['tokens']>;
-  tokensPromise?: Promise<AccountAssetFTsRes['data']>;
+  tokenCachePromise?: Promise<null | TokenCache[]>;
+  tokensPromise?: Promise<AccountAssetFT[] | null>;
 };
 
 export const Tokens = ({

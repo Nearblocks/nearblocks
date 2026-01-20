@@ -3,11 +3,7 @@
 import Link from 'next/link';
 import { use } from 'react';
 
-import {
-  AccountBalanceRes,
-  AccountRes,
-  ContractDeploymentRes,
-} from 'nb-schemas';
+import { Account, AccountBalance, ContractDeployment } from 'nb-schemas';
 
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
@@ -19,9 +15,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  accountPromise?: Promise<AccountRes['data']>;
-  balancePromise?: Promise<AccountBalanceRes['data']>;
-  deploymentsPromise?: Promise<ContractDeploymentRes['data']>;
+  accountPromise?: Promise<Account | null>;
+  balancePromise?: Promise<AccountBalance | null>;
+  deploymentsPromise?: Promise<ContractDeployment[] | null>;
   loading?: boolean;
 };
 

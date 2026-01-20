@@ -23,7 +23,6 @@ export const TableFilter = ({ name, onClear, onFilter }: Props) => {
 
   const onSumbit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ search });
     onFilter({ [name]: search });
   };
 

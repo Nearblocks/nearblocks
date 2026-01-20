@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react';
 import { LuSearch } from 'react-icons/lu';
 
 import { searchKeyword } from '@/lib/search';
+import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { ButtonGroup, ButtonGroupSeparator } from '@/ui/button-group';
 import { Spinner } from '@/ui/spinner';
@@ -12,7 +13,11 @@ import { Spinner } from '@/ui/spinner';
 import { SearchFilter } from './filter';
 import { SearchPopover } from './popover';
 
-export const SearchBar = () => {
+type Props = {
+  size?: 'lg' | 'sm';
+};
+
+export const SearchBar = ({ size = 'lg' }: Props) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('');
@@ -41,31 +46,37 @@ export const SearchBar = () => {
   };
 
   return (
-    <form
-      className="text-body-sm mt-4 max-w-200 gap-2"
-      method="post"
-      onSubmit={onSubmit}
-    >
-      <ButtonGroup className="isolate h-12 w-full items-center rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
+    <form className="text-body-sm" method="post" onSubmit={onSubmit}>
+      <ButtonGroup
+        className={cn(
+          'bg-card isolate w-full items-center rounded-lg border',
+          size === 'lg' ? 'h-12' : 'h-9',
+        )}
+      >
         <ButtonGroup className="hidden pl-1 md:flex">
-          <SearchFilter filter={filter} onSelect={onSelect} />
+          <SearchFilter
+            className={size === 'lg' ? 'h-9 w-34' : 'h-7 w-30'}
+            filter={filter}
+            onSelect={onSelect}
+          />
         </ButtonGroup>
-        <ButtonGroupSeparator className="hidden h-8! self-auto bg-neutral-200 md:flex dark:bg-neutral-700" />
+        <ButtonGroupSeparator className="bg-border hidden h-8! self-auto md:flex" />
         <ButtonGroup className="grow">
           <SearchPopover
+            className={size === 'lg' ? 'h-9' : 'h-7'}
             filter={filter}
             open={open}
             setOpen={setOpen}
             startTransition={startTransition}
           />
         </ButtonGroup>
-        <ButtonGroup className="pr-2">
+        <ButtonGroup className={size === 'lg' ? 'pr-2' : 'pr-1'}>
           <Button
-            className="h-8! rounded-lg"
+            className={cn('rounded-lg', size === 'lg' && 'w-9')}
             disabled={isPending}
-            size="icon-lg"
+            size={size === 'lg' ? 'icon-sm' : 'icon-xs'}
             type="submit"
-            variant="default"
+            variant="secondary"
           >
             {isPending ? (
               <Spinner className="size-4" />

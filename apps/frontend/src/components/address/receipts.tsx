@@ -3,28 +3,32 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { AccountReceiptCount, AccountReceiptsRes } from 'nb-schemas';
+import {
+  AccountReceipt,
+  AccountReceiptCount,
+  AccountReceiptsRes,
+} from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnStatusIcon } from '@/components/txn-status';
+import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
   receiptCountPromise?: Promise<AccountReceiptCount | null>;
   receiptsPromise?: Promise<AccountReceiptsRes>;
 };
-
-type ReceiptRow = NonNullable<AccountReceiptsRes['data']>[number];
 
 export const Receipts = ({
   loading,
@@ -49,7 +53,7 @@ export const Receipts = ({
     router.push(`/address/${address}/${tab}?${params.toString()}`);
   };
 
-  const columns: DataTableColumnDef<ReceiptRow>[] = [
+  const columns: DataTableColumnDef<AccountReceipt>[] = [
     {
       cell: (receipt) => <TxnStatusIcon status={receipt.outcome?.status} />,
       className: 'w-5',
@@ -58,7 +62,10 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Link className="text-link" href={`/receipts/${receipt.receipt_id}`}>
+        <Link
+          className="text-link"
+          href={`/txns/${receipt.transaction_hash}/execution#${receipt.receipt_id}`}
+        >
           <Truncate>
             <TruncateText text={receipt.receipt_id} />
             <TruncateCopy text={receipt.receipt_id} />
@@ -70,10 +77,7 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Link
-          className="text-link"
-          href={`/receipts/${receipt.transaction_hash}`}
-        >
+        <Link className="text-link" href={`/txns/${receipt.transaction_hash}`}>
           <Truncate>
             <TruncateText text={receipt.transaction_hash} />
             <TruncateCopy text={receipt.transaction_hash} />
@@ -126,7 +130,7 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Direction
+        <TxnDirection
           address={address}
           from={receipt.predecessor_account_id}
           to={receipt.receiver_account_id}
@@ -174,23 +178,34 @@ export const Receipts = ({
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={receipts?.data}
-      emptyMessage="No transactions found"
-      getRowKey={(receipt) => receipt.receipt_id}
-      header={
-        <>{`A total of ${numberFormat(
-          receiptCount?.count ?? 0,
-        )} receipts found`}</>
-      }
-      loading={loading || !receiptCount || !receiptCount?.count}
-      onClear={onClear}
-      onFilter={onFilter}
-      onPaginationNavigate={(type, page) =>
-        `/address/${address}/${tab}?${type}=${page}`
-      }
-      pagination={receipts?.meta}
-    />
+    <Card>
+      <CardHeader className="text-body-sm border-b py-3">
+        <SkeletonSlot
+          fallback={<Skeleton className="w-40" />}
+          loading={loading || !receiptCount}
+        >
+          {() => (
+            <>{`A total of ${numberFormat(
+              receiptCount?.count ?? 0,
+            )} receipts found`}</>
+          )}
+        </SkeletonSlot>
+      </CardHeader>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={receipts?.data}
+          emptyMessage="No receipts found"
+          getRowKey={(receipt) => receipt.receipt_id}
+          loading={loading || !!receipts?.errors}
+          onClear={onClear}
+          onFilter={onFilter}
+          onPaginationNavigate={(type, cursor) =>
+            `/address/${address}/${tab}?${type}=${cursor}`
+          }
+          pagination={receipts?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

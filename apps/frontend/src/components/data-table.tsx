@@ -9,7 +9,6 @@ import {
   TableFilter,
 } from '@/components/table-filter';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardFooter, CardHeader } from '@/ui/card';
 import {
   Pagination,
   PaginationContent,
@@ -51,29 +50,25 @@ export type PaginationMeta = {
 };
 
 type DataTableProps<TData> = {
-  className?: string;
   columns: DataTableColumnDef<TData>[];
   data?: null | TData[];
   emptyIcon?: ReactNode;
   emptyMessage?: string;
   getRowKey?: (row: TData) => string;
-  header?: ReactNode;
   loading?: boolean;
   onClear?: (data: FilterClearData) => void;
   onFilter?: (value: FilterData) => void;
-  onPaginationNavigate?: (type: 'next' | 'prev', page: string) => string;
+  onPaginationNavigate?: (type: 'next' | 'prev', cursor: string) => string;
   pagination?: null | PaginationMeta;
   skeletonRows?: number;
 };
 
 export function DataTable<TData>({
-  className,
   columns,
   data,
   emptyIcon = <LuInbox />,
   emptyMessage = 'No data found',
   getRowKey,
-  header,
   loading = false,
   onClear,
   onFilter,
@@ -94,86 +89,73 @@ export function DataTable<TData>({
   };
 
   return (
-    <Card className={className}>
-      {header && (
-        <CardHeader className="text-body-sm border-b py-3">
-          <SkeletonSlot
-            fallback={<Skeleton className="w-40" />}
-            loading={loading}
-          >
-            {() => header}
-          </SkeletonSlot>
-        </CardHeader>
-      )}
-      <CardContent className="text-body-sm p-0">
-        <Table className="xl:table-fixed">
-          <TableHeader className="uppercase">
-            <TableRow>
-              {columns.map((column, index) => (
-                <TableHead
-                  className={column.className}
-                  key={column.id || index}
-                >
-                  {column.enableFilter && column.filterName ? (
-                    <span className="flex items-center gap-1">
-                      {renderHeader(column)}{' '}
-                      <TableFilter
-                        name={column.filterName}
-                        onClear={filterHelpers.onClear}
-                        onFilter={filterHelpers.onFilter}
+    <>
+      <Table className="xl:table-fixed">
+        <TableHeader className="uppercase">
+          <TableRow>
+            {columns.map((column, index) => (
+              <TableHead className={column.className} key={column.id || index}>
+                {column.enableFilter && column.filterName ? (
+                  <span className="flex items-center gap-1">
+                    {renderHeader(column)}{' '}
+                    <TableFilter
+                      name={column.filterName}
+                      onClear={filterHelpers.onClear}
+                      onFilter={filterHelpers.onFilter}
+                    />
+                  </span>
+                ) : (
+                  renderHeader(column)
+                )}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <SkeletonSlot
+          fallback={
+            <TableBody>
+              {[...Array(skeletonRows)].map((_, i) => (
+                <TableRow className="h-15" key={i}>
+                  {columns.map((column, j) => (
+                    <TableCell key={column.id ?? j}>
+                      <Skeleton
+                        className={cn('w-[60%]', column.skeletonWidth)}
                       />
-                    </span>
-                  ) : (
-                    renderHeader(column)
-                  )}
-                </TableHead>
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          </TableHeader>
-          <SkeletonSlot
-            fallback={
-              <TableBody>
-                {[...Array(skeletonRows)].map((_, i) => (
-                  <TableRow className="h-15" key={i}>
-                    {columns.map((column, j) => (
-                      <TableCell key={column.id ?? j}>
-                        <Skeleton
-                          className={cn('w-[60%]', column.skeletonWidth)}
-                        />
+            </TableBody>
+          }
+          loading={loading}
+        >
+          {() => (
+            <TableBody>
+              {data?.map((row, rowIndex) => {
+                const key = getRowKey ? getRowKey(row) : String(rowIndex);
+                return (
+                  <TableRow className="h-15" key={key}>
+                    {columns.map((column, colIndex) => (
+                      <TableCell
+                        className="truncate px-3"
+                        key={column.id || colIndex}
+                      >
+                        {column.cell(row)}
                       </TableCell>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            }
-            loading={loading || !data}
-          >
-            {() => (
-              <TableBody>
-                {data?.map((row, rowIndex) => {
-                  const key = getRowKey ? getRowKey(row) : String(rowIndex);
-                  return (
-                    <TableRow className="h-15" key={key}>
-                      {columns.map((column, colIndex) => (
-                        <TableCell key={column.id || colIndex}>
-                          {column.cell(row)}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            )}
-          </SkeletonSlot>
-        </Table>
-        {data?.length === 0 && (
-          <EmptyBox description={emptyMessage} icon={emptyIcon} />
-        )}
-      </CardContent>
-
+                );
+              })}
+            </TableBody>
+          )}
+        </SkeletonSlot>
+      </Table>
+      {data?.length === 0 && (
+        <EmptyBox description={emptyMessage} icon={emptyIcon} />
+      )}
       <SkeletonSlot
         fallback={
-          <CardFooter className="border-t py-3">
+          <div className="flex items-center border-t p-4 py-3">
             <Pagination className="justify-end">
               <PaginationContent>
                 <PaginationItem>
@@ -184,14 +166,14 @@ export function DataTable<TData>({
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
-          </CardFooter>
+          </div>
         }
         loading={loading}
       >
         {() => (
           <>
             {(pagination?.next_page || pagination?.prev_page) && (
-              <CardFooter className="border-t py-3">
+              <div className="flex items-center border-t p-4 py-3">
                 <Pagination className="justify-end">
                   <PaginationContent>
                     {pagination?.prev_page && onPaginationNavigate && (
@@ -218,11 +200,11 @@ export function DataTable<TData>({
                     )}
                   </PaginationContent>
                 </Pagination>
-              </CardFooter>
+              </div>
             )}
           </>
         )}
       </SkeletonSlot>
-    </Card>
+    </>
   );
 }

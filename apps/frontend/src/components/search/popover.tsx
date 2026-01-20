@@ -1,10 +1,11 @@
 import { useDebounceFn } from 'ahooks';
 import { useState } from 'react';
 
-import { SearchRes } from 'nb-schemas';
+import { Search } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
 import { initialResults, searchKeyword } from '@/lib/search';
+import { cn } from '@/lib/utils';
 import { Input } from '@/ui/input';
 import { Popover, PopoverAnchor, PopoverContent } from '@/ui/popover';
 
@@ -12,6 +13,7 @@ import { SearchItem } from './item';
 import { SearchLink } from './link';
 
 type Props = {
+  className?: string;
   filter: string;
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -19,6 +21,7 @@ type Props = {
 };
 
 export const SearchPopover = ({
+  className,
   filter,
   open,
   setOpen,
@@ -26,9 +29,7 @@ export const SearchPopover = ({
 }: Props) => {
   const { t } = useLocale('layout');
   const [keyword, setKeyword] = useState('');
-  const [results, setResults] = useState<null | SearchRes['data']>(
-    initialResults,
-  );
+  const [results, setResults] = useState<null | Search>(initialResults);
 
   const { run } = useDebounceFn(
     (value: string) => {
@@ -71,7 +72,8 @@ export const SearchPopover = ({
     <Popover onOpenChange={(open) => setOpen(open)} open={open}>
       <PopoverAnchor asChild>
         <Input
-          className="h-9 border-0 shadow-none [&]:bg-white [&]:dark:bg-neutral-800"
+          autoComplete="off"
+          className={cn('bg-card dark:bg-card border-0 shadow-none', className)}
           name="keyword"
           onChange={onChange}
           onFocus={onFocus}

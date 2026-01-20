@@ -11,14 +11,17 @@ import {
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnStatusIcon } from '@/components/txn-status';
+import { TxnStatusIcon } from '@/components/txn';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
@@ -31,7 +34,7 @@ export const StakingTxns = ({
   stakingCountPromise,
   stakingPromise,
 }: Props) => {
-  const stakings = !loading && stakingPromise ? use(stakingPromise) : null;
+  const staking = !loading && stakingPromise ? use(stakingPromise) : null;
   const stakingCount =
     !loading && stakingCountPromise ? use(stakingCountPromise) : null;
 
@@ -57,14 +60,20 @@ export const StakingTxns = ({
       id: 'status',
     },
     {
-      cell: (staking) => (
-        <Link className="text-link" href={`/txns/${staking.transaction_hash}`}>
-          <Truncate>
-            <TruncateText text={staking.transaction_hash ?? ''} />
-            <TruncateCopy text={staking.transaction_hash ?? ''} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (staking) =>
+        staking.transaction_hash ? (
+          <Link
+            className="text-link"
+            href={`/txns/${staking.transaction_hash}`}
+          >
+            <Truncate>
+              <TruncateText text={staking.transaction_hash} />
+              <TruncateCopy text={staking.transaction_hash} />
+            </Truncate>
+          </Link>
+        ) : (
+          <Skeleton className="w-30" />
+        ),
       header: 'Txn Hash',
       id: 'txn_hash',
     },
@@ -106,7 +115,12 @@ export const StakingTxns = ({
       id: 'amount',
     },
     {
-      cell: (staking) => <TimestampCell ns={staking.block?.block_timestamp} />,
+      cell: (staking) =>
+        staking.block?.block_timestamp ? (
+          <TimestampCell ns={staking.block?.block_timestamp} />
+        ) : (
+          <Skeleton className="w-30" />
+        ),
       className: 'w-42',
       header: <TimestampToggle />,
       id: 'age',
@@ -114,23 +128,36 @@ export const StakingTxns = ({
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={stakings?.data}
-      emptyMessage="No staking txns found"
-      getRowKey={(staking) => `${staking.receipt_id}-${staking.index_in_chunk}`}
-      header={
-        <>{`A total of ${numberFormat(
-          stakingCount?.count ?? 0,
-        )} staking txns found`}</>
-      }
-      loading={loading || !stakingCount || !stakingCount?.count}
-      onClear={onClear}
-      onFilter={onFilter}
-      onPaginationNavigate={(type, page) =>
-        `/address/${address}/${tab}?${type}=${page}`
-      }
-      pagination={stakings?.meta}
-    />
+    <Card>
+      <CardHeader className="text-body-sm border-b py-3">
+        <SkeletonSlot
+          fallback={<Skeleton className="w-40" />}
+          loading={loading || !stakingCount}
+        >
+          {() => (
+            <>{`A total of ${numberFormat(
+              stakingCount?.count ?? 0,
+            )} staking txns found`}</>
+          )}
+        </SkeletonSlot>
+      </CardHeader>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={staking?.data}
+          emptyMessage="No staking txns found"
+          getRowKey={(staking) =>
+            `${staking.receipt_id}-${staking.index_in_chunk}`
+          }
+          loading={loading || !!staking?.errors}
+          onClear={onClear}
+          onFilter={onFilter}
+          onPaginationNavigate={(type, cursor) =>
+            `/address/${address}/${tab}?${type}=${cursor}`
+          }
+          pagination={staking?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

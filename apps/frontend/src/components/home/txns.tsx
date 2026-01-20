@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import { use } from 'react';
 import { LuArrowLeftRight } from 'react-icons/lu';
 
-import { TxnsRes } from 'nb-schemas';
+import { Txn } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
@@ -21,7 +21,7 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  txnsPromise?: Promise<TxnsRes['data']>;
+  txnsPromise?: Promise<null | Txn[]>;
 };
 
 export const Txns = ({ loading, txnsPromise }: Props) => {

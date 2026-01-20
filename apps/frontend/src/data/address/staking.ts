@@ -1,4 +1,5 @@
 import {
+  AccountStakingTxnCount,
   AccountStakingTxnCountReq,
   AccountStakingTxnCountRes,
   AccountStakingTxnsReq,
@@ -8,7 +9,10 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchStaking = async (account: string, params: SearchParams) => {
+export const fetchStaking = async (
+  account: string,
+  params: SearchParams,
+): Promise<AccountStakingTxnsRes> => {
   const keys: (keyof AccountStakingTxnsReq)[] = [
     'limit',
     'next',
@@ -27,7 +31,7 @@ export const fetchStaking = async (account: string, params: SearchParams) => {
 export const fetchStakingCount = async (
   account: string,
   params: SearchParams,
-) => {
+): Promise<AccountStakingTxnCount | null> => {
   const keys: (keyof AccountStakingTxnCountReq)[] = ['contract', 'type'];
   const queryParams = safeParams(params, keys);
 

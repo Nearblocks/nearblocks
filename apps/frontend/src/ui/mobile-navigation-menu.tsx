@@ -3,7 +3,7 @@
 import { cva } from 'class-variance-authority';
 import { ComponentProps, HTMLAttributes } from 'react';
 
-import { ActiveLink } from '@/components/active-link';
+import { ActiveLink } from '@/components/link';
 import { cn } from '@/lib/utils';
 
 import { CollapsibleTrigger } from './collapsible';

@@ -1,4 +1,5 @@
 import {
+  AccountTxnCount,
   AccountTxnCountReq,
   AccountTxnCountRes,
   AccountTxnsReq,
@@ -8,7 +9,10 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchTxns = async (account: string, params: SearchParams) => {
+export const fetchTxns = async (
+  account: string,
+  params: SearchParams,
+): Promise<AccountTxnsRes> => {
   const keys: (keyof AccountTxnsReq)[] = [
     'limit',
     'receiver',
@@ -24,7 +28,10 @@ export const fetchTxns = async (account: string, params: SearchParams) => {
   return resp;
 };
 
-export const fetchTxnCount = async (account: string, params: SearchParams) => {
+export const fetchTxnCount = async (
+  account: string,
+  params: SearchParams,
+): Promise<AccountTxnCount | null> => {
   const keys: (keyof AccountTxnCountReq)[] = ['receiver', 'signer'];
   const queryParams = safeParams(params, keys);
 

@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { LuArrowRightLeft, LuGlobe, LuPickaxe } from 'react-icons/lu';
 
-import { DailyStatsRes, StatsRes } from 'nb-schemas';
+import { DailyStats, Stats } from 'nb-schemas';
 
 import { TxnsChart } from '@/components/home/chart';
 import { PriceChange } from '@/components/price-change';
@@ -17,9 +17,9 @@ import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  dailyStatsPromise?: Promise<DailyStatsRes['data']>;
+  dailyStatsPromise?: Promise<DailyStats[] | null>;
   loading?: boolean;
-  statsPromise?: Promise<StatsRes['data']>;
+  statsPromise?: Promise<null | Stats>;
 };
 
 export const Overview = ({
