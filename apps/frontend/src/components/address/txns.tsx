@@ -3,28 +3,28 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { AccountTxnCount, AccountTxnsRes } from 'nb-schemas';
+import { AccountTxn, AccountTxnCount, AccountTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnStatusIcon } from '@/components/txn-status';
+import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
   txnCountPromise?: Promise<AccountTxnCount | null>;
   txnsPromise?: Promise<AccountTxnsRes>;
 };
-
-type TxnRow = NonNullable<AccountTxnsRes['data']>[number];
 
 export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
   const { address } = useParams<{ address: string }>();
@@ -43,7 +43,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
     router.push(`/address/${address}?${params.toString()}`);
   };
 
-  const columns: DataTableColumnDef<TxnRow>[] = [
+  const columns: DataTableColumnDef<AccountTxn>[] = [
     {
       cell: (txn) => <TxnStatusIcon status={txn.outcomes?.status} />,
       className: 'w-5',
@@ -112,7 +112,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
     },
     {
       cell: (txn) => (
-        <Direction
+        <TxnDirection
           address={address}
           from={txn.signer_account_id}
           to={txn.receiver_account_id}
@@ -157,23 +157,34 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={txns?.data}
-      emptyMessage="No transactions found"
-      getRowKey={(txn) => txn.transaction_hash}
-      header={
-        <>{`A total of ${numberFormat(
-          txnCount?.count ?? 0,
-        )} transactions found`}</>
-      }
-      loading={loading || !txnCount || !txnCount?.count}
-      onClear={onClear}
-      onFilter={onFilter}
-      onPaginationNavigate={(type, page) =>
-        `/address/${address}?${type}=${page}`
-      }
-      pagination={txns?.meta}
-    />
+    <Card>
+      <CardHeader className="text-body-sm border-b py-3">
+        <SkeletonSlot
+          fallback={<Skeleton className="w-40" />}
+          loading={loading || !txnCount}
+        >
+          {() => (
+            <>{`A total of ${numberFormat(
+              txnCount?.count ?? 0,
+            )} transactions found`}</>
+          )}
+        </SkeletonSlot>
+      </CardHeader>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={txns?.data}
+          emptyMessage="No transactions found"
+          getRowKey={(txn) => txn.transaction_hash}
+          loading={loading || !!txns?.errors}
+          onClear={onClear}
+          onFilter={onFilter}
+          onPaginationNavigate={(type, cursor) =>
+            `/address/${address}?${type}=${cursor}`
+          }
+          pagination={txns?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

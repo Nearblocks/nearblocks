@@ -10,16 +10,17 @@ import {
 } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { TokenImage } from '@/components/token-image';
+import { TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnStatusIcon } from '@/components/txn-status';
+import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Card, CardContent, CardHeader } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -97,7 +98,7 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
       id: 'affected',
     },
     {
-      cell: (nft) => <Direction amount={nft.delta_amount} />,
+      cell: (nft) => <TxnDirection amount={nft.delta_amount} />,
       className: 'w-20',
       header: '',
       id: 'direction',
@@ -175,23 +176,34 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={nfts?.data}
-      emptyMessage="No nft token txns found"
-      getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
-      header={
-        <>{`A total of ${numberFormat(
-          nftCount?.count ?? 0,
-        )} nft token txns found`}</>
-      }
-      loading={loading || !nftCount || !nftCount?.count}
-      onClear={onClear}
-      onFilter={onFilter}
-      onPaginationNavigate={(type, page) =>
-        `/address/${address}/${tab}?${type}=${page}`
-      }
-      pagination={nfts?.meta}
-    />
+    <Card>
+      <CardHeader className="text-body-sm border-b py-3">
+        <SkeletonSlot
+          fallback={<Skeleton className="w-40" />}
+          loading={loading || !nftCount}
+        >
+          {() => (
+            <>{`A total of ${numberFormat(
+              nftCount?.count ?? 0,
+            )} nft token txns found`}</>
+          )}
+        </SkeletonSlot>
+      </CardHeader>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={nfts?.data}
+          emptyMessage="No nft token txns found"
+          getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
+          loading={loading || !!nfts?.errors}
+          onClear={onClear}
+          onFilter={onFilter}
+          onPaginationNavigate={(type, cursor) =>
+            `/address/${address}/${tab}?${type}=${cursor}`
+          }
+          pagination={nfts?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

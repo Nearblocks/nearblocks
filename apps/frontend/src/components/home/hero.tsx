@@ -9,10 +9,12 @@ export const Hero = () => {
   return (
     <div className="h-64 bg-[url(/images/wavey_bg.png)] bg-cover">
       <div className="container mx-auto px-4 pt-10 pb-8">
-        <h1 className="dark:text-foreground text-headline-lg font-medium text-[#ffffff]">
+        <h1 className="dark:text-foreground text-headline-lg mb-4 font-medium text-[#ffffff]">
           {t('title')}
         </h1>
-        <SearchBar />
+        <div className="max-w-200">
+          <SearchBar />
+        </div>
       </div>
     </div>
   );

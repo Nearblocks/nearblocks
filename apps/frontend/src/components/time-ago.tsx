@@ -20,5 +20,11 @@ export const TimeAgo = ({ ns }: Props) => {
 
   if (!ns) return null;
 
-  return <OGTimeAgo date={new Date(+ns / 10 ** 6)} formatter={intlFormatter} />;
+  return (
+    <OGTimeAgo
+      date={new Date(+ns / 10 ** 6)}
+      formatter={intlFormatter}
+      live={false}
+    />
+  );
 };

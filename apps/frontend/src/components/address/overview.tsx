@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import { AccountAssetFTsRes, AccountBalanceRes, StatsRes } from 'nb-schemas';
+import { AccountAssetFT, AccountBalance, Stats } from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
@@ -10,18 +10,18 @@ import { SkeletonSlot } from '@/components/skeleton';
 // import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, nearFiatFormat, nearFormat } from '@/lib/format';
-import { TokensCacheRes } from '@/types/types';
+import { TokenCache } from '@/types/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 import { Tokens } from './tokens';
 
 type Props = {
-  balancePromise?: Promise<AccountBalanceRes['data']>;
+  balancePromise?: Promise<AccountBalance | null>;
   loading?: boolean;
-  statsPromise?: Promise<StatsRes['data']>;
-  tokenCachePromise?: Promise<TokensCacheRes['tokens']>;
-  tokensPromise?: Promise<AccountAssetFTsRes['data']>;
+  statsPromise?: Promise<null | Stats>;
+  tokenCachePromise?: Promise<null | TokenCache[]>;
+  tokensPromise?: Promise<AccountAssetFT[] | null>;
 };
 
 export const Overview = ({

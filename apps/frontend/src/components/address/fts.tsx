@@ -6,16 +6,17 @@ import { use } from 'react';
 import { AccountFTTxn, AccountFTTxnCount, AccountFTTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Direction } from '@/components/direction';
 import { Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { TokenImage } from '@/components/token-image';
+import { TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnStatusIcon } from '@/components/txn-status';
-import { numberFormat, toTokenAmount } from '@/lib/format';
+import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Card, CardContent, CardHeader } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -90,7 +91,7 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
       id: 'affected',
     },
     {
-      cell: (ft) => <Direction amount={ft.delta_amount} />,
+      cell: (ft) => <TxnDirection amount={ft.delta_amount} />,
       className: 'w-20',
       header: '',
       id: 'direction',
@@ -116,8 +117,12 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
       id: 'involved',
     },
     {
-      cell: (ft) =>
-        numberFormat(toTokenAmount(ft.delta_amount, ft.meta?.decimals ?? 0)),
+      cell: (ft) => (
+        <TokenAmount
+          amount={ft.delta_amount}
+          decimals={ft.meta?.decimals ?? 0}
+        />
+      ),
       header: 'Quantity',
       id: 'quantity',
     },
@@ -156,23 +161,34 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={fts?.data}
-      emptyMessage="No token txns found"
-      getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
-      header={
-        <>{`A total of ${numberFormat(
-          ftCount?.count ?? 0,
-        )} token txns found`}</>
-      }
-      loading={loading || !ftCount || !ftCount?.count}
-      onClear={onClear}
-      onFilter={onFilter}
-      onPaginationNavigate={(type, page) =>
-        `/address/${address}/${tab}?${type}=${page}`
-      }
-      pagination={fts?.meta}
-    />
+    <Card>
+      <CardHeader className="text-body-sm border-b py-3">
+        <SkeletonSlot
+          fallback={<Skeleton className="w-40" />}
+          loading={loading || !ftCount}
+        >
+          {() => (
+            <>{`A total of ${numberFormat(
+              ftCount?.count ?? 0,
+            )} token txns found`}</>
+          )}
+        </SkeletonSlot>
+      </CardHeader>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={fts?.data}
+          emptyMessage="No token txns found"
+          getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
+          loading={loading || !!fts?.errors}
+          onClear={onClear}
+          onFilter={onFilter}
+          onPaginationNavigate={(type, cursor) =>
+            `/address/${address}/${tab}?${type}=${cursor}`
+          }
+          pagination={fts?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

@@ -4,7 +4,7 @@ import { Fragment } from 'react';
 import { use } from 'react';
 import { LuBox, LuFuel } from 'react-icons/lu';
 
-import { BlocksRes } from 'nb-schemas';
+import { Block } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
@@ -19,7 +19,7 @@ import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  blocksPromise?: Promise<BlocksRes['data']>;
+  blocksPromise?: Promise<Block[] | null>;
   loading?: boolean;
 };
 

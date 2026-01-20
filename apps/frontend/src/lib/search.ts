@@ -1,4 +1,4 @@
-import { SearchRes } from 'nb-schemas';
+import { Search } from 'nb-schemas';
 
 import {
   search,
@@ -11,7 +11,7 @@ import {
   searchTxns,
 } from '@/actions/search';
 
-export const initialResults: SearchRes['data'] = {
+export const initialResults: Search = {
   accounts: [],
   blocks: [],
   fts: [],

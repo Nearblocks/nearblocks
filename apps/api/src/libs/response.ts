@@ -49,8 +49,9 @@ export const rollingWindowList = async <T>(
   let endNs = end;
 
   if (direction === 'asc') {
-    while (startNs < end && results.length < limit) {
-      const windowEnd = startNs + windowSize < end ? startNs + windowSize : end;
+    while (startNs <= endNs && results.length < limit) {
+      const windowEnd =
+        startNs + windowSize < endNs ? startNs + windowSize : endNs;
       const remaining = limit - results.length;
 
       const batch = await queryFn(
@@ -64,15 +65,15 @@ export const rollingWindowList = async <T>(
         results.push(...batch.slice(0, remaining));
       }
 
-      if (batch?.length < remaining) break;
+      if (windowEnd === endNs) break;
 
-      startNs = windowEnd;
+      startNs = windowEnd + 1n;
     }
 
     return results;
   }
 
-  while (endNs > start && results.length < limit) {
+  while (endNs >= start && results.length < limit) {
     const windowStart = endNs - windowSize > start ? endNs - windowSize : start;
     const remaining = limit - results.length;
 
@@ -87,7 +88,8 @@ export const rollingWindowList = async <T>(
       results.push(...batch.slice(0, remaining));
     }
 
-    endNs = windowStart;
+    if (windowStart === start) break;
+    endNs = windowStart - 1n;
   }
 
   return results;
@@ -200,8 +202,11 @@ export const paginateData = <T, C extends CursorObject>(
 
   const hasMore = items.length > limit;
   const ordered = direction === 'asc' ? [...items].reverse() : items;
-  const data = hasMore ? ordered.slice(0, limit) : ordered;
-
+  const data = hasMore
+    ? direction === 'asc'
+      ? ordered.slice(-limit)
+      : ordered.slice(0, limit)
+    : ordered;
   const meta: Record<string, string> = {};
 
   if (data.length > 0) {

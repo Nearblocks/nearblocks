@@ -1,6 +1,6 @@
 'use client';
 
-import { ActiveLink } from '@/components/active-link';
+import { ActiveLink } from '@/components/link';
 import { useLocale } from '@/hooks/use-locale';
 import { NavMenu, RouteKey } from '@/types/types';
 import {

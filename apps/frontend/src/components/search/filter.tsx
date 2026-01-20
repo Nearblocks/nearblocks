@@ -1,17 +1,22 @@
 import { useLocale } from '@/hooks/use-locale';
+import { cn } from '@/lib/utils';
 import { NativeSelect, NativeSelectOption } from '@/ui/native-select';
 
 type Props = {
+  className?: string;
   filter: string;
   onSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
-export const SearchFilter = ({ filter, onSelect }: Props) => {
+export const SearchFilter = ({ className, filter, onSelect }: Props) => {
   const { t } = useLocale('layout');
 
   return (
     <NativeSelect
-      className="text-white-950 h-9 w-34 rounded-lg border-0 bg-transparent! px-4 shadow-none"
+      className={cn(
+        'text-card-foreground rounded-lg border-0 bg-transparent! px-4 py-0 shadow-none',
+        className,
+      )}
       onChange={onSelect}
       value={filter}
     >

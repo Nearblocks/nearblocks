@@ -1,4 +1,5 @@
 import {
+  AccountReceiptCount,
   AccountReceiptCountReq,
   AccountReceiptCountRes,
   AccountReceiptsReq,
@@ -8,7 +9,10 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchReceipts = async (account: string, params: SearchParams) => {
+export const fetchReceipts = async (
+  account: string,
+  params: SearchParams,
+): Promise<AccountReceiptsRes> => {
   const keys: (keyof AccountReceiptsReq)[] = [
     'limit',
     'receiver',
@@ -28,7 +32,7 @@ export const fetchReceipts = async (account: string, params: SearchParams) => {
 export const fetchReceiptCount = async (
   account: string,
   params: SearchParams,
-) => {
+): Promise<AccountReceiptCount | null> => {
   const keys: (keyof AccountReceiptCountReq)[] = [
     'predecessor',
     'receiver',

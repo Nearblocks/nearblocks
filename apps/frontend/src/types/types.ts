@@ -1,4 +1,4 @@
-import { AccountAssetFTsRes } from 'nb-schemas';
+import { AccountAssetFT } from 'nb-schemas';
 
 import type { dictionary } from '@/locales/en';
 
@@ -86,7 +86,7 @@ export type TokenCache = {
   contract_id: string;
 };
 
-export type AssetToken = NonNullable<AccountAssetFTsRes['data']>[number] & {
+export type AssetToken = AccountAssetFT & {
   price: string;
 };
 
@@ -96,3 +96,9 @@ export type TokenInventory = {
 };
 
 export type SearchParams = Record<string, string | string[] | undefined>;
+
+export type AccessKeyPermission = {
+  allowance: string;
+  methodNames: string[];
+  receiverId: string;
+};

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { Analytics } from '@/components/address/analytics';
 import { FTTxns } from '@/components/address/fts';
 import { Keys } from '@/components/address/keys';
 import { NFTTxns } from '@/components/address/nfts';
@@ -14,18 +15,6 @@ import { fetchStaking, fetchStakingCount } from '@/data/address/staking';
 
 type Props = PageProps<'/[lang]/address/[address]/[tab]'>;
 
-const tabs = [
-  'receipts',
-  'txns',
-  'fts',
-  'nfts',
-  'keys',
-  'staking',
-  'assets',
-  'contract',
-] as const;
-type TabType = (typeof tabs)[number];
-
 const Tab = async ({ params, searchParams }: Props) => {
   const [{ address, tab }, filters] = await Promise.all([params, searchParams]);
   const receiptsPromise = fetchReceipts(address, filters);
@@ -39,11 +28,11 @@ const Tab = async ({ params, searchParams }: Props) => {
   const stakingPromise = fetchStaking(address, filters);
   const stakingCountPromise = fetchStakingCount(address, filters);
 
-  if (!tab || !tabs.includes(tab as TabType)) {
+  if (!tab) {
     notFound();
   }
 
-  switch (tab as TabType) {
+  switch (tab) {
     case 'receipts':
       return (
         <ErrorSuspense fallback={<Receipts loading />}>
@@ -68,12 +57,6 @@ const Tab = async ({ params, searchParams }: Props) => {
           />
         </ErrorSuspense>
       );
-    case 'keys':
-      return (
-        <ErrorSuspense fallback={<Keys loading />}>
-          <Keys keyCountPromise={keyCountPromise} keysPromise={keysPromise} />
-        </ErrorSuspense>
-      );
     case 'staking':
       return (
         <ErrorSuspense fallback={<StakingTxns loading />}>
@@ -81,6 +64,18 @@ const Tab = async ({ params, searchParams }: Props) => {
             stakingCountPromise={stakingCountPromise}
             stakingPromise={stakingPromise}
           />
+        </ErrorSuspense>
+      );
+    case 'keys':
+      return (
+        <ErrorSuspense fallback={<Keys loading />}>
+          <Keys keyCountPromise={keyCountPromise} keysPromise={keysPromise} />
+        </ErrorSuspense>
+      );
+    case 'analytics':
+      return (
+        <ErrorSuspense fallback={<Analytics />}>
+          <Analytics />
         </ErrorSuspense>
       );
     default:

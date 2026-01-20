@@ -1,4 +1,5 @@
 import {
+  AccountNFTTxnCount,
   AccountNFTTxnCountReq,
   AccountNFTTxnCountRes,
   AccountNFTTxnsReq,
@@ -8,7 +9,10 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchNFTTxns = async (account: string, params: SearchParams) => {
+export const fetchNFTTxns = async (
+  account: string,
+  params: SearchParams,
+): Promise<AccountNFTTxnsRes> => {
   const keys: (keyof AccountNFTTxnsReq)[] = [
     'limit',
     'contract',
@@ -29,7 +33,7 @@ export const fetchNFTTxns = async (account: string, params: SearchParams) => {
 export const fetchNFTTxnCount = async (
   account: string,
   params: SearchParams,
-) => {
+): Promise<AccountNFTTxnCount | null> => {
   const keys: (keyof AccountNFTTxnCountReq)[] = [
     'contract',
     'involved',

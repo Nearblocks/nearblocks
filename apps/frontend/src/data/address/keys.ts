@@ -1,9 +1,17 @@
-import { AccountKeyCountRes, AccountKeysReq, AccountKeysRes } from 'nb-schemas';
+import {
+  AccountKeyCount,
+  AccountKeyCountRes,
+  AccountKeysReq,
+  AccountKeysRes,
+} from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchKeys = async (account: string, params: SearchParams) => {
+export const fetchKeys = async (
+  account: string,
+  params: SearchParams,
+): Promise<AccountKeysRes> => {
   const keys: (keyof AccountKeysReq)[] = ['limit', 'next', 'prev'];
   const queryParams = safeParams(params, keys);
 
@@ -13,7 +21,9 @@ export const fetchKeys = async (account: string, params: SearchParams) => {
   return resp;
 };
 
-export const fetchKeyCount = async (account: string) => {
+export const fetchKeyCount = async (
+  account: string,
+): Promise<AccountKeyCount | null> => {
   const resp = await fetcher<AccountKeyCountRes>(
     `/v3/accounts/${account}/keys/count`,
   );
