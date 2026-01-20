@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { RiQuestionLine } from 'react-icons/ri';
 
-import { numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
