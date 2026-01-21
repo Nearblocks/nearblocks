@@ -3,12 +3,14 @@ import { notFound } from 'next/navigation';
 import { Analytics } from '@/components/address/analytics';
 import { FTTxns } from '@/components/address/fts';
 import { Keys } from '@/components/address/keys';
+import { MTTxns } from '@/components/address/mts';
 import { NFTTxns } from '@/components/address/nfts';
 import { Receipts } from '@/components/address/receipts';
 import { StakingTxns } from '@/components/address/staking';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchFTTxnCount, fetchFTTxns } from '@/data/address/fts';
 import { fetchKeyCount, fetchKeys } from '@/data/address/keys';
+import { fetchMTTxnCount, fetchMTTxns } from '@/data/address/mts';
 import { fetchNFTTxnCount, fetchNFTTxns } from '@/data/address/nfts';
 import { fetchReceiptCount, fetchReceipts } from '@/data/address/receipts';
 import { fetchStaking, fetchStakingCount } from '@/data/address/staking';
@@ -23,6 +25,8 @@ const Tab = async ({ params, searchParams }: Props) => {
   const ftCountPromise = fetchFTTxnCount(address, filters);
   const nftsPromise = fetchNFTTxns(address, filters);
   const nftCountPromise = fetchNFTTxnCount(address, filters);
+  const mtsPromise = fetchMTTxns(address, filters);
+  const mtCountPromise = fetchMTTxnCount(address, filters);
   const keysPromise = fetchKeys(address, filters);
   const keyCountPromise = fetchKeyCount(address);
   const stakingPromise = fetchStaking(address, filters);
@@ -55,6 +59,12 @@ const Tab = async ({ params, searchParams }: Props) => {
             nftCountPromise={nftCountPromise}
             nftsPromise={nftsPromise}
           />
+        </ErrorSuspense>
+      );
+    case 'mts':
+      return (
+        <ErrorSuspense fallback={<MTTxns loading />}>
+          <MTTxns mtCountPromise={mtCountPromise} mtsPromise={mtsPromise} />
         </ErrorSuspense>
       );
     case 'staking':

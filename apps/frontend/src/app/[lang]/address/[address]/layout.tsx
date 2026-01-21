@@ -94,6 +94,12 @@ const AddressLayout = async ({ children, params }: Props) => {
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
+                <ActiveLink href={`/address/${address}/mts`}>
+                  Multi Token Txns
+                  <TabBadge variant="teal">NEW</TabBadge>
+                </ActiveLink>
+              </TabLink>
+              <TabLink asChild>
                 <ActiveLink href={`/address/${address}/staking`}>
                   Staking Txns
                 </ActiveLink>
