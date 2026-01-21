@@ -54,6 +54,10 @@ export const limitSchema = v.optional(
   25,
 );
 
+export const statsLimitSchema = v.optional(
+  v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(365)),
+);
+
 export const cursorSchema = v.optional(v.pipe(v.string(), v.base64()));
 
 export const tsSchema = v.optional(

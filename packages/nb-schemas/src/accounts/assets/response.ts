@@ -12,7 +12,7 @@ const ftMeta = v.object({
   symbol: v.nullable(v.string()),
 });
 
-const fts = v.object({
+const ft = v.object({
   amount: v.string(),
   contract: v.string(),
   meta: v.optional(ftMeta),
@@ -39,7 +39,7 @@ const nftTokenMeta = v.object({
   token: v.string(),
 });
 
-const nfts = v.object({
+const nft = v.object({
   contract: v.string(),
   meta: v.optional(nftMeta),
   token: v.string(),
@@ -50,14 +50,14 @@ const nftCount = v.object({
   count: v.string(),
 });
 
-const ftsResponse = responseSchema(v.array(fts));
+const ftsResponse = responseSchema(v.array(ft));
 const ftCountResponse = responseSchema(ftCount);
-const nftsResponse = responseSchema(v.array(nfts));
+const nftsResponse = responseSchema(v.array(nft));
 const nftCountResponse = responseSchema(nftCount);
 
-export type AccountAssetFT = v.InferOutput<typeof fts>;
+export type AccountAssetFT = v.InferOutput<typeof ft>;
 export type AccountAssetFTCount = v.InferOutput<typeof ftCount>;
-export type AccountAssetNFT = v.InferOutput<typeof nfts>;
+export type AccountAssetNFT = v.InferOutput<typeof nft>;
 export type AccountAssetNFTCount = v.InferOutput<typeof nftCount>;
 
 export type AccountAssetFTsRes = v.InferOutput<typeof ftsResponse>;
