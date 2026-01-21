@@ -8,10 +8,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 import { Copy } from './copy';
 
 export type TruncateProps = {
-  /** Optional composition: <TruncateText />, <TruncateCopy />, etc. */
   children?: React.ReactNode;
-  /** Wrapper className (applies to the outer container). */
   className?: string;
+};
+
+export type TruncateTextProps = {
+  className?: string;
+  text: string;
+  tooltipClassName?: string;
+};
+
+export type TruncateCopyProps = {
+  className?: string;
+  hidden?: boolean;
+  text: string;
 };
 
 export const Truncate = ({ children, className }: TruncateProps) => {
@@ -20,13 +30,6 @@ export const Truncate = ({ children, className }: TruncateProps) => {
       {children}
     </span>
   );
-};
-
-export type TruncateTextProps = {
-  className?: string;
-  text: string;
-  /** ClassName for tooltip content container. */
-  tooltipClassName?: string;
 };
 
 export const TruncateText = ({
@@ -48,13 +51,6 @@ export const TruncateText = ({
       </TooltipContent>
     </Tooltip>
   );
-};
-
-export type TruncateCopyProps = {
-  className?: string;
-  /** Hide this copy button (useful when rendering conditionally). */
-  hidden?: boolean;
-  text: string;
 };
 
 export const TruncateCopy = ({

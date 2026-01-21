@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { LuClock } from 'react-icons/lu';
+import { LuClock, LuHourglass } from 'react-icons/lu';
 
 import { TimeAgo } from '@/components/time-ago';
 import { dayjs } from '@/lib/dayjs';
@@ -25,16 +25,18 @@ export const TimestampToggle = () => {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              className="inline-flex cursor-pointer items-center gap-3 uppercase"
+              className="inline-flex cursor-pointer items-center gap-2 uppercase"
               onClick={toggleTimestampMode}
               type="button"
             >
               {timestampMode === 'age' ? (
                 <>
-                  Age <LuClock className="size-4" />
+                  Age <LuClock className="size-3.5" />
                 </>
               ) : (
-                'Date Time (UTC)'
+                <>
+                  Date Time (UTC) <LuHourglass className="size-3" />
+                </>
               )}
             </button>
           </TooltipTrigger>
