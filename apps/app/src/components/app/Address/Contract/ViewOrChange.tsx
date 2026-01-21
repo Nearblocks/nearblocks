@@ -12,6 +12,7 @@ import {
 import { useFetch } from '@/hooks/app/useFetch';
 import { Link } from '@/i18n/routing';
 import { capitalize, isJson, mapFeilds, toSnakeCase } from '@/utils/libs';
+import { formatContractResponseData } from '@/utils/app/libs';
 import { FieldType } from '@/utils/types';
 
 import Tooltip from '@/components/app/common/Tooltip';
@@ -164,7 +165,7 @@ const ViewOrChange = (props: Props) => {
         resetState(
           response?.data?.transaction_outcome?.id ?? null,
           null,
-          JSON.stringify(response?.data, null, 2),
+          formatContractResponseData(response?.data),
         );
       } else {
         const errorMsg =
