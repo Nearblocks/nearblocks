@@ -7,6 +7,7 @@ import assets from '#routes/v3/accounts/assets';
 import contract from '#routes/v3/accounts/contract';
 import fts from '#routes/v3/accounts/fts';
 import keys from '#routes/v3/accounts/keys';
+import mts from '#routes/v3/accounts/mts';
 import nfts from '#routes/v3/accounts/nfts';
 import receipts from '#routes/v3/accounts/receipts';
 import staking from '#routes/v3/accounts/staking';
@@ -22,6 +23,7 @@ const routes = (app: Router) => {
   contract(route);
   fts(route);
   keys(route);
+  mts(route);
   nfts(route);
   receipts(route);
   staking(route);

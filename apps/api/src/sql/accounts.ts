@@ -24,6 +24,11 @@ export default {
     count: sql('queries/accounts/keys/count.sql'),
     keys: sql('queries/accounts/keys/keys.sql'),
   },
+  mts: {
+    estimate: sql('queries/accounts/mts/estimate.sql'),
+    txn: sql('queries/accounts/mts/txn.sql'),
+    txns: sql('queries/accounts/mts/txns.sql'),
+  },
   nfts: {
     estimate: sql('queries/accounts/nfts/estimate.sql'),
     txn: sql('queries/accounts/nfts/txn.sql'),
