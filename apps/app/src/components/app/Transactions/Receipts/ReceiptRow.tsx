@@ -629,7 +629,7 @@ const ReceiptRow = (props: Props) => {
               );
             return (
               <div className="pl-4 pt-6" key={rcpt?.receipt_id}>
-                <div className="mx-4 border-l-4 border-l-gray-200">
+                <div className="mx-4 border-l-4 border-l-gray-200 dark:border-l-black-200">
                   <ReceiptRow
                     borderFlag
                     receipt={rcpt}
