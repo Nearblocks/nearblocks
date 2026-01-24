@@ -80,6 +80,6 @@ export const onMessage = async (message: Message) => {
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
-    process.exit();
+    // process.exit();
   }
 };
