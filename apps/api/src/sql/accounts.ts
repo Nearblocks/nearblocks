@@ -45,6 +45,13 @@ export default {
     txn: sql('queries/accounts/staking/txn.sql'),
     txns: sql('queries/accounts/staking/txns.sql'),
   },
+  stats: {
+    balance: sql('queries/accounts/stats/balance.sql'),
+    fts: sql('queries/accounts/stats/fts.sql'),
+    near: sql('queries/accounts/stats/near.sql'),
+    overview: sql('queries/accounts/stats/overview.sql'),
+    txns: sql('queries/accounts/stats/txns.sql'),
+  },
   txns: {
     cte: sql('queries/accounts/txns/cte.sql'),
     cteUnion: sql('queries/accounts/txns/cteUnion.sql'),

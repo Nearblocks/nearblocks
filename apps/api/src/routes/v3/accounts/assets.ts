@@ -43,6 +43,7 @@ const routes = (route: Router) => {
    *         description: Success response
    */
   route.get('/:account/assets/fts', validate(request.fts), service.fts);
+
   /**
    * @openapi
    * /v3/accounts/{account}/assets/fts/count:
@@ -66,6 +67,7 @@ const routes = (route: Router) => {
     validate(request.ftCount),
     service.ftCount,
   );
+
   /**
    * @openapi
    * /v3/accounts/{account}/assets/nfts:
@@ -103,6 +105,7 @@ const routes = (route: Router) => {
    *         description: Success response
    */
   route.get('/:account/assets/nfts', validate(request.nfts), service.nfts);
+
   /**
    * @openapi
    * /v3/accounts/{account}/assets/nfts/count:
