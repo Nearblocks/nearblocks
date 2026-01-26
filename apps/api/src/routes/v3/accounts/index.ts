@@ -11,6 +11,7 @@ import mts from '#routes/v3/accounts/mts';
 import nfts from '#routes/v3/accounts/nfts';
 import receipts from '#routes/v3/accounts/receipts';
 import staking from '#routes/v3/accounts/staking';
+import stats from '#routes/v3/accounts/stats';
 import txns from '#routes/v3/accounts/txns';
 
 const route = Router();
@@ -27,6 +28,7 @@ const routes = (app: Router) => {
   nfts(route);
   receipts(route);
   staking(route);
+  stats(route);
   txns(route);
 
   return app;

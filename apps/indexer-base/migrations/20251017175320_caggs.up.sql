@@ -17,7 +17,7 @@ SELECT
   add_continuous_aggregate_policy (
     'block_stats',
     start_offset => '259200000000000', -- 3d in ns
-    end_offset => '3600000000000', -- 1m in ns
+    end_offset => '3600000000000', -- 1h in ns
     schedule_interval => INTERVAL '1 hour'
   );
 
@@ -40,7 +40,7 @@ SELECT
   add_continuous_aggregate_policy (
     'chunk_stats',
     start_offset => '259200000000000', -- 3d in ns
-    end_offset => '3600000000000', -- 1m in ns
+    end_offset => '3600000000000', -- 1h in ns
     schedule_interval => INTERVAL '1 hour'
   );
 
@@ -62,7 +62,7 @@ SELECT
   add_continuous_aggregate_policy (
     'transaction_stats',
     start_offset => '259200000000000', -- 3d in ns
-    end_offset => '3600000000000', -- 1m in ns
+    end_offset => '3600000000000', -- 1h in ns
     schedule_interval => INTERVAL '1 hour'
   );
 
@@ -83,7 +83,7 @@ SELECT
   add_continuous_aggregate_policy (
     'receipt_stats',
     start_offset => '259200000000000', -- 3d in ns
-    end_offset => '3600000000000', -- 1m in ns
+    end_offset => '3600000000000', -- 1h in ns
     schedule_interval => INTERVAL '1 hour'
   );
 
@@ -133,7 +133,7 @@ SELECT
   add_continuous_aggregate_policy (
     'action_stats',
     start_offset => '259200000000000', -- 3d in ns
-    end_offset => '3600000000000', -- 1m in ns
+    end_offset => '3600000000000', -- 1h in ns
     schedule_interval => INTERVAL '1 hour'
   );
 
@@ -154,7 +154,7 @@ SELECT
   add_continuous_aggregate_policy (
     'outcome_stats',
     start_offset => '259200000000000', -- 3d in ns
-    end_offset => '3600000000000', -- 1m in ns
+    end_offset => '3600000000000', -- 1h in ns
     schedule_interval => INTERVAL '1 hour'
   );
 

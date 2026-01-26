@@ -1,0 +1,14 @@
+SELECT
+  TO_CHAR(TO_TIMESTAMP(date / 1e9), 'YYYY-MM-DD') AS date,
+  account,
+  amount,
+  amount_staked,
+  storage_usage
+FROM
+  account_near_stats
+WHERE
+  account = ${account}
+ORDER BY
+  date DESC
+LIMIT
+  ${limit}::INT
