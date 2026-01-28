@@ -30346,10 +30346,10 @@ undici@5.28.4, undici@^5.28.4:
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
-undici@7.8.0:
-  version "7.8.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-7.8.0.tgz#cf51854a6cb26808a9c6a3fb2c58c13c94d10081"
-  integrity sha512-vFv1GA99b7eKO1HG/4RPu2Is3FBTWBrmzqzO0mz+rLxN3yXkE4mqRcb8g8fHxzX4blEysrNZLqg5RbJLqX5buA==
+undici@7.18.2:
+  version "7.18.2"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-7.18.2.tgz#6cf724ef799a67d94fd55adf66b1e184176efcdf"
+  integrity sha512-y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==
 
 undici@^6.11.1:
   version "6.21.0"
