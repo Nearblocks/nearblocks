@@ -64,8 +64,6 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
     return { amountIn, amountOut };
   }, [stats]);
 
-  console.log({ data, stats });
-
   return (
     <div className="h-105">
       <SkeletonSlot

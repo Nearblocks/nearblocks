@@ -117,10 +117,12 @@ export const Info = ({
                   {() => (
                     <>
                       <TimeAgo ns={account!.created.block_timestamp} /> at txn{' '}
-                      <AccountLink
-                        account={account!.created.transaction_hash}
-                        hideCopy
-                      />
+                      <Link
+                        className="text-link inline-block w-30 truncate"
+                        href={`/txns/${account!.created.transaction_hash}`}
+                      >
+                        {account!.created.transaction_hash}
+                      </Link>
                     </>
                   )}
                 </SkeletonSlot>
