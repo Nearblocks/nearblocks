@@ -9,7 +9,8 @@ import { use, useMemo } from 'react';
 import { AccountNearStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
-import { dateFormat, numberFormat } from '@/lib/format';
+import { dateFormat, numberFormat, toNear } from '@/lib/format';
+import { nearIcon } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
 
 import { AnalyticsChart } from './chart';
@@ -38,9 +39,9 @@ const tooltipFormatter = function (this: Highcharts.Point) {
   const rows = (this.points as Array<Highcharts.Point>)?.map((point, index) => {
     return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">\u25CF</span> ${
       point.series.name
-    }: <span class="font-bold align-middle">${numberFormat(
-      point.y,
-    )}</span></span>`;
+    }: <span class="font-bold align-middle">${
+      nearIcon + ' ' + numberFormat(point.y)
+    }</span></span>`;
   });
 
   return header + (rows?.join('') ?? '');
@@ -57,8 +58,8 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
     for (const item of reversed) {
       const timestamp = new Date(item.date).getTime();
 
-      amountIn.push([timestamp, +item.amount_in]);
-      amountOut.push([timestamp, +item.amount_out]);
+      amountIn.push([timestamp, +toNear(item.amount_in)]);
+      amountOut.push([timestamp, +toNear(item.amount_out)]);
     }
 
     return { amountIn, amountOut };

@@ -46,7 +46,7 @@ const tooltipFormatter = function (this: Highcharts.Point) {
     const value =
       point.series.options.id === 'storage'
         ? bytesFormat(point.y)
-        : numberFormat(point.y, { maximumFractionDigits: 2 }) + nearIcon;
+        : nearIcon + ' ' + numberFormat(point.y, { maximumFractionDigits: 2 });
 
     return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">\u25CF</span> ${point.series.name}: <span class="font-bold align-middle">${value}</span></span>`;
   });
