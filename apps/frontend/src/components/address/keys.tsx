@@ -6,7 +6,7 @@ import { use } from 'react';
 import { AccountKey, AccountKeyCount, AccountKeysRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -25,7 +25,11 @@ type Props = {
   loading?: boolean;
 };
 
-export const Keys = ({ keyCountPromise, keysPromise, loading }: Props) => {
+export const AccessKeys = ({
+  keyCountPromise,
+  keysPromise,
+  loading,
+}: Props) => {
   const keys = !loading && keysPromise ? use(keysPromise) : null;
   const keyCount = !loading && keyCountPromise ? use(keyCountPromise) : null;
 
@@ -89,15 +93,7 @@ export const Keys = ({ keyCountPromise, keysPromise, loading }: Props) => {
         const permission = key.permission as AccessKeyPermission | null;
 
         return permission?.receiverId ? (
-          <Link
-            className="text-link"
-            href={`/address/${permission.receiverId}`}
-          >
-            <Truncate>
-              <TruncateText text={permission.receiverId} />
-              <TruncateCopy text={permission.receiverId} />
-            </Truncate>
-          </Link>
+          <AccountLink account={permission.receiverId} />
         ) : (
           ''
         );

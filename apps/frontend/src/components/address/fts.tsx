@@ -6,7 +6,7 @@ import { use } from 'react';
 import { AccountFTTxn, AccountFTTxnCount, AccountFTTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -79,14 +79,7 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
       id: 'cause',
     },
     {
-      cell: (ft) => (
-        <Link className="text-link" href={`/address/${ft.affected_account_id}`}>
-          <Truncate>
-            <TruncateText text={ft.affected_account_id} />
-            <TruncateCopy text={ft.affected_account_id} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (ft) => <AccountLink account={ft.affected_account_id} />,
       header: 'Affected',
       id: 'affected',
     },
@@ -97,20 +90,7 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
       id: 'direction',
     },
     {
-      cell: (ft) =>
-        ft.involved_account_id ? (
-          <Link
-            className="text-link"
-            href={`/address/${ft.involved_account_id}`}
-          >
-            <Truncate>
-              <TruncateText text={ft.involved_account_id} />
-              <TruncateCopy text={ft.involved_account_id} />
-            </Truncate>
-          </Link>
-        ) : (
-          'system'
-        ),
+      cell: (ft) => <AccountLink account={ft.involved_account_id} />,
       enableFilter: true,
       filterName: 'involved',
       header: 'Involved',

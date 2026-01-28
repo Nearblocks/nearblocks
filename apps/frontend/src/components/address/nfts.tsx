@@ -10,7 +10,7 @@ import {
 } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -83,17 +83,7 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
       id: 'cause',
     },
     {
-      cell: (nft) => (
-        <Link
-          className="text-link"
-          href={`/address/${nft.affected_account_id}`}
-        >
-          <Truncate>
-            <TruncateText text={nft.affected_account_id} />
-            <TruncateCopy text={nft.affected_account_id} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (nft) => <AccountLink account={nft.affected_account_id} />,
       header: 'Affected',
       id: 'affected',
     },
@@ -104,20 +94,7 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
       id: 'direction',
     },
     {
-      cell: (nft) =>
-        nft.involved_account_id ? (
-          <Link
-            className="text-link"
-            href={`/address/${nft.involved_account_id}`}
-          >
-            <Truncate>
-              <TruncateText text={nft.involved_account_id} />
-              <TruncateCopy text={nft.involved_account_id} />
-            </Truncate>
-          </Link>
-        ) : (
-          'system'
-        ),
+      cell: (nft) => <AccountLink account={nft.involved_account_id} />,
       enableFilter: true,
       filterName: 'involved',
       header: 'Involved',

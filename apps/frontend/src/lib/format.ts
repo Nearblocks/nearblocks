@@ -1,5 +1,7 @@
 import Big, { BigSource } from 'big.js';
 
+import { dayjs } from './dayjs';
+
 export type NumberFormat = bigint | null | number | string | undefined;
 
 export const currencyFormat = (
@@ -131,3 +133,13 @@ export const toTokenPrice = (
 };
 
 export const toMs = (ns: BigSource) => +ns / 10 ** 6;
+
+export const toYearsAndDays = (totalDays: number) => {
+  const start = dayjs.utc();
+  const end = start.add(totalDays, 'day');
+
+  const years = end.diff(start, 'year');
+  const days = end.subtract(years, 'year').diff(start, 'day');
+
+  return { days, years };
+};

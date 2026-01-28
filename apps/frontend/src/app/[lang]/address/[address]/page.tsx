@@ -4,7 +4,7 @@ import { fetchTxnCount, fetchTxns } from '@/data/address/txns';
 
 type Props = PageProps<'/[lang]/address/[address]'>;
 
-const Address = async ({ params, searchParams }: Props) => {
+const AddressPage = async ({ params, searchParams }: Props) => {
   const [{ address }, filters] = await Promise.all([params, searchParams]);
   const txnsPromise = fetchTxns(address, filters);
   const txnCountPromise = fetchTxnCount(address, filters);
@@ -16,4 +16,4 @@ const Address = async ({ params, searchParams }: Props) => {
   );
 };
 
-export default Address;
+export default AddressPage;

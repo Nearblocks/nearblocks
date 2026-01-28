@@ -16,7 +16,7 @@ export type TruncateTextProps = {
   className?: string;
   text: string;
   tooltipClassName?: string;
-};
+} & React.HTMLAttributes<HTMLSpanElement>;
 
 export type TruncateCopyProps = {
   className?: string;
@@ -36,11 +36,15 @@ export const TruncateText = ({
   className,
   text,
   tooltipClassName,
+  ...props
 }: TruncateTextProps) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className={cn('inline-block max-w-30 truncate', className)}>
+        <span
+          className={cn('inline-block max-w-30 truncate', className)}
+          {...props}
+        >
           {text}
         </span>
       </TooltipTrigger>

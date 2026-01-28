@@ -10,7 +10,7 @@ import {
 } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -91,14 +91,7 @@ export const StakingTxns = ({
       id: 'type',
     },
     {
-      cell: (staking) => (
-        <Link className="text-link" href={`/address/${staking.contract}`}>
-          <Truncate>
-            <TruncateText text={staking.contract} />
-            <TruncateCopy text={staking.contract} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (staking) => <AccountLink account={staking.contract} />,
       enableFilter: true,
       filterName: 'contract',
       header: 'Contract',

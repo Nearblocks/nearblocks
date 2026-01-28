@@ -10,7 +10,7 @@ import { fetchStats } from '@/data/layout';
 import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 
-const Home = async ({ params }: PageProps<'/[lang]'>) => {
+const HomePage = async ({ params }: PageProps<'/[lang]'>) => {
   const { lang } = await params;
   const statsPromise = fetchStats();
   const blocksPromise = fetchBlocks();
@@ -46,4 +46,4 @@ const Home = async ({ params }: PageProps<'/[lang]'>) => {
   );
 };
 
-export default Home;
+export default HomePage;
