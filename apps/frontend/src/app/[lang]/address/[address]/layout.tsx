@@ -102,16 +102,6 @@ const AddressLayout = async ({ children, params }: Props) => {
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/staking`}>
                   Staking Txns
-                </ActiveLink>
-              </TabLink>
-              <TabLink asChild>
-                <ActiveLink href={`/address/${address}/keys`}>
-                  Access Keys
-                </ActiveLink>
-              </TabLink>
-              <TabLink asChild>
-                <ActiveLink href={`/address/${address}/analytics`}>
-                  Analytics
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
               </TabLink>
@@ -121,6 +111,17 @@ const AddressLayout = async ({ children, params }: Props) => {
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
               </TabLink> */}
+              <TabLink asChild>
+                <ActiveLink href={`/address/${address}/analytics`}>
+                  Analytics
+                  <TabBadge variant="teal">NEW</TabBadge>
+                </ActiveLink>
+              </TabLink>
+              <TabLink asChild>
+                <ActiveLink href={`/address/${address}/keys`}>
+                  Access Keys
+                </ActiveLink>
+              </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/contract`}>
                   Contract

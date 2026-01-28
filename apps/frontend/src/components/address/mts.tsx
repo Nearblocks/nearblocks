@@ -6,7 +6,7 @@ import { use } from 'react';
 import { AccountMTTxn, AccountMTTxnCount, AccountMTTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -80,12 +80,10 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
     },
     {
       cell: (mt) => (
-        <Link className="text-link" href={`/address/${mt.affected_account_id}`}>
-          <Truncate>
-            <TruncateText className="max-w-25" text={mt.affected_account_id} />
-            <TruncateCopy text={mt.affected_account_id} />
-          </Truncate>
-        </Link>
+        <AccountLink
+          account={mt.affected_account_id}
+          textClassName="max-w-25"
+        />
       ),
       header: 'Affected',
       id: 'affected',
@@ -97,23 +95,12 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
       id: 'direction',
     },
     {
-      cell: (mt) =>
-        mt.involved_account_id ? (
-          <Link
-            className="text-link"
-            href={`/address/${mt.involved_account_id}`}
-          >
-            <Truncate>
-              <TruncateText
-                className="max-w-25"
-                text={mt.involved_account_id}
-              />
-              <TruncateCopy text={mt.involved_account_id} />
-            </Truncate>
-          </Link>
-        ) : (
-          'system'
-        ),
+      cell: (mt) => (
+        <AccountLink
+          account={mt.involved_account_id}
+          textClassName="max-w-25"
+        />
+      ),
       enableFilter: true,
       filterName: 'involved',
       header: 'Involved',

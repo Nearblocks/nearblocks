@@ -2,21 +2,33 @@
 
 import { Chart } from '@highcharts/react';
 import { Heatmap as HeatmapSeries } from '@highcharts/react/series';
-import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
 import 'highcharts/esm/modules/heatmap.src.js';
 import { memo, useMemo } from 'react';
+
+import { dayjs } from '@/lib/dayjs';
+import { numberFormat } from '@/lib/format';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
+
 type Props = {
-  data?: Array<{ date: Date | number | string; value: number }>;
+  data?: Array<{
+    date: Date | number | string;
+    txns?: number | string;
+  }>;
   height?: number;
 };
 
-dayjs.extend(isoWeek);
-
 const createDateKey = (date: dayjs.Dayjs) => date.format('YYYY-MM-DD');
 
+const colors = [
+  'bg-(--highcharts-color-0)',
+  'bg-(--highcharts-color-1)',
+  'bg-(--highcharts-color-2)',
+  'bg-(--highcharts-color-3)',
+  'bg-(--highcharts-color-4)',
+];
+
 export const Heatmap = memo(({ data, height = 176 }: Props) => {
-  const { options, points } = useMemo(() => {
+  const { options, points, ranges } = useMemo(() => {
     const resolvedData = data ?? [];
     const parsedDates = resolvedData
       .map((item) => dayjs(item.date))
@@ -31,16 +43,19 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
       if (!date.isValid()) continue;
 
       const key = createDateKey(date);
-      valuesByDay.set(key, item.value);
-      dataValues.push(item.value);
+      const rawValue = item.txns ?? 0;
+      const parsedValue =
+        typeof rawValue === 'number' ? rawValue : Number(rawValue);
+      const value = Number.isFinite(parsedValue) ? parsedValue : 0;
+
+      valuesByDay.set(key, value);
+      dataValues.push(value);
     }
 
-    const start = parsedDates.length
-      ? parsedDates[0].startOf('month')
-      : dayjs().startOf('year');
-    const end = parsedDates.length
-      ? parsedDates[parsedDates.length - 1].endOf('month')
-      : dayjs().endOf('year');
+    const end = (
+      parsedDates.length ? parsedDates[parsedDates.length - 1] : dayjs()
+    ).endOf('month');
+    const start = end.subtract(11, 'month').startOf('month');
 
     const maxValue = dataValues.length ? Math.max(...dataValues) : 0;
     const step = Math.max(1, Math.ceil(maxValue / 4));
@@ -102,33 +117,12 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
     });
     const dayNames = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun'];
     const chartWidth = Math.max(1300, globalWeekIndex * 12);
-
     const dataClasses = [
-      {
-        from: 0,
-        // name: 'Less',
-        to: 0,
-      },
-      {
-        from: 1,
-        // name: '',
-        to: Math.min(step, maxValue),
-      },
-      {
-        from: step + 1,
-        // name: '',
-        to: Math.min(step * 2, maxValue),
-      },
-      {
-        from: step * 2 + 1,
-        // name: '',
-        to: Math.min(step * 3, maxValue),
-      },
-      {
-        from: step * 3 + 1,
-        // name: 'More',
-        to: maxValue,
-      },
+      { from: 0, to: 0 },
+      { from: 1, to: Math.min(step, maxValue) },
+      { from: step + 1, to: Math.min(step * 2, maxValue) },
+      { from: step * 2 + 1, to: Math.min(step * 3, maxValue) },
+      { from: step * 3 + 1, to: maxValue },
     ].filter((range) => range.from <= range.to);
 
     return {
@@ -160,7 +154,7 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
             dataLabels: { enabled: false },
             states: {
               hover: {
-                brightness: 0.15,
+                enabled: false,
               },
             },
           },
@@ -173,15 +167,10 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
             ).point;
 
             return `
-              <span class="text-body-xs fill-foreground">${new Intl.DateTimeFormat(
-                'en',
-                {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                },
-              ).format(point.date)}
-              <br/>${point.value} txns</span>
+              <span class="text-body-xs fill-foreground">${dayjs
+                .utc(point.date)
+                .format('ddd DD, MMM YYYY')}
+              <br/>${numberFormat(point.value)} txns</span>
             `;
           },
         },
@@ -209,13 +198,32 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
         },
       },
       points,
+      ranges: dataClasses,
     };
   }, [data, height]);
 
   return (
-    <Chart options={options}>
-      <HeatmapSeries.Series data={points} />
-    </Chart>
+    <div className="heatmap-chart">
+      <Chart options={options}>
+        <HeatmapSeries.Series data={points} />
+      </Chart>
+      <div className="text-body-xs text-muted-foreground flex items-center justify-end gap-1">
+        <div className="mr-2">Less</div>
+        {ranges.map((range, index) => (
+          <Tooltip key={range.from}>
+            <TooltipTrigger>
+              <span className={`${colors[index]} block h-3 w-3 rounded-xs`} />
+            </TooltipTrigger>
+            <TooltipContent>
+              {range.from
+                ? `${numberFormat(range.from)} - ${numberFormat(range.to)}`
+                : '0'}
+            </TooltipContent>
+          </Tooltip>
+        ))}
+        <div className="ml-2">More</div>
+      </div>
+    </div>
   );
 });
 

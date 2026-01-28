@@ -10,7 +10,7 @@ import {
 } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -113,15 +113,7 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Link
-          className="text-link"
-          href={`/address/${receipt.predecessor_account_id}`}
-        >
-          <Truncate>
-            <TruncateText text={receipt.predecessor_account_id} />
-            <TruncateCopy text={receipt.predecessor_account_id} />
-          </Truncate>
-        </Link>
+        <AccountLink account={receipt.predecessor_account_id} />
       ),
       enableFilter: true,
       filterName: 'predecessor',
@@ -141,17 +133,7 @@ export const Receipts = ({
       id: 'direction',
     },
     {
-      cell: (receipt) => (
-        <Link
-          className="text-link"
-          href={`/address/${receipt.receiver_account_id}`}
-        >
-          <Truncate>
-            <TruncateText text={receipt.receiver_account_id} />
-            <TruncateCopy text={receipt.receiver_account_id} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (receipt) => <AccountLink account={receipt.receiver_account_id} />,
       enableFilter: true,
       filterName: 'receiver',
       header: 'To',

@@ -6,7 +6,7 @@ import { use } from 'react';
 import { AccountTxn, AccountTxnCount, AccountTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { Link } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -97,14 +97,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       id: 'txn_fee',
     },
     {
-      cell: (txn) => (
-        <Link className="text-link" href={`/address/${txn.signer_account_id}`}>
-          <Truncate>
-            <TruncateText text={txn.signer_account_id} />
-            <TruncateCopy text={txn.signer_account_id} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (txn) => <AccountLink account={txn.signer_account_id} />,
       enableFilter: true,
       filterName: 'signer',
       header: 'From',
@@ -123,17 +116,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       id: 'direction',
     },
     {
-      cell: (txn) => (
-        <Link
-          className="text-link"
-          href={`/address/${txn.receiver_account_id}`}
-        >
-          <Truncate>
-            <TruncateText text={txn.receiver_account_id} />
-            <TruncateCopy text={txn.receiver_account_id} />
-          </Truncate>
-        </Link>
-      ),
+      cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
       enableFilter: true,
       filterName: 'receiver',
       header: 'To',

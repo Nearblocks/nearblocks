@@ -1,12 +1,12 @@
 'use client';
 
 import { Tooltip, XAxis, YAxis } from '@highcharts/react';
-import { Column } from '@highcharts/react/series';
+import { Column, Line } from '@highcharts/react/series';
 import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
 import { use, useMemo } from 'react';
 
-import { AccountNearStats } from 'nb-schemas';
+import { AccountFTStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
 import { dateFormat, numberFormat } from '@/lib/format';
@@ -15,11 +15,20 @@ import { Skeleton } from '@/ui/skeleton';
 import { AnalyticsChart } from './chart';
 
 type Props = {
+  ftsPromise?: Promise<AccountFTStats[] | null>;
   loading?: boolean;
-  nearPromise?: Promise<AccountNearStats[] | null>;
 };
 
 const countLabel = {
+  formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
+    return numberFormat(this.value, {
+      maximumFractionDigits: 2,
+      notation: 'compact',
+    });
+  },
+};
+
+const storageLabel = {
   formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
     return numberFormat(this.value, {
       maximumFractionDigits: 2,
@@ -46,25 +55,27 @@ const tooltipFormatter = function (this: Highcharts.Point) {
   return header + (rows?.join('') ?? '');
 };
 
-export const NearChart = ({ loading, nearPromise }: Props) => {
-  const stats = !loading && nearPromise ? use(nearPromise) : null;
+export const FTsChart = ({ ftsPromise, loading }: Props) => {
+  const stats = !loading && ftsPromise ? use(ftsPromise) : null;
 
   const data = useMemo(() => {
-    const amountIn = [];
-    const amountOut = [];
+    const transfers = [];
+    const contracts = [];
+    const uniqueIn = [];
+    const uniqueOut = [];
     const reversed = (stats ?? []).toReversed();
 
     for (const item of reversed) {
       const timestamp = new Date(item.date).getTime();
 
-      amountIn.push([timestamp, +item.amount_in]);
-      amountOut.push([timestamp, +item.amount_out]);
+      transfers.push([timestamp, +item.transfers]);
+      contracts.push([timestamp, +item.contracts]);
+      uniqueIn.push([timestamp, +item.unique_address_in]);
+      uniqueOut.push([timestamp, +item.unique_address_out]);
     }
 
-    return { amountIn, amountOut };
+    return { contracts, transfers, uniqueIn, uniqueOut };
   }, [stats]);
-
-  console.log({ data, stats });
 
   return (
     <div className="h-105">
@@ -79,15 +90,36 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
               className="stroke-0"
               labels={countLabel}
               opposite={false}
-              title={{ text: 'Transfer Amounts' }}
+              title={{ text: 'Transfers Count' }}
             />
             <Column.Series
-              data={data.amountOut}
-              options={{ id: 'amountOut', name: 'Sent (Out)' }}
+              data={data.transfers}
+              options={{ id: 'transfers', name: 'Transfers', yAxis: 0 }}
             />
-            <Column.Series
-              data={data.amountIn}
-              options={{ id: 'amountIn', name: 'Received (In)' }}
+            <YAxis
+              className="stroke-0"
+              labels={storageLabel}
+              title={{ text: 'Count' }}
+            />
+            <Line.Series
+              data={data.contracts}
+              options={{ id: 'contracts', name: 'Token Contracts', yAxis: 1 }}
+            />
+            <Line.Series
+              data={data.uniqueIn}
+              options={{
+                id: 'uniqueIn',
+                name: 'Unique Addresses Sent',
+                yAxis: 1,
+              }}
+            />
+            <Line.Series
+              data={data.uniqueOut}
+              options={{
+                id: 'uniqueOut',
+                name: 'Unique Addresses Received',
+                yAxis: 1,
+              }}
             />
             <Tooltip formatter={tooltipFormatter} shared />
           </AnalyticsChart>

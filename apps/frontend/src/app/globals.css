@@ -103,7 +103,7 @@
     --sidebar-border: hsl(220 13% 91%);
     --sidebar-ring: hsl(217.2 91.2% 59.8%);
 
-    --highcharts-heatmap-color-0: #eff2f5;
+    --highcharts-heatmap-color-0: #e5e5e5;
     --highcharts-heatmap-color-1: #aceebb;
     --highcharts-heatmap-color-2: #4ac26b;
     --highcharts-heatmap-color-3: #2da44e;
@@ -158,7 +158,7 @@
     --sidebar-border: hsl(240 3.7% 15.9%);
     --sidebar-ring: hsl(217.2 91.2% 59.8%);
 
-    --highcharts-heatmap-color-0: #061f0f;
+    --highcharts-heatmap-color-0: #262626;
     --highcharts-heatmap-color-1: #033a16;
     --highcharts-heatmap-color-2: #196c2e;
     --highcharts-heatmap-color-3: #2ea043;
@@ -1212,6 +1212,7 @@ circle.highcharts-legend-nav-inactive {
 
 .highcharts-range-selector-buttons .highcharts-button {
     stroke-width: 0;
+    text-transform: uppercase;
 }
 
 .highcharts-range-selector-buttons .highcharts-label {
@@ -1329,24 +1330,12 @@ input.highcharts-range-selector {
     stroke-width: 4px;
 }
 
-.highcharts-heatmap-series .highcharts-point.highcharts-color-0 {
-    fill: var(--highcharts-heatmap-color-0);
-}
-
-.highcharts-heatmap-series .highcharts-point.highcharts-color-1 {
-    fill: var(--highcharts-heatmap-color-1);
-}
-
-.highcharts-heatmap-series .highcharts-point.highcharts-color-2 {
-    fill: var(--highcharts-heatmap-color-2);
-}
-
-.highcharts-heatmap-series .highcharts-point.highcharts-color-3 {
-    fill: var(--highcharts-heatmap-color-3);
-}
-
-.highcharts-heatmap-series .highcharts-point.highcharts-color-4 {
-    fill: var(--highcharts-heatmap-color-4);
+.heatmap-chart {
+    --highcharts-color-0: var(--highcharts-heatmap-color-0);
+    --highcharts-color-1: var(--highcharts-heatmap-color-1);
+    --highcharts-color-2: var(--highcharts-heatmap-color-2);
+    --highcharts-color-3: var(--highcharts-heatmap-color-3);
+    --highcharts-color-4: var(--highcharts-heatmap-color-4);
 }
 
 .highcharts-map-navigation {

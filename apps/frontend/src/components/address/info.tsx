@@ -14,6 +14,8 @@ import { bytesFormat, nearFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
+import { AccountLink } from '../link';
+
 type Props = {
   accountPromise?: Promise<Account | null>;
   balancePromise?: Promise<AccountBalance | null>;
@@ -73,12 +75,10 @@ export const Info = ({
                 <ListLeft className="min-w-30">Contract Creator:</ListLeft>
                 <ListRight>
                   <p className="flex items-center gap-1">
-                    <Link
-                      className="text-link inline-block max-w-30 truncate"
-                      href={`/address/${deployments[0].predecessor_account_id}`}
-                    >
-                      {deployments[0].predecessor_account_id}
-                    </Link>{' '}
+                    <AccountLink
+                      account={deployments[0].predecessor_account_id}
+                      hideCopy
+                    />{' '}
                     at txn{' '}
                     <Link
                       className="text-link inline-block w-30 truncate"
@@ -117,12 +117,10 @@ export const Info = ({
                   {() => (
                     <>
                       <TimeAgo ns={account!.created.block_timestamp} /> at txn{' '}
-                      <Link
-                        className="text-link inline-block w-30 truncate"
-                        href={`/txns/${account!.created.transaction_hash}`}
-                      >
-                        {account!.created.transaction_hash}
-                      </Link>
+                      <AccountLink
+                        account={account!.created.transaction_hash}
+                        hideCopy
+                      />
                     </>
                   )}
                 </SkeletonSlot>
