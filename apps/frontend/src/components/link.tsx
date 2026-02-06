@@ -2,7 +2,13 @@
 
 import OGLink, { LinkProps, useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
-import { AnchorHTMLAttributes, PropsWithChildren, useMemo } from 'react';
+import {
+  AnchorHTMLAttributes,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { cn } from '@/lib/utils';
 import { supportedLocales } from '@/locales/config';
@@ -15,7 +21,9 @@ type Props = PropsWithChildren<LinkProps> &
     className?: string;
   };
 
-type ActiveLinkProps = PropsWithChildren<LinkProps & { className?: string }>;
+type ActiveLinkProps = PropsWithChildren<
+  LinkProps & { className?: string; exact?: boolean }
+>;
 
 type AccountLinkProps = {
   account?: null | string;
@@ -24,17 +32,38 @@ type AccountLinkProps = {
   textClassName?: string;
 };
 
-export const Link = ({ children, className, ...props }: Props) => {
+const PendingMarker = () => {
   const { pending } = useLinkStatus();
+  const [delayedPending, setDelayedPending] = useState(false);
 
+  useEffect(() => {
+    if (pending) {
+      const timeout = setTimeout(() => setDelayedPending(true), 250);
+      return () => clearTimeout(timeout);
+    }
+    setDelayedPending(false);
+    return;
+  }, [pending]);
+
+  return (
+    <span
+      aria-hidden="true"
+      className="hidden"
+      data-link-pending={delayedPending}
+    />
+  );
+};
+
+export const Link = ({ children, className, ...props }: Props) => {
   return (
     <OGLink
       {...props}
-      aria-busy={pending ? 'true' : undefined}
-      className={cn(className, {
-        'pointer-events-none cursor-progress': pending,
-      })}
+      className={cn(
+        className,
+        '[&:has([data-link-pending=true])]:cursor-progress',
+      )}
     >
+      <PendingMarker />
       {children}
     </OGLink>
   );
@@ -46,13 +75,27 @@ const getLinkUrl = (href: LinkProps['href'], as?: LinkProps['as']): string => {
   return href.toString();
 };
 
-export const ActiveLink = ({ children, ...props }: ActiveLinkProps) => {
+const isPathActive = (
+  linkUrl: string,
+  pathname: string,
+  exact: boolean,
+): boolean => {
+  if (exact) return linkUrl === pathname;
+
+  return linkUrl === pathname || pathname.startsWith(linkUrl + '/');
+};
+
+export const ActiveLink = ({
+  children,
+  exact = true,
+  ...props
+}: ActiveLinkProps) => {
   const pathname = usePathname();
   const isActive = useMemo(() => {
     if (pathname) {
       const linkUrl = getLinkUrl(props.href, props.as);
 
-      if (linkUrl === pathname) return true;
+      if (isPathActive(linkUrl, pathname, exact)) return true;
 
       const segments = pathname.split('/').filter(Boolean);
 
@@ -62,12 +105,12 @@ export const ActiveLink = ({ children, ...props }: ActiveLinkProps) => {
       ) {
         const activePathname = `/${segments.slice(1).join('/')}`;
 
-        if (linkUrl === activePathname) return true;
+        if (isPathActive(linkUrl, activePathname, exact)) return true;
       }
     }
 
     return false;
-  }, [pathname, props.as, props.href]);
+  }, [exact, pathname, props.as, props.href]);
 
   return (
     <Link {...props} data-active={isActive}>

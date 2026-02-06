@@ -29,11 +29,7 @@ const txnsLabel = {
 };
 
 const tooltipFormatter = function (this: Highcharts.Point) {
-  const header = `<span>${dateFormat('en', this.x as number, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })}</span><br/>`;
+  const header = `<span>${dateFormat(this.x, 'MMM D, YYYY')}</span><br/>`;
 
   const rows = (this.points as Array<Highcharts.Point>)?.map((point, index) => {
     return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">\u25CF</span> ${

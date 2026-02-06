@@ -6,8 +6,7 @@ import { RiQuestionLine } from 'react-icons/ri';
 import { AccountStatsOverview, AccountTxnStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
-import { dayjs } from '@/lib/dayjs';
-import { numberFormat, toYearsAndDays } from '@/lib/format';
+import { dateFormat, numberFormat, toYearsAndDays } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -25,9 +24,9 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
   const heatmap = !loading && heatmapPromise ? use(heatmapPromise) : null;
 
   return (
-    <>
-      <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="px-3 py-3">
+    <div className="h-105">
+      <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
             Transaction Count{' '}
             <Tooltip>
@@ -54,13 +53,11 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               fallback={<Skeleton className="w-30" />}
               loading={loading || !overview}
             >
-              {() => (
-                <>{dayjs.utc(overview!.first_day).format('ddd DD, MMM YYYY')}</>
-              )}
+              {() => <>{dateFormat(overview!.first_day, 'ddd DD, MMM YYYY')}</>}
             </SkeletonSlot>
           </p>
         </Card>
-        <Card className="px-3 py-3">
+        <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
             Active Age{' '}
             <Tooltip>
@@ -88,14 +85,14 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
             >
               {() => (
                 <>
-                  {dayjs.utc(overview!.first_day).format('ddd DD, MMM YYYY')} -{' '}
-                  {dayjs.utc(overview!.last_day).format('ddd DD, MMM YYYY')}
+                  {dateFormat(overview!.first_day, 'ddd DD, MMM YYYY')} -{' '}
+                  {dateFormat(overview!.last_day, 'ddd DD, MMM YYYY')}
                 </>
               )}
             </SkeletonSlot>
           </p>
         </Card>
-        <Card className="px-3 py-3">
+        <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
             Unique Days Active{' '}
             <Tooltip>
@@ -121,13 +118,11 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               fallback={<Skeleton className="w-30" />}
               loading={loading || !overview}
             >
-              {() => (
-                <>{dayjs.utc(overview!.first_day).format('ddd DD, MMM YYYY')}</>
-              )}
+              {() => <>{dateFormat(overview!.first_day, 'ddd DD, MMM YYYY')}</>}
             </SkeletonSlot>
           </p>
         </Card>
-        <Card className="px-3 py-3">
+        <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
             Longest Streak{' '}
             <Tooltip>
@@ -155,13 +150,12 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
             >
               {() => (
                 <>
-                  {dayjs
-                    .utc(overview!.longest_streak.start)
-                    .format('ddd DD, MMM YYYY')}{' '}
+                  {dateFormat(
+                    overview!.longest_streak.start,
+                    'ddd DD, MMM YYYY',
+                  )}{' '}
                   -{' '}
-                  {dayjs
-                    .utc(overview!.longest_streak.end)
-                    .format('ddd DD, MMM YYYY')}
+                  {dateFormat(overview!.longest_streak.end, 'ddd DD, MMM YYYY')}
                 </>
               )}
             </SkeletonSlot>
@@ -175,16 +169,16 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           </CardTitle>
           {/* <span className="text-muted-foreground">{rangeLabel}</span> */}
         </CardHeader>
-        <CardContent className="h-55 pt-3">
+        <CardContent className="h-64 px-3 py-5">
           <SkeletonSlot
-            fallback={<Skeleton className="h-49 w-full" />}
+            fallback={<Skeleton className="h-54 w-full" />}
             loading={loading || !heatmap}
           >
             {() => <Heatmap data={heatmap ?? []} />}
           </SkeletonSlot>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 };
 

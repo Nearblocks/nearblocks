@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { ContractTab } from '@/components/address/contract/tab';
 import { Info } from '@/components/address/info';
 import { Overview } from '@/components/address/overview';
 import { AccountQr } from '@/components/address/qr';
@@ -13,14 +14,15 @@ import { TabLinks } from '@/components/tab-links';
 import {
   fetchAccount,
   fetchBalance,
-  fetchDeployments,
   fetchTokenCache,
   fetchTokens,
 } from '@/data/address';
+import { fetchContract, fetchDeployments } from '@/data/address/contract';
 import { fetchStats } from '@/data/layout';
 import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
+import { Skeleton } from '@/ui/skeleton';
 
 type Props = LayoutProps<'/[lang]/address/[address]'>;
 
@@ -29,6 +31,7 @@ const AddressLayout = async ({ children, params }: Props) => {
   const statsPromise = fetchStats();
   const accountPromise = fetchAccount(address);
   const balancePromise = fetchBalance(address);
+  const contractPromise = fetchContract(address);
   const deploymentsPromise = fetchDeployments(address);
   const tokensPromise = fetchTokens(address);
   const tokenCachePromise = fetchTokenCache(address);
@@ -71,7 +74,7 @@ const AddressLayout = async ({ children, params }: Props) => {
               />
             </ErrorSuspense>
           </div>
-          <ScrollArea className="mt-10 mb-2 w-full whitespace-nowrap">
+          <ScrollArea className="mt-10 mb-3 w-full whitespace-nowrap">
             <TabLinks>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}`}>
@@ -84,17 +87,17 @@ const AddressLayout = async ({ children, params }: Props) => {
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
-                <ActiveLink href={`/address/${address}/fts`}>
+                <ActiveLink href={`/address/${address}/tokens`}>
                   Token Txns
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
-                <ActiveLink href={`/address/${address}/nfts`}>
+                <ActiveLink href={`/address/${address}/nft-tokens`}>
                   NFT Txns
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
-                <ActiveLink href={`/address/${address}/mts`}>
+                <ActiveLink href={`/address/${address}/mt-tokens`}>
                   Multi Token Txns
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
@@ -112,7 +115,10 @@ const AddressLayout = async ({ children, params }: Props) => {
                 </ActiveLink>
               </TabLink> */}
               <TabLink asChild>
-                <ActiveLink href={`/address/${address}/analytics`}>
+                <ActiveLink
+                  exact={false}
+                  href={`/address/${address}/analytics`}
+                >
                   Analytics
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
@@ -122,11 +128,12 @@ const AddressLayout = async ({ children, params }: Props) => {
                   Access Keys
                 </ActiveLink>
               </TabLink>
-              <TabLink asChild>
-                <ActiveLink href={`/address/${address}/contract`}>
-                  Contract
-                </ActiveLink>
-              </TabLink>
+              <ErrorSuspense fallback={<Skeleton className="w-20" />}>
+                <ContractTab
+                  address={address}
+                  contractPromise={contractPromise}
+                />
+              </ErrorSuspense>
             </TabLinks>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>

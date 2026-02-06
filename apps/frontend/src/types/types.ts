@@ -102,3 +102,68 @@ export type AccessKeyPermission = {
   methodNames: string[];
   receiverId: string;
 };
+
+export type ContractFunctionArg = {
+  name: string;
+  type_schema: {
+    format?: string;
+    items?: { type: string };
+    type: string | string[];
+  };
+};
+
+export type ContractSchemaFunction = {
+  kind: 'call' | 'view';
+  name: string;
+  params?: {
+    args: ContractFunctionArg[];
+    serialization_type: string;
+  };
+  result?: {
+    serialization_type: string;
+    type_schema: unknown;
+  };
+};
+
+export type ContractAbiSchema = {
+  body: {
+    functions: ContractSchemaFunction[];
+    root_schema?: unknown;
+  };
+  metadata: {
+    authors?: string[];
+    build?: {
+      builder: string;
+      compiler: string;
+    };
+    name: string;
+    version: string;
+  };
+  schema_version: string;
+};
+
+export type ContractVerifierData = {
+  cid: string;
+  code_hash: string;
+  lang: string;
+};
+
+export type ContractVerifierResponse = [
+  account: string,
+  data: ContractVerifierData,
+][];
+
+export type ContractSourceMetadata = {
+  build_info: {
+    build_command: string[];
+    build_environment: string;
+    contract_path: string;
+    source_code_snapshot: string;
+  };
+  link: string;
+  standards: {
+    standard: string;
+    version: string;
+  }[];
+  version: string;
+};

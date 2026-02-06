@@ -14,7 +14,7 @@ type Props = {
 };
 
 export const TxnsChart = ({ data }: Props) => {
-  const { locale, t } = useLocale('home');
+  const { t } = useLocale('home');
 
   const chartData = useMemo(() => {
     return data
@@ -50,11 +50,10 @@ export const TxnsChart = ({ data }: Props) => {
           },
         ) {
           return `
-          <span style="font-size:10px">${dateFormat(locale, this.x, {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}</span>
+          <span style="font-size:10px">${dateFormat(
+            this.x,
+            'MMM D, YYYY',
+          )}</span>
           <br/>${t('chart.transactions')}: <strong>${numberFormat(this.y, {
             maximumFractionDigits: 0,
           })}</strong>
@@ -86,7 +85,7 @@ export const TxnsChart = ({ data }: Props) => {
         title: { text: undefined },
       },
     }),
-    [locale, t],
+    [t],
   );
 
   return (

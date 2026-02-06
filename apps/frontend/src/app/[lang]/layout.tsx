@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Geist_Mono, Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import { Layout } from '@/components/layout';
@@ -15,6 +15,11 @@ import '../globals.css';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+});
+
+const geist = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist',
 });
 
 export const metadata: Metadata = {
@@ -43,7 +48,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
       suppressHydrationWarning
     >
       <body
-        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} overflow-x-hidden antialiased`}
+        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} ${geist.variable} overflow-x-hidden wrap-anywhere antialiased`}
       >
         <ConfigProvider value={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>
