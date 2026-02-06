@@ -20,6 +20,11 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
 
+type Deployment = {
+  block_timestamp: string;
+  receipt_id: string;
+};
+
 const contract = responseHandler(
   response.contract,
   async (req: RequestValidator<ContractReq>) => {
@@ -40,9 +45,7 @@ const deployments = responseHandler(
 
     const first = await rollingWindow(
       (start, end) => {
-        return dbContract.oneOrNone<
-          Pick<ContractDeployment, 'block_timestamp' | 'receipt_id'>
-        >(sql.contracts.deployments, {
+        return dbContract.oneOrNone<Deployment>(sql.contracts.deployments, {
           account,
           end,
           order: 'ASC',
@@ -54,9 +57,7 @@ const deployments = responseHandler(
 
     const last = await rollingWindow(
       (start, end) => {
-        return dbContract.oneOrNone<
-          Pick<ContractDeployment, 'block_timestamp' | 'receipt_id'>
-        >(sql.contracts.deployments, {
+        return dbContract.oneOrNone<Deployment>(sql.contracts.deployments, {
           account,
           end,
           order: 'DESC',
@@ -82,13 +83,7 @@ const deployments = responseHandler(
     });
     const unionQuery = queries.join('\nUNION ALL\n');
 
-    const data =
-      await dbBase.manyOrNone<
-        Pick<
-          ContractDeployment,
-          'block' | 'predecessor_account_id' | 'transaction_hash'
-        >
-      >(unionQuery);
+    const data = await dbBase.manyOrNone<ContractDeployment>(unionQuery);
 
     return { data };
   },
