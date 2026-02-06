@@ -17,7 +17,7 @@
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
-    "tar": "7.4.3",
+    "tar": "7.5.7",
     "typescript": "~5.2"
   }
 }
