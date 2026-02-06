@@ -40,9 +40,7 @@ const block = v.object({
 
 const deployment = v.object({
   block,
-  block_timestamp: v.string(),
   predecessor_account_id: v.string(),
-  receipt_id: v.string(),
   transaction_hash: v.string(),
 });
 
@@ -68,6 +66,7 @@ export type AccountBalance = v.InferOutput<typeof balance>;
 export type Contract = v.InferOutput<typeof contract>;
 export type ContractDeployment = v.InferOutput<typeof deployment>;
 export type ContractSchema = v.InferOutput<typeof schema>;
+export type ContractAction = v.InferOutput<typeof action>;
 
 export type AccountRes = v.InferOutput<typeof accountResponse>;
 export type AccountBalanceRes = v.InferOutput<typeof balanceResponse>;
