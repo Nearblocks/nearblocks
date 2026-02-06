@@ -5,8 +5,8 @@ import { Heatmap as HeatmapSeries } from '@highcharts/react/series';
 import 'highcharts/esm/modules/heatmap.src.js';
 import { memo, useMemo } from 'react';
 
-import { dayjs } from '@/lib/dayjs';
-import { numberFormat } from '@/lib/format';
+import { Dayjs } from '@/lib/dayjs';
+import { dateFormat, numberFormat } from '@/lib/format';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 type Props = {
@@ -17,7 +17,10 @@ type Props = {
   height?: number;
 };
 
-const createDateKey = (date: dayjs.Dayjs) => date.format('YYYY-MM-DD');
+type Offset = { label: string; startIndex: number; weeks: number };
+type Point = { date: number; value: number; x: number; y: number };
+
+const createDateKey = (date: Dayjs.Dayjs) => date.format('YYYY-MM-DD');
 
 const colors = [
   'bg-(--highcharts-color-0)',
@@ -27,19 +30,14 @@ const colors = [
   'bg-(--highcharts-color-4)',
 ];
 
-export const Heatmap = memo(({ data, height = 176 }: Props) => {
+export const Heatmap = memo(({ data, height = 184 }: Props) => {
   const { options, points, ranges } = useMemo(() => {
-    const resolvedData = data ?? [];
-    const parsedDates = resolvedData
-      .map((item) => dayjs(item.date))
-      .filter((date) => date.isValid())
-      .sort((a, b) => (a.isAfter(b) ? 1 : -1));
-
+    const reversed = (data ?? []).toReversed();
     const valuesByDay = new Map<string, number>();
     const dataValues: number[] = [];
 
-    for (const item of resolvedData) {
-      const date = dayjs(item.date);
+    for (const item of reversed) {
+      const date = Dayjs.utc(item.date);
       if (!date.isValid()) continue;
 
       const key = createDateKey(date);
@@ -52,25 +50,21 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
       dataValues.push(value);
     }
 
-    const end = (
-      parsedDates.length ? parsedDates[parsedDates.length - 1] : dayjs()
-    ).endOf('month');
+    const end = Dayjs.utc().endOf('month');
     const start = end.subtract(11, 'month').startOf('month');
 
     const maxValue = dataValues.length ? Math.max(...dataValues) : 0;
     const step = Math.max(1, Math.ceil(maxValue / 4));
 
-    const months: dayjs.Dayjs[] = [];
+    const months: Dayjs.Dayjs[] = [];
     let currentMonth = start.startOf('month');
     while (currentMonth.isBefore(end) || currentMonth.isSame(end, 'month')) {
       months.push(currentMonth);
       currentMonth = currentMonth.add(1, 'month');
     }
 
-    const monthOffsets: { label: string; startIndex: number; weeks: number }[] =
-      [];
-    const points: Array<{ date: number; value: number; x: number; y: number }> =
-      [];
+    const monthOffsets: Offset[] = [];
+    const points: Point[] = [];
     let globalWeekIndex = 0;
 
     months.forEach((month) => {
@@ -167,9 +161,10 @@ export const Heatmap = memo(({ data, height = 176 }: Props) => {
             ).point;
 
             return `
-              <span class="text-body-xs fill-foreground">${dayjs
-                .utc(point.date)
-                .format('ddd DD, MMM YYYY')}
+              <span class="text-body-xs fill-foreground">${dateFormat(
+                point.date,
+                'ddd DD, MMM YYYY',
+              )}
               <br/>${numberFormat(point.value)} txns</span>
             `;
           },

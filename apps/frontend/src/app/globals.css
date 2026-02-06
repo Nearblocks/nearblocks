@@ -167,49 +167,50 @@
 
 @theme inline {
     --font-sans: var(--font-inter);
+    --font-mono: var(--font-geist);
 
     --text-*: initial;
     --text-headline-xs: 0.75rem;
-    --text-headline-xs--line-height: 120%;
+    --text-headline-xs--line-height: 0.875rem;
     --text-headline-xs--font-weight: 500;
     --text-headline-sm: 0.875rem;
-    --text-headline-sm--line-height: 120%;
+    --text-headline-sm--line-height: 1rem;
     --text-headline-sm--font-weight: 500;
     --text-headline-base: 1rem;
-    --text-headline-base--line-height: 120%;
+    --text-headline-base--line-height: 1.25rem;
     --text-headline-base--font-weight: 500;
     --text-headline-lg: 1.125rem;
-    --text-headline-lg--line-height: 120%;
+    --text-headline-lg--line-height: 1.5rem;
     --text-headline-lg--font-weight: 500;
     --text-headline-xl: 1.25rem;
-    --text-headline-xl--line-height: 120%;
+    --text-headline-xl--line-height: 1.75rem;
     --text-headline-xl--font-weight: 500;
     --text-headline-2xl: 1.5rem;
-    --text-headline-2xl--line-height: 120%;
+    --text-headline-2xl--line-height: 2rem;
     --text-headline-2xl--font-weight: 500;
     --text-headline-3xl: 2rem;
-    --text-headline-3xl--line-height: 120%;
+    --text-headline-3xl--line-height: 2.5rem;
     --text-headline-3xl--font-weight: 700;
     --text-headline-4xl: 2.5rem;
-    --text-headline-4xl--line-height: 120%;
+    --text-headline-4xl--line-height: 3rem;
     --text-headline-4xl--font-weight: 700;
     --text-headline-5xl: 3rem;
-    --text-headline-5xl--line-height: 120%;
+    --text-headline-5xl--line-height: 3.75rem;
     --text-headline-5xl--font-weight: 700;
     --text-body-xs: 0.75rem;
-    --text-body-xs--line-height: 160%;
+    --text-body-xs--line-height: 1.25rem;
     --text-body-xs--font-weight: 400;
     --text-body-sm: 0.875rem;
-    --text-body-sm--line-height: 160%;
+    --text-body-sm--line-height: 1.5rem;
     --text-body-sm--font-weight: 400;
     --text-body-base: 1rem;
-    --text-body-base--line-height: 160%;
+    --text-body-base--line-height: 1.75rem;
     --text-body-base--font-weight: 400;
     --text-body-lg: 1.125rem;
-    --text-body-lg--line-height: 160%;
+    --text-body-lg--line-height: 1.875rem;
     --text-body-lg--font-weight: 400;
     --text-body-xl: 1.25rem;
-    --text-body-xl--line-height: 160%;
+    --text-body-xl--line-height: 2rem;
     --text-body-xl--font-weight: 400;
 
     --color-*: initial;
@@ -319,6 +320,10 @@
     * {
         @apply border-border outline-ring/50;
     }
+
+    code {
+        @apply font-mono;
+    }
 }
 
 @utility container {
@@ -334,7 +339,149 @@
     }
 }
 
+@layer utilities {
+    .scroll-overlay {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+  
+    .scroll-overlay::-webkit-scrollbar {
+      width: 8px;
+    }
+  
+    .scroll-overlay::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  
+    .scroll-overlay::-webkit-scrollbar-thumb {
+      background-color: var(--border);
+      border-radius: 9999px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+  
+    .scroll-overlay:hover::-webkit-scrollbar-thumb,
+    .scroll-overlay:focus::-webkit-scrollbar-thumb {
+      opacity: 1;
+    }
+}
+
 @custom-variant dark (&:is(.dark *));
+
+/* PrismJS syntax highlighting theme */
+:root {
+    --prism-bg: #f6f8fa;
+    --prism-text: #24292e;
+    --prism-comment: #6a737d;
+    --prism-keyword: #d73a49;
+    --prism-string: #032f62;
+    --prism-function: #6f42c1;
+    --prism-number: #005cc5;
+    --prism-operator: #d73a49;
+    --prism-punctuation: #24292e;
+    --prism-class-name: #6f42c1;
+    --prism-constant: #005cc5;
+    --prism-builtin: #e36209;
+    --prism-attribute: #6f42c1;
+}
+
+.dark {
+    --prism-bg: #161b22;
+    --prism-text: #e6edf3;
+    --prism-comment: #8b949e;
+    --prism-keyword: #ff7b72;
+    --prism-string: #a5d6ff;
+    --prism-function: #d2a8ff;
+    --prism-number: #79c0ff;
+    --prism-operator: #ff7b72;
+    --prism-punctuation: #c9d1d9;
+    --prism-class-name: #f0883e;
+    --prism-constant: #79c0ff;
+    --prism-builtin: #ffa657;
+    --prism-attribute: #d2a8ff;
+}
+
+.prism-code {
+    color: var(--prism-text);
+    background: var(--prism-bg);
+    white-space: pre;
+    word-wrap: normal;
+    tab-size: 4;
+}
+
+.prism-code .token.comment,
+.prism-code .token.prolog,
+.prism-code .token.doctype,
+.prism-code .token.cdata {
+    color: var(--prism-comment);
+    font-style: italic;
+}
+
+.prism-code .token.punctuation {
+    color: var(--prism-punctuation);
+}
+
+.prism-code .token.keyword,
+.prism-code .token.tag,
+.prism-code .token.boolean,
+.prism-code .token.important {
+    color: var(--prism-keyword);
+}
+
+.prism-code .token.string,
+.prism-code .token.char,
+.prism-code .token.attr-value,
+.prism-code .token.regex {
+    color: var(--prism-string);
+}
+
+.prism-code .token.function,
+.prism-code .token.function-definition .function {
+    color: var(--prism-function);
+}
+
+.prism-code .token.number {
+    color: var(--prism-number);
+}
+
+.prism-code .token.operator,
+.prism-code .token.entity,
+.prism-code .token.url {
+    color: var(--prism-operator);
+}
+
+.prism-code .token.class-name,
+.prism-code .token.maybe-class-name,
+.prism-code .token.type-definition {
+    color: var(--prism-class-name);
+}
+
+.prism-code .token.constant,
+.prism-code .token.symbol {
+    color: var(--prism-constant);
+}
+
+.prism-code .token.builtin {
+    color: var(--prism-builtin);
+}
+
+.prism-code .token.attr-name,
+.prism-code .token.attribute {
+    color: var(--prism-attribute);
+}
+
+.prism-code .token.macro .token.name {
+    color: var(--prism-builtin);
+}
+
+.prism-code .token.lifetime-annotation {
+    color: var(--prism-keyword);
+    font-style: italic;
+}
+
+.prism-code .token.namespace {
+    opacity: 0.7;
+}
 
 /* https://code.highcharts.com/css/highcharts.css */
 :root,

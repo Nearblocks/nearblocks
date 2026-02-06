@@ -3,6 +3,7 @@ dist
 out
 static
 .next
+.next-docs/
 .bos
 *.css
 __ENV.js

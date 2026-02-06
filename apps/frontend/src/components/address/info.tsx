@@ -14,8 +14,6 @@ import { bytesFormat, nearFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
-import { AccountLink } from '../link';
-
 type Props = {
   accountPromise?: Promise<Account | null>;
   balancePromise?: Promise<AccountBalance | null>;
@@ -23,24 +21,17 @@ type Props = {
   loading?: boolean;
 };
 
-export const Info = ({
-  accountPromise,
-  balancePromise,
-  deploymentsPromise,
-  loading,
-}: Props) => {
+export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
   // const { t } = useLocale('address');
   const account = !loading && accountPromise ? use(accountPromise) : null;
   const balance = !loading && balancePromise ? use(balancePromise) : null;
-  const deployments =
-    !loading && deploymentsPromise ? use(deploymentsPromise) : null;
 
   return (
     <Card>
       <CardHeader className="border-b py-3">
         <CardTitle className="text-headline-sm">Information</CardTitle>
       </CardHeader>
-      <CardContent className="p-3">
+      <CardContent className="px-3">
         <List pairsPerRow={2}>
           <ListItem>
             <ListLeft className="min-w-30">Staked Balance:</ListLeft>
@@ -69,45 +60,10 @@ export const Info = ({
               </p>
             </ListRight>
           </ListItem>
-          {deployments && deployments.length > 0 && (
-            <>
-              <ListItem>
-                <ListLeft className="min-w-30">Contract Creator:</ListLeft>
-                <ListRight>
-                  <p className="flex items-center gap-1">
-                    <AccountLink
-                      account={deployments[0].predecessor_account_id}
-                      hideCopy
-                    />{' '}
-                    at txn{' '}
-                    <Link
-                      className="text-link inline-block w-30 truncate"
-                      href={`/txns/${deployments[0].transaction_hash}`}
-                    >
-                      {deployments[0].transaction_hash}
-                    </Link>
-                  </p>
-                </ListRight>
-              </ListItem>
-              <ListItem>
-                <ListLeft className="min-w-30">Contract Locked:</ListLeft>
-                <ListRight>
-                  <p className="flex items-center gap-1">
-                    <SkeletonSlot
-                      fallback={<Skeleton className="w-10" />}
-                      loading={loading || !account || !account?.locked}
-                    >
-                      {() => <>{account!.locked ? 'Yes' : 'No'}</>}
-                    </SkeletonSlot>
-                  </p>
-                </ListRight>
-              </ListItem>
-            </>
-          )}
           <ListItem>
             <ListLeft className="min-w-30">Created:</ListLeft>
             <ListRight className="col-span-2">
-              <p className="flex items-center gap-1">
+              <p className="min-w-30">
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
                   loading={
@@ -118,7 +74,7 @@ export const Info = ({
                     <>
                       <TimeAgo ns={account!.created.block_timestamp} /> at txn{' '}
                       <Link
-                        className="text-link inline-block w-30 truncate"
+                        className="text-link inline-block w-30 truncate align-middle"
                         href={`/txns/${account!.created.transaction_hash}`}
                       >
                         {account!.created.transaction_hash}

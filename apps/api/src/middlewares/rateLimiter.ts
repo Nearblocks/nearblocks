@@ -5,7 +5,7 @@ import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
 import config from '#config';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
-import logger from '#libs/logger';
+// import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 import { SubscriptionStatus } from '#types/enums';
@@ -103,7 +103,7 @@ const rateLimiter = catchAsync(
           );
         }
       } catch (error) {
-        logger.error(error);
+        // logger.error(error);
 
         return await useFreePlan(req, res, next, req.ip!);
       }
@@ -142,7 +142,7 @@ const rateLimiter = catchAsync(
         await rateLimit.consume(tokenKey, consumeCount);
       }
     } catch (error) {
-      logger.error(error);
+      // logger.error(error);
     }
 
     try {
@@ -193,7 +193,7 @@ const useFreePlan = async (
       86400,
     );
   } catch (redisError) {
-    logger.error(redisError, 'Error caching user plan in Redis.');
+    // logger.error(redisError, 'Error caching user plan in Redis.');
   }
   const { limiters, rateLimit } = rateLimiterUnion(plan, baseUrl);
 
@@ -213,7 +213,7 @@ const useFreePlan = async (
       await rateLimit.consume(tokenKey, consumeCount);
     }
   } catch (error) {
-    logger.error(error);
+    // logger.error(error);
   }
 
   try {
@@ -254,7 +254,7 @@ const getFreePlan = async () => {
     if (cachedFreePlan) {
       return JSON.parse(cachedFreePlan);
     }
-    logger.info('Free plan not found in Redis cache, fetching from DB.');
+    // logger.info('Free plan not found in Redis cache, fetching from DB.');
 
     const plans = await userSql<Plan[]>`
       SELECT
@@ -276,19 +276,19 @@ const getFreePlan = async () => {
           86400,
         );
       } catch (redisError) {
-        logger.error(redisError, 'Error caching free plan in Redis.');
+        // logger.error(redisError, 'Error caching free plan in Redis.');
       }
 
       return freePlan;
     }
-    logger.warn('No valid free plan found, returning null.');
+    // logger.warn('No valid free plan found, returning null.');
 
     return null;
   } catch (error) {
-    logger.error(
-      error,
-      'Free plan not available, applying default rate limit.',
-    );
+    // logger.error(
+    //   error,
+    //   'Free plan not available, applying default rate limit.',
+    // );
 
     return null;
   }

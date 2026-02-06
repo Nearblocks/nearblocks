@@ -20,11 +20,11 @@ export const rpcProviders = (key: string) => ({
   mainnet: [
     {
       name: 'FastNear',
-      url: `https://mainnet.fastnear.io?apiKey=${key}`,
+      url: `https://rpc.mainnet.fastnear.com?apiKey=${key}`,
     },
     {
       name: 'FastNear (Archival)',
-      url: `https://archival-rpc.mainnet.fastnear.com/?apiKey=${key}`,
+      url: `https://archival-rpc.mainnet.fastnear.com?apiKey=${key}`,
     },
     {
       name: 'NEAR (Archival)',
@@ -50,11 +50,11 @@ export const rpcProviders = (key: string) => ({
   testnet: [
     {
       name: 'FastNear',
-      url: `https://testnet.fastnear.io?apiKey=${key}`,
+      url: `https://rpc.testnet.fastnear.com?apiKey=${key}`,
     },
     {
       name: 'FastNear (Archival)',
-      url: `https://archival-rpc.testnet.fastnear.com/?apiKey=${key}`,
+      url: `https://archival-rpc.testnet.fastnear.com?apiKey=${key}`,
     },
     {
       name: 'NEAR (Archival)',
@@ -78,6 +78,24 @@ export const rpcProviders = (key: string) => ({
     },
   ],
 });
+const contractVerifier = () => ({
+  mainnet: {
+    api: {
+      list: 'https://api.sourcescan.dev/api/ipfs/structure',
+      verify: 'https://api-v2.sourcescan.dev/api/verify/rust',
+    },
+    contract: 'v2-verifier.sourcescan.near',
+    ipfs: 'https://api.sourcescan.dev/ipfs',
+  },
+  testnet: {
+    api: {
+      list: 'https://api.sourcescan.dev/api/ipfs/structure',
+      verify: 'https://api-v2.sourcescan.dev/api/verify/rust',
+    },
+    contract: 'v2-verifier.sourcescan.testnet',
+    ipfs: 'https://api.sourcescan.dev/ipfs',
+  },
+});
 
 export const envSchema = z.object({
   ...serverEnvSchema.shape,
@@ -89,6 +107,15 @@ const providerSchema = z.object({
   url: z.url(),
 });
 
+const verifierSchema = z.object({
+  api: z.object({
+    list: z.url(),
+    verify: z.url(),
+  }),
+  contract: z.string(),
+  ipfs: z.url(),
+});
+
 const configSchema = z.object({
   fastNearRpcKey: publicEnvSchema.shape.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
   mainnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_MAINNET_URL,
@@ -98,6 +125,7 @@ const configSchema = z.object({
   reownProjectId: publicEnvSchema.shape.NEXT_PUBLIC_REOWN_PROJECT_ID,
   testnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_TESTNET_URL,
   theme: z.enum(OTheme),
+  verifier: verifierSchema,
 });
 
 export type Config = z.infer<typeof configSchema>;
@@ -131,6 +159,8 @@ export const getRuntimeConfig = (theme: Theme): Config => {
   const providers = rpcProviders(
     cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
   )[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID];
+  const verifier =
+    contractVerifier()[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID];
 
   return {
     fastNearRpcKey: cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
@@ -141,5 +171,6 @@ export const getRuntimeConfig = (theme: Theme): Config => {
     reownProjectId: cachedPublicConfig.NEXT_PUBLIC_REOWN_PROJECT_ID,
     testnetUrl: cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL,
     theme,
+    verifier,
   };
 };

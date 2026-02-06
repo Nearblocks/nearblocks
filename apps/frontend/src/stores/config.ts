@@ -36,7 +36,6 @@ export const getConfig = (): Config => {
   if (!config) throw new Error('Configs are missing');
   return config;
 };
-
 export const setConfig = (config: Config) =>
   configStore.getState().setConfig(config);
 export const patchConfig = (patch: Partial<Config>) =>

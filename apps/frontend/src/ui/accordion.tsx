@@ -1,5 +1,5 @@
 'use client';
-import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import { Accordion as AccordionPrimitive } from 'radix-ui';
 import * as React from 'react';
 import { LuChevronDown } from 'react-icons/lu';
 
@@ -17,7 +17,7 @@ const AccordionItem = ({
 }: React.ComponentProps<typeof AccordionPrimitive.Item>) => {
   return (
     <AccordionPrimitive.Item
-      className={cn('border-b last:border-b-0', className)}
+      className={cn('rounded border', className)}
       data-slot="accordion-item"
       {...props}
     />
@@ -33,7 +33,7 @@ const AccordionTrigger = ({
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         className={cn(
-          'focus-visible:border-ring focus-visible:ring-ring/50 text-body-sm flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
+          'focus-visible:border-ring focus-visible:ring-ring/50 text-body-sm flex flex-1 items-start justify-between gap-4 rounded-md px-3 py-2 text-left transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
           className,
         )}
         data-slot="accordion-trigger"

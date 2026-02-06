@@ -6,9 +6,12 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Config } from '@/lib/config';
 import type { Network } from '@/types/enums';
 
+import { createNetworkStorage, setCurrentNetwork } from './utils';
+
 type RpcProvider = Config['provider'];
 
 export type TimestampMode = 'age' | 'time';
+export type UTCMode = 'local' | 'utc';
 
 type PreferencesState = {
   hasHydrated: boolean;
@@ -17,10 +20,12 @@ type PreferencesState = {
   providers: RpcProvider[];
   setHasHydrated: (value: boolean) => void;
   setProvider: (provider: RpcProvider) => void;
-
   setTimestampMode: (mode: TimestampMode) => void;
+  setUTCMode: (mode: UTCMode) => void;
   timestampMode: TimestampMode;
   toggleTimestampMode: () => void;
+  toggleUTCMode: () => void;
+  utcMode: UTCMode;
 };
 
 const STORAGE_KEY = 'nearblocks:preferences';
@@ -44,13 +49,18 @@ export const usePreferences = create<PreferencesState>()(
           : [...state.providers, provider];
         set({ provider, providers });
       },
-
       setTimestampMode: (mode) => set({ timestampMode: mode }),
+      setUTCMode: (mode) => set({ utcMode: mode }),
       timestampMode: 'age',
       toggleTimestampMode: () => {
         const mode = get().timestampMode;
         set({ timestampMode: mode === 'age' ? 'time' : 'age' });
       },
+      toggleUTCMode: () => {
+        const mode = get().utcMode;
+        set({ utcMode: mode === 'local' ? 'utc' : 'local' });
+      },
+      utcMode: 'utc',
     }),
     {
       name: STORAGE_KEY,
@@ -66,7 +76,7 @@ export const usePreferences = create<PreferencesState>()(
 
         timestampMode: s.timestampMode,
       }),
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createNetworkStorage(STORAGE_KEY)),
       version: 1,
     },
   ),
@@ -77,10 +87,11 @@ export const initPreferencesStore = (
   defaultProviders: RpcProvider[],
 ) => {
   void (async () => {
+    setCurrentNetwork(networkId);
+
     try {
-      if (!usePreferences.persist.hasHydrated()) {
-        await usePreferences.persist.rehydrate();
-      }
+      usePreferences.setState({ hasHydrated: false });
+      await usePreferences.persist.rehydrate();
     } catch (err) {
       console.error(err);
     } finally {

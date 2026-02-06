@@ -1,6 +1,7 @@
 import Big, { BigSource } from 'big.js';
+import { ConfigType } from 'dayjs';
 
-import { dayjs } from './dayjs';
+import { Dayjs } from './dayjs';
 
 export type NumberFormat = bigint | null | number | string | undefined;
 
@@ -75,16 +76,14 @@ export const gasFormat = (
   );
 };
 
-export const dateFormat = (
-  locale: string,
-  date: Date | number | string,
-  options?: Intl.DateTimeFormatOptions,
-) => {
-  return new Intl.DateTimeFormat(locale, options).format(
-    typeof date === 'string' || typeof date === 'number'
-      ? new Date(date)
-      : date,
-  );
+export const dateFormat = (date: ConfigType, format: string, utc = true) => {
+  return utc
+    ? Dayjs.utc(date).locale('en-US').format(format)
+    : Dayjs(date).locale('en-US').format(format);
+};
+
+export const ageFormat = (date: ConfigType) => {
+  return Dayjs.utc(date).fromNow();
 };
 
 export const bytesFormat = (
@@ -115,6 +114,10 @@ export const toNear = (yoctoNear: BigSource) => {
   return new Big(yoctoNear).div(Big(10 ** 24)).toString();
 };
 
+export const toYocto = (near: BigSource) => {
+  return new Big(near).mul(Big(10 ** 24)).toString();
+};
+
 export const toNearFiat = (yoctoNear: BigSource, nearPrice: BigSource) => {
   return new Big(toNear(yoctoNear)).mul(nearPrice).toString();
 };
@@ -135,11 +138,27 @@ export const toTokenPrice = (
 export const toMs = (ns: BigSource) => +ns / 10 ** 6;
 
 export const toYearsAndDays = (totalDays: number) => {
-  const start = dayjs.utc();
+  const start = Dayjs.utc();
   const end = start.add(totalDays, 'day');
 
   const years = end.diff(start, 'year');
   const days = end.subtract(years, 'year').diff(start, 'day');
 
   return { days, years };
+};
+
+export const toTgas = (gas: BigSource | null | undefined) => {
+  if (gas === undefined || gas === null) return '';
+
+  return Big(gas)
+    .div(Big(10 ** 12))
+    .toString();
+};
+
+export const toGas = (tGas: BigSource | null | undefined) => {
+  if (tGas === undefined || tGas === null) return '';
+
+  return Big(tGas)
+    .mul(Big(10 ** 12))
+    .toString();
 };

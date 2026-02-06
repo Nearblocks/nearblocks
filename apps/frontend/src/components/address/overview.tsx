@@ -40,7 +40,7 @@ export const Overview = ({
       <CardHeader className="border-b py-3">
         <CardTitle className="text-headline-sm">Overview</CardTitle>
       </CardHeader>
-      <CardContent className="p-3">
+      <CardContent className="px-3">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-20">Balance:</ListLeft>
