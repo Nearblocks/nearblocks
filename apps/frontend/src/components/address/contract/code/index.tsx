@@ -244,7 +244,6 @@ export const ContractCode = ({ contract }: Props) => {
                     <>
                       <p className="truncate">
                         {sourceMetadata?.build_info?.build_command?.join(' ')}
-                        {sourceMetadata?.build_info?.build_command?.join(' ')}
                       </p>
                       <Copy
                         className="inline-block align-middle"
