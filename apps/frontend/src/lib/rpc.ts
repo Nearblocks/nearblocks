@@ -28,8 +28,6 @@ export const viewFunction = async <T>(
 ) => {
   const provider = await getProvider();
 
-  console.log(provider);
-
   const client = new NearRpcClient({
     endpoint: provider.url,
   });

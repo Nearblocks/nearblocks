@@ -175,7 +175,6 @@ export const MethodsForm = ({
           ],
           receiverId: address as string,
         });
-        console.log('response', response);
         setResult(JSON.stringify(response, null, 2));
       } else {
         let blockId: number | string | undefined;
@@ -196,7 +195,6 @@ export const MethodsForm = ({
         setResult(JSON.stringify(response, null, 2));
       }
     } catch (err) {
-      console.error(err);
       setError(
         err instanceof Error ? err.message : 'An unknown error occurred',
       );
