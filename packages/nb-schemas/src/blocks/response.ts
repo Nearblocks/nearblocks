@@ -16,16 +16,20 @@ const blockReceiptAgg = v.object({
   count: v.number(),
 });
 
-const block = v.object({
+const blockListItem = v.object({
   author_account_id: v.string(),
   block_hash: v.string(),
   block_height: v.string(),
   block_timestamp: v.string(),
   chunks_agg: blockChunkAgg,
   gas_price: v.string(),
+  transactions_agg: blockTransactionAgg,
+});
+
+const block = v.object({
+  ...blockListItem.entries,
   prev_block_hash: v.string(),
   receipts_agg: blockReceiptAgg,
-  transactions_agg: blockTransactionAgg,
 });
 
 const blockCount = v.object({
@@ -34,10 +38,11 @@ const blockCount = v.object({
 });
 
 const blockResponse = responseSchema(block);
-const blocksResponse = responseSchema(v.array(block));
+const blocksResponse = responseSchema(v.array(blockListItem));
 const blockCountResponse = responseSchema(blockCount);
 
 export type Block = v.InferOutput<typeof block>;
+export type BlockListItem = v.InferOutput<typeof blockListItem>;
 export type BlockCount = v.InferOutput<typeof blockCount>;
 
 export type BlockRes = v.InferOutput<typeof blockResponse>;

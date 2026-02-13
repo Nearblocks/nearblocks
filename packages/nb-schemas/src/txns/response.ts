@@ -11,9 +11,17 @@ const block = v.object({
   block_timestamp: v.optional(v.string()),
 });
 
-const action = v.object({
+const actionListItem = v.object({
   action: v.enum(ActionKind),
   method: v.nullable(v.string()),
+});
+
+const action = v.object({
+  ...actionListItem.entries,
+  args: v.nullable(jsonSchema),
+  args_base64: v.nullable(v.string()),
+  deposit: v.nullable(v.string()),
+  gas: v.nullable(v.string()),
 });
 
 const actionsAgg = v.object({
@@ -31,8 +39,8 @@ const outcomesAgg = v.object({
   transaction_fee: v.string(),
 });
 
-const txn = v.object({
-  actions: v.array(action),
+const txnListItem = v.object({
+  actions: v.array(actionListItem),
   actions_agg: actionsAgg,
   block,
   block_timestamp: v.string(),
@@ -47,6 +55,11 @@ const txn = v.object({
   transaction_hash: v.string(),
 });
 
+const txn = v.object({
+  ...txnListItem.entries,
+  actions: v.array(action),
+});
+
 const txnCount = v.object({
   cost: v.string(),
   count: v.string(),
@@ -55,6 +68,10 @@ const txnCount = v.object({
 const actionsReceipts = v.object({
   action: v.enum(ActionKind),
   args: jsonSchema,
+  args_base64: v.nullable(v.string()),
+  deposit: v.nullable(v.string()),
+  gas: v.nullable(v.string()),
+  method: v.nullable(v.string()),
   rlp_hash: v.nullable(v.string()),
 });
 
@@ -169,13 +186,14 @@ const txnNFT = v.object({
 });
 
 const txnResponse = responseSchema(txn);
-const txnsResponse = responseSchema(v.array(txn));
+const txnsResponse = responseSchema(v.array(txnListItem));
 const txnCountResponse = responseSchema(txnCount);
 const txnReceiptsResponse = responseSchema(txnReceipt);
 const txnFTsResponse = responseSchema(v.array(txnFT));
 const txnNFTsResponse = responseSchema(v.array(txnNFT));
 
 export type Txn = v.InferOutput<typeof txn>;
+export type TxnListItem = v.InferOutput<typeof txnListItem>;
 export type TxnCount = v.InferOutput<typeof txnCount>;
 // export type TxnReceipt = v.InferOutput<typeof txnReceipt>;
 export type TxnFT = v.InferOutput<typeof txnFT>;

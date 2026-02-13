@@ -5,8 +5,7 @@ WITH
       block_height,
       block_hash,
       gas_price,
-      author_account_id,
-      prev_block_hash
+      author_account_id
     FROM
       blocks
     WHERE
@@ -40,10 +39,8 @@ SELECT
   bs.block_hash,
   bs.author_account_id,
   bs.gas_price,
-  bs.prev_block_hash,
   c.chunks_agg,
-  t.transactions_agg,
-  r.receipts_agg
+  t.transactions_agg
 FROM
   blocks_selected bs
   LEFT JOIN LATERAL (
@@ -93,25 +90,5 @@ FROM
       )
       AND included_in_block_hash = bs.block_hash
   ) t ON TRUE
-  LEFT JOIN LATERAL (
-    SELECT
-      JSONB_BUILD_OBJECT('count', COUNT(*)) AS receipts_agg
-    FROM
-      receipts
-    WHERE
-      included_in_block_timestamp >= (
-        SELECT
-          MIN(b.block_timestamp)
-        FROM
-          blocks_selected b
-      )
-      AND included_in_block_timestamp <= (
-        SELECT
-          MAX(b.block_timestamp) + 300000000000 -- 5m in ns
-        FROM
-          blocks_selected b
-      )
-      AND included_in_block_hash = bs.block_hash
-  ) r ON TRUE
 ORDER BY
   bs.block_timestamp ${direction:raw}
