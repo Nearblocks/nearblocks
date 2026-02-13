@@ -49,7 +49,7 @@
     "classnames": "^2.5.1",
     "clipboard": "^2.0.11",
     "dayjs": "1.11.13",
-    "ethers": "^5.7.2",
+    "ethers": "^6.16.0",
     "formik": "^2.4.6",
     "highcharts": "^11.4.8",
     "highcharts-react-official": "^3.2.1",

@@ -73,12 +73,34 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
     }
 
     try {
-      const input = ethers?.utils?.base64?.decode(parsed?.tx_bytes_b64);
-      const data = ethers?.utils?.parseTransaction(input);
+      const input = ethers.decodeBase64(parsed?.tx_bytes_b64);
+      const data = ethers.Transaction.from(ethers.hexlify(input));
       const parsedData = {
-        ...data,
+        authorization: data?.authorizationList?.map((auth) => ({
+          address: auth.address,
+          chainId: auth.chainId?.toString(),
+          nonce: auth.nonce?.toString(),
+          signature: {
+            r: auth.signature.r,
+            s: auth.signature.s,
+            v: auth.signature.v,
+          },
+        })),
+        chainId: data?.chainId?.toString(),
+        data: data?.data,
+        from: data?.from,
         gasLimit: data?.gasLimit?.toString(),
         gasPrice: data?.gasPrice?.toString(),
+        hash: data?.hash,
+        maxFeePerGas: data?.maxFeePerGas?.toString(),
+        maxPriorityFeePerGas: data?.maxPriorityFeePerGas?.toString(),
+        nonce: data?.nonce,
+        signature: {
+          r: data?.signature?.r,
+          s: data?.signature?.s,
+          v: data?.signature?.v,
+        },
+        to: data?.to?.toString(),
         value: data?.value?.toString(),
       };
 
@@ -98,11 +120,35 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
       const buffer = Buffer.from(parsed.tx_bytes_b64, 'base64');
       const submitArgs = deserializeUnchecked(schema, SubmitArgs, buffer);
 
-      const data = ethers?.utils?.parseTransaction(submitArgs.tx_data);
+      const data = ethers.Transaction.from(
+        ethers.hexlify(new Uint8Array(submitArgs.tx_data)),
+      );
       const parsedData = {
-        ...data,
+        authorization: data?.authorizationList?.map((auth) => ({
+          address: auth.address,
+          chainId: auth.chainId?.toString(),
+          nonce: auth.nonce?.toString(),
+          signature: {
+            r: auth.signature.r,
+            s: auth.signature.s,
+            v: auth.signature.v,
+          },
+        })),
+        chainId: data?.chainId?.toString(),
+        data: data?.data,
+        from: data?.from,
         gasLimit: data?.gasLimit?.toString(),
         gasPrice: data?.gasPrice?.toString(),
+        hash: data?.hash,
+        maxFeePerGas: data?.maxFeePerGas?.toString(),
+        maxPriorityFeePerGas: data?.maxPriorityFeePerGas?.toString(),
+        nonce: data?.nonce,
+        signature: {
+          r: data?.signature?.r,
+          s: data?.signature?.s,
+          v: data?.signature?.v,
+        },
+        to: data?.to?.toString(),
         value: data?.value?.toString(),
       };
 
@@ -139,8 +185,8 @@ const RlpTransaction = ({ method, pretty, receiver }: Props) => {
         return data;
       }
 
-      const input = ethers?.utils?.base64?.decode(tx_bytes_b64);
-      const txData = ethers?.utils?.parseTransaction(input);
+      const input = ethers.decodeBase64(tx_bytes_b64);
+      const txData = ethers.Transaction.from(ethers.hexlify(input));
       const parsed = {
         ...txData,
         gasLimit: txData?.gasLimit?.toString(),
