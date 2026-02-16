@@ -1,8 +1,8 @@
 'use client';
 
+import { Box, Fuel } from 'lucide-react';
 import { Fragment } from 'react';
 import { use } from 'react';
-import { LuBox, LuFuel } from 'react-icons/lu';
 
 import { BlockListItem } from 'nb-schemas';
 
@@ -32,7 +32,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
       <CardHeader className="border-b py-3">
         <h2 className="text-headline-sm font-semibold">{t('blocks.title')}</h2>
       </CardHeader>
-      <ScrollArea className="h-[340px]">
+      <ScrollArea className="h-85">
         <CardContent className="@container p-3">
           <SkeletonSlot
             fallback={
@@ -41,7 +41,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                   <Fragment key={i}>
                     <div className="flex items-center gap-3 *:leading-[140%]">
                       <div className="bg-muted rounded-lg p-2">
-                        <LuBox className="size-5" />
+                        <Box className="size-5" />
                       </div>
                       <div className="text-body-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-col flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
@@ -62,7 +62,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         </div>
                         <div className="@lg:ml-auto">
                           <Badge className="text-body-xs h-6" variant="amber">
-                            <LuFuel />
+                            <Fuel />
                             <Skeleton className="w-15" />
                           </Badge>
                         </div>
@@ -81,7 +81,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                   <Fragment key={block.block_height}>
                     <div className="flex items-center gap-3 *:leading-[140%]">
                       <div className="bg-muted rounded-lg p-2">
-                        <LuBox className="size-5" />
+                        <Box className="size-5" />
                       </div>
                       <div className="text-body-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
@@ -110,7 +110,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         </div>
                         <div className="@lg:ml-auto">
                           <Badge className="text-body-xs h-6" variant="amber">
-                            <LuFuel />
+                            <Fuel />
                             {gasFormat(block.chunks_agg.gas_used, {
                               maximumFractionDigits: 2,
                             })}{' '}

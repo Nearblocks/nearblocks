@@ -1,33 +1,28 @@
-import { NearRpcClient, viewFunctionAsJson } from '@near-js/jsonrpc-client';
-import { BlockId, Finality } from '@near-js/jsonrpc-types';
-import { delay } from 'es-toolkit/promise';
+import {
+  experimentalTxStatus,
+  NearRpcClient,
+  viewFunctionAsJson,
+} from '@near-js/jsonrpc-client';
+import {
+  BlockId,
+  Finality,
+  RpcTransactionResponse,
+} from '@near-js/jsonrpc-types';
 
-import { usePreferences } from '@/stores/preferences';
+import { Config } from './config';
 
 export const encodeArgs = (args: unknown) => {
   return Buffer.from(JSON.stringify(args)).toString('base64');
 };
 
-const getProvider = async () => {
-  const provider = usePreferences.getState().provider;
-
-  if (!provider) {
-    await delay(100);
-    return getProvider();
-  }
-
-  return provider;
-};
-
 export const viewFunction = async <T>(
+  provider: Config['provider'],
   contract: string,
   method: string,
   args: unknown,
   finality?: Finality,
   blockId?: BlockId,
 ) => {
-  const provider = await getProvider();
-
   const client = new NearRpcClient({
     endpoint: provider.url,
   });
@@ -41,4 +36,18 @@ export const viewFunction = async <T>(
   });
 
   return data;
+};
+
+export const txnStatus = async (
+  provider: Config['provider'],
+  txHash: string,
+  senderAccountId: string,
+): Promise<RpcTransactionResponse> => {
+  const client = new NearRpcClient({ endpoint: provider.url });
+
+  return experimentalTxStatus(client, {
+    senderAccountId,
+    txHash,
+    waitUntil: 'NONE',
+  });
 };

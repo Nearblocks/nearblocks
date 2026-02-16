@@ -3,12 +3,11 @@ import { Geist_Mono, Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import { Layout } from '@/components/layout';
-import { getRuntimeConfig } from '@/lib/config';
+import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import type { Locale } from '@/locales/config';
 import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { ConfigProvider } from '@/providers/config';
 import { LocaleProvider } from '@/providers/locale';
-import { Theme } from '@/types/enums';
 
 import '../globals.css';
 
@@ -38,8 +37,8 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
   const [{ lang }, cookieStore] = await Promise.all([params, cookies()]);
   const locale = hasLocale(lang) ? (lang as Locale) : 'en';
   const dictionary = await getDictionary(locale, ['layout']);
-  const theme = cookieStore.get('theme')?.value ?? 'light';
-  const config = getRuntimeConfig(theme as Theme);
+  const theme = cookieStore.get('theme')?.value ?? defaultTheme;
+  const config = getRuntimeConfig();
 
   return (
     <html
@@ -50,7 +49,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
       <body
         className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} ${geist.variable} overflow-x-hidden wrap-anywhere antialiased`}
       >
-        <ConfigProvider value={config}>
+        <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>
             <Layout>{children}</Layout>
           </LocaleProvider>

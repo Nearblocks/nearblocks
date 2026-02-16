@@ -3,15 +3,15 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from 'zod-resolver-lite';
 
 import { action } from '@/actions/contract';
 import { CodeBlock } from '@/components/code-block';
 import { Copy } from '@/components/copy';
+import { useViewMutation } from '@/hooks/use-rpc';
+import { useWallet } from '@/hooks/use-wallet';
 import { toGas, toYocto } from '@/lib/format';
-import { viewFunction } from '@/lib/rpc';
 import { FormData, formSchema } from '@/lib/schema/contract';
-import { useWalletStore } from '@/stores/wallet';
+import { zodResolver } from '@/lib/zod';
 import { ContractAbiSchema, ContractSchemaFunction } from '@/types/types';
 import { Button } from '@/ui/button';
 import { Field, FieldGroup } from '@/ui/field';
@@ -36,11 +36,12 @@ export const MethodsForm = ({
   schema,
 }: Props) => {
   const { address } = useParams();
-  const wallet = useWalletStore((s) => s.wallet);
-  const connector = useWalletStore((s) => s.connector);
+  const wallet = useWallet((s) => s.wallet);
+  const connector = useWallet((s) => s.connector);
   const [result, setResult] = useState<null | string>(null);
   const [error, setError] = useState<null | string>(null);
   const [isFetchingArgs, setIsFetchingArgs] = useState(false);
+  const { trigger: triggerViewFunction } = useViewMutation();
 
   const hasSchema = !!schema;
 
@@ -185,13 +186,13 @@ export const MethodsForm = ({
             !isNaN(parsed) && Number.isInteger(parsed) ? parsed : trimmed;
         }
 
-        const response = await viewFunction(
-          address as string,
-          data.method,
-          JSON.parse(data.args || '{}'),
-          data.blockRef === 'finality' ? data.finality : undefined,
+        const response = await triggerViewFunction({
+          args: JSON.parse(data.args || '{}'),
           blockId,
-        );
+          contract: address as string,
+          finality: data.blockRef === 'finality' ? data.finality : undefined,
+          method: data.method,
+        });
         setResult(JSON.stringify(response, null, 2));
       }
     } catch (err) {

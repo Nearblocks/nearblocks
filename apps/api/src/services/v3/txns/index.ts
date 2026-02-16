@@ -6,7 +6,7 @@ import type {
   TxnFTsReq,
   TxnNFT,
   TxnNFTsReq,
-  TxnReceipts,
+  TxnReceipt,
   TxnReceiptsReq,
   TxnReq,
   TxnsLatestReq,
@@ -193,7 +193,7 @@ const receipts = responseHandler(
         (start, end) => {
           const cte = pgp.as.format(sql.rlpCte, { end, hash, start });
 
-          return dbBase.oneOrNone<TxnReceipts>(sql.receipts, { cte });
+          return dbBase.oneOrNone<TxnReceipt>(sql.receipts, { cte });
         },
         { start: config.baseStart },
       );
@@ -205,7 +205,7 @@ const receipts = responseHandler(
       (start, end) => {
         const cte = pgp.as.format(sql.txnCte, { end, hash, start });
 
-        return dbBase.oneOrNone<TxnReceipts>(sql.receipts, { cte });
+        return dbBase.oneOrNone<TxnReceipt>(sql.receipts, { cte });
       },
       { start: config.baseStart },
     );

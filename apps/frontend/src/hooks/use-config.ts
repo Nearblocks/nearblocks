@@ -1,14 +1,15 @@
 'use client';
 
 import { useContext } from 'react';
+import { useStore } from 'zustand';
 
-import type { Config } from '@/lib/config';
 import { ConfigContext } from '@/providers/config';
-import { useConfigStore } from '@/stores/config';
+import { ConfigState } from '@/stores/config';
 
-export const useConfig = <T>(selector: (config: Config) => T): T => {
-  const config = useContext(ConfigContext);
-  if (!config) throw new Error('Configs are missing');
+export const useConfig = <T>(selector: (state: ConfigState) => T): T => {
+  const store = useContext(ConfigContext);
 
-  return useConfigStore((s) => selector(s.config ?? config));
+  if (!store) throw new Error('Configs are missing');
+
+  return useStore(store, selector);
 };

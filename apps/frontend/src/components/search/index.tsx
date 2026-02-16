@@ -1,8 +1,8 @@
 'use client';
 
+import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { LuSearch } from 'react-icons/lu';
 
 import { searchKeyword } from '@/lib/search';
 import { cn } from '@/lib/utils';
@@ -81,7 +81,7 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
             {isPending ? (
               <Spinner className="size-4" />
             ) : (
-              <LuSearch className="size-4" />
+              <Search className="size-4" />
             )}
           </Button>
         </ButtonGroup>

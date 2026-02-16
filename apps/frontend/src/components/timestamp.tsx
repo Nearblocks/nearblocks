@@ -1,9 +1,9 @@
 'use client';
 
-import { LuClock, LuHourglass } from 'react-icons/lu';
+import { Clock, Hourglass } from 'lucide-react';
 
+import { useSettings } from '@/hooks/use-settings';
 import { ageFormat, dateFormat, toMs } from '@/lib/format';
-import { usePreferences } from '@/stores/preferences';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -12,9 +12,9 @@ type Props = {
 };
 
 export const TimestampToggle = () => {
-  const hasHydrated = usePreferences((s) => s.hasHydrated);
-  const timestampMode = usePreferences((s) => s.timestampMode);
-  const toggleTimestampMode = usePreferences((s) => s.toggleTimestampMode);
+  const hasHydrated = useSettings((s) => s.hydrated);
+  const timestampMode = useSettings((s) => s.timestampMode);
+  const toggleTimestampMode = useSettings((s) => s.toggleTimestampMode);
 
   if (!hasHydrated) return <Skeleton className="w-10" />;
 
@@ -28,11 +28,11 @@ export const TimestampToggle = () => {
         >
           {timestampMode === 'age' ? (
             <>
-              Age <LuClock className="size-3.5" />
+              Age <Clock className="size-3.5" />
             </>
           ) : (
             <>
-              Date Time (UTC) <LuHourglass className="size-3" />
+              Date Time (UTC) <Hourglass className="size-3" />
             </>
           )}
         </button>
@@ -45,8 +45,8 @@ export const TimestampToggle = () => {
 };
 
 export const TimestampCell = ({ ns }: Props) => {
-  const hasHydrated = usePreferences((s) => s.hasHydrated);
-  const timestampMode = usePreferences((s) => s.timestampMode);
+  const hasHydrated = useSettings((s) => s.hydrated);
+  const timestampMode = useSettings((s) => s.timestampMode);
 
   if (!ns) return null;
   if (!hasHydrated) return <Skeleton className="w-30" />;
@@ -59,9 +59,9 @@ export const TimestampCell = ({ ns }: Props) => {
 };
 
 export const LongDate = ({ ns }: Props) => {
-  const hasHydrated = usePreferences((s) => s.hasHydrated);
-  const utcMode = usePreferences((s) => s.utcMode);
-  const toggleUTCMode = usePreferences((s) => s.toggleUTCMode);
+  const hasHydrated = useSettings((s) => s.hydrated);
+  const utcMode = useSettings((s) => s.utcMode);
+  const toggleUTCMode = useSettings((s) => s.toggleUTCMode);
 
   if (!ns || !hasHydrated) return <Skeleton className="w-60" />;
 

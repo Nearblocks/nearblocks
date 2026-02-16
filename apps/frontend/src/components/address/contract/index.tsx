@@ -1,5 +1,5 @@
+import { RiQuestionLine } from '@remixicon/react';
 import { use } from 'react';
-import { RiQuestionLine } from 'react-icons/ri';
 
 import {
   Account,
@@ -50,7 +50,7 @@ export const Contract = ({
         <ListRight className="xl:py-2.5">
           <p className="flex min-w-30 items-center gap-1">
             <SkeletonSlot
-              fallback={<Skeleton className="w-40" />}
+              fallback={<Skeleton className="h-7 w-40" />}
               loading={loading || !contract}
             >
               {() => (

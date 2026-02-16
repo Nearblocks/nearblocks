@@ -3,39 +3,13 @@ import { AccountAssetFT } from 'nb-schemas';
 import { AssetToken, TokenCache } from '@/types/types';
 
 import { toTokenPrice } from './format';
-import { viewFunction } from './rpc';
 
-export const mergeTokens = async (
-  account: string,
+export const mergeTokens = (
   tokens: AccountAssetFT[] | null,
-  tokensCache: null | TokenCache[],
+  tokensCache: TokenCache[],
 ) => {
   if (!tokens?.length) {
     return [];
-  }
-
-  if (!tokensCache?.length) {
-    const merged = await Promise.all(
-      tokens.map(async (item) => {
-        const amount = await viewFunction<string>(
-          item.contract,
-          'ft_balance_of',
-          { account_id: account },
-        );
-        const price =
-          item.meta?.price && item.meta?.decimals
-            ? toTokenPrice(item.amount, item.meta.decimals, item.meta.price)
-            : '0';
-
-        return {
-          ...item,
-          amount,
-          price,
-        };
-      }),
-    );
-
-    return merged;
   }
 
   const balanceMap = new Map(

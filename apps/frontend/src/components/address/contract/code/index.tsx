@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { RiCodeSSlashLine, RiQuestionLine } from 'react-icons/ri';
+import { RiCodeSSlashLine, RiQuestionLine } from '@remixicon/react';
+import { useMemo } from 'react';
 
 import { Contract } from 'nb-schemas';
 
@@ -9,11 +9,10 @@ import { Copy } from '@/components/copy';
 import { IpfsSourceViewer } from '@/components/ipfs';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { useConfig } from '@/hooks/use-config';
-import { viewFunction } from '@/lib/rpc';
+import { useView } from '@/hooks/use-rpc';
 import { downloadWasm, getCommitHash } from '@/lib/utils';
 import {
   ContractSourceMetadata,
-  ContractVerifierData,
   ContractVerifierResponse,
 } from '@/types/types';
 import { Button } from '@/ui/button';
@@ -28,16 +27,25 @@ type Props = {
 };
 
 export const ContractCode = ({ contract }: Props) => {
-  const verifier = useConfig((s) => s.verifier);
-  const [loading, setLoading] = useState({
-    metadata: false,
-    verifier: false,
-  });
-  const [verifierData, setVerifierData] = useState<ContractVerifierData | null>(
-    null,
-  );
-  const [sourceMetadata, setSourceMetadata] =
-    useState<ContractSourceMetadata | null>(null);
+  const verifier = useConfig((s) => s.config.verifier);
+
+  const { data: sourceMetadata, isLoading: isLoadingMetadata } =
+    useView<ContractSourceMetadata | null>({
+      args: {},
+      contract: contract.account_id,
+      method: 'contract_source_metadata',
+    });
+  const { data: verifierResponse, isLoading: isLoadingVerifier } =
+    useView<ContractVerifierResponse | null>({
+      args: { code_hash: contract.code_hash },
+      contract: verifier.contract,
+      method: 'get_contracts_by_code_hash',
+    });
+
+  const verifierData = useMemo(() => {
+    return verifierResponse?.[0]?.[1] || null;
+  }, [verifierResponse]);
+
   const info = useMemo(() => {
     const isNep330 =
       sourceMetadata?.standards?.some(
@@ -48,49 +56,15 @@ export const ContractCode = ({ contract }: Props) => {
     return { isNep330, isVerified };
   }, [sourceMetadata, verifierData, contract.code_hash]);
 
-  useEffect(() => {
-    if (contract.account_id) {
-      setLoading((loading) => ({ ...loading, metadata: true }));
-      viewFunction<ContractSourceMetadata | null>(
-        contract.account_id,
-        'contract_source_metadata',
-        {},
-      )
-        .then((data) => setSourceMetadata(data))
-        .catch((error) => console.error(error))
-        .finally(() =>
-          setLoading((loading) => ({ ...loading, metadata: false })),
-        );
-    }
-  }, [contract.account_id]);
-
-  useEffect(() => {
-    if (contract.code_hash && verifier.contract) {
-      setLoading((loading) => ({ ...loading, verifier: true }));
-      viewFunction<ContractVerifierResponse | null>(
-        verifier.contract,
-        'get_contracts_by_code_hash',
-        { code_hash: contract.code_hash },
-      )
-        .then((data) => {
-          setVerifierData(data?.[0]?.[1] || null);
-        })
-        .catch((error) => console.error(error))
-        .finally(() =>
-          setLoading((loading) => ({ ...loading, verifier: false })),
-        );
-    }
-  }, [contract.code_hash, verifier.contract]);
-
   return (
     <>
       <Info
         account={contract.account_id}
         isNep330={info.isNep330}
         isVerified={info.isVerified}
-        loading={loading.metadata || loading.verifier}
+        loading={isLoadingMetadata || isLoadingVerifier}
       />
-      {loading.metadata || loading.verifier ? (
+      {isLoadingMetadata || isLoadingVerifier ? (
         <>
           <div className="mb-6.5">
             <Skeleton className="h-118 w-full lg:h-36.5" />

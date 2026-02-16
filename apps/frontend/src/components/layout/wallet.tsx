@@ -1,11 +1,12 @@
 'use client';
 
-import { LuCircleUserRound } from 'react-icons/lu';
+import { CircleUserRound } from 'lucide-react';
 
 import { useLocale } from '@/hooks/use-locale';
+import { useWallet } from '@/hooks/use-wallet';
 import { cn } from '@/lib/utils';
-import { useWalletStore } from '@/stores/wallet';
 import { Button } from '@/ui/button';
+import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   className?: string;
@@ -13,9 +14,10 @@ type Props = {
 
 export const Wallet = ({ className }: Props) => {
   const { t } = useLocale('layout');
-  const account = useWalletStore((s) => s.account);
-  const connect = useWalletStore((s) => s.connect);
-  const disconnect = useWalletStore((s) => s.disconnect);
+  const account = useWallet((s) => s.account);
+  const connect = useWallet((s) => s.connect);
+  const disconnect = useWallet((s) => s.disconnect);
+  const isInitialized = useWallet((s) => s.isInitialized);
 
   const handleClick = async () => {
     try {
@@ -32,11 +34,16 @@ export const Wallet = ({ className }: Props) => {
   return (
     <Button
       className={cn(className, 'w-30 flex-row px-2')}
+      disabled={!isInitialized}
       onClick={handleClick}
       size="xs"
     >
-      <LuCircleUserRound />
-      <span className="truncate">{account ?? t('menu.wallet.signIn')}</span>
+      <CircleUserRound />
+      {isInitialized ? (
+        <span className="truncate">{account ?? t('menu.wallet.signIn')}</span>
+      ) : (
+        <Skeleton className="w-20" />
+      )}
     </Button>
   );
 };

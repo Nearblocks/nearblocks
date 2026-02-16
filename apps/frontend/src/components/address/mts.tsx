@@ -29,18 +29,18 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
   const mts = !loading && mtsPromise ? use(mtsPromise) : null;
   const mtCount = !loading && mtCountPromise ? use(mtCountPromise) : null;
 
-  const { address, tab } = useParams<{ address: string; tab: string }>();
+  const { address } = useParams<{ address: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const onFilter = (value: FilterData) => {
     const params = buildParams(searchParams, value);
-    router.push(`/address/${address}/${tab}?${params.toString()}`);
+    router.push(`/address/${address}/mt-tokens?${params.toString()}`);
   };
 
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
-    router.push(`/address/${address}/${tab}?${params.toString()}`);
+    router.push(`/address/${address}/mt-tokens?${params.toString()}`);
   };
 
   const columns: DataTableColumnDef<AccountMTTxn>[] = [
@@ -195,7 +195,7 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={(type, cursor) =>
-            `/address/${address}/${tab}?${type}=${cursor}`
+            `/address/${address}/mt-tokens?${type}=${cursor}`
           }
           pagination={mts?.meta}
         />

@@ -1,28 +1,28 @@
 'use client';
 
 import {
-  LuCircleCheck,
-  LuInfo,
-  LuLoaderCircle,
-  LuOctagonX,
-  LuTriangleAlert,
-} from 'react-icons/lu';
+  CircleCheck,
+  Info,
+  LoaderCircle,
+  OctagonX,
+  TriangleAlert,
+} from 'lucide-react';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
-import { useConfig } from '@/hooks/use-config';
+import { useTheme } from '@/hooks/use-theme';
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const theme = useConfig((c) => c.theme);
+  const theme = useTheme();
 
   return (
     <Sonner
       className="toaster group"
       icons={{
-        error: <LuOctagonX className="size-4" />,
-        info: <LuInfo className="size-4" />,
-        loading: <LuLoaderCircle className="size-4 animate-spin" />,
-        success: <LuCircleCheck className="size-4" />,
-        warning: <LuTriangleAlert className="size-4" />,
+        error: <OctagonX className="size-4" />,
+        info: <Info className="size-4" />,
+        loading: <LoaderCircle className="size-4 animate-spin" />,
+        success: <CircleCheck className="size-4" />,
+        warning: <TriangleAlert className="size-4" />,
       }}
       style={
         {

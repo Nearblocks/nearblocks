@@ -19,9 +19,7 @@ const actionListItem = v.object({
 const action = v.object({
   ...actionListItem.entries,
   args: v.nullable(jsonSchema),
-  args_base64: v.nullable(v.string()),
-  deposit: v.nullable(v.string()),
-  gas: v.nullable(v.string()),
+  rlp_hash: v.nullable(v.string()),
 });
 
 const actionsAgg = v.object({
@@ -68,9 +66,6 @@ const txnCount = v.object({
 const actionsReceipts = v.object({
   action: v.enum(ActionKind),
   args: jsonSchema,
-  args_base64: v.nullable(v.string()),
-  deposit: v.nullable(v.string()),
-  gas: v.nullable(v.string()),
   method: v.nullable(v.string()),
   rlp_hash: v.nullable(v.string()),
 });
@@ -78,48 +73,49 @@ const actionsReceipts = v.object({
 const outcomeReceipts = v.object({
   executor_account_id: v.optional(v.string()),
   gas_burnt: v.optional(v.string()),
-  logs: v.optional(v.nullable(jsonSchema)),
+  logs: v.optional(v.nullable(v.array(jsonSchema))),
   result: v.optional(v.nullable(jsonSchema)),
   status: v.optional(v.boolean()),
   status_key: v.optional(v.enum(ExecutionOutcomeStatus)),
   tokens_burnt: v.optional(v.string()),
 });
 
-type ActionReceipt = {
+export type ActionReceipt = {
   action: ActionKind;
   args: JsonData;
+  method: null | string;
   rlp_hash: null | string;
 };
 
-type BlockReceipt = {
+export type BlockReceipt = {
   block_hash?: string;
   block_height?: string;
   block_timestamp?: string;
 };
 
-type OutcomeReceipts = {
+export type OutcomeReceipt = {
   executor_account_id?: string;
   gas_burnt?: string;
-  logs?: JsonData | null;
+  logs?: JsonData[] | null;
   result?: JsonData | null;
   status?: boolean;
   status_key?: ExecutionOutcomeStatus;
   tokens_burnt?: string;
 };
 
-export type TxnReceipts = {
+export type TxnReceipt = {
   actions: ActionReceipt[];
   block: BlockReceipt;
-  outcome: OutcomeReceipts;
+  outcome: OutcomeReceipt;
   predecessor_account_id: string;
   public_key: string;
   receipt_id: string;
-  receipts: TxnReceipts[];
+  receipts: TxnReceipt[];
   receiver_account_id: string;
 };
 
 // recursive schemas require explicit types
-const txnReceipt: v.GenericSchema<TxnReceipts> = v.object({
+const txnReceipt: v.GenericSchema<TxnReceipt> = v.object({
   actions: v.array(actionsReceipts),
   block,
   outcome: outcomeReceipts,

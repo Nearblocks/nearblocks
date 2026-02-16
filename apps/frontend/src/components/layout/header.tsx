@@ -1,6 +1,6 @@
 'use client';
 
-import { LuMenu, LuX } from 'react-icons/lu';
+import { Menu as LuMenu, X } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useLocale } from '@/hooks/use-locale';
@@ -84,7 +84,7 @@ export const Header = () => {
                     variant="secondary"
                   >
                     <LuMenu className="scale-100 rotate-0 transition-all group-data-[state=open]:scale-0 group-data-[state=open]:-rotate-90" />
-                    <LuX className="absolute scale-0 rotate-90 transition-all group-data-[state=open]:scale-100 group-data-[state=open]:rotate-0" />
+                    <X className="absolute scale-0 rotate-90 transition-all group-data-[state=open]:scale-100 group-data-[state=open]:rotate-0" />
                     <span className="sr-only">{t('header.toggleMenu')}</span>
                   </Button>
                 </PopoverTrigger>

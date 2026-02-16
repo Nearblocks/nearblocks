@@ -1,33 +1,45 @@
 'use client';
 
-import { createContext, useEffect } from 'react';
+import { createContext } from 'react';
 import type { PropsWithChildren } from 'react';
 
 import { Config } from '@/lib/config';
-import { initConfigStore } from '@/stores/config';
-import { initPreferencesStore } from '@/stores/preferences';
-import { initWalletStore } from '@/stores/wallet';
+import { ConfigStore, createConfigStore } from '@/stores/config';
+import { createSettingsStore, SettingsStore } from '@/stores/settings';
+import { createWalletStore, WalletStore } from '@/stores/wallet';
 
 type Props = PropsWithChildren<{
-  value: Config;
+  config: Config;
 }>;
 
-export const ConfigContext = createContext<Config | null>(null);
+export const ConfigContext = createContext<ConfigStore | null>(null);
+export const SettingsContext = createContext<null | SettingsStore>(null);
+export const WalletContext = createContext<null | WalletStore>(null);
 
-export const ConfigProvider = ({ children, value }: Props) => {
-  useEffect(() => {
-    initConfigStore(value);
-    initPreferencesStore(value.networkId, value.providers);
-    initWalletStore({
-      mainnetUrl: value.mainnetUrl,
-      network: value.networkId,
-      projectId: value.reownProjectId,
-      providers: value.providers,
-      testnetUrl: value.testnetUrl,
-    });
-  }, [value]);
+import { useState } from 'react';
+
+export const ConfigProvider = ({ children, config }: Props) => {
+  const [configStore] = useState(() => createConfigStore(config));
+  const [settingsStore] = useState(() =>
+    createSettingsStore(config.networkId, config.provider),
+  );
+  const [walletStore] = useState(() =>
+    createWalletStore({
+      mainnetUrl: config.mainnetUrl,
+      network: config.networkId,
+      projectId: config.reownProjectId,
+      providers: config.providers,
+      testnetUrl: config.testnetUrl,
+    }),
+  );
 
   return (
-    <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>
+    <ConfigContext.Provider value={configStore}>
+      <SettingsContext.Provider value={settingsStore}>
+        <WalletContext.Provider value={walletStore}>
+          {children}
+        </WalletContext.Provider>
+      </SettingsContext.Provider>
+    </ConfigContext.Provider>
   );
 };

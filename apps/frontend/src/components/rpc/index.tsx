@@ -1,8 +1,8 @@
 'use client';
 
-import { LuGlobe, LuPlus } from 'react-icons/lu';
+import { Globe, Plus } from 'lucide-react';
 
-import { usePreferences } from '@/stores/preferences';
+import { useSettings } from '@/hooks/use-settings';
 import { Button } from '@/ui/button';
 import {
   DropdownMenu,
@@ -14,22 +14,22 @@ import {
 } from '@/ui/dropdown-menu';
 
 export const RpcSelector = () => {
-  const provider = usePreferences((s) => s.provider);
-  const providers = usePreferences((s) => s.providers);
-  const setProvider = usePreferences((s) => s.setProvider);
+  const provider = useSettings((s) => s.provider);
+  const providers = useSettings((s) => s.providers);
+  const setProvider = useSettings((s) => s.setProvider);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="icon-xs" variant="secondary">
-          <LuGlobe className="h-4 w-4" />
+          <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel className="flex items-center justify-between">
           RPC
           <Button size="icon-xs" variant="ghost">
-            <LuPlus className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
           </Button>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

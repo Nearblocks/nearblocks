@@ -2,55 +2,31 @@
 
 import { NearConnector } from '@hot-labs/near-connect';
 import SignClient from '@walletconnect/sign-client';
-import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 
 import type { Network } from '@/types/enums';
 
 type Wallet = Awaited<ReturnType<NearConnector['wallet']>>;
 
-type WalletStoreState = {
-  account: null | string;
+interface WalletActions {
   connect: () => Promise<void>;
-  connector: NearConnector | null;
   disconnect: () => Promise<void>;
-  isInitialized: boolean;
   setAccount: (account: null | string) => void;
   setConnector: (connector: NearConnector | null) => void;
   setInitialized: (value: boolean) => void;
   setWallet: (wallet: null | Wallet) => void;
+}
+
+export interface WalletState extends WalletActions {
+  account: null | string;
+  connector: NearConnector | null;
+  isInitialized: boolean;
   wallet: null | Wallet;
-};
+}
 
-export const walletStore = createStore<WalletStoreState>((set, get) => ({
-  account: null,
-  connect: async () => {
-    const { connector } = get();
-    if (!connector) return;
-    await connector.connect();
-  },
-  connector: null,
-  disconnect: async () => {
-    const { connector } = get();
-    if (!connector) return;
-    await connector.disconnect();
-  },
-  isInitialized: false,
-  setAccount: (account) => set({ account }),
-  setConnector: (connector) => set({ connector }),
-  setInitialized: (value) => set({ isInitialized: value }),
-  setWallet: (wallet) => set({ wallet }),
-  wallet: null,
-}));
+export type WalletStore = ReturnType<typeof createWalletStore>;
 
-export const useWalletStore = <T>(selector: (state: WalletStoreState) => T) =>
-  useStore(walletStore, selector);
-
-export const getAccount = () => walletStore.getState().account;
-export const getConnector = () => walletStore.getState().connector;
-export const getWallet = () => walletStore.getState().wallet;
-
-type InitWalletParams = {
+type CreateWalletStoreParams = {
   mainnetUrl: string;
   network: Network;
   projectId: string;
@@ -58,76 +34,99 @@ type InitWalletParams = {
   testnetUrl: string;
 };
 
-let cleanup: (() => void) | undefined;
+let signClientPromise: null | ReturnType<typeof SignClient.init> = null;
 
-export const initWalletStore = async ({
+export const createWalletStore = ({
   mainnetUrl,
   network,
   projectId,
   providers,
   testnetUrl,
-}: InitWalletParams) => {
-  cleanup?.();
+}: CreateWalletStoreParams) => {
+  const store = createStore<WalletState>()((set, get) => ({
+    /* eslint-disable perfectionist/sort-objects */
+    account: null,
+    connector: null,
+    isInitialized: false,
+    wallet: null,
+    connect: async () => {
+      const { connector } = get();
+      if (!connector) return;
+      await connector.connect();
+    },
+    disconnect: async () => {
+      const { connector } = get();
+      if (!connector) return;
+      await connector.disconnect();
+    },
+    setAccount: (account) => set({ account }),
+    setConnector: (connector) => set({ connector }),
+    setInitialized: (value) => set({ isInitialized: value }),
+    setWallet: (wallet) => set({ wallet }),
+    /* eslint-enable perfectionist/sort-objects */
+  }));
 
-  try {
-    const url = network === 'mainnet' ? mainnetUrl : testnetUrl;
-    const rpcs = providers.map((rpc) => rpc.url);
+  // Initialize wallet asynchronously
+  (async () => {
+    try {
+      const url = network === 'mainnet' ? mainnetUrl : testnetUrl;
+      const rpcs = providers.map((rpc) => rpc.url);
 
-    const walletConnect = SignClient.init({
-      metadata: {
-        description:
-          'NEAR Blocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
-        icons: ['/favicon.ico'],
-        name: 'NearBlocks',
-        url,
-      },
-      projectId,
-    });
+      if (!signClientPromise) {
+        signClientPromise = SignClient.init({
+          metadata: {
+            description:
+              'NEAR Blocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
+            icons: ['/icon.svg'],
+            name: 'NearBlocks',
+            url,
+          },
+          projectId,
+        });
+      }
 
-    const connector = new NearConnector({
-      logger: {
-        log: (args: unknown) => console.log(args),
-      },
-      network,
-      providers: { [network]: rpcs },
-      walletConnect,
-    });
+      const connector = new NearConnector({
+        logger: {
+          log: (args: unknown) => console.log(args),
+        },
+        network,
+        providers: { [network]: rpcs },
+        walletConnect: signClientPromise,
+      });
 
-    const { setAccount, setConnector, setInitialized, setWallet } =
-      walletStore.getState();
+      const { setAccount, setConnector, setInitialized, setWallet } =
+        store.getState();
 
-    setConnector(connector);
+      setConnector(connector);
 
-    const onSignIn = async (t: { accounts: { accountId: string }[] }) => {
-      setAccount(t.accounts[0].accountId);
+      const onSignIn = async (t: { accounts: { accountId: string }[] }) => {
+        setAccount(t.accounts[0].accountId);
+        const wallet = await connector.wallet().catch(() => undefined);
+        setWallet(wallet ?? null);
+      };
+
+      const onSignOut = () => {
+        setAccount(null);
+        setWallet(null);
+      };
+
+      connector.on('wallet:signIn', onSignIn);
+      connector.on('wallet:signOut', onSignOut);
+
       const wallet = await connector.wallet().catch(() => undefined);
-      setWallet(wallet ?? null);
-    };
+      const accounts = await wallet?.getAccounts().catch(() => []);
 
-    const onSignOut = () => {
-      setAccount(null);
-      setWallet(null);
-    };
+      if (accounts && accounts.length > 0) {
+        setAccount(accounts[0].accountId);
+        setWallet(wallet ?? null);
+      }
 
-    connector.on('wallet:signIn', onSignIn);
-    connector.on('wallet:signOut', onSignOut);
-
-    cleanup = () => {
-      connector.off('wallet:signIn', onSignIn);
-      connector.off('wallet:signOut', onSignOut);
-    };
-
-    const wallet = await connector.wallet().catch(() => undefined);
-    const accounts = await wallet?.getAccounts().catch(() => []);
-
-    if (accounts && accounts.length > 0) {
-      setAccount(accounts[0].accountId);
-      setWallet(wallet ?? null);
+      setInitialized(true);
+    } catch (err) {
+      console.error('Failed to initialize wallet store:', err);
+      store.getState().setInitialized(true);
     }
+  })();
 
-    setInitialized(true);
-  } catch (err) {
-    console.error('Failed to initialize wallet store:', err);
-    walletStore.getState().setInitialized(true);
-  }
+  return store;
 };

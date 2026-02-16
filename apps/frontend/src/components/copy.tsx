@@ -1,8 +1,8 @@
 'use client';
 
 import { VariantProps } from 'class-variance-authority';
+import { Check, Copy as LuCopy } from 'lucide-react';
 import { useState } from 'react';
-import { LuCheck, LuCopy } from 'react-icons/lu';
 
 import { Button, buttonVariants } from '@/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -39,7 +39,7 @@ export const Copy = ({
           size={size}
           variant={variant}
         >
-          {isCopied ? <LuCheck /> : <LuCopy />}
+          {isCopied ? <Check /> : <LuCopy />}
         </Button>
       </TooltipTrigger>
       <TooltipContent>

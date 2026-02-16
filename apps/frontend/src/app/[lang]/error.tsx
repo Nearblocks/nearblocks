@@ -1,7 +1,7 @@
 'use client';
 
+import { ServerOff } from 'lucide-react';
 import { useEffect } from 'react';
-import { LuServerOff } from 'react-icons/lu';
 
 import { EmptyBox } from '@/components/empty';
 import { useLocale } from '@/hooks/use-locale';
@@ -33,7 +33,7 @@ const Error = ({ error, reset }: Props) => {
       <div className="bg-card container mx-auto flex flex-1 items-center justify-center rounded-lg">
         <EmptyBox
           description={t('errors.serverError.description')}
-          icon={<LuServerOff />}
+          icon={<ServerOff />}
           title={t('errors.serverError.title')}
         >
           <EmptyContent>

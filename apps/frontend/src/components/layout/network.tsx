@@ -6,9 +6,9 @@ import { Near } from '@/icons/near';
 import { Button } from '@/ui/button';
 
 export const NetworkSwitcher = () => {
-  const networkId = useConfig((c) => c.networkId);
-  const mainnetUrl = useConfig((c) => c.mainnetUrl);
-  const testnetUrl = useConfig((c) => c.testnetUrl);
+  const networkId = useConfig((c) => c.config.networkId);
+  const mainnetUrl = useConfig((c) => c.config.mainnetUrl);
+  const testnetUrl = useConfig((c) => c.config.testnetUrl);
   const { t } = useLocale('layout');
   const url = networkId === 'mainnet' ? testnetUrl : mainnetUrl;
 

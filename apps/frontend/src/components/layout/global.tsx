@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
-import { getRuntimeConfig } from '@/lib/config';
+import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import { defaultLocale, type Locale, supportedLocales } from '@/locales/config';
 import { clientTranslator, getDictionary } from '@/locales/dictionaries';
 import { ConfigProvider } from '@/providers/config';
@@ -34,8 +34,8 @@ export const GlobalLayout = ({ children, head }: Props) => {
       : defaultLocale;
 
   const [dictionary, setDictionary] = useState<DeepPartial<BaseDictionary>>({});
-  const [theme, setTheme] = useState<Theme>('light');
-  const config = useMemo(() => getRuntimeConfig(theme), [theme]);
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const config = useMemo(() => getRuntimeConfig(), []);
   const layoutDictionary = useMemo(
     () => (dictionary.layout ?? {}) as DeepPartial<BaseDictionary['layout']>,
     [dictionary],
@@ -53,7 +53,7 @@ export const GlobalLayout = ({ children, head }: Props) => {
       .split('; ')
       .find((row) => row.startsWith('theme='));
 
-    setTheme((match?.split('=')[1] as Theme) ?? 'light');
+    setTheme((match?.split('=')[1] as Theme) ?? defaultTheme);
   }, []);
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export const GlobalLayout = ({ children, head }: Props) => {
       <body
         className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} overflow-x-hidden antialiased`}
       >
-        <ConfigProvider value={config}>
+        <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>
             <Header />
             {children({ t })}

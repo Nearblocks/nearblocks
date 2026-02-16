@@ -1,5 +1,5 @@
+import { ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
 import * as React from 'react';
-import { LuChevronLeft, LuChevronRight, LuEllipsis } from 'react-icons/lu';
 
 import { Link } from '@/components/link';
 import { cn } from '@/lib/utils';
@@ -73,7 +73,7 @@ const PaginationPrevious = ({
       size="default"
       {...props}
     >
-      <LuChevronLeft />
+      <ChevronLeft />
       <span className="block">Prev</span>
     </PaginationLink>
   );
@@ -91,7 +91,7 @@ const PaginationNext = ({
       {...props}
     >
       <span className="block">Next</span>
-      <LuChevronRight />
+      <ChevronRight />
     </PaginationLink>
   );
 };
@@ -107,7 +107,7 @@ const PaginationEllipsis = ({
       data-slot="pagination-ellipsis"
       {...props}
     >
-      <LuEllipsis className="size-4" />
+      <Ellipsis className="size-4" />
       <span className="sr-only">More pages</span>
     </span>
   );

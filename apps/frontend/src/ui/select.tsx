@@ -1,8 +1,8 @@
 'use client';
 
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { Select as SelectPrimitive } from 'radix-ui';
 import * as React from 'react';
-import { LuCheck, LuChevronDown, LuChevronUp } from 'react-icons/lu';
 
 import { cn } from '@/lib/utils';
 
@@ -44,7 +44,7 @@ const SelectTrigger = ({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <LuChevronDown className="size-4 opacity-50" />
+        <ChevronDown className="size-4 opacity-50" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -119,7 +119,7 @@ const SelectItem = ({
     >
       <span className="absolute right-2 flex size-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <LuCheck className="size-4" />
+          <Check className="size-4" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -153,7 +153,7 @@ const SelectScrollUpButton = ({
       data-slot="select-scroll-up-button"
       {...props}
     >
-      <LuChevronUp className="size-4" />
+      <ChevronUp className="size-4" />
     </SelectPrimitive.ScrollUpButton>
   );
 };
@@ -171,7 +171,7 @@ const SelectScrollDownButton = ({
       data-slot="select-scroll-down-button"
       {...props}
     >
-      <LuChevronDown className="size-4" />
+      <ChevronDown className="size-4" />
     </SelectPrimitive.ScrollDownButton>
   );
 };

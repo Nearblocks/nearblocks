@@ -38,18 +38,18 @@ export const StakingTxns = ({
   const stakingCount =
     !loading && stakingCountPromise ? use(stakingCountPromise) : null;
 
-  const { address, tab } = useParams<{ address: string; tab: string }>();
+  const { address } = useParams<{ address: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const onFilter = (value: FilterData) => {
     const params = buildParams(searchParams, value);
-    router.push(`/address/${address}/${tab}?${params.toString()}`);
+    router.push(`/address/${address}/staking?${params.toString()}`);
   };
 
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
-    router.push(`/address/${address}/${tab}?${params.toString()}`);
+    router.push(`/address/${address}/staking?${params.toString()}`);
   };
 
   const columns: DataTableColumnDef<AccountStakingTxn>[] = [
@@ -146,7 +146,7 @@ export const StakingTxns = ({
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={(type, cursor) =>
-            `/address/${address}/${tab}?${type}=${cursor}`
+            `/address/${address}/staking?${type}=${cursor}`
           }
           pagination={staking?.meta}
         />

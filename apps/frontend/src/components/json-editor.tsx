@@ -157,14 +157,14 @@ export const JsonEditor = forwardRef<HTMLTextAreaElement, Props>(
       >
         <pre
           aria-hidden="true"
-          className="scroll-overlay pointer-events-none col-start-1 row-start-1 m-0 max-h-[220px] overflow-auto px-3 py-2 font-mono text-sm leading-relaxed wrap-break-word whitespace-pre-wrap [&>code]:bg-transparent!"
+          className="scroll-overlay pointer-events-none col-start-1 row-start-1 m-0 max-h-55 overflow-auto px-3 py-2 font-mono text-sm leading-relaxed wrap-break-word whitespace-pre-wrap [&>code]:bg-transparent!"
           ref={preRef}
         >
           <code dangerouslySetInnerHTML={{ __html: displayCode || '&nbsp;' }} />
         </pre>
         <textarea
           aria-invalid={ariaInvalid}
-          className="scroll-overlay caret-foreground col-start-1 row-start-1 m-0 max-h-[220px] min-h-[100px] w-full resize-none overflow-auto bg-transparent px-3 py-2 font-mono text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-transparent outline-none"
+          className="scroll-overlay caret-foreground col-start-1 row-start-1 m-0 max-h-55 min-h-25 w-full resize-none overflow-auto bg-transparent px-3 py-2 font-mono text-sm leading-relaxed wrap-break-word whitespace-pre-wrap text-transparent outline-none"
           name={name}
           onBlur={handleBlur}
           onChange={handleChange}

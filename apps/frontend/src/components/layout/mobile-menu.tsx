@@ -1,6 +1,6 @@
 'use client';
 
-import { LuChevronRight } from 'react-icons/lu';
+import { ChevronRight } from 'lucide-react';
 
 import { useLocale } from '@/hooks/use-locale';
 import { NavMenu, RouteKey } from '@/types/types';
@@ -37,7 +37,7 @@ export const MobileMenu = ({ menu }: Props) => {
             <MobileNavigationMenuItem>
               <MobileNavigationMenuCollapsibleTrigger>
                 <span>{item.key ? t(item.key) : item.title}</span>
-                <LuChevronRight className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                <ChevronRight className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               </MobileNavigationMenuCollapsibleTrigger>
               <CollapsibleContent>
                 <ul className="border-border my-2 ml-4 border-l pl-2">

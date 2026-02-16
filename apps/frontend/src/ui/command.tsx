@@ -1,8 +1,8 @@
 'use client';
 
 import { Command as CommandPrimitive } from 'cmdk';
+import { Search } from 'lucide-react';
 import * as React from 'react';
-import { LuSearch } from 'react-icons/lu';
 
 import { cn } from '@/lib/utils';
 import {
@@ -69,7 +69,7 @@ const CommandInput = ({
       className="flex h-9 items-center gap-2 border-b px-3"
       data-slot="command-input-wrapper"
     >
-      <LuSearch className="size-4 shrink-0 opacity-50" />
+      <Search className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input
         className={cn(
           'placeholder:text-muted-foreground text-body-sm flex h-10 w-full rounded-md bg-transparent py-3 outline-hidden disabled:cursor-not-allowed disabled:opacity-50',

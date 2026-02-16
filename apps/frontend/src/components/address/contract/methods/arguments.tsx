@@ -1,5 +1,5 @@
+import { RiQuestionLine } from '@remixicon/react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
-import { RiQuestionLine } from 'react-icons/ri';
 
 import { JsonEditor } from '@/components/json-editor';
 import { FormData } from '@/lib/schema/contract';

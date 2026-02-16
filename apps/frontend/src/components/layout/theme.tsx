@@ -1,16 +1,16 @@
 'use client';
 
+import { Moon, Sun } from 'lucide-react';
 import { useTransition } from 'react';
-import { LuMoon, LuSun } from 'react-icons/lu';
 
 import { setTheme } from '@/actions/theme';
-import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
+import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/ui/button';
 
 export const ThemeToggle = () => {
+  const theme = useTheme();
   const { t } = useLocale('layout');
-  const theme = useConfig((c) => c.theme);
   const [isPending, startTransition] = useTransition();
 
   const onToggle = () => {
@@ -28,8 +28,8 @@ export const ThemeToggle = () => {
       title={t('header.toggleTheme')}
       variant="secondary"
     >
-      <LuMoon className="scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-      <LuSun className="absolute scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+      <Moon className="scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+      <Sun className="absolute scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
       <span className="sr-only">{t('header.toggleTheme')}</span>
     </Button>
   );

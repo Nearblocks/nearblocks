@@ -1,7 +1,7 @@
 'use client';
 
+import { Inbox } from 'lucide-react';
 import { ReactNode } from 'react';
-import { LuInbox } from 'react-icons/lu';
 
 import {
   FilterClearData,
@@ -66,7 +66,7 @@ type DataTableProps<TData> = {
 export function DataTable<TData>({
   columns,
   data,
-  emptyIcon = <LuInbox />,
+  emptyIcon = <Inbox />,
   emptyMessage = 'No data found',
   getRowKey,
   loading = false,
@@ -159,10 +159,10 @@ export function DataTable<TData>({
             <Pagination className="justify-end">
               <PaginationContent>
                 <PaginationItem>
-                  <Skeleton className="h-8 w-[70px]" />
+                  <Skeleton className="h-8 w-17.5" />
                 </PaginationItem>
                 <PaginationItem>
-                  <Skeleton className="h-8 w-[70px]" />
+                  <Skeleton className="h-8 w-17.5" />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>

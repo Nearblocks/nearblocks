@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
+    optimizePackageImports: ['radix-ui', '@remixicon/react'],
   },
   async headers() {
     return [

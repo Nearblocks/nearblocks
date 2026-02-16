@@ -1,6 +1,6 @@
 'use client';
 
-import { LuSearchX } from 'react-icons/lu';
+import { SearchX } from 'lucide-react';
 
 import { EmptyBox, EmptyFooter } from '@/components/empty';
 import { useLocale } from '@/hooks/use-locale';
@@ -13,7 +13,7 @@ const NotFound = () => {
       <div className="bg-card container mx-auto flex flex-1 items-center justify-center rounded-lg">
         <EmptyBox
           description={t('errors.notFound.description')}
-          icon={<LuSearchX />}
+          icon={<SearchX />}
           title={t('errors.notFound.title')}
         >
           <EmptyFooter />

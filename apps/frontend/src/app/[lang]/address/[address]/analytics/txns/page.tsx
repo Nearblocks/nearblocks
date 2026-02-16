@@ -1,4 +1,4 @@
-import { TxnsChart } from '@/components/address/analytics/txns';
+import { TxnsChart } from '@/components/address/analytics/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchTxnStats } from '@/data/address/analytics';
 

@@ -1,4 +1,4 @@
-import { BalanceChart } from '@/components/address/analytics/balance';
+import { BalanceChart } from '@/components/address/analytics/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchBalanceStats } from '@/data/address/analytics';
 

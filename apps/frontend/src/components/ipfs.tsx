@@ -1,18 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import {
   RiArrowDownSLine,
   RiArrowRightSLine,
   RiCollapseDiagonalLine,
   RiExpandDiagonalLine,
   RiFileCodeLine,
-} from 'react-icons/ri';
+} from '@remixicon/react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { CodeBlock } from '@/components/code-block';
 import { Copy } from '@/components/copy';
 import { cn } from '@/lib/utils';
+import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
+
+import { ToggleGroup } from './toggle-group';
 
 type IpfsEntry = {
   Hash: string;
@@ -236,27 +240,40 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
                 ) : content !== undefined ? (
                   <>
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
-                      <Copy className="text-muted-foreground" text={content} />
-                      <button
-                        className="text-muted-foreground hover:text-foreground rounded-md p-1 transition-colors"
-                        onClick={() =>
-                          setFullHeightFiles((prev) =>
-                            toggleSet(prev, file.hash),
-                          )
-                        }
-                        title={isFullHeight ? 'Collapse' : 'Expand'}
-                      >
-                        {isFullHeight ? (
-                          <RiCollapseDiagonalLine className="size-3.5" />
-                        ) : (
-                          <RiExpandDiagonalLine className="size-3.5" />
-                        )}
-                      </button>
+                      <ToggleGroup>
+                        <Copy
+                          className="text-muted-foreground"
+                          text={content}
+                        />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              className="text-muted-foreground"
+                              onClick={() =>
+                                setFullHeightFiles((prev) =>
+                                  toggleSet(prev, file.hash),
+                                )
+                              }
+                              size="icon-xs"
+                              variant="ghost"
+                            >
+                              {isFullHeight ? (
+                                <RiCollapseDiagonalLine className="size-3.5" />
+                              ) : (
+                                <RiExpandDiagonalLine className="size-3.5" />
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {isFullHeight ? 'Collapse' : 'Expand'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </ToggleGroup>
                     </div>
                     <div
                       className={cn(
                         'scroll-overlay overflow-auto',
-                        !isFullHeight && 'max-h-[500px]',
+                        !isFullHeight && 'max-h-125',
                       )}
                     >
                       <CodeBlock

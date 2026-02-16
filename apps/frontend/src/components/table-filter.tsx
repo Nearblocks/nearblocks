@@ -1,8 +1,8 @@
 'use client';
 
+import { ListFilter } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { LuListFilter } from 'react-icons/lu';
 
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
@@ -35,7 +35,7 @@ export const TableFilter = ({ name, onClear, onFilter }: Props) => {
     <Popover>
       <PopoverTrigger asChild>
         <Button size="icon-xs" variant="ghost">
-          <LuListFilter className="size-4" />
+          <ListFilter className="size-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="max-w-50 p-3">

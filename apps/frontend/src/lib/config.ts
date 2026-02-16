@@ -1,6 +1,6 @@
-import * as z from 'zod/mini';
+import * as z from 'zod/v4/mini';
 
-import { ONetwork, OTheme, Theme } from '@/types/enums';
+import { ONetwork } from '@/types/enums';
 
 export const serverEnvSchema = z.object({
   API_ACCESS_KEY: z.string(),
@@ -15,6 +15,8 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_REOWN_PROJECT_ID: z.string(),
   NEXT_PUBLIC_TESTNET_URL: z._default(z.url(), 'https://testnet.nearblocks.io'),
 });
+
+export const defaultTheme = 'dark';
 
 export const rpcProviders = (key: string) => ({
   mainnet: [
@@ -78,7 +80,8 @@ export const rpcProviders = (key: string) => ({
     },
   ],
 });
-const contractVerifier = () => ({
+
+const contractVerifier = {
   mainnet: {
     api: {
       list: 'https://api.sourcescan.dev/api/ipfs/structure',
@@ -95,7 +98,7 @@ const contractVerifier = () => ({
     contract: 'v2-verifier.sourcescan.testnet',
     ipfs: 'https://api.sourcescan.dev/ipfs',
   },
-});
+} as const;
 
 export const envSchema = z.object({
   ...serverEnvSchema.shape,
@@ -124,7 +127,6 @@ const configSchema = z.object({
   providers: z.array(providerSchema),
   reownProjectId: publicEnvSchema.shape.NEXT_PUBLIC_REOWN_PROJECT_ID,
   testnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_TESTNET_URL,
-  theme: z.enum(OTheme),
   verifier: verifierSchema,
 });
 
@@ -145,7 +147,7 @@ export const getServerConfig = (): ServerEnv => {
 
 let cachedPublicConfig: null | PublicEnv = null;
 
-export const getRuntimeConfig = (theme: Theme): Config => {
+export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
       NEXT_PUBLIC_FASTNEAR_RPC_KEY: process.env.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
@@ -159,8 +161,6 @@ export const getRuntimeConfig = (theme: Theme): Config => {
   const providers = rpcProviders(
     cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
   )[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID];
-  const verifier =
-    contractVerifier()[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID];
 
   return {
     fastNearRpcKey: cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
@@ -170,7 +170,6 @@ export const getRuntimeConfig = (theme: Theme): Config => {
     providers,
     reownProjectId: cachedPublicConfig.NEXT_PUBLIC_REOWN_PROJECT_ID,
     testnetUrl: cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL,
-    theme,
-    verifier,
+    verifier: contractVerifier[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID],
   };
 };

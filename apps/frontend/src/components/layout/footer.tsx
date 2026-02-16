@@ -1,7 +1,11 @@
 'use client';
 
-import { LuArrowUpRight } from 'react-icons/lu';
-import { RiGithubFill, RiTelegram2Line, RiTwitterXLine } from 'react-icons/ri';
+import {
+  RiGithubFill,
+  RiTelegram2Line,
+  RiTwitterXLine,
+} from '@remixicon/react';
+import { ArrowUpRight } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useLocale } from '@/hooks/use-locale';
@@ -72,7 +76,7 @@ export const Footer = () => {
                   target="_blank"
                 >
                   {t('footer.menu.tools.nearValidate')}{' '}
-                  <LuArrowUpRight className="size-3" />
+                  <ArrowUpRight className="size-3" />
                 </Link>
               </li>
             </ul>
@@ -127,7 +131,7 @@ export const Footer = () => {
                   target="_blank"
                 >
                   {t('footer.menu.company.status')}{' '}
-                  <LuArrowUpRight className="size-3" />
+                  <ArrowUpRight className="size-3" />
                 </Link>
               </li>
             </ul>

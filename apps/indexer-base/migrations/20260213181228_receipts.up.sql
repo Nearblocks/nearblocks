@@ -1,4 +1,34 @@
 CREATE
+OR REPLACE FUNCTION unescape_log (input text) RETURNS text LANGUAGE plpgsql IMMUTABLE STRICT AS $$
+DECLARE
+  clean_input text;
+BEGIN
+  clean_input := replace(input, '\u0000', '');
+  RETURN ('"' || clean_input || '"')::json #>> '{}';
+EXCEPTION WHEN OTHERS THEN
+  RETURN regexp_replace(input, E'\\\\(.)', E'\\1', 'g');
+END;
+$$;
+
+CREATE
+OR REPLACE FUNCTION unescape_logs (logs jsonb) RETURNS jsonb LANGUAGE plpgsql IMMUTABLE AS $$
+BEGIN
+  IF logs IS NULL OR jsonb_typeof(logs) != 'array' THEN
+    RETURN COALESCE(logs, '[]'::jsonb);
+  END IF;
+  RETURN (
+    SELECT COALESCE(
+      jsonb_agg(to_jsonb(unescape_log(elem))),
+      '[]'::jsonb
+    )
+    FROM jsonb_array_elements_text(logs) AS elem
+  );
+EXCEPTION WHEN OTHERS THEN
+  RETURN logs;
+END;
+$$;
+
+CREATE
 OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS JSONB LANGUAGE SQL STABLE AS $$
   WITH
     receipt_selected AS (
@@ -88,15 +118,9 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
             'action',
             ara.action_kind,
             'method',
-            method,
-            'gas',
-            args ->> 'gas'::TEXT,
-            'deposit',
-            args ->> 'deposit'::TEXT,
+            ara.method,
             'args',
-            args -> 'args_json',
-            'args_base64',
-            args ->> 'args_base64'::TEXT,
+            ara.args,
             'rlp_hash',
             ara.nep518_rlp_hash
           )
@@ -128,9 +152,9 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
           'status_key',
           status,
           'logs',
-           eo.logs,
+          unescape_logs(eo.logs),
           'result',
-          eo.result
+          unescape_logs(eo.result)
         ) AS outcome
       FROM
         execution_outcomes eo

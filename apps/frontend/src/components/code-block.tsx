@@ -78,7 +78,7 @@ export const CodeBlock = ({ className, code, language = 'plain' }: Props) => {
       <tbody>
         {lines.map((line, i) => (
           <tr key={i}>
-            <td className="text-muted-foreground/50 sticky left-0 bg-(--prism-bg) pr-3 pl-4 text-right align-top select-none">
+            <td className="text-muted-foreground/50 sticky left-0 w-px bg-(--prism-bg) pr-3 pl-4 text-right align-top select-none">
               {i + 1}
             </td>
             <td className="pr-4">

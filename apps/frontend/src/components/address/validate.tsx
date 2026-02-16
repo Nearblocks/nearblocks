@@ -1,6 +1,6 @@
 'use client';
 
-import { LuCircleCheckBig } from 'react-icons/lu';
+import { CircleCheckBig } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
@@ -17,13 +17,13 @@ type Props = {
 };
 
 export const Validate = ({ address }: Props) => {
-  const networkId = useConfig((s) => s.networkId);
+  const networkId = useConfig((s) => s.config.networkId);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="icon-xs" variant="secondary">
-          <LuCircleCheckBig className="h-4 w-4" />
+          <CircleCheckBig className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

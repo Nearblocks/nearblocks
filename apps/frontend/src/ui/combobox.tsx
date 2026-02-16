@@ -1,7 +1,7 @@
 'use client';
 import { Combobox as ComboboxPrimitive } from '@base-ui/react';
+import { Check, ChevronDown, X } from 'lucide-react';
 import * as React from 'react';
-import { LuCheck, LuChevronDown, LuX } from 'react-icons/lu';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
@@ -30,7 +30,7 @@ const ComboboxTrigger = ({
       {...props}
     >
       {children}
-      <LuChevronDown
+      <ChevronDown
         className="text-muted-foreground pointer-events-none size-4"
         data-slot="combobox-trigger-icon"
       />
@@ -49,7 +49,7 @@ const ComboboxClear = ({
       render={<InputGroupButton size="icon-xs" variant="ghost" />}
       {...props}
     >
-      <LuX className="pointer-events-none" />
+      <X className="pointer-events-none" />
     </ComboboxPrimitive.Clear>
   );
 };
@@ -165,7 +165,7 @@ const ComboboxItem = ({
           <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
         }
       >
-        <LuCheck className="pointer-events-none size-4 pointer-coarse:size-5" />
+        <Check className="pointer-events-none size-4 pointer-coarse:size-5" />
       </ComboboxPrimitive.ItemIndicator>
     </ComboboxPrimitive.Item>
   );
@@ -278,7 +278,7 @@ const ComboboxChip = ({
           data-slot="combobox-chip-remove"
           render={<Button size="icon-xs" variant="ghost" />}
         >
-          <LuX className="pointer-events-none" />
+          <X className="pointer-events-none" />
         </ComboboxPrimitive.ChipRemove>
       )}
     </ComboboxPrimitive.Chip>

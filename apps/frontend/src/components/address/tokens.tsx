@@ -1,17 +1,18 @@
 'use client';
 
+import { ChevronsUpDown } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { Fragment, use, useEffect, useState } from 'react';
-import { LuChevronsUpDown } from 'react-icons/lu';
+import { Fragment, use, useMemo, useState } from 'react';
 
 import { AccountAssetFT } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage } from '@/components/token';
+import { useTokenBalances } from '@/hooks/use-token-balances';
 import { currencyFormat, numberFormat, toTokenAmount } from '@/lib/format';
 import { mergeTokens, sortTokens } from '@/lib/token';
-import { TokenCache, TokenInventory } from '@/types/types';
+import { TokenCache } from '@/types/types';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@/ui/command';
@@ -34,41 +35,24 @@ export const Tokens = ({
   const tokens = !loading && tokensPromise ? use(tokensPromise) : null;
   const tokenCache =
     !loading && tokenCachePromise ? use(tokenCachePromise) : null;
-  const [open, setOpen] = useState(false);
-  const [fetching, setFetching] = useState(true);
+
   const { address } = useParams<{ address: string }>();
-  const [inventory, setInventory] = useState<TokenInventory>({
-    amount: 0,
-    tokens: [],
-  });
+  const { data: balances, isLoading } = useTokenBalances(
+    !loading && tokens && !tokenCache ? { account: address, tokens } : null,
+  );
+  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
+  const inventory = useMemo(() => {
+    const merged = tokenCache ? mergeTokens(tokens, tokenCache) : balances;
 
-    const fetchInventory = async () => {
-      if (!tokens || !address) return;
-
-      try {
-        const inventory = await mergeTokens(address, tokens, tokenCache);
-        if (cancelled) return;
-        setInventory(sortTokens(inventory));
-      } finally {
-        if (!cancelled) setFetching(false);
-      }
-    };
-
-    fetchInventory();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [address, tokens, tokenCache]);
+    return sortTokens(merged);
+  }, [tokens, tokenCache, balances]);
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <SkeletonSlot
         fallback={<Skeleton className="h-9 w-full" />}
-        loading={loading || !tokens || fetching}
+        loading={loading || !tokens || isLoading}
       >
         {() => (
           <PopoverTrigger asChild>
@@ -91,7 +75,7 @@ export const Tokens = ({
               ) : (
                 'N/A'
               )}
-              <LuChevronsUpDown className="opacity-50" />
+              <ChevronsUpDown className="opacity-50" />
             </Button>
           </PopoverTrigger>
         )}

@@ -1,4 +1,4 @@
-import { FTsChart } from '@/components/address/analytics/fts';
+import { FTsChart } from '@/components/address/analytics/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchFTStats } from '@/data/address/analytics';
 

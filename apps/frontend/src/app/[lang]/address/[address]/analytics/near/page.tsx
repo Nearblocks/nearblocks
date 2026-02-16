@@ -1,4 +1,4 @@
-import { NearChart } from '@/components/address/analytics/near';
+import { NearChart } from '@/components/address/analytics/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchNearStats } from '@/data/address/analytics';
 

@@ -5,7 +5,7 @@ type HighlightState = {
   setHighlighted: (highlighted: null | string) => void;
 };
 
-export const useHighlightStore = create<HighlightState>((set) => ({
+export const useHighlightStore = create<HighlightState>()((set) => ({
   highlighted: null,
   setHighlighted: (highlighted) => set({ highlighted }),
 }));

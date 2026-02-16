@@ -1,7 +1,8 @@
 'use client';
 
+import { RiQuestionLine } from '@remixicon/react';
+import dynamic from 'next/dynamic';
 import { use } from 'react';
-import { RiQuestionLine } from 'react-icons/ri';
 
 import { AccountStatsOverview, AccountTxnStats } from 'nb-schemas';
 
@@ -11,7 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
-import { Heatmap } from './heatmap';
+const Heatmap = dynamic(() => import('./heatmap').then((mod) => mod.Heatmap), {
+  loading: () => <Skeleton className="h-46 w-full" />,
+  ssr: false,
+});
 
 type Props = {
   heatmapPromise?: Promise<AccountTxnStats[] | null>;

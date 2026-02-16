@@ -1,6 +1,10 @@
-import { LuCircleCheck, LuCircleX, LuHourglass } from 'react-icons/lu';
+import { CircleCheck, CircleX, Hourglass } from 'lucide-react';
 
 import { Badge } from '@/ui/badge';
+
+type StatusProps = {
+  status: boolean | undefined;
+};
 
 type StatusIconProps = {
   status: boolean | undefined;
@@ -18,21 +22,40 @@ const statusClass = 'size-5 rounded-full p-1';
 const directionClass =
   'inline-block max-w-20 min-w-12.5 truncate text-center align-middle';
 
+export const TxnStatus = ({ status }: StatusProps) => {
+  if (status == null)
+    return (
+      <Badge variant="amber">
+        <Hourglass className={iconClass} /> Pending
+      </Badge>
+    );
+
+  return status ? (
+    <Badge variant="lime">
+      <CircleCheck className={iconClass} /> Success
+    </Badge>
+  ) : (
+    <Badge variant="red">
+      <CircleX className={iconClass} /> Failed
+    </Badge>
+  );
+};
+
 export const TxnStatusIcon = ({ status }: StatusIconProps) => {
   if (status == null)
     return (
       <Badge className={statusClass} variant="amber">
-        <LuHourglass className={iconClass} />
+        <Hourglass className={iconClass} />
       </Badge>
     );
 
   return status ? (
     <Badge className={statusClass} variant="lime">
-      <LuCircleCheck className={iconClass} />
+      <CircleCheck className={iconClass} />
     </Badge>
   ) : (
     <Badge className={statusClass} variant="red">
-      <LuCircleX className={iconClass} />
+      <CircleX className={iconClass} />
     </Badge>
   );
 };

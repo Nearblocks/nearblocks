@@ -8,7 +8,7 @@ const TabLinks = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
     <div
       className={cn(
-        'bg-background text-muted-foreground inline-flex h-9 w-fit items-center justify-center gap-0.5 rounded-md border p-[2px]',
+        'bg-background text-muted-foreground inline-flex h-9 w-fit items-center justify-center gap-0.5 rounded-md border p-0.5',
         className,
       )}
       data-slot="tab-links"

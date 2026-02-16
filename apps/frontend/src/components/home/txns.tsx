@@ -1,8 +1,8 @@
 'use client';
 
+import { ArrowLeftRight } from 'lucide-react';
 import { Fragment } from 'react';
 import { use } from 'react';
-import { LuArrowLeftRight } from 'react-icons/lu';
 
 import { TxnListItem } from 'nb-schemas';
 
@@ -33,7 +33,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
       <CardHeader className="border-b py-3">
         <h2 className="text-headline-sm font-semibold">{t('txns.title')}</h2>
       </CardHeader>
-      <ScrollArea className="h-[340px]">
+      <ScrollArea className="h-85">
         <CardContent className="@container p-3">
           <SkeletonSlot
             fallback={
@@ -42,7 +42,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                   <Fragment key={i}>
                     <div className="flex items-center gap-3 *:leading-[140%]">
                       <div className="bg-muted rounded-lg p-2">
-                        <LuArrowLeftRight className="size-5" />
+                        <ArrowLeftRight className="size-5" />
                       </div>
                       <div className="text-body-sm flex grow grid-cols-[2fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
@@ -82,7 +82,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                   <Fragment key={txn.transaction_hash}>
                     <div className="flex items-center gap-3 *:leading-[140%]">
                       <div className="bg-muted rounded-lg p-2">
-                        <LuArrowLeftRight className="size-5" />
+                        <ArrowLeftRight className="size-5" />
                       </div>
                       <div className="text-body-sm flex grow grid-cols-[2fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>

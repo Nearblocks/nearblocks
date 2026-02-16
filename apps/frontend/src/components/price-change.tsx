@@ -1,6 +1,6 @@
 'use client';
 
-import { IoCaretDownCircle, IoCaretUpCircle } from 'react-icons/io5';
+import { CircleChevronDown, CircleChevronUp } from 'lucide-react';
 
 import { numberFormat, NumberFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,7 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
   if (changeNumber < 0) {
     return (
       <Badge className={cn('h-6', className)} variant="red" {...props}>
-        <IoCaretDownCircle />
+        <CircleChevronDown />
         {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
       </Badge>
     );
@@ -26,7 +26,7 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
 
   return (
     <Badge className={cn('h-6', className)} variant="lime" {...props}>
-      <IoCaretUpCircle />+
+      <CircleChevronUp />+
       {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
     </Badge>
   );

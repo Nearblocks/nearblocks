@@ -1,11 +1,11 @@
 'use client';
 
+import { ArrowRightLeft, Globe, Pickaxe } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { use } from 'react';
-import { LuArrowRightLeft, LuGlobe, LuPickaxe } from 'react-icons/lu';
 
 import { DailyStats, Stats } from 'nb-schemas';
 
-import { TxnsChart } from '@/components/home/chart';
 import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
@@ -15,6 +15,14 @@ import { currencyFormat, gasFormat, numberFormat } from '@/lib/format';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
+
+const TxnsChart = dynamic(
+  () => import('@/components/home/chart').then((mod) => mod.TxnsChart),
+  {
+    loading: () => <Skeleton className="h-28.75 w-full" />,
+    ssr: false,
+  },
+);
 
 type Props = {
   dailyStatsPromise?: Promise<DailyStats[] | null>;
@@ -71,7 +79,7 @@ export const Overview = ({
           </div>
           <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
-              <LuGlobe className="size-6" />
+              <Globe className="size-6" />
             </div>
             <div>
               <h3 className="text-body-xs text-muted-foreground uppercase">
@@ -99,7 +107,7 @@ export const Overview = ({
         <div className="divide-y">
           <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
-              <LuArrowRightLeft className="size-6" />
+              <ArrowRightLeft className="size-6" />
             </div>
             <div className="flex grow flex-wrap justify-between gap-2">
               <div>
@@ -150,7 +158,7 @@ export const Overview = ({
           </div>
           <div className="flex items-center gap-3 py-3">
             <div className="bg-muted rounded-lg p-3">
-              <LuPickaxe className="size-6" />
+              <Pickaxe className="size-6" />
             </div>
             <div className="flex grow flex-wrap items-center gap-2">
               <div>
@@ -197,7 +205,7 @@ export const Overview = ({
           </h3>
           <div className="flex items-start">
             <SkeletonSlot
-              fallback={<Skeleton className="h-[115px] w-full" />}
+              fallback={<Skeleton className="h-28.75 w-full" />}
               loading={loading || !dailyStats}
             >
               {() => <TxnsChart data={dailyStats ?? []} />}
