@@ -87,7 +87,7 @@ export const createWalletStore = ({
 
       const connector = new NearConnector({
         logger: {
-          log: (args: unknown) => console.log(args),
+          log: (args: unknown) => console.error(args),
         },
         network,
         providers: { [network]: rpcs },

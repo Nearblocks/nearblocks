@@ -21,7 +21,7 @@ import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
-import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -51,6 +51,14 @@ export const Receipts = ({
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
     router.push(`/address/${address}/receipts?${params.toString()}`);
+  };
+
+  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
+    const params = buildParams(searchParams, {
+      [type]: cursor,
+      [type === 'next' ? 'prev' : 'next']: '',
+    });
+    return `/address/${address}/receipts?${params.toString()}`;
   };
 
   const columns: DataTableColumnDef<AccountReceipt>[] = [
@@ -161,30 +169,28 @@ export const Receipts = ({
 
   return (
     <Card>
-      <CardHeader className="text-body-sm border-b py-3">
-        <SkeletonSlot
-          fallback={<Skeleton className="w-40" />}
-          loading={loading || !receiptCount}
-        >
-          {() => (
-            <>{`A total of ${numberFormat(
-              receiptCount?.count ?? 0,
-            )} receipts found`}</>
-          )}
-        </SkeletonSlot>
-      </CardHeader>
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
           data={receipts?.data}
           emptyMessage="No receipts found"
           getRowKey={(receipt) => receipt.receipt_id}
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !receiptCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  receiptCount?.count ?? 0,
+                )} receipts found`}</>
+              )}
+            </SkeletonSlot>
+          }
           loading={loading || !!receipts?.errors}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={(type, cursor) =>
-            `/address/${address}/receipts?${type}=${cursor}`
-          }
+          onPaginationNavigate={onPaginate}
           pagination={receipts?.meta}
         />
       </CardContent>

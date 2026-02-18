@@ -1,4 +1,4 @@
-import { CircleCheck, CircleX, Hourglass } from 'lucide-react';
+import { CircleCheck, CircleX, Hourglass, MoveRight } from 'lucide-react';
 
 import { Badge } from '@/ui/badge';
 
@@ -91,3 +91,9 @@ export const TxnDirection = ({ address, amount, from, to }: DirectionProps) => {
 
   return address === from ? <Out /> : <In />;
 };
+
+export const TxnDirectionIcon = () => (
+  <div className="bg-teal-background flex size-6 items-center justify-center rounded-full">
+    <MoveRight className="text-teal-foreground size-4" />
+  </div>
+);

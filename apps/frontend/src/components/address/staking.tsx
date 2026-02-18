@@ -20,7 +20,7 @@ import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
-import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -50,6 +50,14 @@ export const StakingTxns = ({
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
     router.push(`/address/${address}/staking?${params.toString()}`);
+  };
+
+  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
+    const params = buildParams(searchParams, {
+      [type]: cursor,
+      [type === 'next' ? 'prev' : 'next']: '',
+    });
+    return `/address/${address}/staking?${params.toString()}`;
   };
 
   const columns: DataTableColumnDef<AccountStakingTxn>[] = [
@@ -122,18 +130,6 @@ export const StakingTxns = ({
 
   return (
     <Card>
-      <CardHeader className="text-body-sm border-b py-3">
-        <SkeletonSlot
-          fallback={<Skeleton className="w-40" />}
-          loading={loading || !stakingCount}
-        >
-          {() => (
-            <>{`A total of ${numberFormat(
-              stakingCount?.count ?? 0,
-            )} staking txns found`}</>
-          )}
-        </SkeletonSlot>
-      </CardHeader>
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
@@ -142,12 +138,22 @@ export const StakingTxns = ({
           getRowKey={(staking) =>
             `${staking.receipt_id}-${staking.index_in_chunk}`
           }
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !stakingCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  stakingCount?.count ?? 0,
+                )} staking txns found`}</>
+              )}
+            </SkeletonSlot>
+          }
           loading={loading || !!staking?.errors}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={(type, cursor) =>
-            `/address/${address}/staking?${type}=${cursor}`
-          }
+          onPaginationNavigate={onPaginate}
           pagination={staking?.meta}
         />
       </CardContent>

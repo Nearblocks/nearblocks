@@ -16,7 +16,7 @@ import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
-import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -41,6 +41,14 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
     router.push(`/address/${address}/mt-tokens?${params.toString()}`);
+  };
+
+  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
+    const params = buildParams(searchParams, {
+      [type]: cursor,
+      [type === 'next' ? 'prev' : 'next']: '',
+    });
+    return `/address/${address}/mt-tokens?${params.toString()}`;
   };
 
   const columns: DataTableColumnDef<AccountMTTxn>[] = [
@@ -173,30 +181,28 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
 
   return (
     <Card>
-      <CardHeader className="text-body-sm border-b py-3">
-        <SkeletonSlot
-          fallback={<Skeleton className="w-40" />}
-          loading={loading || !mtCount}
-        >
-          {() => (
-            <>{`A total of ${numberFormat(
-              mtCount?.count ?? 0,
-            )} mt token txns found`}</>
-          )}
-        </SkeletonSlot>
-      </CardHeader>
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
           data={mts?.data}
           emptyMessage="No mt token txns found"
           getRowKey={(mt) => `${mt.receipt_id}-${mt.event_index}`}
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !mtCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  mtCount?.count ?? 0,
+                )} mt token txns found`}</>
+              )}
+            </SkeletonSlot>
+          }
           loading={loading || !!mts?.errors}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={(type, cursor) =>
-            `/address/${address}/mt-tokens?${type}=${cursor}`
-          }
+          onPaginationNavigate={onPaginate}
           pagination={mts?.meta}
         />
       </CardContent>

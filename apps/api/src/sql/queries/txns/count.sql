@@ -1,5 +1,6 @@
 SELECT
-  COUNT(block_timestamp)
+  COUNT(block_timestamp),
+  '0' AS cost
 FROM
   transactions
 WHERE

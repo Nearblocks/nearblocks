@@ -7,7 +7,7 @@ import type { TxnReceipt } from 'nb-schemas';
 import { useTxnStatus } from '@/hooks/use-rpc';
 
 import { RpcContext } from './context';
-import { ReceiptTree } from './receipt-tree';
+import { ReceiptTree } from './tree';
 
 type Props = {
   receipts: TxnReceipt;

@@ -63,13 +63,13 @@ export const nearFiatFormat = (
 };
 
 export const gasFormat = (
-  yoctoNear: BigSource | null | undefined,
+  value: BigSource | null | undefined,
   options?: Intl.NumberFormatOptions,
 ) => {
-  if (yoctoNear === undefined || yoctoNear === null) return '';
+  if (value === undefined || value === null) return '';
 
   return numberFormat(
-    Big(yoctoNear)
+    Big(value)
       .div(Big(10 ** 12))
       .toString(),
     options,
@@ -161,4 +161,10 @@ export const toGas = (tGas: BigSource | null | undefined) => {
   return Big(tGas)
     .mul(Big(10 ** 12))
     .toString();
+};
+
+export const gasFee = (gas: string, price: string) => {
+  const near = nearFormat(Big(gas).mul(Big(price)).toString());
+
+  return `${near}`;
 };

@@ -1,4 +1,4 @@
-import { ServerOff } from 'lucide-react';
+import { QrCodeIcon } from 'lucide-react';
 
 import { QrCode } from '@/components/qr-code';
 import { Button } from '@/ui/button';
@@ -16,7 +16,7 @@ export const AccountQr = ({ address }: Props) => {
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
             <Button size="icon-xs" variant="ghost">
-              <ServerOff />
+              <QrCodeIcon />
             </Button>
           </PopoverTrigger>
         </TooltipTrigger>

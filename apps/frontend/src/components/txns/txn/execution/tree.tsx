@@ -1,6 +1,6 @@
 import type { TxnReceipt } from 'nb-schemas';
 
-import { ReceiptBlock } from './receipt-block';
+import { ReceiptBlock } from './receipt';
 
 type Props = {
   depth: number;

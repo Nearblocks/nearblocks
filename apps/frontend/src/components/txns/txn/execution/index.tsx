@@ -8,7 +8,7 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { Card, CardContent } from '@/ui/card';
 
 import { ExecutionPlan } from './execution';
-import { ReceiptBlock } from './receipt-block';
+import { ReceiptBlock } from './receipt';
 
 type Props = {
   loading?: boolean;

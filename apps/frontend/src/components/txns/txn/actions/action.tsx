@@ -11,24 +11,30 @@ import { Badge } from '@/ui/badge';
 
 type Props = {
   action: ActionReceipt;
+  full?: boolean;
   receiver: string;
   signer: string;
 };
 
-const argsRecord = (args: JsonData): Record<string, JsonData> =>
+export const argsRecord = (args: JsonData): Record<string, JsonData> =>
   args !== null && typeof args === 'object' && !Array.isArray(args)
     ? (args as Record<string, JsonData>)
     : {};
 
-export const Action = ({ action, receiver, signer }: Props) => {
+export const Action = ({ action, full = true, receiver, signer }: Props) => {
   const args = argsRecord(action.args);
 
   if (action.action === ActionKind.FUNCTION_CALL) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Call <Badge variant="blue">{action.method || 'method'}</Badge> By{' '}
-        <AccountLink account={signer} textClassName="max-w-40" /> On{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" />
+        Call <Badge variant="blue">{action.method || 'method'}</Badge>
+        {full && (
+          <>
+            {' '}
+            By <AccountLink account={signer} textClassName="max-w-40" /> On{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -37,9 +43,16 @@ export const Action = ({ action, receiver, signer }: Props) => {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         Transfer <NearCircle className="size-4" />
-        {nearFormat(String(args.deposit ?? 0))} From{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" /> To{' '}
-        <AccountLink account={signer} textClassName="max-w-40" />
+        {nearFormat(String(args.deposit ?? 0))}
+        {full && (
+          <>
+            {' '}
+            From <AccountLink
+              account={receiver}
+              textClassName="max-w-40"
+            /> To <AccountLink account={signer} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -48,9 +61,16 @@ export const Action = ({ action, receiver, signer }: Props) => {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         Stake <NearCircle className="size-4" />
-        {nearFormat(String(args.stake ?? 0))} To{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" /> By{' '}
-        <AccountLink account={signer} textClassName="max-w-40" />
+        {nearFormat(String(args.stake ?? 0))}
+        {full && (
+          <>
+            {' '}
+            To <AccountLink
+              account={receiver}
+              textClassName="max-w-40"
+            /> By <AccountLink account={signer} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -58,8 +78,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
   if (action.action === ActionKind.DEPLOY_CONTRACT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Deploy Contract To{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" />
+        Deploy Contract
+        {full && (
+          <>
+            {' '}
+            To <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -72,8 +97,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
   ) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Deploy Global Contract To{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" />
+        Deploy Global Contract
+        {full && (
+          <>
+            {' '}
+            To <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -81,8 +111,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
   if (action.action === ActionKind.CREATE_ACCOUNT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Create Account{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" />
+        Create Account
+        {full && (
+          <>
+            {' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -90,8 +125,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
   if (action.action === ActionKind.DETERMINISTIC_STATE_INIT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Create Deterministic Account{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" />
+        Create Deterministic Account
+        {full && (
+          <>
+            {' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -99,8 +139,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
   if (action.action === ActionKind.DELETE_ACCOUNT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Delete Account{' '}
-        <AccountLink account={receiver} textClassName="max-w-40" />
+        Delete Account
+        {full && (
+          <>
+            {' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -108,7 +153,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
   if (action.action === ActionKind.DELEGATE_ACTION) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Delegate For <AccountLink account={receiver} textClassName="max-w-40" />
+        Delegate
+        {full && (
+          <>
+            {' '}
+            For <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -126,8 +177,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
         <Copy
           className="text-muted-foreground"
           text={String(args.public_key ?? '')}
-        />{' '}
-        For <AccountLink account={receiver} textClassName="max-w-40" />
+        />
+        {full && (
+          <>
+            {' '}
+            For <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }
@@ -145,8 +201,13 @@ export const Action = ({ action, receiver, signer }: Props) => {
         <Copy
           className="text-muted-foreground"
           text={String(args.public_key ?? '')}
-        />{' '}
-        From <AccountLink account={receiver} textClassName="max-w-40" />
+        />
+        {full && (
+          <>
+            {' '}
+            From <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        )}
       </span>
     );
   }

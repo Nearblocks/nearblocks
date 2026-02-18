@@ -1,14 +1,17 @@
-import { RpcTransactionResponse } from '@near-js/jsonrpc-types';
+import {
+  FinalExecutionOutcomeWithReceiptView,
+  RpcTransactionResponse,
+} from '@near-js/jsonrpc-types';
 import { deserialize } from 'borsh';
 import { decodeBase64, hexlify, Transaction } from 'ethers';
 
-import { ActionKind } from 'nb-types';
+export type AuroraViewFormat = 'default' | 'rlp' | 'table';
 
-import type {
-  AuroraSubmitArgs,
-  EvmTransactionData,
-  RpcTransactionResponseWithReceipts,
-} from './types';
+export type AuroraSubmitArgs = {
+  gas_token_address?: null | number[] | undefined;
+  max_gas_price?: null | string | undefined;
+  tx_data: number[];
+};
 
 export const deepUnescape = (value: unknown): unknown => {
   if (typeof value === 'string') {
@@ -45,66 +48,25 @@ export const deepUnescape = (value: unknown): unknown => {
   return value;
 };
 
-export const actionLabel = (action: ActionKind): string => {
-  switch (action) {
-    case ActionKind.FUNCTION_CALL:
-      return 'Function Call';
-    case ActionKind.TRANSFER:
-      return 'Transfer';
-    case ActionKind.STAKE:
-      return 'Stake';
-    case ActionKind.ADD_KEY:
-      return 'Add Key';
-    case ActionKind.DELETE_KEY:
-      return 'Delete Key';
-    case ActionKind.DEPLOY_CONTRACT:
-      return 'Deploy Contract';
-    case ActionKind.DEPLOY_GLOBAL_CONTRACT:
-    case ActionKind.DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID:
-      return 'Deploy Global Contract';
-    case ActionKind.CREATE_ACCOUNT:
-      return 'Create Account';
-    case ActionKind.DELETE_ACCOUNT:
-      return 'Delete Account';
-    case ActionKind.DELEGATE_ACTION:
-      return 'Delegate Action';
-    default:
-      return action;
-  }
-};
-
 export const findRawArgs = (
   rpcData: RpcTransactionResponse | undefined,
   receiptId: string,
-  methodName: string | undefined,
+  actionIndex: number,
 ): null | string => {
-  if (!rpcData) return null;
-
-  const rpcDataWithReceipts = rpcData as RpcTransactionResponseWithReceipts;
-  const receipts = rpcDataWithReceipts.receipts;
-
+  const receipts = (rpcData as FinalExecutionOutcomeWithReceiptView)?.receipts;
   if (!Array.isArray(receipts)) return null;
 
-  const rpcReceipt = receipts.find((r) => r.receiptId === receiptId);
-  if (!rpcReceipt) return null;
+  const receipt = receipts.find((r) => r.receiptId === receiptId);
+  const actionReceipt =
+    receipt?.receipt && 'Action' in receipt.receipt
+      ? receipt.receipt.Action
+      : null;
+  const action = actionReceipt?.actions?.[actionIndex];
 
-  const receipt = rpcReceipt;
-  const actionReceipt = receipt.receipt?.Action || receipt.receipt?.action;
-  if (!actionReceipt) return null;
+  if (!action || typeof action === 'string' || !('FunctionCall' in action))
+    return null;
 
-  const actions = actionReceipt.actions || [];
-  const match = actions.find((a) => {
-    const fc = a.FunctionCall || a.functionCall;
-    if (!fc) return false;
-    if (methodName) {
-      return (fc.methodName || fc.method_name) === methodName;
-    }
-    return true;
-  });
-
-  if (!match) return null;
-  const fc = match.FunctionCall || match.functionCall;
-  return fc?.args ?? null;
+  return action.FunctionCall.args ?? null;
 };
 
 export const isAuroraAction = (
@@ -127,26 +89,44 @@ export const isBase64 = (str: string): boolean => {
   }
 };
 
+const toPlainObject = (obj: unknown): unknown => {
+  if (obj == null || typeof obj !== 'object') {
+    if (typeof obj === 'bigint') return obj.toString();
+    return obj;
+  }
+
+  if (Array.isArray(obj)) return obj.map(toPlainObject);
+
+  const proto = Object.getPrototypeOf(obj);
+  const descriptors = Object.getOwnPropertyDescriptors(proto);
+  const getterKeys = Object.entries(descriptors)
+    .filter(([, d]) => typeof d.get === 'function')
+    .map(([key]) => key);
+
+  if (getterKeys.length === 0) {
+    const entries = Object.entries(obj as Record<string, unknown>);
+    if (entries.length === 0) return String(obj);
+    const plain: Record<string, unknown> = {};
+    for (const [key, val] of entries) {
+      if (val != null) plain[key] = toPlainObject(val);
+    }
+    return plain;
+  }
+
+  const plain: Record<string, unknown> = {};
+  for (const key of getterKeys) {
+    const val = (obj as any)[key];
+    if (val != null) plain[key] = toPlainObject(val);
+  }
+  return plain;
+};
+
 export const parseEvmTransaction = (
   input: Uint8Array,
-): EvmTransactionData | null => {
+): null | Record<string, unknown> => {
   try {
     const tx = Transaction.from(hexlify(input));
-    const proto = Object.getPrototypeOf(tx);
-    const descriptors = Object.getOwnPropertyDescriptors(proto);
-    const getters = Object.entries(descriptors)
-      .filter(([, d]) => typeof d.get === 'function')
-      .map(([key]) => key);
-    const plain: Record<string, unknown> = {};
-
-    for (const key of getters) {
-      const val = (tx as any)[key];
-      if (val != null) {
-        plain[key] = val;
-      }
-    }
-
-    return plain;
+    return toPlainObject(tx) as Record<string, unknown>;
   } catch {
     return null;
   }
@@ -165,9 +145,7 @@ const submitArgsSchema = {
 };
 /* eslint-enable perfectionist/sort-objects */
 
-export const decodeSubmitTransaction = (
-  b64: string,
-): null | Record<string, unknown> => {
+export const decodeSubmit = (b64: string): null | Record<string, unknown> => {
   if (!isBase64(b64)) return null;
   try {
     const input = decodeBase64(b64);
@@ -177,7 +155,7 @@ export const decodeSubmitTransaction = (
   }
 };
 
-export const decodeSubmitWithArgsTransaction = (
+export const decodeSubmitWithArgs = (
   b64: string,
 ): null | Record<string, unknown> => {
   if (!isBase64(b64)) return null;
@@ -194,7 +172,7 @@ export const decodeSubmitWithArgsTransaction = (
   }
 };
 
-export const decodeRlpExecuteTransaction = (
+export const decodeRlpExecute = (
   data: Record<string, unknown>,
 ): null | Record<string, unknown> => {
   const b64 = data.tx_bytes_b64;

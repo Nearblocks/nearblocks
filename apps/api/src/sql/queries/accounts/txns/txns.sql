@@ -58,7 +58,7 @@ FROM
       AND ar.receipt_included_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
       AND r.included_in_block_timestamp >= ts.block_timestamp
       AND r.included_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
-      AND r.originated_from_transaction_hash = ts.converted_into_receipt_id
+      AND r.receipt_id = ts.converted_into_receipt_id
   ) aa ON TRUE
   LEFT JOIN LATERAL (
     SELECT

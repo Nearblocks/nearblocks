@@ -17,7 +17,7 @@ import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
-import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -41,6 +41,14 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
     router.push(`/address/${address}?${params.toString()}`);
+  };
+
+  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
+    const params = buildParams(searchParams, {
+      [type]: cursor,
+      [type === 'next' ? 'prev' : 'next']: '',
+    });
+    return `/address/${address}?${params.toString()}`;
   };
 
   const columns: DataTableColumnDef<AccountTxn>[] = [
@@ -141,30 +149,28 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
 
   return (
     <Card>
-      <CardHeader className="text-body-sm border-b py-3">
-        <SkeletonSlot
-          fallback={<Skeleton className="w-40" />}
-          loading={loading || !txnCount}
-        >
-          {() => (
-            <>{`A total of ${numberFormat(
-              txnCount?.count ?? 0,
-            )} transactions found`}</>
-          )}
-        </SkeletonSlot>
-      </CardHeader>
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
           data={txns?.data}
           emptyMessage="No transactions found"
           getRowKey={(txn) => txn.transaction_hash}
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !txnCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  txnCount?.count ?? 0,
+                )} transactions found`}</>
+              )}
+            </SkeletonSlot>
+          }
           loading={loading || !!txns?.errors}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={(type, cursor) =>
-            `/address/${address}?${type}=${cursor}`
-          }
+          onPaginationNavigate={onPaginate}
           pagination={txns?.meta}
         />
       </CardContent>

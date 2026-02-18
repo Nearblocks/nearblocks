@@ -48,7 +48,7 @@ FROM
           'args',
           args,
           'rlp_hash',
-          rlp_hash
+          nep518_rlp_hash
         )
         ORDER BY
           index_in_action_receipt

@@ -27,7 +27,7 @@ export const Wallet = ({ className }: Props) => {
         await connect();
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

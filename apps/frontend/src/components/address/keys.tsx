@@ -16,7 +16,7 @@ import { nearFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { AccessKeyPermission } from '@/types/types';
 import { Badge } from '@/ui/badge';
-import { Card, CardContent, CardHeader } from '@/ui/card';
+import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -45,6 +45,14 @@ export const AccessKeys = ({
   const onClear = (data: FilterClearData) => {
     const params = buildParams(searchParams, data);
     router.push(`/address/${address}/keys?${params.toString()}`);
+  };
+
+  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
+    const params = buildParams(searchParams, {
+      [type]: cursor,
+      [type === 'next' ? 'prev' : 'next']: '',
+    });
+    return `/address/${address}/keys?${params.toString()}`;
   };
 
   const columns: DataTableColumnDef<AccountKey>[] = [
@@ -160,30 +168,28 @@ export const AccessKeys = ({
 
   return (
     <Card>
-      <CardHeader className="text-body-sm border-b py-3">
-        <SkeletonSlot
-          fallback={<Skeleton className="w-40" />}
-          loading={loading || !keyCount}
-        >
-          {() => (
-            <>{`A total of ${numberFormat(
-              keyCount?.count ?? 0,
-            )} access keys found`}</>
-          )}
-        </SkeletonSlot>
-      </CardHeader>
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
           data={keys?.data}
           emptyMessage="No access keys found"
           getRowKey={(key) => key.public_key}
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !keyCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  keyCount?.count ?? 0,
+                )} access keys found`}</>
+              )}
+            </SkeletonSlot>
+          }
           loading={loading || !!keys?.errors}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={(type, cursor) =>
-            `/address/${address}/keys?${type}=${cursor}`
-          }
+          onPaginationNavigate={onPaginate}
           pagination={keys?.meta}
         />
       </CardContent>

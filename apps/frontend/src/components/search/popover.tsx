@@ -46,7 +46,7 @@ export const SearchPopover = ({
                 resp.txns.length > 0),
           );
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       });
     },

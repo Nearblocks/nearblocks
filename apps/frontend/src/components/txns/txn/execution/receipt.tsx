@@ -1,6 +1,7 @@
 import { RiQuestionLine } from '@remixicon/react';
 
 import type { TxnReceipt } from 'nb-schemas';
+import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
@@ -12,9 +13,9 @@ import { gasFormat, nearFormat, numberFormat } from '@/lib/format';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
-import { CodeViewer } from './code-viewer';
-import { ReceiptAction } from './receipt-action';
-import { ReceiptLogs } from './receipt-logs';
+import { ReceiptAction } from './action';
+import { CodeViewer } from './code';
+import { ReceiptLogs } from './logs';
 
 type Props = {
   loading?: boolean;
@@ -23,7 +24,7 @@ type Props = {
 
 export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
   return (
-    <div className="mx-3">
+    <div className="mx-3" id={receipt?.receipt_id}>
       <List pairsPerRow={1}>
         <ListItem>
           <ListLeft className="min-w-60">
@@ -101,14 +102,14 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <p className="flex items-center gap-1">
                   <Link
                     className="text-link"
-                    href={`/blocks/receipt.block.block_height`}
+                    href={`/blocks/${receipt!.block.block_height}`}
                   >
                     {numberFormat(receipt!.block.block_height)}
                   </Link>
                   <Copy
                     className="text-muted-foreground shrink-0"
                     size="icon-xs"
-                    text={receipt!.receipt_id}
+                    text={String(receipt!.block.block_height)}
                   />
                 </p>
               )}
@@ -135,10 +136,29 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
               loading={!receipt || loading}
             >
               {() => (
-                <AccountLink
-                  account={receipt!.predecessor_account_id}
-                  textClassName="max-w-60"
-                />
+                <p className="flex items-center gap-1">
+                  <AccountLink
+                    account={receipt!.predecessor_account_id}
+                    textClassName="max-w-60"
+                  />{' '}
+                  <span className="text-muted-foreground flex items-center">
+                    (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          className="text-link inline max-w-40 truncate"
+                          href={`/address/${
+                            receipt!.predecessor_account_id
+                          }/keys`}
+                        >
+                          {receipt!.public_key}
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>{receipt!.public_key}</TooltipContent>
+                    </Tooltip>
+                    <Copy text={receipt!.public_key} />)
+                  </span>
+                </p>
               )}
             </SkeletonSlot>
           </ListRight>
@@ -197,9 +217,13 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
             >
               {() => (
                 <div className="flex flex-col gap-3">
-                  {receipt!.actions.map((action, i) => (
+                  {(receipt!.actions[0]?.action === ActionKind.DELEGATE_ACTION
+                    ? [receipt!.actions[0]]
+                    : receipt!.actions
+                  ).map((action, i) => (
                     <ReceiptAction
                       action={action}
+                      index={i}
                       key={i}
                       receiptId={receipt!.receipt_id}
                       receiver={receipt!.receiver_account_id}

@@ -3,13 +3,14 @@
 import { use } from 'react';
 
 import { Txn } from 'nb-schemas';
+import { ActionKind } from 'nb-types';
 
 import { SkeletonSlot } from '@/components/skeleton';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 import { Action } from './action';
-import { Icon } from './icon';
+import { TxnIcon } from './icon';
 
 type Props = {
   loading?: boolean;
@@ -27,7 +28,7 @@ export const Actions = ({ loading, txnPromise }: Props) => {
             fallback={<Skeleton className="size-10 rounded-full" />}
             loading={loading || !txn}
           >
-            {() => <Icon actions={txn!.actions} />}
+            {() => <TxnIcon actions={txn!.actions} />}
           </SkeletonSlot>
           <div className="flex-1">
             <h2 className="text-headline-xs mb-1 font-bold uppercase">
@@ -43,7 +44,10 @@ export const Actions = ({ loading, txnPromise }: Props) => {
             >
               {() => (
                 <div className="space-y-1">
-                  {txn!.actions.map((action, index) => (
+                  {(txn!.actions[0]?.action === ActionKind.DELEGATE_ACTION
+                    ? [txn!.actions[0]]
+                    : txn!.actions
+                  ).map((action, index) => (
                     <Action
                       action={action}
                       key={index}

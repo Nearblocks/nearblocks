@@ -1,6 +1,7 @@
 'use client';
 
-import { Inbox } from 'lucide-react';
+import { Inbox, X } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { ReactNode } from 'react';
 
 import {
@@ -9,6 +10,7 @@ import {
   TableFilter,
 } from '@/components/table-filter';
 import { cn } from '@/lib/utils';
+import { Button } from '@/ui/button';
 import {
   Pagination,
   PaginationContent,
@@ -31,6 +33,7 @@ import { SkeletonSlot } from './skeleton';
 
 export type DataTableColumnDef<TData> = {
   cell: (row: TData) => ReactNode;
+  cellClassName?: string;
   className?: string;
   enableFilter?: boolean;
   filterName?: string;
@@ -55,6 +58,7 @@ type DataTableProps<TData> = {
   emptyIcon?: ReactNode;
   emptyMessage?: string;
   getRowKey?: (row: TData) => string;
+  header?: ReactNode;
   loading?: boolean;
   onClear?: (data: FilterClearData) => void;
   onFilter?: (value: FilterData) => void;
@@ -69,6 +73,7 @@ export function DataTable<TData>({
   emptyIcon = <Inbox />,
   emptyMessage = 'No data found',
   getRowKey,
+  header,
   loading = false,
   onClear,
   onFilter,
@@ -76,10 +81,23 @@ export function DataTable<TData>({
   pagination,
   skeletonRows = 25,
 }: DataTableProps<TData>) {
+  const searchParams = useSearchParams();
+
   const filterHelpers: FilterHelpers = {
     onClear: onClear || (() => {}),
     onFilter: onFilter || (() => {}),
   };
+
+  const activeFilters = columns
+    .filter(
+      (col) =>
+        col.enableFilter && col.filterName && searchParams.get(col.filterName),
+    )
+    .map((col) => ({
+      label: typeof col.header === 'string' ? col.header : col.filterName!,
+      name: col.filterName!,
+      value: searchParams.get(col.filterName!)!,
+    }));
 
   const renderHeader = (column: DataTableColumnDef<TData>) => {
     if (typeof column.header === 'function') {
@@ -90,6 +108,30 @@ export function DataTable<TData>({
 
   return (
     <>
+      {(header || activeFilters.length > 0) && (
+        <div className="text-body-sm flex flex-wrap items-center justify-between gap-1 border-b px-4 py-3">
+          <div className="leading-7">{header}</div>
+          {activeFilters.length > 0 && !loading && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-muted-foreground shrink-0">
+                Filtered By:
+              </span>
+              {activeFilters.map((filter) => (
+                <Button
+                  key={filter.name}
+                  onClick={() => onClear?.({ [filter.name]: undefined })}
+                  size="xs"
+                  variant="outline"
+                >
+                  <span className="font-medium">{filter.label}:</span>
+                  <span className="max-w-20 truncate">{filter.value}</span>
+                  <X className="size-3" />
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <Table className="xl:table-fixed">
         <TableHeader className="uppercase">
           <TableRow>
@@ -137,7 +179,7 @@ export function DataTable<TData>({
                   <TableRow className="h-15" key={key}>
                     {columns.map((column, colIndex) => (
                       <TableCell
-                        className="truncate px-3"
+                        className={cn('truncate px-3', column.cellClassName)}
                         key={column.id || colIndex}
                       >
                         {column.cell(row)}

@@ -1,4 +1,4 @@
-import { CodeViewer } from './code-viewer';
+import { CodeViewer } from './code';
 
 type Props = {
   logs: unknown[];
