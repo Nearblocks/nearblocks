@@ -7,7 +7,7 @@ import config from '#config';
 import cg from '#libs/cg';
 import { dbBase } from '#libs/knex';
 import { fetchValidators } from '#libs/near';
-import { Raw } from '#types/types.js';
+import { Raw } from '#types/types';
 
 export const syncStats = async () => {
   const block = await blockData();

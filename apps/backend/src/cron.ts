@@ -5,11 +5,12 @@ const options = {
   noOverlap: true,
 };
 
+// TODO: reenable jobs after receipts are in sync
 export const scheduleJobs = () => {
   try {
     // Stats
     cron.schedule('*/15 * * * * *', './jobs/stats.js', options); // 15s
-    cron.schedule('0 1 0 * * *', './jobs/dailyStats.js', options); // every day at 00:01
+    // cron.schedule('0 1 0 * * *', './jobs/dailyStats.js', options); // every day at 00:01
 
     // Token jobs
     cron.schedule('*/15 * * * * *', './jobs/tokenSupply.js', options); // 15s
@@ -18,10 +19,10 @@ export const scheduleJobs = () => {
     cron.schedule('0 0 0 * * *', './jobs/tokenMetaReset.js', options); // 1d
 
     // Validator jobs
-    cron.schedule('0 * * * * *', './jobs/nodes.js', options); // 1m
-    cron.schedule('0 */15 * * * *', './jobs/pools.js', options); // 15m
-    cron.schedule('0 0 * * * *', './jobs/protocol.js', options); // 1h
-    cron.schedule('0 0 0 * * *', './jobs/genesis.js', options); // 1d
+    // cron.schedule('0 * * * * *', './jobs/nodes.js', options); // 1m
+    // cron.schedule('0 */15 * * * *', './jobs/pools.js', options); // 15m
+    // cron.schedule('0 0 * * * *', './jobs/protocol.js', options); // 1h
+    // cron.schedule('0 0 0 * * *', './jobs/genesis.js', options); // 1d
 
     // View refresher jobs
     cron.schedule('0 */15 * * * *', './jobs/refreshTokenList.js', options); // 15m
