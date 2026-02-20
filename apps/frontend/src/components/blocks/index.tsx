@@ -77,33 +77,30 @@ export const Blocks = ({
   ];
 
   return (
-    <>
-      <h1 className="text-headline-lg mb-6">Latest Near Protocol Blocks</h1>
-      <Card>
-        <CardContent className="text-body-sm p-0">
-          <DataTable
-            columns={columns}
-            data={blocks?.data}
-            emptyMessage="No blocks found"
-            getRowKey={(block) => block.block_hash}
-            header={
-              <SkeletonSlot
-                fallback={<Skeleton className="w-40" />}
-                loading={loading || !blockCount}
-              >
-                {() => (
-                  <>{`A total of ${numberFormat(
-                    blockCount?.count ?? 0,
-                  )} blocks found`}</>
-                )}
-              </SkeletonSlot>
-            }
-            loading={loading || !!blocks?.errors}
-            onPaginationNavigate={(type, cursor) => `/blocks?${type}=${cursor}`}
-            pagination={blocks?.meta}
-          />
-        </CardContent>
-      </Card>
-    </>
+    <Card>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={blocks?.data}
+          emptyMessage="No blocks found"
+          getRowKey={(block) => block.block_hash}
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !blockCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  blockCount?.count ?? 0,
+                )} blocks found`}</>
+              )}
+            </SkeletonSlot>
+          }
+          loading={loading || !!blocks?.errors}
+          onPaginationNavigate={(type, cursor) => `/blocks?${type}=${cursor}`}
+          pagination={blocks?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

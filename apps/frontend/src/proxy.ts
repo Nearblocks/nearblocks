@@ -8,6 +8,18 @@ export const proxy = (request: NextRequest) => {
 
   if (pathname.startsWith('/_next/data/')) return NextResponse.next();
 
+  if (
+    pathname === `/${defaultLocale}` ||
+    pathname.startsWith(`/${defaultLocale}/`)
+  ) {
+    const newPathname =
+      pathname === `/${defaultLocale}`
+        ? '/'
+        : pathname.slice(`/${defaultLocale}`.length);
+    request.nextUrl.pathname = newPathname;
+    return NextResponse.redirect(request.nextUrl);
+  }
+
   const hasLocale = supportedLocales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
@@ -16,7 +28,7 @@ export const proxy = (request: NextRequest) => {
 
   request.nextUrl.pathname = `/${defaultLocale}${pathname}`;
 
-  return NextResponse.redirect(request.nextUrl);
+  return NextResponse.rewrite(request.nextUrl);
 };
 
 export const config = {

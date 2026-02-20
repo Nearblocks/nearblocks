@@ -115,7 +115,7 @@ export const Tokens = ({
                             </span>
                           </span>
                           {token.meta?.decimals && (
-                            <span className="">
+                            <span>
                               {numberFormat(
                                 toTokenAmount(
                                   token.amount,
@@ -126,10 +126,11 @@ export const Tokens = ({
                             </span>
                           )}
                         </span>
-                        <span className="flex flex-col gap-1">
+                        <span className="flex flex-col gap-1 text-right">
                           <span>{currencyFormat(token.price)}</span>
                           {token.meta?.price && (
-                            <span className="text-right">
+                            <span>
+                              @$
                               {numberFormat(token.meta?.price, {
                                 maximumFractionDigits: 6,
                               })}

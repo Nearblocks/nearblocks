@@ -1,6 +1,6 @@
 import { dbContracts } from '#libs/knex';
 import { resetFTMeta } from '#services/fts/meta';
-import { resetMTMeta } from '#services/mts/meta';
+// import { resetMTMeta } from '#services/mts/meta';
 import { resetNFTMeta } from '#services/nfts/meta';
 import { MetaContract, Raw } from '#types/types';
 
@@ -11,7 +11,7 @@ export const resetMeta = async () => {
   if (contracts.length) {
     await Promise.all([
       resetFTMeta(contracts),
-      resetMTMeta(contracts),
+      // resetMTMeta(contracts),
       resetNFTMeta(contracts),
     ]);
   }

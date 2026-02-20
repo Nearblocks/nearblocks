@@ -10,9 +10,14 @@ const TxnsPage = async ({ searchParams }: Props) => {
   const txnCountPromise = fetchTxnCount(filters);
 
   return (
-    <ErrorSuspense fallback={<Txns loading />}>
-      <Txns txnCountPromise={txnCountPromise} txnsPromise={txnsPromise} />
-    </ErrorSuspense>
+    <>
+      <h1 className="text-headline-lg mb-6">
+        Latest Near Protocol Transactions
+      </h1>
+      <ErrorSuspense fallback={<Txns loading />}>
+        <Txns txnCountPromise={txnCountPromise} txnsPromise={txnsPromise} />
+      </ErrorSuspense>
+    </>
   );
 };
 

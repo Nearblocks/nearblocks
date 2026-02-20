@@ -98,7 +98,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       cell: (txn) => (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
-          {nearFormat(txn.outcomes_agg?.transaction_fee) ?? '0'}
+          {nearFormat(txn.outcomes_agg?.transaction_fee)}
         </span>
       ),
       header: 'Txn Fee',

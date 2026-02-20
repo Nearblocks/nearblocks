@@ -5,12 +5,12 @@ import { protocolConfigCheck } from '#services/contracts/tasks';
 
 export const task = async () => {
   try {
-    logger.info('poolId: job started');
+    logger.info('protocol: job started');
     await Promise.all([protocolConfigCheck()]);
-    logger.info('poolId: job ended');
+    logger.info('protocol: job ended');
   } catch (error) {
     sentry.captureException(error);
-    logger.error('poolId: job error');
+    logger.error('protocol: job error');
     logger.error(error);
   }
 };

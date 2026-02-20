@@ -1,4 +1,5 @@
 import { RiQuestionLine } from '@remixicon/react';
+import { useMemo } from 'react';
 
 import type { TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
@@ -23,6 +24,15 @@ type Props = {
 };
 
 export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
+  const deposit = useMemo(() => {
+    return receipt?.actions
+      .reduce((sum, action) => {
+        const d = (action.args as { deposit?: string })?.deposit;
+        return sum + BigInt(d ?? '0');
+      }, BigInt(0))
+      .toString();
+  }, [receipt]);
+
   return (
     <div className="mx-3" id={receipt?.receipt_id}>
       <List pairsPerRow={1}>
@@ -80,7 +90,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -117,7 +127,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -164,7 +174,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -192,7 +202,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -236,7 +246,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -256,14 +266,14 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
             >
               {() => (
                 <span className="flex items-center gap-1">
-                  <NearCircle className="size-4" /> {nearFormat(0)}
+                  <NearCircle className="size-4" /> {nearFormat(deposit)}
                 </span>
               )}
             </SkeletonSlot>
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -298,7 +308,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>
@@ -330,7 +340,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
         <ListItem>
-          <ListLeft className="">
+          <ListLeft>
             <div className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger>

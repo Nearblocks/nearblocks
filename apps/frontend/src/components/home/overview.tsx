@@ -54,7 +54,7 @@ export const Overview = ({
               </h3>
               <p className="text-headline-base mt-0.5 flex flex-wrap items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-45" />}
+                  fallback={<Skeleton className="h-6 w-45" />}
                   loading={loading || !stats}
                 >
                   {() => (

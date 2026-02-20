@@ -33,7 +33,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
       <CardHeader className="border-b py-3">
         <h2 className="text-headline-sm font-semibold">{t('txns.title')}</h2>
       </CardHeader>
-      <ScrollArea className="h-85">
+      <ScrollArea className="h-78.5">
         <CardContent className="@container p-3">
           <SkeletonSlot
             fallback={

@@ -105,7 +105,11 @@ export const ActiveLink = ({
       ) {
         const activePathname = `/${segments.slice(1).join('/')}`;
 
-        if (isPathActive(linkUrl, activePathname, exact)) return true;
+        if (
+          activePathname !== '/' &&
+          isPathActive(linkUrl, activePathname, exact)
+        )
+          return true;
       }
     }
 

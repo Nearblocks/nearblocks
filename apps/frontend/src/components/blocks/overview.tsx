@@ -11,7 +11,7 @@ import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
 import { NearCircle } from '@/icons/near-circle';
-import { gasFee, gasFormat, nearFormat, numberFormat } from '@/lib/format';
+import { gasFee, gasFormat, numberFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -249,7 +249,10 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                   {() => (
                     <span className="flex items-center gap-1">
                       <NearCircle className="size-4" />
-                      {nearFormat(block!.gas_price)}
+                      {gasFormat(block!.gas_price, {
+                        maximumSignificantDigits: 4,
+                      })}{' '}
+                      / TGas
                     </span>
                   )}
                 </SkeletonSlot>
@@ -290,6 +293,29 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
+                <TooltipContent>
+                  Number of shards (chunks) in this block
+                </TooltipContent>
+              </Tooltip>
+              Chunks:
+            </ListLeft>
+            <ListRight>
+              <p>
+                <SkeletonSlot
+                  fallback={<Skeleton className="w-10" />}
+                  loading={loading || !block}
+                >
+                  {() => <>{numberFormat(block!.chunks_agg.count)}</>}
+                </SkeletonSlot>
+              </p>
+            </ListRight>
+          </ListItem>
+          <ListItem>
+            <ListLeft className="flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <RiQuestionLine className="size-4" />
+                </TooltipTrigger>
                 <TooltipContent>The hash of the previous block</TooltipContent>
               </Tooltip>
               Parent Hash:
@@ -315,29 +341,6 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                       />
                     </>
                   )}
-                </SkeletonSlot>
-              </p>
-            </ListRight>
-          </ListItem>
-          <ListItem>
-            <ListLeft className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <RiQuestionLine className="size-4" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  Number of shards (chunks) in this block
-                </TooltipContent>
-              </Tooltip>
-              Shard Number:
-            </ListLeft>
-            <ListRight>
-              <p>
-                <SkeletonSlot
-                  fallback={<Skeleton className="w-10" />}
-                  loading={loading || !block}
-                >
-                  {() => <>{numberFormat(block!.chunks_agg.count)}</>}
                 </SkeletonSlot>
               </p>
             </ListRight>

@@ -10,17 +10,17 @@ import {
 
 export const task = async () => {
   try {
-    logger.info('poolId: job started');
+    logger.info('nodes: job started');
     await Promise.all([
       latestBlockCheck(),
       updatePoolInfoMap(),
       updateStakingPoolStake(),
       validatorsCheck(),
     ]);
-    logger.info('poolId: job ended');
+    logger.info('nodes: job ended');
   } catch (error) {
     sentry.captureException(error);
-    logger.error('poolId: job error');
+    logger.error('nodes: job error');
     logger.error(error);
   }
 };

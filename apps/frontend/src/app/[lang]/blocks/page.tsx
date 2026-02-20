@@ -10,12 +10,15 @@ const BlocksPage = async ({ searchParams }: Props) => {
   const blockCountPromise = fetchBlockCount();
 
   return (
-    <ErrorSuspense fallback={<Blocks loading />}>
-      <Blocks
-        blockCountPromise={blockCountPromise}
-        blocksPromise={blocksPromise}
-      />
-    </ErrorSuspense>
+    <>
+      <h1 className="text-headline-lg mb-6">Latest Near Protocol Blocks</h1>
+      <ErrorSuspense fallback={<Blocks loading />}>
+        <Blocks
+          blockCountPromise={blockCountPromise}
+          blocksPromise={blocksPromise}
+        />
+      </ErrorSuspense>
+    </>
   );
 };
 

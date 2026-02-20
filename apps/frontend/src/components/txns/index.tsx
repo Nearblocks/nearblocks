@@ -97,7 +97,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       cell: (txn) => (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
-          {nearFormat(txn.outcomes_agg?.transaction_fee) ?? '0'}
+          {nearFormat(txn.outcomes_agg?.transaction_fee)}
         </span>
       ),
       header: 'Txn Fee',
@@ -139,37 +139,32 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
   ];
 
   return (
-    <>
-      <h1 className="text-headline-lg mb-6">
-        Latest Near Protocol Transactions
-      </h1>
-      <Card>
-        <CardContent className="text-body-sm p-0">
-          <DataTable
-            columns={columns}
-            data={txns?.data}
-            emptyMessage="No transactions found"
-            getRowKey={(txn) => txn.transaction_hash}
-            header={
-              <SkeletonSlot
-                fallback={<Skeleton className="w-40" />}
-                loading={loading || !txnCount}
-              >
-                {() => (
-                  <>{`A total of ${numberFormat(
-                    txnCount?.count ?? 0,
-                  )} transactions found`}</>
-                )}
-              </SkeletonSlot>
-            }
-            loading={loading || !!txns?.errors}
-            onClear={onClear}
-            onFilter={onFilter}
-            onPaginationNavigate={onPaginate}
-            pagination={txns?.meta}
-          />
-        </CardContent>
-      </Card>
-    </>
+    <Card>
+      <CardContent className="text-body-sm p-0">
+        <DataTable
+          columns={columns}
+          data={txns?.data}
+          emptyMessage="No transactions found"
+          getRowKey={(txn) => txn.transaction_hash}
+          header={
+            <SkeletonSlot
+              fallback={<Skeleton className="w-40" />}
+              loading={loading || !txnCount}
+            >
+              {() => (
+                <>{`A total of ${numberFormat(
+                  txnCount?.count ?? 0,
+                )} transactions found`}</>
+              )}
+            </SkeletonSlot>
+          }
+          loading={loading || !!txns?.errors}
+          onClear={onClear}
+          onFilter={onFilter}
+          onPaginationNavigate={onPaginate}
+          pagination={txns?.meta}
+        />
+      </CardContent>
+    </Card>
   );
 };

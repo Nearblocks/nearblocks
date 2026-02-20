@@ -10,6 +10,10 @@ const TxnLayout = async ({ children, params }: Props) => {
 
   return (
     <div className="container mx-auto px-4">
+      <h1 className="text-headline-lg mb-6">
+        Transaction{' '}
+        <span className="text-muted-foreground text-headline-base">#{txn}</span>
+      </h1>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>

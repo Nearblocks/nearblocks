@@ -1,7 +1,5 @@
 'use client';
 
-import { CircleChevronDown, CircleChevronUp } from 'lucide-react';
-
 import { numberFormat, NumberFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -18,7 +16,6 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
   if (changeNumber < 0) {
     return (
       <Badge className={cn('h-6', className)} variant="red" {...props}>
-        <CircleChevronDown />
         {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
       </Badge>
     );
@@ -26,8 +23,7 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
 
   return (
     <Badge className={cn('h-6', className)} variant="lime" {...props}>
-      <CircleChevronUp />+
-      {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
+      +{numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
     </Badge>
   );
 };

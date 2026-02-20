@@ -8,12 +8,12 @@ import {
 
 export const task = async () => {
   try {
-    logger.info('poolId: job started');
+    logger.info('genesis: job started');
     await Promise.all([genesisProtocolInfoFetch(), validatorsTelemetryCheck()]);
-    logger.info('poolId: job ended');
+    logger.info('genesis: job ended');
   } catch (error) {
     sentry.captureException(error);
-    logger.error('poolId: job error');
+    logger.error('genesis: job error');
     logger.error(error);
   }
 };

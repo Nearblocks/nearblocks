@@ -8,13 +8,13 @@ import {
 
 export const task = async () => {
   try {
-    logger.info('poolId: job started');
+    logger.info('pools: job started');
     await Promise.all([poolIdsCheck(), stakingPoolMetadataCheck()]);
 
-    logger.info('poolId: job ended');
+    logger.info('pools: job ended');
   } catch (error) {
     sentry.captureException(error);
-    logger.error('poolId: job error');
+    logger.error('pools: job error');
     logger.error(error);
   }
 };

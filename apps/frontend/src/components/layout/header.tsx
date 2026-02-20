@@ -42,7 +42,7 @@ const menu: NavMenu<RouteKey<'layout'>> = [
   {
     key: 'menu.languages.title',
     menu: [
-      { href: '/en', title: 'English' },
+      { href: '/', title: 'English' },
       { href: '/es', title: 'Español' },
       { href: '/fil-ph', title: 'Filipino' },
       { href: '/fr', title: 'Français' },
