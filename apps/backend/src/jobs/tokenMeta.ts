@@ -2,7 +2,7 @@ import { logger } from 'nb-logger';
 
 import sentry from '#libs/sentry';
 import { refreshFTMeta, syncFTMeta } from '#services/fts/meta';
-// import { refreshMTMeta, syncMTMeta, syncMTTokenMeta } from '#services/mts/meta';
+import { syncMTMeta, syncMTTokenMeta } from '#services/mts/meta';
 import {
   refreshNFTMeta,
   syncNFTMeta,
@@ -14,12 +14,11 @@ export const task = async () => {
     logger.info('tokenMeta: job started');
     await Promise.all([
       syncFTMeta(),
-      // syncMTMeta(),
-      // syncMTTokenMeta(),
+      syncMTMeta(),
+      syncMTTokenMeta(),
       syncNFTMeta(),
       syncNFTTokenMeta(),
       refreshFTMeta(),
-      // refreshMTMeta(),
       refreshNFTMeta(),
     ]);
     logger.info('tokenMeta: job ended');

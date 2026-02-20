@@ -12,6 +12,8 @@ import {
   Raw,
 } from '#types/types';
 
+import { copyExternalTokenMeta } from './intents.js';
+
 export const syncMTMeta = async () => {
   const { rows: mts } = await dbEvents.raw<Raw<MetaContract>>(`
     SELECT
@@ -141,13 +143,23 @@ export const updateMTTokenMeta = async (contract: string, token: string) => {
 
     if (meta) {
       await updateTokenMeta(contract, token, meta);
-    } else {
+      return;
+    }
+
+    const copied = await copyExternalTokenMeta(contract, token);
+
+    if (!copied) {
       await upsertError(contract, 'mt', token);
     }
   } catch (error) {
     logger.error(`tokenMeta: updateMTTokenMeta: ${contract}: ${token}`);
     logger.error(error);
-    await upsertError(contract, 'mt', token);
+
+    const copied = await copyExternalTokenMeta(contract, token);
+
+    if (!copied) {
+      await upsertError(contract, 'mt', token);
+    }
   }
 };
 
@@ -197,39 +209,6 @@ const updateTokenMeta = async (
     });
   } catch (error) {
     logger.error(`tokenMeta: updateTokenMeta: ${contract}: ${token}`);
-    logger.error(error);
-  }
-};
-
-export const resetMTMeta = async (contracts: string[]) => {
-  try {
-    await dbEvents.transaction(async (tx) => {
-      return Promise.all([
-        tx.raw(
-          `
-            UPDATE mt_meta
-            SET
-              modified_at = NULL
-            WHERE
-              contract = ANY(?)
-              AND modified_at IS NOT NULL
-          `,
-          [contracts],
-        ),
-        tx.raw(
-          `
-            DELETE FROM errored_contracts
-            WHERE
-              contract = ANY(?)
-              AND type = ?
-              AND token IS NULL
-          `,
-          [contracts, 'mt'],
-        ),
-      ]);
-    });
-  } catch (error) {
-    logger.error(`tokenMetaReset: resetMTMeta: ${contracts.join(',')}`);
     logger.error(error);
   }
 };
