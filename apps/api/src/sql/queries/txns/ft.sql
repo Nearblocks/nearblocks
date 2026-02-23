@@ -32,6 +32,7 @@ FROM
       ft_meta fm
     WHERE
       fm.contract = ft.contract_account_id
+      AND fm.modified_at IS NOT NULL
   ) m ON TRUE
 WHERE
   ft.receipt_id = ${receipt_id}::TEXT

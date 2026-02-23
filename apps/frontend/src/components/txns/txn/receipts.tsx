@@ -7,7 +7,7 @@ import type { ActionReceipt, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { AccountLink } from '@/components/link';
+import { AccountLink, Link } from '@/components/link';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { NearCircle } from '@/icons/near-circle';
@@ -92,7 +92,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
     },
     {
       cell: (row) => (
-        <a
+        <Link
           className="text-link"
           href={`/txns/${txn}/execution#${row.receipt_id}`}
         >
@@ -100,7 +100,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
             <TruncateText text={row.receipt_id} />
             <TruncateCopy text={row.receipt_id} />
           </Truncate>
-        </a>
+        </Link>
       ),
       header: 'Receipt',
       id: 'receipt_id',

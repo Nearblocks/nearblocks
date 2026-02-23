@@ -4,6 +4,8 @@ import type {
   TxnCountReq,
   TxnFT,
   TxnFTsReq,
+  TxnMT,
+  TxnMTsReq,
   TxnNFT,
   TxnNFTsReq,
   TxnReceipt,
@@ -340,4 +342,67 @@ const nfts = responseHandler(
   },
 );
 
-export default { count, fts, latest, nfts, receipts, txn, txns };
+const mts = responseHandler(
+  response.mts,
+  async (req: RequestValidator<TxnMTsReq>) => {
+    const hash = req.validator.hash;
+
+    if (hash.startsWith('0x')) {
+      const receipts = await rollingWindow<
+        Pick<TxnMT, 'block_timestamp' | 'receipt_id'>[]
+      >(
+        async (start, end) => {
+          const receipts = await dbBase.any<TxnMT>(sql.eventsRlp, {
+            end,
+            hash,
+            start,
+          });
+
+          return receipts.length ? receipts : null;
+        },
+        { start: config.baseStart },
+      );
+
+      if (!receipts || !receipts.length) {
+        return { data: [] };
+      }
+
+      const queries = receipts.map((receipt) => {
+        return pgp.as.format(sql.mt, receipt);
+      });
+      const unionQuery = queries.join('\nUNION ALL\n');
+      const mts = await dbEvents.manyOrNone<TxnMT>(unionQuery);
+
+      return { data: mts };
+    }
+
+    const receipts = await rollingWindow<
+      Pick<TxnMT, 'block_timestamp' | 'receipt_id'>[]
+    >(
+      async (start, end) => {
+        const receipts = await dbBase.any<TxnMT>(sql.events, {
+          end,
+          hash,
+          start,
+        });
+
+        return receipts.length ? receipts : null;
+      },
+      { start: config.baseStart },
+    );
+
+    if (!receipts || !receipts.length) {
+      return { data: [] };
+    }
+
+    const queries = receipts.map((receipt) => {
+      return pgp.as.format(sql.mt, receipt);
+    });
+    const unionQuery = queries.join('\nUNION ALL\n');
+    const mts = await dbEvents.manyOrNone<TxnMT>(unionQuery);
+
+    return { data: mts };
+  },
+);
+
+export default { count, fts, latest, mts, nfts, receipts, txn, txns };

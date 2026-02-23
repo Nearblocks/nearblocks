@@ -49,6 +49,7 @@ const list = responseHandler(
         sort: cursor?.sort,
       },
       direction,
+      has_cursor: !!cursor,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
       order,
@@ -63,7 +64,7 @@ const list = responseHandler(
       direction,
       (token) => ({
         contract: token.contract,
-        sort,
+        sort: token[sort as keyof FTList],
       }),
       !!cursor,
     );

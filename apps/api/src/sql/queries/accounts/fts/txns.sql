@@ -41,6 +41,7 @@ FROM
       ft_meta fm
     WHERE
       fm.contract = ft.contract_account_id
+      AND fm.modified_at IS NOT NULL
   ) m ON TRUE
 WHERE
   affected_account_id = ${account}

@@ -5,8 +5,9 @@ import { fetchStats } from '@/data/layout';
 import {
   fetchTxn,
   fetchTxnFTs,
+  fetchTxnMTs,
   fetchTxnNFTs,
-  // fetchTxnReceipts,
+  fetchTxnReceipts,
 } from '@/data/txns';
 
 type Props = PageProps<'/[lang]/txns/[txn]'>;
@@ -15,8 +16,9 @@ const TxnPage = async ({ params }: Props) => {
   const { txn } = await params;
   const txnPromise = fetchTxn(txn);
   const txnFTsPromise = fetchTxnFTs(txn);
+  const txnMTsPromise = fetchTxnMTs(txn);
   const txnNFTsPromise = fetchTxnNFTs(txn);
-  // const txnReceiptsPromise = fetchTxnReceipts(txn);
+  const txnReceiptsPromise = fetchTxnReceipts(txn);
   const statsPromise = fetchStats();
 
   return (
@@ -26,8 +28,10 @@ const TxnPage = async ({ params }: Props) => {
       </ErrorSuspense>
       <ErrorSuspense fallback={<Overview loading />}>
         <Overview
+          receiptsPromise={txnReceiptsPromise}
           statsPromise={statsPromise}
           txnFTsPromise={txnFTsPromise}
+          txnMTsPromise={txnMTsPromise}
           txnNFTsPromise={txnNFTsPromise}
           txnPromise={txnPromise}
         />

@@ -192,6 +192,26 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/:hash/nfts', validate(request.nfts), service.nfts);
+
+  /**
+   * @openapi
+   * /v3/txns/{hash}/mts:
+   *   get:
+   *     summary: Get txn mt events
+   *     tags:
+   *       - V3 / Txns
+   *     parameters:
+   *       - in: path
+   *         name: hash
+   *         required: true
+   *         description: Txn hash or RLP hash to retrieve mt events for
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:hash/mts', validate(request.mts), service.mts);
 };
 
 export default routes;

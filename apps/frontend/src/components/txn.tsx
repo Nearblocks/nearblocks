@@ -1,5 +1,7 @@
 import { CircleCheck, CircleX, Hourglass, MoveRight } from 'lucide-react';
 
+import type { TxnReceipt } from 'nb-schemas';
+
 import { Badge } from '@/ui/badge';
 
 type StatusProps = {
@@ -15,6 +17,10 @@ type DirectionProps = {
   amount?: string;
   from?: string;
   to?: string;
+};
+
+type ErrorsProps = {
+  receipts?: null | TxnReceipt;
 };
 
 const iconClass = 'size-4';
@@ -97,3 +103,62 @@ export const TxnDirectionIcon = () => (
     <MoveRight className="text-teal-foreground size-4" />
   </div>
 );
+
+const countFailedReceipts = (receipt: TxnReceipt): number => {
+  let count = receipt.outcome?.status === false ? 1 : 0;
+  for (const child of receipt.receipts ?? []) {
+    count += countFailedReceipts(child);
+  }
+  return count;
+};
+
+const extractErrorKind = (value: unknown): null | string => {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>;
+    const key = Object.keys(obj)[0];
+    if (!key) return null;
+    return extractErrorKind(obj[key]) ?? key;
+  }
+  return null;
+};
+
+const extractError = (result: unknown): null | string => {
+  if (!result || typeof result !== 'object' || Array.isArray(result))
+    return null;
+  const r = result as Record<string, unknown>;
+  const actionError = r['ActionError'];
+  if (
+    !actionError ||
+    typeof actionError !== 'object' ||
+    Array.isArray(actionError)
+  )
+    return null;
+  const kind = (actionError as Record<string, unknown>)['kind'];
+  return extractErrorKind(kind);
+};
+
+export const TxnReceiptErrors = ({ receipts }: ErrorsProps) => {
+  if (!receipts) return null;
+
+  const failed = countFailedReceipts(receipts);
+  if (failed === 0) return null;
+
+  const isTxnFailed = receipts.outcome?.status === false;
+  const error = isTxnFailed ? extractError(receipts.outcome?.result) : null;
+
+  return (
+    <>
+      {!isTxnFailed && (
+        <Badge className="text-body-xs" variant="red">
+          {failed} Failed Receipt{failed > 1 ? 's' : ''}
+        </Badge>
+      )}
+      {error && (
+        <Badge className="text-body-xs" variant="amber">
+          {error}
+        </Badge>
+      )}
+    </>
+  );
+};

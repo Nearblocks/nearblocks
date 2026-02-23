@@ -3,7 +3,6 @@ import { Knex } from 'nb-knex';
 import {
   EventCause,
   EventStandard,
-  IntentsMeta,
   MTBaseMeta,
   MTEvent,
   MTMeta,
@@ -16,11 +15,8 @@ import {
   isMTMintEventLog,
   isMTTransferEventLog,
 } from '#libs/guards';
-import { parseIntentsToken } from '#libs/utils';
 import { updateMTEvents } from '#services/events';
 import { EventDataEvent } from '#types/types';
-
-const INTENTS = 'intents.near';
 
 export const storeMTEvents = async (
   knex: Knex,
@@ -199,21 +195,12 @@ export const storeMTEvents = async (
       contract: event.contract_account_id,
       token: event.token_id,
     }));
-    const intentsMeta: IntentsMeta[] = eventData
-      .filter((event) => INTENTS === event.contract_account_id)
-      .flatMap((event) => {
-        const token = parseIntentsToken(event.token_id);
-        return token
-          ? [{ contract: token.contract, token: token.token, type: token.type }]
-          : [];
-      });
 
     await Promise.all([
       saveMTData(knex, data),
       saveMTMeta(knex, meta),
       saveMTBaseMeta(knex, tokenMeta),
       saveMTTokenMeta(knex, tokenMeta),
-      intentsMeta.length && saveIntentsMeta(knex, intentsMeta),
     ]);
   }
 };
@@ -247,15 +234,6 @@ export const saveMTTokenMeta = async (knex: Knex, data: MTTokenMeta[]) => {
     await knex('mt_token_meta')
       .insert(data)
       .onConflict(['contract', 'token'])
-      .ignore();
-  });
-};
-
-export const saveIntentsMeta = async (knex: Knex, data: IntentsMeta[]) => {
-  await retry(async () => {
-    await knex('intents_meta')
-      .insert(data)
-      .onConflict(['contract', 'type', 'token'])
       .ignore();
   });
 };

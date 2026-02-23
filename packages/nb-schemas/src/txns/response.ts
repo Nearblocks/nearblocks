@@ -181,12 +181,54 @@ const txnNFT = v.object({
   token_meta: v.optional(nftTokenMeta),
 });
 
+const mtMeta = v.object({
+  contract: v.string(),
+  name: v.nullable(v.string()),
+  spec: v.nullable(v.string()),
+});
+
+const mtBaseMeta = v.object({
+  base_uri: v.nullable(v.string()),
+  contract: v.string(),
+  decimals: v.nullable(v.number()),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
+  token: v.string(),
+});
+
+const mtTokenMeta = v.object({
+  contract: v.string(),
+  media: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  title: v.nullable(v.string()),
+  token: v.string(),
+});
+
+const txnMT = v.object({
+  affected_account_id: v.string(),
+  base_meta: v.optional(mtBaseMeta),
+  block_timestamp: v.string(),
+  cause: v.enum(EventCause),
+  contract_account_id: v.string(),
+  delta_amount: v.string(),
+  event_index: v.number(),
+  involved_account_id: v.nullable(v.string()),
+  meta: v.optional(mtMeta),
+  receipt_id: v.string(),
+  shard_id: v.number(),
+  token_id: v.string(),
+  token_meta: v.optional(mtTokenMeta),
+});
+
 const txnResponse = responseSchema(txn);
 const txnsResponse = responseSchema(v.array(txnListItem));
 const txnCountResponse = responseSchema(txnCount);
 const txnReceiptsResponse = responseSchema(txnReceipt);
 const txnFTsResponse = responseSchema(v.array(txnFT));
 const txnNFTsResponse = responseSchema(v.array(txnNFT));
+const txnMTsResponse = responseSchema(v.array(txnMT));
 
 export type Txn = v.InferOutput<typeof txn>;
 export type TxnListItem = v.InferOutput<typeof txnListItem>;
@@ -194,6 +236,7 @@ export type TxnCount = v.InferOutput<typeof txnCount>;
 // export type TxnReceipt = v.InferOutput<typeof txnReceipt>;
 export type TxnFT = v.InferOutput<typeof txnFT>;
 export type TxnNFT = v.InferOutput<typeof txnNFT>;
+export type TxnMT = v.InferOutput<typeof txnMT>;
 
 export type TxnRes = v.InferOutput<typeof txnResponse>;
 export type TxnsRes = v.InferOutput<typeof txnsResponse>;
@@ -201,10 +244,12 @@ export type TxnCountRes = v.InferOutput<typeof txnCountResponse>;
 export type TxnReceiptsRes = v.InferOutput<typeof txnReceiptsResponse>;
 export type TxnFTsRes = v.InferOutput<typeof txnFTsResponse>;
 export type TxnNFTsRes = v.InferOutput<typeof txnNFTsResponse>;
+export type TxnMTsRes = v.InferOutput<typeof txnMTsResponse>;
 
 export default {
   count: txnCountResponse,
   fts: txnFTsResponse,
+  mts: txnMTsResponse,
   nfts: txnNFTsResponse,
   receipts: txnReceiptsResponse,
   txn: txnResponse,

@@ -29,7 +29,7 @@ const count = v.object({
 
 const cursor = v.object({
   contract: v.string(),
-  sort: v.enum(NFTListSort),
+  sort: v.nullable(v.string()),
 });
 
 const txns = v.object({

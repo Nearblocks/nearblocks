@@ -48,6 +48,7 @@ const list = responseHandler(
         contract: cursor?.contract,
         sort: cursor?.sort,
       },
+      has_cursor: !!cursor,
       // Fetch one extra to check if there is a next page
       limit: limit + 1,
       order,
@@ -62,7 +63,7 @@ const list = responseHandler(
       direction,
       (token) => ({
         contract: token.contract,
-        sort,
+        sort: token[sort as keyof NFTList],
       }),
       !!cursor,
     );

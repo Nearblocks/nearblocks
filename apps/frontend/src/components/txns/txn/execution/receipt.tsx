@@ -34,7 +34,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
   }, [receipt]);
 
   return (
-    <div className="mx-3" id={receipt?.receipt_id}>
+    <div className="mx-3 scroll-mt-11" id={receipt?.receipt_id}>
       <List pairsPerRow={1}>
         <ListItem>
           <ListLeft className="min-w-60">
@@ -52,7 +52,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListLeft>
           <ListRight>
             <SkeletonSlot
-              fallback={<Skeleton className="h-7 w-40" />}
+              fallback={<Skeleton className="h-7 w-60" />}
               loading={!receipt || loading}
             >
               {() => (
@@ -82,7 +82,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListLeft>
           <ListRight className="h-13">
             <SkeletonSlot
-              fallback={<Skeleton className="h-6 w-40" />}
+              fallback={<Skeleton className="h-6 w-20" />}
               loading={!receipt || loading}
             >
               {() => <TxnStatus status={receipt!.outcome.status} />}
@@ -105,7 +105,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListLeft>
           <ListRight>
             <SkeletonSlot
-              fallback={<Skeleton className="h-7 w-40" />}
+              fallback={<Skeleton className="h-7 w-25" />}
               loading={!receipt || loading}
             >
               {() => (
@@ -189,7 +189,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListLeft>
           <ListRight>
             <SkeletonSlot
-              fallback={<Skeleton className="h-7 w-40" />}
+              fallback={<Skeleton className="h-7 w-30" />}
               loading={!receipt || loading}
             >
               {() => (
@@ -219,8 +219,8 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
             <SkeletonSlot
               fallback={
                 <div className="flex flex-col">
-                  <Skeleton className="mb-2 h-7 w-1/4" />
-                  <Skeleton className="h-35 w-full" />
+                  <Skeleton className="mb-1 h-6 w-30" />
+                  <Skeleton className="h-35.5 w-full" />
                 </div>
               }
               loading={!receipt || loading}
@@ -261,7 +261,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListLeft>
           <ListRight>
             <SkeletonSlot
-              fallback={<Skeleton className="w-40" />}
+              fallback={<Skeleton className="w-20" />}
               loading={!receipt || loading}
             >
               {() => (
@@ -288,7 +288,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListLeft>
           <ListRight>
             <SkeletonSlot
-              fallback={<Skeleton className="w-40" />}
+              fallback={<Skeleton className="w-30" />}
               loading={!receipt || loading}
             >
               {() => (

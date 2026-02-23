@@ -26,6 +26,91 @@ type Props = {
   txnsPromise?: Promise<TxnsRes>;
 };
 
+const columns: DataTableColumnDef<TxnListItem>[] = [
+  {
+    cell: (txn) => <TxnStatusIcon status={txn.outcomes?.status} />,
+    className: 'w-5',
+    header: '',
+    id: 'status',
+  },
+  {
+    cell: (txn) => (
+      <Link className="text-link" href={`/txns/${txn.transaction_hash}`}>
+        <Truncate>
+          <TruncateText text={txn.transaction_hash} />
+          <TruncateCopy text={txn.transaction_hash} />
+        </Truncate>
+      </Link>
+    ),
+    header: 'Txn Hash',
+    id: 'txn_hash',
+  },
+  {
+    cell: (txn) => (
+      <Badge variant="teal">
+        <Truncate>
+          <TruncateText className="max-w-20" text={actionMethod(txn.actions)} />
+        </Truncate>
+      </Badge>
+    ),
+    header: 'Method',
+    id: 'method',
+  },
+  {
+    cell: (txn) => (
+      <span className="flex items-center gap-1">
+        <NearCircle className="size-4" />
+        {nearFormat(txn.actions_agg?.deposit)}
+      </span>
+    ),
+    header: 'Deposit Value',
+    id: 'deposit',
+  },
+  {
+    cell: (txn) => (
+      <span className="flex items-center gap-1">
+        <NearCircle className="size-4" />
+        {nearFormat(txn.outcomes_agg?.transaction_fee)}
+      </span>
+    ),
+    header: 'Txn Fee',
+    id: 'txn_fee',
+  },
+  {
+    cell: (txn) => <AccountLink account={txn.signer_account_id} />,
+    header: 'From',
+    id: 'from',
+  },
+  {
+    cell: () => <TxnDirectionIcon />,
+    className: 'w-12',
+    header: '',
+    id: 'direction',
+  },
+  {
+    cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
+    header: 'To',
+    id: 'to',
+  },
+  {
+    cell: (txn) => (
+      <Link className="text-link" href={`/blocks/${txn.block?.block_hash}`}>
+        {numberFormat(txn.block?.block_height)}
+      </Link>
+    ),
+    enableFilter: true,
+    filterName: 'block',
+    header: 'Block',
+    id: 'block',
+  },
+  {
+    cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
+    className: 'w-42',
+    header: <TimestampToggle />,
+    id: 'age',
+  },
+];
+
 export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,94 +134,6 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
     });
     return `/txns?${params.toString()}`;
   };
-
-  const columns: DataTableColumnDef<TxnListItem>[] = [
-    {
-      cell: (txn) => <TxnStatusIcon status={txn.outcomes?.status} />,
-      className: 'w-5',
-      header: '',
-      id: 'status',
-    },
-    {
-      cell: (txn) => (
-        <Link className="text-link" href={`/txns/${txn.transaction_hash}`}>
-          <Truncate>
-            <TruncateText text={txn.transaction_hash} />
-            <TruncateCopy text={txn.transaction_hash} />
-          </Truncate>
-        </Link>
-      ),
-      header: 'Txn Hash',
-      id: 'txn_hash',
-    },
-    {
-      cell: (txn) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText
-              className="max-w-20"
-              text={actionMethod(txn.actions)}
-            />
-          </Truncate>
-        </Badge>
-      ),
-      header: 'Method',
-      id: 'method',
-    },
-    {
-      cell: (txn) => (
-        <span className="flex items-center gap-1">
-          <NearCircle className="size-4" />
-          {nearFormat(txn.actions_agg?.deposit)}
-        </span>
-      ),
-      header: 'Deposit Value',
-      id: 'deposit',
-    },
-    {
-      cell: (txn) => (
-        <span className="flex items-center gap-1">
-          <NearCircle className="size-4" />
-          {nearFormat(txn.outcomes_agg?.transaction_fee)}
-        </span>
-      ),
-      header: 'Txn Fee',
-      id: 'txn_fee',
-    },
-    {
-      cell: (txn) => <AccountLink account={txn.signer_account_id} />,
-      header: 'From',
-      id: 'from',
-    },
-    {
-      cell: () => <TxnDirectionIcon />,
-      className: 'w-12',
-      header: '',
-      id: 'direction',
-    },
-    {
-      cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
-      header: 'To',
-      id: 'to',
-    },
-    {
-      cell: (txn) => (
-        <Link className="text-link" href={`/blocks/${txn.block?.block_hash}`}>
-          {numberFormat(txn.block?.block_height)}
-        </Link>
-      ),
-      enableFilter: true,
-      filterName: 'block',
-      header: 'Block',
-      id: 'block',
-    },
-    {
-      cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
-      className: 'w-42',
-      header: <TimestampToggle />,
-      id: 'age',
-    },
-  ];
 
   return (
     <Card>

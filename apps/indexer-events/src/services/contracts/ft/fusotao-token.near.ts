@@ -1,4 +1,10 @@
-import { EventCause, EventStandard, EventType, FTEvent } from 'nb-types';
+import {
+  EventCause,
+  EventStandard,
+  EventType,
+  FTEvent,
+  FTMeta,
+} from 'nb-types';
 
 import { decodeArgs } from '#libs/utils';
 import { updateFTEvents } from '#services/events';
@@ -7,11 +13,16 @@ import {
   ftTransfer,
   getLegacyEvents,
   saveFTData,
+  saveFTMeta,
 } from '#services/ft';
-import { EventContract, FTContractMatchAction, FTMeta } from '#types/types';
+import {
+  EventContract,
+  FTContractMatchAction,
+  FTMeta as FTMetadata,
+} from '#types/types';
 
 export type FTMetaArgs = {
-  metadata: FTMeta;
+  metadata: FTMetadata;
   owner_id: string;
   premined_balance: string;
   premined_beneficiary: string;
@@ -41,6 +52,11 @@ const contract: EventContract = async ({
 
   if (events.length) {
     events = updateFTEvents(shardId, EVENT_TYPE, EVENT_STANDARD, events);
+    const meta: FTMeta[] = events.map((event) => ({
+      contract: event.contract_account_id,
+    }));
+
+    await Promise.all([saveFTData(knex, events), saveFTMeta(knex, meta)]);
 
     await saveFTData(knex, events);
   }

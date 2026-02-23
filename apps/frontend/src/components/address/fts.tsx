@@ -10,7 +10,7 @@ import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { TokenAmount, TokenImage } from '@/components/token';
+import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { numberFormat } from '@/lib/format';
@@ -24,6 +24,95 @@ type Props = {
   ftsPromise?: Promise<AccountFTTxnsRes>;
   loading?: boolean;
 };
+
+const columns: DataTableColumnDef<AccountFTTxn>[] = [
+  {
+    cell: () => <TxnStatusIcon status />,
+    className: 'w-5',
+    header: '',
+    id: 'status',
+  },
+  {
+    cell: (ft) =>
+      ft.transaction_hash ? (
+        <Link className="text-link" href={`/txns/${ft.transaction_hash}`}>
+          <Truncate>
+            <TruncateText text={ft.transaction_hash} />
+            <TruncateCopy text={ft.transaction_hash} />
+          </Truncate>
+        </Link>
+      ) : (
+        <Skeleton className="w-30" />
+      ),
+    header: 'Txn Hash',
+    id: 'txn_hash',
+  },
+  {
+    cell: (ft) => (
+      <Badge variant="teal">
+        <Truncate>
+          <TruncateText className="max-w-20" text={ft.cause} />
+        </Truncate>
+      </Badge>
+    ),
+    enableFilter: true,
+    filterName: 'cause',
+    header: 'Method',
+    id: 'cause',
+  },
+  {
+    cell: (ft) => <AccountLink account={ft.affected_account_id} />,
+    header: 'Affected',
+    id: 'affected',
+  },
+  {
+    cell: (ft) => <TxnDirection amount={ft.delta_amount} />,
+    className: 'w-20',
+    header: '',
+    id: 'direction',
+  },
+  {
+    cell: (ft) => <AccountLink account={ft.involved_account_id} />,
+    enableFilter: true,
+    filterName: 'involved',
+    header: 'Involved',
+    id: 'involved',
+  },
+  {
+    cell: (ft) => (
+      <TokenAmount amount={ft.delta_amount} decimals={ft.meta?.decimals ?? 0} />
+    ),
+    header: 'Quantity',
+    id: 'quantity',
+  },
+  {
+    cell: (ft) => (
+      <span className="flex items-center gap-1">
+        <TokenImage
+          alt={ft.meta?.name ?? ''}
+          className="m-px size-5 rounded-full border"
+          src={ft.meta?.icon ?? ''}
+        />
+        <TokenLink contract={ft.contract_account_id} name={ft.meta?.name} />
+      </span>
+    ),
+    enableFilter: true,
+    filterName: 'token',
+    header: 'Token',
+    id: 'token',
+  },
+  {
+    cell: (ft) =>
+      ft.block?.block_timestamp ? (
+        <TimestampCell ns={ft.block?.block_timestamp} />
+      ) : (
+        <Skeleton className="w-30" />
+      ),
+    className: 'w-42',
+    header: <TimestampToggle />,
+    id: 'age',
+  },
+];
 
 export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
   const fts = !loading && ftsPromise ? use(ftsPromise) : null;
@@ -50,103 +139,6 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
     });
     return `/address/${address}/tokens?${params.toString()}`;
   };
-
-  const columns: DataTableColumnDef<AccountFTTxn>[] = [
-    {
-      cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
-      header: '',
-      id: 'status',
-    },
-    {
-      cell: (ft) =>
-        ft.transaction_hash ? (
-          <Link className="text-link" href={`/txns/${ft.transaction_hash}`}>
-            <Truncate>
-              <TruncateText text={ft.transaction_hash} />
-              <TruncateCopy text={ft.transaction_hash} />
-            </Truncate>
-          </Link>
-        ) : (
-          <Skeleton className="w-30" />
-        ),
-      header: 'Txn Hash',
-      id: 'txn_hash',
-    },
-    {
-      cell: (ft) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText className="max-w-20" text={ft.cause} />
-          </Truncate>
-        </Badge>
-      ),
-      enableFilter: true,
-      filterName: 'cause',
-      header: 'Method',
-      id: 'cause',
-    },
-    {
-      cell: (ft) => <AccountLink account={ft.affected_account_id} />,
-      header: 'Affected',
-      id: 'affected',
-    },
-    {
-      cell: (ft) => <TxnDirection amount={ft.delta_amount} />,
-      className: 'w-20',
-      header: '',
-      id: 'direction',
-    },
-    {
-      cell: (ft) => <AccountLink account={ft.involved_account_id} />,
-      enableFilter: true,
-      filterName: 'involved',
-      header: 'Involved',
-      id: 'involved',
-    },
-    {
-      cell: (ft) => (
-        <TokenAmount
-          amount={ft.delta_amount}
-          decimals={ft.meta?.decimals ?? 0}
-        />
-      ),
-      header: 'Quantity',
-      id: 'quantity',
-    },
-    {
-      cell: (ft) => (
-        <span className="flex items-center gap-1">
-          <TokenImage
-            alt={ft.meta?.name ?? ''}
-            className="m-px size-5 rounded-full border"
-            src={ft.meta?.icon ?? ''}
-          />
-          <Link className="text-link" href={`/token/${ft.contract_account_id}`}>
-            <Truncate>
-              <TruncateText text={ft.meta?.name ?? ''} />
-              <TruncateCopy text={ft.contract_account_id} />
-            </Truncate>
-          </Link>
-        </span>
-      ),
-      enableFilter: true,
-      filterName: 'token',
-      header: 'Token',
-      id: 'token',
-    },
-    {
-      cell: (ft) =>
-        ft.block?.block_timestamp ? (
-          <TimestampCell ns={ft.block?.block_timestamp} />
-        ) : (
-          <Skeleton className="w-30" />
-        ),
-      className: 'w-42',
-      header: <TimestampToggle />,
-      id: 'age',
-    },
-  ];
 
   return (
     <Card>

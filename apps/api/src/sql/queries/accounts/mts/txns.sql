@@ -55,6 +55,7 @@ FROM
     WHERE
       mbm.contract = mt.contract_account_id
       AND mbm.token = mt.token_id
+      AND mbm.modified_at IS NOT NULL
   ) bm ON TRUE
   JOIN LATERAL (
     SELECT
@@ -75,6 +76,7 @@ FROM
     WHERE
       mtm.contract = mt.contract_account_id
       AND mtm.token = mt.token_id
+      AND mtm.modified_at IS NOT NULL
   ) tm ON TRUE
 WHERE
   affected_account_id = ${account}

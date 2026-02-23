@@ -42,7 +42,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-30" />}
+                  fallback={<Skeleton className="h-7 w-25" />}
                   loading={loading || !block}
                 >
                   {() => (
@@ -74,7 +74,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="flex min-w-30 items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-40" />}
+                  fallback={<Skeleton className="h-7 w-70" />}
                   loading={loading || !block}
                 >
                   {() => (
@@ -157,7 +157,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={<Skeleton className="w-40" />}
                   loading={loading || !block}
                 >
                   {() => (
@@ -193,7 +193,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-30" />}
+                  fallback={<Skeleton className="w-25" />}
                   loading={loading || !block}
                 >
                   {() => (
@@ -218,7 +218,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-30" />}
+                  fallback={<Skeleton className="w-20" />}
                   loading={loading || !block}
                 >
                   {() => (
@@ -274,7 +274,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-30" />}
+                  fallback={<Skeleton className="w-25" />}
                   loading={loading || !block}
                 >
                   {() => (
@@ -323,7 +323,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="flex min-w-30 items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-40" />}
+                  fallback={<Skeleton className="h-7 w-70" />}
                   loading={loading || !block}
                 >
                   {() => (

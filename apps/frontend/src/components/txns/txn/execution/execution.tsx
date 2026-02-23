@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import type { TxnReceipt } from 'nb-schemas';
 
+import { useHashScroll } from '@/hooks/use-hash-scroll';
 import { useTxnStatus } from '@/hooks/use-rpc';
 
 import { RpcContext } from './context';
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export const ExecutionPlan = ({ receipts, txnHash }: Props) => {
+  useHashScroll(true);
   const [rpcEnabled, setRpcEnabled] = useState(false);
 
   const { data: rpcData, isLoading: rpcLoading } = useTxnStatus(

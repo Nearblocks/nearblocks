@@ -1,9 +1,10 @@
 'use client';
 
-import { Inbox, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Inbox, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { ReactNode } from 'react';
 
+import { Link } from '@/components/link';
 import {
   FilterClearData,
   FilterData,
@@ -36,10 +37,12 @@ export type DataTableColumnDef<TData> = {
   cellClassName?: string;
   className?: string;
   enableFilter?: boolean;
+  enableSort?: boolean;
   filterName?: string;
   header?: ((helpers: FilterHelpers) => ReactNode) | ReactNode;
   id?: string;
   skeletonWidth?: string;
+  sortName?: string;
 };
 
 export type FilterHelpers = {
@@ -55,6 +58,7 @@ export type PaginationMeta = {
 type DataTableProps<TData> = {
   columns: DataTableColumnDef<TData>[];
   data?: null | TData[];
+  defaultSort?: string;
   emptyIcon?: ReactNode;
   emptyMessage?: string;
   getRowKey?: (row: TData) => string;
@@ -63,13 +67,15 @@ type DataTableProps<TData> = {
   onClear?: (data: FilterClearData) => void;
   onFilter?: (value: FilterData) => void;
   onPaginationNavigate?: (type: 'next' | 'prev', cursor: string) => string;
+  onSortNavigate?: (sort: string, order: 'asc' | 'desc') => string;
   pagination?: null | PaginationMeta;
   skeletonRows?: number;
 };
 
-export function DataTable<TData>({
+export const DataTable = <TData,>({
   columns,
   data,
+  defaultSort,
   emptyIcon = <Inbox />,
   emptyMessage = 'No data found',
   getRowKey,
@@ -78,9 +84,10 @@ export function DataTable<TData>({
   onClear,
   onFilter,
   onPaginationNavigate,
+  onSortNavigate,
   pagination,
   skeletonRows = 25,
-}: DataTableProps<TData>) {
+}: DataTableProps<TData>) => {
   const searchParams = useSearchParams();
 
   const filterHelpers: FilterHelpers = {
@@ -99,10 +106,35 @@ export function DataTable<TData>({
       value: searchParams.get(col.filterName!)!,
     }));
 
+  const currentSort = searchParams.get('sort') ?? defaultSort ?? null;
+  const currentOrder = (searchParams.get('order') ?? 'desc') as 'asc' | 'desc';
+
   const renderHeader = (column: DataTableColumnDef<TData>) => {
     if (typeof column.header === 'function') {
       return column.header(filterHelpers);
     }
+
+    if (column.enableSort && column.sortName && onSortNavigate) {
+      const isActive = currentSort === column.sortName;
+      const newOrder = isActive && currentOrder === 'desc' ? 'asc' : 'desc';
+      const SortIcon = isActive
+        ? currentOrder === 'asc'
+          ? ArrowUp
+          : ArrowDown
+        : ArrowUpDown;
+
+      return (
+        <span className="flex items-center gap-1">
+          {column.header}
+          <Button asChild size="icon-xs" variant="ghost">
+            <Link href={onSortNavigate(column.sortName, newOrder)}>
+              <SortIcon className="size-3" />
+            </Link>
+          </Button>
+        </span>
+      );
+    }
+
     return column.header;
   };
 
@@ -249,4 +281,4 @@ export function DataTable<TData>({
       </SkeletonSlot>
     </>
   );
-}
+};

@@ -22,13 +22,24 @@ WHERE
     OR name ILIKE ${search}
   )
   AND (
-    ${cursor.sort} IS NULL
+    NOT ${has_cursor}
     OR (
       ${order} = 'desc'
       AND (
-        (${sort:name} < ${cursor.sort})
+        (
+          ${cursor.sort} IS NOT NULL
+          AND (
+            (${sort:name} < ${cursor.sort})
+            OR (
+              ${sort:name} = ${cursor.sort}
+              AND contract > ${cursor.contract}
+            )
+            OR (${sort:name} IS NULL)
+          )
+        )
         OR (
-          ${sort:name} = ${cursor.sort}
+          ${cursor.sort} IS NULL
+          AND ${sort:name} IS NULL
           AND contract > ${cursor.contract}
         )
       )
@@ -36,10 +47,25 @@ WHERE
     OR (
       ${order} = 'asc'
       AND (
-        (${sort:name} > ${cursor.sort})
+        (
+          ${cursor.sort} IS NOT NULL
+          AND (
+            (${sort:name} > ${cursor.sort})
+            OR (
+              ${sort:name} = ${cursor.sort}
+              AND contract > ${cursor.contract}
+            )
+          )
+        )
         OR (
-          ${sort:name} = ${cursor.sort}
-          AND contract > ${cursor.contract}
+          ${cursor.sort} IS NULL
+          AND (
+            (
+              ${sort:name} IS NULL
+              AND contract > ${cursor.contract}
+            )
+            OR (${sort:name} IS NOT NULL)
+          )
         )
       )
     )

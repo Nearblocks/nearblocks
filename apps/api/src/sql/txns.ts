@@ -7,6 +7,7 @@ export default {
   eventsRlp: sql('queries/txns/eventsRlp.sql'),
   ft: sql('queries/txns/ft.sql'),
   latestCte: sql('queries/txns/latestCte.sql'),
+  mt: sql('queries/txns/mt.sql'),
   nft: sql('queries/txns/nft.sql'),
   receipts: sql('queries/txns/receipts.sql'),
   rlpCte: sql('queries/txns/rlpCte.sql'),

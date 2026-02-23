@@ -25,6 +25,117 @@ type Props = {
   loading?: boolean;
 };
 
+const columns: DataTableColumnDef<AccountKey>[] = [
+  {
+    cell: (key) => {
+      const txnHash =
+        key.deleted.transaction_hash ?? key.created.transaction_hash;
+
+      if (!txnHash) return <Skeleton className="w-30" />;
+
+      return (
+        <Link className="text-link" href={`/txns/${txnHash}`}>
+          <Truncate>
+            <TruncateText text={txnHash} />
+            <TruncateCopy text={txnHash} />
+          </Truncate>
+        </Link>
+      );
+    },
+    header: 'Txn Hash',
+    id: 'txn_hash',
+  },
+  {
+    cell: (key) => (
+      <Truncate>
+        <TruncateText text={key.public_key} />
+        <TruncateCopy text={key.public_key} />
+      </Truncate>
+    ),
+    header: 'Public Key',
+    id: 'public_key',
+  },
+  {
+    cell: (key) => (
+      <Badge variant="teal">
+        <Truncate>
+          <TruncateText className="max-w-30" text={key.permission_kind} />
+        </Truncate>
+      </Badge>
+    ),
+    header: 'Access',
+    id: 'access',
+  },
+  {
+    cell: (key) => {
+      const permission = key.permission as AccessKeyPermission | null;
+
+      return permission?.receiverId ? (
+        <AccountLink account={permission.receiverId} />
+      ) : (
+        ''
+      );
+    },
+    header: 'Contract',
+    id: 'contract',
+  },
+  {
+    cell: (key) => {
+      const permission = key.permission as AccessKeyPermission | null;
+      return permission?.allowance ? (
+        <span className="flex items-center gap-1">
+          <NearCircle className="size-4" />
+          {nearFormat(permission.allowance, {
+            maximumFractionDigits: 4,
+          })}
+        </span>
+      ) : permission?.receiverId ? (
+        'Unlimited'
+      ) : (
+        ''
+      );
+    },
+    className: 'w-25',
+    header: 'Allowance',
+    id: 'allowance',
+  },
+  {
+    cell: (key) => {
+      const permission = key.permission as AccessKeyPermission | null;
+      const methods = permission?.methodNames ?? [];
+
+      return methods.length > 0 ? (
+        <Truncate>
+          <TruncateText text={methods.join(', ')} />
+        </Truncate>
+      ) : permission?.receiverId ? (
+        'All methods'
+      ) : (
+        ''
+      );
+    },
+    className: 'w-35',
+    header: 'Methods',
+    id: 'methods',
+  },
+  {
+    cell: (key) =>
+      key.deleted.transaction_hash ? (
+        <Badge variant="red">Deleted</Badge>
+      ) : (
+        <Badge variant="lime">Created</Badge>
+      ),
+    header: 'Action',
+    id: 'action',
+  },
+  {
+    cell: (key) => <TimestampCell ns={key.action_timestamp} />,
+    className: 'w-42',
+    header: <TimestampToggle />,
+    id: 'age',
+  },
+];
+
 export const AccessKeys = ({
   keyCountPromise,
   keysPromise,
@@ -54,117 +165,6 @@ export const AccessKeys = ({
     });
     return `/address/${address}/keys?${params.toString()}`;
   };
-
-  const columns: DataTableColumnDef<AccountKey>[] = [
-    {
-      cell: (key) => {
-        const txnHash =
-          key.deleted.transaction_hash ?? key.created.transaction_hash;
-
-        if (!txnHash) return <Skeleton className="w-30" />;
-
-        return (
-          <Link className="text-link" href={`/txns/${txnHash}`}>
-            <Truncate>
-              <TruncateText text={txnHash} />
-              <TruncateCopy text={txnHash} />
-            </Truncate>
-          </Link>
-        );
-      },
-      header: 'Txn Hash',
-      id: 'txn_hash',
-    },
-    {
-      cell: (key) => (
-        <Truncate>
-          <TruncateText text={key.public_key} />
-          <TruncateCopy text={key.public_key} />
-        </Truncate>
-      ),
-      header: 'Public Key',
-      id: 'public_key',
-    },
-    {
-      cell: (key) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText className="max-w-30" text={key.permission_kind} />
-          </Truncate>
-        </Badge>
-      ),
-      header: 'Access',
-      id: 'access',
-    },
-    {
-      cell: (key) => {
-        const permission = key.permission as AccessKeyPermission | null;
-
-        return permission?.receiverId ? (
-          <AccountLink account={permission.receiverId} />
-        ) : (
-          ''
-        );
-      },
-      header: 'Contract',
-      id: 'contract',
-    },
-    {
-      cell: (key) => {
-        const permission = key.permission as AccessKeyPermission | null;
-        return permission?.allowance ? (
-          <span className="flex items-center gap-1">
-            <NearCircle className="size-4" />
-            {nearFormat(permission.allowance, {
-              maximumFractionDigits: 4,
-            })}
-          </span>
-        ) : permission?.receiverId ? (
-          'Unlimited'
-        ) : (
-          ''
-        );
-      },
-      className: 'w-25',
-      header: 'Allowance',
-      id: 'allowance',
-    },
-    {
-      cell: (key) => {
-        const permission = key.permission as AccessKeyPermission | null;
-        const methods = permission?.methodNames ?? [];
-
-        return methods.length > 0 ? (
-          <Truncate>
-            <TruncateText text={methods.join(', ')} />
-          </Truncate>
-        ) : permission?.receiverId ? (
-          'All methods'
-        ) : (
-          ''
-        );
-      },
-      className: 'w-35',
-      header: 'Methods',
-      id: 'methods',
-    },
-    {
-      cell: (key) =>
-        key.deleted.transaction_hash ? (
-          <Badge variant="red">Deleted</Badge>
-        ) : (
-          <Badge variant="lime">Created</Badge>
-        ),
-      header: 'Action',
-      id: 'action',
-    },
-    {
-      cell: (key) => <TimestampCell ns={key.action_timestamp} />,
-      className: 'w-42',
-      header: <TimestampToggle />,
-      id: 'age',
-    },
-  ];
 
   return (
     <Card>

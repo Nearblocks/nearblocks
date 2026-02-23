@@ -7,6 +7,8 @@ import {
   TxnCountRes,
   TxnFT,
   TxnFTsRes,
+  TxnMT,
+  TxnMTsRes,
   TxnNFT,
   TxnNFTsRes,
   TxnReceipt,
@@ -61,6 +63,13 @@ export const fetchTxnFTs = cache(
 export const fetchTxnNFTs = cache(
   async (txn: string): Promise<null | TxnNFT[]> => {
     const resp = await fetcher<TxnNFTsRes>(`/v3/txns/${txn}/nfts`);
+    return resp.data;
+  },
+);
+
+export const fetchTxnMTs = cache(
+  async (txn: string): Promise<null | TxnMT[]> => {
+    const resp = await fetcher<TxnMTsRes>(`/v3/txns/${txn}/mts`);
     return resp.data;
   },
 );

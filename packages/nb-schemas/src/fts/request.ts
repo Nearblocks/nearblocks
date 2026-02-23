@@ -32,7 +32,7 @@ const count = v.object({
 
 const cursor = v.object({
   contract: v.string(),
-  sort: v.enum(FTListSort),
+  sort: v.nullable(v.string()),
 });
 
 const txns = v.object({

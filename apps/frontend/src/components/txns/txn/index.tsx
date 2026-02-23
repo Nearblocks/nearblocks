@@ -4,15 +4,14 @@ import { RiQuestionLine } from '@remixicon/react';
 import { useRouter } from 'next/navigation';
 import { use, useEffect } from 'react';
 
-import { Stats, Txn, TxnFT, TxnNFT } from 'nb-schemas';
+import { Stats, Txn, TxnFT, TxnMT, TxnNFT, TxnReceipt } from 'nb-schemas';
 
 import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
-// import { TokenAmount, TokenImage } from '@/components/token';
-import { TxnStatus } from '@/components/txn';
+import { TxnReceiptErrors, TxnStatus } from '@/components/txn';
 import { NearCircle } from '@/icons/near-circle';
 import {
   gasFormat,
@@ -24,24 +23,32 @@ import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
+import { Transfers } from './transfers';
+
 type Props = {
   loading?: boolean;
+  receiptsPromise?: Promise<null | TxnReceipt>;
   statsPromise?: Promise<null | Stats>;
   txnFTsPromise?: Promise<null | TxnFT[]>;
+  txnMTsPromise?: Promise<null | TxnMT[]>;
   txnNFTsPromise?: Promise<null | TxnNFT[]>;
   txnPromise?: Promise<null | Txn>;
 };
 
 export const Overview = ({
   loading,
+  receiptsPromise,
   statsPromise,
-  // txnFTsPromise,
-  // txnNFTsPromise,
+  txnFTsPromise,
+  txnMTsPromise,
+  txnNFTsPromise,
   txnPromise,
 }: Props) => {
   const txn = !loading && txnPromise ? use(txnPromise) : null;
-  // const fts = !loading && txnFTsPromise ? use(txnFTsPromise) : null;
-  // const nfts = !loading && txnNFTsPromise ? use(txnNFTsPromise) : null;
+  const fts = !loading && txnFTsPromise ? use(txnFTsPromise) : null;
+  const mts = !loading && txnMTsPromise ? use(txnMTsPromise) : null;
+  const nfts = !loading && txnNFTsPromise ? use(txnNFTsPromise) : null;
+  const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
   const stats = !loading && statsPromise ? use(statsPromise) : null;
   const router = useRouter();
 
@@ -75,7 +82,7 @@ export const Overview = ({
             <ListRight className="xl:py-2.5">
               <p className="flex min-w-30 items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-40" />}
+                  fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !txn}
                 >
                   {() => (
@@ -107,7 +114,12 @@ export const Overview = ({
                 fallback={<Skeleton className="h-6 w-20" />}
                 loading={loading || !txn}
               >
-                {() => <TxnStatus status={txn!.outcomes.status} />}
+                {() => (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <TxnStatus status={txn!.outcomes.status} />
+                    <TxnReceiptErrors receipts={receipts} />
+                  </div>
+                )}
               </SkeletonSlot>
             </ListRight>
           </ListItem>
@@ -126,7 +138,7 @@ export const Overview = ({
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-30" />}
+                  fallback={<Skeleton className="h-7 w-25" />}
                   loading={loading || !txn || !txn.block?.block_height}
                 >
                   {() => (
@@ -255,6 +267,7 @@ export const Overview = ({
               </p>
             </ListRight>
           </ListItem>
+          <Transfers fts={fts} loading={loading} mts={mts} nfts={nfts} />
           <ListItem>
             <ListLeft className="flex items-center gap-1">
               <Tooltip>
@@ -264,7 +277,7 @@ export const Overview = ({
                 <TooltipContent>
                   Sum of all NEAR tokens transferred from the Signing account to
                   the Receiver account. This includes tokens sent in a Transfer
-                  action(s), and as deposits on Function Call action(s)
+                  (s), and as deposits on Function Call action(s)
                 </TooltipContent>
               </Tooltip>
               Deposit Value:
@@ -310,7 +323,7 @@ export const Overview = ({
             <ListRight>
               <p>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-30" />}
+                  fallback={<Skeleton className="w-25" />}
                   loading={loading || !txn}
                 >
                   {() => (

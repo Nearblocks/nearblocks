@@ -30,9 +30,10 @@ FROM
         reference
       ) AS meta
     FROM
-      nft_meta nfm
+      nft_meta nm
     WHERE
-      nfm.contract = nft.contract_account_id
+      nm.contract = nft.contract_account_id
+      AND nm.modified_at IS NOT NULL
   ) m ON TRUE
   JOIN LATERAL (
     SELECT
@@ -53,6 +54,7 @@ FROM
     WHERE
       ntm.contract = nft.contract_account_id
       AND ntm.token = nft.token_id
+      AND ntm.modified_at IS NOT NULL
   ) tm ON TRUE
 WHERE
   nft.receipt_id = ${receipt_id}::TEXT

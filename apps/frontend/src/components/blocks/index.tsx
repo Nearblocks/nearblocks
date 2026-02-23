@@ -19,6 +19,54 @@ type Props = {
   loading?: boolean;
 };
 
+const columns: DataTableColumnDef<BlockListItem>[] = [
+  {
+    cell: (block) => (
+      <Link className="text-link" href={`/blocks/${block.block_height}`}>
+        {numberFormat(block.block_height)}
+      </Link>
+    ),
+    header: 'Block',
+    id: 'block',
+  },
+  {
+    cell: (block) => <AccountLink account={block.author_account_id} />,
+    header: 'Author',
+    id: 'author',
+  },
+  {
+    cell: (block) => numberFormat(block.transactions_agg.count),
+    header: 'Txns',
+    id: 'txns_count',
+  },
+  {
+    cell: (block) => `${gasFormat(block.chunks_agg.gas_used)} Tgas`,
+    header: 'Gas Used',
+    id: 'gas_used',
+  },
+  {
+    cell: (block) => `${gasFormat(block.chunks_agg.gas_limit)} Tgas`,
+    header: 'Gas Limit',
+    id: 'gas_limit',
+  },
+  {
+    cell: (block) => (
+      <span className="flex items-center gap-1">
+        <NearCircle className="size-4" />
+        {gasFee(block.chunks_agg.gas_used, block.gas_price)}
+      </span>
+    ),
+    header: 'Gas Fee',
+    id: 'gas_fee',
+  },
+  {
+    cell: (block) => <TimestampCell ns={block.block_timestamp} />,
+    className: 'w-42',
+    header: <TimestampToggle />,
+    id: 'age',
+  },
+];
+
 export const Blocks = ({
   blockCountPromise,
   blocksPromise,
@@ -27,54 +75,6 @@ export const Blocks = ({
   const blocks = !loading && blocksPromise ? use(blocksPromise) : null;
   const blockCount =
     !loading && blockCountPromise ? use(blockCountPromise) : null;
-
-  const columns: DataTableColumnDef<BlockListItem>[] = [
-    {
-      cell: (block) => (
-        <Link className="text-link" href={`/blocks/${block.block_height}`}>
-          {numberFormat(block.block_height)}
-        </Link>
-      ),
-      header: 'Block',
-      id: 'block',
-    },
-    {
-      cell: (block) => <AccountLink account={block.author_account_id} />,
-      header: 'Author',
-      id: 'author',
-    },
-    {
-      cell: (block) => numberFormat(block.transactions_agg.count),
-      header: 'Txns',
-      id: 'txns_count',
-    },
-    {
-      cell: (block) => `${gasFormat(block.chunks_agg.gas_used)} Tgas`,
-      header: 'Gas Used',
-      id: 'gas_used',
-    },
-    {
-      cell: (block) => `${gasFormat(block.chunks_agg.gas_limit)} Tgas`,
-      header: 'Gas Limit',
-      id: 'gas_limit',
-    },
-    {
-      cell: (block) => (
-        <span className="flex items-center gap-1">
-          <NearCircle className="size-4" />
-          {gasFee(block.chunks_agg.gas_used, block.gas_price)}
-        </span>
-      ),
-      header: 'Gas Fee',
-      id: 'gas_fee',
-    },
-    {
-      cell: (block) => <TimestampCell ns={block.block_timestamp} />,
-      className: 'w-42',
-      header: <TimestampToggle />,
-      id: 'age',
-    },
-  ];
 
   return (
     <Card>
