@@ -3,9 +3,8 @@ SELECT
 FROM
   accounts
 WHERE
-  account_id = ${account}
-  OR search @@ TO_TSQUERY(${account} || ':*')
+  search @@ TO_TSQUERY(${account} || ':*')
 ORDER BY
-  account_id
+  TS_RANK(search, TO_TSQUERY(${account} || ':*')) DESC
 LIMIT
   5

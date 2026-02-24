@@ -57,8 +57,6 @@ const contract: EventContract = async ({
     }));
 
     await Promise.all([saveFTData(knex, events), saveFTMeta(knex, meta)]);
-
-    await saveFTData(knex, events);
   }
 };
 
