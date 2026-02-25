@@ -52,11 +52,11 @@ const txn = v.object({
   delta_amount: v.string(),
   event_index: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(meta),
+  meta: meta,
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: v.optional(tokenMeta),
+  token_meta: tokenMeta,
   transaction_hash: v.optional(v.string()),
 });
 
@@ -69,12 +69,15 @@ const contract = v.object({
   base_uri: v.nullable(v.string()),
   contract: v.string(),
   description: v.nullable(v.string()),
+  holders: v.nullable(v.string()),
   icon: v.nullable(v.string()),
   name: v.nullable(v.string()),
   reference: v.nullable(v.string()),
   reference_hash: v.nullable(v.string()),
   spec: v.nullable(v.string()),
   symbol: v.nullable(v.string()),
+  tokens: v.nullable(v.string()),
+  transfers_24h: v.nullable(v.string()),
 });
 
 const contractTxn = v.object({
@@ -86,11 +89,11 @@ const contractTxn = v.object({
   delta_amount: v.string(),
   event_index: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(meta),
+  meta: meta,
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: v.optional(tokenMeta),
+  token_meta: tokenMeta,
   transaction_hash: v.optional(v.string()),
 });
 

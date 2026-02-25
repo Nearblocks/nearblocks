@@ -17,11 +17,13 @@ FROM
         AND (
           %L::BIGINT IS NULL
           OR block_timestamp < %L
-        )',
+        )
+        AND (%L::TEXT IS NOT NULL OR cause = ''BURN'' OR delta_amount >= 0)',
       ${contract},
       ${affected},
       ${affected},
       ${before},
-      ${before}
+      ${before},
+      ${affected}
     )
   )

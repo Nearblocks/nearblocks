@@ -33,6 +33,27 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/txns';
 
+const sortFtEvents = (events: TxnFT[]): TxnFT[] =>
+  events.sort((a, b) => {
+    const tsDiff = BigInt(a.block_timestamp) - BigInt(b.block_timestamp);
+    if (tsDiff !== 0n) return tsDiff < 0n ? -1 : 1;
+    if (a.shard_id !== b.shard_id) return a.shard_id - b.shard_id;
+    if (a.event_type !== b.event_type) return a.event_type - b.event_type;
+    return a.event_index - b.event_index;
+  });
+
+const sortEvents = <
+  T extends { block_timestamp: string; event_index: number; shard_id: number },
+>(
+  events: T[],
+): T[] =>
+  events.sort((a, b) => {
+    const tsDiff = BigInt(a.block_timestamp) - BigInt(b.block_timestamp);
+    if (tsDiff !== 0n) return tsDiff < 0n ? -1 : 1;
+    if (a.shard_id !== b.shard_id) return a.shard_id - b.shard_id;
+    return a.event_index - b.event_index;
+  });
+
 const latest = responseHandler(
   response.txns,
   async (req: RequestValidator<TxnsLatestReq>) => {
@@ -247,7 +268,7 @@ const fts = responseHandler(
       const unionQuery = queries.join('\nUNION ALL\n');
       const fts = await dbEvents.manyOrNone<TxnFT>(unionQuery);
 
-      return { data: fts };
+      return { data: sortFtEvents(fts) };
     }
 
     const receipts = await rollingWindow<
@@ -275,7 +296,7 @@ const fts = responseHandler(
     const unionQuery = queries.join('\nUNION ALL\n');
     const fts = await dbEvents.manyOrNone<TxnFT>(unionQuery);
 
-    return { data: fts };
+    return { data: sortFtEvents(fts) };
   },
 );
 
@@ -310,7 +331,7 @@ const nfts = responseHandler(
       const unionQuery = queries.join('\nUNION ALL\n');
       const nfts = await dbEvents.manyOrNone<TxnNFT>(unionQuery);
 
-      return { data: nfts };
+      return { data: sortEvents(nfts) };
     }
 
     const receipts = await rollingWindow<
@@ -338,7 +359,7 @@ const nfts = responseHandler(
     const unionQuery = queries.join('\nUNION ALL\n');
     const nfts = await dbEvents.manyOrNone<TxnNFT>(unionQuery);
 
-    return { data: nfts };
+    return { data: sortEvents(nfts) };
   },
 );
 
@@ -373,7 +394,7 @@ const mts = responseHandler(
       const unionQuery = queries.join('\nUNION ALL\n');
       const mts = await dbEvents.manyOrNone<TxnMT>(unionQuery);
 
-      return { data: mts };
+      return { data: sortEvents(mts) };
     }
 
     const receipts = await rollingWindow<
@@ -401,7 +422,7 @@ const mts = responseHandler(
     const unionQuery = queries.join('\nUNION ALL\n');
     const mts = await dbEvents.manyOrNone<TxnMT>(unionQuery);
 
-    return { data: mts };
+    return { data: sortEvents(mts) };
   },
 );
 

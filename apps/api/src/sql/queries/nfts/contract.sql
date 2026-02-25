@@ -1,16 +1,20 @@
 SELECT
-  contract,
-  name,
-  symbol,
-  icon,
-  spec,
-  base_uri,
-  reference,
-  reference_hash,
-  description,
-  modified_at
+  nm.contract,
+  nm.name,
+  nm.symbol,
+  nm.icon,
+  nm.spec,
+  nm.base_uri,
+  nm.reference,
+  nm.reference_hash,
+  nm.description,
+  nm.modified_at,
+  nl.tokens,
+  nl.holders,
+  nl.transfers_24h
 FROM
-  nft_meta
+  nft_meta nm
+  LEFT JOIN nft_list nl ON nl.contract = nm.contract
 WHERE
-  contract = ${contract}
-  AND modified_at IS NOT NULL
+  nm.contract = ${contract}
+  AND nm.modified_at IS NOT NULL

@@ -49,7 +49,7 @@ const txn = v.object({
   event_index: v.number(),
   event_type: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(meta),
+  meta: meta,
   receipt_id: v.string(),
   shard_id: v.number(),
   transaction_hash: v.optional(v.string()),
@@ -61,7 +61,7 @@ const txnCount = v.object({
 });
 
 const contract = v.object({
-  change_24h: v.nullable(v.number()),
+  change_24h: v.nullable(v.string()),
   circulating_supply: v.nullable(v.string()),
   coingecko_id: v.nullable(v.string()),
   coinmarketcap_id: v.nullable(v.string()),
@@ -71,9 +71,11 @@ const contract = v.object({
   facebook: v.nullable(v.string()),
   fully_diluted_market_cap: v.nullable(v.string()),
   hex_address: v.nullable(v.string()),
+  holders: v.nullable(v.string()),
   icon: v.nullable(v.string()),
   market_cap: v.nullable(v.string()),
   name: v.nullable(v.string()),
+  onchain_market_cap: v.nullable(v.string()),
   price: v.nullable(v.string()),
   reddit: v.nullable(v.string()),
   reference: v.nullable(v.string()),
@@ -97,7 +99,7 @@ const contractTxn = v.object({
   event_index: v.number(),
   event_type: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(meta),
+  meta: meta,
   receipt_id: v.string(),
   shard_id: v.number(),
   transaction_hash: v.optional(v.string()),

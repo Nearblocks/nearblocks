@@ -144,7 +144,7 @@ const txnFT = v.object({
   event_index: v.number(),
   event_type: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(ftMeta),
+  meta: ftMeta,
   receipt_id: v.string(),
   shard_id: v.number(),
 });
@@ -174,11 +174,11 @@ const txnNFT = v.object({
   delta_amount: v.number(),
   event_index: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(nftMeta),
+  meta: nftMeta,
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: v.optional(nftTokenMeta),
+  token_meta: nftTokenMeta,
 });
 
 const mtMeta = v.object({
@@ -215,11 +215,11 @@ const txnMT = v.object({
   delta_amount: v.string(),
   event_index: v.number(),
   involved_account_id: v.nullable(v.string()),
-  meta: v.optional(mtMeta),
+  meta: mtMeta,
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: v.optional(mtTokenMeta),
+  token_meta: mtTokenMeta,
 });
 
 const txnResponse = responseSchema(txn);

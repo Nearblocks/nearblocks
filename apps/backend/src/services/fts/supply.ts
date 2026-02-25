@@ -27,7 +27,7 @@ export const syncFTSupply = async () => {
           AND ec.attempts >= 5
       )
     ORDER BY
-      fm.synced_at ASC
+      fm.synced_at ASC NULLS FIRST
     LIMIT
       10
   `);
@@ -45,7 +45,7 @@ const updateFTSupply = async (ft: FTContractDecimals) => {
       await upsertError(ft.contract, 'ft', null);
     }
   } catch (error) {
-    logger.error(`tokenSupply: updateFTMeta: ${ft.contract}: ${ft.decimals}`);
+    logger.error(`tokenSupply: updateFTSupply: ${ft.contract}: ${ft.decimals}`);
     logger.error(error);
     await upsertError(ft.contract, 'ft', null);
   }
@@ -61,7 +61,7 @@ const updateSupply = async (ft: FTContractDecimals, supply: string) => {
   try {
     await dbEvents('ft_meta').where('contract', ft.contract).update(data);
   } catch (error) {
-    logger.error(`tokenMeta: updateMeta: ${ft.contract}: ${ft.decimals}`);
+    logger.error(`tokenSupply: updateSupply: ${ft.contract}: ${ft.decimals}`);
     logger.error(error);
   }
 };

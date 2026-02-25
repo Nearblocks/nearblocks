@@ -89,6 +89,10 @@ WHERE
     ${before}::BIGINT IS NULL
     OR ft.block_timestamp < ${before}
   )
+  AND (
+    ft.cause = 'BURN'
+    OR ft.delta_amount >= 0
+  )
 ORDER BY
   block_timestamp ${direction:raw},
   shard_id ${direction:raw},
