@@ -74,6 +74,9 @@ export const FTTransfers = ({ fts }: Props) => {
               >
                 <TokenAmount
                   amount={ft.delta_amount}
+                  className={
+                    ft.cause === 'TRANSFER' ? 'text-blue-foreground' : ''
+                  }
                   decimals={ft.meta?.decimals ?? 0}
                   hideSign
                 />

@@ -9,7 +9,7 @@ const TxnLayout = async ({ children, params }: Props) => {
   const { txn } = await params;
 
   return (
-    <div className="container mx-auto px-4">
+    <>
       <h1 className="text-headline-lg mb-6">
         Transaction{' '}
         <span className="text-muted-foreground text-headline-base">#{txn}</span>
@@ -41,7 +41,7 @@ const TxnLayout = async ({ children, params }: Props) => {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       {children}
-    </div>
+    </>
   );
 };
 

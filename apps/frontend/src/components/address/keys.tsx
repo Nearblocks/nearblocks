@@ -130,7 +130,8 @@ const columns: DataTableColumnDef<AccountKey>[] = [
   },
   {
     cell: (key) => <TimestampCell ns={key.action_timestamp} />,
-    className: 'w-42',
+    cellClassName: 'px-1',
+    className: 'w-40',
     header: <TimestampToggle />,
     id: 'age',
   },

@@ -141,7 +141,8 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
     },
     {
       cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
-      className: 'w-42',
+      cellClassName: 'px-1',
+      className: 'w-40',
       header: <TimestampToggle />,
       id: 'age',
     },

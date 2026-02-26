@@ -31,7 +31,7 @@ export const Footer = () => {
                 href="https://x.com/nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
-                title="Twitter"
+                title="X"
               >
                 <RiTwitterXLine className="text-primary size-4" />
               </Link>

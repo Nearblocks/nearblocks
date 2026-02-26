@@ -61,7 +61,8 @@ const columns: DataTableColumnDef<BlockListItem>[] = [
   },
   {
     cell: (block) => <TimestampCell ns={block.block_timestamp} />,
-    className: 'w-42',
+    cellClassName: 'px-1',
+    className: 'w-40',
     header: <TimestampToggle />,
     id: 'age',
   },

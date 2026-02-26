@@ -161,7 +161,8 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => <TimestampCell ns={receipt.block?.block_timestamp} />,
-      className: 'w-42',
+      cellClassName: 'px-1',
+      className: 'w-40',
       header: <TimestampToggle />,
       id: 'age',
     },

@@ -122,7 +122,8 @@ export const StakingTxns = ({
         ) : (
           <Skeleton className="w-30" />
         ),
-      className: 'w-42',
+      cellClassName: 'px-1',
+      className: 'w-40',
       header: <TimestampToggle />,
       id: 'age',
     },

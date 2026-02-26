@@ -1,18 +1,17 @@
 'use client';
 
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { AccountFTTxn, AccountFTTxnCount, AccountFTTxnsRes } from 'nb-schemas';
+import { FTTxn, FTTxnCountRes, FTTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
-import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -20,12 +19,12 @@ import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  ftCountPromise?: Promise<AccountFTTxnCount | null>;
-  ftsPromise?: Promise<AccountFTTxnsRes>;
+  ftCountPromise?: Promise<FTTxnCountRes>;
+  ftsPromise?: Promise<FTTxnsRes>;
   loading?: boolean;
 };
 
-const columns: DataTableColumnDef<AccountFTTxn>[] = [
+const columns: DataTableColumnDef<FTTxn>[] = [
   {
     cell: () => <TxnStatusIcon status />,
     className: 'w-5',
@@ -55,32 +54,43 @@ const columns: DataTableColumnDef<AccountFTTxn>[] = [
         </Truncate>
       </Badge>
     ),
-    enableFilter: true,
-    filterName: 'cause',
     header: 'Method',
-    id: 'cause',
+    id: 'method',
   },
   {
-    cell: (ft) => <AccountLink account={ft.affected_account_id} />,
-    header: 'Affected',
-    id: 'affected',
+    cell: (ft) => (
+      <AccountLink
+        account={
+          ft.cause === 'BURN' ? ft.affected_account_id : ft.involved_account_id
+        }
+      />
+    ),
+    header: 'From',
+    id: 'from',
   },
   {
-    cell: (ft) => <TxnDirection amount={ft.delta_amount} />,
-    className: 'w-20',
+    cell: () => <TxnDirectionIcon />,
+    className: 'w-12',
     header: '',
     id: 'direction',
   },
   {
-    cell: (ft) => <AccountLink account={ft.involved_account_id} />,
-    enableFilter: true,
-    filterName: 'involved',
-    header: 'Involved',
-    id: 'involved',
+    cell: (ft) => (
+      <AccountLink
+        account={ft.cause === 'BURN' ? null : ft.affected_account_id}
+      />
+    ),
+    header: 'To',
+    id: 'to',
   },
   {
     cell: (ft) => (
-      <TokenAmount amount={ft.delta_amount} decimals={ft.meta?.decimals ?? 0} />
+      <TokenAmount
+        amount={ft.delta_amount}
+        className="text-foreground"
+        decimals={ft.meta?.decimals ?? 0}
+        hideSign
+      />
     ),
     header: 'Quantity',
     id: 'quantity',
@@ -96,18 +106,11 @@ const columns: DataTableColumnDef<AccountFTTxn>[] = [
         <TokenLink contract={ft.contract_account_id} name={ft.meta?.name} />
       </span>
     ),
-    enableFilter: true,
-    filterName: 'token',
     header: 'Token',
     id: 'token',
   },
   {
-    cell: (ft) =>
-      ft.block?.block_timestamp ? (
-        <TimestampCell ns={ft.block?.block_timestamp} />
-      ) : (
-        <Skeleton className="w-30" />
-      ),
+    cell: (ft) => <TimestampCell ns={ft.block_timestamp} />,
     cellClassName: 'px-1',
     className: 'w-40',
     header: <TimestampToggle />,
@@ -115,30 +118,22 @@ const columns: DataTableColumnDef<AccountFTTxn>[] = [
   },
 ];
 
-export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
+export const TokenTransfers = ({
+  ftCountPromise,
+  ftsPromise,
+  loading,
+}: Props) => {
   const fts = !loading && ftsPromise ? use(ftsPromise) : null;
   const ftCount = !loading && ftCountPromise ? use(ftCountPromise) : null;
 
-  const { address } = useParams<{ address: string }>();
-  const router = useRouter();
   const searchParams = useSearchParams();
-
-  const onFilter = (value: FilterData) => {
-    const params = buildParams(searchParams, value);
-    router.push(`/address/${address}/tokens?${params.toString()}`);
-  };
-
-  const onClear = (data: FilterClearData) => {
-    const params = buildParams(searchParams, data);
-    router.push(`/address/${address}/tokens?${params.toString()}`);
-  };
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
     const params = buildParams(searchParams, {
       [type]: cursor,
       [type === 'next' ? 'prev' : 'next']: '',
     });
-    return `/address/${address}/tokens?${params.toString()}`;
+    return `/tokens/transfers?${params.toString()}`;
   };
 
   return (
@@ -147,7 +142,7 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
         <DataTable
           columns={columns}
           data={fts?.data}
-          emptyMessage="No token txns found"
+          emptyMessage="No token transfers found"
           getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
           header={
             <SkeletonSlot
@@ -156,14 +151,12 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
             >
               {() => (
                 <>{`A total of ${numberFormat(
-                  ftCount?.count ?? 0,
+                  ftCount?.data?.count ?? 0,
                 )} token txns found`}</>
               )}
             </SkeletonSlot>
           }
           loading={loading || !!fts?.errors}
-          onClear={onClear}
-          onFilter={onFilter}
           onPaginationNavigate={onPaginate}
           pagination={fts?.meta}
         />

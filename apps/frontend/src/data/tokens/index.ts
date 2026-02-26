@@ -1,6 +1,15 @@
 import { cache } from 'react';
 
-import { FTCountReq, FTCountRes, FTListReq, FTListRes } from 'nb-schemas';
+import {
+  FTCountReq,
+  FTCountRes,
+  FTListReq,
+  FTListRes,
+  FTTxnCountReq,
+  FTTxnCountRes,
+  FTTxnsReq,
+  FTTxnsRes,
+} from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
@@ -29,6 +38,30 @@ export const fetchTokenCount = cache(
 
     const resp = await fetcher<FTCountRes>(
       `/v3/fts/count?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchFTTxns = cache(
+  async (params: SearchParams): Promise<FTTxnsRes> => {
+    const keys: (keyof FTTxnsReq)[] = ['limit', 'next', 'prev', 'before_ts'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<FTTxnsRes>(
+      `/v3/fts/txns?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchFTTxnCount = cache(
+  async (params: SearchParams): Promise<FTTxnCountRes> => {
+    const keys: (keyof FTTxnCountReq)[] = ['before_ts'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<FTTxnCountRes>(
+      `/v3/fts/txns/count?${queryParams.toString()}`,
     );
     return resp;
   },

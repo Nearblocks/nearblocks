@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import { numberFormat, toTokenAmount } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 import { Link } from './link';
 import { Truncate, TruncateText } from './truncate';
@@ -18,6 +19,7 @@ type NFTMediaProps = {
 } & Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'alt' | 'src'>;
 type AmountProps = {
   amount: string;
+  className?: string;
   decimals: number;
   hideSign?: boolean;
 };
@@ -159,19 +161,24 @@ export const TokenImage = ({ alt, src, ...rest }: ImageProps) => {
   );
 };
 
-export const TokenAmount = ({ amount, decimals, hideSign }: AmountProps) => {
+export const TokenAmount = ({
+  amount,
+  className,
+  decimals,
+  hideSign,
+}: AmountProps) => {
   const formatted = numberFormat(toTokenAmount(amount, decimals), {
     maximumFractionDigits: 6,
   });
   const display = hideSign ? formatted.replace(/^-/, '') : formatted;
 
   return +amount > 0 ? (
-    <span className="text-lime-foreground">
+    <span className={cn('text-lime-foreground', className)}>
       {!hideSign && '+'}
       {display}
     </span>
   ) : (
-    <span className="text-red-foreground">{display}</span>
+    <span className={cn('text-red-foreground', className)}>{display}</span>
   );
 };
 

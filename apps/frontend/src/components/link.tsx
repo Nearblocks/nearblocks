@@ -29,6 +29,7 @@ type AccountLinkProps = {
   account?: null | string;
   className?: string;
   hideCopy?: boolean;
+  name?: string;
   textClassName?: string;
 };
 
@@ -127,6 +128,7 @@ export const AccountLink = ({
   account,
   className,
   hideCopy = false,
+  name,
   textClassName,
 }: AccountLinkProps) => {
   const { highlighted, setHighlighted } = useHighlightStore();
@@ -151,7 +153,7 @@ export const AccountLink = ({
           )}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
-          text={account}
+          text={name ?? account}
         />
         {!hideCopy && <TruncateCopy text={account} />}
       </Truncate>

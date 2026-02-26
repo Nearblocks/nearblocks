@@ -34,9 +34,9 @@ const menu: NavMenu<RouteKey<'layout'>> = [
     key: 'menu.tokens.title',
     menu: [
       { href: '/tokens', key: 'menu.tokens.topTokens' },
-      { href: '/tokentxns', key: 'menu.tokens.tokenTransfers' },
+      { href: '/tokens/transfers', key: 'menu.tokens.tokenTransfers' },
       { href: '/nft-tokens', key: 'menu.tokens.topNFTs' },
-      { href: '/nft-tokentxns', key: 'menu.tokens.nftTransfers' },
+      { href: '/nft-tokens/transfers', key: 'menu.tokens.nftTransfers' },
     ],
   },
   {

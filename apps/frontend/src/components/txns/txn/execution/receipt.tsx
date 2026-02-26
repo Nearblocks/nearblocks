@@ -1,4 +1,5 @@
 import { RiQuestionLine } from '@remixicon/react';
+import { Key } from 'lucide-react';
 import { useMemo } from 'react';
 
 import type { TxnReceipt } from 'nb-schemas';
@@ -153,6 +154,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                   />{' '}
                   <span className="text-muted-foreground flex items-center">
                     (
+                    <Key className="mx-1 size-3.5" />
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Link

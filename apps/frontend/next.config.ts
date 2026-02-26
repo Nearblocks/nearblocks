@@ -27,6 +27,20 @@ const nextConfig: NextConfig = {
     ];
   },
   output: 'standalone',
+  async redirects() {
+    return [
+      {
+        destination: '/tokens/transfers',
+        permanent: true,
+        source: '/tokentxns',
+      },
+      {
+        destination: '/nft-tokens/transfers',
+        permanent: true,
+        source: '/nft-tokentxns',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

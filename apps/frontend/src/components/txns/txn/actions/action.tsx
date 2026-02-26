@@ -48,9 +48,9 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             From <AccountLink
-              account={receiver}
+              account={signer}
               textClassName="max-w-40"
-            /> To <AccountLink account={signer} textClassName="max-w-40" />
+            /> To <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>

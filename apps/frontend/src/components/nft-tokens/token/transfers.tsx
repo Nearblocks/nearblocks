@@ -1,22 +1,16 @@
 'use client';
 
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import {
-  AccountNFTTxn,
-  AccountNFTTxnCount,
-  AccountNFTTxnsRes,
-} from 'nb-schemas';
+import { NFTContractTxnCountRes, NFTContractTxnsRes, NFTTxn } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
-import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -25,11 +19,11 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  nftCountPromise?: Promise<AccountNFTTxnCount | null>;
-  nftsPromise?: Promise<AccountNFTTxnsRes>;
+  nftCountPromise?: Promise<NFTContractTxnCountRes>;
+  nftsPromise?: Promise<NFTContractTxnsRes>;
 };
 
-const columns: DataTableColumnDef<AccountNFTTxn>[] = [
+const columns: DataTableColumnDef<NFTTxn>[] = [
   {
     cell: () => <TxnStatusIcon status />,
     className: 'w-5',
@@ -48,7 +42,7 @@ const columns: DataTableColumnDef<AccountNFTTxn>[] = [
       ) : (
         <Skeleton className="w-30" />
       ),
-    header: 'Txn Hash',
+    header: 'Hash',
     id: 'txn_hash',
   },
   {
@@ -59,28 +53,36 @@ const columns: DataTableColumnDef<AccountNFTTxn>[] = [
         </Truncate>
       </Badge>
     ),
-    enableFilter: true,
-    filterName: 'cause',
-    header: 'Method',
-    id: 'cause',
+    header: 'Type',
+    id: 'type',
   },
   {
-    cell: (nft) => <AccountLink account={nft.affected_account_id} />,
-    header: 'Affected',
-    id: 'affected',
+    cell: (nft) => (
+      <AccountLink
+        account={
+          nft.cause === 'BURN'
+            ? nft.affected_account_id
+            : nft.involved_account_id
+        }
+      />
+    ),
+    header: 'From',
+    id: 'from',
   },
   {
-    cell: (nft) => <TxnDirection amount={nft.delta_amount} />,
-    className: 'w-20',
+    cell: () => <TxnDirectionIcon />,
+    className: 'w-12',
     header: '',
     id: 'direction',
   },
   {
-    cell: (nft) => <AccountLink account={nft.involved_account_id} />,
-    enableFilter: true,
-    filterName: 'involved',
-    header: 'Involved',
-    id: 'involved',
+    cell: (nft) => (
+      <AccountLink
+        account={nft.cause === 'BURN' ? null : nft.affected_account_id}
+      />
+    ),
+    header: 'To',
+    id: 'to',
   },
   {
     cell: (nft) => (
@@ -98,32 +100,7 @@ const columns: DataTableColumnDef<AccountNFTTxn>[] = [
     id: 'token_id',
   },
   {
-    cell: (nft) => (
-      <span className="flex items-center gap-1">
-        <TokenImage
-          alt={nft.meta?.name ?? ''}
-          className="m-px size-5 rounded-full border"
-          src={nft.meta?.icon ?? ''}
-        />
-        <TokenLink
-          contract={nft.contract_account_id}
-          name={nft.meta?.name}
-          type="nft-tokens"
-        />
-      </span>
-    ),
-    enableFilter: true,
-    filterName: 'token',
-    header: 'Token',
-    id: 'token',
-  },
-  {
-    cell: (nft) =>
-      nft.block?.block_timestamp ? (
-        <TimestampCell ns={nft.block.block_timestamp} />
-      ) : (
-        <Skeleton className="w-30" />
-      ),
+    cell: (nft) => <TimestampCell ns={nft.block_timestamp} />,
     cellClassName: 'px-1',
     className: 'w-40',
     header: <TimestampToggle />,
@@ -131,30 +108,23 @@ const columns: DataTableColumnDef<AccountNFTTxn>[] = [
   },
 ];
 
-export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
+export const NftTokenTransfers = ({
+  loading,
+  nftCountPromise,
+  nftsPromise,
+}: Props) => {
   const nfts = !loading && nftsPromise ? use(nftsPromise) : null;
   const nftCount = !loading && nftCountPromise ? use(nftCountPromise) : null;
 
-  const { address } = useParams<{ address: string }>();
-  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  const onFilter = (value: FilterData) => {
-    const params = buildParams(searchParams, value);
-    router.push(`/address/${address}/nft-tokens?${params.toString()}`);
-  };
-
-  const onClear = (data: FilterClearData) => {
-    const params = buildParams(searchParams, data);
-    router.push(`/address/${address}/nft-tokens?${params.toString()}`);
-  };
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
     const params = buildParams(searchParams, {
       [type]: cursor,
       [type === 'next' ? 'prev' : 'next']: '',
     });
-    return `/address/${address}/nft-tokens?${params.toString()}`;
+    return `${pathname}?${params.toString()}`;
   };
 
   return (
@@ -163,7 +133,7 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
         <DataTable
           columns={columns}
           data={nfts?.data}
-          emptyMessage="No nft token txns found"
+          emptyMessage="No NFT token transfers found"
           getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
           header={
             <SkeletonSlot
@@ -172,14 +142,12 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
             >
               {() => (
                 <>{`A total of ${numberFormat(
-                  nftCount?.count ?? 0,
+                  nftCount?.data?.count ?? 0,
                 )} nft token txns found`}</>
               )}
             </SkeletonSlot>
           }
           loading={loading || !!nfts?.errors}
-          onClear={onClear}
-          onFilter={onFilter}
           onPaginationNavigate={onPaginate}
           pagination={nfts?.meta}
         />
