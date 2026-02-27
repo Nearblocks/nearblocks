@@ -58,14 +58,6 @@ const columns: DataTableColumnDef<NFTList>[] = [
     id: 'transfers_24h',
     sortName: 'transfers_24h',
   },
-  {
-    cell: (token) => numberFormat(token.holders),
-    className: 'w-40',
-    enableSort: true,
-    header: 'Holders',
-    id: 'holders',
-    sortName: 'holders',
-  },
 ];
 
 export const NftTokens = ({

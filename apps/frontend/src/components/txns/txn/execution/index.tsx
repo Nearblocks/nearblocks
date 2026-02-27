@@ -13,10 +13,10 @@ import { ReceiptBlock } from './receipt';
 type Props = {
   loading?: boolean;
   receiptsPromise?: Promise<null | TxnReceipt>;
-  txnHash?: string;
+  tid?: string;
 };
 
-export const Execution = ({ loading, receiptsPromise, txnHash }: Props) => {
+export const Execution = ({ loading, receiptsPromise, tid }: Props) => {
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
 
   return (
@@ -30,7 +30,7 @@ export const Execution = ({ loading, receiptsPromise, txnHash }: Props) => {
           }
           loading={loading || !receipts}
         >
-          {() => <ExecutionPlan receipts={receipts!} txnHash={txnHash} />}
+          {() => <ExecutionPlan receipts={receipts!} tid={tid} />}
         </SkeletonSlot>
       </CardContent>
     </Card>

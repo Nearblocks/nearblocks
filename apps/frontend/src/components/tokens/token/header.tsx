@@ -10,12 +10,12 @@ import { Truncate, TruncateText } from '@/components/truncate';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  cid: string;
   contractPromise?: Promise<FTContractRes>;
   loading?: boolean;
-  token: string;
 };
 
-export const TokenHeader = ({ contractPromise, loading, token }: Props) => {
+export const TokenHeader = ({ cid, contractPromise, loading }: Props) => {
   const result = !loading && contractPromise ? use(contractPromise) : null;
   const contract = result?.data ?? null;
 
@@ -32,21 +32,21 @@ export const TokenHeader = ({ contractPromise, loading, token }: Props) => {
       {() => (
         <span className="flex items-center gap-2">
           <TokenImage
-            alt={contract?.name ?? token}
+            alt={contract?.name ?? cid}
             className="size-6 rounded-full border"
             src={contract?.icon ?? ''}
           />
           <Truncate className="flex items-center gap-2">
             <TruncateText
               className="text-foreground max-w-60"
-              text={contract?.name ?? token}
+              text={contract?.name ?? cid}
             />
           </Truncate>
           <Truncate>
             (
             <TruncateText
               className="text-foreground max-w-30"
-              text={contract?.symbol ?? token}
+              text={contract?.symbol ?? cid}
             />
             )
           </Truncate>

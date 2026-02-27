@@ -65,7 +65,9 @@ FROM
       AND ntm.modified_at IS NOT NULL
   ) tm ON TRUE
 WHERE
-  (
+  nft.contract_account_id = ${contract}
+  AND nft.token_id = ${token}
+  AND (
     p.block_timestamp IS NULL
     OR (
       (
@@ -103,8 +105,8 @@ WHERE
     OR nft.delta_amount >= 0
   )
 ORDER BY
-  block_timestamp DESC,
-  shard_id DESC,
-  event_index DESC
+  block_timestamp ${direction:raw},
+  shard_id ${direction:raw},
+  event_index ${direction:raw}
 LIMIT
   ${limit}

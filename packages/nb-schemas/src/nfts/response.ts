@@ -7,7 +7,6 @@ import { responseSchema } from '../common.js';
 const list = v.object({
   base_uri: v.nullable(v.string()),
   contract: v.string(),
-  holders: v.string(),
   icon: v.nullable(v.string()),
   name: v.string(),
   reference: v.nullable(v.string()),
@@ -69,7 +68,6 @@ const contract = v.object({
   base_uri: v.nullable(v.string()),
   contract: v.string(),
   description: v.nullable(v.string()),
-  holders: v.nullable(v.string()),
   icon: v.nullable(v.string()),
   name: v.nullable(v.string()),
   reference: v.nullable(v.string()),

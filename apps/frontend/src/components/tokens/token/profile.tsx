@@ -22,12 +22,12 @@ const toSocialUrl = (value: string, base: string) =>
     : `${base}${value}`;
 
 type Props = {
+  cid: string;
   contractPromise?: Promise<FTContractRes>;
   loading?: boolean;
-  token: string;
 };
 
-export const Profile = ({ contractPromise, loading, token }: Props) => {
+export const Profile = ({ cid, contractPromise, loading }: Props) => {
   const result = !loading && contractPromise ? use(contractPromise) : null;
   const contract = result?.data ?? null;
 
@@ -51,7 +51,7 @@ export const Profile = ({ contractPromise, loading, token }: Props) => {
                 fallback={<Skeleton className="h-7 w-40" />}
                 loading={loading || !contract}
               >
-                {() => <AccountLink account={token} textClassName="max-w-60" />}
+                {() => <AccountLink account={cid} textClassName="max-w-60" />}
               </SkeletonSlot>
             </ListRight>
           </ListItem>

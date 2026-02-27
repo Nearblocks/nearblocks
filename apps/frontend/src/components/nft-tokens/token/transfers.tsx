@@ -19,8 +19,8 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  nftCountPromise?: Promise<NFTContractTxnCountRes>;
-  nftsPromise?: Promise<NFTContractTxnsRes>;
+  txnCountPromise?: Promise<NFTContractTxnCountRes>;
+  txnsPromise?: Promise<NFTContractTxnsRes>;
 };
 
 const columns: DataTableColumnDef<NFTTxn>[] = [
@@ -110,11 +110,11 @@ const columns: DataTableColumnDef<NFTTxn>[] = [
 
 export const NftTokenTransfers = ({
   loading,
-  nftCountPromise,
-  nftsPromise,
+  txnCountPromise,
+  txnsPromise,
 }: Props) => {
-  const nfts = !loading && nftsPromise ? use(nftsPromise) : null;
-  const nftCount = !loading && nftCountPromise ? use(nftCountPromise) : null;
+  const nfts = !loading && txnsPromise ? use(txnsPromise) : null;
+  const nftCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const pathname = usePathname();
   const searchParams = useSearchParams();

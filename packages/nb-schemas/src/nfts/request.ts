@@ -3,7 +3,6 @@ import * as v from 'valibot';
 import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 
 export const NFTListSort = {
-  HOLDERS: 'holders',
   NAME: 'name',
   TOKENS: 'tokens',
   TRANSFERS: 'transfers_24h',

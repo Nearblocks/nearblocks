@@ -10,7 +10,6 @@ SELECT
   nm.description,
   nm.modified_at,
   nl.tokens,
-  nl.holders,
   nl.transfers_24h
 FROM
   nft_meta nm

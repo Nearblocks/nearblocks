@@ -10,14 +10,13 @@ import { Truncate, TruncateText } from '@/components/truncate';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  cid: string;
   contractPromise?: Promise<NFTContractRes>;
   loading?: boolean;
-  token: string;
 };
 
-export const NftTokenHeader = ({ contractPromise, loading, token }: Props) => {
-  const result = !loading && contractPromise ? use(contractPromise) : null;
-  const contract = result?.data ?? null;
+export const NftTokenHeader = ({ cid, contractPromise, loading }: Props) => {
+  const contract = !loading && contractPromise ? use(contractPromise) : null;
 
   return (
     <SkeletonSlot
@@ -32,21 +31,21 @@ export const NftTokenHeader = ({ contractPromise, loading, token }: Props) => {
       {() => (
         <span className="flex items-center gap-2">
           <TokenImage
-            alt={contract?.name ?? token}
+            alt={contract?.data?.name ?? cid}
             className="size-6 rounded-full border"
-            src={contract?.icon ?? ''}
+            src={contract?.data?.icon ?? ''}
           />
           <Truncate className="flex items-center gap-2">
             <TruncateText
               className="text-foreground max-w-60"
-              text={contract?.name ?? token}
+              text={contract?.data?.name ?? cid}
             />
           </Truncate>
           <Truncate>
             (
             <TruncateText
               className="text-foreground max-w-30"
-              text={contract?.symbol ?? token}
+              text={contract?.data?.symbol ?? cid}
             />
             )
           </Truncate>

@@ -19,9 +19,9 @@ import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  ftCountPromise?: Promise<FTTxnCountRes>;
-  ftsPromise?: Promise<FTTxnsRes>;
   loading?: boolean;
+  txnCountPromise?: Promise<FTTxnCountRes>;
+  txnsPromise?: Promise<FTTxnsRes>;
 };
 
 const columns: DataTableColumnDef<FTTxn>[] = [
@@ -119,12 +119,12 @@ const columns: DataTableColumnDef<FTTxn>[] = [
 ];
 
 export const TokenTransfers = ({
-  ftCountPromise,
-  ftsPromise,
   loading,
+  txnCountPromise,
+  txnsPromise,
 }: Props) => {
-  const fts = !loading && ftsPromise ? use(ftsPromise) : null;
-  const ftCount = !loading && ftCountPromise ? use(ftCountPromise) : null;
+  const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const searchParams = useSearchParams();
 
@@ -141,24 +141,24 @@ export const TokenTransfers = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
-          data={fts?.data}
+          data={txns?.data}
           emptyMessage="No token transfers found"
           getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !ftCount}
+              loading={loading || !txnCount}
             >
               {() => (
                 <>{`A total of ${numberFormat(
-                  ftCount?.data?.count ?? 0,
+                  txnCount?.data?.count ?? 0,
                 )} token txns found`}</>
               )}
             </SkeletonSlot>
           }
-          loading={loading || !!fts?.errors}
+          loading={loading || !!txns?.errors}
           onPaginationNavigate={onPaginate}
-          pagination={fts?.meta}
+          pagination={txns?.meta}
         />
       </CardContent>
     </Card>

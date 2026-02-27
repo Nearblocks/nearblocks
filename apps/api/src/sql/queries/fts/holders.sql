@@ -9,15 +9,30 @@ WHERE
   AND (
     ${cursor.amount}::NUMERIC IS NULL
     OR (
-      amount < ${cursor.amount}
+      (
+        ${direction} = 'desc'
+        AND (
+          amount < ${cursor.amount}
+          OR (
+            amount = ${cursor.amount}
+            AND account > ${cursor.account}
+          )
+        )
+      )
       OR (
-        amount = ${cursor.amount}
-        AND account > ${cursor.account}
+        ${direction} = 'asc'
+        AND (
+          amount > ${cursor.amount}
+          OR (
+            amount = ${cursor.amount}
+            AND account < ${cursor.account}
+          )
+        )
       )
     )
   )
 ORDER BY
-  amount DESC,
-  account ASC
+  amount ${direction:raw},
+  account ${accountDirection:raw}
 LIMIT
   ${limit}

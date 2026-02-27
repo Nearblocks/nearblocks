@@ -3,9 +3,14 @@ import * as v from 'valibot';
 import { cursorSchema, limitSchema, tsSchema } from '../../common.js';
 
 const list = v.object({
+  contract: v.string(),
   limit: limitSchema,
   next: cursorSchema,
   prev: cursorSchema,
+});
+
+const tokenCount = v.object({
+  contract: v.string(),
 });
 
 const cursor = v.object({
@@ -13,15 +18,24 @@ const cursor = v.object({
   token: v.string(),
 });
 
+const token = v.object({
+  contract: v.string(),
+  token: v.string(),
+});
+
 const txns = v.object({
   before_ts: tsSchema,
+  contract: v.string(),
   limit: limitSchema,
   next: cursorSchema,
   prev: cursorSchema,
+  token: v.string(),
 });
 
 const txnCount = v.object({
   before_ts: tsSchema,
+  contract: v.string(),
+  token: v.string(),
 });
 
 const txnCursor = v.object({
@@ -32,63 +46,19 @@ const txnCursor = v.object({
   token: v.string(),
 });
 
-const contract = v.object({
-  contract: v.string(),
-});
-
-const contractTxns = v.object({
-  affected: v.optional(v.string()),
-  before_ts: tsSchema,
-  contract: v.string(),
-  limit: limitSchema,
-  next: cursorSchema,
-  prev: cursorSchema,
-});
-
-const contractTxnCount = v.object({
-  affected: v.optional(v.string()),
-  before_ts: tsSchema,
-  contract: v.string(),
-});
-
-const contractHolders = v.object({
-  contract: v.string(),
-  limit: limitSchema,
-  next: cursorSchema,
-  prev: cursorSchema,
-});
-
-const contractHolderCount = v.object({
-  contract: v.string(),
-});
-
-const contractHoldersCursor = v.object({
-  account: v.string(),
-  quantity: v.string(),
-});
-
-export type NFTListReq = v.InferOutput<typeof list>;
+export type NFTTokenListReq = v.InferOutput<typeof list>;
+export type NFTTokenCountReq = v.InferOutput<typeof tokenCount>;
 export type NFTCursorReq = v.InferOutput<typeof cursor>;
-export type NFTTxnsReq = v.InferOutput<typeof txns>;
-export type NFTTxnsCursor = v.InferOutput<typeof txnCursor>;
-export type NFTTxnCountReq = v.InferOutput<typeof txnCount>;
-export type NFTContractReq = v.InferOutput<typeof contract>;
-export type NFTContractTxnsReq = v.InferOutput<typeof contractTxns>;
-export type NFTContractTxnCountReq = v.InferOutput<typeof contractTxnCount>;
-export type NFTContractHoldersReq = v.InferOutput<typeof contractHolders>;
-export type NFTContractHolderCountReq = v.InferOutput<
-  typeof contractHolderCount
->;
+export type NFTTokenReq = v.InferOutput<typeof token>;
+export type NFTTokenTxnsReq = v.InferOutput<typeof txns>;
+export type NFTTokenTxnsCursor = v.InferOutput<typeof txnCursor>;
+export type NFTTokenTxnCountReq = v.InferOutput<typeof txnCount>;
 
 export default {
-  contract,
-  contractHolderCount,
-  contractHolders,
-  contractHoldersCursor,
-  contractTxnCount,
-  contractTxns,
   cursor,
   list,
+  token,
+  tokenCount,
   txnCount,
   txnCursor,
   txns,

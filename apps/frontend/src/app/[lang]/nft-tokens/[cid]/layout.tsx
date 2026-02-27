@@ -1,9 +1,9 @@
 import { ErrorSuspense } from '@/components/error-suspense';
 import { ActiveLink } from '@/components/link';
-import { TabLink, TabLinks } from '@/components/tab-links';
 import { NftTokenHeader } from '@/components/nft-tokens/token/header';
 import { Overview } from '@/components/nft-tokens/token/overview';
 import { Profile } from '@/components/nft-tokens/token/profile';
+import { TabLink, TabLinks } from '@/components/tab-links';
 import {
   fetchNFTContract,
   fetchNFTContractHolderCount,
@@ -11,20 +11,20 @@ import {
 } from '@/data/nft-tokens/contract';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
-type Props = LayoutProps<'/[lang]/nft-tokens/[token]'>;
+type Props = LayoutProps<'/[lang]/nft-tokens/[cid]'>;
 
 const NftTokenLayout = async ({ children, params }: Props) => {
-  const { token } = await params;
-  const contractPromise = fetchNFTContract(token);
-  const holderCountPromise = fetchNFTContractHolderCount(token);
-  const txCountPromise = fetchNFTContractTxnCount(token, {});
+  const { cid } = await params;
+  const contractPromise = fetchNFTContract(cid);
+  const holderCountPromise = fetchNFTContractHolderCount(cid);
+  const txCountPromise = fetchNFTContractTxnCount(cid, {});
 
   return (
     <>
       <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
         NFT Token:{' '}
-        <ErrorSuspense fallback={<NftTokenHeader loading token={token} />}>
-          <NftTokenHeader contractPromise={contractPromise} token={token} />
+        <ErrorSuspense fallback={<NftTokenHeader cid={cid} loading />}>
+          <NftTokenHeader cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </h1>
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -35,20 +35,23 @@ const NftTokenLayout = async ({ children, params }: Props) => {
             txCountPromise={txCountPromise}
           />
         </ErrorSuspense>
-        <ErrorSuspense fallback={<Profile loading token={token} />}>
-          <Profile contractPromise={contractPromise} token={token} />
+        <ErrorSuspense fallback={<Profile cid={cid} loading />}>
+          <Profile cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </div>
       <ScrollArea className="mt-10 mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>
-            <ActiveLink exact href={`/nft-tokens/${token}`}>
+            <ActiveLink exact href={`/nft-tokens/${cid}`}>
               Transfers
             </ActiveLink>
           </TabLink>
           <TabLink asChild>
-            <ActiveLink href={`/nft-tokens/${token}/holders`}>
-              Holders
+            <ActiveLink href={`/nft-tokens/${cid}/holders`}>Holders</ActiveLink>
+          </TabLink>
+          <TabLink asChild>
+            <ActiveLink href={`/nft-tokens/${cid}/tokens`}>
+              Inventory
             </ActiveLink>
           </TabLink>
         </TabLinks>

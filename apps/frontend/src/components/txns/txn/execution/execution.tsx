@@ -12,18 +12,18 @@ import { ReceiptTree } from './tree';
 
 type Props = {
   receipts: TxnReceipt;
-  txnHash?: string;
+  tid?: string;
 };
 
-export const ExecutionPlan = ({ receipts, txnHash }: Props) => {
+export const ExecutionPlan = ({ receipts, tid }: Props) => {
   useHashScroll(true);
   const [rpcEnabled, setRpcEnabled] = useState(false);
 
   const { data: rpcData, isLoading: rpcLoading } = useTxnStatus(
-    rpcEnabled && txnHash
+    rpcEnabled && tid
       ? {
           senderAccountId: receipts.predecessor_account_id,
-          txHash: txnHash,
+          txHash: tid,
         }
       : null,
   );

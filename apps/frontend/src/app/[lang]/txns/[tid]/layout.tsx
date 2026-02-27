@@ -3,37 +3,37 @@ import { TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
-type Props = LayoutProps<'/[lang]/txns/[txn]'>;
+type Props = LayoutProps<'/[lang]/txns/[tid]'>;
 
 const TxnLayout = async ({ children, params }: Props) => {
-  const { txn } = await params;
+  const { tid } = await params;
 
   return (
     <>
       <h1 className="text-headline-lg mb-6">
         Transaction{' '}
-        <span className="text-muted-foreground text-headline-base">#{txn}</span>
+        <span className="text-muted-foreground text-headline-base">#{tid}</span>
       </h1>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>
-            <ActiveLink href={`/txns/${txn}`}>Overview</ActiveLink>
+            <ActiveLink href={`/txns/${tid}`}>Overview</ActiveLink>
           </TabLink>
           <TabLink asChild>
-            <ActiveLink href={`/txns/${txn}/execution`}>
+            <ActiveLink href={`/txns/${tid}/execution`}>
               Execution Plan
             </ActiveLink>
           </TabLink>
           {/* <TabLink asChild>
-              <ActiveLink href={`/txns/${txn}/enhanced`}>
+              <ActiveLink href={`/txns/${tid}/enhanced`}>
                 Enhanced Plan
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
-              <ActiveLink href={`/txns/${txn}/tree`}>Tree Plan</ActiveLink>
+              <ActiveLink href={`/txns/${tid}/tree`}>Tree Plan</ActiveLink>
             </TabLink> */}
           <TabLink asChild>
-            <ActiveLink href={`/txns/${txn}/receipts`}>
+            <ActiveLink href={`/txns/${tid}/receipts`}>
               Receipts Summary
             </ActiveLink>
           </TabLink>

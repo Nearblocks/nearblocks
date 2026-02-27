@@ -9,6 +9,9 @@ import {
   NFTContractTxnCountRes,
   NFTContractTxnsReq,
   NFTContractTxnsRes,
+  NFTTokenCountRes,
+  NFTTokenListReq,
+  NFTTokenListRes,
 } from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
@@ -76,6 +79,27 @@ export const fetchNFTContractHolderCount = cache(
   async (contract: string): Promise<NFTContractHolderCountRes> => {
     const resp = await fetcher<NFTContractHolderCountRes>(
       `/v3/nfts/${contract}/holders/count`,
+    );
+    return resp;
+  },
+);
+
+export const fetchNFTContractTokens = cache(
+  async (contract: string, params: SearchParams): Promise<NFTTokenListRes> => {
+    const keys: (keyof NFTTokenListReq)[] = ['limit', 'next', 'prev'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<NFTTokenListRes>(
+      `/v3/nfts/${contract}/tokens?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchNFTContractTokenCount = cache(
+  async (contract: string): Promise<NFTTokenCountRes> => {
+    const resp = await fetcher<NFTTokenCountRes>(
+      `/v3/nfts/${contract}/tokens/count`,
     );
     return resp;
   },

@@ -3,8 +3,6 @@ import * as v from 'valibot';
 import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 
 export const FTListSort = {
-  CHANGE: 'change_24h',
-  HOLDERS: 'holders',
   MARKET_CAP: 'market_cap',
   NAME: 'name',
   ONCHAIN_MARKET_CAP: 'onchain_market_cap',

@@ -1,31 +1,29 @@
 import { Router } from 'express';
 
-import request from 'nb-schemas/dist/fts/request.js';
+import request from 'nb-schemas/dist/nfts/tokens/request.js';
 
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
-import contract from '#routes/v3/fts/contract';
-import service from '#services/v3/fts/index';
+import service from '#services/v3/nfts/token';
 
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/fts', bearerAuth, rateLimiter, route);
-
-  contract(app);
+  app.use('/nfts', bearerAuth, rateLimiter, route);
 
   /**
    * @openapi
-   * /v3/fts:
+   * /v3/nfts/{contract}/tokens:
    *   get:
-   *     summary: Get top tokens
+   *     summary: Get nft tokens
    *     tags:
-   *       - V3 / FTs
+   *       - V3 / NFTs
    *     parameters:
-   *       - in: query
-   *         name: search
-   *         description: Search keyword
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
    *         schema:
    *           type: string
    *       - in: query
@@ -46,53 +44,82 @@ const routes = (app: Router) => {
    *           minimum: 1
    *           maximum: 100
    *           default: 25
-   *       - in: query
-   *         name: sort
-   *         description: Sort field
-   *         schema:
-   *           type: string
-   *           enum: [market_cap, name, onchain_market_cap, price, volume_24h]
-   *           default: onchain_market_cap
-   *       - in: query
-   *         name: order
-   *         description: Sort order
-   *         schema:
-   *           type: string
-   *           enum: [desc, asc]
-   *           default: desc
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/', validate(request.list), service.list);
+  route.get('/:contract/tokens', validate(request.list), service.list);
 
   /**
    * @openapi
-   * /v3/fts/count:
+   * /v3/nfts/{contract}/tokens/count:
    *   get:
-   *     summary: Get top tokens count
+   *     summary: Get nft tokens count
    *     tags:
-   *       - V3 / FTs
+   *       - V3 / NFTs
    *     parameters:
-   *       - in: query
-   *         name: search
-   *         description: Search keyword
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
    *         schema:
    *           type: string
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/count', validate(request.count), service.count);
+  route.get(
+    '/:contract/tokens/count',
+    validate(request.tokenCount),
+    service.tokenCount,
+  );
 
   /**
    * @openapi
-   * /v3/fts/txns:
+   * /v3/nfts/{contract}/tokens/{token}:
    *   get:
-   *     summary: Get all token transfers
+   *     summary: Get nft token info
    *     tags:
-   *       - V3 / FTs
+   *       - V3 / NFTs
    *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:contract/tokens/:token', validate(request.token), service.token);
+
+  /**
+   * @openapi
+   * /v3/nfts/{contract}/tokens/{token}/txns:
+   *   get:
+   *     summary: Get nft token transfers
+   *     tags:
+   *       - V3 / NFTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
    *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
@@ -122,16 +149,32 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns', validate(request.txns), service.txns);
+  route.get(
+    '/:contract/tokens/:token/txns',
+    validate(request.txns),
+    service.txns,
+  );
 
   /**
    * @openapi
-   * /v3/fts/txns/count:
+   * /v3/nfts/{contract}/tokens/{token}/txns/count:
    *   get:
-   *     summary: Get token transfers count
+   *     summary: Get nft token transfers count
    *     tags:
-   *       - V3 / FTs
+   *       - V3 / NFTs
    *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
    *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
@@ -143,9 +186,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validate(request.txnCount), service.txnCount);
-
-  return app;
+  route.get(
+    '/:contract/tokens/:token/txns/count',
+    validate(request.txnCount),
+    service.txnCount,
+  );
 };
 
 export default routes;
