@@ -166,9 +166,11 @@ const holders = responseHandler(
       ? cursors.decode(request.contractHoldersCursor, req.validator.prev)
       : null;
     const direction = prev ? 'asc' : 'desc';
+    const accountDirection = prev ? 'desc' : 'asc';
     const cursor = prev || next;
 
     const data = await dbEvents.manyOrNone<FTContractHolders>(sql.holders, {
+      accountDirection,
       contract,
       cursor: {
         account: cursor?.account,

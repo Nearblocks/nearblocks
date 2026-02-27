@@ -10,15 +10,15 @@ import {
   fetchTxnReceipts,
 } from '@/data/txns';
 
-type Props = PageProps<'/[lang]/txns/[txn]'>;
+type Props = PageProps<'/[lang]/txns/[tid]'>;
 
 const TxnPage = async ({ params }: Props) => {
-  const { txn } = await params;
-  const txnPromise = fetchTxn(txn);
-  const txnFTsPromise = fetchTxnFTs(txn);
-  const txnMTsPromise = fetchTxnMTs(txn);
-  const txnNFTsPromise = fetchTxnNFTs(txn);
-  const txnReceiptsPromise = fetchTxnReceipts(txn);
+  const { tid } = await params;
+  const txnPromise = fetchTxn(tid);
+  const txnFTsPromise = fetchTxnFTs(tid);
+  const txnMTsPromise = fetchTxnMTs(tid);
+  const txnNFTsPromise = fetchTxnNFTs(tid);
+  const txnReceiptsPromise = fetchTxnReceipts(tid);
   const statsPromise = fetchStats();
 
   return (

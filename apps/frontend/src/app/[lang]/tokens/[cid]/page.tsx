@@ -5,16 +5,19 @@ import {
   fetchFTContractTxns,
 } from '@/data/tokens/contract';
 
-type Props = PageProps<'/[lang]/tokens/[token]'>;
+type Props = PageProps<'/[lang]/tokens/[cid]'>;
 
 const TokenPage = async ({ params, searchParams }: Props) => {
-  const [{ token }, filters] = await Promise.all([params, searchParams]);
-  const ftsPromise = fetchFTContractTxns(token, filters);
-  const ftCountPromise = fetchFTContractTxnCount(token, filters);
+  const [{ cid }, filters] = await Promise.all([params, searchParams]);
+  const txnsPromise = fetchFTContractTxns(cid, filters);
+  const txnCountPromise = fetchFTContractTxnCount(cid, filters);
 
   return (
     <ErrorSuspense fallback={<TokenTransfers loading />}>
-      <TokenTransfers ftCountPromise={ftCountPromise} ftsPromise={ftsPromise} />
+      <TokenTransfers
+        txnCountPromise={txnCountPromise}
+        txnsPromise={txnsPromise}
+      />
     </ErrorSuspense>
   );
 };

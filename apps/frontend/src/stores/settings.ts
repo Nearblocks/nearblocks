@@ -65,7 +65,15 @@ export const createSettingsStore = (
           timestampMode: state.timestampMode,
           utcMode: state.utcMode,
         }),
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() =>
+          typeof window !== 'undefined'
+            ? localStorage
+            : {
+                getItem: () => null,
+                removeItem: () => void 0,
+                setItem: () => void 0,
+              },
+        ),
       },
     ),
   );

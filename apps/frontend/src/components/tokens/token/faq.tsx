@@ -20,7 +20,7 @@ type Props = {
   deploymentsPromise?: Promise<ContractDeployment[] | null>;
   holderCountPromise?: Promise<FTContractHolderCountRes>;
   loading?: boolean;
-  txCountPromise?: Promise<FTContractTxnCountRes>;
+  txnCountPromise?: Promise<FTContractTxnCountRes>;
 };
 
 export const TokenFaq = ({
@@ -28,20 +28,19 @@ export const TokenFaq = ({
   deploymentsPromise,
   holderCountPromise,
   loading,
-  txCountPromise,
+  txnCountPromise,
 }: Props) => {
   const contractRes = !loading && contractPromise ? use(contractPromise) : null;
   const deployments =
     !loading && deploymentsPromise ? use(deploymentsPromise) : null;
-  const txCountRes = !loading && txCountPromise ? use(txCountPromise) : null;
+  const txnCountRes = !loading && txnCountPromise ? use(txnCountPromise) : null;
   const holderCountRes =
     !loading && holderCountPromise ? use(holderCountPromise) : null;
 
   const contract = contractRes?.data ?? null;
   const firstDeployment = deployments?.[0] ?? null;
-  const txCount = txCountRes?.data ?? null;
+  const txnCount = txnCountRes?.data ?? null;
   const holderCount = holderCountRes?.data ?? null;
-
   const name = contract?.name ?? contract?.symbol ?? 'this token';
   const symbol = contract?.symbol ?? '';
 
@@ -177,11 +176,11 @@ export const TokenFaq = ({
                 ) : (
                   <>Creation information is not available for {name}.</>
                 )}{' '}
-                {txCount?.count && (
+                {txnCount?.count && (
                   <>
                     Since the creation of {name}, there has been{' '}
                     <span className="text-foreground">
-                      {numberFormat(txCount.count)}
+                      {numberFormat(txnCount.count)}
                     </span>{' '}
                     on-chain transfers.
                   </>

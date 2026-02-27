@@ -6,13 +6,13 @@ import {
   fetchFTContractHolders,
 } from '@/data/tokens/contract';
 
-type Props = PageProps<'/[lang]/tokens/[token]/holders'>;
+type Props = PageProps<'/[lang]/tokens/[cid]/holders'>;
 
 const HoldersPage = async ({ params, searchParams }: Props) => {
-  const [{ token }, filters] = await Promise.all([params, searchParams]);
-  const holdersPromise = fetchFTContractHolders(token, filters);
-  const holderCountPromise = fetchFTContractHolderCount(token);
-  const contractPromise = fetchFTContract(token);
+  const [{ cid }, filters] = await Promise.all([params, searchParams]);
+  const holdersPromise = fetchFTContractHolders(cid, filters);
+  const holderCountPromise = fetchFTContractHolderCount(cid);
+  const contractPromise = fetchFTContract(cid);
 
   return (
     <ErrorSuspense fallback={<TokenHolders loading />}>

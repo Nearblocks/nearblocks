@@ -6,13 +6,13 @@ import {
   fetchNFTContractHolders,
 } from '@/data/nft-tokens/contract';
 
-type Props = PageProps<'/[lang]/nft-tokens/[token]/holders'>;
+type Props = PageProps<'/[lang]/nft-tokens/[cid]/holders'>;
 
 const HoldersPage = async ({ params, searchParams }: Props) => {
-  const [{ token }, filters] = await Promise.all([params, searchParams]);
-  const holdersPromise = fetchNFTContractHolders(token, filters);
-  const holderCountPromise = fetchNFTContractHolderCount(token);
-  const contractPromise = fetchNFTContract(token);
+  const [{ cid }, filters] = await Promise.all([params, searchParams]);
+  const holdersPromise = fetchNFTContractHolders(cid, filters);
+  const holderCountPromise = fetchNFTContractHolderCount(cid);
+  const contractPromise = fetchNFTContract(cid);
 
   return (
     <ErrorSuspense fallback={<NftTokenHolders loading />}>

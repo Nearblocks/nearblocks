@@ -23,8 +23,7 @@ SELECT
   fm.coinmarketcap_id,
   fm.volume_24h,
   fm.change_24h,
-  fl.onchain_market_cap,
-  fl.holders
+  fl.onchain_market_cap
 FROM
   ft_meta fm
   LEFT JOIN ft_list fl ON fl.contract = fm.contract

@@ -20,8 +20,8 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  nftCountPromise?: Promise<NFTTxnCountRes>;
-  nftsPromise?: Promise<NFTTxnsRes>;
+  txnCountPromise?: Promise<NFTTxnCountRes>;
+  txnsPromise?: Promise<NFTTxnsRes>;
 };
 
 const columns: DataTableColumnDef<NFTTxn>[] = [
@@ -129,11 +129,11 @@ const columns: DataTableColumnDef<NFTTxn>[] = [
 
 export const NftTokenTransfers = ({
   loading,
-  nftCountPromise,
-  nftsPromise,
+  txnCountPromise,
+  txnsPromise,
 }: Props) => {
-  const nfts = !loading && nftsPromise ? use(nftsPromise) : null;
-  const nftCount = !loading && nftCountPromise ? use(nftCountPromise) : null;
+  const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const searchParams = useSearchParams();
 
@@ -150,24 +150,24 @@ export const NftTokenTransfers = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
-          data={nfts?.data}
+          data={txns?.data}
           emptyMessage="No NFT token transfers found"
           getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !nftCount}
+              loading={loading || !txnCount}
             >
               {() => (
                 <>{`A total of ${numberFormat(
-                  nftCount?.data?.count ?? 0,
+                  txnCount?.data?.count ?? 0,
                 )} nft token txns found`}</>
               )}
             </SkeletonSlot>
           }
-          loading={loading || !!nfts?.errors}
+          loading={loading || !!txns?.errors}
           onPaginationNavigate={onPaginate}
-          pagination={nfts?.meta}
+          pagination={txns?.meta}
         />
       </CardContent>
     </Card>

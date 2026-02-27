@@ -1,19 +1,19 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
-  NFTContract,
-  NFTContractHolderCount,
-  NFTContractHolderCountReq,
-  NFTContractHolders,
-  NFTContractHoldersReq,
-  NFTContractReq,
-  NFTContractTxn,
-  NFTContractTxnCount,
-  NFTContractTxnCountReq,
-  NFTContractTxnsReq,
-} from 'nb-schemas';
-import request from 'nb-schemas/dist/nfts/request.js';
-import response from 'nb-schemas/dist/nfts/response.js';
+  NFTToken,
+  NFTTokenCount,
+  NFTTokenCountReq,
+  NFTTokenList,
+  NFTTokenListReq,
+  NFTTokenReq,
+  NFTTokenTxn,
+  NFTTokenTxnCount,
+  NFTTokenTxnCountReq,
+  NFTTokenTxnsReq,
+} from 'nb-schemas/dist/nfts/tokens/index.js';
+import request from 'nb-schemas/dist/nfts/tokens/request.js';
+import response from 'nb-schemas/dist/nfts/tokens/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
@@ -29,13 +29,64 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/nfts';
 
-const contract = responseHandler(
-  response.contract,
-  async (req: RequestValidator<NFTContractReq>) => {
+const list = responseHandler(
+  response.list,
+  async (req: RequestValidator<NFTTokenListReq>) => {
+    const contract = req.validator.contract;
+    const limit = req.validator.limit;
+    const next = req.validator.next
+      ? cursors.decode(request.cursor, req.validator.next)
+      : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.cursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
+
+    const data = await dbEvents.manyOrNone<NFTTokenList>(sql.tokens.tokens, {
+      contract,
+      cursor: {
+        token: cursor?.token,
+      },
+      // Fetch one extra to check if there is a next page
+      limit: limit + 1,
+    });
+
+    return paginateData(
+      data,
+      limit,
+      direction,
+      (item) => ({
+        contract: item.contract,
+        token: item.token,
+      }),
+      !!cursor,
+    );
+  },
+);
+
+const tokenCount = responseHandler(
+  response.count,
+  async (req: RequestValidator<NFTTokenCountReq>) => {
     const contract = req.validator.contract;
 
-    const data = await dbEvents.oneOrNone<NFTContract>(sql.contract, {
+    const data = await dbEvents.one<NFTTokenCount>(sql.tokens.tokenCount, {
       contract,
+    });
+
+    return { data };
+  },
+);
+
+const token = responseHandler(
+  response.token,
+  async (req: RequestValidator<NFTTokenReq>) => {
+    const contract = req.validator.contract;
+    const token = req.validator.token;
+
+    const data = await dbEvents.oneOrNone<NFTToken>(sql.tokens.token, {
+      contract,
+      token,
     });
 
     return { data };
@@ -44,9 +95,9 @@ const contract = responseHandler(
 
 const txns = responseHandler(
   response.txns,
-  async (req: RequestValidator<NFTContractTxnsReq>) => {
+  async (req: RequestValidator<NFTTokenTxnsReq>) => {
     const contract = req.validator.contract;
-    const affected = req.validator.affected;
+    const token = req.validator.token;
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const next = req.validator.next
@@ -59,12 +110,11 @@ const txns = responseHandler(
     const cursor = prev || next;
 
     const eventsQuery: WindowListQuery<
-      Omit<NFTContractTxn, 'block' | 'transaction_hash'>
+      Omit<NFTTokenTxn, 'block' | 'transaction_hash'>
     > = (start, end, limit) => {
       return dbEvents.manyOrNone<
-        Omit<NFTContractTxn, 'block' | 'transaction_hash'>
-      >(sql.contractTxns, {
-        affected,
+        Omit<NFTTokenTxn, 'block' | 'transaction_hash'>
+      >(sql.tokens.tokenTxns, {
         before,
         contract,
         cursor: {
@@ -76,6 +126,7 @@ const txns = responseHandler(
         end,
         limit,
         start,
+        token,
       });
     };
 
@@ -92,10 +143,10 @@ const txns = responseHandler(
     }
 
     const queries = events.map((event) => {
-      return pgp.as.format(sql.contractTxn, event);
+      return pgp.as.format(sql.tokens.tokenTxn, event);
     });
     const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<NFTContractTxn>(unionQuery);
+    const txns = await dbBase.manyOrNone<NFTTokenTxn>(unionQuery);
 
     // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
@@ -112,9 +163,11 @@ const txns = responseHandler(
         limit,
         direction,
         (txn) => ({
+          contract: txn.contract_account_id,
           index: txn.event_index,
           shard: txn.shard_id,
           timestamp: txn.block_timestamp,
+          token: txn.token_id,
         }),
         !!cursor,
       );
@@ -125,9 +178,11 @@ const txns = responseHandler(
       limit,
       direction,
       (txn) => ({
+        contract: txn.contract_account_id,
         index: txn.event_index,
         shard: txn.shard_id,
         timestamp: txn.block_timestamp,
+        token: txn.token_id,
       }),
       !!cursor,
     );
@@ -135,73 +190,23 @@ const txns = responseHandler(
 );
 
 const txnCount = responseHandler(
-  response.count,
-  async (req: RequestValidator<NFTContractTxnCountReq>) => {
+  response.txnCount,
+  async (req: RequestValidator<NFTTokenTxnCountReq>) => {
     const contract = req.validator.contract;
-    const affected = req.validator.affected;
+    const token = req.validator.token;
     const before = req.validator.before_ts;
 
-    const txns = await dbEvents.one<NFTContractTxnCount>(sql.contractTxnCount, {
-      affected,
-      before,
-      contract,
-    });
-
-    return { data: txns };
-  },
-);
-
-const holders = responseHandler(
-  response.contractHolders,
-  async (req: RequestValidator<NFTContractHoldersReq>) => {
-    const contract = req.validator.contract;
-    const limit = req.validator.limit;
-    const next = req.validator.next
-      ? cursors.decode(request.contractHoldersCursor, req.validator.next)
-      : null;
-    const prev = req.validator.prev
-      ? cursors.decode(request.contractHoldersCursor, req.validator.prev)
-      : null;
-    const direction = prev ? 'asc' : 'desc';
-    const accountDirection = prev ? 'desc' : 'asc';
-    const cursor = prev || next;
-
-    const data = await dbEvents.manyOrNone<NFTContractHolders>(sql.holders, {
-      accountDirection,
-      contract,
-      cursor: {
-        account: cursor?.account,
-        quantity: cursor?.quantity,
+    const data = await dbEvents.one<NFTTokenTxnCount>(
+      sql.tokens.tokenTxnCount,
+      {
+        before,
+        contract,
+        token,
       },
-      direction,
-      // Fetch one extra to check if there is a next page
-      limit: limit + 1,
-    });
-
-    return paginateData(
-      data,
-      limit,
-      direction,
-      (holder) => ({
-        account: holder.account,
-        quantity: holder.quantity,
-      }),
-      !!cursor,
     );
-  },
-);
-
-const holderCount = responseHandler(
-  response.contractHolderCount,
-  async (req: RequestValidator<NFTContractHolderCountReq>) => {
-    const contract = req.validator.contract;
-
-    const data = await dbEvents.one<NFTContractHolderCount>(sql.holderCount, {
-      contract,
-    });
 
     return { data };
   },
 );
 
-export default { contract, holderCount, holders, txnCount, txns };
+export default { list, token, tokenCount, txnCount, txns };

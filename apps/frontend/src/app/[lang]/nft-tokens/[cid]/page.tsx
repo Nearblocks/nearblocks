@@ -5,18 +5,18 @@ import {
   fetchNFTContractTxns,
 } from '@/data/nft-tokens/contract';
 
-type Props = PageProps<'/[lang]/nft-tokens/[token]'>;
+type Props = PageProps<'/[lang]/nft-tokens/[cid]'>;
 
 const NftTokenPage = async ({ params, searchParams }: Props) => {
-  const [{ token }, filters] = await Promise.all([params, searchParams]);
-  const nftsPromise = fetchNFTContractTxns(token, filters);
-  const nftCountPromise = fetchNFTContractTxnCount(token, filters);
+  const [{ cid }, filters] = await Promise.all([params, searchParams]);
+  const txnsPromise = fetchNFTContractTxns(cid, filters);
+  const txnCountPromise = fetchNFTContractTxnCount(cid, filters);
 
   return (
     <ErrorSuspense fallback={<NftTokenTransfers loading />}>
       <NftTokenTransfers
-        nftCountPromise={nftCountPromise}
-        nftsPromise={nftsPromise}
+        txnCountPromise={txnCountPromise}
+        txnsPromise={txnsPromise}
       />
     </ErrorSuspense>
   );

@@ -103,6 +103,11 @@ WHERE
     ${before}::BIGINT IS NULL
     OR nft.block_timestamp < ${before}
   )
+  AND (
+    ${affected}::BIGINT IS NOT NULL
+    OR nft.cause = 'BURN'
+    OR nft.delta_amount >= 0
+  )
 ORDER BY
   block_timestamp ${direction:raw},
   shard_id ${direction:raw},

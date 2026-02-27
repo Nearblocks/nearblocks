@@ -92,13 +92,6 @@ const columns: DataTableColumnDef<FTList>[] = [
     sortName: 'onchain_market_cap',
   },
   {
-    cell: (token) => numberFormat(token.holders),
-    enableSort: true,
-    header: 'Holders',
-    id: 'holders',
-    sortName: 'holders',
-  },
-  {
     cell: (token) => {
       if (!token.total_supply || token.decimals == null)
         return <span>N/A</span>;

@@ -7,14 +7,14 @@ import {
   fetchFTContractTxnCount,
 } from '@/data/tokens/contract';
 
-type Props = PageProps<'/[lang]/tokens/[token]/faq'>;
+type Props = PageProps<'/[lang]/tokens/[cid]/faq'>;
 
 const FaqPage = async ({ params }: Props) => {
-  const { token } = await params;
-  const contractPromise = fetchFTContract(token);
-  const deploymentsPromise = fetchDeployments(token);
-  const txCountPromise = fetchFTContractTxnCount(token, {});
-  const holderCountPromise = fetchFTContractHolderCount(token);
+  const { cid } = await params;
+  const contractPromise = fetchFTContract(cid);
+  const deploymentsPromise = fetchDeployments(cid);
+  const txnCountPromise = fetchFTContractTxnCount(cid, {});
+  const holderCountPromise = fetchFTContractHolderCount(cid);
 
   return (
     <ErrorSuspense fallback={<TokenFaq loading />}>
@@ -22,7 +22,7 @@ const FaqPage = async ({ params }: Props) => {
         contractPromise={contractPromise}
         deploymentsPromise={deploymentsPromise}
         holderCountPromise={holderCountPromise}
-        txCountPromise={txCountPromise}
+        txnCountPromise={txnCountPromise}
       />
     </ErrorSuspense>
   );

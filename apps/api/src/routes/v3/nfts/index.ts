@@ -6,6 +6,7 @@ import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
 import contract from '#routes/v3/nfts/contract';
+import token from '#routes/v3/nfts/token';
 import service from '#services/v3/nfts/index';
 
 const route = Router();
@@ -14,6 +15,7 @@ const routes = (app: Router) => {
   app.use('/nfts', bearerAuth, rateLimiter, route);
 
   contract(app);
+  token(app);
 
   /**
    * @openapi
@@ -51,7 +53,7 @@ const routes = (app: Router) => {
    *         description: Sort field
    *         schema:
    *           type: string
-   *           enum: [holders, name, tokens, transfers_24h]
+   *           enum: [name, tokens, transfers_24h]
    *           default: transfers_24h
    *       - in: query
    *         name: order

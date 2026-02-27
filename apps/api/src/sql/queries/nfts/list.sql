@@ -6,7 +6,6 @@ SELECT
   base_uri,
   reference,
   tokens,
-  holders,
   transfers_24h
 FROM
   nft_list

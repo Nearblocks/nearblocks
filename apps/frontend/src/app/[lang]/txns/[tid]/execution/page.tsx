@@ -2,15 +2,15 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { Execution } from '@/components/txns/txn/execution';
 import { fetchTxnReceipts } from '@/data/txns';
 
-type Props = PageProps<'/[lang]/txns/[txn]/execution'>;
+type Props = PageProps<'/[lang]/txns/[tid]/execution'>;
 
 const ExecutionPage = async ({ params }: Props) => {
-  const { txn } = await params;
-  const receiptsPromise = fetchTxnReceipts(txn);
+  const { tid } = await params;
+  const receiptsPromise = fetchTxnReceipts(tid);
 
   return (
     <ErrorSuspense fallback={<Execution loading />}>
-      <Execution receiptsPromise={receiptsPromise} txnHash={txn} />
+      <Execution receiptsPromise={receiptsPromise} tid={tid} />
     </ErrorSuspense>
   );
 };

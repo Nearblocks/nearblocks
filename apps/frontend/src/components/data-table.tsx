@@ -224,7 +224,7 @@ export const DataTable = <TData,>({
           )}
         </SkeletonSlot>
       </Table>
-      {data?.length === 0 && (
+      {!loading && data?.length === 0 && (
         <EmptyBox description={emptyMessage} icon={emptyIcon} />
       )}
       <SkeletonSlot
