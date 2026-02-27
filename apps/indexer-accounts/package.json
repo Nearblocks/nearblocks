@@ -20,7 +20,7 @@
     "@sentry/node": "7.74.1",
     "axios": "1.8.3",
     "envalid": "8.0.0",
-    "lodash-es": "4.17.21",
+    "lodash-es": "4.17.23",
     "minio": "8.0.5",
     "stream-json": "1.9.1"
   },

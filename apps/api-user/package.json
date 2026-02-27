@@ -47,7 +47,7 @@
     "envalid": "^8.0.0",
     "express": "^4.21.1",
     "helmet": "^8.0.0",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "near-api-js": "^5.0.1",
     "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
