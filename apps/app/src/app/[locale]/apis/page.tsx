@@ -1,5 +1,6 @@
+import { getContactDetails } from '@/actions/contact';
 import ApiActions from '@/components/app/Apis/ApiActions';
-import { getRequest, postRequest } from '@/utils/app/api';
+import { getRequest } from '@/utils/app/api';
 import { userApiURL } from '@/utils/app/config';
 
 export default async function ApisPage(props: {
@@ -10,12 +11,6 @@ export default async function ApisPage(props: {
   const { status } = searchParams;
 
   const plans = await getRequest(`${userApiURL}plans`, {}, {}, false);
-  const getContactDetails = async (contactDeatils: any) => {
-    'use server';
-
-    const contactRes = await postRequest('/api/contact', contactDeatils);
-    return contactRes;
-  };
   return (
     <section>
       <ApiActions

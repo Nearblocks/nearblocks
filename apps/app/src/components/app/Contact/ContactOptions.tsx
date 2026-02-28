@@ -1,15 +1,8 @@
-import { postRequest } from '@/utils/app/api';
+import { getContactDetails } from '@/actions/contact';
 
 import ContactActions from '@/components/app/Contact/ContactActions';
 
 const ContactOptions = async () => {
-  const getContactDetails = async (contactDeatils: any) => {
-    'use server';
-
-    const contactRes = await postRequest('/api/contact', contactDeatils);
-    return contactRes;
-  };
-
   return <ContactActions getContactDetails={getContactDetails} />;
 };
 export default ContactOptions;
