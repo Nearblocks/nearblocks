@@ -49,11 +49,13 @@ const ApiActions = ({
         subject,
       };
       const response = await getContactDetails(contactDetails);
-      if (!response) {
-        throw new Error('Network response was not ok');
+      if (!response?.success) {
+        toast.error(response?.error || 'Something went wrong!');
+        return;
       }
       toast.success('Thank you!');
     } catch (err) {
+      console.log(err);
       toast.error('Something went wrong!');
     } finally {
       setLoading(false);

@@ -1,13 +1,17 @@
-import { postRequest } from '@/utils/app/api';
+import { submitContact } from '@/utils/app/contact';
 
 import ContactActions from '@/components/app/Contact/ContactActions';
 
 const ContactOptions = async () => {
-  const getContactDetails = async (contactDeatils: any) => {
+  const getContactDetails = async (contactDetails: any) => {
     'use server';
 
-    const contactRes = await postRequest('/api/contact', contactDeatils);
-    return contactRes;
+    try {
+      return await submitContact(contactDetails);
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      return { error: 'Failed to submit contact form', success: false };
+    }
   };
 
   return <ContactActions getContactDetails={getContactDetails} />;

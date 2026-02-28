@@ -55,8 +55,9 @@ const FormContact = ({ getContactDetails, selectValue }: Props) => {
         token: token,
       };
       const response = await getContactDetails(contactDetails);
-      if (!response) {
-        throw new Error('Network response was not ok');
+      if (!response?.success) {
+        toast.error(response?.error || 'Something went wrong!');
+        return;
       } else {
         setName('');
         setEmail('');
