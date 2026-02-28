@@ -51,7 +51,29 @@ function escapeHtml(str: string): string {
 export async function submitContact(
   body: ContactFormData,
 ): Promise<ContactResult> {
-  const { description, email, name, subject, token } = body;
+  if (!body || typeof body !== 'object') {
+    return {
+      error: 'Invalid request body',
+      statusCode: 400,
+      success: false,
+    };
+  }
+
+  const { description, email, name, subject, token } = body as ContactFormData;
+
+  if (
+    typeof name !== 'string' ||
+    typeof email !== 'string' ||
+    typeof subject !== 'string' ||
+    typeof description !== 'string' ||
+    typeof token !== 'string'
+  ) {
+    return {
+      error: 'Invalid field types',
+      statusCode: 400,
+      success: false,
+    };
+  }
 
   if (!name || !email || !subject || !description) {
     return {

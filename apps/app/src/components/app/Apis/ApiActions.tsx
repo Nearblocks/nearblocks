@@ -45,7 +45,12 @@ const ApiActions = ({
   const submitForm = async (event: any) => {
     event.preventDefault();
 
-    if (!siteKey || captchaStatus !== 'solved' || !token) {
+    if (!siteKey) {
+      toast.error('Captcha is currently unavailable.');
+      return;
+    }
+
+    if (captchaStatus !== 'solved' || !token) {
       setCaptchaStatus('error');
       return;
     }
@@ -531,7 +536,7 @@ const ApiActions = ({
                   Captcha is currently unavailable.
                 </span>
               )}
-              {captchaStatus === 'error' && (
+              {siteKey && captchaStatus === 'error' && (
                 <span className="text-red-500 text-sm p-6">
                   * Please verify the captcha
                 </span>
