@@ -1,8 +1,10 @@
 'use client';
+import { Turnstile } from '@marsidev/react-turnstile';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { useTheme } from 'next-themes';
 import { Link, useIntlRouter } from '@/i18n/routing';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useConfig } from 'app/src/hooks/app/useConfig';
 import { localFormat } from '@/utils/app/libs';
@@ -33,12 +35,21 @@ const ApiActions = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
+  const [captchaStatus, setCaptchaStatus] = useState<string | null>(null);
+  const [token, setToken] = useState<string>();
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const router = useIntlRouter();
 
-  const { docsUrl } = useConfig();
+  const { docsUrl, siteKey } = useConfig();
 
   const submitForm = async (event: any) => {
     event.preventDefault();
+
+    if (captchaStatus !== 'solved' || !token) {
+      setCaptchaStatus('error');
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -47,6 +58,7 @@ const ApiActions = ({
         email: email,
         name: name,
         subject,
+        token: token,
       };
       const response = await getContactDetails(contactDetails);
       if (!response?.success) {
@@ -55,7 +67,7 @@ const ApiActions = ({
       }
       toast.success('Thank you!');
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.error('Something went wrong!');
     } finally {
       setLoading(false);
@@ -492,6 +504,32 @@ const ApiActions = ({
                 rows={5}
                 value={description}
               />
+            </div>
+            <div className="flex my-4">
+              <Turnstile
+                onError={() => setCaptchaStatus('error')}
+                onExpire={() => {
+                  setCaptchaStatus('expired');
+                  setToken('');
+                }}
+                onSuccess={(token) => {
+                  setToken(token);
+                  setCaptchaStatus('solved');
+                }}
+                options={{
+                  appearance: 'always',
+                  refreshExpired: 'auto',
+                  size: 'normal',
+                  theme: theme as any,
+                }}
+                ref={turnstileRef}
+                siteKey={siteKey as string}
+              />
+              {captchaStatus === 'error' && (
+                <span className="text-red-500 text-sm p-6">
+                  * Please verify the captcha
+                </span>
+              )}
             </div>
             <div className="w-full text-center my-2">
               <button

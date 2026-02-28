@@ -1,6 +1,10 @@
 import ApiActions from '@/components/app/Apis/ApiActions';
 import { getRequest } from '@/utils/app/api';
-import { submitContact } from '@/utils/app/contact';
+import {
+  ContactFormData,
+  ContactResult,
+  submitContact,
+} from '@/utils/app/contact';
 import { userApiURL } from '@/utils/app/config';
 
 export default async function ApisPage(props: {
@@ -11,14 +15,20 @@ export default async function ApisPage(props: {
   const { status } = searchParams;
 
   const plans = await getRequest(`${userApiURL}plans`, {}, {}, false);
-  const getContactDetails = async (contactDetails: any) => {
+  const getContactDetails = async (
+    contactDetails: ContactFormData,
+  ): Promise<ContactResult> => {
     'use server';
 
     try {
       return await submitContact(contactDetails);
     } catch (error) {
       console.error('Contact form submission error:', error);
-      return { error: 'Failed to submit contact form', success: false };
+      return {
+        error: 'Failed to submit contact form',
+        statusCode: 500,
+        success: false,
+      };
     }
   };
   return (

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import {
-  ContactFormData,
-  submitContact,
-} from '@/utils/app/contact';
+import { ContactFormData, submitContact } from '@/utils/app/contact';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,13 +10,13 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json(
         { err: result.error, status: 0 },
-        { status: 400 },
+        { status: result.statusCode },
       );
     }
 
     return NextResponse.json(
-      { message: 'Message sent successfully', status: 1 },
-      { status: 200 },
+      { message: result.data?.message, status: 1 },
+      { status: result.statusCode },
     );
   } catch (err) {
     const error = err as Error;

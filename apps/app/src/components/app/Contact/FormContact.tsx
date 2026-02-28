@@ -67,7 +67,7 @@ const FormContact = ({ getContactDetails, selectValue }: Props) => {
         toast.success('Thank you!');
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.error('Something went wrong!');
     } finally {
       setLoading(false);

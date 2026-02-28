@@ -1,15 +1,24 @@
+import 'server-only';
+
 import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses';
 import type { TurnstileServerValidationResponse } from '@marsidev/react-turnstile';
-
-const sesClient = new SESClient({
-  region: process.env.AWS_REGION,
-});
 
 const TO_EMAIL = process.env.AWS_SES_TO_EMAIL;
 const FROM_EMAIL = process.env.AWS_SES_FROM_EMAIL;
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
 const TURNSTILE_VERIFY_URL =
   'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+
+let sesClient: SESClient | null = null;
+
+function getSESClient(): SESClient {
+  if (!sesClient) {
+    sesClient = new SESClient({
+      region: process.env.AWS_REGION,
+    });
+  }
+  return sesClient;
+}
 
 export interface ContactFormData {
   description: string;
@@ -19,9 +28,14 @@ export interface ContactFormData {
   token: string;
 }
 
+export interface ContactResultData {
+  message: string;
+}
+
 export interface ContactResult {
-  data?: any;
+  data?: ContactResultData;
   error?: string;
+  statusCode: number;
   success: boolean;
 }
 
@@ -31,15 +45,32 @@ export async function submitContact(
   const { description, email, name, subject, token } = body;
 
   if (!name || !email || !subject || !description) {
-    return { error: 'Missing required fields', success: false };
+    return {
+      error: 'Missing required fields',
+      statusCode: 400,
+      success: false,
+    };
   }
 
-  if (!TO_EMAIL || !FROM_EMAIL || !TURNSTILE_SECRET_KEY) {
-    return { error: 'Server configuration error', success: false };
+  if (
+    !TO_EMAIL ||
+    !FROM_EMAIL ||
+    !TURNSTILE_SECRET_KEY ||
+    !process.env.AWS_REGION
+  ) {
+    return {
+      error: 'Server configuration error',
+      statusCode: 500,
+      success: false,
+    };
   }
 
   if (!token) {
-    return { error: 'Captcha token is missing', success: false };
+    return {
+      error: 'Captcha token is missing',
+      statusCode: 400,
+      success: false,
+    };
   }
 
   const formData = new URLSearchParams();
@@ -59,7 +90,11 @@ export async function submitContact(
       'Turnstile verification request failed:',
       verificationResponse.status,
     );
-    return { error: 'Captcha verification service unavailable', success: false };
+    return {
+      error: 'Captcha verification service unavailable',
+      statusCode: 502,
+      success: false,
+    };
   }
 
   const data =
@@ -67,8 +102,14 @@ export async function submitContact(
 
   if (!data.success) {
     console.log('Captcha verification failed:', data);
-    return { error: 'Captcha verification failed', success: false };
+    return {
+      error: 'Captcha verification failed',
+      statusCode: 400,
+      success: false,
+    };
   }
+
+  const client = getSESClient();
 
   const params = {
     Destination: {
@@ -97,11 +138,12 @@ export async function submitContact(
   };
 
   const command = new SendEmailCommand(params);
-  const emailResponse = await sesClient.send(command);
+  const emailResponse = await client.send(command);
   console.log('Email sent successfully:', emailResponse);
 
   return {
     data: { message: 'Message sent successfully' },
+    statusCode: 200,
     success: true,
   };
 }
