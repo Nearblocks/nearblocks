@@ -39,6 +39,15 @@ export interface ContactResult {
   success: boolean;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export async function submitContact(
   body: ContactFormData,
 ): Promise<ContactResult> {
@@ -77,13 +86,36 @@ export async function submitContact(
   formData.append('secret', TURNSTILE_SECRET_KEY);
   formData.append('response', token);
 
-  const verificationResponse = await fetch(TURNSTILE_VERIFY_URL, {
-    body: formData.toString(),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    method: 'POST',
-  });
+  const turnstileTimeoutMs = 10_000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, turnstileTimeoutMs);
+
+  let verificationResponse: Response;
+  try {
+    verificationResponse = await fetch(TURNSTILE_VERIFY_URL, {
+      body: formData.toString(),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      method: 'POST',
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if ((error as any)?.name === 'AbortError') {
+      console.error('Turnstile verification request timed out');
+    } else {
+      console.error('Turnstile verification request failed:', error);
+    }
+    return {
+      error: 'Captcha verification service unavailable',
+      statusCode: 502,
+      success: false,
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!verificationResponse.ok) {
     console.error(
@@ -97,11 +129,21 @@ export async function submitContact(
     };
   }
 
-  const data =
-    (await verificationResponse.json()) as TurnstileServerValidationResponse;
+  let data: TurnstileServerValidationResponse;
+  try {
+    data =
+      (await verificationResponse.json()) as TurnstileServerValidationResponse;
+  } catch (error) {
+    console.error('Failed to parse Turnstile verification response:', error);
+    return {
+      error: 'Captcha verification service unavailable',
+      statusCode: 502,
+      success: false,
+    };
+  }
 
   if (!data.success) {
-    console.log('Captcha verification failed:', data);
+    console.error('Captcha verification failed:', data);
     return {
       error: 'Captcha verification failed',
       statusCode: 400,
@@ -110,6 +152,11 @@ export async function submitContact(
   }
 
   const client = getSESClient();
+
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeDescription = escapeHtml(description);
 
   const params = {
     Destination: {
@@ -120,10 +167,10 @@ export async function submitContact(
         Html: {
           Data: `
               <h2>New Contact Form Submission</h2>
-              <p><strong>From:</strong> ${name} (${email})</p>
-              <p><strong>Subject:</strong> ${subject}</p>
+              <p><strong>From:</strong> ${safeName} (${safeEmail})</p>
+              <p><strong>Subject:</strong> ${safeSubject}</p>
               <p><strong>Message:</strong></p>
-              <p>${description}</p>
+              <p>${safeDescription}</p>
             `,
         },
         Text: {
@@ -138,12 +185,22 @@ export async function submitContact(
   };
 
   const command = new SendEmailCommand(params);
-  const emailResponse = await client.send(command);
-  console.log('Email sent successfully:', emailResponse);
 
-  return {
-    data: { message: 'Message sent successfully' },
-    statusCode: 200,
-    success: true,
-  };
+  try {
+    const emailResponse = await client.send(command);
+    console.log('Email sent successfully:', emailResponse);
+
+    return {
+      data: { message: 'Message sent successfully' },
+      statusCode: 200,
+      success: true,
+    };
+  } catch (error) {
+    console.error('Error sending email via SES:', error);
+    return {
+      error: 'Failed to send message. Please try again later.',
+      statusCode: 502,
+      success: false,
+    };
+  }
 }

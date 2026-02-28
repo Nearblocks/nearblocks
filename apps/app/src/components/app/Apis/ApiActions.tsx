@@ -45,7 +45,7 @@ const ApiActions = ({
   const submitForm = async (event: any) => {
     event.preventDefault();
 
-    if (captchaStatus !== 'solved' || !token) {
+    if (!siteKey || captchaStatus !== 'solved' || !token) {
       setCaptchaStatus('error');
       return;
     }
@@ -506,25 +506,31 @@ const ApiActions = ({
               />
             </div>
             <div className="flex my-4">
-              <Turnstile
-                onError={() => setCaptchaStatus('error')}
-                onExpire={() => {
-                  setCaptchaStatus('expired');
-                  setToken('');
-                }}
-                onSuccess={(token) => {
-                  setToken(token);
-                  setCaptchaStatus('solved');
-                }}
-                options={{
-                  appearance: 'always',
-                  refreshExpired: 'auto',
-                  size: 'normal',
-                  theme: theme as any,
-                }}
-                ref={turnstileRef}
-                siteKey={siteKey as string}
-              />
+              {siteKey ? (
+                <Turnstile
+                  onError={() => setCaptchaStatus('error')}
+                  onExpire={() => {
+                    setCaptchaStatus('expired');
+                    setToken('');
+                  }}
+                  onSuccess={(token) => {
+                    setToken(token);
+                    setCaptchaStatus('solved');
+                  }}
+                  options={{
+                    appearance: 'always',
+                    refreshExpired: 'auto',
+                    size: 'normal',
+                    theme: theme as any,
+                  }}
+                  ref={turnstileRef}
+                  siteKey={siteKey}
+                />
+              ) : (
+                <span className="text-red-500 text-sm">
+                  Captcha is currently unavailable.
+                </span>
+              )}
               {captchaStatus === 'error' && (
                 <span className="text-red-500 text-sm p-6">
                   * Please verify the captcha
@@ -533,8 +539,8 @@ const ApiActions = ({
             </div>
             <div className="w-full text-center my-2">
               <button
-                className="text-sm text-white my-2 text-center font-thin px-7 py-3 dark:bg-green-250 bg-green-500 rounded"
-                disabled={loading}
+                className="text-sm text-white my-2 text-center font-thin px-7 py-3 dark:bg-green-250 bg-green-500 rounded disabled:opacity-50"
+                disabled={loading || !siteKey}
               >
                 {loading ? <LoadingCircular /> : 'Send message'}
               </button>
