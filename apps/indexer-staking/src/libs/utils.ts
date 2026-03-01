@@ -1,4 +1,4 @@
-import { ExecutionStatus } from 'nb-blocks-minio';
+import { ExecutionStatus } from 'nb-blocks-proxy';
 
 export const isExecutionSuccess = (status: ExecutionStatus) => {
   if ('SuccessValue' in status || 'SuccessReceiptId' in status) {

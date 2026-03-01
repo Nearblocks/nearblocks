@@ -1,7 +1,7 @@
 // Temp batch processing
 import { forEach } from 'hwp';
 
-import { Message, streamBlock } from 'nb-blocks-minio';
+import { Message, streamBlock } from 'nb-blocks-proxy';
 import { logger } from 'nb-logger';
 
 import config from '#config';
@@ -10,13 +10,6 @@ import sentry from '#libs/sentry';
 import { storeStakingData } from '#services/staking';
 
 const indexerKey = config.indexerKey;
-const s3Config = {
-  accessKey: config.s3AccessKey,
-  endPoint: config.s3Host,
-  port: config.s3Port,
-  secretKey: config.s3SecretKey,
-  useSSL: config.s3UseSsl,
-};
 
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
@@ -37,8 +30,7 @@ export const syncData = async () => {
   const stream = streamBlock({
     dbConfig: streamConfig,
     limit: 25, // Temp batch processing
-    s3Bucket: config.s3Bucket,
-    s3Config,
+    proxyUrl: config.proxyUrl,
     start: startBlock,
   });
 

@@ -1,0 +1,22 @@
+{
+  "name": "nb-blocks-proxy",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix"
+  },
+  "devDependencies": {
+    "eslint-config-custom-node": "*",
+    "nb-knex": "*",
+    "nb-logger": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "typescript": "~5.8"
+  }
+}

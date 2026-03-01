@@ -8,12 +8,7 @@ export type Config = {
   dbUrlBase: string;
   indexerKey: string;
   network: Network;
-  s3AccessKey: string;
-  s3Bucket: string;
-  s3Host: string;
-  s3Port: number;
-  s3SecretKey: string;
-  s3UseSsl: boolean;
+  proxyUrl: string;
   sentryDsn?: string;
   startBlockHeight: number;
 };

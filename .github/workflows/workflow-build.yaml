@@ -27,6 +27,7 @@ jobs:
             indexer-contract,
             explorer-selector,
             aggregates,
+            block-proxy,
           ]
       fail-fast: false
     steps:
