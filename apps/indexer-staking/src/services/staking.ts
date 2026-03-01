@@ -1,4 +1,4 @@
-import { BlockHeader, Message, Shard } from 'nb-blocks-minio';
+import { BlockHeader, Message, Shard } from 'nb-blocks-proxy';
 import { Knex } from 'nb-knex';
 import { Network, StakingEvent, StakingEventType } from 'nb-types';
 import { retry } from 'nb-utils';

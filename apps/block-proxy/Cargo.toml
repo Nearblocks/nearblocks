@@ -1,0 +1,28 @@
+[package]
+name = "block-proxy"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs", "signal"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tower-http = { version = "0.6", features = ["trace", "request-id", "util"] }
+tower = "0.5"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["raw_value"] }
+envy = "0.4"
+uuid = { version = "1", features = ["v4"] }
+reqwest = { version = "0.13", features = ["json"] }
+aws-sdk-s3 = "1"
+aws-config = "1"
+async_singleflight = "0.6"
+zstd = "0.13"
+thiserror = "2"
+anyhow = "1"
+tempfile = "3"
+bytes = "1"
+futures = "0.3"
+metrics = "0.24"
+metrics-exporter-prometheus = { version = "0.16", default-features = false }
