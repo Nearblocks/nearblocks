@@ -15,7 +15,7 @@ anyhow = "1.0.51"
 near-jsonrpc-client = "0.6.0"
 near-indexer-primitives = "0.17.0"
 near-jsonrpc-primitives = "0.17.0"
-near-sdk = { git = "https://github.com/near/near-sdk-rs", rev="03487c184d37b0382dd9bd41c57466acad58fc1f" }
+near-sdk = { git = "https://github.com/near/near-sdk-rs", rev = "03487c184d37b0382dd9bd41c57466acad58fc1f" }
 once_cell = "1"
 tokio = { version = "1", features = ["rt-multi-thread"] }
 tracing = "0.1.13"

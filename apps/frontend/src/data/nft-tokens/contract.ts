@@ -12,6 +12,11 @@ import {
   NFTTokenCountRes,
   NFTTokenListReq,
   NFTTokenListRes,
+  NFTTokenRes,
+  NFTTokenTxnCountReq,
+  NFTTokenTxnCountRes,
+  NFTTokenTxnsReq,
+  NFTTokenTxnsRes,
 } from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
@@ -100,6 +105,52 @@ export const fetchNFTContractTokenCount = cache(
   async (contract: string): Promise<NFTTokenCountRes> => {
     const resp = await fetcher<NFTTokenCountRes>(
       `/v3/nfts/${contract}/tokens/count`,
+    );
+    return resp;
+  },
+);
+
+export const fetchNFTToken = cache(
+  async (contract: string, token: string): Promise<NFTTokenRes> => {
+    const resp = await fetcher<NFTTokenRes>(
+      `/v3/nfts/${contract}/tokens/${token}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchNFTTokenTxns = cache(
+  async (
+    contract: string,
+    token: string,
+    params: SearchParams,
+  ): Promise<NFTTokenTxnsRes> => {
+    const keys: (keyof NFTTokenTxnsReq)[] = [
+      'before_ts',
+      'limit',
+      'next',
+      'prev',
+    ];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<NFTTokenTxnsRes>(
+      `/v3/nfts/${contract}/tokens/${token}/txns?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchNFTTokenTxnCount = cache(
+  async (
+    contract: string,
+    token: string,
+    params: SearchParams,
+  ): Promise<NFTTokenTxnCountRes> => {
+    const keys: (keyof NFTTokenTxnCountReq)[] = ['before_ts'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<NFTTokenTxnCountRes>(
+      `/v3/nfts/${contract}/tokens/${token}/txns/count?${queryParams.toString()}`,
     );
     return resp;
   },

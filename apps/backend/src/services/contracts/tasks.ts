@@ -276,7 +276,7 @@ const fetchStakingPoolInfo = async () => {
 
     if (mappings.valueMap.size > 0) {
       const mappingsnew = {
-        valueMap: new Map([...mappings.valueMap]),
+        valueMap: new Map(mappings.valueMap),
       };
 
       await dbBase('validator_data').update(
@@ -364,7 +364,7 @@ const fetchPoolInfo = async () => {
 
     if (mappings.valueMap.size > 0) {
       const mappingsnew = {
-        valueMap: new Map([...mappings.valueMap]),
+        valueMap: new Map(mappings.valueMap),
       };
       await dbBase('validator_data').update(
         'staking_pool_infos',

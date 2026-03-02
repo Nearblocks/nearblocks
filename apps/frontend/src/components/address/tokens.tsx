@@ -121,7 +121,9 @@ export const Tokens = ({
                                   token.amount,
                                   token.meta.decimals,
                                 ),
-                                { maximumFractionDigits: 6 },
+                                {
+                                  maximumFractionDigits: 6,
+                                },
                               )}
                             </span>
                           )}

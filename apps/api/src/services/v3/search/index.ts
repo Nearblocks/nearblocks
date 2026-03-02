@@ -36,7 +36,7 @@ const getFts = async (keyword: string) => {
 
   return dbEvents.manyOrNone<SearchFT>(sql.fts, {
     contract: query,
-    hex: /^0x/.test(query) ? query : null,
+    hex: query.startsWith('0x') ? query : null,
   });
 };
 
