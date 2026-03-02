@@ -44,11 +44,11 @@ export const zodResolver = <T extends FieldValues>(
 
       if (criteriaAll) {
         errors[path] = {
-          ...(errors[path] || {}),
+          ...errors[path],
           message: issue.message,
           type: issue.code,
           types: {
-            ...(errors[path]?.types || {}),
+            ...errors[path]?.types,
             [issue.code]: issue.message,
           },
         };

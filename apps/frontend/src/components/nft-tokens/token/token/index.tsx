@@ -46,7 +46,7 @@ const TokenCard = ({
   token: NFTTokenList;
 }) => (
   <div className="flex flex-col gap-2">
-    <Link href={`/nft-token/${contract}/${token.token}`}>
+    <Link href={`/nft-tokens/${contract}/tokens/${token.token}`}>
       <div className="aspect-square w-full overflow-hidden rounded-lg border">
         <NFTMedia
           alt={token.title ?? token.token}
@@ -62,7 +62,7 @@ const TokenCard = ({
         <span className="text-muted-foreground">Token ID: </span>
         <Link
           className="text-link"
-          href={`/nft-token/${contract}/${token.token}`}
+          href={`/nft-tokens/${contract}/tokens/${token.token}`}
         >
           {token.token}
         </Link>
@@ -120,8 +120,10 @@ export const NftTokens = ({
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <div className="flex flex-col gap-2" key={i}>
                 <Skeleton className="aspect-square w-full rounded-lg" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+                <div className="h-12.5">
+                  <Skeleton className="h-5 w-1/2" />
+                  <Skeleton className="h-6 w-3/4" />
+                </div>
               </div>
             ))
           ) : tokens.data?.length ? (

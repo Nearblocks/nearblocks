@@ -22,7 +22,7 @@ export const NFTTransfers = ({ nfts }: Props) => {
           <div className="flex items-center gap-2" key={i}>
             <Link
               className="text-link size-11"
-              href={`/nft-token/${nft.contract_account_id}/${nft.token_id}`}
+              href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
             >
               <NFTMedia
                 alt={nft.token_meta?.title ?? nft.token_id}
@@ -37,7 +37,7 @@ export const NFTTransfers = ({ nfts }: Props) => {
                 <span>Token</span>
                 <Link
                   className="text-link"
-                  href={`/nft-token/${nft.contract_account_id}/${nft.token_id}`}
+                  href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
                 >
                   {nft.token_id}
                 </Link>

@@ -86,7 +86,7 @@ const columns: DataTableColumnDef<AccountNFTTxn>[] = [
     cell: (nft) => (
       <Link
         className="text-link"
-        href={`/nft-token/${nft.contract_account_id}/${nft.token_id}`}
+        href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
       >
         <Truncate>
           <TruncateText text={nft.token_id} />

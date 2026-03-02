@@ -1,17 +1,18 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { NFTTxn, NFTTxnCountRes, NFTTxnsRes } from 'nb-schemas';
+import { NFTTokenTxn, NFTTokenTxnCountRes, NFTTokenTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
-import { AccountLink, Link } from '@/components/link';
+import { Link } from '@/components/link';
+import { AccountLink } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import { TxnStatusIcon } from '@/components/txn';
+import { TxnDirectionIcon } from '@/components/txn';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -20,11 +21,11 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  txnCountPromise?: Promise<NFTTxnCountRes>;
-  txnsPromise?: Promise<NFTTxnsRes>;
+  txnCountPromise?: Promise<NFTTokenTxnCountRes>;
+  txnsPromise?: Promise<NFTTokenTxnsRes>;
 };
 
-const columns: DataTableColumnDef<NFTTxn>[] = [
+const txnColumns: DataTableColumnDef<NFTTokenTxn>[] = [
   {
     cell: () => <TxnStatusIcon status />,
     className: 'w-5',
@@ -43,7 +44,7 @@ const columns: DataTableColumnDef<NFTTxn>[] = [
       ) : (
         <Skeleton className="w-30" />
       ),
-    header: 'Hash',
+    header: 'Txn Hash',
     id: 'txn_hash',
   },
   {
@@ -54,8 +55,8 @@ const columns: DataTableColumnDef<NFTTxn>[] = [
         </Truncate>
       </Badge>
     ),
-    header: 'Type',
-    id: 'type',
+    header: 'Method',
+    id: 'method',
   },
   {
     cell: (nft) => (
@@ -86,40 +87,24 @@ const columns: DataTableColumnDef<NFTTxn>[] = [
     id: 'to',
   },
   {
-    cell: (nft) => (
-      <Link
-        className="text-link"
-        href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
-      >
-        <Truncate>
-          <TruncateText text={nft.token_id} />
-          <TruncateCopy text={nft.token_id} />
-        </Truncate>
-      </Link>
-    ),
-    header: 'Token ID',
-    id: 'token_id',
+    cell: (nft) =>
+      nft.block?.block_height ? (
+        <Link className="text-link" href={`/blocks/${nft.block.block_height}`}>
+          {numberFormat(nft.block.block_height)}
+        </Link>
+      ) : (
+        <Skeleton className="w-20" />
+      ),
+    header: 'Block',
+    id: 'block',
   },
   {
-    cell: (nft) => (
-      <span className="flex items-center gap-1">
-        <TokenImage
-          alt={nft.meta?.name ?? ''}
-          className="m-px size-5 rounded-full border"
-          src={nft.meta?.icon ?? ''}
-        />
-        <TokenLink
-          contract={nft.contract_account_id}
-          name={nft.meta?.name}
-          type="nft-tokens"
-        />
-      </span>
-    ),
-    header: 'Token',
-    id: 'token',
-  },
-  {
-    cell: (nft) => <TimestampCell ns={nft.block_timestamp} />,
+    cell: (nft) =>
+      nft.block?.block_timestamp ? (
+        <TimestampCell ns={nft.block.block_timestamp} />
+      ) : (
+        <Skeleton className="w-20" />
+      ),
     cellClassName: 'px-1',
     className: 'w-40',
     header: <TimestampToggle />,
@@ -127,7 +112,7 @@ const columns: DataTableColumnDef<NFTTxn>[] = [
   },
 ];
 
-export const NftTokenTransfers = ({
+export const NftTransfers = ({
   loading,
   txnCountPromise,
   txnsPromise,
@@ -135,6 +120,7 @@ export const NftTokenTransfers = ({
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
@@ -142,14 +128,14 @@ export const NftTokenTransfers = ({
       [type]: cursor,
       [type === 'next' ? 'prev' : 'next']: '',
     });
-    return `/nft-tokens/transfers?${params.toString()}`;
+    return `${pathname}?${params.toString()}`;
   };
 
   return (
-    <Card>
+    <Card className="mt-10">
       <CardContent className="text-body-sm p-0">
         <DataTable
-          columns={columns}
+          columns={txnColumns}
           data={txns?.data}
           emptyMessage="No NFT token transfers found"
           getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
@@ -161,7 +147,7 @@ export const NftTokenTransfers = ({
               {() => (
                 <>{`A total of ${numberFormat(
                   txnCount?.data?.count ?? 0,
-                )} nft token txns found`}</>
+                )} transactions found`}</>
               )}
             </SkeletonSlot>
           }
