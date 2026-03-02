@@ -7,13 +7,8 @@ export type Config = {
   dbUrl: string;
   dbUrlBase: string;
   indexerKey: string;
+  neardataUrl?: string;
   network: Network;
-  s3AccessKey: string;
-  s3Bucket: string;
-  s3Host: string;
-  s3Port: number;
-  s3SecretKey: string;
-  s3UseSsl: boolean;
   sentryDsn?: string;
   startBlockHeight: number;
 };

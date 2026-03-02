@@ -1,0 +1,19 @@
+services:
+  block-proxy:
+    container_name: mainnet-block-proxy
+    build:
+      context: .
+      dockerfile: ./apps/block-proxy/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: mainnet.block-proxy.env
+    ports:
+      - '127.0.0.1:3015:3000'
+      - '127.0.0.1:3017:3001'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:3000/healthz']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -1,22 +1,15 @@
 // Temp batch processing
 import { forEach } from 'hwp';
 
-import { Message, streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
+import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import { db, streamConfig } from '#libs/knex';
+import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeStakingData } from '#services/staking';
 
 const indexerKey = config.indexerKey;
-const s3Config = {
-  accessKey: config.s3AccessKey,
-  endPoint: config.s3Host,
-  port: config.s3Port,
-  secretKey: config.s3SecretKey,
-  useSSL: config.s3UseSsl,
-};
 
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
@@ -35,11 +28,10 @@ export const syncData = async () => {
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
-    dbConfig: streamConfig,
     limit: 25, // Temp batch processing
-    s3Bucket: config.s3Bucket,
-    s3Config,
+    network: config.network,
     start: startBlock,
+    url: config.neardataUrl,
   });
 
   // for await (const message of stream) {
