@@ -1,10 +1,10 @@
+import { Knex } from 'nb-knex';
 import {
   AccessKeyFunctionCallPermission,
   BlockHeader,
   Message,
   Receipt,
-} from 'nb-blocks-minio';
-import { Knex } from 'nb-knex';
+} from 'nb-neardata';
 import { AccessKey, AccessKeyPermissionKind, JsonValue } from 'nb-types';
 import { retry } from 'nb-utils';
 

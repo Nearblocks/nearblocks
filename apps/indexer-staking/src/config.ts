@@ -1,4 +1,4 @@
-import { cleanEnv, num, str } from 'envalid';
+import { cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -9,8 +9,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  DATABASE_URL_BASE: str({ default: '' }),
-  NEARDATA_URL: str({ default: '' }),
+  NEARDATA_URL: url(),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -19,14 +18,16 @@ const env = cleanEnv(process.env, {
   STAKING_START_BLOCK: num({ default: 0 }),
 });
 
+const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
+
 const config: Config = {
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  dbUrlBase: env.DATABASE_URL_BASE,
+  genesisHeight,
   indexerKey: env.STAKING_INDEXER_KEY,
-  neardataUrl: env.NEARDATA_URL || undefined,
+  neardataUrl: env.NEARDATA_URL,
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.STAKING_START_BLOCK,

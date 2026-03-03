@@ -1,5 +1,5 @@
-import { BlockHeader, Message, Receipt } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
+import { BlockHeader, Message, Receipt } from 'nb-neardata';
 import { Account } from 'nb-types';
 import { retry } from 'nb-utils';
 

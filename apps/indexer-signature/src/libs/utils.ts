@@ -1,7 +1,7 @@
 import { createRequire } from 'module';
 
-import { ExecutionStatus } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
+import { ExecutionStatus } from 'nb-neardata';
 
 import sentry from '#libs/sentry';
 import { MPCSignature } from '#types/types';

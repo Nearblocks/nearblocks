@@ -3,8 +3,8 @@ import { createRequire } from 'module';
 import { decodeBase64, encodeBase58, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
 
-import { Action, ExecutionStatus, ReceiptEnum } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
+import { Action, ExecutionStatus, ReceiptEnum } from 'nb-neardata';
 import {
   AccessKeyPermissionKind,
   ActionKind,

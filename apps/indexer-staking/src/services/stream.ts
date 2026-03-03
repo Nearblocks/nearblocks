@@ -1,6 +1,3 @@
-// Temp batch processing
-import { forEach } from 'hwp';
-
 import { logger } from 'nb-logger';
 import { Message, streamBlock } from 'nb-neardata';
 
@@ -14,31 +11,23 @@ const indexerKey = config.indexerKey;
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
+  let startBlock = config.startBlockHeight;
 
-  if (!startBlockHeight && latestBlock) {
-    logger.info(`last synced block: ${latestBlock}`);
-    // startBlockHeight = +latestBlock;
-    // Temp batch processing
-    startBlockHeight = +latestBlock - 25;
+  if (!startBlock && latestBlock) {
+    startBlock = +latestBlock;
   }
-
-  const startBlock = startBlockHeight || 0;
 
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
-    limit: 25, // Temp batch processing
     network: config.network,
-    start: startBlock,
+    start: startBlock || config.genesisHeight,
     url: config.neardataUrl,
   });
 
-  // for await (const message of stream) {
-  //   await onMessage(message);
-  // }
-  // Temp batch processing
-  await forEach(stream, onMessage, 25);
+  for await (const message of stream) {
+    await onMessage(message);
+  }
 };
 
 export const onMessage = async (message: Message) => {

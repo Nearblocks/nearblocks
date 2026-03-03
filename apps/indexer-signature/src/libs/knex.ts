@@ -37,27 +37,6 @@ const migrationConfig = {
   pool: { max: 1, min: 0 },
 };
 
-const baseConfig = {
-  ...dbConfig,
-  connection: {
-    ...dbConfig.connection,
-    application_name: 'indexer-signature-base',
-    connectionString: config.dbUrlBase,
-  },
-  pool: { max: 2, min: 1 },
-};
-
-export const streamConfig = {
-  ...baseConfig,
-  connection: {
-    ...baseConfig.connection,
-    application_name: 'indexer-signature-stream',
-  },
-  pool: { max: 1, min: 1 },
-};
-
 export const db: Knex = createKnex(dbConfig);
-
-export const dbBase: Knex = createKnex(baseConfig);
 
 export const dbMigration: Knex = createKnex(migrationConfig);

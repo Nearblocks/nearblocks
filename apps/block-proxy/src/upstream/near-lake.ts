@@ -4,19 +4,32 @@ import { logger } from 'nb-logger';
 
 import type { Config } from '#config';
 
+const NEAR_LAKE_LAG_DEPTH = 10;
+const POLL_INTERVAL_MS = 1000;
+
 export class NearLakeUpstream {
   private bucket: string;
   private client: S3Client;
   private timeoutMs: number;
 
-  constructor(config: Config) {
+  private constructor(config: Config) {
     this.bucket = config.nearLakeBucket;
     this.timeoutMs = config.upstreamTimeoutMs;
 
-    // Uses default AWS credential chain (not MinIO credentials)
     this.client = new S3Client({
+      credentials: {
+        accessKeyId: config.nearLakeAccessKey,
+        secretAccessKey: config.nearLakeSecretKey,
+      },
       region: config.nearLakeRegion,
     });
+  }
+
+  static create(config: Config): NearLakeUpstream | null {
+    if (!config.nearLakeAccessKey || !config.nearLakeSecretKey) {
+      return null;
+    }
+    return new NearLakeUpstream(config);
   }
 
   private async fetchAssembled(
@@ -111,31 +124,100 @@ export class NearLakeUpstream {
     return Buffer.from(bytes);
   }
 
-  async fetch(height: number): Promise<Buffer> {
+  async fetch(
+    height: number,
+    getTipHeight: () => number = () => 0,
+  ): Promise<Buffer> {
     const start = Date.now();
     const abort = new AbortController();
     const timer = setTimeout(() => abort.abort(), this.timeoutMs);
 
-    let result: Buffer;
     try {
-      result = await this.fetchAssembled(height, abort.signal);
-    } catch (err) {
-      clearTimeout(timer);
+      try {
+        const result = await this.fetchAssembled(height, abort.signal);
+        logger.debug(
+          { bytes: result.length, height, latency_ms: Date.now() - start },
+          'NEAR Lake upstream fetch complete',
+        );
+        return result;
+      } catch (firstErr) {
+        if (!(firstErr as Error & { notFound?: boolean }).notFound) {
+          throw firstErr;
+        }
+      }
+
+      const tipHeight = getTipHeight();
+
+      // Height too far ahead of known tip
+      if (tipHeight > 0 && height > tipHeight + NEAR_LAKE_LAG_DEPTH) {
+        const err = new Error(
+          `NEAR Lake block ${height} is too far ahead of tip ${tipHeight}`,
+        ) as Error & { notFound: boolean };
+        err.notFound = true;
+        throw err;
+      }
+
+      // Height at or below known tip — block is finalized but absent from S3 (skipped)
+      if (tipHeight > 0 && height <= tipHeight) {
+        logger.debug(
+          { height, tipHeight },
+          'NEAR Lake block missing below tip, treating as skipped block',
+        );
+        return Buffer.from('null');
+      }
+
+      // Height near-future block — wait proportional to gap, then retry once
+      const gapSeconds =
+        tipHeight > 0
+          ? Math.min(height - tipHeight, NEAR_LAKE_LAG_DEPTH)
+          : NEAR_LAKE_LAG_DEPTH;
+      const waitMs = gapSeconds * POLL_INTERVAL_MS;
+
+      logger.debug(
+        {
+          gapSeconds,
+          height,
+          latency_ms: Date.now() - start,
+          tipHeight,
+          waitMs,
+        },
+        'NEAR Lake block ahead of tip, waiting before retry',
+      );
+
+      await Promise.race([
+        new Promise<void>((resolve) => setTimeout(resolve, waitMs)),
+        new Promise<void>((resolve) =>
+          abort.signal.addEventListener('abort', () => resolve(), {
+            once: true,
+          }),
+        ),
+      ]);
+
       if (abort.signal.aborted) {
         throw new Error(
           `NEAR Lake fetch timed out for block ${height} after ${this.timeoutMs}ms`,
         );
       }
-      throw err;
+
+      try {
+        const result = await this.fetchAssembled(height, abort.signal);
+        logger.debug(
+          { bytes: result.length, height, latency_ms: Date.now() - start },
+          'NEAR Lake upstream fetch complete on retry',
+        );
+        return result;
+      } catch (retryErr) {
+        if (!(retryErr as Error & { notFound?: boolean }).notFound) {
+          throw retryErr;
+        }
+        logger.debug(
+          { gapSeconds, height, tipHeight },
+          'NEAR Lake block not found after wait, treating as skipped block',
+        );
+        return Buffer.from('null');
+      }
+    } finally {
+      clearTimeout(timer);
     }
-    clearTimeout(timer);
-
-    const elapsed = Date.now() - start;
-    logger.debug(
-      { bytes: result.length, height, latency_ms: elapsed },
-      'NEAR Lake upstream fetch complete',
-    );
-
-    return result;
   }
 }

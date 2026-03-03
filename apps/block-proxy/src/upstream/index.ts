@@ -156,7 +156,7 @@ export async function fetchBlock(
   if (state.nearLakeEnabled && state.nearLake) {
     const upstreamStart = Date.now();
     try {
-      const bytes = await state.nearLake.fetch(height);
+      const bytes = await state.nearLake.fetch(height, () => state.tipHeight);
       recordUpstreamOk(state, 'near_lake', Date.now() - upstreamStart);
       logger.info(
         { height, latency_ms: Date.now() - start, source: 'near_lake' },

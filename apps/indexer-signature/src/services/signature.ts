@@ -1,4 +1,4 @@
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks-minio';
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { retry } from 'nb-utils';
 
 import config from '#config';

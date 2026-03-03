@@ -1,5 +1,5 @@
-import { ExecutionOutcomeWithReceipt, Message } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
+import { ExecutionOutcomeWithReceipt, Message } from 'nb-neardata';
 import { EventStandard, EventType, FTEvent, MTEvent, NFTEvent } from 'nb-types';
 
 import { isNep141, isNep171, isNep245 } from '#libs/guards';

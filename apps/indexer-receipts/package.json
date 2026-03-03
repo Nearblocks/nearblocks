@@ -1,6 +1,6 @@
 {
   "name": "indexer-receipts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -29,7 +29,7 @@
     "@types/lodash-es": "~4.17",
     "@types/node": "~22.13",
     "eslint-config-custom-node": "*",
-    "nb-blocks-minio": "*",
+    "nb-neardata": "*",
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",

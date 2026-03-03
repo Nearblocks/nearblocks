@@ -26,7 +26,7 @@ export function createAppState(config: Config): AppState {
   const cache = new CacheStore(config);
   const fastnear = new FastnearUpstream(config);
   const s3 = S3Upstream.create(config);
-  const nearLake = config.nearLakeEnabled ? new NearLakeUpstream(config) : null;
+  const nearLake = NearLakeUpstream.create(config);
 
   return {
     cache,

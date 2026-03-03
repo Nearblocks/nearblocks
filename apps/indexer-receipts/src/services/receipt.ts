@@ -1,11 +1,11 @@
+import { Knex } from 'nb-knex';
+import { logger } from 'nb-logger';
 import {
   Action,
   DataReceiver,
   Receipt as JReceipt,
   Message,
-} from 'nb-blocks-minio';
-import { Knex } from 'nb-knex';
-import { logger } from 'nb-logger';
+} from 'nb-neardata';
 import {
   ActionReceiptAction,
   ActionReceiptInputData,

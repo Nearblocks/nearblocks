@@ -38,16 +38,6 @@ const migrationConfig = {
   pool: { max: 1, min: 0 },
 };
 
-export const streamConfig = {
-  ...dbConfig,
-  connection: {
-    ...dbConfig.connection,
-    application_name: 'indexer-staking-stream',
-    connectionString: config.dbUrlBase,
-  },
-  pool: { max: 1, min: 1 },
-};
-
 export const db: Knex = createKnex(dbConfig);
 
 export const dbMigration: Knex = createKnex(migrationConfig);

@@ -2,11 +2,9 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { server } from '#libs/http';
-import { dbMigration, dbRead, dbWrite } from '#libs/knex';
+import { db, dbMigration } from '#libs/knex';
 import sentry from '#libs/sentry';
-// import { syncData } from '#services/stream';
-// Temp stream from s3
-import { syncData } from '#services/tempStream';
+import { syncData } from '#services/stream';
 
 (async () => {
   try {
@@ -25,12 +23,7 @@ import { syncData } from '#services/tempStream';
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([
-      server.close(),
-      dbWrite.destroy(),
-      dbRead.destroy(),
-      sentry.close(1_000),
-    ]);
+    await Promise.all([server.close(), db.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }

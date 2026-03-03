@@ -5,9 +5,9 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  dbUrlBase: string;
+  genesisHeight: number;
   indexerKey: string;
-  neardataUrl?: string;
+  neardataUrl: string;
   network: Network;
   sentryDsn?: string;
   startBlockHeight: number;

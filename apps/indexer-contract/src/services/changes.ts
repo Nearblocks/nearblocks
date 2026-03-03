@@ -2,14 +2,14 @@ import { createHash } from 'crypto';
 
 import { base58 } from '@scure/base';
 
+import { Knex } from 'nb-knex';
 import {
   BlockHeader,
   StateChange as BStateChange,
   ExecutionOutcomeWithReceipt,
   Message,
   Shard,
-} from 'nb-blocks-minio';
-import { Knex } from 'nb-knex';
+} from 'nb-neardata';
 import {
   ContractCodeEvent,
   ContractDataEvent,
