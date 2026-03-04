@@ -1,7 +1,6 @@
 import { Readable } from 'stream';
 
 import { logger } from 'nb-logger';
-import { Network } from 'nb-types';
 import { retry, sleep } from 'nb-utils';
 
 import { Message } from './type.js';
@@ -9,10 +8,9 @@ import { Message } from './type.js';
 export * from './type.js';
 
 export type BlockStreamConfig = {
-  limit?: number;
   network: string;
   start: number;
-  url?: string;
+  url: string;
 };
 
 interface CamelCaseObject {
@@ -24,12 +22,6 @@ const retries = 10;
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
   logger.error({ attempt });
-};
-
-const endpoint = (network: string) => {
-  return network === Network.MAINNET
-    ? 'https://mainnet.neardata.xyz'
-    : 'https://testnet.neardata.xyz';
 };
 
 const camelCase = (str: string): string => {
@@ -99,10 +91,10 @@ const fetchFinal = async (url: string): Promise<Message> => {
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const url = config.url ?? endpoint(config.network);
-  const limit = config.limit ?? 10;
+  const limit = 10;
   let finalFetch = 0;
   let isFetching = false;
+  const url = config.url;
   let block = config.start;
   const highWaterMark = limit * 5;
 

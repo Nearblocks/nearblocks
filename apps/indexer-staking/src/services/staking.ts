@@ -1,5 +1,5 @@
-import { BlockHeader, Message, Shard } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
+import { BlockHeader, Message, Shard } from 'nb-neardata';
 import { Network, StakingEvent, StakingEventType } from 'nb-types';
 import { retry } from 'nb-utils';
 

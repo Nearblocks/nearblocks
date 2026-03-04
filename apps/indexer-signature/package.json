@@ -1,6 +1,6 @@
 {
   "name": "indexer-signature",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "NearBlocks",
   "license": "Business Source License 1.1",
   "type": "module",
@@ -34,7 +34,7 @@
     "@types/node": "22",
     "eslint-config-custom-node": "*",
     "nb-json": "*",
-    "nb-blocks-minio": "*",
+    "nb-neardata": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-redis": "*",

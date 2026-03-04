@@ -1,5 +1,5 @@
-import { Message } from 'nb-blocks-minio';
 import { Knex } from 'nb-knex';
+import { Message } from 'nb-neardata';
 import { Network } from 'nb-types';
 
 import config from '#config';

@@ -5,7 +5,7 @@ import {
   DeleteAccountAction,
   DeleteKeyAction,
   TransferAction,
-} from 'nb-blocks-minio';
+} from 'nb-neardata';
 
 export const isCreateAccountAction = (
   action: Action,

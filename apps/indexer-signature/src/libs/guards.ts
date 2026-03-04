@@ -1,4 +1,4 @@
-import { Action, DelegateAction, FunctionCallAction } from 'nb-blocks-minio';
+import { Action, DelegateAction, FunctionCallAction } from 'nb-neardata';
 
 import { Ed25519Signature, Scheme } from '#types/types';
 

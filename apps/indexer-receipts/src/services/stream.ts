@@ -1,75 +1,57 @@
-import { Message, streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
+import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import { dbRead, dbWrite, streamConfig } from '#libs/knex';
+import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 
 const indexerKey = config.indexerKey;
-const s3Config = {
-  accessKey: config.s3AccessKey,
-  endPoint: config.s3Host,
-  port: config.s3Port,
-  secretKey: config.s3SecretKey,
-  useSSL: config.s3UseSsl,
-};
 
 export const syncData = async () => {
-  const settings = await dbRead('settings').where({ key: indexerKey }).first();
+  const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight;
+  let startBlock = config.startBlockHeight;
 
-  if (!startBlockHeight && latestBlock) {
-    startBlockHeight = +latestBlock - config.delta;
+  if (!startBlock && latestBlock) {
+    startBlock = +latestBlock;
   }
-
-  const startBlock = startBlockHeight || 0;
 
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
-    dbConfig: streamConfig,
-    s3Bucket: config.s3Bucket,
-    s3Config,
-    start: startBlock,
+    network: config.network,
+    start: startBlock || config.genesisHeight,
+    url: config.neardataUrl,
   });
 
-  let messages: Message[] = [];
-
-  for await (const message of stream as AsyncIterable<Message>) {
-    // Temp batch processing
-    const concurrency = message.block.header.height - startBlock > 100 ? 25 : 1;
-    prepareCache(message);
-    messages.push(message);
-
-    if (messages.length >= concurrency) {
-      await Promise.all(messages.map((msg) => onMessage(msg)));
-      messages = [];
-    }
-  }
-
-  if (messages.length > 0) {
-    await Promise.all(messages.map((msg) => onMessage(msg)));
+  for await (const message of stream) {
+    await onMessage(message);
   }
 };
 
 export const onMessage = async (message: Message) => {
   try {
     const start = performance.now();
+    prepareCache(message);
+    const cacheTime = performance.now() - start;
 
     await Promise.all([
-      storeReceipts(dbWrite, message),
-      storeExecutionOutcomes(dbWrite, message),
+      storeReceipts(db, message),
+      storeExecutionOutcomes(db, message),
     ]);
 
-    const time = performance.now() - start;
+    const dbTime = performance.now() - cacheTime;
 
-    logger.info({ block: message.block.header.height, db: `${time} ms` });
+    logger.info({
+      block: message.block.header.height,
+      cache: `${cacheTime} ms`,
+      db: `${dbTime} ms`,
+    });
 
-    await dbWrite('settings')
+    await db('settings')
       .insert({
         key: indexerKey,
         value: { sync: message.block.header.height },

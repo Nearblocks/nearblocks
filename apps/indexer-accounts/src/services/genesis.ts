@@ -10,7 +10,7 @@ import { JsonObject } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { dbRead, dbWrite } from '#libs/knex';
+import { db } from '#libs/knex';
 import { getAccessKeyData, storeGenesisAccessKeys } from '#services/accessKey';
 import { getAccountData, storeGenesisAccounts } from '#services/account';
 
@@ -18,7 +18,7 @@ const genesisKey = 'genesis';
 const genesisValue = { sync: true } as JsonObject;
 
 export const syncGenesis = async () => {
-  const settings = await dbRead('settings').where({ key: genesisKey }).first();
+  const settings = await db('settings').where({ key: genesisKey }).first();
 
   const genesis = settings?.value as JsonObject;
 
@@ -34,7 +34,7 @@ export const syncGenesis = async () => {
   logger.info('inserting genesis data...');
   await insertGenesisData(path);
   await retry(async () => {
-    await dbWrite('settings')
+    await db('settings')
       .insert({ key: genesisKey, value: genesisValue })
       .onConflict('key')
       .merge();
@@ -71,12 +71,12 @@ export const insertGenesisData = async (path: string) => {
 
   for await (const chunk of readable) {
     if (accounts.length === config.insertLimit) {
-      await storeGenesisAccounts(dbWrite, accounts);
+      await storeGenesisAccounts(db, accounts);
       accounts = [];
     }
 
     if (accessKeys.length === config.insertLimit) {
-      await storeGenesisAccessKeys(dbWrite, accessKeys);
+      await storeGenesisAccessKeys(db, accessKeys);
       accessKeys = [];
     }
 
@@ -103,8 +103,8 @@ export const insertGenesisData = async (path: string) => {
     }
   }
 
-  await storeGenesisAccounts(dbWrite, accounts);
-  await storeGenesisAccessKeys(dbWrite, accessKeys);
+  await storeGenesisAccounts(db, accounts);
+  await storeGenesisAccessKeys(db, accessKeys);
 
   logger.info(
     `inserted ${accountsCount} accounts and ${accessKeysCount} access keys...`,

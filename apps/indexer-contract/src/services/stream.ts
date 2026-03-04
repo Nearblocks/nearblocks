@@ -1,56 +1,33 @@
-import { Message, streamBlock } from 'nb-blocks-minio';
 import { logger } from 'nb-logger';
+import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import { db, streamConfig } from '#libs/knex';
+import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
 import { storeChanges } from '#services/changes';
 
 const indexerKey = config.indexerKey;
-const s3Config = {
-  accessKey: config.s3AccessKey,
-  endPoint: config.s3Host,
-  port: config.s3Port,
-  secretKey: config.s3SecretKey,
-  useSSL: config.s3UseSsl,
-};
 
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
-  let startBlockHeight = config.startBlockHeight && config.startBlockHeight - 1;
+  let startBlock = config.startBlockHeight;
 
-  if (!startBlockHeight && latestBlock) {
-    logger.info(`last synced block: ${latestBlock}`);
-    // startBlockHeight = +latestBlock;
-    // Temp batch processing
-    startBlockHeight = +latestBlock - 50;
+  if (!startBlock && latestBlock) {
+    startBlock = +latestBlock;
   }
-
-  const startBlock = startBlockHeight || 0;
 
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
-    dbConfig: streamConfig,
-    limit: 50, // Temp batch processing
-    s3Bucket: config.s3Bucket,
-    s3Config,
-    start: startBlock,
+    network: config.network,
+    start: startBlock || config.genesisHeight,
+    url: config.neardataUrl,
   });
 
   for await (const message of stream) {
     await onMessage(message);
   }
-
-  stream.on('end', () => {
-    logger.error('stream ended');
-    process.exit();
-  });
-  stream.on('error', (error: Error) => {
-    logger.error(error);
-    process.exit();
-  });
 };
 
 export const onMessage = async (message: Message) => {

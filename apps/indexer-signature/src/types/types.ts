@@ -5,17 +5,11 @@ export interface Config {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  dbUrlBase: string;
-  delta: number;
+  genesisHeight: number;
   indexerKey: string;
   insertLimit: number;
+  neardataUrl: string;
   network: Network;
-  s3AccessKey: string;
-  s3Bucket: string;
-  s3Host: string;
-  s3Port: number;
-  s3SecretKey: string;
-  s3UseSsl: boolean;
   sentryDsn?: string;
   startBlockHeight: number;
 }

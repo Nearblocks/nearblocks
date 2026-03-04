@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { ExecutionStatus } from 'nb-blocks-minio';
+import { ExecutionStatus } from 'nb-neardata';
 import { retry, sleep } from 'nb-utils';
 
 import { db } from '#libs/knex';

@@ -3,7 +3,7 @@ import { Message } from 'nb-neardata';
 import { Network } from 'nb-types';
 
 import config from '#config';
-import { dbRead } from '#libs/knex';
+import { db } from '#libs/knex';
 
 export const checkFastnear = async () => {
   const url =
@@ -23,7 +23,7 @@ export const checkFastnear = async () => {
     },
   );
   const latestBlock = (await latestResponse.json()) as Message;
-  const block = await dbRead('blocks').orderBy('block_height', 'desc').first();
+  const block = await db('blocks').orderBy('block_height', 'desc').first();
 
   logger.info({
     block: block?.block_height,
