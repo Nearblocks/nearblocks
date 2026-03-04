@@ -5,16 +5,23 @@ import type { Config } from '#config';
 const MAX_BODY_SIZE = 100 * 1024 * 1024; // 100 MB
 
 export class FastnearUpstream {
+  private apiKey: string;
   private baseUrl: string;
   private timeoutMs: number;
 
   constructor(config: Config) {
+    this.apiKey = config.fastnearApiKey;
     this.baseUrl = config.fastnearBaseUrl;
     this.timeoutMs = config.upstreamTimeoutMs;
   }
 
+  private buildUrl(path: string): string {
+    const url = `${this.baseUrl}${path}`;
+    return this.apiKey ? `${url}?apiKey=${this.apiKey}` : url;
+  }
+
   async fetch(height: number): Promise<Buffer> {
-    const url = `${this.baseUrl}/v0/block/${height}`;
+    const url = this.buildUrl(`/v0/block/${height}`);
     const start = Date.now();
 
     const response = await globalThis
@@ -67,7 +74,7 @@ export class FastnearUpstream {
   }
 
   async fetchLastBlockFinal(): Promise<Buffer> {
-    const url = `${this.baseUrl}/v0/last_block/final`;
+    const url = this.buildUrl('/v0/last_block/final');
     const start = Date.now();
 
     const response = await globalThis
