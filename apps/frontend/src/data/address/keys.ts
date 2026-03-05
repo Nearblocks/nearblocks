@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import {
   AccountKeyCount,
   AccountKeyCountRes,
@@ -8,24 +10,23 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchKeys = async (
-  account: string,
-  params: SearchParams,
-): Promise<AccountKeysRes> => {
-  const keys: (keyof AccountKeysReq)[] = ['limit', 'next', 'prev'];
-  const queryParams = safeParams(params, keys);
+export const fetchKeys = cache(
+  async (account: string, params: SearchParams): Promise<AccountKeysRes> => {
+    const keys: (keyof AccountKeysReq)[] = ['limit', 'next', 'prev'];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<AccountKeysRes>(
-    `/v3/accounts/${account}/keys?${queryParams.toString()}`,
-  );
-  return resp;
-};
+    const resp = await fetcher<AccountKeysRes>(
+      `/v3/accounts/${account}/keys?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
 
-export const fetchKeyCount = async (
-  account: string,
-): Promise<AccountKeyCount | null> => {
-  const resp = await fetcher<AccountKeyCountRes>(
-    `/v3/accounts/${account}/keys/count`,
-  );
-  return resp.data;
-};
+export const fetchKeyCount = cache(
+  async (account: string): Promise<AccountKeyCount | null> => {
+    const resp = await fetcher<AccountKeyCountRes>(
+      `/v3/accounts/${account}/keys/count`,
+    );
+    return resp.data;
+  },
+);

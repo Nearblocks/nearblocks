@@ -2,6 +2,7 @@ import type { BaseDictionary } from '@/types/types';
 
 import { address } from './address';
 import { blocks } from './blocks';
+import { charts } from './charts';
 import { fts } from './fts';
 import { home } from './home';
 import { layout } from './layout';
@@ -11,6 +12,7 @@ import { txns } from './txns';
 export const dictionary = {
   address,
   blocks,
+  charts,
   fts,
   home,
   layout,

@@ -21,25 +21,27 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchTxns = async (params: SearchParams): Promise<TxnsRes> => {
-  const keys: (keyof TxnsReq)[] = ['limit', 'block', 'next', 'prev'];
-  const queryParams = safeParams(params, keys);
+export const fetchTxns = cache(
+  async (params: SearchParams): Promise<TxnsRes> => {
+    const keys: (keyof TxnsReq)[] = ['limit', 'block', 'next', 'prev'];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<TxnsRes>(`/v3/txns?${queryParams.toString()}`);
-  return resp;
-};
+    const resp = await fetcher<TxnsRes>(`/v3/txns?${queryParams.toString()}`);
+    return resp;
+  },
+);
 
-export const fetchTxnCount = async (
-  params: SearchParams,
-): Promise<null | TxnCount> => {
-  const keys: (keyof TxnCountReq)[] = ['block'];
-  const queryParams = safeParams(params, keys);
+export const fetchTxnCount = cache(
+  async (params: SearchParams): Promise<null | TxnCount> => {
+    const keys: (keyof TxnCountReq)[] = ['block'];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<TxnCountRes>(
-    `/v3/txns/count?${queryParams.toString()}`,
-  );
-  return resp.data;
-};
+    const resp = await fetcher<TxnCountRes>(
+      `/v3/txns/count?${queryParams.toString()}`,
+    );
+    return resp.data;
+  },
+);
 
 export const fetchTxn = cache(async (txn: string): Promise<null | Txn> => {
   const resp = await fetcher<TxnRes>(`/v3/txns/${txn}`);
