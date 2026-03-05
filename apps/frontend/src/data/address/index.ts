@@ -20,40 +20,40 @@ export const fetchAccount = cache(
   },
 );
 
-export const fetchBalance = async (
-  account: string,
-): Promise<AccountBalance | null> => {
-  const resp = await fetcher<AccountBalanceRes>(
-    `/v3/accounts/${account}/balance`,
-  );
-  return resp.data;
-};
-
-export const fetchTokens = async (
-  account: string,
-): Promise<AccountAssetFT[] | null> => {
-  const resp = await fetcher<AccountAssetFTsRes>(
-    `/v3/accounts/${account}/assets/fts?limit=100`,
-  );
-  return resp.data;
-};
-
-export const fetchTokenCache = async (
-  account: string,
-): Promise<null | TokenCache[]> => {
-  try {
-    const config = getServerConfig();
-    const apiKey = config.NEXT_PUBLIC_FASTNEAR_RPC_KEY;
-
-    const res = await fetch(
-      `https://api.fastnear.com/v1/account/${account}/ft?apiKey=${apiKey}`,
+export const fetchBalance = cache(
+  async (account: string): Promise<AccountBalance | null> => {
+    const resp = await fetcher<AccountBalanceRes>(
+      `/v3/accounts/${account}/balance`,
     );
+    return resp.data;
+  },
+);
 
-    if (!res.ok) return null;
+export const fetchTokens = cache(
+  async (account: string): Promise<AccountAssetFT[] | null> => {
+    const resp = await fetcher<AccountAssetFTsRes>(
+      `/v3/accounts/${account}/assets/fts?limit=100`,
+    );
+    return resp.data;
+  },
+);
 
-    const resp = (await res.json()) as TokensCacheRes;
-    return resp.tokens;
-  } catch {
-    return null;
-  }
-};
+export const fetchTokenCache = cache(
+  async (account: string): Promise<null | TokenCache[]> => {
+    try {
+      const config = getServerConfig();
+      const apiKey = config.NEXT_PUBLIC_FASTNEAR_RPC_KEY;
+
+      const res = await fetch(
+        `https://api.fastnear.com/v1/account/${account}/ft?apiKey=${apiKey}`,
+      );
+
+      if (!res.ok) return null;
+
+      const resp = (await res.json()) as TokensCacheRes;
+      return resp.tokens;
+    } catch {
+      return null;
+    }
+  },
+);

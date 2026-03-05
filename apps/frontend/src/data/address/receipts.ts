@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import {
   AccountReceiptCount,
   AccountReceiptCountReq,
@@ -9,39 +11,43 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchReceipts = async (
-  account: string,
-  params: SearchParams,
-): Promise<AccountReceiptsRes> => {
-  const keys: (keyof AccountReceiptsReq)[] = [
-    'limit',
-    'receiver',
-    'predecessor',
-    'method',
-    'next',
-    'prev',
-  ];
-  const queryParams = safeParams(params, keys);
+export const fetchReceipts = cache(
+  async (
+    account: string,
+    params: SearchParams,
+  ): Promise<AccountReceiptsRes> => {
+    const keys: (keyof AccountReceiptsReq)[] = [
+      'limit',
+      'receiver',
+      'predecessor',
+      'method',
+      'next',
+      'prev',
+    ];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<AccountReceiptsRes>(
-    `/v3/accounts/${account}/receipts?${queryParams.toString()}`,
-  );
-  return resp;
-};
+    const resp = await fetcher<AccountReceiptsRes>(
+      `/v3/accounts/${account}/receipts?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
 
-export const fetchReceiptCount = async (
-  account: string,
-  params: SearchParams,
-): Promise<AccountReceiptCount | null> => {
-  const keys: (keyof AccountReceiptCountReq)[] = [
-    'predecessor',
-    'receiver',
-    'method',
-  ];
-  const queryParams = safeParams(params, keys);
+export const fetchReceiptCount = cache(
+  async (
+    account: string,
+    params: SearchParams,
+  ): Promise<AccountReceiptCount | null> => {
+    const keys: (keyof AccountReceiptCountReq)[] = [
+      'predecessor',
+      'receiver',
+      'method',
+    ];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<AccountReceiptCountRes>(
-    `/v3/accounts/${account}/receipts/count?${queryParams.toString()}`,
-  );
-  return resp.data;
-};
+    const resp = await fetcher<AccountReceiptCountRes>(
+      `/v3/accounts/${account}/receipts/count?${queryParams.toString()}`,
+    );
+    return resp.data;
+  },
+);

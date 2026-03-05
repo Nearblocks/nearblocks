@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import {
   AccountFTTxnCount,
   AccountFTTxnCountReq,
@@ -9,39 +11,40 @@ import {
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
 
-export const fetchFTTxns = async (
-  account: string,
-  params: SearchParams,
-): Promise<AccountFTTxnsRes> => {
-  const keys: (keyof AccountFTTxnsReq)[] = [
-    'limit',
-    'contract',
-    'involved',
-    'cause',
-    'next',
-    'prev',
-  ];
-  const queryParams = safeParams(params, keys);
+export const fetchFTTxns = cache(
+  async (account: string, params: SearchParams): Promise<AccountFTTxnsRes> => {
+    const keys: (keyof AccountFTTxnsReq)[] = [
+      'limit',
+      'contract',
+      'involved',
+      'cause',
+      'next',
+      'prev',
+    ];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<AccountFTTxnsRes>(
-    `/v3/accounts/${account}/ft-txns?${queryParams.toString()}`,
-  );
-  return resp;
-};
+    const resp = await fetcher<AccountFTTxnsRes>(
+      `/v3/accounts/${account}/ft-txns?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
 
-export const fetchFTTxnCount = async (
-  account: string,
-  params: SearchParams,
-): Promise<AccountFTTxnCount | null> => {
-  const keys: (keyof AccountFTTxnCountReq)[] = [
-    'contract',
-    'involved',
-    'cause',
-  ];
-  const queryParams = safeParams(params, keys);
+export const fetchFTTxnCount = cache(
+  async (
+    account: string,
+    params: SearchParams,
+  ): Promise<AccountFTTxnCount | null> => {
+    const keys: (keyof AccountFTTxnCountReq)[] = [
+      'contract',
+      'involved',
+      'cause',
+    ];
+    const queryParams = safeParams(params, keys);
 
-  const resp = await fetcher<AccountFTTxnCountRes>(
-    `/v3/accounts/${account}/ft-txns/count?${queryParams.toString()}`,
-  );
-  return resp.data;
-};
+    const resp = await fetcher<AccountFTTxnCountRes>(
+      `/v3/accounts/${account}/ft-txns/count?${queryParams.toString()}`,
+    );
+    return resp.data;
+  },
+);
