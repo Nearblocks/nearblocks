@@ -1,6 +1,6 @@
 import { createRequire } from 'module';
 
-import { ExecutionStatus } from 'nb-blocks';
+import { ExecutionStatus } from 'nb-neardata';
 import { JsonValue } from 'nb-types';
 import { sleep } from 'nb-utils';
 

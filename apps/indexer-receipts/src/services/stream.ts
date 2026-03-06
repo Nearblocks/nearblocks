@@ -1,8 +1,8 @@
-import { Message, streamBlock } from 'nb-blocks';
 import { logger } from 'nb-logger';
+import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
-import { dbRead, dbWrite, streamConfig } from '#libs/knex';
+import { dbRead, dbWrite } from '#libs/knex';
 import { lru } from '#libs/lru';
 import { cacheHistogram } from '#libs/prom';
 import sentry from '#libs/sentry';
@@ -11,15 +11,6 @@ import { storeExecutionOutcomes } from '#services/executionOutcome';
 import { storeReceipts } from '#services/receipt';
 
 const indexerKey = config.indexerKey;
-const s3Config = {
-  credentials: {
-    accessKeyId: config.s3AccessKey,
-    secretAccessKey: config.s3SecretKey,
-  },
-  endpoint: config.s3Endpoint,
-  forcePathStyle: true,
-  region: config.s3Region,
-};
 
 export const syncData = async () => {
   const settings = await dbRead('settings').where({ key: indexerKey }).first();
@@ -27,32 +18,20 @@ export const syncData = async () => {
   let startBlockHeight = config.startBlockHeight;
 
   if (!startBlockHeight && latestBlock) {
-    startBlockHeight = +latestBlock - config.delta;
+    startBlockHeight = +latestBlock;
   }
 
-  const startBlock = startBlockHeight || 0;
-
-  logger.info(`syncing from block: ${startBlock}`);
+  logger.info(`syncing from block: ${startBlockHeight}`);
 
   const stream = streamBlock({
-    dbConfig: streamConfig,
-    s3Bucket: config.s3Bucket,
-    s3Config,
-    start: startBlock,
+    network: config.network,
+    start: startBlockHeight || config.genesisHeight,
+    url: config.neardataUrl,
   });
 
-  for await (const message of stream as AsyncIterable<Message>) {
+  for await (const message of stream) {
     await onMessage(message);
   }
-
-  stream.on('end', () => {
-    logger.error('stream ended');
-    process.exit();
-  });
-  stream.on('error', (error: Error) => {
-    logger.error(error);
-    process.exit();
-  });
 };
 
 export const onMessage = async (message: Message) => {

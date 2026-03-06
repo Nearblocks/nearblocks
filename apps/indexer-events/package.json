@@ -24,7 +24,7 @@
   "devDependencies": {
     "@types/node": "~22.10",
     "eslint-config-custom-node": "*",
-    "nb-blocks": "*",
+    "nb-neardata": "*",
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",

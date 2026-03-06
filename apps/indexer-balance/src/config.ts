@@ -11,16 +11,14 @@ const env = cleanEnv(process.env, {
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   DATABASE_URL_READ: str({ default: '' }),
+  NEARDATA_URL: url(),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  S3_ACCESS_KEY: str(),
-  S3_BUCKET: str({ default: 'nearblocks' }),
-  S3_ENDPOINT: url(),
-  S3_REGION: str({ default: '' }),
-  S3_SECRET_KEY: str(),
   SENTRY_DSN: str({ default: '' }),
 });
+
+const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
 
 const config: Config = {
   dbCa: env.DATABASE_CA,
@@ -28,13 +26,10 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   dbUrlRead: env.DATABASE_URL_READ,
+  genesisHeight,
   indexerKey: 'balance',
+  neardataUrl: env.NEARDATA_URL,
   network: env.NETWORK,
-  s3AccessKey: env.S3_ACCESS_KEY,
-  s3Bucket: env.S3_BUCKET,
-  s3Endpoint: env.S3_ENDPOINT,
-  s3Region: env.S3_REGION,
-  s3SecretKey: env.S3_SECRET_KEY,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.BALANCE_START_BLOCK,
 };

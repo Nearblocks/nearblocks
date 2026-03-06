@@ -1,4 +1,4 @@
-import { Action } from 'nb-blocks';
+import { Action } from 'nb-neardata';
 import { AccessKeyPermissionKind, ActionKind, Network } from 'nb-types';
 
 export type Config = {
@@ -8,15 +8,11 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbUrlRead: string;
-  delta: number;
+  genesisHeight: number;
   indexerKey: string;
   insertLimit: number;
+  neardataUrl: string;
   network: Network;
-  s3AccessKey: string;
-  s3Bucket: string;
-  s3Endpoint: string;
-  s3Region: string;
-  s3SecretKey: string;
   sentryDsn?: string;
   startBlockHeight: number;
 };

@@ -1,6 +1,11 @@
-import { Action, DataReceiver, Receipt as JReceipt, Message } from 'nb-blocks';
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
+import {
+  Action,
+  DataReceiver,
+  Receipt as JReceipt,
+  Message,
+} from 'nb-neardata';
 import {
   ActionReceiptAction,
   ActionReceiptInputData,

@@ -1,3 +1,4 @@
+import { Knex } from 'nb-knex';
 import {
   BlockHeader,
   StateChange as BlockStateChange,
@@ -5,8 +6,7 @@ import {
   IndexerTransactionWithOutcome,
   Message,
   Shard,
-} from 'nb-blocks';
-import { Knex } from 'nb-knex';
+} from 'nb-neardata';
 import {
   BalanceEvent,
   EventStatus,

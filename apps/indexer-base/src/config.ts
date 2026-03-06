@@ -1,36 +1,19 @@
-import { types } from '@near-lake/framework';
-import { bool, cleanEnv, num, str, url } from 'envalid';
+import { cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
-import { DataSource } from '#types/enum';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
-  BASE_DATA_SOURCE: str({
-    choices: [DataSource.FAST_NEAR, DataSource.NEAR_LAKE],
-    default: DataSource.NEAR_LAKE,
-  }),
   BASE_START_BLOCK: num({ default: 0 }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  DISABLE_AUTO_SWITCH: bool({ default: false }),
-  DISABLE_S3_UPLOAD: bool({ default: false }),
-  FASTNEAR_API_KEY: str(),
-  FASTNEAR_ENDPOINT: str({ default: undefined }),
-  NEARLAKE_ACCESS_KEY: str(),
-  NEARLAKE_ENDPOINT: url({ default: '' }),
-  NEARLAKE_SECRET_KEY: str(),
+  NEARDATA_URL: url(),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
-  S3_ACCESS_KEY: str(),
-  S3_BUCKET: str({ default: '' }),
-  S3_ENDPOINT: url(),
-  S3_REGION: str({ default: '' }),
-  S3_SECRET_KEY: str(),
   SENTRY_DSN: str({ default: '' }),
 });
 
@@ -40,49 +23,18 @@ const genesisTimestamp =
     ? '1595350551591948000'
     : '1596166782911378000';
 const genesisFile = `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/${env.NETWORK}/genesis.json`;
-let nearlakeEndpoint: null | types.EndpointConfig = null;
-const nearlakeBucketName =
-  env.NETWORK === Network.MAINNET
-    ? 'near-lake-data-mainnet'
-    : 'near-lake-data-testnet';
-
-if (env.NEARLAKE_ENDPOINT) {
-  const endpoint = new URL(env.NEARLAKE_ENDPOINT);
-  nearlakeEndpoint = {
-    hostname: endpoint.hostname,
-    path: endpoint.pathname,
-    port: +endpoint.port || 80,
-    protocol: endpoint.protocol,
-  };
-}
 
 const config: Config = {
-  dataSource: env.BASE_DATA_SOURCE,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  delta: 10, // start from blocks earlier on sync interuption
-  disableAutoSwitch: env.DISABLE_AUTO_SWITCH,
-  disableS3Upload: env.DISABLE_S3_UPLOAD,
-  fastnearApiKey: env.FASTNEAR_API_KEY,
-  fastnearEndpoint: env.FASTNEAR_ENDPOINT,
   genesisFile: genesisFile, // url to download genesis data
   genesisHeight,
   genesisTimestamp,
   insertLimit: 2_500, // records to insert into the db at a time
-  nearlakeAccessKey: env.NEARLAKE_ACCESS_KEY,
-  nearlakeBucketName,
-  nearlakeEndpoint,
-  nearlakeRegionName: 'eu-central-1',
-  nearlakeSecretKey: env.NEARLAKE_SECRET_KEY,
+  neardataUrl: env.NEARDATA_URL,
   network: env.NETWORK,
-  preloadSize: 100, // blocks to preload in nearlake
-  s3AccessKey: env.S3_ACCESS_KEY,
-  s3Bucket: env.S3_BUCKET,
-  s3Endpoint: env.S3_ENDPOINT,
-  s3Region: env.S3_REGION,
-  s3SecretKey: env.S3_SECRET_KEY,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.BASE_START_BLOCK,
 };

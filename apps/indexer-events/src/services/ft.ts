@@ -1,5 +1,5 @@
-import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-blocks';
 import { Knex } from 'nb-knex';
+import { BlockHeader, ExecutionOutcomeWithReceipt } from 'nb-neardata';
 import {
   EventCause,
   EventStandard,

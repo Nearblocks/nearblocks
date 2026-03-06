@@ -1,6 +1,6 @@
 import { snakeCase, toUpper } from 'lodash-es';
 
-import { ExecutionStatus } from 'nb-blocks';
+import { ExecutionStatus } from 'nb-neardata';
 import { EventStatus, ExecutionOutcomeStatus, JsonValue } from 'nb-types';
 import { sleep } from 'nb-utils';
 

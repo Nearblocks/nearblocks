@@ -14,7 +14,7 @@ import {
   TransferAction,
   UseGlobalContractAction,
   UseGlobalContractByAccountIdAction,
-} from 'nb-blocks';
+} from 'nb-neardata';
 
 export const isFunctionCallAction = (
   action: Action,

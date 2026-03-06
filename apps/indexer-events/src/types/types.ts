@@ -1,10 +1,10 @@
+import { Knex } from 'nb-knex';
 import {
   BlockHeader,
   ExecutionOutcomeWithReceipt,
   ExecutionStatus,
   FunctionCallAction,
-} from 'nb-blocks';
-import { Knex } from 'nb-knex';
+} from 'nb-neardata';
 import { EventCause, Network } from 'nb-types';
 
 export type Config = {
@@ -13,13 +13,10 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   dbUrlRead: string;
+  genesisHeight: number;
   indexerKey: string;
+  neardataUrl: string;
   network: Network;
-  s3AccessKey: string;
-  s3Bucket: string;
-  s3Endpoint: string;
-  s3Region: string;
-  s3SecretKey: string;
   sentryDsn?: string;
   startBlockHeight: number;
 };

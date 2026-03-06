@@ -1,5 +1,5 @@
-import { BlockHeader } from 'nb-blocks';
 import { Knex } from 'nb-knex';
+import { BlockHeader } from 'nb-neardata';
 import {
   EventCause,
   EventStandard,
