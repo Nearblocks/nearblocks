@@ -23,6 +23,10 @@ export default function ExplorerSelector() {
   const network = getNetworkId();
 
   const config = {
+    nearrocks:
+      network === 'testnet'
+        ? 'https://testnet.near.rocks'
+        : 'https://near.rocks',
     nearblocks:
       network === 'testnet'
         ? 'https://testnet.nearblocks.io'
@@ -79,6 +83,27 @@ export default function ExplorerSelector() {
       }
     else {
       return config.pikespeakai;
+    }
+  }
+
+  function getNearRocksHref(link: string) {
+    if (link)
+      switch (path) {
+        case 'accounts':
+          return config.nearrocks + '/account/' + value;
+        case 'transactions':
+          return config.nearrocks + '/tx/' + value;
+        case 'blocks':
+          return config.nearrocks + '/block/' + value;
+        // WIP: receipts and stats are not yet available on Near Rocks
+        case 'receipts':
+        case 'stats':
+          return null;
+        default:
+          return config.nearrocks;
+      }
+    else {
+      return config.nearrocks;
     }
   }
 
@@ -151,6 +176,27 @@ export default function ExplorerSelector() {
     return false;
   }
 
+  function linkNearRocks(link: string) {
+    if (link)
+      switch (path) {
+        case '':
+          return true;
+        case 'accounts':
+          return true;
+        case 'transactions':
+          return true;
+        case 'blocks':
+          return true;
+        // WIP: receipts and stats are not yet available on Near Rocks
+        case 'receipts':
+        case 'stats':
+          return false;
+        default:
+          return false;
+      }
+    return false;
+  }
+
   function linkNearblocksLite(link: string) {
     if (link)
       switch (path) {
@@ -185,13 +231,22 @@ export default function ExplorerSelector() {
   }
 
   const hasValidLink =
-    linkNearblocks(path) || linkNearblocksLite(path) || linkPikespeakai(path);
+    linkNearRocks(path) ||
+    linkNearblocks(path) ||
+    linkNearblocksLite(path) ||
+    linkPikespeakai(path);
 
   const isInvalidReceiptsPath = path === 'receipts' && isNumericId(value);
 
+  const nearRocksHref = getNearRocksHref(path);
   const href = getHref(path);
   const pikespeakHref = getPikespeakHref(path);
   const nearblocksLiteHref = getNearblocksLiteHref(path);
+
+  const isNearRocksInactive =
+    (path && !linkNearRocks(path)) ||
+    isInvalidReceiptsPath ||
+    (path && value === '');
 
   const isNearblocksInactive =
     (path && !linkNearblocks(path)) ||
@@ -250,10 +305,30 @@ export default function ExplorerSelector() {
               <div
                 className={`${styles.linkContainer} ${
                   config.pikespeakai !== null
-                    ? styles.threeColumns
-                    : styles.twoColumns
+                    ? styles.fourColumns
+                    : styles.threeColumns
                 }`}
               >
+                <a
+                  href={
+                    !isNearRocksInactive
+                      ? nearRocksHref || config.nearrocks
+                      : config.nearrocks
+                  }
+                  className={`${styles.nearExplorerButton} ${
+                    isNearRocksInactive ? styles.inactive : ''
+                  }`}
+                >
+                  <Image
+                    src="/images/nearrocks.svg"
+                    style={imageStyle}
+                    width={45}
+                    height={45}
+                    alt="Near Rocks"
+                  />
+                  <h3 className={styles.explorerHead}>Near Rocks</h3>
+                </a>
+
                 <a
                   href={
                     !isNearblocksLiteInactive
