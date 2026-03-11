@@ -1,8 +1,10 @@
+'use client';
+
 import { TxnNFT } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { NFTMedia, TokenImage, TokenLink } from '@/components/token';
-import { ScrollArea } from '@/ui/scroll-area';
+import { ScrollableList } from '@/ui/scrollable-list';
 
 import { TransferSummary } from './transfer';
 
@@ -16,7 +18,7 @@ export const NFTTransfers = ({ nfts }: Props) => {
   );
 
   return (
-    <ScrollArea className="max-h-44">
+    <ScrollableList className="max-h-44">
       <div className="flex flex-col gap-3">
         {displayNfts.map((nft, i) => (
           <div className="flex items-center gap-2" key={i}>
@@ -64,6 +66,6 @@ export const NFTTransfers = ({ nfts }: Props) => {
           </div>
         ))}
       </div>
-    </ScrollArea>
+    </ScrollableList>
   );
 };

@@ -7,7 +7,7 @@ import { ActionKind } from 'nb-types';
 
 import { SkeletonSlot } from '@/components/skeleton';
 import { Card, CardContent } from '@/ui/card';
-import { ScrollArea } from '@/ui/scroll-area';
+import { ScrollableList } from '@/ui/scrollable-list';
 import { Skeleton } from '@/ui/skeleton';
 
 import { Action } from './action';
@@ -44,7 +44,7 @@ export const Actions = ({ loading, txnPromise }: Props) => {
               loading={loading || !txn || txn.actions?.length === 0}
             >
               {() => (
-                <ScrollArea className="max-h-40">
+                <ScrollableList className="max-h-40">
                   <div className="space-y-1">
                     {(txn!.actions[0]?.action === ActionKind.DELEGATE_ACTION
                       ? [txn!.actions[0]]
@@ -58,7 +58,7 @@ export const Actions = ({ loading, txnPromise }: Props) => {
                       />
                     ))}
                   </div>
-                </ScrollArea>
+                </ScrollableList>
               )}
             </SkeletonSlot>
           </div>

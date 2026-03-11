@@ -6,7 +6,7 @@ import { TxnFT } from 'nb-schemas';
 
 import { AccountLink } from '@/components/link';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
-import { ScrollArea } from '@/ui/scroll-area';
+import { ScrollableList } from '@/ui/scrollable-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
 import { TransferSummary } from './transfer';
@@ -63,7 +63,7 @@ export const FTTransfers = ({ fts }: Props) => {
         <TabsTrigger value="all">All Transfers</TabsTrigger>
         <TabsTrigger value="net">Net Transfers</TabsTrigger>
       </TabsList>
-      <ScrollArea className="max-h-53">
+      <ScrollableList className="max-h-53">
         <TabsContent className="flex flex-col gap-3 pt-3" value="all">
           {transfers.map((ft, i) => (
             <div className="flex flex-wrap items-center gap-1" key={i}>
@@ -94,8 +94,8 @@ export const FTTransfers = ({ fts }: Props) => {
             </div>
           ))}
         </TabsContent>
-      </ScrollArea>
-      <ScrollArea className="max-h-53">
+      </ScrollableList>
+      <ScrollableList className="max-h-53">
         <TabsContent className="flex flex-col gap-3 pt-3" value="net">
           {netFts.map((net, i) => (
             <div className="flex flex-wrap items-center gap-1" key={i}>
@@ -122,7 +122,7 @@ export const FTTransfers = ({ fts }: Props) => {
             </div>
           ))}
         </TabsContent>
-      </ScrollArea>
+      </ScrollableList>
     </Tabs>
   );
 };
