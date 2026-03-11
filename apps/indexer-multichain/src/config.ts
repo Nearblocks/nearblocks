@@ -7,6 +7,8 @@ import { Config } from '#types/types';
 const env = cleanEnv(process.env, {
   ARBITRUM_RPC_URL: str({ default: '' }),
   ARBITRUM_START_BLOCK: num({ default: 0 }),
+  AURORA_RPC_URL: str({ default: '' }),
+  AURORA_START_BLOCK: num({ default: 0 }),
   BASE_RPC_URL: str({ default: '' }),
   BASE_START_BLOCK: num({ default: 0 }),
   BITCOIN_RPC_URL: str({ default: '' }),
@@ -39,6 +41,11 @@ const config: Config = {
       interval: 1000, // 1s
       start: env.ARBITRUM_START_BLOCK,
       url: env.ARBITRUM_RPC_URL,
+    },
+    AURORA: {
+      interval: 1000, // 1s
+      start: env.AURORA_START_BLOCK,
+      url: env.AURORA_RPC_URL,
     },
     BASE: {
       interval: 5000, // 5s

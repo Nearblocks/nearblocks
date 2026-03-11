@@ -1,5 +1,6 @@
 export const Chains = {
   ARBITRUM: 'ARBITRUM',
+  AURORA: 'AURORA',
   BASE: 'BASE',
   BITCOIN: 'BITCOIN',
   BSC: 'BSC',

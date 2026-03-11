@@ -11,6 +11,7 @@ export const syncData = async () => {
     await Promise.all([
       evm.processBlocks(Chains.ETHEREUM),
       evm.processBlocks(Chains.ARBITRUM),
+      evm.processBlocks(Chains.AURORA),
       evm.processBlocks(Chains.BASE),
       evm.processBlocks(Chains.BSC),
       evm.processBlocks(Chains.GNOSIS),

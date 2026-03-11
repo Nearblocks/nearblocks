@@ -351,7 +351,7 @@ export type MultichainSignature = {
   account_id: string;
   block_timestamp: string;
   event_index: number;
-  path: string;
+  path: null | string;
   public_key: string;
   r: Buffer | null;
   receipt_id: string;
