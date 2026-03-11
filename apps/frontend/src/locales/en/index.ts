@@ -6,6 +6,7 @@ import { home } from './home';
 import { layout } from './layout';
 import { nfts } from './nfts';
 import { txns } from './txns';
+import { validators } from './validators';
 
 export const dictionary = {
   address,
@@ -16,4 +17,5 @@ export const dictionary = {
   layout,
   nfts,
   txns,
+  validators,
 };

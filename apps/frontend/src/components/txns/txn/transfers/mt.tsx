@@ -11,7 +11,7 @@ import {
   TokenImage,
   TokenLink,
 } from '@/components/token';
-import { ScrollArea } from '@/ui/scroll-area';
+import { ScrollableList } from '@/ui/scrollable-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
 import { TransferSummary } from './transfer';
@@ -86,7 +86,7 @@ export const MTTransfers = ({ mts }: Props) => {
             <TabsTrigger value="all">All Transfers</TabsTrigger>
             <TabsTrigger value="net">Net Transfers</TabsTrigger>
           </TabsList>
-          <ScrollArea className="max-h-53">
+          <ScrollableList className="max-h-53">
             <TabsContent className="flex flex-col gap-3 pt-3" value="all">
               {ftLike.map((mt, i) => (
                 <div className="flex flex-wrap items-center gap-1" key={i}>
@@ -115,8 +115,8 @@ export const MTTransfers = ({ mts }: Props) => {
                 </div>
               ))}
             </TabsContent>
-          </ScrollArea>
-          <ScrollArea className="max-h-53">
+          </ScrollableList>
+          <ScrollableList className="max-h-53">
             <TabsContent className="flex flex-col gap-3 pt-3" value="net">
               {netMts.map((net, i) => (
                 <div className="flex flex-wrap items-center gap-1" key={i}>
@@ -144,11 +144,11 @@ export const MTTransfers = ({ mts }: Props) => {
                 </div>
               ))}
             </TabsContent>
-          </ScrollArea>
+          </ScrollableList>
         </Tabs>
       )}
       {nftLike.length > 0 && (
-        <ScrollArea className={hasFts ? 'mt-3 max-h-44' : 'max-h-44'}>
+        <ScrollableList className={hasFts ? 'mt-3 max-h-44' : 'max-h-44'}>
           <div className="flex flex-col gap-3">
             {nftLike.map((mt, i) => (
               <div className="flex items-center gap-2" key={i}>
@@ -196,7 +196,7 @@ export const MTTransfers = ({ mts }: Props) => {
               </div>
             ))}
           </div>
-        </ScrollArea>
+        </ScrollableList>
       )}
     </>
   );

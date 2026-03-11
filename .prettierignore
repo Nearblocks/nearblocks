@@ -7,3 +7,4 @@ static
 .bos
 *.css
 __ENV.js
+next-env.d.ts

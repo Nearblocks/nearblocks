@@ -30,6 +30,8 @@ FROM
 WHERE
   modified_at IS NOT NULL;
 
+CREATE UNIQUE INDEX ON ft_list (contract);
+
 CREATE MATERIALIZED VIEW nft_list AS
 SELECT
   m.contract,
@@ -66,4 +68,6 @@ FROM
       )::BIGINT
   ) dt ON true
 WHERE
-  m.modified_at IS NOT NULL
+  m.modified_at IS NOT NULL;
+
+CREATE UNIQUE INDEX ON nft_list (contract);
