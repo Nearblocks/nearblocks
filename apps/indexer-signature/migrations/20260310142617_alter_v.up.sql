@@ -1,0 +1,7 @@
+ALTER TABLE multichain_signatures
+ALTER COLUMN v TYPE BIGINT,
+ALTER COLUMN path
+DROP NOT NULL;
+
+ALTER TABLE multichain_transactions
+ALTER COLUMN v TYPE BIGINT;

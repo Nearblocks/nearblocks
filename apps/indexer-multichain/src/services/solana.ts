@@ -118,7 +118,16 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
           .ignore();
       };
 
-      promises.push(retry(runBatch, { retries: 3 }));
+      const onError = async ({
+        attempts,
+        error,
+        retries,
+      }: RetryErrorContext) => {
+        logger.error({ attempts, chain, dberr: error, height });
+        await retryOnError({ attempts, error, retries });
+      };
+
+      promises.push(retry(runBatch, { onError }));
     }
   }
 

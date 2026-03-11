@@ -19,7 +19,8 @@ export type Sign = {
 };
 
 export type SignRequest = {
-  path: string;
+  domain_id?: string;
+  path?: string;
 };
 
 export type MSReceipt = Omit<
