@@ -32,3 +32,10 @@ const onSignal = async (signal: number | string) => {
 
 process.once('SIGINT', onSignal);
 process.once('SIGTERM', onSignal);
+process.once('unhandledRejection', async (error) => {
+  logger.error('unhandled rejection');
+  logger.error(error);
+  sentry.captureException(error);
+  await Promise.all([db.destroy(), sentry.close(1_000)]);
+  process.exit(1);
+});

@@ -19,9 +19,16 @@ const dbConfig = {
   connection: {
     application_name: 'indexer-signature',
     connectionString: config.dbUrl,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10_000,
     ssl: ssl?.ca ? ssl : false,
   },
-  pool: { max: 10, min: 1 },
+  pool: {
+    max: 5,
+    min: 0,
+    idleTimeoutMillis: 30_000,
+    propagateCreateError: false,
+  },
 };
 
 const migrationConfig = {
