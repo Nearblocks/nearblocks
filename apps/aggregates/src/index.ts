@@ -12,7 +12,8 @@ import { syncNFTHolders } from '#services/nft';
     logger.error('aborting...');
     logger.error(error);
     sentry.captureException(error);
-    process.exit();
+    await Promise.all([knex.destroy(), sentry.close(1_000)]);
+    process.exit(1);
   }
 })();
 
