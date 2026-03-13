@@ -21,7 +21,7 @@ const dbConfig = {
     connectionString: config.dbUrl,
     ssl: ssl?.ca ? ssl : false,
   },
-  pool: { max: 10, min: 1 },
+  pool: { max: 20, min: 1 },
 };
 
 export const db: Knex = createKnex(dbConfig);

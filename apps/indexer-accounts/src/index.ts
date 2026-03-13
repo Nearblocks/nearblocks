@@ -17,7 +17,8 @@ import { syncData } from '#services/stream';
     logger.error('aborting...');
     logger.error(error);
     sentry.captureException(error);
-    process.exit();
+    await Promise.all([db.destroy(), sentry.close(1_000)]);
+    process.exit(1);
   }
 })();
 

@@ -1,5 +1,6 @@
 import { logger } from 'nb-logger';
 
+import { db } from '#libs/knex';
 import Sentry from '#libs/sentry';
 import bitcoin from '#services/bitcoin';
 import evm from '#services/evm';
@@ -23,6 +24,7 @@ export const syncData = async () => {
   } catch (error) {
     logger.error(error);
     Sentry.captureException(error);
-    process.exit();
+    await Promise.all([db.destroy(), Sentry.close(1_000)]);
+    process.exit(1);
   }
 };
