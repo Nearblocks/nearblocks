@@ -52,7 +52,9 @@ const OverviewActions = (props: Props) => {
   const deployments = use(deploymentsPromise);
   const sourceScanResponses = use(sourceScanDataPromise);
 
-  const accountId = account?.account?.[0]?.account_id;
+  const params = useParams<{ id: string }>();
+  const accountId =
+    account?.account?.[0]?.account_id || params?.id?.toLowerCase();
   const contractInfo: ContractParseInfo = parse?.contract?.[0]?.contract;
   const schema = parse?.contract?.[0]?.schema;
   const methodExist =
@@ -63,7 +65,6 @@ const OverviewActions = (props: Props) => {
       : false;
 
   const { signedAccountId, wallet } = useContext(NearContext);
-  const params = useParams<{ id: string }>();
   const { verifierConfig } = useConfig();
   const { rpc } = useRpcProvider();
   const verifiers = verifierConfig.map((config) => config.accountId);
