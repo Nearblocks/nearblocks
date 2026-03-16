@@ -24,9 +24,9 @@ const dbConfig = {
     ssl: ssl?.ca ? ssl : false,
   },
   pool: {
+    idleTimeoutMillis: 30_000,
     max: 10,
     min: 0,
-    idleTimeoutMillis: 30_000,
     propagateCreateError: false,
   },
 };
