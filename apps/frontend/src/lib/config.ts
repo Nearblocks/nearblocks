@@ -5,7 +5,11 @@ import { ONetwork } from '@/types/enums';
 export const serverEnvSchema = z.object({
   API_ACCESS_KEY: z.string(),
   API_URL: z.url(),
+  AWS_REGION: z.string(),
+  AWS_SES_FROM_EMAIL: z.email(),
+  AWS_SES_TO_EMAIL: z.email(),
   NEXT_PUBLIC_FASTNEAR_RPC_KEY: z.string(),
+  TURNSTILE_SECRET_KEY: z.string(),
 });
 
 export const publicEnvSchema = z.object({
@@ -14,6 +18,7 @@ export const publicEnvSchema = z.object({
   NEXT_PUBLIC_NETWORK_ID: z.enum(ONetwork),
   NEXT_PUBLIC_REOWN_PROJECT_ID: z.string(),
   NEXT_PUBLIC_TESTNET_URL: z._default(z.url(), 'https://testnet.nearblocks.io'),
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string(),
 });
 
 export const defaultTheme = 'dark';
@@ -127,6 +132,7 @@ const configSchema = z.object({
   providers: z.array(providerSchema),
   reownProjectId: publicEnvSchema.shape.NEXT_PUBLIC_REOWN_PROJECT_ID,
   testnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_TESTNET_URL,
+  turnstileSiteKey: publicEnvSchema.shape.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   verifier: verifierSchema,
 });
 
@@ -155,6 +161,8 @@ export const getRuntimeConfig = (): Config => {
       NEXT_PUBLIC_NETWORK_ID: process.env.NEXT_PUBLIC_NETWORK_ID,
       NEXT_PUBLIC_REOWN_PROJECT_ID: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
       NEXT_PUBLIC_TESTNET_URL: process.env.NEXT_PUBLIC_TESTNET_URL,
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY:
+        process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
     });
   }
 
@@ -170,6 +178,7 @@ export const getRuntimeConfig = (): Config => {
     providers,
     reownProjectId: cachedPublicConfig.NEXT_PUBLIC_REOWN_PROJECT_ID,
     testnetUrl: cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL,
+    turnstileSiteKey: cachedPublicConfig.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
     verifier: contractVerifier[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID],
   };
 };
