@@ -27,7 +27,7 @@ const menu: NavMenu<RouteKey<'layout'>> = [
       { href: '/blocks', key: 'menu.blockchain.blocks' },
       { href: '/txns', key: 'menu.blockchain.txns' },
       { href: '/charts', key: 'menu.blockchain.charts' },
-      { href: '/nodes', key: 'menu.blockchain.nodes' },
+      { href: '/node-explorer', key: 'menu.blockchain.nodes' },
     ],
   },
   {

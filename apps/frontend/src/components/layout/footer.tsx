@@ -114,9 +114,7 @@ export const Footer = () => {
                 <Link href="/contact">{t('footer.menu.company.contact')}</Link>
               </li>
               <li>
-                <Link href="/terms-and-conditions">
-                  {t('footer.menu.company.terms')}
-                </Link>
+                <Link href="/terms">{t('footer.menu.company.terms')}</Link>
               </li>
               <li>
                 <Link href="/privacy-policy">
