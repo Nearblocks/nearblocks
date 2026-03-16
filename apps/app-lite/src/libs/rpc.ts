@@ -1,12 +1,27 @@
 import {
   RPC,
   RpcResponse,
+  RpcResultAccessKey,
   RpcResultAccount,
   RpcResultBlock,
   RpcResultReceipt,
   RpcResultTxn,
 } from 'nb-near';
 import { Network } from 'nb-types';
+
+export interface RpcResultExperimentalTxn {
+  receipts: Array<{
+    receipt_id: string;
+    receiver_id: string;
+  }>;
+  receipts_outcome: Array<{
+    block_hash: string;
+    id: string;
+    outcome: any;
+  }>;
+  transaction: any;
+  transaction_outcome: any;
+}
 
 export const getProviders = (netwrok: string) => {
   return netwrok === Network.MAINNET
@@ -67,6 +82,21 @@ export const getAccount = async (rpc: RPC, accountId: string) => {
   }
 };
 
+export const getAccountAccessKeys = async (rpc: RPC, accountId: string) => {
+  try {
+    const { data } = await rpc.query({
+      account_id: accountId,
+      finality: 'final',
+      request_type: 'view_access_key_list',
+    });
+
+    return data as RpcResponse<RpcResultAccessKey>;
+  } catch (error) {
+    console.log({ error });
+    return;
+  }
+};
+
 export const getBlock = async (rpc: RPC, blockId: number | string) => {
   try {
     const { data } = await rpc.query({ block_id: blockId }, 'block');
@@ -100,6 +130,24 @@ export const getReceipt = async (rpc: RPC, receiptId: string) => {
     );
 
     return data as RpcResponse<RpcResultReceipt>;
+  } catch (error) {
+    console.log({ error });
+    return;
+  }
+};
+
+export const getExperimentalTxnStatus = async (rpc: RPC, txnHash: string) => {
+  try {
+    const { data } = await rpc.query(
+      {
+        sender_account_id: 'bowen',
+        tx_hash: txnHash,
+        wait_until: 'NONE',
+      },
+      'EXPERIMENTAL_tx_status',
+    );
+
+    return data as RpcResponse<RpcResultExperimentalTxn>;
   } catch (error) {
     console.log({ error });
     return;
