@@ -17,6 +17,7 @@ import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -29,111 +30,112 @@ type Props = {
   nftsPromise?: Promise<AccountNFTTxnsRes>;
 };
 
-const columns: DataTableColumnDef<AccountNFTTxn>[] = [
-  {
-    cell: () => <TxnStatusIcon status />,
-    className: 'w-5',
-    header: '',
-    id: 'status',
-  },
-  {
-    cell: (nft) =>
-      nft.transaction_hash ? (
-        <Link className="text-link" href={`/txns/${nft.transaction_hash}`}>
-          <Truncate>
-            <TruncateText text={nft.transaction_hash} />
-            <TruncateCopy text={nft.transaction_hash} />
-          </Truncate>
-        </Link>
-      ) : (
-        <Skeleton className="w-30" />
-      ),
-    header: 'Txn Hash',
-    id: 'txn_hash',
-  },
-  {
-    cell: (nft) => (
-      <Badge variant="teal">
-        <Truncate>
-          <TruncateText className="max-w-20" text={nft.cause} />
-        </Truncate>
-      </Badge>
-    ),
-    enableFilter: true,
-    filterName: 'cause',
-    header: 'Method',
-    id: 'cause',
-  },
-  {
-    cell: (nft) => <AccountLink account={nft.affected_account_id} />,
-    header: 'Affected',
-    id: 'affected',
-  },
-  {
-    cell: (nft) => <TxnDirection amount={nft.delta_amount} />,
-    className: 'w-20',
-    header: '',
-    id: 'direction',
-  },
-  {
-    cell: (nft) => <AccountLink account={nft.involved_account_id} />,
-    enableFilter: true,
-    filterName: 'involved',
-    header: 'Involved',
-    id: 'involved',
-  },
-  {
-    cell: (nft) => (
-      <Link
-        className="text-link"
-        href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
-      >
-        <Truncate>
-          <TruncateText text={nft.token_id} />
-          <TruncateCopy text={nft.token_id} />
-        </Truncate>
-      </Link>
-    ),
-    header: 'Token ID',
-    id: 'token_id',
-  },
-  {
-    cell: (nft) => (
-      <span className="flex items-center gap-1">
-        <TokenImage
-          alt={nft.meta?.name ?? ''}
-          className="m-px size-5 rounded-full border"
-          src={nft.meta?.icon ?? ''}
-        />
-        <TokenLink
-          contract={nft.contract_account_id}
-          name={nft.meta?.name}
-          type="nft-tokens"
-        />
-      </span>
-    ),
-    enableFilter: true,
-    filterName: 'token',
-    header: 'Token',
-    id: 'token',
-  },
-  {
-    cell: (nft) =>
-      nft.block?.block_timestamp ? (
-        <TimestampCell ns={nft.block.block_timestamp} />
-      ) : (
-        <Skeleton className="w-30" />
-      ),
-    cellClassName: 'px-1',
-    className: 'w-40',
-    header: <TimestampToggle />,
-    id: 'age',
-  },
-];
-
 export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
+  const { t } = useLocale('address');
   const nfts = !loading && nftsPromise ? use(nftsPromise) : null;
   const nftCount = !loading && nftCountPromise ? use(nftCountPromise) : null;
+
+  const columns: DataTableColumnDef<AccountNFTTxn>[] = [
+    {
+      cell: () => <TxnStatusIcon status />,
+      className: 'w-5',
+      header: '',
+      id: 'status',
+    },
+    {
+      cell: (nft) =>
+        nft.transaction_hash ? (
+          <Link className="text-link" href={`/txns/${nft.transaction_hash}`}>
+            <Truncate>
+              <TruncateText text={nft.transaction_hash} />
+              <TruncateCopy text={nft.transaction_hash} />
+            </Truncate>
+          </Link>
+        ) : (
+          <Skeleton className="w-30" />
+        ),
+      header: t('nfts.columns.txnHash'),
+      id: 'txn_hash',
+    },
+    {
+      cell: (nft) => (
+        <Badge variant="teal">
+          <Truncate>
+            <TruncateText className="max-w-20" text={nft.cause} />
+          </Truncate>
+        </Badge>
+      ),
+      enableFilter: true,
+      filterName: 'cause',
+      header: t('nfts.columns.method'),
+      id: 'cause',
+    },
+    {
+      cell: (nft) => <AccountLink account={nft.affected_account_id} />,
+      header: t('nfts.columns.affected'),
+      id: 'affected',
+    },
+    {
+      cell: (nft) => <TxnDirection amount={nft.delta_amount} />,
+      className: 'w-20',
+      header: '',
+      id: 'direction',
+    },
+    {
+      cell: (nft) => <AccountLink account={nft.involved_account_id} />,
+      enableFilter: true,
+      filterName: 'involved',
+      header: t('nfts.columns.involved'),
+      id: 'involved',
+    },
+    {
+      cell: (nft) => (
+        <Link
+          className="text-link"
+          href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
+        >
+          <Truncate>
+            <TruncateText text={nft.token_id} />
+            <TruncateCopy text={nft.token_id} />
+          </Truncate>
+        </Link>
+      ),
+      header: t('nfts.columns.tokenId'),
+      id: 'token_id',
+    },
+    {
+      cell: (nft) => (
+        <span className="flex items-center gap-1">
+          <TokenImage
+            alt={nft.meta?.name ?? ''}
+            className="m-px size-5 rounded-full border"
+            src={nft.meta?.icon ?? ''}
+          />
+          <TokenLink
+            contract={nft.contract_account_id}
+            name={nft.meta?.name}
+            type="nft-tokens"
+          />
+        </span>
+      ),
+      enableFilter: true,
+      filterName: 'token',
+      header: t('nfts.columns.token'),
+      id: 'token',
+    },
+    {
+      cell: (nft) =>
+        nft.block?.block_timestamp ? (
+          <TimestampCell ns={nft.block.block_timestamp} />
+        ) : (
+          <Skeleton className="w-30" />
+        ),
+      cellClassName: 'px-1',
+      className: 'w-40',
+      header: <TimestampToggle />,
+      id: 'age',
+    },
+  ];
 
   const { address } = useParams<{ address: string }>();
   const router = useRouter();
@@ -163,7 +165,7 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
         <DataTable
           columns={columns}
           data={nfts?.data}
-          emptyMessage="No nft token txns found"
+          emptyMessage={t('nfts.empty')}
           getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
           header={
             <SkeletonSlot
@@ -171,9 +173,11 @@ export const NFTTxns = ({ loading, nftCountPromise, nftsPromise }: Props) => {
               loading={loading || !nftCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  nftCount?.count ?? 0,
-                )} nft token txns found`}</>
+                <>
+                  {t('nfts.total', {
+                    count: numberFormat(nftCount?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

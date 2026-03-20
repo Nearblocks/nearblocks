@@ -9,6 +9,7 @@ import { use, useMemo } from 'react';
 import { AccountTxnStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat } from '@/lib/format';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -43,6 +44,7 @@ const tooltipFormatter = function (this: Highcharts.Point) {
 };
 
 export const TxnsChart = ({ loading, txnsPromise }: Props) => {
+  const { t } = useLocale('address');
   const stats = !loading && txnsPromise ? use(txnsPromise) : null;
 
   const data = useMemo(() => {
@@ -75,19 +77,19 @@ export const TxnsChart = ({ loading, txnsPromise }: Props) => {
               className="stroke-0"
               labels={txnsLabel}
               opposite={false}
-              title={{ text: 'Count' }}
+              title={{ text: t('analytics.txns.count') }}
             />
             <Line.Series
               data={data.txns}
-              options={{ id: 'txns', name: 'Transactions' }}
+              options={{ id: 'txns', name: t('analytics.txns.transactions') }}
             />
             <Line.Series
               data={data.uniqueIn}
-              options={{ id: 'in', name: 'Unique Incoming Addresses' }}
+              options={{ id: 'in', name: t('analytics.txns.uniqueIn') }}
             />
             <Line.Series
               data={data.uniqueOut}
-              options={{ id: 'out', name: 'Unique Outgoing Addresses' }}
+              options={{ id: 'out', name: t('analytics.txns.uniqueOut') }}
             />
             <Tooltip formatter={tooltipFormatter} shared />
           </AnalyticsChart>

@@ -9,6 +9,7 @@ import { Copy } from '@/components/copy';
 import { IpfsSourceViewer } from '@/components/ipfs';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { useConfig } from '@/hooks/use-config';
+import { useLocale } from '@/hooks/use-locale';
 import { useView } from '@/hooks/use-rpc';
 import { downloadWasm, getCommitHash } from '@/lib/utils';
 import {
@@ -27,6 +28,7 @@ type Props = {
 };
 
 export const ContractCode = ({ contract }: Props) => {
+  const { t } = useLocale('address');
   const verifier = useConfig((s) => s.config.verifier);
 
   const { data: sourceMetadata, isLoading: isLoadingMetadata } =
@@ -91,31 +93,15 @@ export const ContractCode = ({ contract }: Props) => {
                     <TooltipTrigger asChild>
                       <RiQuestionLine className="size-4" />
                     </TooltipTrigger>
-                    <TooltipContent>Version of the contract</TooltipContent>
-                  </Tooltip>{' '}
-                  Version:
-                </ListLeft>
-                <ListRight>
-                  <p className="truncate">{sourceMetadata.version || 'N/A'}</p>
-                </ListRight>
-              </ListItem>
-              <ListItem>
-                <ListLeft className="flex items-center gap-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <RiQuestionLine className="size-4" />
-                    </TooltipTrigger>
                     <TooltipContent>
-                      Standards used by the contract
+                      {t('contract.code.versionTip')}
                     </TooltipContent>
                   </Tooltip>{' '}
-                  Standard:
+                  {t('contract.code.version')}
                 </ListLeft>
                 <ListRight>
                   <p className="truncate">
-                    {sourceMetadata.standards
-                      ?.map((s) => `${s.standard}:v${s.version}`)
-                      .join(', ') || 'N/A'}
+                    {sourceMetadata.version || t('contract.code.na')}
                   </p>
                 </ListRight>
               </ListItem>
@@ -126,10 +112,30 @@ export const ContractCode = ({ contract }: Props) => {
                       <RiQuestionLine className="size-4" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      Snapshot of the contract source code
+                      {t('contract.code.standardTip')}
                     </TooltipContent>
                   </Tooltip>{' '}
-                  Source snapshot:
+                  {t('contract.code.standard')}
+                </ListLeft>
+                <ListRight>
+                  <p className="truncate">
+                    {sourceMetadata.standards
+                      ?.map((s) => `${s.standard}:v${s.version}`)
+                      .join(', ') || t('contract.code.na')}
+                  </p>
+                </ListRight>
+              </ListItem>
+              <ListItem>
+                <ListLeft className="flex items-center gap-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <RiQuestionLine className="size-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {t('contract.code.sourceTip')}
+                    </TooltipContent>
+                  </Tooltip>{' '}
+                  {t('contract.code.snapshot')}
                 </ListLeft>
                 <ListRight className="flex items-center xl:py-2.5">
                   {sourceMetadata.build_info?.source_code_snapshot ? (
@@ -147,7 +153,7 @@ export const ContractCode = ({ contract }: Props) => {
                       />
                     </>
                   ) : (
-                    'N/A'
+                    t('contract.code.na')
                   )}
                 </ListRight>
               </ListItem>
@@ -160,10 +166,10 @@ export const ContractCode = ({ contract }: Props) => {
                       <RiQuestionLine className="size-4" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      IPFS hash of the contract source code
+                      {t('contract.code.ipfsTip')}
                     </TooltipContent>
                   </Tooltip>{' '}
-                  IPFS:
+                  {t('contract.code.ipfs')}
                 </ListLeft>
                 <ListRight className="flex items-center xl:py-2.5">
                   {verifierData?.cid ? (
@@ -179,7 +185,7 @@ export const ContractCode = ({ contract }: Props) => {
                       <Copy text={verifierData.cid} />
                     </>
                   ) : (
-                    'N/A'
+                    t('contract.code.na')
                   )}
                 </ListRight>
               </ListItem>
@@ -190,14 +196,15 @@ export const ContractCode = ({ contract }: Props) => {
                       <RiQuestionLine className="size-4" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      Environment in which the contract was built
+                      {t('contract.code.buildEnvTip')}
                     </TooltipContent>
                   </Tooltip>{' '}
-                  Build Environment:
+                  {t('contract.code.buildEnv')}
                 </ListLeft>
                 <ListRight>
                   <p className="truncate">
-                    {sourceMetadata?.build_info?.build_environment || 'N/A'}
+                    {sourceMetadata?.build_info?.build_environment ||
+                      t('contract.code.na')}
                   </p>
                 </ListRight>
               </ListItem>
@@ -208,10 +215,10 @@ export const ContractCode = ({ contract }: Props) => {
                       <RiQuestionLine className="size-4" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      Build commands used to compile the contract
+                      {t('contract.code.buildCommandTip')}
                     </TooltipContent>
                   </Tooltip>{' '}
-                  Build Command:
+                  {t('contract.code.buildCommand')}
                 </ListLeft>
                 <ListRight className="flex items-center xl:py-2.5">
                   {sourceMetadata?.build_info?.build_command?.length > 0 ? (
@@ -227,7 +234,7 @@ export const ContractCode = ({ contract }: Props) => {
                       />
                     </>
                   ) : (
-                    'N/A'
+                    t('contract.code.na')
                   )}
                 </ListRight>
               </ListItem>
@@ -235,7 +242,8 @@ export const ContractCode = ({ contract }: Props) => {
           </div>
           <div className="mb-4 px-1">
             <p className="text-muted-foreground flex items-center gap-1 py-2.5">
-              <RiCodeSSlashLine className="size-4" /> Contract Source Code:
+              <RiCodeSSlashLine className="size-4" />{' '}
+              {t('contract.code.sourceCode')}
             </p>
             <IpfsSourceViewer
               api={verifier.api.list}
@@ -249,7 +257,7 @@ export const ContractCode = ({ contract }: Props) => {
       <div className="px-1">
         <div className="text-muted-foreground flex items-center justify-between gap-1 py-2.5">
           <span className="flex items-center gap-1">
-            <RiCodeSSlashLine className="size-4" /> Contract Code (Base64):
+            <RiCodeSSlashLine className="size-4" /> {t('contract.code.base64')}
           </span>
           <Button
             onClick={() =>
@@ -258,7 +266,7 @@ export const ContractCode = ({ contract }: Props) => {
             size="xs"
             variant="secondary"
           >
-            Download .wasm
+            {t('contract.code.downloadWasm')}
           </Button>
         </div>
         <Textarea

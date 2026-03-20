@@ -1,5 +1,7 @@
 'use client';
 
+import type { UrlObject } from 'url';
+
 import OGLink, { LinkProps, useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -10,8 +12,10 @@ import {
   useState,
 } from 'react';
 
+import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
-import { supportedLocales } from '@/locales/config';
+import type { Locale } from '@/locales/config';
+import { defaultLocale, supportedLocales } from '@/locales/config';
 import { useHighlightStore } from '@/stores/highlight';
 
 import { Truncate, TruncateCopy, TruncateText } from './truncate';
@@ -31,6 +35,33 @@ type AccountLinkProps = {
   hideCopy?: boolean;
   name?: string;
   textClassName?: string;
+};
+
+const localizeHref = (
+  href: LinkProps['href'],
+  locale: Locale,
+): LinkProps['href'] => {
+  if (locale === defaultLocale) return href;
+
+  if (typeof href === 'object' && href !== null) {
+    const pathname = (href as UrlObject).pathname;
+    if (!pathname || typeof pathname !== 'string') return href;
+    const localized = localizeHref(pathname, locale);
+    return { ...href, pathname: localized as string };
+  }
+
+  const hrefStr = href.toString();
+  if (
+    supportedLocales.some(
+      (l) => hrefStr === `/${l}` || hrefStr.startsWith(`/${l}/`),
+    )
+  )
+    return href;
+  if (hrefStr.startsWith('//')) return href;
+  if (hrefStr === '/') return `/${locale}`;
+  if (hrefStr.startsWith('/')) return `/${locale}${hrefStr}`;
+
+  return href;
 };
 
 const PendingMarker = () => {
@@ -55,7 +86,14 @@ const PendingMarker = () => {
   );
 };
 
-export const Link = ({ children, className, ...props }: Props) => {
+export const Link = ({ children, className, href, ...props }: Props) => {
+  const { locale } = useLocale();
+
+  const localizedHref = useMemo(
+    () => localizeHref(href, locale),
+    [href, locale],
+  );
+
   return (
     <OGLink
       {...props}
@@ -63,6 +101,7 @@ export const Link = ({ children, className, ...props }: Props) => {
         className,
         '[&:has([data-link-pending=true])]:cursor-progress',
       )}
+      href={localizedHref}
     >
       <PendingMarker />
       {children}
@@ -75,6 +114,17 @@ const getLinkUrl = (href: LinkProps['href'], as?: LinkProps['as']): string => {
 
   return href.toString();
 };
+
+const stripDefaultLocalePrefix = (path: string): string => {
+  const prefix = `/${defaultLocale}`;
+  if (path === prefix || path === `${prefix}/`) return '/';
+  if (path.startsWith(`${prefix}/`)) return path.slice(prefix.length);
+
+  return path;
+};
+
+const linkHasAnyLocalePrefix = (path: string) =>
+  supportedLocales.some((l) => path === `/${l}` || path.startsWith(`/${l}/`));
 
 const isPathActive = (
   linkUrl: string,
@@ -94,13 +144,16 @@ export const ActiveLink = ({
   const pathname = usePathname();
   const isActive = useMemo(() => {
     if (pathname) {
-      const linkUrl = getLinkUrl(props.href, props.as);
+      const rawLinkUrl = getLinkUrl(props.href, props.as);
+      const linkUrl = stripDefaultLocalePrefix(rawLinkUrl);
+      const pathForMatch = stripDefaultLocalePrefix(pathname);
 
-      if (isPathActive(linkUrl, pathname, exact)) return true;
+      if (isPathActive(linkUrl, pathForMatch, exact)) return true;
 
       const segments = pathname.split('/').filter(Boolean);
 
       if (
+        !linkHasAnyLocalePrefix(rawLinkUrl) &&
         segments.length > 0 &&
         supportedLocales.some((locale) => locale === segments[0])
       ) {

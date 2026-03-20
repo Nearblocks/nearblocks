@@ -10,6 +10,7 @@ import { DailyStats } from 'nb-schemas';
 
 import { AnalyticsChart } from '@/components/address/analytics/chart';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat, toNear } from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -53,6 +54,7 @@ const tooltipFormatter = function (this: Highcharts.Point) {
 };
 
 export const SupplyChart = ({ loading, statsPromise }: Props) => {
+  const { t } = useLocale('charts');
   const [logView, setLogView] = useState(false);
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
@@ -61,8 +63,7 @@ export const SupplyChart = ({ loading, statsPromise }: Props) => {
   return (
     <Card>
       <ChartHeader
-        description="Near Unique Accounts chart shows the number of active accounts per day
-          on the Near protocol."
+        description={t('nearSupply.description')}
         logView={logView}
         setLogView={setLogView}
       />
@@ -78,10 +79,13 @@ export const SupplyChart = ({ loading, statsPromise }: Props) => {
                 className="stroke-0"
                 labels={yAxisLabel}
                 opposite={false}
-                title={{ text: 'Near Supply' }}
+                title={{ text: t('nearSupply.yAxis') }}
                 type={logView ? 'logarithmic' : 'linear'}
               />
-              <Area.Series data={data} options={{ name: 'Near Supply' }} />
+              <Area.Series
+                data={data}
+                options={{ name: t('nearSupply.series') }}
+              />
               <Tooltip formatter={tooltipFormatter} shared />
             </AnalyticsChart>
           )}
@@ -92,6 +96,7 @@ export const SupplyChart = ({ loading, statsPromise }: Props) => {
 };
 
 export const SupplyChartMini = ({ loading, statsPromise }: Props) => {
+  const { t } = useLocale('charts');
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   const data = useMemo(() => getData(stats), [stats]);
@@ -104,7 +109,10 @@ export const SupplyChartMini = ({ loading, statsPromise }: Props) => {
       >
         {() => (
           <MiniChart height={220}>
-            <Line.Series data={data} options={{ name: 'Near Supply' }} />
+            <Line.Series
+              data={data}
+              options={{ name: t('nearSupply.series') }}
+            />
             <Tooltip formatter={tooltipFormatter} shared />
           </MiniChart>
         )}

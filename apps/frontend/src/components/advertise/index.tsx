@@ -3,6 +3,7 @@
 import { CircleCheck } from 'lucide-react';
 import Image from 'next/image';
 
+import { useLocale } from '@/hooks/use-locale';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -10,36 +11,28 @@ import { Separator } from '@/ui/separator';
 
 export const Advertise = () => {
   const theme = useTheme();
+  const { t } = useLocale('advertise');
 
   return (
     <>
       <div className="mb-20 flex flex-col items-center gap-10 md:flex-row md:items-start">
         <div className="flex-1 text-balance">
           <p className="text-body-sm text-muted-foreground mb-4 tracking-widest uppercase">
-            ADVERTISE ON NEARBLOCKS
+            {t('label')}
           </p>
-          <h1 className="text-headline-2xl mb-6">
-            Reach millions of Blockchain Enthusiasts and Developers Worldwide
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            Nearblocks is the leading Block Explorer, Search, API and Analytics
-            Platform for the NEAR Blockchain.
-          </p>
-          <p className="text-muted-foreground mb-8">
-            Our website offers wide exposure to the Near Protocol and block
-            chain community. Advertising with us makes it easier for users to
-            discover your project through sponsored content on our web pages.
-          </p>
+          <h1 className="text-headline-2xl mb-6">{t('title')}</h1>
+          <p className="text-muted-foreground mb-4">{t('description')}</p>
+          <p className="text-muted-foreground mb-8">{t('body')}</p>
           <Button asChild size="lg" variant="secondary">
-            <a href="https://dash.nearblocks.io/login">Get started now</a>
+            <a href="https://dash.nearblocks.io/login">{t('cta')}</a>
           </Button>
         </div>
         <div className="flex-1">
           <Image
-            alt="Reach millions worldwide"
+            alt={t('label')}
             className="mx-auto w-full max-w-lg"
             height={348}
-            src="/images/world_link.png"
+            src="/images/world-link.png"
             width={618}
           />
         </div>
@@ -49,7 +42,7 @@ export const Advertise = () => {
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">#1</p>
             <p className="text-body-xs text-muted-foreground mt-1 uppercase">
-              NEAR Block Explorer
+              {t('stats.explorer')}
             </p>
           </div>
           <Separator
@@ -60,7 +53,7 @@ export const Advertise = () => {
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">3M</p>
             <p className="text-body-xs text-muted-foreground mt-1 uppercase">
-              Page Views Per Month
+              {t('stats.pageViews')}
             </p>
           </div>
           <Separator
@@ -71,7 +64,7 @@ export const Advertise = () => {
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">900K</p>
             <p className="text-body-xs text-muted-foreground mt-1 uppercase">
-              Unique Visitors per Month
+              {t('stats.visitors')}
             </p>
           </div>
           <Separator
@@ -82,47 +75,45 @@ export const Advertise = () => {
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">150K</p>
             <p className="text-body-xs text-muted-foreground mt-1 uppercase">
-              Registered Users
+              {t('stats.users')}
             </p>
           </div>
         </div>
       </Card>
       <Card className="border-0 px-4 py-10">
         <h2 className="text-headline-2xl mb-4 text-center">
-          Advertisement Types
+          {t('types.title')}
         </h2>
         <p className="text-muted-foreground mx-auto mb-20 max-w-2xl text-center">
-          Get your message in front of millions blockchain enthusiasts. Our
-          sponsored contents are designed to be cohesive with the site&apos;s
-          user experience.
+          {t('types.description')}
         </p>
         <div className="mx-auto max-w-5xl space-y-8">
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex-1">
-              <h3 className="text-headline-lg mb-3">Banner Ad Sponsorship</h3>
+              <h3 className="text-headline-lg mb-3">
+                {t('types.banner.title')}
+              </h3>
               <p className="text-muted-foreground mb-5">
-                Prominently create brand awareness and user retention with
-                banner ads on Nearblocks pages. Creatively promote, engage user
-                and increase &quot;eyeball&quot; reach.
+                {t('types.banner.description')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Graphical</span>
+                  <span>{t('types.banner.graphical')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Eyeball Catching</span>
+                  <span>{t('types.banner.eyeball')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Brand Awareness</span>
+                  <span>{t('types.banner.brand')}</span>
                 </li>
               </ul>
             </div>
             <div className="flex-1">
               <Image
-                alt="Banner Ad Sponsorship"
+                alt={t('types.banner.title')}
                 className="bg-muted w-full rounded-lg object-contain"
                 height={380}
                 src={
@@ -137,31 +128,29 @@ export const Advertise = () => {
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex-1">
               <h3 className="text-headline-lg mb-3">
-                Header Text Ad Sponsorship
+                {t('types.header.title')}
               </h3>
               <p className="text-muted-foreground mb-5">
-                Reach users by reaching to them individually with targeted copy.
-                Your sponsored ad text displays in a non-intrusive and clean
-                manner on the top of Nearblocks pages.
+                {t('types.header.description')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Clear Message</span>
+                  <span>{t('types.header.clearMessage')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Non-Intrusive</span>
+                  <span>{t('types.header.nonIntrusive')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>High Coverage</span>
+                  <span>{t('types.header.highCoverage')}</span>
                 </li>
               </ul>
             </div>
             <div className="flex-1">
               <Image
-                alt="Header Text Ad Sponsorship"
+                alt={t('types.header.title')}
                 className="bg-muted w-full rounded-lg object-contain"
                 height={380}
                 src={
@@ -175,30 +164,30 @@ export const Advertise = () => {
           </div>
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex-1">
-              <h3 className="text-headline-lg mb-3">Search Ad Sponsorship</h3>
+              <h3 className="text-headline-lg mb-3">
+                {t('types.search.title')}
+              </h3>
               <p className="text-muted-foreground mb-5">
-                Increase brand awareness and user retention with ads on the
-                Search Bar. Promote creatively, engage users and increase
-                &quot;eyeball&quot; reach.
+                {t('types.search.description')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Clear Message</span>
+                  <span>{t('types.search.clearMessage')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>Non-Intrusive</span>
+                  <span>{t('types.search.nonIntrusive')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CircleCheck className="text-lime-foreground size-4 shrink-0" />
-                  <span>High Coverage</span>
+                  <span>{t('types.search.highCoverage')}</span>
                 </li>
               </ul>
             </div>
             <div className="flex-1">
               <Image
-                alt="Search Ad Sponsorship"
+                alt={t('types.search.title')}
                 className="bg-muted w-full rounded-lg object-contain"
                 height={380}
                 src={

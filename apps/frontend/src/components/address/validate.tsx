@@ -4,6 +4,7 @@ import { CircleCheckBig } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
+import { useLocale } from '@/hooks/use-locale';
 import { Button } from '@/ui/button';
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export const Validate = ({ address }: Props) => {
+  const { t } = useLocale('address');
   const networkId = useConfig((s) => s.config.networkId);
 
   return (
@@ -33,7 +35,7 @@ export const Validate = ({ address }: Props) => {
             rel="noopener noreferrer"
             target="_blank"
           >
-            Validate Account
+            {t('validate')}
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

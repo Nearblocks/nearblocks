@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Copy } from '@/components/copy';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { ToggleGroup } from '@/components/toggle-group';
+import { useLocale } from '@/hooks/use-locale';
 import { safeStringify } from '@/lib/json';
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
@@ -44,6 +45,7 @@ export const TableView = ({ data }: TableProps) => {
 };
 
 export const AuroraArgsViewer = ({ argsBase64, method }: Props) => {
+  const { t } = useLocale('txns');
   const [format, setFormat] = useState<AuroraViewFormat>('rlp');
   const [isFullHeight, setIsFullHeight] = useState(false);
 
@@ -106,7 +108,9 @@ export const AuroraArgsViewer = ({ argsBase64, method }: Props) => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {isFullHeight ? 'Collapse' : 'Expand'}
+                  {isFullHeight
+                    ? t('codeViewer.collapse')
+                    : t('codeViewer.expand')}
                 </TooltipContent>
               </Tooltip>
             </ToggleGroup>
@@ -130,7 +134,7 @@ export const AuroraArgsViewer = ({ argsBase64, method }: Props) => {
           size="xs"
           variant={format === 'default' ? 'secondary' : 'outline'}
         >
-          Default
+          {t('codeViewer.default')}
         </Button>
         <Button
           className="border-0"
@@ -138,7 +142,7 @@ export const AuroraArgsViewer = ({ argsBase64, method }: Props) => {
           size="xs"
           variant={format === 'rlp' ? 'secondary' : 'outline'}
         >
-          RLP Decoded
+          {t('codeViewer.rlpDecoded')}
         </Button>
         <Button
           className="border-0"
@@ -146,7 +150,7 @@ export const AuroraArgsViewer = ({ argsBase64, method }: Props) => {
           size="xs"
           variant={format === 'table' ? 'secondary' : 'outline'}
         >
-          Table
+          {t('codeViewer.table')}
         </Button>
       </ToggleGroup>
     </div>

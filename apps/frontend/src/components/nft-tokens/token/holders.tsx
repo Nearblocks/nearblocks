@@ -14,6 +14,7 @@ import {
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
@@ -30,51 +31,13 @@ type HolderRow = NFTContractHolders & {
   percentage: null | string;
 };
 
-const columns: DataTableColumnDef<HolderRow>[] = [
-  {
-    cell: (holder) => (
-      <AccountLink account={holder.account} textClassName="max-w-80" />
-    ),
-    header: 'Address',
-    id: 'address',
-  },
-  {
-    cell: (holder) => numberFormat(holder.quantity),
-    className: 'w-60',
-    header: 'Quantity',
-    id: 'quantity',
-  },
-  {
-    cell: (holder) =>
-      holder.percentage ? (
-        <div className="min-w-32">
-          <span>
-            {numberFormat(holder.percentage, { maximumFractionDigits: 4 })}%
-          </span>
-          <div className="bg-border mt-1 h-0.5 w-full rounded-full">
-            <div
-              className="h-0.5 rounded-full bg-teal-500"
-              style={{
-                width: `${Math.min(parseFloat(holder.percentage), 100)}%`,
-              }}
-            />
-          </div>
-        </div>
-      ) : (
-        'N/A'
-      ),
-    className: 'w-60',
-    header: 'Percentage',
-    id: 'percentage',
-  },
-];
-
 export const NftTokenHolders = ({
   contractPromise,
   holderCountPromise,
   holdersPromise,
   loading,
 }: Props) => {
+  const { t } = useLocale('nfts');
   const holders = !loading && holdersPromise ? use(holdersPromise) : null;
   const holderCount =
     !loading && holderCountPromise ? use(holderCountPromise) : null;
@@ -83,6 +46,45 @@ export const NftTokenHolders = ({
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const columns: DataTableColumnDef<HolderRow>[] = [
+    {
+      cell: (holder) => (
+        <AccountLink account={holder.account} textClassName="max-w-80" />
+      ),
+      header: t('holders.address'),
+      id: 'address',
+    },
+    {
+      cell: (holder) => numberFormat(holder.quantity),
+      className: 'w-60',
+      header: t('holders.quantity'),
+      id: 'quantity',
+    },
+    {
+      cell: (holder) =>
+        holder.percentage ? (
+          <div className="min-w-32">
+            <span>
+              {numberFormat(holder.percentage, { maximumFractionDigits: 4 })}%
+            </span>
+            <div className="bg-border mt-1 h-0.5 w-full rounded-full">
+              <div
+                className="h-0.5 rounded-full bg-teal-500"
+                style={{
+                  width: `${Math.min(parseFloat(holder.percentage), 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          t('holders.na')
+        ),
+      className: 'w-60',
+      header: t('holders.percentage'),
+      id: 'percentage',
+    },
+  ];
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
     const params = buildParams(searchParams, {
@@ -107,7 +109,7 @@ export const NftTokenHolders = ({
         <DataTable
           columns={columns}
           data={loading ? undefined : rows}
-          emptyMessage="No token holders found"
+          emptyMessage={t('holders.empty')}
           getRowKey={(h) => h.account}
           header={
             <SkeletonSlot
@@ -115,9 +117,11 @@ export const NftTokenHolders = ({
               loading={loading || !holderCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  holderCount?.data?.count ?? 0,
-                )} token holders found`}</>
+                <>
+                  {t('holders.total', {
+                    count: numberFormat(holderCount?.data?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

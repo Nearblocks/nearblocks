@@ -1,13 +1,16 @@
 import { ActiveLink } from '@/components/link';
 import { TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
+import { hasLocale, translator } from '@/locales/dictionaries';
 import { Card, CardContent } from '@/ui/card';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
 type Props = LayoutProps<'/[lang]/address/[address]/analytics'>;
 
 const AnalyticsLayout = async ({ children, params }: Props) => {
-  const { address } = await params;
+  const { address, lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'address');
 
   return (
     <Card>
@@ -16,27 +19,27 @@ const AnalyticsLayout = async ({ children, params }: Props) => {
           <TabLinks>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/analytics`}>
-                Overview
+                {t('analytics.tabs.overview')}
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/analytics/balance`}>
-                Balance
+                {t('analytics.tabs.balance')}
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/analytics/txns`}>
-                Transactions
+                {t('analytics.tabs.txns')}
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/analytics/near`}>
-                Near Transfers
+                {t('analytics.tabs.near')}
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/analytics/tokens`}>
-                Token Transfers
+                {t('analytics.tabs.tokens')}
               </ActiveLink>
             </TabLink>
           </TabLinks>

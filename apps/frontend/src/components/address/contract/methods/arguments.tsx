@@ -1,7 +1,10 @@
+'use client';
+
 import { RiQuestionLine } from '@remixicon/react';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 
 import { JsonEditor } from '@/components/json-editor';
+import { useLocale } from '@/hooks/use-locale';
 import { FormData } from '@/lib/schema/contract';
 import { Button } from '@/ui/button';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/ui/field';
@@ -26,10 +29,12 @@ export const Arguments = ({
   onFetchArgs,
   selectedMethod,
 }: Props) => {
+  const { t } = useLocale('address');
+
   return (
     <Field data-invalid={!!errors.args}>
       <div className="flex items-center justify-between">
-        <FieldLabel htmlFor="args">Arguments</FieldLabel>
+        <FieldLabel htmlFor="args">{t('contract.methods.args')}</FieldLabel>
         {mode === 'change' && !hasSchema && selectedMethod && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -40,20 +45,20 @@ export const Arguments = ({
                 type="button"
                 variant="outline"
               >
-                Auto detect <RiQuestionLine className="size-4" />
+                {t('contract.methods.autoDetect')}{' '}
+                <RiQuestionLine className="size-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Scan the blockchain to find successful method calls and copy the
-              parameter schema. Auto-detect might not work on every method.
+              {t('contract.methods.autoDetectTip')}
             </TooltipContent>
           </Tooltip>
         )}
       </div>
       <FieldDescription>
         {hasSchema
-          ? 'JSON arguments for the method call'
-          : 'Specify an arguments JSON schema'}
+          ? t('contract.methods.hasSchemaArgs')
+          : t('contract.methods.noSchemaArgs')}
       </FieldDescription>
       <Controller
         control={control}

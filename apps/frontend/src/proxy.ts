@@ -34,6 +34,6 @@ export const proxy = (request: NextRequest) => {
 export const config = {
   matcher: [
     '/((?!api(?:/|$)|_next(?:/|$))(?!.*\\.[^/]+$).*)',
-    '/:prefix(address|tokens|nft-tokens|mt-tokens|node-explorer)/:path*',
+    '/:prefix(address|tokens|nft-tokens|mt-tokens|validators)/:path*',
   ],
 };

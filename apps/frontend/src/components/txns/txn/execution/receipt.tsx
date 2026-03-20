@@ -1,3 +1,5 @@
+'use client';
+
 import { RiQuestionLine } from '@remixicon/react';
 import { Key } from 'lucide-react';
 import { useMemo } from 'react';
@@ -10,6 +12,7 @@ import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TxnStatus } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { gasFormat, nearFormat, numberFormat } from '@/lib/format';
 import { Skeleton } from '@/ui/skeleton';
@@ -25,6 +28,7 @@ type Props = {
 };
 
 export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
+  const { t } = useLocale('txns');
   const deposit = useMemo(() => {
     return receipt?.actions
       .reduce((sum, action) => {
@@ -44,11 +48,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Unique identifier (hash) of this receipt
-                </TooltipContent>
+                <TooltipContent>{t('receipt.receiptTip')}</TooltipContent>
               </Tooltip>
-              Receipt:
+              {t('receipt.receipt')}
             </div>
           </ListLeft>
           <ListRight>
@@ -76,9 +78,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>The status of the receipt</TooltipContent>
+                <TooltipContent>{t('receipt.statusTip')}</TooltipContent>
               </Tooltip>
-              Status:
+              {t('receipt.status')}
             </div>
           </ListLeft>
           <ListRight className="h-13">
@@ -97,11 +99,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The number of the block in which the receipt was recorded
-                </TooltipContent>
+                <TooltipContent>{t('receipt.blockTip')}</TooltipContent>
               </Tooltip>
-              Block:
+              {t('receipt.block')}
             </div>
           </ListLeft>
           <ListRight>
@@ -134,11 +134,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The account which issued a receipt
-                </TooltipContent>
+                <TooltipContent>{t('receipt.fromTip')}</TooltipContent>
               </Tooltip>
-              From:
+              {t('receipt.from')}
             </div>
           </ListLeft>
           <ListRight>
@@ -182,11 +180,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The destination account of the receipt
-                </TooltipContent>
+                <TooltipContent>{t('receipt.toTip')}</TooltipContent>
               </Tooltip>
-              To:
+              {t('receipt.to')}
             </div>
           </ListLeft>
           <ListRight>
@@ -210,11 +206,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The actions performed during receipt processing
-                </TooltipContent>
+                <TooltipContent>{t('receipt.actionsTip')}</TooltipContent>
               </Tooltip>
-              Actions:
+              {t('receipt.actions')}
             </div>
           </ListLeft>
           <ListRight>
@@ -254,11 +248,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Deposit value attached with the receipt
-                </TooltipContent>
+                <TooltipContent>{t('receipt.valueTip')}</TooltipContent>
               </Tooltip>
-              Value:
+              {t('receipt.value')}
             </div>
           </ListLeft>
           <ListRight>
@@ -281,11 +273,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Total amount of Gas & Token burnt from this receipt
-                </TooltipContent>
+                <TooltipContent>{t('receipt.burntGasTip')}</TooltipContent>
               </Tooltip>
-              Burnt Gas & Tokens:
+              {t('receipt.burntGas')}
             </div>
           </ListLeft>
           <ListRight>
@@ -316,11 +306,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The result of the receipt execution
-                </TooltipContent>
+                <TooltipContent>{t('receipt.resultTip')}</TooltipContent>
               </Tooltip>
-              Result:
+              {t('receipt.result')}
             </div>
           </ListLeft>
           <ListRight>
@@ -348,9 +336,9 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                 <TooltipTrigger>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>Logs included in the receipt</TooltipContent>
+                <TooltipContent>{t('receipt.logsTip')}</TooltipContent>
               </Tooltip>
-              Logs:
+              {t('receipt.logs')}
             </div>
           </ListLeft>
           <ListRight>

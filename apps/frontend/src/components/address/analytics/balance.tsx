@@ -9,6 +9,7 @@ import { use, useMemo } from 'react';
 import { AccountBalanceStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { bytesFormat, dateFormat, numberFormat, toNear } from '@/lib/format';
 import { nearIcon } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
@@ -51,6 +52,7 @@ const tooltipFormatter = function (this: Highcharts.Point) {
 };
 
 export const BalanceChart = ({ balancePromise, loading }: Props) => {
+  const { t } = useLocale('address');
   const stats = !loading && balancePromise ? use(balancePromise) : null;
 
   const data = useMemo(() => {
@@ -83,24 +85,36 @@ export const BalanceChart = ({ balancePromise, loading }: Props) => {
               className="stroke-0"
               labels={balanceLabel}
               opposite={false}
-              title={{ text: 'Balance' }}
+              title={{ text: t('analytics.balance.balance') }}
             />
             <Line.Series
               data={data.amount}
-              options={{ id: 'balance', name: 'Balance', yAxis: 0 }}
+              options={{
+                id: 'balance',
+                name: t('analytics.balance.balance'),
+                yAxis: 0,
+              }}
             />
             <Line.Series
               data={data.staked}
-              options={{ id: 'staked', name: 'Staked Balance', yAxis: 0 }}
+              options={{
+                id: 'staked',
+                name: t('analytics.balance.stakedBalance'),
+                yAxis: 0,
+              }}
             />
             <YAxis
               className="stroke-0"
               labels={storageLabel}
-              title={{ text: 'Storage Used' }}
+              title={{ text: t('analytics.balance.storage') }}
             />
             <Line.Series
               data={data.storage}
-              options={{ id: 'storage', name: 'Storage Used', yAxis: 1 }}
+              options={{
+                id: 'storage',
+                name: t('analytics.balance.storage'),
+                yAxis: 1,
+              }}
             />
             <Tooltip formatter={tooltipFormatter} shared />
           </AnalyticsChart>

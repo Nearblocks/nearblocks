@@ -10,6 +10,7 @@ import {
 
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -27,6 +28,7 @@ export const Overview = ({
   loading,
   txCountPromise,
 }: Props) => {
+  const { t } = useLocale('nfts');
   const result = !loading && contractPromise ? use(contractPromise) : null;
   const contract = result?.data ?? null;
   const holderCount =
@@ -36,12 +38,16 @@ export const Overview = ({
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">Overview</CardTitle>
+        <CardTitle className="text-headline-sm">
+          {t('contract.overview.title')}
+        </CardTitle>
       </CardHeader>
       <CardContent className="px-3">
         <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="min-w-36">Total Supply:</ListLeft>
+            <ListLeft className="min-w-36">
+              {t('contract.overview.totalSupply')}
+            </ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-28" />}
@@ -54,7 +60,9 @@ export const Overview = ({
                         maximumFractionDigits: 0,
                       })
                     ) : (
-                      <span className="text-muted-foreground">N/A</span>
+                      <span className="text-muted-foreground">
+                        {t('contract.overview.na')}
+                      </span>
                     )}
                   </>
                 )}
@@ -62,7 +70,9 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-36">Holders:</ListLeft>
+            <ListLeft className="min-w-36">
+              {t('contract.overview.holders')}
+            </ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-20" />}
@@ -73,7 +83,9 @@ export const Overview = ({
                     {holderCount?.data?.count ? (
                       numberFormat(holderCount.data.count)
                     ) : (
-                      <span className="text-muted-foreground">N/A</span>
+                      <span className="text-muted-foreground">
+                        {t('contract.overview.na')}
+                      </span>
                     )}
                   </>
                 )}
@@ -81,7 +93,9 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-36">Transfers:</ListLeft>
+            <ListLeft className="min-w-36">
+              {t('contract.overview.transfers')}
+            </ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-20" />}
@@ -92,7 +106,9 @@ export const Overview = ({
                     {txCount?.data?.count ? (
                       numberFormat(txCount.data.count)
                     ) : (
-                      <span className="text-muted-foreground">N/A</span>
+                      <span className="text-muted-foreground">
+                        {t('contract.overview.na')}
+                      </span>
                     )}
                   </>
                 )}

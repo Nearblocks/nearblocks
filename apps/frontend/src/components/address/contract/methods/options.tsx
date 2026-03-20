@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Control,
   Controller,
@@ -5,6 +7,7 @@ import {
   UseFormRegister,
 } from 'react-hook-form';
 
+import { useLocale } from '@/hooks/use-locale';
 import { FormData } from '@/lib/schema/contract';
 import {
   Collapsible,
@@ -41,6 +44,8 @@ export const ViewOptions = ({
   errors,
   register,
 }: ViewOptionsProps) => {
+  const { t } = useLocale('address');
+
   return (
     <Collapsible>
       <CollapsibleTrigger className="text-body-xs text-muted-foreground hover:text-foreground flex w-full items-center gap-2 text-left font-medium [&[data-state=open]>svg]:rotate-90">
@@ -58,14 +63,14 @@ export const ViewOptions = ({
             strokeLinejoin="round"
           />
         </svg>
-        Advanced options
+        {t('contract.methods.options')}
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-5 pt-4">
         <Field>
-          <FieldLabel htmlFor="blockRef">Block reference</FieldLabel>
-          <FieldDescription>
-            Query state at a specific block or finality level
-          </FieldDescription>
+          <FieldLabel htmlFor="blockRef">
+            {t('contract.methods.finalLabel')}
+          </FieldLabel>
+          <FieldDescription>{t('contract.methods.finalDesc')}</FieldDescription>
           <Controller
             control={control}
             name="blockRef"
@@ -78,7 +83,7 @@ export const ViewOptions = ({
                 <FieldLabel htmlFor="finality">
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldTitle>Finality</FieldTitle>
+                      <FieldTitle>{t('contract.methods.finality')}</FieldTitle>
                     </FieldContent>
                     <RadioGroupItem id="finality" value="finality" />
                   </Field>
@@ -86,7 +91,9 @@ export const ViewOptions = ({
                 <FieldLabel htmlFor="blockId">
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldTitle>Block ID</FieldTitle>
+                      <FieldTitle>
+                        {t('contract.methods.finalBlockId')}
+                      </FieldTitle>
                     </FieldContent>
                     <RadioGroupItem id="blockId" value="blockId" />
                   </Field>
@@ -97,21 +104,25 @@ export const ViewOptions = ({
         </Field>
         {blockRef === 'finality' && (
           <Field data-invalid={!!errors.finality}>
-            <FieldLabel htmlFor="finality-select">Finality</FieldLabel>
+            <FieldLabel htmlFor="finality-select">
+              {t('contract.methods.finality')}
+            </FieldLabel>
             <FieldDescription>
-              Select finality level for the query
+              {t('contract.methods.finalityDesc')}
             </FieldDescription>
             <Controller
               control={control}
               name="finality"
               render={({ field }) => (
                 <NativeSelect onChange={field.onChange} value={field.value}>
-                  <NativeSelectOption value="final">Final</NativeSelectOption>
+                  <NativeSelectOption value="final">
+                    {t('contract.methods.finalityFinal')}
+                  </NativeSelectOption>
                   <NativeSelectOption value="near-final">
-                    Near Final
+                    {t('contract.methods.finalityNearFinal')}
                   </NativeSelectOption>
                   <NativeSelectOption value="optimistic">
-                    Optimistic
+                    {t('contract.methods.finalityOptimistic')}
                   </NativeSelectOption>
                 </NativeSelect>
               )}
@@ -120,9 +131,11 @@ export const ViewOptions = ({
         )}
         {blockRef === 'blockId' && (
           <Field data-invalid={!!errors.blockId}>
-            <FieldLabel htmlFor="blockId-input">Block ID</FieldLabel>
+            <FieldLabel htmlFor="blockId-input">
+              {t('contract.methods.blockId')}
+            </FieldLabel>
             <FieldDescription>
-              Enter block height or block hash
+              {t('contract.methods.blockIdDesc')}
             </FieldDescription>
             <Input
               aria-invalid={!!errors.blockId}
@@ -139,10 +152,12 @@ export const ViewOptions = ({
 };
 
 export const ChangeOptions = ({ errors, register }: ChangeOptionsProps) => {
+  const { t } = useLocale('address');
+
   return (
     <div className="grid grid-cols-2 gap-4">
       <Field data-invalid={!!errors.gas}>
-        <FieldLabel htmlFor="gas">Gas (Tgas)</FieldLabel>
+        <FieldLabel htmlFor="gas">{t('contract.methods.gas')}</FieldLabel>
         <Input
           aria-invalid={!!errors.gas}
           id="gas"
@@ -152,7 +167,9 @@ export const ChangeOptions = ({ errors, register }: ChangeOptionsProps) => {
         <FieldError errors={[errors.gas]} />
       </Field>
       <Field data-invalid={!!errors.deposit}>
-        <FieldLabel htmlFor="deposit">Deposit (NEAR)</FieldLabel>
+        <FieldLabel htmlFor="deposit">
+          {t('contract.methods.deposit')}
+        </FieldLabel>
         <Input
           aria-invalid={!!errors.deposit}
           id="deposit"

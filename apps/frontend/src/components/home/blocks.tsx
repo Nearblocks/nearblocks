@@ -105,7 +105,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                             </Link>
                           </h4>
                           <p className="text-body-xs text-muted-foreground mt-0.5">
-                            {block.transactions_agg.count} txns
+                            {block.transactions_agg.count} {t('blocks.txns')}
                           </p>
                         </div>
                         <div className="@lg:ml-auto">

@@ -18,7 +18,7 @@ export const layout = {
   footer: {
     copyright: 'NearBlocks ©',
     description:
-      'NEAR Blocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
+      'NearBlocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
     disclaimer: 'Price feeds aggregated by',
     menu: {
       company: {
@@ -32,7 +32,7 @@ export const layout = {
       explore: {
         blocks: 'Latest Blocks',
         charts: 'Charts & Stats',
-        nodes: 'Node Explorer',
+        nodes: 'Validators',
         title: 'Explore',
         transactions: 'Latest Transactions',
       },
@@ -56,7 +56,7 @@ export const layout = {
     blockchain: {
       blocks: 'Blocks',
       charts: 'Charts',
-      nodes: 'Node Explorer',
+      nodes: 'Validators',
       title: 'Blockchain',
       txns: 'Transactions',
     },
@@ -76,6 +76,11 @@ export const layout = {
     wallet: {
       signIn: 'Sign In',
     },
+  },
+  meta: {
+    description:
+      'NearBlocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
+    title: 'NEAR Protocol Explorer | NearBlocks',
   },
   search: {
     addresses: 'Addresses',

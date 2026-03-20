@@ -9,6 +9,7 @@ import { AccountAssetFT } from 'nb-schemas';
 import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage } from '@/components/token';
+import { useLocale } from '@/hooks/use-locale';
 import { useTokenBalances } from '@/hooks/use-token-balances';
 import { currencyFormat, numberFormat, toTokenAmount } from '@/lib/format';
 import { mergeTokens, sortTokens } from '@/lib/token';
@@ -32,6 +33,7 @@ export const Tokens = ({
   tokenCachePromise,
   tokensPromise,
 }: Props) => {
+  const { t } = useLocale('address');
   const tokens = !loading && tokensPromise ? use(tokensPromise) : null;
   const tokenCache =
     !loading && tokenCachePromise ? use(tokenCachePromise) : null;
@@ -73,7 +75,7 @@ export const Tokens = ({
                   </Badge>
                 </span>
               ) : (
-                'N/A'
+                t('tokensNa')
               )}
               <ChevronsUpDown className="opacity-50" />
             </Button>

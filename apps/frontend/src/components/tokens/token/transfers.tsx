@@ -12,6 +12,7 @@ import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenAmount } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -24,113 +25,116 @@ type Props = {
   txnsPromise?: Promise<FTTxnsRes>;
 };
 
-const columns: DataTableColumnDef<FTTxn>[] = [
-  {
-    cell: () => <TxnStatusIcon status />,
-    className: 'w-5',
-    header: '',
-    id: 'status',
-  },
-  {
-    cell: (ft) =>
-      ft.transaction_hash ? (
-        <Link className="text-link" href={`/txns/${ft.transaction_hash}`}>
-          <Truncate>
-            <TruncateText text={ft.transaction_hash} />
-            <TruncateCopy text={ft.transaction_hash} />
-          </Truncate>
-        </Link>
-      ) : (
-        <Skeleton className="w-30" />
-      ),
-    header: 'Txn Hash',
-    id: 'txn_hash',
-  },
-  {
-    cell: (ft) => (
-      <Badge variant="teal">
-        <Truncate>
-          <TruncateText className="max-w-20" text={ft.cause} />
-        </Truncate>
-      </Badge>
-    ),
-    header: 'Method',
-    id: 'method',
-  },
-  {
-    cell: (ft) => (
-      <AccountLink
-        account={
-          ft.cause === 'BURN' ? ft.affected_account_id : ft.involved_account_id
-        }
-      />
-    ),
-    header: 'From',
-    id: 'from',
-  },
-  {
-    cell: () => <TxnDirectionIcon />,
-    className: 'w-12',
-    header: '',
-    id: 'direction',
-  },
-  {
-    cell: (ft) => (
-      <AccountLink
-        account={ft.cause === 'BURN' ? null : ft.affected_account_id}
-      />
-    ),
-    header: 'To',
-    id: 'to',
-  },
-  {
-    cell: (ft) => (
-      <TokenAmount
-        amount={ft.delta_amount}
-        className="text-foreground"
-        decimals={ft.meta?.decimals ?? 0}
-        hideSign
-      />
-    ),
-    header: 'Quantity',
-    id: 'quantity',
-  },
-  {
-    cell: (ft) =>
-      ft.block?.block_height ? (
-        <Link className="text-link" href={`/blocks/${ft.block.block_height}`}>
-          {numberFormat(ft.block.block_height)}
-        </Link>
-      ) : (
-        <Skeleton className="w-20" />
-      ),
-    header: 'Block',
-    id: 'block',
-  },
-  {
-    cell: (ft) =>
-      ft.block?.block_timestamp ? (
-        <TimestampCell ns={ft.block.block_timestamp} />
-      ) : (
-        <Skeleton className="w-20" />
-      ),
-    cellClassName: 'px-1',
-    className: 'w-40',
-    header: <TimestampToggle />,
-    id: 'age',
-  },
-];
-
 export const TokenTransfers = ({
   loading,
   txnCountPromise,
   txnsPromise,
 }: Props) => {
+  const { t } = useLocale('fts');
   const txn = !loading && txnsPromise ? use(txnsPromise) : null;
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const columns: DataTableColumnDef<FTTxn>[] = [
+    {
+      cell: () => <TxnStatusIcon status />,
+      className: 'w-5',
+      header: '',
+      id: 'status',
+    },
+    {
+      cell: (ft) =>
+        ft.transaction_hash ? (
+          <Link className="text-link" href={`/txns/${ft.transaction_hash}`}>
+            <Truncate>
+              <TruncateText text={ft.transaction_hash} />
+              <TruncateCopy text={ft.transaction_hash} />
+            </Truncate>
+          </Link>
+        ) : (
+          <Skeleton className="w-30" />
+        ),
+      header: t('transfers.txnHash'),
+      id: 'txn_hash',
+    },
+    {
+      cell: (ft) => (
+        <Badge variant="teal">
+          <Truncate>
+            <TruncateText className="max-w-20" text={ft.cause} />
+          </Truncate>
+        </Badge>
+      ),
+      header: t('transfers.method'),
+      id: 'method',
+    },
+    {
+      cell: (ft) => (
+        <AccountLink
+          account={
+            ft.cause === 'BURN'
+              ? ft.affected_account_id
+              : ft.involved_account_id
+          }
+        />
+      ),
+      header: t('transfers.from'),
+      id: 'from',
+    },
+    {
+      cell: () => <TxnDirectionIcon />,
+      className: 'w-12',
+      header: '',
+      id: 'direction',
+    },
+    {
+      cell: (ft) => (
+        <AccountLink
+          account={ft.cause === 'BURN' ? null : ft.affected_account_id}
+        />
+      ),
+      header: t('transfers.to'),
+      id: 'to',
+    },
+    {
+      cell: (ft) => (
+        <TokenAmount
+          amount={ft.delta_amount}
+          className="text-foreground"
+          decimals={ft.meta?.decimals ?? 0}
+          hideSign
+        />
+      ),
+      header: t('transfers.quantity'),
+      id: 'quantity',
+    },
+    {
+      cell: (ft) =>
+        ft.block?.block_height ? (
+          <Link className="text-link" href={`/blocks/${ft.block.block_height}`}>
+            {numberFormat(ft.block.block_height)}
+          </Link>
+        ) : (
+          <Skeleton className="w-20" />
+        ),
+      header: t('transfers.block'),
+      id: 'block',
+    },
+    {
+      cell: (ft) =>
+        ft.block?.block_timestamp ? (
+          <TimestampCell ns={ft.block.block_timestamp} />
+        ) : (
+          <Skeleton className="w-20" />
+        ),
+      cellClassName: 'px-1',
+      className: 'w-40',
+      header: <TimestampToggle />,
+      id: 'age',
+    },
+  ];
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
     const params = buildParams(searchParams, {
@@ -146,7 +150,7 @@ export const TokenTransfers = ({
         <DataTable
           columns={columns}
           data={txn?.data}
-          emptyMessage="No token transfers found"
+          emptyMessage={t('transfers.empty')}
           getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
           header={
             <SkeletonSlot
@@ -154,9 +158,11 @@ export const TokenTransfers = ({
               loading={loading || !txnCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  txnCount?.data?.count ?? 0,
-                )} token txns found`}</>
+                <>
+                  {t('transfers.total', {
+                    count: numberFormat(txnCount?.data?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

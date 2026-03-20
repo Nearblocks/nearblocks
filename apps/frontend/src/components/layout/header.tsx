@@ -1,10 +1,14 @@
 'use client';
 
 import { Menu as LuMenu, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useMemo } from 'react';
 
 import { Link } from '@/components/link';
 import { useLocale } from '@/hooks/use-locale';
 import { Logo } from '@/icons/logo';
+import { hrefForLocale } from '@/lib/locale';
+import type { Locale } from '@/locales/config';
 import { NavMenu, RouteKey } from '@/types/types';
 import { Button } from '@/ui/button';
 import {
@@ -19,7 +23,24 @@ import { MobileMenu } from './mobile-menu';
 import { NetworkSwitcher } from './network';
 import { ThemeToggle } from './theme';
 
-const menu: NavMenu<RouteKey<'layout'>> = [
+const languageChoices: { locale: Locale; title: string }[] = [
+  { locale: 'en', title: 'English' },
+  { locale: 'es', title: 'Español' },
+  { locale: 'fil-ph', title: 'Filipino' },
+  { locale: 'fr', title: 'Français' },
+  { locale: 'id', title: 'Bahasa' },
+  { locale: 'it', title: 'Italiano' },
+  { locale: 'ja', title: '日本語' },
+  { locale: 'ko', title: '한국어' },
+  { locale: 'ru', title: 'Русский' },
+  { locale: 'th', title: 'ภาษาไทย' },
+  { locale: 'uk', title: 'Українська' },
+  { locale: 'vi', title: 'Tiếng Việt' },
+  { locale: 'zh-cn', title: '汉语 (Simplified)' },
+  { locale: 'zh-hk', title: '漢語 (Traditional)' },
+];
+
+const staticMenu: NavMenu<RouteKey<'layout'>> = [
   { href: '/', key: 'menu.home.title' },
   {
     key: 'menu.blockchain.title',
@@ -27,7 +48,7 @@ const menu: NavMenu<RouteKey<'layout'>> = [
       { href: '/blocks', key: 'menu.blockchain.blocks' },
       { href: '/txns', key: 'menu.blockchain.txns' },
       { href: '/charts', key: 'menu.blockchain.charts' },
-      { href: '/node-explorer', key: 'menu.blockchain.nodes' },
+      { href: '/validators', key: 'menu.blockchain.nodes' },
     ],
   },
   {
@@ -39,29 +60,24 @@ const menu: NavMenu<RouteKey<'layout'>> = [
       { href: '/nft-tokens/transfers', key: 'menu.tokens.nftTransfers' },
     ],
   },
-  {
-    key: 'menu.languages.title',
-    menu: [
-      { href: '/', title: 'English' },
-      { href: '/es', title: 'Español' },
-      { href: '/fil-ph', title: 'Filipino' },
-      { href: '/fr', title: 'Français' },
-      { href: '/id', title: 'Bahasa' },
-      { href: '/it', title: 'Italiano' },
-      { href: '/ja', title: '日本語' },
-      { href: '/ko', title: '한국어' },
-      { href: '/ru', title: 'Русский' },
-      { href: '/th', title: 'ภาษาไทย' },
-      { href: '/uk', title: 'Українська' },
-      { href: '/vi', title: 'Tiếng Việt' },
-      { href: '/zh-cn', title: '汉语 (Simplified)' },
-      { href: '/zh-hk', title: '漢語 (Traditional)' },
-    ],
-  },
 ];
+
+const useHeaderMenu = (): NavMenu<RouteKey<'layout'>> => {
+  const pathname = usePathname() ?? '/';
+
+  return useMemo(() => {
+    const languageMenu = languageChoices.map(({ locale, title }) => ({
+      href: hrefForLocale(pathname, locale),
+      title,
+    }));
+
+    return [...staticMenu, { key: 'menu.languages.title', menu: languageMenu }];
+  }, [pathname]);
+};
 
 export const Header = () => {
   const { t } = useLocale('layout');
+  const menu = useHeaderMenu();
 
   return (
     <header className="bg-card">

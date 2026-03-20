@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { CodeBlock } from '@/components/code-block';
 import { Copy } from '@/components/copy';
 import { ToggleGroup } from '@/components/toggle-group';
+import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -23,6 +24,7 @@ export const CodeViewer = ({
   language = 'json',
   toolbar,
 }: Props) => {
+  const { t } = useLocale('txns');
   const [isFullHeight, setIsFullHeight] = useState(false);
 
   return (
@@ -47,7 +49,7 @@ export const CodeViewer = ({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              {isFullHeight ? 'Collapse' : 'Expand'}
+              {isFullHeight ? t('codeViewer.collapse') : t('codeViewer.expand')}
             </TooltipContent>
           </Tooltip>
         </ToggleGroup>

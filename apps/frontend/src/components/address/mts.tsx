@@ -13,6 +13,7 @@ import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -25,125 +26,132 @@ type Props = {
   mtsPromise?: Promise<AccountMTTxnsRes>;
 };
 
-const columns: DataTableColumnDef<AccountMTTxn>[] = [
-  {
-    cell: () => <TxnStatusIcon status />,
-    className: 'w-5',
-    header: '',
-    id: 'status',
-  },
-  {
-    cell: (mt) =>
-      mt.transaction_hash ? (
-        <Link className="text-link" href={`/txns/${mt.transaction_hash}`}>
-          <Truncate>
-            <TruncateText text={mt.transaction_hash} />
-            <TruncateCopy text={mt.transaction_hash} />
-          </Truncate>
-        </Link>
-      ) : (
-        <Skeleton className="w-25" />
-      ),
-    header: 'Txn Hash',
-    id: 'txn_hash',
-  },
-  {
-    cell: (mt) => (
-      <Badge variant="teal">
-        <Truncate>
-          <TruncateText className="max-w-20" text={mt.cause} />
-        </Truncate>
-      </Badge>
-    ),
-    enableFilter: true,
-    filterName: 'cause',
-    header: 'Method',
-    id: 'cause',
-  },
-  {
-    cell: (mt) => (
-      <AccountLink account={mt.affected_account_id} textClassName="max-w-25" />
-    ),
-    header: 'Affected',
-    id: 'affected',
-  },
-  {
-    cell: (mt) => <TxnDirection amount={mt.delta_amount} />,
-    className: 'w-20',
-    header: '',
-    id: 'direction',
-  },
-  {
-    cell: (mt) => (
-      <AccountLink account={mt.involved_account_id} textClassName="max-w-25" />
-    ),
-    enableFilter: true,
-    filterName: 'involved',
-    header: 'Involved',
-    id: 'involved',
-  },
-  {
-    cell: (mt) => (
-      <TokenAmount
-        amount={mt.delta_amount}
-        decimals={mt.base_meta?.decimals ?? 0}
-      />
-    ),
-    header: 'Quantity',
-    id: 'quantity',
-  },
-  {
-    cell: (mt) => (
-      <Link
-        className="text-link"
-        href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}
-      >
-        <Truncate>
-          <TruncateText className="max-w-25" text={mt.token_id} />
-          <TruncateCopy text={mt.token_id} />
-        </Truncate>
-      </Link>
-    ),
-    header: 'Token ID',
-    id: 'token_id',
-  },
-  {
-    cell: (mt) => (
-      <span className="flex items-center gap-1">
-        <TokenImage
-          alt={mt.meta?.name ?? ''}
-          className="m-px size-5 rounded-full border"
-          src={mt.base_meta?.icon ?? ''}
-        />
-        <TokenLink
-          contract={mt.contract_account_id}
-          name={mt.base_meta?.name}
-          type="mt-tokens"
-        />
-      </span>
-    ),
-    enableFilter: true,
-    filterName: 'token',
-    header: 'Token',
-    id: 'token',
-  },
-  {
-    cell: (mt) =>
-      mt.block?.block_timestamp ? (
-        <TimestampCell ns={mt.block.block_timestamp} />
-      ) : (
-        <Skeleton className="w-30" />
-      ),
-    cellClassName: 'px-1',
-    className: 'w-40',
-    header: <TimestampToggle />,
-    id: 'age',
-  },
-];
-
 export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
+  const { t } = useLocale('address');
   const mts = !loading && mtsPromise ? use(mtsPromise) : null;
   const mtCount = !loading && mtCountPromise ? use(mtCountPromise) : null;
+
+  const columns: DataTableColumnDef<AccountMTTxn>[] = [
+    {
+      cell: () => <TxnStatusIcon status />,
+      className: 'w-5',
+      header: '',
+      id: 'status',
+    },
+    {
+      cell: (mt) =>
+        mt.transaction_hash ? (
+          <Link className="text-link" href={`/txns/${mt.transaction_hash}`}>
+            <Truncate>
+              <TruncateText text={mt.transaction_hash} />
+              <TruncateCopy text={mt.transaction_hash} />
+            </Truncate>
+          </Link>
+        ) : (
+          <Skeleton className="w-25" />
+        ),
+      header: t('mts.columns.txnHash'),
+      id: 'txn_hash',
+    },
+    {
+      cell: (mt) => (
+        <Badge variant="teal">
+          <Truncate>
+            <TruncateText className="max-w-20" text={mt.cause} />
+          </Truncate>
+        </Badge>
+      ),
+      enableFilter: true,
+      filterName: 'cause',
+      header: t('mts.columns.method'),
+      id: 'cause',
+    },
+    {
+      cell: (mt) => (
+        <AccountLink
+          account={mt.affected_account_id}
+          textClassName="max-w-25"
+        />
+      ),
+      header: t('mts.columns.affected'),
+      id: 'affected',
+    },
+    {
+      cell: (mt) => <TxnDirection amount={mt.delta_amount} />,
+      className: 'w-20',
+      header: '',
+      id: 'direction',
+    },
+    {
+      cell: (mt) => (
+        <AccountLink
+          account={mt.involved_account_id}
+          textClassName="max-w-25"
+        />
+      ),
+      enableFilter: true,
+      filterName: 'involved',
+      header: t('mts.columns.involved'),
+      id: 'involved',
+    },
+    {
+      cell: (mt) => (
+        <TokenAmount
+          amount={mt.delta_amount}
+          decimals={mt.base_meta?.decimals ?? 0}
+        />
+      ),
+      header: t('mts.columns.quantity'),
+      id: 'quantity',
+    },
+    {
+      cell: (mt) => (
+        <Link
+          className="text-link"
+          href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}
+        >
+          <Truncate>
+            <TruncateText className="max-w-25" text={mt.token_id} />
+            <TruncateCopy text={mt.token_id} />
+          </Truncate>
+        </Link>
+      ),
+      header: t('mts.columns.tokenId'),
+      id: 'token_id',
+    },
+    {
+      cell: (mt) => (
+        <span className="flex items-center gap-1">
+          <TokenImage
+            alt={mt.meta?.name ?? ''}
+            className="m-px size-5 rounded-full border"
+            src={mt.base_meta?.icon ?? ''}
+          />
+          <TokenLink
+            contract={mt.contract_account_id}
+            name={mt.base_meta?.name}
+            type="mt-tokens"
+          />
+        </span>
+      ),
+      enableFilter: true,
+      filterName: 'token',
+      header: t('mts.columns.token'),
+      id: 'token',
+    },
+    {
+      cell: (mt) =>
+        mt.block?.block_timestamp ? (
+          <TimestampCell ns={mt.block.block_timestamp} />
+        ) : (
+          <Skeleton className="w-30" />
+        ),
+      cellClassName: 'px-1',
+      className: 'w-40',
+      header: <TimestampToggle />,
+      id: 'age',
+    },
+  ];
 
   const { address } = useParams<{ address: string }>();
   const router = useRouter();
@@ -173,7 +181,7 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
         <DataTable
           columns={columns}
           data={mts?.data}
-          emptyMessage="No mt token txns found"
+          emptyMessage={t('mts.empty')}
           getRowKey={(mt) => `${mt.receipt_id}-${mt.event_index}`}
           header={
             <SkeletonSlot
@@ -181,9 +189,9 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
               loading={loading || !mtCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  mtCount?.count ?? 0,
-                )} mt token txns found`}</>
+                <>
+                  {t('mts.total', { count: numberFormat(mtCount?.count ?? 0) })}
+                </>
               )}
             </SkeletonSlot>
           }

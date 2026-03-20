@@ -11,6 +11,7 @@ import {
   TokenImage,
   TokenLink,
 } from '@/components/token';
+import { useLocale } from '@/hooks/use-locale';
 import { ScrollableList } from '@/ui/scrollable-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
@@ -29,6 +30,7 @@ type NetTransfer = {
 };
 
 export const MTTransfers = ({ mts }: Props) => {
+  const { t } = useLocale('txns');
   const [tab, setTab] = useState<'all' | 'net'>('all');
 
   const ftLike = useMemo(
@@ -83,8 +85,8 @@ export const MTTransfers = ({ mts }: Props) => {
           value={tab}
         >
           <TabsList className="bg-card">
-            <TabsTrigger value="all">All Transfers</TabsTrigger>
-            <TabsTrigger value="net">Net Transfers</TabsTrigger>
+            <TabsTrigger value="all">{t('transfer.allTransfers')}</TabsTrigger>
+            <TabsTrigger value="net">{t('transfer.netTransfers')}</TabsTrigger>
           </TabsList>
           <ScrollableList className="max-h-53">
             <TabsContent className="flex flex-col gap-3 pt-3" value="all">
@@ -124,7 +126,11 @@ export const MTTransfers = ({ mts }: Props) => {
                     account={net.affected_account_id}
                     textClassName="max-w-40"
                   />
-                  <span>{net.delta >= 0n ? 'received' : 'sent'}</span>
+                  <span>
+                    {net.delta >= 0n
+                      ? t('transfer.received')
+                      : t('transfer.sent')}
+                  </span>
                   <TokenAmount
                     amount={net.delta.toString()}
                     decimals={net.meta?.decimals ?? 0}
@@ -166,7 +172,7 @@ export const MTTransfers = ({ mts }: Props) => {
                 </Link>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span>Token</span>
+                    <span>{t('transfer.token')}</span>
                     <Link
                       className="text-link"
                       href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}

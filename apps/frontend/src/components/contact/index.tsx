@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { useLocale } from '@/hooks/use-locale';
 import {
   Select,
   SelectContent,
@@ -20,19 +21,20 @@ const FEATURE_REQUEST =
 const TOKEN_REQUEST =
   'https://github.com/Nearblocks/nearblocks/issues/new?template=token_request.md';
 
-const subjects = [
-  { label: '1. General Inquiry', value: '1' },
-  { label: '2. API Support', value: '2' },
-  { label: '3. Advertising', value: '3' },
-  { label: '4. Issue / Fix / Bug', value: '4' },
-  { label: '5. Feature Request', value: '5' },
-  { label: '6. Legacy Token Request', value: '6' },
-];
-
 export const Contact = () => {
+  const { t } = useLocale('contact');
   const router = useRouter();
   const searchParams = useSearchParams();
   const subject = searchParams.get('subject') ?? '';
+
+  const subjects = [
+    { label: t('subjects.generalInquiry'), value: '1' },
+    { label: t('subjects.apiSupport'), value: '2' },
+    { label: t('subjects.advertising'), value: '3' },
+    { label: t('subjects.bug'), value: '4' },
+    { label: t('subjects.feature'), value: '5' },
+    { label: t('subjects.tokenRequest'), value: '6' },
+  ];
 
   const handleSubjectChange = (value: string) => {
     if (value === '4') {
@@ -62,40 +64,31 @@ export const Contact = () => {
   return (
     <div className="bg-card rounded-lg p-6">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-headline-2xl mb-6">Contact NearBlocks</h1>
+        <h1 className="text-headline-2xl mb-6">{t('heading')}</h1>
         <div className="bg-blue-background text-blue-foreground text-body-sm mb-10 rounded p-4">
-          <p className="mb-3">Drop us a message, but please be aware that:</p>
+          <p className="mb-3">{t('disclaimer.heading')}</p>
           <ul className="flex flex-col gap-4 pl-5">
             <li>
-              <p className="font-medium">1. Refund Transaction</p>
+              <p className="font-medium">{t('disclaimer.item1Heading')}</p>
               <p className="mt-1 font-normal opacity-80">
-                We do not process transactions and are therefore unable to
-                revert, refund, expedite, cancel or replace them.
+                {t('disclaimer.item1Body')}
               </p>
             </li>
             <li>
-              <p className="font-medium">2. Near Protocol Block Explorer</p>
+              <p className="font-medium">{t('disclaimer.item2Heading')}</p>
               <p className="mt-1 font-normal opacity-80">
-                NearBlocks is an independent block explorer unrelated to other
-                service providers (unless stated explicitly otherwise) and is
-                therefore unable to provide a precise response for inquiries
-                that are specific to other service providers.
+                {t('disclaimer.item2Body')}
               </p>
             </li>
             <li>
-              <p className="font-medium">
-                3. Wallet / Exchange / Project related issues
-              </p>
+              <p className="font-medium">{t('disclaimer.item3Heading')}</p>
               <p className="mt-1 font-normal opacity-80">
-                Kindly reach out to your wallet service provider, exchanges or
-                project/contract owner for further support as they are in a
-                better position to assist you on the issues related to and from
-                their platforms.
+                {t('disclaimer.item3Body')}
               </p>
             </li>
           </ul>
           <p className="mt-4">
-            Near community support can be found here{' '}
+            {t('disclaimer.community')}{' '}
             <a
               className="text-link underline underline-offset-4"
               href="https://dev.near.org"
@@ -108,10 +101,10 @@ export const Contact = () => {
         </div>
 
         <div className="mb-4">
-          <p className="text-headline-sm mb-2">Subject</p>
+          <p className="text-headline-sm mb-2">{t('subjectLabel')}</p>
           <Select onValueChange={handleSubjectChange} value={subject}>
             <SelectTrigger className="w-72">
-              <SelectValue placeholder="Please Select Your Message Subject" />
+              <SelectValue placeholder={t('subjectPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {subjects.map((s) => (
@@ -122,9 +115,8 @@ export const Contact = () => {
             </SelectContent>
           </Select>
           <p className="text-muted-foreground text-body-sm mt-2">
-            <span className="text-foreground font-medium">Note:</span> Selecting
-            an incorrect subject could result in a delayed or non response. Only
-            inquiries in english will be responded to.
+            <span className="text-foreground font-medium">{t('note')}</span>{' '}
+            {t('noteText')}
           </p>
         </div>
 

@@ -1,3 +1,12 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/terms' },
+  description:
+    'Please read these terms of service carefully. By accessing or using our services, you agree to be bound by these terms of service and all terms incorporated by reference.',
+  title: 'Terms of Service',
+};
+
 const TermsPage = () => {
   return (
     <main className="flex flex-1 flex-col py-10">

@@ -9,6 +9,7 @@ import { use, useMemo } from 'react';
 import { AccountNearStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat, toNear } from '@/lib/format';
 import { nearIcon } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
@@ -44,6 +45,7 @@ const tooltipFormatter = function (this: Highcharts.Point) {
 };
 
 export const NearChart = ({ loading, nearPromise }: Props) => {
+  const { t } = useLocale('address');
   const stats = !loading && nearPromise ? use(nearPromise) : null;
 
   const data = useMemo(() => {
@@ -74,15 +76,15 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
               className="stroke-0"
               labels={countLabel}
               opposite={false}
-              title={{ text: 'Transfer Amounts' }}
+              title={{ text: t('analytics.near.transfers') }}
             />
             <Column.Series
               data={data.amountOut}
-              options={{ id: 'amountOut', name: 'Sent (Out)' }}
+              options={{ id: 'amountOut', name: t('analytics.near.sent') }}
             />
             <Column.Series
               data={data.amountIn}
-              options={{ id: 'amountIn', name: 'Received (In)' }}
+              options={{ id: 'amountIn', name: t('analytics.near.received') }}
             />
             <Tooltip formatter={tooltipFormatter} shared />
           </AnalyticsChart>

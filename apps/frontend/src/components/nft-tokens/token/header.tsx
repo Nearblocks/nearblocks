@@ -9,6 +9,7 @@ import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage } from '@/components/token';
 import { Truncate, TruncateText } from '@/components/truncate';
+import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -79,6 +80,7 @@ export const NftHeader = ({
   loading,
   tokenPromise,
 }: NFTProps) => {
+  const { t } = useLocale('nfts');
   const token = !loading && tokenPromise ? use(tokenPromise) : null;
 
   return (
@@ -95,7 +97,7 @@ export const NftHeader = ({
         >
           {() => (
             <Truncate className="flex items-center gap-2">
-              NFT:{' '}
+              {t('token.label')}{' '}
               <TruncateText
                 className="text-foreground max-w-80"
                 text={token?.data?.title ?? token?.data?.token ?? ''}

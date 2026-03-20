@@ -8,7 +8,7 @@ import { Account, AccountBalance, ContractDeployment } from 'nb-schemas';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimeAgo } from '@/components/time-ago';
-// import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { bytesFormat, nearFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
@@ -22,19 +22,19 @@ type Props = {
 };
 
 export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
-  // const { t } = useLocale('address');
+  const { t } = useLocale('address');
   const account = !loading && accountPromise ? use(accountPromise) : null;
   const balance = !loading && balancePromise ? use(balancePromise) : null;
 
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">Information</CardTitle>
+        <CardTitle className="text-headline-sm">{t('info.title')}</CardTitle>
       </CardHeader>
       <CardContent className="px-3">
         <List pairsPerRow={2}>
           <ListItem>
-            <ListLeft className="min-w-30">Staked Balance:</ListLeft>
+            <ListLeft className="min-w-30">{t('info.stakedBalance')}</ListLeft>
             <ListRight>
               <p className="flex min-w-30 items-center gap-1">
                 <NearCircle className="size-4" />{' '}
@@ -48,7 +48,7 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-30">Storage used:</ListLeft>
+            <ListLeft className="min-w-30">{t('info.storageUsed')}</ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
@@ -61,7 +61,7 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-30">Created:</ListLeft>
+            <ListLeft className="min-w-30">{t('info.created')}</ListLeft>
             <ListRight className="col-span-2">
               <p className="min-w-30">
                 <SkeletonSlot
@@ -72,7 +72,8 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
                 >
                   {() => (
                     <>
-                      <TimeAgo ns={account!.created.block_timestamp} /> at txn{' '}
+                      <TimeAgo ns={account!.created.block_timestamp} />{' '}
+                      {t('info.atTxn')}{' '}
                       <Link
                         className="text-link inline-block w-30 truncate align-middle"
                         href={`/txns/${account!.created.transaction_hash}`}

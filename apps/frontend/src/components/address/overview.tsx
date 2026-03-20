@@ -7,7 +7,7 @@ import { AccountAssetFT, AccountBalance, Stats } from 'nb-schemas';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
-// import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, nearFiatFormat, nearFormat } from '@/lib/format';
 import { TokenCache } from '@/types/types';
@@ -31,19 +31,21 @@ export const Overview = ({
   tokenCachePromise,
   tokensPromise,
 }: Props) => {
-  // const { t } = useLocale('address');
+  const { t } = useLocale('address');
   const stats = !loading && statsPromise ? use(statsPromise) : null;
   const balance = !loading && balancePromise ? use(balancePromise) : null;
 
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">Overview</CardTitle>
+        <CardTitle className="text-headline-sm">
+          {t('overview.title')}
+        </CardTitle>
       </CardHeader>
       <CardContent className="px-3">
         <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="min-w-20">Balance:</ListLeft>
+            <ListLeft className="min-w-20">{t('overview.balance')}</ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
                 <NearCircle className="size-4" />{' '}
@@ -57,7 +59,7 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-20">Value:</ListLeft>
+            <ListLeft className="min-w-20">{t('overview.value')}</ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
@@ -78,7 +80,7 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-20">Tokens:</ListLeft>
+            <ListLeft className="min-w-20">{t('overview.tokens')}</ListLeft>
             <ListRight className="xl:py-2">
               <ErrorSuspense fallback={<Tokens loading />}>
                 <Tokens

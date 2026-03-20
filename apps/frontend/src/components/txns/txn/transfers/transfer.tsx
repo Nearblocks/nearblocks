@@ -1,7 +1,10 @@
+'use client';
+
 import { Flame, Pickaxe, Send } from 'lucide-react';
 import { ReactNode } from 'react';
 
 import { AccountLink } from '@/components/link';
+import { useLocale } from '@/hooks/use-locale';
 
 type Props = {
   affected: string;
@@ -20,6 +23,7 @@ export const TransferSummary = ({
   children,
   involved,
 }: Props) => {
+  const { t } = useLocale('txns');
   const isMint = cause === 'MINT';
   const isBurn = cause === 'BURN';
   const type = isMint ? 'mint' : isBurn ? 'burn' : 'transfer';
@@ -30,21 +34,21 @@ export const TransferSummary = ({
       {children}
       {isMint && (
         <>
-          <span>For</span>
+          <span>{t('transfer.for')}</span>
           <AccountLink account={affected} textClassName="max-w-36" />
         </>
       )}
       {isBurn && (
         <>
-          <span>From</span>
+          <span>{t('transfer.from')}</span>
           <AccountLink account={affected} textClassName="max-w-36" />
         </>
       )}
       {!isMint && !isBurn && (
         <>
-          <span>From</span>
+          <span>{t('transfer.from')}</span>
           <AccountLink account={involved} textClassName="max-w-36" />
-          <span>To</span>
+          <span>{t('transfer.to')}</span>
           <AccountLink account={affected} textClassName="max-w-36" />
         </>
       )}
@@ -53,6 +57,7 @@ export const TransferSummary = ({
 };
 
 export const TransferIcon = ({ type }: IconProps) => {
+  const { t } = useLocale('txns');
   return (
     <>
       {type === 'mint' ? (
@@ -63,7 +68,11 @@ export const TransferIcon = ({ type }: IconProps) => {
         <Send className="text-blue-foreground size-3" />
       )}
       <span>
-        {type === 'mint' ? 'Mint' : type === 'burn' ? 'Burn' : 'Transfer'}
+        {type === 'mint'
+          ? t('transfer.mint')
+          : type === 'burn'
+          ? t('transfer.burn')
+          : t('transfer.transfer')}
       </span>
     </>
   );

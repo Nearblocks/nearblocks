@@ -1,6 +1,9 @@
+'use client';
+
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { FormData } from '@/lib/schema/contract';
 import { Button } from '@/ui/button';
 import {
@@ -39,9 +42,11 @@ export const MethodSelector = ({
   methods,
   onMethodChange,
 }: Props) => {
+  const { t } = useLocale('address');
+
   return (
     <Field data-invalid={!!errors.method}>
-      <FieldLabel htmlFor="method">Method</FieldLabel>
+      <FieldLabel htmlFor="method">{t('contract.methods.method')}</FieldLabel>
       <SkeletonSlot
         fallback={<Skeleton className="h-9 w-full" />}
         loading={loading}
@@ -71,7 +76,7 @@ export const MethodSelector = ({
                         <ComboboxValue />
                       ) : (
                         <span className="text-muted-foreground">
-                          Select a method
+                          {t('contract.methods.methodPlaceholder')}
                         </span>
                       )}
                     </Button>
@@ -79,10 +84,12 @@ export const MethodSelector = ({
                 />
                 <ComboboxContent className="min-w-(--anchor-width)">
                   <ComboboxInput
-                    placeholder="Search methods..."
+                    placeholder={t('contract.methods.methodSearch')}
                     showTrigger={false}
                   />
-                  <ComboboxEmpty>No methods found.</ComboboxEmpty>
+                  <ComboboxEmpty>
+                    {t('contract.methods.methodEmpty')}
+                  </ComboboxEmpty>
                   <ComboboxList className="scroll-overlay max-h-47.5 overflow-y-auto">
                     {hasSchema
                       ? (group, index) => (

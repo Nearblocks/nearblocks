@@ -16,6 +16,7 @@ import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
@@ -34,6 +35,7 @@ export const StakingTxns = ({
   stakingCountPromise,
   stakingPromise,
 }: Props) => {
+  const { t } = useLocale('address');
   const staking = !loading && stakingPromise ? use(stakingPromise) : null;
   const stakingCount =
     !loading && stakingCountPromise ? use(stakingCountPromise) : null;
@@ -82,7 +84,7 @@ export const StakingTxns = ({
         ) : (
           <Skeleton className="w-30" />
         ),
-      header: 'Txn Hash',
+      header: t('staking.columns.txnHash'),
       id: 'txn_hash',
     },
     {
@@ -95,14 +97,14 @@ export const StakingTxns = ({
       ),
       enableFilter: true,
       filterName: 'type',
-      header: 'Method',
+      header: t('staking.columns.method'),
       id: 'type',
     },
     {
       cell: (staking) => <AccountLink account={staking.contract} />,
       enableFilter: true,
       filterName: 'contract',
-      header: 'Contract',
+      header: t('staking.columns.contract'),
       id: 'contract',
     },
     {
@@ -112,7 +114,7 @@ export const StakingTxns = ({
           {nearFormat(staking.amount)}
         </span>
       ),
-      header: 'Amount',
+      header: t('staking.columns.amount'),
       id: 'amount',
     },
     {
@@ -135,7 +137,7 @@ export const StakingTxns = ({
         <DataTable
           columns={columns}
           data={staking?.data}
-          emptyMessage="No staking txns found"
+          emptyMessage={t('staking.empty')}
           getRowKey={(staking) =>
             `${staking.receipt_id}-${staking.index_in_chunk}`
           }
@@ -145,9 +147,11 @@ export const StakingTxns = ({
               loading={loading || !stakingCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  stakingCount?.count ?? 0,
-                )} staking txns found`}</>
+                <>
+                  {t('staking.total', {
+                    count: numberFormat(stakingCount?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

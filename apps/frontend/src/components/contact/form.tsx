@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { submitContactForm } from '@/actions/contact';
 import { useConfig } from '@/hooks/use-config';
+import { useLocale } from '@/hooks/use-locale';
 import { type ContactFormValues } from '@/lib/schema/contact';
 import { Button } from '@/ui/button';
 import {
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export const ContactForm = ({ subject }: Props) => {
+  const { t } = useLocale('contact');
   const turnstileSiteKey = useConfig((state) => state.config.turnstileSiteKey);
   const tokenRef = useRef<string>('');
   const [submitting, setSubmitting] = useState(false);
@@ -37,7 +39,7 @@ export const ContactForm = ({ subject }: Props) => {
 
   const onSubmit = async (values: ContactFormValues) => {
     if (!tokenRef.current) {
-      toast.error('Please complete the captcha');
+      toast.error(t('form.captchaError'));
       return;
     }
 
@@ -73,31 +75,31 @@ export const ContactForm = ({ subject }: Props) => {
       <FieldSet>
         <div className="flex flex-col gap-6 md:flex-row">
           <Field data-invalid={!!errors.name}>
-            <FieldLabel htmlFor="name">Name</FieldLabel>
+            <FieldLabel htmlFor="name">{t('form.nameLabel')}</FieldLabel>
             <FieldContent>
               <Input
                 aria-invalid={!!errors.name}
                 id="name"
-                placeholder="Enter name..."
-                {...register('name', { required: 'Name is required' })}
+                placeholder={t('form.namePlaceholder')}
+                {...register('name', { required: t('form.nameRequired') })}
               />
               <FieldError errors={errors.name ? [errors.name] : []} />
             </FieldContent>
           </Field>
           <Field data-invalid={!!errors.email}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="email">{t('form.emailLabel')}</FieldLabel>
             <FieldContent>
               <Input
                 aria-invalid={!!errors.email}
                 id="email"
-                placeholder="Enter email..."
+                placeholder={t('form.emailPlaceholder')}
                 type="email"
                 {...register('email', {
                   pattern: {
-                    message: 'Invalid email address',
+                    message: t('form.emailInvalid'),
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   },
-                  required: 'Email is required',
+                  required: t('form.emailRequired'),
                 })}
               />
               <FieldError errors={errors.email ? [errors.email] : []} />
@@ -105,19 +107,21 @@ export const ContactForm = ({ subject }: Props) => {
           </Field>
         </div>
         <Field data-invalid={!!errors.description}>
-          <FieldLabel htmlFor="message">Message</FieldLabel>
+          <FieldLabel htmlFor="message">
+            {t('form.descriptionLabel')}
+          </FieldLabel>
           <FieldContent>
             <Textarea
               aria-invalid={!!errors.description}
               id="message"
-              placeholder="Max characters (300 words)"
+              placeholder={t('form.descriptionPlaceholder')}
               rows={6}
               {...register('description', {
                 maxLength: {
-                  message: 'Message must be under 1500 characters',
+                  message: t('form.descriptionMaxLength'),
                   value: 1500,
                 },
-                required: 'Message is required',
+                required: t('form.descriptionRequired'),
               })}
             />
             <FieldError
@@ -136,7 +140,7 @@ export const ContactForm = ({ subject }: Props) => {
 
       <div>
         <Button disabled={submitting} type="submit" variant="secondary">
-          {submitting ? 'Sending...' : 'Send Message'}
+          {submitting ? t('form.sending') : t('form.send')}
         </Button>
       </div>
     </form>
