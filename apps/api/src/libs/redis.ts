@@ -3,7 +3,18 @@ import { Redis, RedisOptions } from 'nb-redis';
 import config from '#config';
 import { errorHandler } from '#libs/utils';
 
-let options: RedisOptions = {};
+let options: RedisOptions = {
+  reconnectOnError(err) {
+    const targetError = 'READONLY';
+
+    if (err.message.includes(targetError)) {
+      // Resend the failed command after reconnecting
+      return 2;
+    }
+
+    return false;
+  },
+};
 
 if (config.redisUrl) {
   const url = new URL(config.redisUrl);
