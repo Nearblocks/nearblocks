@@ -6,6 +6,7 @@ import { TxnFT } from 'nb-schemas';
 
 import { AccountLink } from '@/components/link';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
+import { useLocale } from '@/hooks/use-locale';
 import { ScrollableList } from '@/ui/scrollable-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
@@ -23,6 +24,7 @@ type NetTransfer = {
 };
 
 export const FTTransfers = ({ fts }: Props) => {
+  const { t } = useLocale('txns');
   const [tab, setTab] = useState<'all' | 'net'>('all');
 
   const transfers = useMemo(
@@ -60,8 +62,8 @@ export const FTTransfers = ({ fts }: Props) => {
       value={tab}
     >
       <TabsList className="bg-card">
-        <TabsTrigger value="all">All Transfers</TabsTrigger>
-        <TabsTrigger value="net">Net Transfers</TabsTrigger>
+        <TabsTrigger value="all">{t('transfer.allTransfers')}</TabsTrigger>
+        <TabsTrigger value="net">{t('transfer.netTransfers')}</TabsTrigger>
       </TabsList>
       <ScrollableList className="max-h-53">
         <TabsContent className="flex flex-col gap-3 pt-3" value="all">
@@ -103,7 +105,9 @@ export const FTTransfers = ({ fts }: Props) => {
                 account={net.affected_account_id}
                 textClassName="max-w-40"
               />
-              <span>{net.delta >= 0n ? 'received' : 'sent'}</span>
+              <span>
+                {net.delta >= 0n ? t('transfer.received') : t('transfer.sent')}
+              </span>
               <TokenAmount
                 amount={net.delta.toString()}
                 decimals={net.meta?.decimals ?? 0}

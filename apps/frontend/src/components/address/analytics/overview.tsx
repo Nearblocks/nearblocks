@@ -7,6 +7,7 @@ import { use } from 'react';
 import { AccountStatsOverview, AccountTxnStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat, toYearsAndDays } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -24,6 +25,7 @@ type Props = {
 };
 
 const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
+  const { t } = useLocale('address');
   const overview = !loading && overviewPromise ? use(overviewPromise) : null;
   const heatmap = !loading && heatmapPromise ? use(heatmapPromise) : null;
 
@@ -32,14 +34,13 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
-            Transaction Count{' '}
+            {t('analytics.overview.txnCount')}{' '}
             <Tooltip>
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
               <TooltipContent>
-                Count of normal transactions, internal transactions and token
-                transfers involving this address
+                {t('analytics.overview.txnCountTip')}
               </TooltipContent>
             </Tooltip>
           </h3>
@@ -52,7 +53,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
             </SkeletonSlot>
           </p>
           <p className="text-body-xs text-muted-foreground mt-2">
-            Since{' '}
+            {t('analytics.overview.since')}{' '}
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
               loading={loading || !overview}
@@ -63,14 +64,13 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
         </Card>
         <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
-            Active Age{' '}
+            {t('analytics.overview.activeAge')}{' '}
             <Tooltip>
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
               <TooltipContent>
-                Number of days between the first and last transaction involving
-                this address as either a sender or recipient
+                {t('analytics.overview.activeAgeTip')}
               </TooltipContent>
             </Tooltip>
           </h3>
@@ -98,13 +98,13 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
         </Card>
         <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
-            Unique Days Active{' '}
+            {t('analytics.overview.uniqueDays')}{' '}
             <Tooltip>
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
               <TooltipContent>
-                Number of days this address has had activity onchain
+                {t('analytics.overview.uniqueDaysTip')}
               </TooltipContent>
             </Tooltip>
           </h3>
@@ -117,7 +117,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
             </SkeletonSlot>
           </p>
           <p className="text-body-xs text-muted-foreground mt-2">
-            Since{' '}
+            {t('analytics.overview.since')}{' '}
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
               loading={loading || !overview}
@@ -128,14 +128,13 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
         </Card>
         <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
-            Longest Streak{' '}
+            {t('analytics.overview.longestStreak')}{' '}
             <Tooltip>
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
               <TooltipContent>
-                Longest streak of consecutive days with onchain activity for
-                this address
+                {t('analytics.overview.longestStreakTip')}
               </TooltipContent>
             </Tooltip>
           </h3>
@@ -169,7 +168,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
       <Card>
         <CardHeader className="border-b py-3">
           <CardTitle className="text-headline-sm">
-            Transaction Heatmap
+            {t('analytics.overview.heatmap')}
           </CardTitle>
           {/* <span className="text-muted-foreground">{rangeLabel}</span> */}
         </CardHeader>
@@ -187,12 +186,18 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
 };
 
 const YearsAndDays = ({ dayCount }: { dayCount: number }) => {
+  const { t } = useLocale('address');
   const { days, years } = toYearsAndDays(dayCount);
 
-  if (!years) return `${days} ${days === 1 ? 'Day' : 'Days'}`;
+  if (!years)
+    return `${days} ${
+      days === 1 ? t('analytics.overview.day') : t('analytics.overview.days')
+    }`;
 
-  return `${years} ${years === 1 ? 'Year' : 'Years'} ${days} ${
-    days === 1 ? 'Day' : 'Days'
+  return `${years} ${
+    years === 1 ? t('analytics.overview.year') : t('analytics.overview.years')
+  } ${days} ${
+    days === 1 ? t('analytics.overview.day') : t('analytics.overview.days')
   }`;
 };
 

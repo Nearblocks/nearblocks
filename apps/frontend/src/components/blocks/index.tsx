@@ -8,6 +8,7 @@ import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { gasFee, gasFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
@@ -19,63 +20,64 @@ type Props = {
   loading?: boolean;
 };
 
-const columns: DataTableColumnDef<BlockListItem>[] = [
-  {
-    cell: (block) => (
-      <Link className="text-link" href={`/blocks/${block.block_height}`}>
-        {numberFormat(block.block_height)}
-      </Link>
-    ),
-    header: 'Block',
-    id: 'block',
-  },
-  {
-    cell: (block) => <AccountLink account={block.author_account_id} />,
-    header: 'Author',
-    id: 'author',
-  },
-  {
-    cell: (block) => numberFormat(block.transactions_agg.count),
-    header: 'Txns',
-    id: 'txns_count',
-  },
-  {
-    cell: (block) => `${gasFormat(block.chunks_agg.gas_used)} Tgas`,
-    header: 'Gas Used',
-    id: 'gas_used',
-  },
-  {
-    cell: (block) => `${gasFormat(block.chunks_agg.gas_limit)} Tgas`,
-    header: 'Gas Limit',
-    id: 'gas_limit',
-  },
-  {
-    cell: (block) => (
-      <span className="flex items-center gap-1">
-        <NearCircle className="size-4" />
-        {gasFee(block.chunks_agg.gas_used, block.gas_price)}
-      </span>
-    ),
-    header: 'Gas Fee',
-    id: 'gas_fee',
-  },
-  {
-    cell: (block) => <TimestampCell ns={block.block_timestamp} />,
-    cellClassName: 'px-1',
-    className: 'w-40',
-    header: <TimestampToggle />,
-    id: 'age',
-  },
-];
-
 export const Blocks = ({
   blockCountPromise,
   blocksPromise,
   loading,
 }: Props) => {
+  const { t } = useLocale('blocks');
   const blocks = !loading && blocksPromise ? use(blocksPromise) : null;
   const blockCount =
     !loading && blockCountPromise ? use(blockCountPromise) : null;
+
+  const columns: DataTableColumnDef<BlockListItem>[] = [
+    {
+      cell: (block) => (
+        <Link className="text-link" href={`/blocks/${block.block_height}`}>
+          {numberFormat(block.block_height)}
+        </Link>
+      ),
+      header: t('columns.block'),
+      id: 'block',
+    },
+    {
+      cell: (block) => <AccountLink account={block.author_account_id} />,
+      header: t('columns.author'),
+      id: 'author',
+    },
+    {
+      cell: (block) => numberFormat(block.transactions_agg.count),
+      header: t('columns.txns'),
+      id: 'txns_count',
+    },
+    {
+      cell: (block) => `${gasFormat(block.chunks_agg.gas_used)} Tgas`,
+      header: t('columns.gasUsed'),
+      id: 'gas_used',
+    },
+    {
+      cell: (block) => `${gasFormat(block.chunks_agg.gas_limit)} Tgas`,
+      header: t('columns.gasLimit'),
+      id: 'gas_limit',
+    },
+    {
+      cell: (block) => (
+        <span className="flex items-center gap-1">
+          <NearCircle className="size-4" />
+          {gasFee(block.chunks_agg.gas_used, block.gas_price)}
+        </span>
+      ),
+      header: t('columns.gasFee'),
+      id: 'gas_fee',
+    },
+    {
+      cell: (block) => <TimestampCell ns={block.block_timestamp} />,
+      cellClassName: 'px-1',
+      className: 'w-40',
+      header: <TimestampToggle />,
+      id: 'age',
+    },
+  ];
 
   return (
     <Card>
@@ -83,7 +85,7 @@ export const Blocks = ({
         <DataTable
           columns={columns}
           data={blocks?.data}
-          emptyMessage="No blocks found"
+          emptyMessage={t('empty')}
           getRowKey={(block) => block.block_hash}
           header={
             <SkeletonSlot
@@ -91,9 +93,11 @@ export const Blocks = ({
               loading={loading || !blockCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  blockCount?.count ?? 0,
-                )} blocks found`}</>
+                <>
+                  {t('total', {
+                    count: numberFormat(blockCount?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

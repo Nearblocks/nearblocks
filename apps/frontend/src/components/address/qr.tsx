@@ -1,6 +1,9 @@
+'use client';
+
 import { QrCodeIcon } from 'lucide-react';
 
 import { QrCode } from '@/components/qr-code';
+import { useLocale } from '@/hooks/use-locale';
 import { Button } from '@/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -10,6 +13,8 @@ type Props = {
 };
 
 export const AccountQr = ({ address }: Props) => {
+  const { t } = useLocale('address');
+
   return (
     <Popover>
       <Tooltip>
@@ -20,7 +25,7 @@ export const AccountQr = ({ address }: Props) => {
             </Button>
           </PopoverTrigger>
         </TooltipTrigger>
-        <TooltipContent>View QR Code</TooltipContent>
+        <TooltipContent>{t('qr')}</TooltipContent>
       </Tooltip>
       <PopoverContent>
         <QrCode text={address} />

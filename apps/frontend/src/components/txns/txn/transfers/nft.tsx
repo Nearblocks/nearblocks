@@ -4,6 +4,7 @@ import { TxnNFT } from 'nb-schemas';
 
 import { Link } from '@/components/link';
 import { NFTMedia, TokenImage, TokenLink } from '@/components/token';
+import { useLocale } from '@/hooks/use-locale';
 import { ScrollableList } from '@/ui/scrollable-list';
 
 import { TransferSummary } from './transfer';
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export const NFTTransfers = ({ nfts }: Props) => {
+  const { t } = useLocale('txns');
   const displayNfts = nfts.filter(
     (nft) => nft.delta_amount > 0 || nft.involved_account_id === null,
   );
@@ -36,7 +38,7 @@ export const NFTTransfers = ({ nfts }: Props) => {
             </Link>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span>Token</span>
+                <span>{t('transfer.token')}</span>
                 <Link
                   className="text-link"
                   href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}

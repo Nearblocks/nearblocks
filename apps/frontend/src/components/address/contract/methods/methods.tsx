@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { action } from '@/actions/contract';
 import { CodeBlock } from '@/components/code-block';
 import { Copy } from '@/components/copy';
+import { useLocale } from '@/hooks/use-locale';
 import { useViewMutation } from '@/hooks/use-rpc';
 import { useWallet } from '@/hooks/use-wallet';
 import { toGas, toYocto } from '@/lib/format';
@@ -35,6 +36,7 @@ export const MethodsForm = ({
   methods = [],
   schema,
 }: Props) => {
+  const { t } = useLocale('address');
   const { address } = useParams();
   const wallet = useWallet((s) => s.wallet);
   const connector = useWallet((s) => s.connector);
@@ -63,14 +65,20 @@ export const MethodsForm = ({
     const groups: { items: string[]; value: string }[] = [];
 
     if (viewMethods.length > 0) {
-      groups.push({ items: viewMethods, value: 'View Methods' });
+      groups.push({
+        items: viewMethods,
+        value: t('contract.methods.viewMethods'),
+      });
     }
     if (callMethods.length > 0) {
-      groups.push({ items: callMethods, value: 'Call Methods' });
+      groups.push({
+        items: callMethods,
+        value: t('contract.methods.callMethods'),
+      });
     }
 
     return groups;
-  }, [functions]);
+  }, [functions, t]);
 
   const methodsMap = useMemo(() => {
     const map = new Map<string, ContractSchemaFunction>();
@@ -251,13 +259,15 @@ export const MethodsForm = ({
               type="submit"
               variant="secondary"
             >
-              {mode === 'change' ? 'Write' : 'Read'}
+              {mode === 'change'
+                ? t('contract.methods.write')
+                : t('contract.methods.read')}
             </Button>
           </Field>
           {result && (
             <Field>
               <div className="flex items-center justify-between">
-                <Label>Response</Label>
+                <Label>{t('contract.methods.response')}</Label>
                 <Copy size="sm" text={result} />
               </div>
               <div className="scroll-overlay max-h-116 overflow-auto">
@@ -268,7 +278,7 @@ export const MethodsForm = ({
           {error && (
             <Field>
               <div className="flex items-center justify-between">
-                <Label>Error</Label>
+                <Label>{t('contract.methods.error')}</Label>
                 <Copy size="sm" text={error} />
               </div>
               <div className="bg-red-background text-red-foreground text-body-xs scroll-overlay max-h-40 overflow-y-auto rounded-lg border p-3">

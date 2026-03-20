@@ -1,11 +1,10 @@
-import { BaseDictionary } from '@/types/types';
-
 export const home = {
   blocks: {
     author: 'Author',
     button: 'View all blocks',
     gas: 'Gas used',
     title: 'Latest Blocks',
+    txns: 'txns',
   },
   chart: {
     price: 'Price',
@@ -20,7 +19,7 @@ export const home = {
     transactions: 'Transactions',
     validators: 'Active Validators',
   },
-  title: 'The Near blockchain explorer',
+  title: 'The NEAR Blockchain Explorer',
   txns: {
     button: 'View all transactions',
     deposit: 'Deposit value',
@@ -28,4 +27,4 @@ export const home = {
     title: 'Latest Transactions',
     to: 'To',
   },
-} satisfies BaseDictionary['home'];
+} as const;

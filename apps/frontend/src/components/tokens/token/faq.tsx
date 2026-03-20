@@ -11,6 +11,7 @@ import {
 
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { currencyFormat, dateFormat, numberFormat, toMs } from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -30,6 +31,7 @@ export const TokenFaq = ({
   loading,
   txnCountPromise,
 }: Props) => {
+  const { t } = useLocale('fts');
   const contractRes = !loading && contractPromise ? use(contractPromise) : null;
   const deployments =
     !loading && deploymentsPromise ? use(deploymentsPromise) : null;
@@ -54,7 +56,7 @@ export const TokenFaq = ({
           >
             {() => (
               <h3 className="text-headline-sm mb-3">
-                What is {name} price now?
+                {t('faq.priceTitle', { name })}
               </h3>
             )}
           </SkeletonSlot>
@@ -64,7 +66,7 @@ export const TokenFaq = ({
           >
             {() => (
               <p className="text-body-sm text-muted-foreground">
-                The live price of {name} is{' '}
+                {t('faq.priceLive', { name })}{' '}
                 {contract?.price ? (
                   <span className="text-foreground">
                     {currencyFormat(contract.price)}
@@ -72,7 +74,7 @@ export const TokenFaq = ({
                 ) : (
                   'N/A'
                 )}{' '}
-                today with a current circulating market cap of{' '}
+                {t('faq.priceCircMC')}{' '}
                 {contract?.market_cap && +contract.market_cap > 0 ? (
                   <span className="text-foreground">
                     {currencyFormat(contract.market_cap, {
@@ -82,7 +84,7 @@ export const TokenFaq = ({
                 ) : (
                   'N/A'
                 )}
-                . The on-chain market cap of {name} is{' '}
+                . {t('faq.priceOnchainMC', { name })}{' '}
                 {contract?.onchain_market_cap &&
                 +contract.onchain_market_cap > 0 ? (
                   <span className="text-foreground">
@@ -93,7 +95,8 @@ export const TokenFaq = ({
                 ) : (
                   'N/A'
                 )}
-                . {name}&apos;s 24-hour trading volume is{' '}
+                . {symbol}
+                {t('faq.priceVolume')}{' '}
                 {contract?.volume_24h && +contract.volume_24h > 0 ? (
                   <span className="text-foreground">
                     {currencyFormat(contract.volume_24h, {
@@ -103,16 +106,18 @@ export const TokenFaq = ({
                 ) : (
                   'N/A'
                 )}{' '}
-                {symbol} to USD price is updated in real-time.
+                {symbol} {t('faq.priceUpdated')}
                 {contract?.change_24h && (
                   <>
                     {' '}
                     {name} is{' '}
                     <span className="text-foreground">
-                      {+contract.change_24h > 0 ? 'up' : 'down'}{' '}
+                      {+contract.change_24h > 0
+                        ? t('faq.priceUp')
+                        : t('faq.priceDown')}{' '}
                       {contract.change_24h}%
                     </span>{' '}
-                    in the last 24 hours.
+                    {t('faq.priceLast24h')}
                   </>
                 )}
               </p>
@@ -130,7 +135,7 @@ export const TokenFaq = ({
           >
             {() => (
               <h3 className="text-headline-sm mb-3">
-                When was {name} created on Near Protocol?
+                {t('faq.creationTitle', { name })}
               </h3>
             )}
           </SkeletonSlot>
@@ -149,7 +154,7 @@ export const TokenFaq = ({
                       name={name}
                       textClassName="max-w-60 underline"
                     />{' '}
-                    contract was created on Near Protocol at{' '}
+                    {t('faq.creationContractCreated')}{' '}
                     <span className="text-foreground">
                       {firstDeployment.block?.block_timestamp
                         ? dateFormat(
@@ -158,31 +163,31 @@ export const TokenFaq = ({
                           )
                         : 'N/A'}
                     </span>{' '}
-                    by{' '}
+                    {t('faq.creationBy')}{' '}
                     <AccountLink
                       account={firstDeployment.predecessor_account_id}
                       hideCopy
                       textClassName="max-w-60 underline"
                     />{' '}
-                    through{' '}
+                    {t('faq.creationThrough')}{' '}
                     <Link
                       className="text-link underline"
                       href={`/txns/${firstDeployment.transaction_hash}`}
                     >
-                      this transaction
+                      {t('faq.creationThisTxn')}
                     </Link>
                     .
                   </>
                 ) : (
-                  <>Creation information is not available for {name}.</>
+                  <>{t('faq.creationNA', { name })}</>
                 )}{' '}
                 {txnCount?.count && (
                   <>
-                    Since the creation of {name}, there has been{' '}
+                    {t('faq.creationSince', { name })}{' '}
                     <span className="text-foreground">
                       {numberFormat(txnCount.count)}
                     </span>{' '}
-                    on-chain transfers.
+                    {t('faq.creationTransfers')}
                   </>
                 )}
               </p>
@@ -200,7 +205,7 @@ export const TokenFaq = ({
           >
             {() => (
               <h3 className="text-headline-sm mb-3">
-                How many {name} tokens are there?
+                {t('faq.supplyTitle', { name })}
               </h3>
             )}
           </SkeletonSlot>
@@ -212,7 +217,7 @@ export const TokenFaq = ({
               <p className="text-body-sm text-muted-foreground">
                 {contract?.total_supply ? (
                   <>
-                    There is a total supply of{' '}
+                    {t('faq.supplyTotal')}{' '}
                     <span className="text-foreground">
                       {numberFormat(contract.total_supply, {
                         maximumFractionDigits: 0,
@@ -221,15 +226,16 @@ export const TokenFaq = ({
                     .
                   </>
                 ) : (
-                  'Total supply is not available.'
+                  t('faq.supplyNA')
                 )}{' '}
                 {holderCount?.count && (
                   <>
-                    {symbol}&apos;s supply is split between{' '}
+                    {symbol}
+                    {t('faq.supplySplit')}{' '}
                     <span className="text-foreground">
                       {numberFormat(holderCount.count)}
                     </span>{' '}
-                    different wallet addresses.
+                    {t('faq.supplyWallets')}
                   </>
                 )}
               </p>

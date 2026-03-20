@@ -39,6 +39,16 @@ const nextConfig: NextConfig = {
         permanent: true,
         source: '/nft-tokentxns',
       },
+      {
+        destination: '/validators',
+        permanent: true,
+        source: '/node-explorer',
+      },
+      {
+        destination: '/terms',
+        permanent: true,
+        source: '/terms-and-conditions',
+      },
     ];
   },
 };

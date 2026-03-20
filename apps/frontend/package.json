@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit && eslint",
+    "lint": "tsc --noEmit && eslint .",
     "codemod": "jscodeshift -t codemod.js --parser tsx --extensions tsx src/ui/*.tsx"
   },
   "dependencies": {

@@ -98,9 +98,7 @@ export const Footer = () => {
                 <Link href="/charts">{t('footer.menu.explore.charts')}</Link>
               </li>
               <li>
-                <Link href="/node-explorer">
-                  {t('footer.menu.explore.nodes')}
-                </Link>
+                <Link href="/validators">{t('footer.menu.explore.nodes')}</Link>
               </li>
             </ul>
           </div>

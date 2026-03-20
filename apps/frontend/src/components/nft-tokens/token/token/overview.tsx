@@ -8,6 +8,7 @@ import { AccountLink } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { NFTMedia } from '@/components/token';
+import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -24,6 +25,7 @@ export const NftOverview = ({
   loading,
   tokenPromise,
 }: Props) => {
+  const { t } = useLocale('nfts');
   const tokenRes = !loading && tokenPromise ? use(tokenPromise) : null;
   const contractRes = !loading && contractPromise ? use(contractPromise) : null;
   const token = tokenRes?.data ?? null;
@@ -49,12 +51,14 @@ export const NftOverview = ({
       </div>
       <Card className="lg:col-span-2">
         <CardHeader className="border-b py-3">
-          <CardTitle className="text-headline-sm">Overview</CardTitle>
+          <CardTitle className="text-headline-sm">
+            {t('token.overview')}
+          </CardTitle>
         </CardHeader>
         <CardContent className="px-3">
           <List pairsPerRow={1}>
             <ListItem>
-              <ListLeft className="min-w-40">Owner:</ListLeft>
+              <ListLeft className="min-w-40">{t('token.owner')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
                   fallback={<Skeleton className="h-5 w-40" />}
@@ -70,7 +74,7 @@ export const NftOverview = ({
               </ListRight>
             </ListItem>
             <ListItem>
-              <ListLeft className="min-w-40">Contract Address:</ListLeft>
+              <ListLeft className="min-w-40">{t('token.contract')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
                   fallback={<Skeleton className="h-5 w-40" />}
@@ -81,7 +85,7 @@ export const NftOverview = ({
               </ListRight>
             </ListItem>
             <ListItem>
-              <ListLeft className="min-w-40">Token ID:</ListLeft>
+              <ListLeft className="min-w-40">{t('token.tokenId')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
                   fallback={<Skeleton className="h-5 w-24" />}
@@ -92,14 +96,16 @@ export const NftOverview = ({
               </ListRight>
             </ListItem>
             <ListItem>
-              <ListLeft className="min-w-40">Token Standard:</ListLeft>
+              <ListLeft className="min-w-40">{t('token.standard')}</ListLeft>
               <ListRight>
-                <span className="text-body-sm">NEP-171</span>
+                <span className="text-body-sm">{t('token.nep171')}</span>
               </ListRight>
             </ListItem>
             {(loading || token?.description) && (
               <ListItem>
-                <ListLeft className="min-w-40">Description:</ListLeft>
+                <ListLeft className="min-w-40">
+                  {t('token.description')}
+                </ListLeft>
                 <ListRight>
                   <SkeletonSlot
                     fallback={<Skeleton className="h-5 w-48" />}

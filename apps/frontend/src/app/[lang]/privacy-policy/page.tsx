@@ -1,3 +1,12 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/privacy-policy' },
+  description:
+    'Please read this privacy policy carefully to understand how we collect, use, and protect your information. By accessing or using our services, you agree to the terms outlined in this policy.',
+  title: 'Privacy Policy',
+};
+
 const PrivacyPolicyPage = () => {
   return (
     <main className="flex flex-1 flex-col py-10">

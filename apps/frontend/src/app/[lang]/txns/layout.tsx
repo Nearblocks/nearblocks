@@ -1,9 +1,23 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getDictionary, hasLocale } from '@/locales/dictionaries';
+import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 
 type Props = LayoutProps<'/[lang]/txns'>;
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'txns');
+  return {
+    alternates: { canonical: '/txns' },
+    description: t('meta.description'),
+    title: t('meta.title'),
+  };
+};
 
 const TxnsLayout = async ({ children, params }: Props) => {
   const { lang } = await params;

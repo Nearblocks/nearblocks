@@ -12,6 +12,7 @@ import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
 import { TxnReceiptErrors, TxnStatus } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
   gasFormat,
@@ -44,6 +45,7 @@ export const Overview = ({
   txnNFTsPromise,
   txnPromise,
 }: Props) => {
+  const { t } = useLocale('txns');
   const txn = !loading && txnPromise ? use(txnPromise) : null;
   const fts = !loading && txnFTsPromise ? use(txnFTsPromise) : null;
   const mts = !loading && txnMTsPromise ? use(txnMTsPromise) : null;
@@ -73,11 +75,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Unique identifier (hash) of this transaction
-                </TooltipContent>
+                <TooltipContent>{t('overview.txnHashTip')}</TooltipContent>
               </Tooltip>
-              Txn Hash:
+              {t('overview.txnHash')}
             </ListLeft>
             <ListRight className="xl:py-2.5">
               <p className="flex min-w-30 items-center gap-1">
@@ -105,9 +105,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>The status of the transaction</TooltipContent>
+                <TooltipContent>{t('overview.statusTip')}</TooltipContent>
               </Tooltip>
-              Status:
+              {t('overview.status')}
             </ListLeft>
             <ListRight className="h-13">
               <SkeletonSlot
@@ -129,11 +129,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The number of the block in which the transaction was recorded
-                </TooltipContent>
+                <TooltipContent>{t('overview.blockHeightTip')}</TooltipContent>
               </Tooltip>
-              Block Height:
+              {t('overview.blockHeight')}
             </ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
@@ -166,11 +164,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Date and time when transaction was processed
-                </TooltipContent>
+                <TooltipContent>{t('overview.timestampTip')}</TooltipContent>
               </Tooltip>
-              Timestamp:
+              {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
               <p>
@@ -189,11 +185,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Shard ID where this transaction was executed
-                </TooltipContent>
+                <TooltipContent>{t('overview.shardNumberTip')}</TooltipContent>
               </Tooltip>
-              Shard Number:
+              {t('overview.shardNumber')}
             </ListLeft>
             <ListRight>
               <p>
@@ -213,11 +207,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Account that signed and sent the transaction
-                </TooltipContent>
+                <TooltipContent>{t('overview.fromTip')}</TooltipContent>
               </Tooltip>
-              From:
+              {t('overview.from')}
             </ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
@@ -243,11 +235,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Account that received this transaction
-                </TooltipContent>
+                <TooltipContent>{t('overview.toTip')}</TooltipContent>
               </Tooltip>
-              To:
+              {t('overview.to')}
             </ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
@@ -274,13 +264,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Sum of all NEAR tokens transferred from the Signing account to
-                  the Receiver account. This includes tokens sent in a Transfer
-                  (s), and as deposits on Function Call action(s)
-                </TooltipContent>
+                <TooltipContent>{t('overview.depositTip')}</TooltipContent>
               </Tooltip>
-              Deposit Value:
+              {t('overview.deposit')}
             </ListLeft>
             <ListRight>
               <p>
@@ -314,11 +300,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Total fee paid in NEAR to execute this transaction
-                </TooltipContent>
+                <TooltipContent>{t('overview.feeTip')}</TooltipContent>
               </Tooltip>
-              Transaction Fee:
+              {t('overview.fee')}
             </ListLeft>
             <ListRight>
               <p>
@@ -352,12 +336,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Maximum amount of gas allocated for the transaction & the
-                  amount eventually used
-                </TooltipContent>
+                <TooltipContent>{t('overview.gasLimitTip')}</TooltipContent>
               </Tooltip>
-              Gas Limit & Usage:
+              {t('overview.gasLimit')}
             </ListLeft>
             <ListRight>
               <p>
@@ -382,11 +363,9 @@ export const Overview = ({
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Total amount of Gas & Token burnt from this transaction
-                </TooltipContent>
+                <TooltipContent>{t('overview.burntGasTip')}</TooltipContent>
               </Tooltip>
-              Burnt Gas & Tokens:
+              {t('overview.burntGas')}
             </ListLeft>
             <ListRight>
               <p>

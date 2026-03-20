@@ -12,6 +12,7 @@ import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
@@ -27,6 +28,7 @@ type Props = {
 };
 
 export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
+  const { t } = useLocale('address');
   const { address } = useParams<{ address: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -67,7 +69,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
           </Truncate>
         </Link>
       ),
-      header: 'Txn Hash',
+      header: t('txns.columns.txnHash'),
       id: 'txn_hash',
     },
     {
@@ -81,7 +83,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
           </Truncate>
         </Badge>
       ),
-      header: 'Method',
+      header: t('txns.columns.method'),
       id: 'method',
     },
     {
@@ -91,7 +93,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
           {nearFormat(txn.actions_agg?.deposit)}
         </span>
       ),
-      header: 'Deposit Value',
+      header: t('txns.columns.depositValue'),
       id: 'deposit',
     },
     {
@@ -101,14 +103,14 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
           {nearFormat(txn.outcomes_agg?.transaction_fee)}
         </span>
       ),
-      header: 'Txn Fee',
+      header: t('txns.columns.txnFee'),
       id: 'txn_fee',
     },
     {
       cell: (txn) => <AccountLink account={txn.signer_account_id} />,
       enableFilter: true,
       filterName: 'signer',
-      header: 'From',
+      header: t('txns.columns.from'),
       id: 'from',
     },
     {
@@ -127,7 +129,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
       enableFilter: true,
       filterName: 'receiver',
-      header: 'To',
+      header: t('txns.columns.to'),
       id: 'to',
     },
     {
@@ -136,7 +138,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
           {numberFormat(txn.block?.block_height)}
         </Link>
       ),
-      header: 'Block',
+      header: t('txns.columns.block'),
       id: 'block',
     },
     {
@@ -154,7 +156,7 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
         <DataTable
           columns={columns}
           data={txns?.data}
-          emptyMessage="No transactions found"
+          emptyMessage={t('txns.empty')}
           getRowKey={(txn) => txn.transaction_hash}
           header={
             <SkeletonSlot
@@ -162,9 +164,11 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
               loading={loading || !txnCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  txnCount?.count ?? 0,
-                )} transactions found`}</>
+                <>
+                  {t('txns.total', {
+                    count: numberFormat(txnCount?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

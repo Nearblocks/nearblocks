@@ -1,13 +1,16 @@
 import { ActiveLink } from '@/components/link';
 import { TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
+import { hasLocale, translator } from '@/locales/dictionaries';
 import { Card, CardContent } from '@/ui/card';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
 type Props = LayoutProps<'/[lang]/address/[address]/contract'>;
 
 const ContractLayout = async ({ children, params }: Props) => {
-  const { address } = await params;
+  const { address, lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'address');
 
   return (
     <Card>
@@ -16,17 +19,17 @@ const ContractLayout = async ({ children, params }: Props) => {
           <TabLinks>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/contract`}>
-                Overview
+                {t('contract.tabs.overview')}
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/contract/code`}>
-                Contract Code
+                {t('contract.tabs.code')}
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
               <ActiveLink href={`/address/${address}/contract/methods`}>
-                Contract Methods
+                {t('contract.tabs.methods')}
               </ActiveLink>
             </TabLink>
           </TabLinks>

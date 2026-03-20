@@ -1,4 +1,7 @@
+'use client';
+
 import { Link } from '@/components/link';
+import { useLocale } from '@/hooks/use-locale';
 import { Alert, AlertDescription } from '@/ui/alert';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -10,6 +13,7 @@ type Props = {
 };
 
 export const Info = ({ account, isNep330, isVerified, loading }: Props) => {
+  const { t } = useLocale('address');
   if (loading) return <Skeleton className="mb-4 h-11 w-full" />;
   if (!isNep330) return null;
 
@@ -17,14 +21,14 @@ export const Info = ({ account, isNep330, isVerified, loading }: Props) => {
     return (
       <Alert className="bg-amber-background mb-3 border-0">
         <AlertDescription className="text-amber-foreground text-body-xs inline-block">
-          Are you the contract owner?{' '}
+          {t('contract.code.owner')}{' '}
           <Link
             className="font-bold underline"
             href={`/verify-contract?account=${account}`}
           >
-            Verify and Publish
+            {t('contract.code.publish')}
           </Link>{' '}
-          your contract source code today!
+          {t('contract.code.publishSuffix')}
         </AlertDescription>
       </Alert>
     );
@@ -32,7 +36,7 @@ export const Info = ({ account, isNep330, isVerified, loading }: Props) => {
   return (
     <Alert className="bg-teal-background mb-3 border-0">
       <AlertDescription className="text-teal-foreground text-body-xs block">
-        Contract Source Code Verified
+        {t('contract.code.verified')}
       </AlertDescription>
     </Alert>
   );

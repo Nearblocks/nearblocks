@@ -7,9 +7,9 @@ export const Hero = () => {
   const { t } = useLocale('home');
 
   return (
-    <div className="h-64 bg-[url(/images/wavey_bg.png)] bg-cover">
+    <div className="h-64 bg-[url(/images/wavey-bg.png)] bg-cover">
       <div className="container mx-auto px-4 pt-10 pb-8">
-        <h1 className="dark:text-foreground text-headline-lg mb-4 font-medium text-[#ffffff]">
+        <h1 className="dark:text-foreground text-headline-lg text-background mb-4 font-medium">
           {t('title')}
         </h1>
         <div className="max-w-200">

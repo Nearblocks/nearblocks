@@ -5,6 +5,7 @@ import { useContext, useMemo, useState } from 'react';
 import type { ActionReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
+import { useLocale } from '@/hooks/use-locale';
 import { Button } from '@/ui/button';
 
 import { Action, argsRecord } from '../actions/action';
@@ -29,6 +30,7 @@ export const ReceiptAction = ({
   receiver,
   signer,
 }: Props) => {
+  const { t } = useLocale('txns');
   const { enableRpc, rpcData, rpcLoading } = useContext(RpcContext);
   const [viewMode, setViewMode] = useState<'auto' | 'raw'>('auto');
 
@@ -94,7 +96,7 @@ export const ReceiptAction = ({
                     size="xs"
                     variant={viewMode === 'auto' ? 'secondary' : 'outline'}
                   >
-                    Auto
+                    {t('codeViewer.auto')}
                   </Button>
 
                   <Button
@@ -103,7 +105,7 @@ export const ReceiptAction = ({
                     size="xs"
                     variant={viewMode === 'raw' ? 'secondary' : 'outline'}
                   >
-                    Raw
+                    {t('codeViewer.raw')}
                   </Button>
                 </>
               )

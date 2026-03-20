@@ -9,6 +9,7 @@ import { use, useMemo } from 'react';
 import { AccountFTStats } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat } from '@/lib/format';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -52,6 +53,7 @@ const tooltipFormatter = function (this: Highcharts.Point) {
 };
 
 export const FTsChart = ({ ftsPromise, loading }: Props) => {
+  const { t } = useLocale('address');
   const stats = !loading && ftsPromise ? use(ftsPromise) : null;
 
   const data = useMemo(() => {
@@ -86,26 +88,34 @@ export const FTsChart = ({ ftsPromise, loading }: Props) => {
               className="stroke-0"
               labels={countLabel}
               opposite={false}
-              title={{ text: 'Transfers Count' }}
+              title={{ text: t('analytics.fts.transfersCount') }}
             />
             <Column.Series
               data={data.transfers}
-              options={{ id: 'transfers', name: 'Transfers', yAxis: 0 }}
+              options={{
+                id: 'transfers',
+                name: t('analytics.fts.transfers'),
+                yAxis: 0,
+              }}
             />
             <YAxis
               className="stroke-0"
               labels={storageLabel}
-              title={{ text: 'Count' }}
+              title={{ text: t('analytics.fts.count') }}
             />
             <Line.Series
               data={data.contracts}
-              options={{ id: 'contracts', name: 'Token Contracts', yAxis: 1 }}
+              options={{
+                id: 'contracts',
+                name: t('analytics.fts.contracts'),
+                yAxis: 1,
+              }}
             />
             <Line.Series
               data={data.uniqueIn}
               options={{
                 id: 'uniqueIn',
-                name: 'Unique Addresses Sent',
+                name: t('analytics.fts.uniqueOut'),
                 yAxis: 1,
               }}
             />
@@ -113,7 +123,7 @@ export const FTsChart = ({ ftsPromise, loading }: Props) => {
               data={data.uniqueOut}
               options={{
                 id: 'uniqueOut',
-                name: 'Unique Addresses Received',
+                name: t('analytics.fts.uniqueIn'),
                 yAxis: 1,
               }}
             />

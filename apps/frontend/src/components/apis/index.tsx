@@ -6,42 +6,21 @@ import Link from 'next/link';
 import { use, useState } from 'react';
 
 import type { ApiPlan } from '@/data/plans';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Switch } from '@/ui/switch';
 
-const faqs = [
-  {
-    answer: 'Kindly visit the API self-checkout section above',
-    question: 'How do I Subscribe to NearBlocks API services?',
-  },
-  {
-    answer: 'We accept VISA and Mastercard credit card payments, via Stripe.',
-    question: 'What are the Payment Options available?',
-  },
-  {
-    answer:
-      'API Account upgrades and cancellations can be done through your API user dashboard. Head to the \u201cCurrent plan\u201d section in your dashboard for more details.',
-    question: 'How do I Upgrade or Cancel an account?',
-  },
-  {
-    answer:
-      'Payments made are non-refundable and we do not provide refunds or credits for any services already paid for.',
-    question: 'What is your refund policy?',
-  },
-  {
-    answer:
-      'Renewals are automatic, you will receive an email notification coming up to your renewal date.',
-    question: 'How does Renewal work?',
-  },
-  {
-    answer:
-      'API Account activations are instant once the plan payment is made. To setup an API key after the subscription payment is made, head to API keys.',
-    question: 'When will Account Activation occur?',
-  },
-];
+const faqKeys = [
+  'subscribe',
+  'payment',
+  'upgrade',
+  'refund',
+  'renewal',
+  'activation',
+] as const;
 
 const formatCents = (cents: number, decimals = 2) => {
   const value = cents / 100;
@@ -55,6 +34,7 @@ type Props = {
 };
 
 export const Apis = ({ plansPromise }: Props) => {
+  const { t } = useLocale('apis');
   const [isAnnual, setIsAnnual] = useState(true);
   const plans = use(plansPromise);
 
@@ -63,14 +43,13 @@ export const Apis = ({ plansPromise }: Props) => {
       <div className="mb-20 flex flex-col items-center gap-10 md:flex-row md:items-start">
         <div className="flex-1">
           <p className="text-body-sm text-muted-foreground mb-4 tracking-widest uppercase">
-            NEARBLOCKS API
+            {t('label')}
           </p>
           <h1 className="text-headline-2xl mb-6 text-balance md:max-w-xl">
-            Build Precise &amp; Reliable Apps with NearBlocks APIs
+            {t('heading')}
           </h1>
           <p className="text-muted-foreground mb-8 text-pretty md:max-w-xl">
-            Data from the leading Near Protocol Block Explorer catered to your
-            project&apos;s needs.
+            {t('description')}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Button asChild size="lg" variant="secondary">
@@ -79,7 +58,7 @@ export const Apis = ({ plansPromise }: Props) => {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                User Dashboard
+                {t('dashboard')}
                 <ArrowUpRight className="mt-2 -ml-1 size-3 self-start" />
               </a>
             </Button>
@@ -89,7 +68,7 @@ export const Apis = ({ plansPromise }: Props) => {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                API Documentation
+                {t('docs')}
                 <ArrowUpRight className="mt-2 -ml-1 size-3 self-start" />
               </a>
             </Button>
@@ -107,19 +86,19 @@ export const Apis = ({ plansPromise }: Props) => {
       </div>
 
       <div className="mb-6 text-center">
-        <h2 className="text-headline-2xl mb-3">Ready to get started?</h2>
+        <h2 className="text-headline-2xl mb-3">{t('pricing.heading')}</h2>
         <p className="text-muted-foreground mx-auto mb-8 text-balance">
-          Choose a plan that&apos;s right for you.
+          {t('pricing.subheading')}
         </p>
         <div className="mb-8 flex items-center justify-center gap-3">
           <span className={isAnnual ? 'text-muted-foreground' : 'font-medium'}>
-            Monthly
+            {t('pricing.monthly')}
           </span>
           <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
           <span className={isAnnual ? 'font-medium' : 'text-muted-foreground'}>
-            Annually{' '}
+            {t('pricing.annually')}{' '}
             <span className="text-lime-foreground text-body-sm">
-              (Save 15%)
+              {t('pricing.save')}
             </span>
           </span>
         </div>
@@ -153,7 +132,7 @@ export const Apis = ({ plansPromise }: Props) => {
               >
                 {isFeatured && (
                   <span className="bg-primary text-primary-foreground text-body-xs absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 font-medium">
-                    Most used!
+                    {t('pricing.mostUsed')}
                   </span>
                 )}
                 <p className="text-body-xs mb-4 tracking-widest uppercase">
@@ -163,13 +142,13 @@ export const Apis = ({ plansPromise }: Props) => {
                   <span className="text-headline-4xl">{currentPrice}</span>
                   {currentPrice !== '$0' && (
                     <span className="text-muted-foreground text-body-sm">
-                      /mo
+                      {t('pricing.mo')}
                     </span>
                   )}
                 </div>
                 {isFree ? (
                   <p className="text-muted-foreground text-body-xs mb-4 h-5">
-                    * Attribution required
+                    {t('pricing.attribution')}
                   </p>
                 ) : isAnnual ? (
                   <p className="text-muted-foreground text-body-xs mb-4 h-5">
@@ -182,25 +161,35 @@ export const Apis = ({ plansPromise }: Props) => {
                   </p>
                 ) : (
                   <p className="text-muted-foreground text-body-xs mb-4 h-5">
-                    Or{' '}
+                    {t('pricing.or')}{' '}
                     <span className="text-lime-foreground">
-                      {annualMonthlyDisplay} (15% off)
+                      {annualMonthlyDisplay} {t('pricing.off')}
                     </span>{' '}
-                    when billed yearly
+                    {t('pricing.billed')}
                   </p>
                 )}
                 <Separator className="mb-4" />
                 <ul className="text-body-sm mb-6 flex-1 space-y-2 text-center">
                   <li>
-                    {numberFormat(plan.limit_per_minute)} calls/minute limit
+                    {t('pricing.callsPerMinute', {
+                      count: numberFormat(plan.limit_per_minute),
+                    })}
                   </li>
                   <li>
-                    Up to {numberFormat(plan.limit_per_day)} API calls a day
+                    {t('pricing.callsPerDay', {
+                      count: numberFormat(plan.limit_per_day),
+                    })}
                   </li>
                   <li>
-                    Up to {numberFormat(plan.limit_per_month)} API calls a month
+                    {t('pricing.callsPerMonth', {
+                      count: numberFormat(plan.limit_per_month),
+                    })}
                   </li>
-                  <li>{isFree ? 'Personal Use' : 'Commercial Use'}</li>
+                  <li>
+                    {isFree
+                      ? t('pricing.personalUse')
+                      : t('pricing.commercialUse')}
+                  </li>
                 </ul>
                 <Button asChild className="w-full" variant="secondary">
                   <a
@@ -208,7 +197,7 @@ export const Apis = ({ plansPromise }: Props) => {
                       isAnnual ? 'year' : 'month'
                     }`}
                   >
-                    Get started now
+                    {t('pricing.cta')}
                   </a>
                 </Button>
               </Card>
@@ -221,17 +210,16 @@ export const Apis = ({ plansPromise }: Props) => {
         <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-body-sm text-muted-foreground mb-1">
-              Enterprise
+              {t('enterprise.label')}
             </p>
-            <h3 className="text-headline-lg mb-1">Dedicated Plan</h3>
+            <h3 className="text-headline-lg mb-1">{t('enterprise.heading')}</h3>
             <p className="text-muted-foreground text-body-sm text-balance">
-              Greater rate limit with SLA support. Suitable for Enterprise user
-              that uses large scale of Nearblocks data.
+              {t('enterprise.description')}
             </p>
           </div>
           <Button asChild>
             <Link href="/contact?subject=2">
-              Contact Us <ArrowRight className="ml-1 size-4" />
+              {t('enterprise.cta')} <ArrowRight className="ml-1 size-4" />
             </Link>
           </Button>
         </div>
@@ -239,14 +227,14 @@ export const Apis = ({ plansPromise }: Props) => {
 
       <div className="mb-16">
         <h2 className="text-headline-2xl mb-8 text-center">
-          Frequently Asked Questions
+          {t('faq.heading')}
         </h2>
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2">
-          {faqs.map((faq) => (
-            <div key={faq.question}>
-              <p className="mb-2 font-medium">{faq.question}</p>
+          {faqKeys.map((key) => (
+            <div key={key}>
+              <p className="mb-2 font-medium">{t(`faq.${key}.question`)}</p>
               <p className="text-muted-foreground text-body-sm text-balance">
-                {faq.answer}
+                {t(`faq.${key}.answer`)}
               </p>
             </div>
           ))}
@@ -255,14 +243,14 @@ export const Apis = ({ plansPromise }: Props) => {
 
       <Separator className="mb-10" />
       <div className="mb-4 flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-center">
-        <p className="text-body-lg">Detailed documentation to get started.</p>
+        <p className="text-body-lg">{t('footer.description')}</p>
         <Button asChild size="lg" variant="secondary">
           <a
             href="https://api.nearblocks.io/api-docs"
             rel="noopener noreferrer"
             target="_blank"
           >
-            View API Documentation
+            {t('footer.cta')}
             <ArrowUpRight className="mt-2 -ml-1 size-3 self-start" />
           </a>
         </Button>

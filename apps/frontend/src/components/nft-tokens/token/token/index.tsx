@@ -15,6 +15,7 @@ import { EmptyBox } from '@/components/empty';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { NFTMedia } from '@/components/token';
+import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
@@ -39,10 +40,14 @@ const SKELETON_COUNT = 24;
 const TokenCard = ({
   baseUri,
   contract,
+  ownerLabel,
+  titleLabel,
   token,
 }: {
   baseUri: null | string;
   contract: string;
+  ownerLabel: string;
+  titleLabel: string;
   token: NFTTokenList;
 }) => (
   <div className="flex flex-col gap-2">
@@ -59,7 +64,7 @@ const TokenCard = ({
     </Link>
     <div className="text-body-xs space-y-0.5">
       <div>
-        <span className="text-muted-foreground">Token ID: </span>
+        <span className="text-muted-foreground">{titleLabel}</span>
         <Link
           className="text-link"
           href={`/nft-tokens/${contract}/tokens/${token.token}`}
@@ -68,7 +73,7 @@ const TokenCard = ({
         </Link>
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-muted-foreground">Owner: </span>
+        <span className="text-muted-foreground">{ownerLabel}</span>
         <AccountLink account={token.owner} />
       </div>
     </div>
@@ -81,6 +86,7 @@ export const NftTokens = ({
   tokenCountPromise,
   tokensPromise,
 }: Props) => {
+  const { t } = useLocale('nfts');
   const tokens = !loading && tokensPromise ? use(tokensPromise) : null;
   const tokenCount =
     !loading && tokenCountPromise ? use(tokenCountPromise) : null;
@@ -108,9 +114,11 @@ export const NftTokens = ({
           loading={loading || !tokenCount}
         >
           {() => (
-            <span className="leading-7">{`A total of ${numberFormat(
-              tokenCount?.data?.count ?? 0,
-            )} tokens found`}</span>
+            <span className="leading-7">
+              {t('inventory.total', {
+                count: numberFormat(tokenCount?.data?.count ?? 0),
+              })}
+            </span>
           )}
         </SkeletonSlot>
       </div>
@@ -132,11 +140,13 @@ export const NftTokens = ({
                 baseUri={contract?.base_uri ?? null}
                 contract={contractId}
                 key={`${token.contract}-${token.token}`}
+                ownerLabel={t('inventory.owner')}
+                titleLabel={t('inventory.title')}
                 token={token}
               />
             ))
           ) : (
-            <EmptyBox description="No NFT tokens found" icon={<Inbox />} />
+            <EmptyBox description={t('inventory.empty')} icon={<Inbox />} />
           )}
         </div>
         {!loading && (tokens?.meta?.next_page || tokens?.meta?.prev_page) && (

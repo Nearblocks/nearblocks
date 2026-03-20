@@ -1,9 +1,12 @@
+'use client';
+
 import { RiQuestionLine } from '@remixicon/react';
 
 import { TxnFT, TxnMT, TxnNFT } from 'nb-schemas';
 
 import { ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { Badge } from '@/ui/badge';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -20,6 +23,8 @@ type Props = {
 };
 
 export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
+  const { t } = useLocale('txns');
+
   const mtFtCount =
     mts?.filter(
       (mt) =>
@@ -44,11 +49,9 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Fungible token transfers involving this transaction
-                </TooltipContent>
+                <TooltipContent>{t('transfers.ftTip')}</TooltipContent>
               </Tooltip>
-              Token Transfers:
+              {t('transfers.ftTitle')}
               {!loading && fts && (
                 <Badge className="ml-1 px-1.5 py-0.5 text-xs" variant="gray">
                   {
@@ -80,11 +83,9 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Non-fungible token transfers involving this transaction
-                </TooltipContent>
+                <TooltipContent>{t('transfers.nftTip')}</TooltipContent>
               </Tooltip>
-              NFT Token Transfers:
+              {t('transfers.nftTitle')}
               {!loading && nfts && (
                 <Badge className="ml-1 px-1.5 py-0.5 text-xs" variant="gray">
                   {
@@ -116,11 +117,9 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Multi-token transfers involving this transaction
-                </TooltipContent>
+                <TooltipContent>{t('transfers.mtTip')}</TooltipContent>
               </Tooltip>
-              MT Token Transfers:
+              {t('transfers.mtTitle')}
               {!loading && mts && (
                 <Badge className="ml-1 px-1.5 py-0.5 text-xs" variant="gray">
                   {mtFtCount + mtNftCount}

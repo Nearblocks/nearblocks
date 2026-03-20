@@ -49,13 +49,13 @@ const ScrollableList = ({
 
   const scrollToBottom = () => {
     viewportRef.current?.scrollTo({
-      top: viewportRef.current.scrollHeight,
       behavior: 'smooth',
+      top: viewportRef.current.scrollHeight,
     });
   };
 
   const scrollToTop = () => {
-    viewportRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    viewportRef.current?.scrollTo({ behavior: 'smooth', top: 0 });
   };
 
   return (

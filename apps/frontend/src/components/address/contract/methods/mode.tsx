@@ -1,5 +1,8 @@
+'use client';
+
 import { Control, Controller } from 'react-hook-form';
 
+import { useLocale } from '@/hooks/use-locale';
 import { FormData } from '@/lib/schema/contract';
 import {
   Field,
@@ -16,13 +19,15 @@ type Props = {
 };
 
 export const ExecutionMode = ({ control, hasSchema }: Props) => {
+  const { t } = useLocale('address');
+
   return (
     <Field>
-      <FieldLabel htmlFor="mode">Execution mode</FieldLabel>
+      <FieldLabel htmlFor="mode">{t('contract.methods.execMode')}</FieldLabel>
       <FieldDescription>
         {hasSchema
-          ? 'Auto-selected based on schema. You can override if needed.'
-          : "We can't differentiate read/write methods for this contract, so you should choose the appropriate action"}
+          ? t('contract.methods.hasSchemaMode')
+          : t('contract.methods.noSchemaMode')}
       </FieldDescription>
       <Controller
         control={control}
@@ -36,9 +41,9 @@ export const ExecutionMode = ({ control, hasSchema }: Props) => {
             <FieldLabel htmlFor="view">
               <Field orientation="horizontal">
                 <FieldContent>
-                  <FieldTitle>View</FieldTitle>
+                  <FieldTitle>{t('contract.methods.view')}</FieldTitle>
                   <FieldDescription>
-                    Free, read-only data queries
+                    {t('contract.methods.viewFree')}
                   </FieldDescription>
                 </FieldContent>
                 <RadioGroupItem id="view" value="view" />
@@ -47,9 +52,9 @@ export const ExecutionMode = ({ control, hasSchema }: Props) => {
             <FieldLabel htmlFor="change">
               <Field orientation="horizontal">
                 <FieldContent>
-                  <FieldTitle>Change</FieldTitle>
+                  <FieldTitle>{t('contract.methods.change')}</FieldTitle>
                   <FieldDescription>
-                    State-altering transactions
+                    {t('contract.methods.stateAltering')}
                   </FieldDescription>
                 </FieldContent>
                 <RadioGroupItem id="change" value="change" />

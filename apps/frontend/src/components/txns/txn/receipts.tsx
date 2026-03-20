@@ -10,6 +10,7 @@ import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { gasFormat, nearFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
@@ -75,6 +76,7 @@ type Props = {
 };
 
 export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
+  const { t } = useLocale('txns');
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
   const { txn } = useParams<{ txn: string }>();
 
@@ -102,7 +104,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
           </Truncate>
         </Link>
       ),
-      header: 'Receipt',
+      header: t('receipts.receipt'),
       id: 'receipt_id',
     },
     {
@@ -116,12 +118,12 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
           </Truncate>
         </Badge>
       ),
-      header: 'Method',
+      header: t('receipts.method'),
       id: 'method',
     },
     {
       cell: (row) => <AccountLink account={row.predecessor_account_id} />,
-      header: 'From',
+      header: t('receipts.from'),
       id: 'from',
     },
     {
@@ -133,7 +135,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
     },
     {
       cell: (row) => <AccountLink account={row.receiver_account_id} />,
-      header: 'To',
+      header: t('receipts.to'),
       id: 'to',
     },
     {
@@ -146,7 +148,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
           </span>
         );
       },
-      header: 'Deposit Value',
+      header: t('receipts.deposit'),
       id: 'deposit',
     },
     {
@@ -160,7 +162,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
           {row.tokens_burnt && nearFormat(row.tokens_burnt)}
         </span>
       ),
-      header: 'Burnt Gas & Tokens',
+      header: t('receipts.burntGas'),
       id: 'burnt',
     },
   ];
@@ -171,7 +173,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
         <DataTable
           columns={columns}
           data={loading || !receipts ? undefined : rows}
-          emptyMessage="No receipts found"
+          emptyMessage={t('receipts.empty')}
           getRowKey={(row) => `${row.receipt_id}-${row.index}`}
           loading={loading || !receipts}
           skeletonRows={5}

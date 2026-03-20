@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { ContractTab } from '@/components/address/contract/tab';
@@ -19,12 +20,26 @@ import {
 } from '@/data/address';
 import { fetchContract, fetchDeployments } from '@/data/address/contract';
 import { fetchStats } from '@/data/layout';
-import { getDictionary, hasLocale } from '@/locales/dictionaries';
+import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = LayoutProps<'/[lang]/address/[address]'>;
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { address, lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'address');
+
+  return {
+    alternates: { canonical: `/address/${address}` },
+    description: t('meta.description', { address }),
+    title: t('meta.title', { address }),
+  };
+};
 
 const AddressLayout = async ({ children, params }: Props) => {
   const { address, lang } = await params;
@@ -39,6 +54,7 @@ const AddressLayout = async ({ children, params }: Props) => {
   if (!hasLocale(lang)) notFound();
 
   const dictionary = await getDictionary(lang, ['address']);
+  const t = await translator(lang, 'address');
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>
@@ -47,7 +63,8 @@ const AddressLayout = async ({ children, params }: Props) => {
           <div className="flex flex-wrap items-center justify-between gap-2 wrap-anywhere">
             <div>
               <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
-                Near Account: <span className="text-foreground">{address}</span>{' '}
+                {t('heading')}{' '}
+                <span className="text-foreground">{address}</span>{' '}
                 <Copy text={address} />
                 <AccountQr address={address} />
               </h1>
@@ -78,54 +95,48 @@ const AddressLayout = async ({ children, params }: Props) => {
             <TabLinks>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}`}>
-                  Transactions
+                  {t('tabs.transactions')}
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/receipts`}>
-                  Receipts
+                  {t('tabs.receipts')}
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/tokens`}>
-                  Token Txns
+                  {t('tabs.tokenTxns')}
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/nft-tokens`}>
-                  NFT Txns
+                  {t('tabs.nftTxns')}
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/mt-tokens`}>
-                  Multi Token Txns
+                  {t('tabs.multiTokenTxns')}
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/staking`}>
-                  Staking Txns
+                  {t('tabs.stakingTxns')}
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
               </TabLink>
-              {/* <TabLink asChild>
-                <ActiveLink href={`/address/${address}/assets`}>
-                  Assets
-                  <TabBadge variant="teal">NEW</TabBadge>
-                </ActiveLink>
-              </TabLink> */}
               <TabLink asChild>
                 <ActiveLink
                   exact={false}
                   href={`/address/${address}/analytics`}
                 >
-                  Analytics
+                  {t('tabs.analytics')}
                   <TabBadge variant="teal">NEW</TabBadge>
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
                 <ActiveLink href={`/address/${address}/keys`}>
-                  Access Keys
+                  {t('tabs.accessKeys')}
                 </ActiveLink>
               </TabLink>
               <ErrorSuspense fallback={<Skeleton className="w-20" />}>

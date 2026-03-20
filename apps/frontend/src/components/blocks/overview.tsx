@@ -10,6 +10,7 @@ import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { gasFee, gasFormat, numberFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export const Overview = ({ blockPromise, loading }: Props) => {
+  const { t } = useLocale('blocks');
   const block = !loading && blockPromise ? use(blockPromise) : null;
 
   return (
@@ -35,9 +37,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>The block height of this block</TooltipContent>
+                <TooltipContent>{t('tooltips.blockHeight')}</TooltipContent>
               </Tooltip>
-              Block Height:
+              {t('overview.blockHeight')}
             </ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
@@ -65,11 +67,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Unique identifier (hash) of this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.hash')}</TooltipContent>
               </Tooltip>
-              Hash:
+              {t('overview.hash')}
             </ListLeft>
             <ListRight>
               <p className="flex min-w-30 items-center gap-1">
@@ -97,11 +97,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Date and time when this block was produced
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.timestamp')}</TooltipContent>
               </Tooltip>
-              Timestamp:
+              {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
               <p>
@@ -120,11 +118,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  The validator who produced this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.author')}</TooltipContent>
               </Tooltip>
-              Author:
+              {t('overview.author')}
             </ListLeft>
             <ListRight>
               <p className="flex items-center gap-1">
@@ -148,11 +144,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Number of transactions and receipts in this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.txns')}</TooltipContent>
               </Tooltip>
-              Transactions:
+              {t('overview.txns')}
             </ListLeft>
             <ListRight>
               <p>
@@ -167,11 +161,14 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                           className="text-link"
                           href={`/txns?block=${block!.block_hash}`}
                         >
-                          {numberFormat(block!.transactions_agg.count)}{' '}
-                          transactions
+                          {t('overview.transactions', {
+                            count: numberFormat(block!.transactions_agg.count),
+                          })}
                         </Link>
                       </Badge>{' '}
-                      and {numberFormat(block!.receipts_agg.count)} receipts
+                      {t('overview.receipts', {
+                        count: numberFormat(block!.receipts_agg.count),
+                      })}
                     </>
                   )}
                 </SkeletonSlot>
@@ -184,11 +181,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Total gas used by all chunks in this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.gasUsed')}</TooltipContent>
               </Tooltip>
-              Gas Used:
+              {t('overview.gasUsed')}
             </ListLeft>
             <ListRight>
               <p>
@@ -209,11 +204,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Total gas limit across all chunks in this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.gasLimit')}</TooltipContent>
               </Tooltip>
-              Gas Limit:
+              {t('overview.gasLimit')}
             </ListLeft>
             <ListRight>
               <p>
@@ -234,11 +227,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Cost per unit of gas for this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.gasPrice')}</TooltipContent>
               </Tooltip>
-              Gas Price:
+              {t('overview.gasPrice')}
             </ListLeft>
             <ListRight>
               <p>
@@ -265,11 +256,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Total gas fee for this block (gas used × gas price)
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.gasFee')}</TooltipContent>
               </Tooltip>
-              Gas Fee:
+              {t('overview.gasFee')}
             </ListLeft>
             <ListRight>
               <p>
@@ -293,11 +282,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Number of shards (chunks) in this block
-                </TooltipContent>
+                <TooltipContent>{t('tooltips.chunks')}</TooltipContent>
               </Tooltip>
-              Chunks:
+              {t('overview.chunks')}
             </ListLeft>
             <ListRight>
               <p>
@@ -316,9 +303,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
                 </TooltipTrigger>
-                <TooltipContent>The hash of the previous block</TooltipContent>
+                <TooltipContent>{t('tooltips.parentHash')}</TooltipContent>
               </Tooltip>
-              Parent Hash:
+              {t('overview.parentHash')}
             </ListLeft>
             <ListRight>
               <p className="flex min-w-30 items-center gap-1">

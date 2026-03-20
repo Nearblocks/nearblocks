@@ -6,6 +6,7 @@ import { Txn } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent } from '@/ui/card';
 import { ScrollableList } from '@/ui/scrollable-list';
 import { Skeleton } from '@/ui/skeleton';
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export const Actions = ({ loading, txnPromise }: Props) => {
+  const { t } = useLocale('txns');
   const txn = !loading && txnPromise ? use(txnPromise) : null;
 
   return (
@@ -33,7 +35,7 @@ export const Actions = ({ loading, txnPromise }: Props) => {
           </SkeletonSlot>
           <div className="flex-1">
             <h2 className="text-headline-xs mb-1 font-bold uppercase">
-              Transaction Actions
+              {t('actions.title')}
             </h2>
             <SkeletonSlot
               fallback={

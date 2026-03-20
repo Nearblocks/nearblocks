@@ -1,9 +1,24 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getDictionary, hasLocale } from '@/locales/dictionaries';
+import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 
 type Props = LayoutProps<'/[lang]/blocks'>;
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'blocks');
+
+  return {
+    alternates: { canonical: '/blocks' },
+    description: t('meta.description'),
+    title: t('meta.title'),
+  };
+};
 
 const BlocksLayout = async ({ children, params }: Props) => {
   const { lang } = await params;

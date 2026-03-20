@@ -11,6 +11,7 @@ import {
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { currencyFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
@@ -29,6 +30,7 @@ export const Overview = ({
   loading,
   txCountPromise,
 }: Props) => {
+  const { t } = useLocale('fts');
   const result = !loading && contractPromise ? use(contractPromise) : null;
   const contract = result?.data ?? null;
   const holderCount =
@@ -38,13 +40,17 @@ export const Overview = ({
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">Overview</CardTitle>
+        <CardTitle className="text-headline-sm">
+          {t('overview.title')}
+        </CardTitle>
       </CardHeader>
       <CardContent className="px-3">
         <List pairsPerRow={2}>
           <ListItem>
             <div>
-              <ListLeft className="min-w-81 pb-0!">Price:</ListLeft>
+              <ListLeft className="min-w-81 pb-0!">
+                {t('overview.price')}
+              </ListLeft>
               <ListRight className="pt-0!">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-6 w-28" />}
@@ -71,7 +77,7 @@ export const Overview = ({
           <ListItem>
             <div>
               <ListLeft className="min-w-81 pb-0!">
-                Circulating Supply Market Cap:
+                {t('overview.circulatingMC')}
               </ListLeft>
               <ListRight className="pt-0!">
                 <SkeletonSlot
@@ -98,7 +104,9 @@ export const Overview = ({
         <Separator />
         <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="min-w-36">Total Supply:</ListLeft>
+            <ListLeft className="min-w-36">
+              {t('overview.totalSupply')}
+            </ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-28" />}
@@ -119,7 +127,7 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-36">Holders:</ListLeft>
+            <ListLeft className="min-w-36">{t('overview.holders')}</ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-20" />}
@@ -138,7 +146,7 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-36">Transfers:</ListLeft>
+            <ListLeft className="min-w-36">{t('overview.transfers')}</ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-20" />}

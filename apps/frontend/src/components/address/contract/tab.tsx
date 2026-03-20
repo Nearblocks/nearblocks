@@ -6,6 +6,7 @@ import { Contract } from 'nb-schemas';
 
 import { ActiveLink } from '@/components/link';
 import { TabLink } from '@/components/tab-links';
+import { useLocale } from '@/hooks/use-locale';
 
 type Props = {
   address: string;
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export const ContractTab = ({ address, contractPromise }: Props) => {
+  const { t } = useLocale('address');
   const contract = use(contractPromise);
 
   if (!contract) return null;
@@ -20,7 +22,7 @@ export const ContractTab = ({ address, contractPromise }: Props) => {
   return (
     <TabLink asChild>
       <ActiveLink exact={false} href={`/address/${address}/contract`}>
-        Contract
+        {t('contract.tab')}
       </ActiveLink>
     </TabLink>
   );

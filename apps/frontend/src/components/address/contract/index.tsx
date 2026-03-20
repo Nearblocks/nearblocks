@@ -1,3 +1,5 @@
+'use client';
+
 import { RiQuestionLine } from '@remixicon/react';
 import { use } from 'react';
 
@@ -13,6 +15,7 @@ import { ListItem, ListLeft, ListRight } from '@/components/list';
 import { List } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
+import { useLocale } from '@/hooks/use-locale';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -29,6 +32,7 @@ export const Contract = ({
   deploymentsPromise,
   loading,
 }: Props) => {
+  const { t } = useLocale('address');
   const account = !loading && accountPromise ? use(accountPromise) : null;
   const deployments =
     !loading && deploymentsPromise ? use(deploymentsPromise) : null;
@@ -42,10 +46,10 @@ export const Contract = ({
               <RiQuestionLine className="size-4" />
             </TooltipTrigger>
             <TooltipContent>
-              Checksum (SHA-256 in base58 encoding) of the contract binary
+              {t('contract.overview.contractHashTip')}
             </TooltipContent>
           </Tooltip>{' '}
-          Contract Hash:
+          {t('contract.overview.contractHash')}
         </ListLeft>
         <ListRight className="xl:py-2.5">
           <p className="flex min-w-30 items-center gap-1">
@@ -74,11 +78,10 @@ export const Contract = ({
               <RiQuestionLine className="size-4" />
             </TooltipTrigger>
             <TooltipContent>
-              Locked contract means that there are no access keys allowing the
-              contract code to be re-deployed
+              {t('contract.overview.contractLockedTip')}
             </TooltipContent>
           </Tooltip>
-          Contract Locked:
+          {t('contract.overview.contractLocked')}
         </ListLeft>
         <ListRight>
           <p>
@@ -86,7 +89,13 @@ export const Contract = ({
               fallback={<Skeleton className="w-20" />}
               loading={loading || !account}
             >
-              {() => <>{account!.locked ? 'Yes' : 'No'}</>}
+              {() => (
+                <>
+                  {account!.locked
+                    ? t('contract.overview.yes')
+                    : t('contract.overview.no')}
+                </>
+              )}
             </SkeletonSlot>
           </p>
         </ListRight>
@@ -98,10 +107,10 @@ export const Contract = ({
               <RiQuestionLine className="size-4" />
             </TooltipTrigger>
             <TooltipContent>
-              The last time the contract was updated.
+              {t('contract.overview.lastUpdatedTip')}
             </TooltipContent>
           </Tooltip>
-          Last Updated:
+          {t('contract.overview.lastUpdated')}
         </ListLeft>
         <ListRight>
           <p>
@@ -127,11 +136,9 @@ export const Contract = ({
             <TooltipTrigger asChild>
               <RiQuestionLine className="size-4" />
             </TooltipTrigger>
-            <TooltipContent>
-              The transaction hash of the latest contract deployment.
-            </TooltipContent>
+            <TooltipContent>{t('contract.overview.txnHashTip')}</TooltipContent>
           </Tooltip>
-          Transaction Hash:
+          {t('contract.overview.txnHash')}
         </ListLeft>
         <ListRight>
           <p>
@@ -162,10 +169,10 @@ export const Contract = ({
               <RiQuestionLine className="size-4" />
             </TooltipTrigger>
             <TooltipContent>
-              The account that deployed the contract.
+              {t('contract.overview.contractCreatorTip')}
             </TooltipContent>
           </Tooltip>
-          Contract Creator:
+          {t('contract.overview.contractCreator')}
         </ListLeft>
         <ListRight>
           <p>
@@ -188,10 +195,10 @@ export const Contract = ({
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
               <TooltipContent>
-                The transaction hash of the first contract deployment.
+                {t('contract.overview.txnHashFirstTip')}
               </TooltipContent>
             </Tooltip>
-            Transaction Hash:
+            {t('contract.overview.txnHash')}
           </ListLeft>
           <ListRight>
             <p>

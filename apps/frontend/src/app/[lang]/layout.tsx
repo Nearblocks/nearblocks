@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { Layout } from '@/components/layout';
 import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import type { Locale } from '@/locales/config';
-import { getDictionary, hasLocale } from '@/locales/dictionaries';
+import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { ConfigProvider } from '@/providers/config';
 import { LocaleProvider } from '@/providers/locale';
 import { Toaster } from '@/ui/sonner';
@@ -22,16 +22,34 @@ const geist = Geist_Mono({
   variable: '--font-geist',
 });
 
-export const metadata: Metadata = {
-  description:
-    'NEAR Blocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
-  icons: {
-    apple: '/apple-touch-icon.png',
-    icon: { sizes: 'any', type: 'image/svg+xml', url: '/icon.svg' },
-    shortcut: { sizes: '32x32', url: '/favicon.ico' },
-  },
-  manifest: '/manifest.webmanifest',
-  title: 'Near Protocol Explorer | NearBlocks',
+export const generateMetadata = async ({
+  params,
+}: LayoutProps<'/[lang]'>): Promise<Metadata> => {
+  const [{ lang }, config] = await Promise.all([params, getRuntimeConfig()]);
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'layout');
+  const url =
+    config.networkId === 'mainnet' ? config.mainnetUrl : config.testnetUrl;
+
+  return {
+    alternates: {
+      canonical: '/',
+    },
+    description: t('meta.description'),
+    icons: {
+      apple: '/apple-touch-icon.png',
+      icon: [
+        { type: 'image/svg+xml', url: '/icon.svg' },
+        { sizes: '32x32', url: '/favicon.ico' },
+      ],
+    },
+    manifest: '/manifest.webmanifest',
+    metadataBase: new URL(url),
+    title: {
+      default: t('meta.title'),
+      template: '%s | NearBlocks',
+    },
+  };
 };
 
 const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {

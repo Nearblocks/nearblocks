@@ -16,6 +16,7 @@ import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
@@ -35,6 +36,7 @@ export const Receipts = ({
   receiptCountPromise,
   receiptsPromise,
 }: Props) => {
+  const { t } = useLocale('address');
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
   const receiptCount =
     !loading && receiptCountPromise ? use(receiptCountPromise) : null;
@@ -80,7 +82,7 @@ export const Receipts = ({
           </Truncate>
         </Link>
       ),
-      header: 'Receipt ID',
+      header: t('receipts.columns.receiptId'),
       id: 'receipt_id',
     },
     {
@@ -92,7 +94,7 @@ export const Receipts = ({
           </Truncate>
         </Link>
       ),
-      header: 'Txn Hash',
+      header: t('receipts.columns.txnHash'),
       id: 'txn_hash',
     },
     {
@@ -106,7 +108,7 @@ export const Receipts = ({
           </Truncate>
         </Badge>
       ),
-      header: 'Method',
+      header: t('receipts.columns.method'),
       id: 'method',
     },
     {
@@ -116,7 +118,7 @@ export const Receipts = ({
           {nearFormat(receipt.actions_agg?.deposit)}
         </span>
       ),
-      header: 'Deposit Value',
+      header: t('receipts.columns.depositValue'),
       id: 'deposit',
     },
     {
@@ -125,7 +127,7 @@ export const Receipts = ({
       ),
       enableFilter: true,
       filterName: 'predecessor',
-      header: 'From',
+      header: t('receipts.columns.from'),
       id: 'from',
     },
     {
@@ -144,7 +146,7 @@ export const Receipts = ({
       cell: (receipt) => <AccountLink account={receipt.receiver_account_id} />,
       enableFilter: true,
       filterName: 'receiver',
-      header: 'To',
+      header: t('receipts.columns.to'),
       id: 'to',
     },
     {
@@ -156,7 +158,7 @@ export const Receipts = ({
           {numberFormat(receipt.block?.block_height)}
         </Link>
       ),
-      header: 'Block',
+      header: t('receipts.columns.block'),
       id: 'block',
     },
     {
@@ -174,7 +176,7 @@ export const Receipts = ({
         <DataTable
           columns={columns}
           data={receipts?.data}
-          emptyMessage="No receipts found"
+          emptyMessage={t('receipts.empty')}
           getRowKey={(receipt) => receipt.receipt_id}
           header={
             <SkeletonSlot
@@ -182,9 +184,11 @@ export const Receipts = ({
               loading={loading || !receiptCount}
             >
               {() => (
-                <>{`A total of ${numberFormat(
-                  receiptCount?.count ?? 0,
-                )} receipts found`}</>
+                <>
+                  {t('receipts.total', {
+                    count: numberFormat(receiptCount?.count ?? 0),
+                  })}
+                </>
               )}
             </SkeletonSlot>
           }

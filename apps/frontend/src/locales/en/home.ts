@@ -4,6 +4,7 @@ export const home = {
     button: 'View all blocks',
     gas: 'Gas used',
     title: 'Latest Blocks',
+    txns: 'txns',
   },
   chart: {
     price: 'Price',
@@ -18,7 +19,7 @@ export const home = {
     transactions: 'Transactions',
     validators: 'Active Validators',
   },
-  title: 'The Near Blockchain Explorer',
+  title: 'The NEAR Blockchain Explorer',
   txns: {
     button: 'View all transactions',
     deposit: 'Deposit value',

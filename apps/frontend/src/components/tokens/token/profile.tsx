@@ -13,6 +13,7 @@ import { FTContractRes } from 'nb-schemas';
 import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export const Profile = ({ cid, contractPromise, loading }: Props) => {
+  const { t } = useLocale('fts');
   const result = !loading && contractPromise ? use(contractPromise) : null;
   const contract = result?.data ?? null;
 
@@ -40,12 +42,12 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">Profile Summary</CardTitle>
+        <CardTitle className="text-headline-sm">{t('profile.title')}</CardTitle>
       </CardHeader>
       <CardContent className="px-3">
         <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="min-w-28">Contract:</ListLeft>
+            <ListLeft className="min-w-28">{t('profile.contract')}</ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="h-7 w-40" />}
@@ -56,7 +58,7 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-28">Decimals:</ListLeft>
+            <ListLeft className="min-w-28">{t('profile.decimals')}</ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-8" />}
@@ -75,7 +77,9 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-28">Official Site:</ListLeft>
+            <ListLeft className="min-w-28">
+              {t('profile.officialSite')}
+            </ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-32" />}
@@ -101,7 +105,9 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="min-w-28">Social Profiles:</ListLeft>
+            <ListLeft className="min-w-28">
+              {t('profile.socialProfiles')}
+            </ListLeft>
             <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="w-24" />}

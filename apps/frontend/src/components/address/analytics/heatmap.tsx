@@ -5,6 +5,7 @@ import { Heatmap as HeatmapSeries } from '@highcharts/react/series';
 import 'highcharts/esm/modules/heatmap.src.js';
 import { memo, useMemo } from 'react';
 
+import { useLocale } from '@/hooks/use-locale';
 import { Dayjs } from '@/lib/dayjs';
 import { dateFormat, numberFormat } from '@/lib/format';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -31,6 +32,8 @@ const colors = [
 ];
 
 export const Heatmap = memo(({ data, height = 184 }: Props) => {
+  const { t } = useLocale('address');
+
   const { options, points, ranges } = useMemo(() => {
     const reversed = (data ?? []).toReversed();
     const valuesByDay = new Map<string, number>();
@@ -109,7 +112,15 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
       monthLabels.set(tick, month.label);
       return tick;
     });
-    const dayNames = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun'];
+    const dayNames = [
+      t('analytics.heatmap.mon'),
+      '',
+      t('analytics.heatmap.wed'),
+      '',
+      t('analytics.heatmap.fri'),
+      '',
+      t('analytics.heatmap.sun'),
+    ];
     const chartWidth = Math.max(1300, globalWeekIndex * 12);
     const dataClasses = [
       { from: 0, to: 0 },
@@ -165,7 +176,9 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
                 point.date,
                 'ddd DD, MMM YYYY',
               )}
-              <br/>${numberFormat(point.value)} txns</span>
+              <br/>${numberFormat(point.value)} ${t(
+                'analytics.heatmap.txns',
+              )}</span>
             `;
           },
         },
@@ -195,7 +208,7 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
       points,
       ranges: dataClasses,
     };
-  }, [data, height]);
+  }, [data, height, t]);
 
   return (
     <div className="heatmap-chart">
@@ -203,7 +216,7 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
         <HeatmapSeries.Series data={points} />
       </Chart>
       <div className="text-body-xs text-muted-foreground flex items-center justify-end gap-1">
-        <div className="mr-2">Less</div>
+        <div className="mr-2">{t('analytics.heatmap.less')}</div>
         {ranges.map((range, index) => (
           <Tooltip key={range.from}>
             <TooltipTrigger>
@@ -216,7 +229,7 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
             </TooltipContent>
           </Tooltip>
         ))}
-        <div className="ml-2">More</div>
+        <div className="ml-2">{t('analytics.heatmap.more')}</div>
       </div>
     </div>
   );
