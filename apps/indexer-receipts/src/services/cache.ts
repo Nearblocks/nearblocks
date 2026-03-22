@@ -10,6 +10,26 @@ export const prepareCache = (message: Message) => {
 
       lru.set(receiptId, txnHash);
     });
+    shard.receiptExecutionOutcomes.forEach((outcome) => {
+      const parentHash =
+        lru.peek(outcome.executionOutcome.id) || outcome.txHash;
+
+      if (parentHash) {
+        lru.set(outcome.executionOutcome.id, parentHash);
+        outcome.executionOutcome.outcome.receiptIds.forEach((receiptId) =>
+          lru.set(receiptId, parentHash),
+        );
+
+        if (outcome.receipt && 'Action' in outcome.receipt.receipt) {
+          outcome.receipt.receipt.Action.inputDataIds.forEach((dataId) =>
+            lru.set(dataId, parentHash),
+          );
+          outcome.receipt.receipt.Action.outputDataReceivers.forEach(
+            (receiver) => lru.set(receiver.dataId, parentHash),
+          );
+        }
+      }
+    });
     shard.chunk?.receipts.forEach((receipt) => {
       const receiptOrDataId: string =
         'Data' in receipt.receipt
@@ -24,15 +44,6 @@ export const prepareCache = (message: Message) => {
         );
         receipt.receipt.Action.outputDataReceivers.forEach((receiver) =>
           lru.set(receiver.dataId, parentHash),
-        );
-      }
-    });
-    shard.receiptExecutionOutcomes.forEach((outcome) => {
-      const parentHash = lru.peek(outcome.executionOutcome.id);
-
-      if (parentHash) {
-        outcome.executionOutcome.outcome.receiptIds.forEach((receiptId) =>
-          lru.set(receiptId, parentHash),
         );
       }
     });
