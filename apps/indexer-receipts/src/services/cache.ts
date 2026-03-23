@@ -34,6 +34,15 @@ export const prepareCache = (message: Message) => {
         outcome.executionOutcome.outcome.receiptIds.forEach((receiptId) =>
           lru.set(receiptId, parentHash),
         );
+
+        if (outcome.receipt && 'Action' in outcome.receipt.receipt) {
+          outcome.receipt.receipt.Action.inputDataIds.forEach((dataId) =>
+            lru.set(dataId, parentHash),
+          );
+          outcome.receipt.receipt.Action.outputDataReceivers.forEach(
+            (receiver) => lru.set(receiver.dataId, parentHash),
+          );
+        }
       }
     });
   });
