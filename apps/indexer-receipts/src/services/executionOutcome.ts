@@ -30,19 +30,23 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
   message.shards.forEach(async (shard) => {
     const chunkHash = shard.chunk?.header.chunkHash;
 
-    if (!chunkHash) throw new Error('Chunk hash is required');
+    if (!chunkHash && shard.receiptExecutionOutcomes.length) {
+      throw new Error('Chunk hash is required');
+    }
 
-    const executions = storeChunkExecutionOutcomes(
-      shard.shardId,
-      chunkHash,
-      message.block.header.hash,
-      message.block.header.timestampNanosec,
-      shard.receiptExecutionOutcomes,
-    );
+    if (chunkHash) {
+      const executions = storeChunkExecutionOutcomes(
+        shard.shardId,
+        chunkHash,
+        message.block.header.hash,
+        message.block.header.timestampNanosec,
+        shard.receiptExecutionOutcomes,
+      );
 
-    outcomes = outcomes.concat(executions.outcomes);
-    receipts = receipts.concat(executions.receipts);
-    actions = actions.concat(executions.actions);
+      outcomes = outcomes.concat(executions.outcomes);
+      receipts = receipts.concat(executions.receipts);
+      actions = actions.concat(executions.actions);
+    }
   });
 
   const promises = [];
