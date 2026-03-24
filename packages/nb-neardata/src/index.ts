@@ -8,6 +8,7 @@ import { Message } from './type.js';
 export * from './type.js';
 
 export type BlockStreamConfig = {
+  limit?: number;
   network: string;
   start: number;
   url: string;
@@ -91,11 +92,11 @@ const fetchFinal = async (url: string): Promise<Message> => {
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const limit = 10;
   let finalFetch = 0;
   let isFetching = false;
   const url = config.url;
   let block = config.start;
+  const limit = config.limit || 10;
   const highWaterMark = limit * 5;
 
   const readable = new Readable({

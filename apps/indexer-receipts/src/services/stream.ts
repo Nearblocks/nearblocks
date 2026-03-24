@@ -4,9 +4,7 @@ import { Message, streamBlock } from 'nb-neardata';
 import config from '#config';
 import { db } from '#libs/knex';
 import sentry from '#libs/sentry';
-import { prepareCache } from '#services/cache';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
-import { storeReceipts } from '#services/receipt';
 
 const indexerKey = config.indexerKey;
 
@@ -22,6 +20,7 @@ export const syncData = async () => {
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
+    limit: 50,
     network: config.network,
     start: startBlock || config.genesisHeight,
     url: config.neardataUrl,
@@ -35,19 +34,13 @@ export const syncData = async () => {
 export const onMessage = async (message: Message) => {
   try {
     const start = performance.now();
-    prepareCache(message);
-    const cacheTime = performance.now() - start;
 
-    await Promise.all([
-      storeReceipts(db, message),
-      storeExecutionOutcomes(db, message),
-    ]);
+    await Promise.all([storeExecutionOutcomes(db, message)]);
 
-    const dbTime = performance.now() - cacheTime;
+    const dbTime = performance.now() - start;
 
     logger.info({
       block: message.block.header.height,
-      cache: `${cacheTime} ms`,
       db: `${dbTime} ms`,
     });
 
