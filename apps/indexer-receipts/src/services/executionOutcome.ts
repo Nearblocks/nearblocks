@@ -5,7 +5,12 @@ import {
   Receipt as JReceipt,
   Message,
 } from 'nb-neardata';
-import { ActionReceiptAction, ExecutionOutcome, Receipt } from 'nb-types';
+import {
+  ActionReceiptAction,
+  ExecutionOutcome,
+  ExecutionOutcomeReceipt,
+  Receipt,
+} from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
@@ -26,6 +31,7 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
   let receipts: Receipt[] = [];
   let actions: ActionReceiptAction[] = [];
   let outcomes: ExecutionOutcome[] = [];
+  let outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
   message.shards.forEach(async (shard) => {
     const chunkHash = shard.chunk?.header.chunkHash;
@@ -44,6 +50,7 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
       );
 
       outcomes = outcomes.concat(executions.outcomes);
+      outcomeReceipts = outcomeReceipts.concat(executions.outcomeReceipts);
       receipts = receipts.concat(executions.receipts);
       actions = actions.concat(executions.actions);
     }
@@ -100,6 +107,25 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
     }
   }
 
+  if (outcomeReceipts.length) {
+    for (let i = 0; i < outcomeReceipts.length; i += batchSize) {
+      const batch = outcomeReceipts.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await knex('execution_outcome_receipts')
+            .insert(batch)
+            .onConflict([
+              'executed_receipt_id',
+              'index_in_execution_outcome',
+              'produced_receipt_id',
+            ])
+            .ignore();
+        }),
+      );
+    }
+  }
+
   await Promise.all(promises);
   outcomeHistogram.labels(config.network).observe(performance.now() - start);
 };
@@ -114,6 +140,7 @@ export const storeChunkExecutionOutcomes = (
   const receipts: Receipt[] = [];
   const actions: ActionReceiptAction[] = [];
   const outcomes: ExecutionOutcome[] = [];
+  const outcomeReceipts: ExecutionOutcomeReceipt[] = [];
 
   executionOutcomes.forEach((executionOutcome, indexInChunk) => {
     outcomes.push(
@@ -123,6 +150,17 @@ export const storeChunkExecutionOutcomes = (
         indexInChunk,
         executionOutcome,
       ),
+    );
+    executionOutcome.executionOutcome.outcome.receiptIds.forEach(
+      (receiptId, receiptIndex) => {
+        outcomeReceipts.push(
+          getExecutionOutcomeReceiptData(
+            executionOutcome.executionOutcome.id,
+            receiptId,
+            receiptIndex,
+          ),
+        );
+      },
     );
 
     if (
@@ -202,7 +240,7 @@ export const storeChunkExecutionOutcomes = (
     }
   });
 
-  return { actions, outcomes, receipts };
+  return { actions, outcomeReceipts, outcomes, receipts };
 };
 
 const getExecutionOutcomeData = (
@@ -222,6 +260,16 @@ const getExecutionOutcomeData = (
   shard_id: shardId,
   status: mapExecutionStatus(outcome.executionOutcome.outcome.status),
   tokens_burnt: outcome.executionOutcome.outcome.tokensBurnt,
+});
+
+const getExecutionOutcomeReceiptData = (
+  executedReceipt: string,
+  producedReceipt: string,
+  receiptIndex: number,
+): ExecutionOutcomeReceipt => ({
+  executed_receipt_id: executedReceipt,
+  index_in_execution_outcome: receiptIndex,
+  produced_receipt_id: producedReceipt,
 });
 
 const getReceiptData = (
