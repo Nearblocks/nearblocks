@@ -87,18 +87,6 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Link className="text-link" href={`/txns/${receipt.transaction_hash}`}>
-          <Truncate>
-            <TruncateText text={receipt.transaction_hash} />
-            <TruncateCopy text={receipt.transaction_hash} />
-          </Truncate>
-        </Link>
-      ),
-      header: t('receipts.columns.txnHash'),
-      id: 'txn_hash',
-    },
-    {
-      cell: (receipt) => (
         <Badge variant="teal">
           <Truncate>
             <TruncateText

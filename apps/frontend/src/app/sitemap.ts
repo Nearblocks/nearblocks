@@ -44,22 +44,20 @@ const getStaticRoutes = (): string[] => {
 
 const sitemap = (): MetadataRoute.Sitemap => {
   const config = getRuntimeConfig();
-  const baseUrl =
-    config.networkId === 'mainnet' ? config.mainnetUrl : config.testnetUrl;
 
   return getStaticRoutes().map((route) => ({
     alternates: {
       languages: Object.fromEntries(
         supportedLocales.map((locale) => [
           locale,
-          `${baseUrl}/${locale}${route}`,
+          `${config.siteUrl}/${locale}${route}`,
         ]),
       ),
     },
     changeFrequency: route === '' ? 'hourly' : 'daily',
     lastModified: new Date(),
     priority: route === '' ? 1.0 : 0.8,
-    url: `${baseUrl}${route}`,
+    url: `${config.siteUrl}${route}`,
   }));
 };
 

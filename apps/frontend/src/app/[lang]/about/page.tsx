@@ -1,6 +1,21 @@
+import { Metadata } from 'next';
 import Image from 'next/image';
 
 import { hasLocale, translator } from '@/locales/dictionaries';
+
+export const generateMetadata = async ({
+  params,
+}: PageProps<'/[lang]/about'>): Promise<Metadata> => {
+  const { lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'about');
+
+  return {
+    alternates: { canonical: '/about' },
+    description: t('meta.description'),
+    title: t('meta.title'),
+  };
+};
 
 const AboutPage = async ({ params }: PageProps<'/[lang]/about'>) => {
   const { lang } = await params;

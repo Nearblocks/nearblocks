@@ -10,7 +10,7 @@ import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
+import { TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
@@ -106,36 +106,25 @@ export const MTTxns = ({ loading, mtCountPromise, mtsPromise }: Props) => {
     },
     {
       cell: (mt) => (
-        <Link
-          className="text-link"
-          href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}
-        >
-          <Truncate>
-            <TruncateText className="max-w-25" text={mt.token_id} />
-            <TruncateCopy text={mt.token_id} />
-          </Truncate>
-        </Link>
-      ),
-      header: t('mts.columns.tokenId'),
-      id: 'token_id',
-    },
-    {
-      cell: (mt) => (
         <span className="flex items-center gap-1">
           <TokenImage
             alt={mt.meta?.name ?? ''}
             className="m-px size-5 rounded-full border"
             src={mt.base_meta?.icon ?? ''}
           />
-          <TokenLink
-            contract={mt.contract_account_id}
-            name={mt.base_meta?.name}
-            type="mt-tokens"
-          />
+          <Link
+            className="text-link"
+            href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}
+          >
+            <Truncate>
+              <TruncateText
+                className="max-w-30"
+                text={mt.base_meta?.name ?? mt.token_id}
+              />
+            </Truncate>
+          </Link>
         </span>
       ),
-      enableFilter: true,
-      filterName: 'token',
       header: t('mts.columns.token'),
       id: 'token',
     },

@@ -21,9 +21,9 @@ const Image = async ({ params }: Props) => {
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'address');
   const title =
-    config.networkId === 'mainnet'
+    config.network === 'mainnet'
       ? t('meta.label')
-      : `TESTNET ${t('meta.label')}`;
+      : `TESTNET | ${t('meta.label')}`;
 
   return new ImageResponse(
     (

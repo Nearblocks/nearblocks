@@ -19,7 +19,7 @@ type Props = {
 
 export const Validate = ({ address }: Props) => {
   const { t } = useLocale('address');
-  const networkId = useConfig((s) => s.config.networkId);
+  const network = useConfig((s) => s.config.network);
 
   return (
     <DropdownMenu>
@@ -31,7 +31,7 @@ export const Validate = ({ address }: Props) => {
       <DropdownMenuContent align="end">
         <DropdownMenuItem>
           <Link
-            href={`https://nearvalidate.org/address/${address}?network=${networkId}`}
+            href={`https://nearvalidate.org/address/${address}?network=${network}`}
             rel="noopener noreferrer"
             target="_blank"
           >

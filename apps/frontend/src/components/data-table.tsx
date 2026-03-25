@@ -164,7 +164,7 @@ export const DataTable = <TData,>({
           )}
         </div>
       )}
-      <Table className="xl:table-fixed">
+      <Table>
         <TableHeader className="uppercase">
           <TableRow>
             {columns.map((column, index) => (

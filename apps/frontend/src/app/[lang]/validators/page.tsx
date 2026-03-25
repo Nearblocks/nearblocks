@@ -1,3 +1,5 @@
+import { Metadata } from 'next';
+
 import { ErrorSuspense } from '@/components/error-suspense';
 import { RpcSelector } from '@/components/rpc';
 import { Validators } from '@/components/validators';
@@ -7,6 +9,20 @@ import { fetchValidators } from '@/data/validators';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/validators'>;
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'validators');
+
+  return {
+    alternates: { canonical: '/validators' },
+    description: t('meta.description'),
+    title: t('meta.title'),
+  };
+};
 
 const ValidatorsPage = async ({ params, searchParams }: Props) => {
   const { lang } = await params;

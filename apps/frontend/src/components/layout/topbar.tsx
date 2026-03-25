@@ -6,6 +6,8 @@ import { Stats } from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { SearchBar } from '@/components/search';
+import { useConfig } from '@/hooks/use-config';
+import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
 
 import { NetworkSwitcher } from './network';
@@ -18,6 +20,8 @@ type Props = {
 
 export const TopBar = ({ statsPromise }: Props) => {
   const pathname = usePathname();
+  const { t } = useLocale('layout');
+  const network = useConfig((s) => s.config.network);
   const isHome = (pathname.match(/\//g) || []).length === 1;
 
   return (
@@ -28,9 +32,15 @@ export const TopBar = ({ statsPromise }: Props) => {
       )}
     >
       <div className="container mx-auto flex h-11 items-center px-4">
-        <ErrorSuspense fallback={<NearPrice loading />}>
-          <NearPrice statsPromise={statsPromise} />
-        </ErrorSuspense>
+        {network === 'mainnet' ? (
+          <ErrorSuspense fallback={<NearPrice loading />}>
+            <NearPrice statsPromise={statsPromise} />
+          </ErrorSuspense>
+        ) : (
+          <span className="text-body-xs text-red-foreground">
+            {t('header.testnetNetwork')}
+          </span>
+        )}
         <div className="ml-auto w-full lg:mr-2 lg:max-w-150">
           {!isHome && <SearchBar size="sm" />}
         </div>

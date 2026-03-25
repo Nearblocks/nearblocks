@@ -97,16 +97,6 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
       id: 'deposit',
     },
     {
-      cell: (txn) => (
-        <span className="flex items-center gap-1">
-          <NearCircle className="size-4" />
-          {nearFormat(txn.outcomes_agg?.transaction_fee)}
-        </span>
-      ),
-      header: t('txns.columns.txnFee'),
-      id: 'txn_fee',
-    },
-    {
       cell: (txn) => <AccountLink account={txn.signer_account_id} />,
       enableFilter: true,
       filterName: 'signer',

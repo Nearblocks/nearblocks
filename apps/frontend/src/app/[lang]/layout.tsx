@@ -28,8 +28,6 @@ export const generateMetadata = async ({
   const [{ lang }, config] = await Promise.all([params, getRuntimeConfig()]);
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'layout');
-  const url =
-    config.networkId === 'mainnet' ? config.mainnetUrl : config.testnetUrl;
 
   return {
     alternates: {
@@ -44,10 +42,13 @@ export const generateMetadata = async ({
       ],
     },
     manifest: '/manifest.webmanifest',
-    metadataBase: new URL(url),
+    metadataBase: new URL(config.siteUrl),
     title: {
-      default: t('meta.title'),
-      template: '%s | NearBlocks',
+      default:
+        config.network === 'testnet'
+          ? `TESTNET | ${t('meta.title')}`
+          : t('meta.title'),
+      template: config.metaTemplate,
     },
   };
 };
