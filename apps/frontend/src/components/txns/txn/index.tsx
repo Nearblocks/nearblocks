@@ -12,6 +12,7 @@ import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
 import { TxnReceiptErrors, TxnStatus } from '@/components/txn';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
@@ -46,6 +47,7 @@ export const Overview = ({
   txnPromise,
 }: Props) => {
   const { t } = useLocale('txns');
+  const network = useConfig((s) => s.config.network);
   const txn = !loading && txnPromise ? use(txnPromise) : null;
   const fts = !loading && txnFTsPromise ? use(txnFTsPromise) : null;
   const mts = !loading && txnMTsPromise ? use(txnMTsPromise) : null;
@@ -69,6 +71,13 @@ export const Overview = ({
     <Card>
       <CardContent className="px-3">
         <List pairsPerRow={1}>
+          {network !== 'mainnet' && (
+            <ListItem>
+              <span className="text-red-foreground col-span-2 px-1 py-3">
+                [{t('overview.testnetNotice')}]
+              </span>
+            </ListItem>
+          )}
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>

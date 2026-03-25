@@ -13,6 +13,7 @@ export const generateMetadata = async ({
   const { lang } = await params;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'charts');
+
   return {
     alternates: { canonical: '/charts/txn-volume' },
     description: t('txnVolume.meta.description'),

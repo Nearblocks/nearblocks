@@ -47,6 +47,7 @@ export const txns = {
     shardNumberTip: 'Shard ID where this transaction was executed',
     status: 'Status:',
     statusTip: 'The status of the transaction',
+    testnetNotice: 'This is a Testnet transaction only.',
     timestamp: 'Timestamp:',
     timestampTip: 'Date and time when transaction was processed',
     to: 'To:',

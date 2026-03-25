@@ -1,23 +1,9 @@
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
+import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 
 type Props = LayoutProps<'/[lang]/nft-tokens'>;
-
-export const generateMetadata = async ({
-  params,
-}: Props): Promise<Metadata> => {
-  const { lang } = await params;
-  const locale = hasLocale(lang) ? lang : 'en';
-  const t = await translator(locale, 'nfts');
-  return {
-    alternates: { canonical: '/nft-tokens' },
-    description: t('meta.description'),
-    title: t('meta.title'),
-  };
-};
 
 const NftTokensLayout = async ({ children, params }: Props) => {
   const { lang } = await params;

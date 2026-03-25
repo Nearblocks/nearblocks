@@ -127,10 +127,12 @@ const verifierSchema = z.object({
 const configSchema = z.object({
   fastNearRpcKey: publicEnvSchema.shape.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
   mainnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_MAINNET_URL,
-  networkId: publicEnvSchema.shape.NEXT_PUBLIC_NETWORK_ID,
+  metaTemplate: z.string(),
+  network: publicEnvSchema.shape.NEXT_PUBLIC_NETWORK_ID,
   provider: providerSchema,
   providers: z.array(providerSchema),
   reownProjectId: publicEnvSchema.shape.NEXT_PUBLIC_REOWN_PROJECT_ID,
+  siteUrl: z.string(),
   testnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_TESTNET_URL,
   turnstileSiteKey: publicEnvSchema.shape.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   verifier: verifierSchema,
@@ -166,19 +168,27 @@ export const getRuntimeConfig = (): Config => {
     });
   }
 
+  const network = cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID;
+  const mainnetUrl = cachedPublicConfig.NEXT_PUBLIC_MAINNET_URL;
+  const testnetUrl = cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL;
   const providers = rpcProviders(
     cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
-  )[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID];
+  )[network];
+  const siteUrl = network === 'mainnet' ? mainnetUrl : testnetUrl;
+  const metaTemplate =
+    network === 'mainnet' ? '%s | NearBlocks' : 'TESTNET | %s | NearBlocks';
 
   return {
     fastNearRpcKey: cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
-    mainnetUrl: cachedPublicConfig.NEXT_PUBLIC_MAINNET_URL,
-    networkId: cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID,
+    mainnetUrl,
+    metaTemplate,
+    network,
     provider: providers[0],
     providers,
     reownProjectId: cachedPublicConfig.NEXT_PUBLIC_REOWN_PROJECT_ID,
-    testnetUrl: cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL,
+    siteUrl,
+    testnetUrl,
     turnstileSiteKey: cachedPublicConfig.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-    verifier: contractVerifier[cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID],
+    verifier: contractVerifier[network],
   };
 };

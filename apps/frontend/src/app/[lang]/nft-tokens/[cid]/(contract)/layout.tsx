@@ -1,6 +1,20 @@
 import type { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
+import { ActiveLink } from '@/components/link';
+import { NftTokenHeader } from '@/components/nft-tokens/token/header';
+import { Overview } from '@/components/nft-tokens/token/overview';
+import { Profile } from '@/components/nft-tokens/token/profile';
+import { TabLink, TabLinks } from '@/components/tab-links';
+import {
+  fetchNFTContract,
+  fetchNFTContractHolderCount,
+  fetchNFTContractTxnCount,
+} from '@/data/nft-tokens/contract';
+import { hasLocale, translator } from '@/locales/dictionaries';
+import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
+
+type Props = LayoutProps<'/[lang]/nft-tokens/[cid]'>;
 
 export const generateMetadata = async ({
   params,
@@ -30,20 +44,6 @@ export const generateMetadata = async ({
     };
   }
 };
-import { ActiveLink } from '@/components/link';
-import { NftTokenHeader } from '@/components/nft-tokens/token/header';
-import { Overview } from '@/components/nft-tokens/token/overview';
-import { Profile } from '@/components/nft-tokens/token/profile';
-import { TabLink, TabLinks } from '@/components/tab-links';
-import {
-  fetchNFTContract,
-  fetchNFTContractHolderCount,
-  fetchNFTContractTxnCount,
-} from '@/data/nft-tokens/contract';
-import { hasLocale, translator } from '@/locales/dictionaries';
-import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
-
-type Props = LayoutProps<'/[lang]/nft-tokens/[cid]'>;
 
 const NftTokenLayout = async ({ children, params }: Props) => {
   const { cid, lang } = await params;

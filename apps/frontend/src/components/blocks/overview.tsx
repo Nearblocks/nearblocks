@@ -10,6 +10,7 @@ import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { gasFee, gasFormat, numberFormat } from '@/lib/format';
@@ -25,12 +26,20 @@ type Props = {
 
 export const Overview = ({ blockPromise, loading }: Props) => {
   const { t } = useLocale('blocks');
+  const network = useConfig((s) => s.config.network);
   const block = !loading && blockPromise ? use(blockPromise) : null;
 
   return (
     <Card>
       <CardContent className="px-3">
         <List pairsPerRow={1}>
+          {network !== 'mainnet' && (
+            <ListItem>
+              <span className="text-red-foreground col-span-2 px-1 py-3">
+                [{t('overview.testnetNotice')}]
+              </span>
+            </ListItem>
+          )}
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>

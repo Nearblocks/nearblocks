@@ -49,6 +49,7 @@ export const layout = {
   header: {
     nearPrice: 'NEAR Price',
     switchNetwork: 'Switch Network',
+    testnetNetwork: 'Testnet Network',
     toggleMenu: 'Toggle Menu',
     toggleTheme: 'Toggle Theme',
   },

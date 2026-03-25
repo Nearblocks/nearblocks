@@ -32,6 +32,7 @@ export const blocks = {
     heading: 'Block',
     parentHash: 'Parent Hash:',
     receipts: 'and {{count}} receipts',
+    testnetNotice: 'This is a Testnet block only.',
     timestamp: 'Timestamp:',
     transactions: '{{count}} transactions',
     txns: 'Transactions:',

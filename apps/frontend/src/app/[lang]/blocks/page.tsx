@@ -1,9 +1,25 @@
+import { Metadata } from 'next';
+
 import { Blocks } from '@/components/blocks';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchBlockCount, fetchBlocks } from '@/data/blocks';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/blocks'>;
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { lang } = await params;
+  const locale = hasLocale(lang) ? lang : 'en';
+  const t = await translator(locale, 'blocks');
+
+  return {
+    alternates: { canonical: '/blocks' },
+    description: t('meta.description'),
+    title: t('meta.title'),
+  };
+};
 
 const BlocksPage = async ({ params, searchParams }: Props) => {
   const { lang } = await params;

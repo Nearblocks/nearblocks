@@ -22,9 +22,9 @@ const Image = async ({ params }: Props) => {
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'blocks');
   const title =
-    config.networkId === 'mainnet'
+    config.network === 'mainnet'
       ? t('bidMeta.label')
-      : `TESTNET ${t('bidMeta.label')}`;
+      : `TESTNET | ${t('bidMeta.label')}`;
 
   return new ImageResponse(
     (
