@@ -33,7 +33,7 @@ const onSignal = async (signal: number | string) => {
 
 process.once('SIGINT', onSignal);
 process.once('SIGTERM', onSignal);
-process.once('unhandledRejection', async (error) => {
+process.once('unhandledRejection', async (error: unknown) => {
   logger.error('unhandled rejection');
   logger.error(error);
   sentry.captureException(error);
