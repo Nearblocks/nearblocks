@@ -2,7 +2,7 @@
 
 import { useContext, useMemo, useState } from 'react';
 
-import type { ActionReceipt } from 'nb-schemas';
+import type { ActionReceipt, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { useLocale } from '@/hooks/use-locale';
@@ -18,17 +18,15 @@ import { deepUnescape, findRawArgs, isAuroraAction } from './utils';
 type Props = {
   action: ActionReceipt;
   index: number;
-  receiptId: string;
-  receiver: string;
-  signer: string;
+  onlyArgs?: boolean;
+  receipt: TxnReceipt;
 };
 
 export const ReceiptAction = ({
   action,
   index,
-  receiptId,
-  receiver,
-  signer,
+  onlyArgs = false,
+  receipt,
 }: Props) => {
   const { t } = useLocale('txns');
   const { enableRpc, rpcData, rpcLoading } = useContext(RpcContext);
@@ -55,8 +53,8 @@ export const ReceiptAction = ({
     return { args: argsJson ?? args, argsBase64, hasArgs, method };
   }, [action]);
 
-  const isAurora = isAuroraAction(method, receiver);
-  const rawArgs = findRawArgs(rpcData, receiptId, index);
+  const isAurora = isAuroraAction(method, receipt.receiver_account_id);
+  const rawArgs = findRawArgs(rpcData, receipt.receipt_id, index);
   const autoCode = hasArgs
     ? JSON.stringify(deepUnescape(args), null, 2)
     : argsBase64;
@@ -70,6 +68,45 @@ export const ReceiptAction = ({
     }
   };
 
+  const codeBlock =
+    isAurora && argsBase64 ? (
+      <AuroraArgsViewer argsBase64={argsBase64} method={method!} />
+    ) : (
+      displayCode && (
+        <CodeViewer
+          className="min-h-17"
+          code={displayCode}
+          toolbar={
+            !!method && (
+              <>
+                <Button
+                  className="border-0"
+                  onClick={() => setViewMode('auto')}
+                  size="xs"
+                  variant={viewMode === 'auto' ? 'secondary' : 'outline'}
+                >
+                  {t('codeViewer.auto')}
+                </Button>
+
+                <Button
+                  className="border-0"
+                  onClick={onRawClick}
+                  size="xs"
+                  variant={viewMode === 'raw' ? 'secondary' : 'outline'}
+                >
+                  {t('codeViewer.raw')}
+                </Button>
+              </>
+            )
+          }
+        />
+      )
+    );
+
+  if (onlyArgs) {
+    return <>{codeBlock}</>;
+  }
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-1">
@@ -77,42 +114,11 @@ export const ReceiptAction = ({
         <Action
           action={action}
           full={false}
-          receiver={receiver}
-          signer={signer}
+          receiver={receipt.receiver_account_id}
+          signer={receipt.predecessor_account_id}
         />
       </div>
-      {isAurora && argsBase64 ? (
-        <AuroraArgsViewer argsBase64={argsBase64} method={method!} />
-      ) : (
-        displayCode && (
-          <CodeViewer
-            code={displayCode}
-            toolbar={
-              !!method && (
-                <>
-                  <Button
-                    className="border-0"
-                    onClick={() => setViewMode('auto')}
-                    size="xs"
-                    variant={viewMode === 'auto' ? 'secondary' : 'outline'}
-                  >
-                    {t('codeViewer.auto')}
-                  </Button>
-
-                  <Button
-                    className="border-0"
-                    onClick={onRawClick}
-                    size="xs"
-                    variant={viewMode === 'raw' ? 'secondary' : 'outline'}
-                  >
-                    {t('codeViewer.raw')}
-                  </Button>
-                </>
-              )
-            }
-          />
-        )
-      )}
+      {codeBlock}
     </div>
   );
 };

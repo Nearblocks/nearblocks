@@ -44,6 +44,11 @@ const TxnLayout = async ({ children, params }: Props) => {
             </ActiveLink>
           </TabLink>
           <TabLink asChild>
+            <ActiveLink href={`/txns/${tid}/enhanced`}>
+              {t('tid.enhanced')}
+            </ActiveLink>
+          </TabLink>
+          <TabLink asChild>
             <ActiveLink href={`/txns/${tid}/receipts`}>
               {t('tid.receipts')}
             </ActiveLink>
