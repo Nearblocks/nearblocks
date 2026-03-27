@@ -58,6 +58,8 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
         eor.executed_receipt_id = p_receipt_id
         AND r.included_in_block_timestamp >= p_timestamp
         AND r.included_in_block_timestamp < (p_timestamp + 300000000000) -- 5m in ns
+      ORDER BY
+        eor.index_in_execution_outcome
     )
   SELECT
     JSONB_BUILD_OBJECT(

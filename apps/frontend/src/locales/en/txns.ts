@@ -11,6 +11,15 @@ export const txns = {
     rlpDecoded: 'RLP Decoded',
     table: 'Table',
   },
+  enhanced: {
+    burntGas: 'Burnt Gas:',
+    burntTokens: 'Burnt Tokens:',
+    collapseAll: 'Collapse All',
+    expandAll: 'Expand All',
+    gasLimit: 'Gas Limit:',
+    inspect: 'Inspect',
+    output: 'Output',
+  },
   list: {
     block: 'Block',
     deposit: 'Deposit Value',
@@ -89,6 +98,7 @@ export const txns = {
   tid: {
     description:
       'View NEAR Protocol transaction {{tid}}. Inspect execution plan, receipts, and token transfers.',
+    enhanced: 'Enhanced Plan',
     execution: 'Execution Plan',
     overview: 'Overview',
     receipts: 'Receipts Summary',
