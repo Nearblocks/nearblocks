@@ -49,6 +49,26 @@ const nextConfig: NextConfig = {
         permanent: true,
         source: '/terms-and-conditions',
       },
+      {
+        destination: '/fil-ph/:path*',
+        permanent: true,
+        source: '/ph/:path*',
+      },
+      {
+        destination: '/ja/:path*',
+        permanent: true,
+        source: '/jp/:path*',
+      },
+      {
+        destination: '/ko/:path*',
+        permanent: true,
+        source: '/kr/:path*',
+      },
+      {
+        destination: '/uk/:path*',
+        permanent: true,
+        source: '/ua/:path*',
+      },
     ];
   },
 };

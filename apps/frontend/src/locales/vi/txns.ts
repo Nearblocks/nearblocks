@@ -18,12 +18,7 @@ export const txns = {
     expandAll: 'Expand All',
     gasLimit: 'Gas Limit:',
     inspect: 'Inspect',
-    noLogs: 'No logs',
-    noResult: 'Empty result',
     output: 'Output',
-    receipt: 'Receipt:',
-    result: 'Result',
-    value: 'Value:',
   },
   list: {
     block: 'Block',
