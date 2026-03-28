@@ -65,7 +65,7 @@ const List = ({ data, error, handleSearch, stats, tokensCount }: Props) => {
   const [form, setForm] = useState(initialForm);
   const [sorting, setSorting] = useState<Sorting>(initialSorting);
 
-  const tokens = data?.tokens?.filter((token) => token?.contract !== 'aurora'); // The 'aurora' token has been removed from the list of tokens due to its role as a proxy contract for the ETH bridge on the NEAR
+  const tokens = data?.tokens;
 
   const totalCount = tokensCount?.tokens?.[0]?.count || 0;
 
