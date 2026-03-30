@@ -8,6 +8,7 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { SearchBar } from '@/components/search';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
+import { pathnameWithoutLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils';
 
 import { NetworkSwitcher } from './network';
@@ -22,7 +23,7 @@ export const TopBar = ({ statsPromise }: Props) => {
   const pathname = usePathname();
   const { t } = useLocale('layout');
   const network = useConfig((s) => s.config.network);
-  const isHome = (pathname.match(/\//g) || []).length === 1;
+  const isHome = pathnameWithoutLocale(pathname) === '/';
 
   return (
     <section

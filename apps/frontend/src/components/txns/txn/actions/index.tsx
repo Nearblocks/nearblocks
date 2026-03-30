@@ -5,10 +5,10 @@ import { use } from 'react';
 import { Txn } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
+import { ScrollableList } from '@/components/scrollable-list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent } from '@/ui/card';
-import { ScrollableList } from '@/ui/scrollable-list';
 import { Skeleton } from '@/ui/skeleton';
 
 import { Action } from './action';

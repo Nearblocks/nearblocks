@@ -47,6 +47,7 @@ const staticMenu: NavMenu<RouteKey<'layout'>> = [
     menu: [
       { href: '/blocks', key: 'menu.blockchain.blocks' },
       { href: '/txns', key: 'menu.blockchain.txns' },
+      { href: '/multichain-txns', key: 'menu.blockchain.multichain' },
       { href: '/charts', key: 'menu.blockchain.charts' },
       { href: '/validators', key: 'menu.blockchain.nodes' },
     ],

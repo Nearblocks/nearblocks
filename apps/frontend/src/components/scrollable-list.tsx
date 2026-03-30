@@ -1,8 +1,11 @@
 'use client';
 
+import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import * as React from 'react';
 
+import { useLocale } from '@/hooks/use-locale';
 import { cn } from '@/lib/utils';
+import { Button } from '@/ui/button';
 import { ScrollArea } from '@/ui/scroll-area';
 
 const ScrollableList = ({
@@ -14,6 +17,7 @@ const ScrollableList = ({
   const viewportRef = React.useRef<Element | null>(null);
   const [isScrollable, setIsScrollable] = React.useState(false);
   const [atBottom, setAtBottom] = React.useState(false);
+  const { t } = useLocale('layout');
 
   const checkScroll = React.useCallback(() => {
     const vp = viewportRef.current;
@@ -64,13 +68,24 @@ const ScrollableList = ({
         {children}
       </ScrollArea>
       {isScrollable && (
-        <button
-          className="text-muted-foreground hover:text-foreground w-full cursor-pointer pt-1 text-center text-xs transition-colors"
+        <Button
+          className="!hover:bg-transparent !dark:hover:bg-transparent justify-start"
           onClick={atBottom ? scrollToTop : scrollToBottom}
-          type="button"
+          size="xs"
+          variant="ghost"
         >
-          {atBottom ? '↑ Scroll to top' : 'Scroll for more ↓'}
-        </button>
+          {atBottom ? (
+            <>
+              <ChevronsUp className="size-3" />
+              {t('scrollable.top')}
+            </>
+          ) : (
+            <>
+              <ChevronsDown className="size-3" />
+              {t('scrollable.more')}
+            </>
+          )}
+        </Button>
       )}
     </div>
   );

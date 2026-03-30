@@ -3,9 +3,9 @@
 import { TxnNFT } from 'nb-schemas';
 
 import { Link } from '@/components/link';
+import { ScrollableList } from '@/components/scrollable-list';
 import { NFTMedia, TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { ScrollableList } from '@/ui/scrollable-list';
 
 import { TransferSummary } from './transfer';
 
