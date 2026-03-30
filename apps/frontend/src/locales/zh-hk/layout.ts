@@ -57,6 +57,7 @@ export const layout = {
     blockchain: {
       blocks: 'Blocks',
       charts: 'Charts',
+      multichain: 'Multichain Txns',
       nodes: 'Validators',
       title: 'Blockchain',
       txns: 'Transactions',
@@ -82,6 +83,10 @@ export const layout = {
     description:
       'NearBlocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
     title: 'NEAR Protocol Explorer | NearBlocks',
+  },
+  scrollable: {
+    more: 'Scroll for more',
+    top: 'Scroll to top',
   },
   search: {
     addresses: 'Addresses',

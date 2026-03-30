@@ -10,6 +10,7 @@ import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
+import { LongDate } from '@/components/timestamp';
 import { TxnStatus } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
@@ -134,6 +135,27 @@ export const ReceiptInspectRows = ({
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
+              <TooltipContent>{t('receipt.timestampTip')}</TooltipContent>
+            </Tooltip>
+            {t('receipt.timestamp')}
+          </div>
+        </ListLeft>
+        <ListRight>
+          <SkeletonSlot
+            fallback={<Skeleton className="h-6 w-60" />}
+            loading={!receipt || loading}
+          >
+            {() => <LongDate hideAge ns={receipt!.block.block_timestamp} />}
+          </SkeletonSlot>
+        </ListRight>
+      </ListItem>
+      <ListItem>
+        <ListLeft>
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger>
+                <RiQuestionLine className="size-4" />
+              </TooltipTrigger>
               <TooltipContent>{t('receipt.fromTip')}</TooltipContent>
             </Tooltip>
             {t('receipt.from')}
@@ -233,7 +255,7 @@ export const ReceiptInspectRows = ({
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
-              <TooltipContent>{t('receipt.burntGasTip')}</TooltipContent>
+              <TooltipContent>{t('enhanced.burntGasTip')}</TooltipContent>
             </Tooltip>
             {t('enhanced.burntGas')}
           </div>
@@ -259,7 +281,7 @@ export const ReceiptInspectRows = ({
               <TooltipTrigger>
                 <RiQuestionLine className="size-4" />
               </TooltipTrigger>
-              <TooltipContent>{t('receipt.burntGasTip')}</TooltipContent>
+              <TooltipContent>{t('enhanced.burntTokensTip')}</TooltipContent>
             </Tooltip>
             {t('enhanced.burntTokens')}
           </div>

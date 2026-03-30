@@ -11,6 +11,11 @@ type Props = {
   ns: null | string | undefined;
 };
 
+type LongDateProps = {
+  hideAge?: boolean;
+  ns: null | string | undefined;
+};
+
 export const TimestampToggle = () => {
   const hasHydrated = useSettings((s) => s.hydrated);
   const timestampMode = useSettings((s) => s.timestampMode);
@@ -58,7 +63,7 @@ export const TimestampCell = ({ ns }: Props) => {
     : dateFormat(ms, 'YYYY-MM-DD HH:mm:ss');
 };
 
-export const LongDate = ({ ns }: Props) => {
+export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
   const hasHydrated = useSettings((s) => s.hydrated);
   const utcMode = useSettings((s) => s.utcMode);
   const toggleUTCMode = useSettings((s) => s.toggleUTCMode);
@@ -66,15 +71,14 @@ export const LongDate = ({ ns }: Props) => {
   if (!ns || !hasHydrated) return <Skeleton className="w-60" />;
 
   const ms = toMs(ns);
-  const age = ageFormat(ms);
   const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss.SSS Z', utcMode === 'utc');
 
   return (
     <>
-      {age}{' '}
+      {!hideAge && `${ageFormat(ms)} `}
       <Tooltip>
         <TooltipTrigger className="text-left" onClick={toggleUTCMode}>
-          ({date})
+          {hideAge ? date : `(${date})`}
         </TooltipTrigger>
         <TooltipContent>
           Click to show {utcMode === 'local' ? 'UTC' : 'Local'} time

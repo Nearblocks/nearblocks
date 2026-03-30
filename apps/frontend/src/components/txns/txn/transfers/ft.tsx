@@ -5,9 +5,9 @@ import { useMemo, useState } from 'react';
 import { TxnFT } from 'nb-schemas';
 
 import { AccountLink } from '@/components/link';
+import { ScrollableList } from '@/components/scrollable-list';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { ScrollableList } from '@/ui/scrollable-list';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
 import { TransferSummary } from './transfer';

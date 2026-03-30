@@ -197,7 +197,7 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
               <ListLeft className="min-w-60">
                 <LabelWithTip
                   label={t('enhanced.gasLimit')}
-                  tip="Maximum amount of gas allocated for the Receipt"
+                  tip={t('enhanced.gasLimitTip')}
                 />
               </ListLeft>
               <ListRight>{`${gasFormat(gasLimit)} Tgas`}</ListRight>
@@ -205,15 +205,18 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
             <ListItem>
               <ListLeft>
                 <LabelWithTip
-                  label="Pre-charged Fee"
-                  tip="Fees Pre-charged on Receipt"
+                  label={t('enhanced.preCharged')}
+                  tip={t('enhanced.preChargedTip')}
                 />
               </ListLeft>
               <ListRight>{`${nearFormat(preCharged)} Ⓝ`}</ListRight>
             </ListItem>
             <ListItem>
               <ListLeft>
-                <LabelWithTip label="Refund" tip="Refund from the receipt" />
+                <LabelWithTip
+                  label={t('enhanced.refund')}
+                  tip={t('enhanced.refundTip')}
+                />
               </ListLeft>
               <ListRight>{`${nearFormat(refund)} Ⓝ`}</ListRight>
             </ListItem>
