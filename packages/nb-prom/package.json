@@ -1,0 +1,23 @@
+{
+  "name": "nb-prom",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "prom-client": "15.1.3"
+  },
+  "devDependencies": {
+    "eslint-config-custom-node": "*",
+    "nb-tsconfig": "*",
+    "typescript": "~5.8",
+    "vitest": "~3.0"
+  }
+}

@@ -1,21 +1,8 @@
-import http from 'http';
-
 import { logger } from 'nb-logger';
 
-import { register } from '#libs/prom';
+import metrics from '#libs/prom';
 
-const PORT = 3010;
-
-export const server = http.createServer(async (req, res) => {
-  if (req.url === '/metrics') {
-    res.setHeader('Content-Type', register.contentType);
-    res.end(await register.metrics());
-  } else {
-    res.writeHead(404);
-    res.end();
-  }
-});
-
-server.listen(PORT, () =>
-  logger.info(`metrics server listening on port ${PORT}`),
+export const server = metrics.startMetricsServer(3010);
+server.on('listening', () =>
+  logger.info('metrics server listening on port 3010'),
 );
