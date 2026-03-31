@@ -4,7 +4,6 @@ export interface SyncMetrics {
   blockHeight: client.Gauge;
   blocksBehind: client.Gauge;
   inSync: client.Gauge;
-  dataSource: client.Gauge;
 }
 
 export interface PerfMetrics {
@@ -40,11 +39,6 @@ export function createSyncMetrics(register: client.Registry): SyncMetrics {
     inSync: new client.Gauge({
       help: 'Whether the indexer is in sync with the chain (1=yes, 0=no)',
       name: 'indexer_in_sync',
-      registers: [register],
-    }),
-    dataSource: new client.Gauge({
-      help: 'Data source the indexer is reading from (0=rpc, 1=lake)',
-      name: 'indexer_data_source',
       registers: [register],
     }),
   };
