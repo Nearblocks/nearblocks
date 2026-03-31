@@ -55,7 +55,7 @@ export const storeTransactions = async (knex: Knex, message: Message) => {
     await Promise.all(promises);
   }
 
-  txnHistogram.labels(config.network).observe(performance.now() - start);
+  txnHistogram.observe(performance.now() - start);
 };
 
 const getTransactionData = (

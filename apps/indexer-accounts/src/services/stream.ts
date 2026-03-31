@@ -3,11 +3,13 @@ import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import { db } from '#libs/knex';
+import metrics from '#libs/prom';
 import sentry from '#libs/sentry';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
 
 const indexerKey = 'accounts';
+
 
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
@@ -33,7 +35,10 @@ export const syncData = async () => {
 
 export const onMessage = async (message: Message) => {
   try {
-    logger.info(`syncing block: ${message.block.header.height}`);
+    const start = performance.now();
+    const blockHeight = message.block.header.height;
+
+    logger.info(`syncing block: ${blockHeight}`);
 
     await Promise.all([
       storeAccounts(db, message),
@@ -43,14 +48,26 @@ export const onMessage = async (message: Message) => {
     await db('settings')
       .insert({
         key: indexerKey,
-        value: { sync: message.block.header.height },
+        value: { sync: blockHeight },
       })
       .onConflict('key')
       .merge();
+
+    metrics.sync.blockHeight.set(blockHeight);
+    metrics.perf.blocksProcessedTotal.inc();
+    metrics.perf.blockProcessingSeconds.observe(
+      (performance.now() - start) / 1000,
+    );
+    const pool = (db as any).client.pool;
+    metrics.infra.dbPoolActive.set(pool.numUsed());
+    metrics.infra.dbPoolIdle.set(pool.numFree());
+    metrics.infra.dbPoolWaiting.set(pool.numPendingAcquires());
   } catch (error) {
+    metrics.errors.errorsTotal.inc({ type: 'processing' });
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
-    process.exit();
+    await sentry.close(2000);
+    process.exit(1);
   }
 };

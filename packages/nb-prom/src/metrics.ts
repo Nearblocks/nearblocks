@@ -2,21 +2,15 @@ import client from 'prom-client';
 
 export interface SyncMetrics {
   blockHeight: client.Gauge;
-  blocksBehind: client.Gauge;
-  inSync: client.Gauge;
-  dataSource: client.Gauge;
 }
 
 export interface PerfMetrics {
   blockProcessingSeconds: client.Histogram;
   blocksProcessedTotal: client.Counter;
-  batchSize: client.Histogram;
-  dbQueryDurationSeconds: client.Histogram<'operation'>;
 }
 
 export interface ErrorMetrics {
   errorsTotal: client.Counter<'type'>;
-  failedBlocksTotal: client.Counter;
 }
 
 export interface InfraMetrics {
@@ -30,21 +24,6 @@ export function createSyncMetrics(register: client.Registry): SyncMetrics {
     blockHeight: new client.Gauge({
       help: 'Current block height the indexer has processed',
       name: 'indexer_block_height',
-      registers: [register],
-    }),
-    blocksBehind: new client.Gauge({
-      help: 'Number of blocks the indexer is behind the chain tip',
-      name: 'indexer_blocks_behind',
-      registers: [register],
-    }),
-    inSync: new client.Gauge({
-      help: 'Whether the indexer is in sync with the chain (1=yes, 0=no)',
-      name: 'indexer_in_sync',
-      registers: [register],
-    }),
-    dataSource: new client.Gauge({
-      help: 'Data source the indexer is reading from (0=rpc, 1=lake)',
-      name: 'indexer_data_source',
       registers: [register],
     }),
   };
@@ -63,19 +42,6 @@ export function createPerfMetrics(register: client.Registry): PerfMetrics {
       name: 'indexer_blocks_processed_total',
       registers: [register],
     }),
-    batchSize: new client.Histogram({
-      buckets: [1, 10, 50, 100, 500, 1000],
-      help: 'Number of blocks processed in a single batch',
-      name: 'indexer_batch_size',
-      registers: [register],
-    }),
-    dbQueryDurationSeconds: new client.Histogram({
-      buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5],
-      help: 'Time in seconds for database query execution',
-      labelNames: ['operation'],
-      name: 'indexer_db_query_duration_seconds',
-      registers: [register],
-    }),
   };
 }
 
@@ -85,11 +51,6 @@ export function createErrorMetrics(register: client.Registry): ErrorMetrics {
       help: 'Total number of errors encountered by the indexer',
       labelNames: ['type'],
       name: 'indexer_errors_total',
-      registers: [register],
-    }),
-    failedBlocksTotal: new client.Counter({
-      help: 'Total number of blocks that failed to process',
-      name: 'indexer_failed_blocks_total',
       registers: [register],
     }),
   };

@@ -3,7 +3,6 @@ import { Message } from 'nb-neardata';
 import { Block } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
 import { blockHistogram } from '#libs/prom';
 
 export const storeBlock = async (knex: Knex, message: Message) => {
@@ -17,7 +16,7 @@ export const storeBlock = async (knex: Knex, message: Message) => {
       .ignore();
   });
 
-  blockHistogram.labels(config.network).observe(performance.now() - start);
+  blockHistogram.observe(performance.now() - start);
 };
 
 const getBlockData = (message: Message): Block => {
