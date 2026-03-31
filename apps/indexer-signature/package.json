@@ -23,6 +23,7 @@
     "bitcoinjs-lib": "7.0.0-rc.0",
     "elliptic": "6.6.0",
     "envalid": "8.0.0",
+    "nb-prom": "*",
     "js-sha3": "0.9.3",
     "knex-migrate-sql-file": "~2.0",
     "near-api-js": "5.0.1",

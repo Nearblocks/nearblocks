@@ -19,6 +19,7 @@
     "@scure/base": "1.1.9",
     "@sentry/node": "7.74.1",
     "envalid": "8.0.0",
+    "nb-prom": "*",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {

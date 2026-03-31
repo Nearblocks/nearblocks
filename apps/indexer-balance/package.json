@@ -18,6 +18,7 @@
   "dependencies": {
     "@sentry/node": "7.120.0",
     "envalid": "8.0.0",
+    "nb-prom": "*",
     "hwp": "0.4.1",
     "lodash-es": "4.17.21"
   },

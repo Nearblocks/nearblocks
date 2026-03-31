@@ -2,6 +2,7 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { db } from '#libs/knex';
+import { server } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { syncGenesis } from '#services/genesis';
 import { syncData } from '#services/stream';
@@ -17,14 +18,14 @@ import { syncData } from '#services/stream';
     logger.error('aborting...');
     logger.error(error);
     sentry.captureException(error);
-    await Promise.all([db.destroy(), sentry.close(1_000)]);
+    await Promise.all([server.close(), db.destroy(), sentry.close(1_000)]);
     process.exit(1);
   }
 })();
 
 const onSignal = async (signal: number | string) => {
   try {
-    await Promise.all([db.destroy(), sentry.close(1_000)]);
+    await Promise.all([server.close(), db.destroy(), sentry.close(1_000)]);
   } catch (error) {
     logger.error(error);
   }
