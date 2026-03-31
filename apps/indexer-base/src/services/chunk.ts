@@ -3,7 +3,6 @@ import { Chunk as JChunk, Message } from 'nb-neardata';
 import { Chunk } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import config from '#config';
 import { chunkHistogram } from '#libs/prom';
 
 export const storeChunks = async (knex: Knex, message: Message) => {
@@ -27,7 +26,7 @@ export const storeChunks = async (knex: Knex, message: Message) => {
     });
   }
 
-  chunkHistogram.labels(config.network).observe(performance.now() - start);
+  chunkHistogram.observe(performance.now() - start);
 };
 
 const getChunkData = (

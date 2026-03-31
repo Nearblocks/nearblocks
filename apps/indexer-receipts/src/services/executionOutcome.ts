@@ -127,7 +127,7 @@ export const storeExecutionOutcomes = async (knex: Knex, message: Message) => {
   }
 
   await Promise.all(promises);
-  outcomeHistogram.labels(config.network).observe(performance.now() - start);
+  outcomeHistogram.observe(performance.now() - start);
 };
 
 export const storeChunkExecutionOutcomes = (

@@ -3,10 +3,12 @@ import { Message, streamBlock } from 'nb-neardata';
 
 import config from '#config';
 import { db } from '#libs/knex';
+import metrics from '#libs/prom';
 import sentry from '#libs/sentry';
 import { storeExecutionOutcomes } from '#services/executionOutcome';
 
 const indexerKey = config.indexerKey;
+
 
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
@@ -34,27 +36,35 @@ export const syncData = async () => {
 export const onMessage = async (message: Message) => {
   try {
     const start = performance.now();
+    const blockHeight = message.block.header.height;
 
     await Promise.all([storeExecutionOutcomes(db, message)]);
 
     const dbTime = performance.now() - start;
 
     logger.info({
-      block: message.block.header.height,
+      block: blockHeight,
       db: `${dbTime} ms`,
     });
 
     await db('settings')
       .insert({
         key: indexerKey,
-        value: { sync: message.block.header.height },
+        value: { sync: blockHeight },
       })
       .onConflict('key')
       .merge();
+
+    metrics.sync.blockHeight.set(blockHeight);
+    metrics.perf.blocksProcessedTotal.inc();
+    metrics.perf.blockProcessingSeconds.observe(
+      (performance.now() - start) / 1000,
+    );
   } catch (error) {
+    metrics.errors.errorsTotal.inc({ type: 'processing' });
     logger.error(`aborting... block ${message.block.header.height}`);
     logger.error(error);
     sentry.captureException(error);
-    process.exit();
+    setTimeout(() => process.exit(1), 2000);
   }
 };

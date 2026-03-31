@@ -135,7 +135,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
   }
 
   await Promise.all(promises);
-  receiptHistogram.labels(config.network).observe(performance.now() - start);
+  receiptHistogram.observe(performance.now() - start);
 };
 
 const storeChunkReceipts = async (

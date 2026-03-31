@@ -22,7 +22,6 @@ describe('createSyncMetrics', () => {
     expect(sync).toHaveProperty('blockHeight');
     expect(sync).toHaveProperty('blocksBehind');
     expect(sync).toHaveProperty('inSync');
-    expect(sync).toHaveProperty('dataSource');
   });
 
   it('blockHeight is registered and reports value', async () => {
@@ -53,13 +52,6 @@ describe('createSyncMetrics', () => {
     expect(found).toBe(true);
   });
 
-  it('dataSource is registered and reports value', async () => {
-    const sync = createSyncMetrics(register);
-    sync.dataSource.set(0);
-    const metrics = await register.getMetricsAsJSON();
-    const found = metrics.some((m: Metric) => m.name === 'indexer_data_source');
-    expect(found).toBe(true);
-  });
 });
 
 describe('createPerfMetrics', () => {
