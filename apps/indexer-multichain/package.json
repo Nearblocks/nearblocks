@@ -27,6 +27,7 @@
     "eslint-config-custom-node": "*",
     "nb-knex": "*",
     "nb-logger": "*",
+    "nb-prom": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
