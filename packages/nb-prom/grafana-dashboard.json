@@ -39,9 +39,9 @@
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "yellow", "value": 30 },
-              { "color": "orange", "value": 120 },
-              { "color": "red", "value": 300 }
+              { "color": "yellow", "value": 120 },
+              { "color": "orange", "value": 300 },
+              { "color": "red", "value": 600 }
             ]
           },
           "mappings": [],
@@ -335,7 +335,7 @@
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "red", "value": 60 }
+              { "color": "red", "value": 120 }
             ]
           }
         },
@@ -879,12 +879,6 @@
               "expr": "histogram_quantile(0.95, sum by (le) (rate(keys_insertion_ms_bucket{network=~\"$network\", indexer=\"base\"}[5m])))",
               "legendFormat": "keys_insertion_ms",
               "refId": "F"
-            },
-            {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.95, sum by (le) (rate(s3_upload_ms_bucket{network=~\"$network\", indexer=\"base\"}[5m])))",
-              "legendFormat": "s3_upload_ms",
-              "refId": "G"
             }
           ]
         },
@@ -1091,22 +1085,71 @@
       "collapsed": true,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
       "id": 107,
-      "title": "Multichain Indexer (coming soon)",
+      "title": "Multichain Indexer",
       "type": "row",
       "panels": [
         {
           "id": 15,
-          "title": "Multichain Indexer Status",
-          "type": "text",
-          "gridPos": { "h": 3, "w": 24, "x": 0, "y": 28 },
+          "title": "Multichain Block Height (per chain)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 28 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "options": {
-            "mode": "markdown",
-            "content": "Multichain indexer metrics (Ethereum, Arbitrum, Aurora, Base, BSC, Gnosis, Optimism, Polygon, Solana, Bitcoin) will be available once nb-prom is integrated into indexer-multichain. Track per-chain block height, sync lag, and processing rates here.",
-            "code": {
-              "language": "plaintext",
-              "showLineNumbers": false,
-              "showMiniMap": false
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "multichain_chain_block_height{network=~\"$network\", indexer=\"multichain\"}",
+              "legendFormat": "{{chain}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": { "defaults": { "unit": "none" } },
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto", "colorMode": "value", "graphMode": "none", "orientation": "auto" }
+        },
+        {
+          "id": 16,
+          "title": "Multichain Blocks Processed (per chain)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 34 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "rate(multichain_chain_blocks_processed_total{network=~\"$network\", indexer=\"multichain\"}[5m])",
+              "legendFormat": "{{chain}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 5, "showPoints": "never" }
+            }
+          }
+        },
+        {
+          "id": 18,
+          "title": "Multichain Errors",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 42 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "rate(indexer_errors_total{network=~\"$network\", indexer=\"multichain\"}[5m])",
+              "legendFormat": "{{type}}",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "rate(indexer_failed_blocks_total{network=~\"$network\", indexer=\"multichain\"}[5m])",
+              "legendFormat": "failed_blocks",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 5, "showPoints": "never" }
             }
           }
         }

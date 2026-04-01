@@ -2,6 +2,7 @@ import { logger } from 'nb-logger';
 
 import config from '#config';
 import { db } from '#libs/knex';
+import { server } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { syncData } from '#services/multichain';
 
@@ -24,6 +25,7 @@ import { syncData } from '#services/multichain';
 const onSignal = async (signal: number | string) => {
   try {
     await Promise.all([db.destroy(), sentry.close(1_000)]);
+    server.close();
   } catch (error) {
     logger.error(error);
   }

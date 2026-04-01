@@ -12,6 +12,7 @@ import {
 } from '#libs/bitcoin';
 import { NotFoundError } from '#libs/errors';
 import { db } from '#libs/knex';
+import { chainBlockHeight, chainBlocksProcessed } from '#libs/prom';
 import {
   getStartBlock,
   retry,
@@ -50,6 +51,7 @@ const processBlocks = async (chain: Chains) => {
 
     await Promise.all(promises);
     await updateProgress(chain, Math.min(i + BATCH_SIZE, latestBlock));
+    chainBlocksProcessed.inc({ chain }, BATCH_SIZE);
   }
 
   let currentBlock = latestBlock;
@@ -66,6 +68,8 @@ const processBlocks = async (chain: Chains) => {
       url,
     });
     await updateProgress(chain, currentBlock);
+    chainBlockHeight.set({ chain }, currentBlock);
+    chainBlocksProcessed.inc({ chain });
   }
 };
 

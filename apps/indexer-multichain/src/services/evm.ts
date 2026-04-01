@@ -6,6 +6,7 @@ import config from '#config';
 import { NotFoundError } from '#libs/errors';
 import { getBlock, getLatestBlock, isValid } from '#libs/evm';
 import { db } from '#libs/knex';
+import { chainBlockHeight, chainBlocksProcessed } from '#libs/prom';
 import {
   getStartBlock,
   retry,
@@ -44,6 +45,7 @@ const processBlocks = async (chain: Chains) => {
 
     await Promise.all(promises);
     await updateProgress(chain, Math.min(i + BATCH_SIZE, latestBlock));
+    chainBlocksProcessed.inc({ chain }, BATCH_SIZE);
   }
 
   let currentBlock = latestBlock;
@@ -60,6 +62,8 @@ const processBlocks = async (chain: Chains) => {
       url,
     });
     await updateProgress(chain, currentBlock);
+    chainBlockHeight.set({ chain }, currentBlock);
+    chainBlocksProcessed.inc({ chain });
   }
 };
 
