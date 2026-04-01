@@ -9,7 +9,6 @@ import { storeEvents } from '#services/events';
 
 const indexerKey = config.indexerKey;
 
-
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
   const latestBlock = settings?.value?.sync;
@@ -53,10 +52,18 @@ export const onMessage = async (message: Message) => {
       .merge();
 
     metrics.sync.blockHeight.set(blockHeight);
+    metrics.sync.lastBlockTimestamp.set(
+      Number(message.block.header.timestampNanosec) / 1e9,
+    );
     metrics.perf.blocksProcessedTotal.inc();
     metrics.perf.blockProcessingSeconds.observe(
       (performance.now() - start) / 1000,
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pool = (db as any).client.pool;
+    metrics.infra.dbPoolActive.set(pool.numUsed());
+    metrics.infra.dbPoolIdle.set(pool.numFree());
+    metrics.infra.dbPoolWaiting.set(pool.numPendingAcquires());
   } catch (error) {
     metrics.errors.errorsTotal.inc({ type: 'processing' });
     logger.error(
@@ -64,6 +71,7 @@ export const onMessage = async (message: Message) => {
     );
     logger.error(error);
     sentry.captureException(error);
-    setTimeout(() => process.exit(1), 2000);
+    await sentry.close(2000);
+    process.exit(1);
   }
 };
