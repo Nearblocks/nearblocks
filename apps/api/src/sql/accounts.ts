@@ -16,6 +16,7 @@ export default {
     deploymentTxn: sql('queries/accounts/contracts/deploymentTxn.sql'),
   },
   fts: {
+    count: sql('queries/accounts/fts/count.sql'),
     estimate: sql('queries/accounts/fts/estimate.sql'),
     txn: sql('queries/accounts/fts/txn.sql'),
     txns: sql('queries/accounts/fts/txns.sql'),
@@ -25,22 +26,26 @@ export default {
     keys: sql('queries/accounts/keys/keys.sql'),
   },
   mts: {
+    count: sql('queries/accounts/mts/count.sql'),
     estimate: sql('queries/accounts/mts/estimate.sql'),
     txn: sql('queries/accounts/mts/txn.sql'),
     txns: sql('queries/accounts/mts/txns.sql'),
   },
   nfts: {
+    count: sql('queries/accounts/nfts/count.sql'),
     estimate: sql('queries/accounts/nfts/estimate.sql'),
     txn: sql('queries/accounts/nfts/txn.sql'),
     txns: sql('queries/accounts/nfts/txns.sql'),
   },
   receipts: {
+    count: sql('queries/accounts/receipts/count.sql'),
     cte: sql('queries/accounts/receipts/cte.sql'),
     cteUnion: sql('queries/accounts/receipts/cteUnion.sql'),
     estimate: sql('queries/accounts/receipts/estimate.sql'),
     receipts: sql('queries/accounts/receipts/receipts.sql'),
   },
   staking: {
+    count: sql('queries/accounts/staking/count.sql'),
     estimate: sql('queries/accounts/staking/estimate.sql'),
     txn: sql('queries/accounts/staking/txn.sql'),
     txns: sql('queries/accounts/staking/txns.sql'),
@@ -53,6 +58,7 @@ export default {
     txns: sql('queries/accounts/stats/txns.sql'),
   },
   txns: {
+    count: sql('queries/accounts/txns/count.sql'),
     cte: sql('queries/accounts/txns/cte.sql'),
     cteUnion: sql('queries/accounts/txns/cteUnion.sql'),
     estimate: sql('queries/accounts/txns/estimate.sql'),

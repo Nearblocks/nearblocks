@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
@@ -13,6 +14,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 type Props = {
   loading?: boolean;
@@ -21,6 +23,7 @@ type Props = {
 
 type ChainExplorer = {
   addrUrl: string;
+  icon: string;
   name: string;
   txUrl: string;
 };
@@ -28,60 +31,79 @@ type ChainExplorer = {
 const CHAIN_EXPLORERS: Record<string, ChainExplorer> = {
   ARBITRUM: {
     addrUrl: 'https://arbiscan.io/address/',
+    icon: '/images/icons/arb.svg',
     name: 'Arbitrum',
     txUrl: 'https://arbiscan.io/tx/',
   },
   AURORA: {
     addrUrl: 'https://explorer.aurora.dev/address/',
+    icon: '/images/icons/aurora.svg',
     name: 'Aurora',
     txUrl: 'https://explorer.aurora.dev/tx/',
   },
   BASE: {
     addrUrl: 'https://basescan.org/address/',
+    icon: '/images/icons/base.svg',
     name: 'Base',
     txUrl: 'https://basescan.org/tx/',
   },
   BITCOIN: {
     addrUrl: 'https://mempool.space/address/',
+    icon: '/images/icons/btc.svg',
     name: 'Bitcoin',
     txUrl: 'https://mempool.space/tx/',
   },
   BSC: {
     addrUrl: 'https://bscscan.com/address/',
+    icon: '/images/icons/bsc.svg',
     name: 'BSC',
     txUrl: 'https://bscscan.com/tx/',
   },
   ETHEREUM: {
     addrUrl: 'https://etherscan.io/address/',
+    icon: '/images/icons/eth.svg',
     name: 'Ethereum',
     txUrl: 'https://etherscan.io/tx/',
   },
   GNOSIS: {
     addrUrl: 'https://gnosisscan.io/address/',
+    icon: '/images/icons/gno.svg',
     name: 'Gnosis',
     txUrl: 'https://gnosisscan.io/tx/',
   },
   OPTIMISM: {
     addrUrl: 'https://optimistic.etherscan.io/address/',
+    icon: '/images/icons/op.svg',
     name: 'Optimism',
     txUrl: 'https://optimistic.etherscan.io/tx/',
   },
   POLYGON: {
     addrUrl: 'https://polygonscan.com/address/',
+    icon: '/images/icons/pol.svg',
     name: 'Polygon',
     txUrl: 'https://polygonscan.com/tx/',
   },
   SOLANA: {
     addrUrl: 'https://solscan.io/address/',
+    icon: '/images/icons/sol.svg',
     name: 'Solana',
     txUrl: 'https://solscan.io/tx/',
   },
 };
 
-const ChainIcon = ({ chain }: { chain: string }) => (
-  <span className="bg-muted inline-flex size-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold">
-    {chain[0]}
-  </span>
+const ChainIcon = ({ icon, name }: { icon: string; name: string }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Image
+        alt={name}
+        className="size-4 rounded-sm"
+        height={16}
+        src={icon}
+        width={16}
+      />
+    </TooltipTrigger>
+    <TooltipContent>{name}</TooltipContent>
+  </Tooltip>
 );
 
 export const MultichainTxns = ({ loading, txnsPromise }: Props) => {
@@ -133,9 +155,9 @@ export const MultichainTxns = ({ loading, txnsPromise }: Props) => {
         if (txn.dest_txn && explorer) {
           return (
             <Truncate>
-              <ChainIcon chain={explorer.name} />
+              <ChainIcon icon={explorer.icon} name={explorer.name} />
               <a
-                className="text-link ml-1"
+                className="text-link ml-2 flex"
                 href={`${explorer.txUrl}${txn.dest_txn}`}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -163,9 +185,9 @@ export const MultichainTxns = ({ loading, txnsPromise }: Props) => {
         if (txn.dest_address && explorer) {
           return (
             <Truncate>
-              <ChainIcon chain={explorer.name} />
+              <ChainIcon icon={explorer.icon} name={explorer.name} />
               <a
-                className="text-link ml-1"
+                className="text-link ml-2 flex"
                 href={`${explorer.addrUrl}${txn.dest_address}`}
                 rel="noopener noreferrer"
                 target="_blank"

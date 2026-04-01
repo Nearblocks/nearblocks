@@ -1,15 +1,15 @@
 SELECT
   COUNT(*)::TEXT AS count
 FROM
-  nft_events ne
+  transactions
 WHERE
-  block_timestamp >= ${start}::BIGINT
+  (
+    signer_account_id = ${signer}
+    OR receiver_account_id = ${receiver}
+  )
+  AND block_timestamp >= ${start}::BIGINT
   AND block_timestamp <= ${end}::BIGINT
   AND (
     ${before}::BIGINT IS NULL
     OR block_timestamp < ${before}
-  )
-  AND (
-    cause = 'BURN'
-    OR delta_amount >= 0
   )

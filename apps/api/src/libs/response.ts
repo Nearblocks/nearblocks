@@ -7,7 +7,18 @@ export type WindowListQuery<T> = (
   direction?: 'asc' | 'desc',
 ) => Promise<T[]>;
 
+export type WindowCountQuery = (
+  start: string,
+  end: string,
+) => Promise<{ count: string }>;
+
 export type WindowQuery<T> = (start: string, end: string) => Promise<null | T>;
+
+export type WindowCountOptions = {
+  end?: bigint;
+  limit?: number;
+  start: bigint;
+};
 
 export type WindowListOptions = {
   direction?: 'asc' | 'desc';
@@ -93,6 +104,39 @@ export const rollingWindowList = async <T>(
   }
 
   return results;
+};
+
+/**
+ * Sums counts by repeatedly querying over rolling time windows, moving backwards in time.
+ * Continues querying until the start boundary is hit or the optional limit is reached,
+ * accumulating the count from each window.
+ * Each query receives the current window's start and end timestamps.
+ *
+ * @param queryFn - An async function that takes (start, end) and returns an object with a count string.
+ * @param options - Settings including start time, optional end time, and optional count limit.
+ * @returns The total count across all windows, capped at limit if provided.
+ */
+export const rollingWindowCount = async (
+  queryFn: WindowCountQuery,
+  options: WindowCountOptions,
+): Promise<number> => {
+  const NOW = BigInt(Date.now()) * 1_000_000n;
+  const { end = NOW, limit, start } = options;
+  const windowSize = WINDOW_SIZE;
+  let total = 0;
+  let endNs = end;
+
+  while (endNs >= start) {
+    const windowStart = endNs - windowSize > start ? endNs - windowSize : start;
+    const result = await queryFn(windowStart.toString(), endNs.toString());
+    total += Number(result.count);
+
+    if (limit && total >= limit) return total;
+    if (windowStart === start) break;
+    endNs = windowStart - 1n;
+  }
+
+  return total;
 };
 
 /**

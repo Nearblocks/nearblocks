@@ -30,6 +30,41 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        destination: '/txns',
+        permanent: true,
+        source: '/transactions',
+      },
+      {
+        destination: '/txns/:slug',
+        permanent: true,
+        source: '/transactions/:slug',
+      },
+      {
+        destination: '/txns/:slug',
+        permanent: true,
+        source: '/tx/:slug',
+      },
+      {
+        destination: '/blocks/:slug',
+        permanent: true,
+        source: '/block/:slug',
+      },
+      {
+        destination: '/tokens/:slug',
+        permanent: true,
+        source: '/token/:slug',
+      },
+      {
+        destination: '/nft-tokens/:slug',
+        permanent: true,
+        source: '/nft-token/:slug',
+      },
+      {
+        destination: '/nft-tokens/:slug/tokens/:token',
+        permanent: true,
+        source: '/nft-token/:slug/:token',
+      },
+      {
         destination: '/tokens/transfers',
         permanent: true,
         source: '/tokentxns',

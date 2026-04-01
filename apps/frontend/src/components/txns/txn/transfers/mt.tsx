@@ -4,14 +4,9 @@ import { useMemo, useState } from 'react';
 
 import { TxnMT } from 'nb-schemas';
 
-import { AccountLink, Link } from '@/components/link';
+import { AccountLink } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
-import {
-  NFTMedia,
-  TokenAmount,
-  TokenImage,
-  TokenLink,
-} from '@/components/token';
+import { MTLink, NFTMedia, TokenAmount, TokenImage } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
@@ -107,11 +102,11 @@ export const MTTransfers = ({ mts }: Props) => {
                       className="m-px size-5 rounded-full border"
                       src={mt.base_meta?.icon ?? ''}
                     />
-                    <TokenLink
+                    <MTLink
                       contract={mt.contract_account_id}
                       name={mt.base_meta?.name}
                       symbol={mt.base_meta?.symbol}
-                      type="mt-tokens"
+                      token={mt.token_id}
                     />
                   </TransferSummary>
                 </div>
@@ -141,11 +136,11 @@ export const MTTransfers = ({ mts }: Props) => {
                     className="m-px size-5 rounded-full border"
                     src={net.meta?.icon ?? ''}
                   />
-                  <TokenLink
+                  <MTLink
                     contract={net.contract_account_id}
                     name={net.meta?.name}
                     symbol={net.meta?.symbol}
-                    type="mt-tokens"
+                    token={net.token_id}
                   />
                 </div>
               ))}
@@ -158,10 +153,7 @@ export const MTTransfers = ({ mts }: Props) => {
           <div className="flex flex-col gap-3">
             {nftLike.map((mt, i) => (
               <div className="flex items-center gap-2" key={i}>
-                <Link
-                  className="text-link size-11"
-                  href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}
-                >
+                <span className="size-11">
                   <NFTMedia
                     alt={mt.token_meta?.title ?? mt.token_id}
                     base={mt.base_meta?.base_uri}
@@ -169,26 +161,26 @@ export const MTTransfers = ({ mts }: Props) => {
                     media={mt.token_meta?.media}
                     reference={mt.token_meta?.reference}
                   />
-                </Link>
+                </span>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span>{t('transfer.token')}</span>
-                    <Link
-                      className="text-link"
-                      href={`/mt-token/${mt.contract_account_id}/${mt.token_id}`}
-                    >
-                      {mt.token_id}
-                    </Link>
+                    <MTLink
+                      contract={mt.contract_account_id}
+                      name={mt.token_meta?.title ?? mt.base_meta?.name}
+                      token={mt.token_id}
+                      type="token"
+                    />
                     <TokenImage
                       alt={mt.token_meta?.title ?? mt.base_meta?.name ?? ''}
                       className="m-px size-5 rounded-full border"
-                      src={mt.token_meta?.media ?? mt.base_meta?.icon ?? ''}
+                      src={mt.base_meta?.icon ?? ''}
                     />
-                    <TokenLink
+                    <MTLink
                       contract={mt.contract_account_id}
                       name={mt.base_meta?.name}
                       symbol={mt.base_meta?.symbol}
-                      type="mt-tokens"
+                      token={mt.token_id}
                     />
                   </div>
                   <div className="flex flex-wrap items-center gap-1">

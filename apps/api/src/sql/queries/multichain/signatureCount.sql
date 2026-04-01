@@ -1,25 +1,15 @@
 SELECT
-  count,
-  cost
+  COUNT(*)::TEXT AS count
 FROM
-  count_cost_estimate (
-    FORMAT(
-      'SELECT
-        ms.account_id
-      FROM
-        multichain_signatures ms
-      WHERE
-        (
-          %L::BIGINT IS NULL
-          OR block_timestamp < %L
-        )
-        AND (
-          %L::TEXT IS NULL
-          OR ms.account_id = %L
-        )',
-      ${before},
-      ${before},
-      ${account},
-      ${account}
-    )
+  multichain_signatures
+WHERE
+  block_timestamp >= ${start}::BIGINT
+  AND block_timestamp <= ${end}::BIGINT
+  AND (
+    ${before}::BIGINT IS NULL
+    OR block_timestamp < ${before}
+  )
+  AND (
+    ${account}::TEXT IS NULL
+    OR account_id = ${account}
   )

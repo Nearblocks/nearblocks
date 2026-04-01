@@ -38,8 +38,8 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
       if (resp?.accounts.length)
         router.push(`/address/${resp.accounts[0].account_id}`);
       if (resp?.blocks.length)
-        router.push(`/block/${resp.blocks[0].block_hash}`);
-      if (resp?.fts.length) router.push(`/token/${resp.fts[0].contract}`);
+        router.push(`/blocks/${resp.blocks[0].block_hash}`);
+      if (resp?.fts.length) router.push(`/tokens/${resp.fts[0].contract}`);
       if (resp?.txns.length)
         router.push(`/txns/${resp.txns[0].transaction_hash}`);
     });

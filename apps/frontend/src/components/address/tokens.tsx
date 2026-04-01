@@ -92,7 +92,7 @@ export const Tokens = ({
                     <CommandItem asChild>
                       <Link
                         className="text-body-xs flex items-center justify-between gap-2"
-                        href={`/token/${token.contract}?account=${address}`}
+                        href={`/tokens/${token.contract}?account=${address}`}
                       >
                         <span className="flex flex-col gap-1">
                           <span className="flex items-center gap-2">

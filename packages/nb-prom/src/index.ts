@@ -1,25 +1,27 @@
 import http from 'http';
+
 import client from 'prom-client';
+
 import {
-  createSyncMetrics,
-  createPerfMetrics,
   createErrorMetrics,
   createInfraMetrics,
+  createPerfMetrics,
+  createSyncMetrics,
 } from './metrics.js';
 
-export type {
-  SyncMetrics,
-  PerfMetrics,
-  ErrorMetrics,
-  InfraMetrics,
-} from './metrics.js';
 export { startChainTipPoller } from './chain-tip.js';
 export type { ChainTipOptions, ChainTipPoller } from './chain-tip.js';
+export type {
+  ErrorMetrics,
+  InfraMetrics,
+  PerfMetrics,
+  SyncMetrics,
+} from './metrics.js';
 export {
-  createSyncMetrics,
-  createPerfMetrics,
   createErrorMetrics,
   createInfraMetrics,
+  createPerfMetrics,
+  createSyncMetrics,
 } from './metrics.js';
 
 export interface MetricsOptions {
@@ -28,12 +30,12 @@ export interface MetricsOptions {
 }
 
 export interface MetricsContext {
+  errors: ReturnType<typeof createErrorMetrics>;
+  infra: ReturnType<typeof createInfraMetrics>;
+  perf: ReturnType<typeof createPerfMetrics>;
   register: client.Registry;
   startMetricsServer: (port?: number) => http.Server;
   sync: ReturnType<typeof createSyncMetrics>;
-  perf: ReturnType<typeof createPerfMetrics>;
-  errors: ReturnType<typeof createErrorMetrics>;
-  infra: ReturnType<typeof createInfraMetrics>;
 }
 
 export function createMetrics(options: MetricsOptions): MetricsContext {
@@ -49,21 +51,21 @@ export function createMetrics(options: MetricsOptions): MetricsContext {
   const startTimestamp = Date.now() / 1000;
 
   new client.Gauge({
-    help: 'Unix timestamp (seconds) when the indexer process started',
-    name: 'indexer_start_timestamp_seconds',
-    registers: [register],
     collect() {
       this.set(startTimestamp);
     },
+    help: 'Unix timestamp (seconds) when the indexer process started',
+    name: 'indexer_start_timestamp_seconds',
+    registers: [register],
   });
 
   new client.Gauge({
-    help: 'Number of seconds the indexer process has been running',
-    name: 'indexer_uptime_seconds',
-    registers: [register],
     collect() {
       this.set(Date.now() / 1000 - startTimestamp);
     },
+    help: 'Number of seconds the indexer process has been running',
+    name: 'indexer_uptime_seconds',
+    registers: [register],
   });
 
   function startMetricsServer(port = 3010): http.Server {
