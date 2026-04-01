@@ -1,10 +1,11 @@
 SELECT
-  COUNT(block_timestamp),
-  '0' AS cost
+  COUNT(*)::TEXT AS count
 FROM
   transactions
 WHERE
-  (
+  block_timestamp >= ${start}::BIGINT
+  AND block_timestamp <= ${end}::BIGINT
+  AND (
     ${before}::BIGINT IS NULL
     OR block_timestamp < ${before}
   )

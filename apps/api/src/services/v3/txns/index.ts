@@ -24,6 +24,7 @@ import redis from '#libs/redis';
 import {
   paginateData,
   rollingWindow,
+  rollingWindowCount,
   rollingWindowList,
   windowEnd,
   WindowListQuery,
@@ -140,38 +141,43 @@ const count = responseHandler(
     const before = req.validator.before_ts;
 
     if (block) {
-      const txns = await rollingWindow(
-        (start, end) => {
-          return dbBase.oneOrNone<Pick<TxnCount, 'count'>>(sql.count, {
+      const beforeTs = before ? BigInt(before) - 1n : undefined;
+      const count = await rollingWindowCount(
+        (start, end) =>
+          dbBase.one<{ count: string }>(sql.count, {
             before,
             block,
             end,
             start,
-          });
-        },
-        { start: config.baseStart },
+          }),
+        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
       );
 
-      return { data: txns };
+      return { data: { cost: '0', count: String(count) } };
     }
 
-    const estimated = await dbBase.one<TxnCount>(sql.estimate, {
-      before,
-    });
+    const estimated = await dbBase.one<TxnCount>(sql.estimate, { before });
 
-    const cost = +estimated.cost;
-    const count = +estimated.count;
+    if (
+      +estimated.count < config.maxQueryRows ||
+      +estimated.cost < config.maxQueryCost
+    ) {
+      const beforeTs = before ? BigInt(before) - 1n : undefined;
+      const count = await rollingWindowCount(
+        (start, end) =>
+          dbBase.one<{ count: string }>(sql.count, {
+            before,
+            block,
+            end,
+            start,
+          }),
+        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
+      );
 
-    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
-      return { data: estimated };
+      return { data: { cost: estimated.cost, count: String(count) } };
     }
 
-    const txns = await dbBase.one<TxnCount>(sql.count, {
-      before,
-      block,
-    });
-
-    return { data: txns };
+    return { data: estimated };
   },
 );
 

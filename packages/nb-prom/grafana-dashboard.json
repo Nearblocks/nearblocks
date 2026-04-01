@@ -88,9 +88,7 @@
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null }
-            ]
+            "steps": [{ "color": "green", "value": null }]
           }
         },
         "overrides": [
@@ -138,15 +136,11 @@
           },
           {
             "matcher": { "id": "byName", "options": "Block Height" },
-            "properties": [
-              { "id": "decimals", "value": 0 }
-            ]
+            "properties": [{ "id": "decimals", "value": 0 }]
           },
           {
             "matcher": { "id": "byName", "options": "Uptime" },
-            "properties": [
-              { "id": "unit", "value": "s" }
-            ]
+            "properties": [{ "id": "unit", "value": "s" }]
           },
           {
             "matcher": { "id": "byName", "options": "Processing Time p95" },
@@ -157,9 +151,7 @@
           },
           {
             "matcher": { "id": "byName", "options": "Blocks/sec" },
-            "properties": [
-              { "id": "decimals", "value": 2 }
-            ]
+            "properties": [{ "id": "decimals", "value": 2 }]
           }
         ]
       },
@@ -167,9 +159,7 @@
         "showHeader": true,
         "cellHeight": "sm",
         "footer": { "show": false },
-        "sortBy": [
-          { "displayName": "Sync Lag", "desc": true }
-        ]
+        "sortBy": [{ "displayName": "Sync Lag", "desc": true }]
       },
       "transformations": [
         {
@@ -297,7 +287,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi", "sort": "desc" },
-        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": ["lastNotNull"]
+        }
       },
       "targets": [
         {
@@ -349,7 +343,11 @@
       },
       "options": {
         "tooltip": { "mode": "multi", "sort": "desc" },
-        "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": ["lastNotNull"]
+        }
       },
       "targets": [
         {
@@ -404,21 +402,40 @@
             "overrides": [
               {
                 "matcher": { "id": "byName", "options": "p50" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": { "fixedColor": "green", "mode": "fixed" }
+                  }
+                ]
               },
               {
                 "matcher": { "id": "byName", "options": "p95" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": { "fixedColor": "yellow", "mode": "fixed" }
+                  }
+                ]
               },
               {
                 "matcher": { "id": "byName", "options": "p99" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": { "fixedColor": "red", "mode": "fixed" }
+                  }
+                ]
               }
             ]
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -478,7 +495,11 @@
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -534,21 +555,40 @@
             "overrides": [
               {
                 "matcher": { "id": "byRegexp", "options": "/active/" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": { "fixedColor": "red", "mode": "fixed" }
+                  }
+                ]
               },
               {
                 "matcher": { "id": "byRegexp", "options": "/idle/" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": { "fixedColor": "green", "mode": "fixed" }
+                  }
+                ]
               },
               {
                 "matcher": { "id": "byRegexp", "options": "/waiting/" },
-                "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }]
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": { "fixedColor": "yellow", "mode": "fixed" }
+                  }
+                ]
               }
             ]
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -623,7 +663,11 @@
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -687,7 +731,11 @@
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -789,7 +837,11 @@
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -874,7 +926,11 @@
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -945,14 +1001,21 @@
                 "matcher": { "id": "byRegexp", "options": "/total/" },
                 "properties": [
                   { "id": "custom.fillOpacity", "value": 0 },
-                  { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } }
+                  {
+                    "id": "custom.lineStyle",
+                    "value": { "fill": "dash", "dash": [10, 10] }
+                  }
                 ]
               }
             ]
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -1007,7 +1070,11 @@
           },
           "options": {
             "tooltip": { "mode": "multi", "sort": "desc" },
-            "legend": { "displayMode": "list", "placement": "bottom", "calcs": ["lastNotNull"] }
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "calcs": ["lastNotNull"]
+            }
           },
           "targets": [
             {
@@ -1036,7 +1103,11 @@
           "options": {
             "mode": "markdown",
             "content": "Multichain indexer metrics (Ethereum, Arbitrum, Aurora, Base, BSC, Gnosis, Optimism, Polygon, Solana, Bitcoin) will be available once nb-prom is integrated into indexer-multichain. Track per-chain block height, sync lag, and processing rates here.",
-            "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false }
+            "code": {
+              "language": "plaintext",
+              "showLineNumbers": false,
+              "showMiniMap": false
+            }
           }
         }
       ]

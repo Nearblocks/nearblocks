@@ -1,20 +1,15 @@
 SELECT
-  count,
-  cost
+  COUNT(*)::TEXT AS count
 FROM
-  count_cost_estimate (
-    FORMAT(
-      'SELECT
-        block_timestamp
-      FROM
-        ft_events
-      WHERE
-        (
-          %L::BIGINT IS NULL
-          OR block_timestamp < %L
-        )
-        AND (cause = ''BURN'' OR delta_amount >= 0)',
-      ${before},
-      ${before}
-    )
+  ft_events
+WHERE
+  block_timestamp >= ${start}::BIGINT
+  AND block_timestamp <= ${end}::BIGINT
+  AND (
+    ${before}::BIGINT IS NULL
+    OR block_timestamp < ${before}
+  )
+  AND (
+    cause = 'BURN'
+    OR delta_amount >= 0
   )

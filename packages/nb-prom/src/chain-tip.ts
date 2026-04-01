@@ -1,19 +1,19 @@
 import client from 'prom-client';
 
 export interface ChainTipOptions {
-  register: client.Registry;
   blockProxyUrl: string;
   intervalMs?: number;
   logger?: { warn: (msg: string, meta?: unknown) => void };
+  register: client.Registry;
 }
 
 export interface ChainTipPoller {
-  stop: () => void;
   chainTipHeight: client.Gauge;
+  stop: () => void;
 }
 
 export function startChainTipPoller(options: ChainTipOptions): ChainTipPoller {
-  const { register, blockProxyUrl, intervalMs = 5000, logger } = options;
+  const { blockProxyUrl, intervalMs = 5000, logger, register } = options;
 
   const chainTipHeight = new client.Gauge({
     help: 'Current chain tip height as reported by block-proxy',
@@ -57,7 +57,7 @@ export function startChainTipPoller(options: ChainTipOptions): ChainTipPoller {
   void poll();
 
   return {
-    stop: () => clearTimeout(timer),
     chainTipHeight,
+    stop: () => clearTimeout(timer),
   };
 }

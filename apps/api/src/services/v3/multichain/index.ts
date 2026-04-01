@@ -9,6 +9,7 @@ import cursors from '#libs/cursors';
 import { dbBase, dbMultichain, pgp } from '#libs/pgp';
 import {
   paginateData,
+  rollingWindowCount,
   rollingWindowList,
   windowEnd,
   WindowListQuery,
@@ -112,24 +113,34 @@ const count = responseHandler(
     const account = req.validator.account;
     const before = req.validator.before_ts;
 
-    const estimated = await dbMultichain.one<MCTxnCount>(sql.signatureCount, {
-      account,
-      before,
-    });
+    const estimated = await dbMultichain.one<MCTxnCount>(
+      sql.signatureEstimate,
+      {
+        account,
+        before,
+      },
+    );
 
-    const cost = +estimated.cost;
-    const count = +estimated.count;
+    if (
+      +estimated.count < config.maxQueryRows ||
+      +estimated.cost < config.maxQueryCost
+    ) {
+      const beforeTs = before ? BigInt(before) - 1n : undefined;
+      const count = await rollingWindowCount(
+        (start, end) =>
+          dbMultichain.one<{ count: string }>(sql.signatureCount, {
+            account,
+            before,
+            end,
+            start,
+          }),
+        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
+      );
 
-    if (cost > config.maxQueryCost && count > config.maxQueryRows) {
-      return { data: estimated };
+      return { data: { cost: estimated.cost, count: String(count) } };
     }
 
-    const txn = await dbMultichain.one<MCTxnCount>(sql.signatureCount, {
-      account,
-      before,
-    });
-
-    return { data: txn };
+    return { data: estimated };
   },
 );
 

@@ -102,7 +102,7 @@ export const SearchPopover = ({
           <SearchItem title={t('search.blocks')}>
             {results.blocks.map((block) => (
               <SearchLink
-                href={`/block/${block.block_hash}`}
+                href={`/blocks/${block.block_hash}`}
                 key={block.block_hash}
               >
                 {block.block_hash}
@@ -113,7 +113,7 @@ export const SearchPopover = ({
         {results && results.fts.length > 0 && (
           <SearchItem title={t('search.tokens')}>
             {results.fts.map((ft) => (
-              <SearchLink href={`/token/${ft.contract}`} key={ft.contract}>
+              <SearchLink href={`/tokens/${ft.contract}`} key={ft.contract}>
                 {ft.contract}
               </SearchLink>
             ))}

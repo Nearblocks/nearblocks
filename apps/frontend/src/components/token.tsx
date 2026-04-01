@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 
 import { numberFormat, toTokenAmount } from '@/lib/format';
+import { parseMTToken } from '@/lib/token';
 import { cn } from '@/lib/utils';
 
 import { Link } from './link';
@@ -27,7 +28,14 @@ type LinkProps = {
   contract: string;
   name?: null | string;
   symbol?: null | string;
-  type?: 'mt-tokens' | 'nft-tokens' | 'tokens';
+  type?: 'nft-tokens' | 'tokens';
+};
+type MTLinkProps = {
+  contract: string;
+  name?: null | string;
+  symbol?: null | string;
+  token: string;
+  type?: 'contract' | 'token';
 };
 
 const placeholder = '/images/placeholder.svg';
@@ -203,4 +211,60 @@ export const TokenLink = ({
       )}
     </Link>
   );
+};
+
+const SymbolSuffix = ({ symbol }: { symbol?: null | string }) =>
+  symbol ? (
+    <Truncate className="text-muted-foreground">
+      (<TruncateText className="max-w-15" text={symbol} />)
+    </Truncate>
+  ) : null;
+
+export const MTLink = ({
+  contract,
+  name,
+  symbol,
+  token,
+  type = 'contract',
+}: MTLinkProps) => {
+  const parsed = parseMTToken(token);
+
+  let href: string | undefined;
+  let text: string | undefined;
+  let showSymbol = true;
+
+  if (parsed.type === 'ft') {
+    href = `/tokens/${parsed.contract}`;
+    text = name ?? parsed.contract;
+  } else if (parsed.type === 'nft') {
+    if (type === 'contract') {
+      href = `/nft-tokens/${parsed.contract}`;
+      text = name ?? parsed.contract;
+    } else {
+      href = `/nft-tokens/${parsed.contract}/tokens/${parsed.token}`;
+      text = name ?? parsed.token;
+      showSymbol = false;
+    }
+  } else {
+    text = name ?? token ?? contract;
+  }
+
+  const content = (
+    <>
+      <Truncate>
+        <TruncateText className="max-w-30" text={text} />
+      </Truncate>
+      {showSymbol && <SymbolSuffix symbol={symbol} />}
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link className="text-link flex items-center gap-1" href={href}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <span className="flex items-center gap-1">{content}</span>;
 };
