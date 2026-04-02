@@ -9,8 +9,6 @@ const metrics = createMetrics({ indexer: 'base', network: config.network });
 export const { register } = metrics;
 export default metrics;
 
-metrics.startMetricsServer(3010);
-
 export const blocksHistogram = new client.Histogram({
   buckets: [100, 200, 300, 400, 500, 600, 800, 1000, 1500, 2000, 3000, 5000],
   help: 'Block processing time in ms',
