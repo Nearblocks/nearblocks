@@ -21,6 +21,7 @@ export const syncData = async () => {
   logger.info(`syncing from block: ${startBlock}`);
 
   const stream = streamBlock({
+    concurrency: config.neardataConcurrency,
     network: config.network,
     start: startBlock || config.genesisHeight,
     url: config.neardataUrl,

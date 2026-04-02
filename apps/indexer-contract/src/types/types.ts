@@ -12,6 +12,7 @@ export type Config = {
   dbUrl: string;
   genesisHeight: number;
   indexerKey: string;
+  neardataConcurrency: 'auto' | number;
   neardataUrl: string;
   network: Network;
   sentryDsn?: string;
