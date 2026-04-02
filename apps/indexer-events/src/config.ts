@@ -11,6 +11,7 @@ const env = cleanEnv(process.env, {
   DATABASE_URL: str(),
   EVENTS_INDEXER_KEY: str(),
   EVENTS_START_BLOCK: num({ default: 0 }),
+  NEARDATA_CONCURRENCY: str({ default: 'auto' }),
   NEARDATA_URL: url(),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -27,6 +28,10 @@ const config: Config = {
   dbUrl: env.DATABASE_URL,
   genesisHeight,
   indexerKey: env.EVENTS_INDEXER_KEY,
+  neardataConcurrency:
+    env.NEARDATA_CONCURRENCY === 'auto'
+      ? 'auto'
+      : Number(env.NEARDATA_CONCURRENCY),
   neardataUrl: env.NEARDATA_URL,
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,

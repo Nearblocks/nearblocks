@@ -1,4 +1,5 @@
 import client from 'prom-client';
+
 import { logger } from 'nb-logger';
 import { createMetrics } from 'nb-prom';
 

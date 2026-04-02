@@ -8,6 +8,7 @@ import { Message } from './type.js';
 export * from './type.js';
 
 export type BlockStreamConfig = {
+  concurrency?: 'auto' | number;
   limit?: number;
   network: string;
   start: number;
@@ -97,6 +98,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
   const url = config.url;
   let block = config.start;
   const limit = config.limit || 10;
+  const concurrencyMode = config.concurrency ?? 'auto';
   const highWaterMark = limit * 5;
 
   const readable = new Readable({
@@ -121,15 +123,23 @@ export const streamBlock = (config: BlockStreamConfig) => {
         queueSize: readable.readableLength,
       });
 
-      if ((!finalFetch || block - finalFetch >= 10) && remaining >= 10) {
-        finalFetch = block;
-        const final = (await fetchFinal(url)).block.header.height;
-        const promises: Promise<Message>[] = [];
-        const concurrency = Math.min(limit, final - block, remaining - 5);
+      if (concurrencyMode !== 0 && remaining >= 10) {
+        let concurrency = 0;
 
-        logger.warn({ concurrency, finalBlock: final });
+        if (concurrencyMode === 'auto') {
+          if (!finalFetch || block - finalFetch >= 10) {
+            finalFetch = block;
+            const final = (await fetchFinal(url)).block.header.height;
+            concurrency = Math.min(limit, final - block, remaining - 5);
+            logger.warn({ concurrency, finalBlock: final });
+          }
+        } else {
+          concurrency = Math.min(concurrencyMode, remaining - 5);
+        }
 
         if (concurrency > 0) {
+          const promises: Promise<Message>[] = [];
+
           for (let i = 0; i < concurrency; i++) {
             promises.push(fetchBlock(url, block + i));
           }

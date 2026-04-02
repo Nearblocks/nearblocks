@@ -9,8 +9,6 @@ import {
   createSyncMetrics,
 } from './metrics.js';
 
-export { startChainTipPoller } from './chain-tip.js';
-export type { ChainTipOptions, ChainTipPoller } from './chain-tip.js';
 export type {
   ErrorMetrics,
   InfraMetrics,
