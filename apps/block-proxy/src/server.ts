@@ -104,7 +104,10 @@ export function createDataServer(state: AppState): express.Express {
     state.stats.requestsLastBlock++;
 
     // Serve from short-lived cache
-    if (lastBlockCache && Date.now() - lastBlockCache.ts < LAST_BLOCK_CACHE_MS) {
+    if (
+      lastBlockCache &&
+      Date.now() - lastBlockCache.ts < LAST_BLOCK_CACHE_MS
+    ) {
       res
         .status(200)
         .set('content-type', 'application/json')

@@ -3,6 +3,8 @@ import { request } from 'undici';
 import { NotFoundError, RateLimitError, RpcError } from '#libs/errors';
 import { SolanaBlock, SolanaRpcRequest, SolanaRpcResponse } from '#types/types';
 
+const ERROR_CODES = new Set([-32001, -32007, -32009]);
+
 export const rpcCall = async <T>(
   url: string,
   method: string,
@@ -35,7 +37,7 @@ export const rpcCall = async <T>(
   const json = (await body.json()) as SolanaRpcResponse<T>;
 
   if (json.error) {
-    if (options.allowNull && json.error.code === -32009) {
+    if (options.allowNull && ERROR_CODES.has(json.error.code)) {
       return null as T;
     }
 

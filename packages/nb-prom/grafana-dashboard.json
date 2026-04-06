@@ -1103,7 +1103,13 @@
             }
           ],
           "fieldConfig": { "defaults": { "unit": "none" } },
-          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "auto", "colorMode": "value", "graphMode": "none", "orientation": "auto" }
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "orientation": "auto"
+          }
         },
         {
           "id": 16,
@@ -1122,7 +1128,13 @@
           "fieldConfig": {
             "defaults": {
               "unit": "ops",
-              "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 5, "showPoints": "never" }
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 15,
+                "lineWidth": 2,
+                "pointSize": 5,
+                "showPoints": "never"
+              }
             }
           }
         },
@@ -1149,7 +1161,13 @@
           "fieldConfig": {
             "defaults": {
               "unit": "ops",
-              "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 5, "showPoints": "never" }
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 15,
+                "lineWidth": 2,
+                "pointSize": 5,
+                "showPoints": "never"
+              }
             }
           }
         }

@@ -119,7 +119,8 @@ export const ActionCard = ({ action, expanded, receipt, toggle }: Props) => {
       const args = argsRecord(action.args);
       if ('method_name' in args) return args.method_name as string;
     }
-    return action.action.toLowerCase();
+
+    return action.action;
   }, [action]);
 
   const variant = actionVariant(action.action);
