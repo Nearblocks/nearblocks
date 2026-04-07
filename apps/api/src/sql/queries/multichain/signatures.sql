@@ -12,11 +12,11 @@ WITH
       ms.event_index,
       ms.public_key,
       ms.receipt_id,
-      ms.signature,
-      ms.r,
-      ms.s
+      ms.tx_address,
+      ms.tx_chain,
+      ms.tx_hash
     FROM
-      multichain_signatures ms
+      signatures ms
       JOIN params p ON TRUE
     WHERE
       (
@@ -48,6 +48,18 @@ WITH
         ${account}::TEXT IS NULL
         OR ms.account_id = ${account}
       )
+      AND (
+        ${chain}::TEXT IS NULL
+        OR ms.tx_chain = ${chain}
+      )
+      AND (
+        ${address}::TEXT IS NULL
+        OR ms.tx_address = ${address}
+      )
+      AND (
+        ${txn}::TEXT IS NULL
+        OR ms.tx_hash = ${txn}
+      )
     ORDER BY
       block_timestamp ${direction:raw},
       event_index ${direction:raw}
@@ -60,36 +72,11 @@ SELECT
   ss.event_index,
   ss.public_key,
   ss.receipt_id,
-  COALESCE(s.address, rs.address) AS dest_address,
-  COALESCE(s.chain, rs.chain) AS dest_chain,
-  COALESCE(s.transaction, rs.transaction) AS dest_txn
+  ss.tx_address AS dest_address,
+  ss.tx_chain AS dest_chain,
+  ss.tx_hash AS dest_txn
 FROM
   signatures_selected ss
-  LEFT JOIN LATERAL (
-    SELECT
-      mt.address,
-      mt.chain,
-      mt.transaction
-    FROM
-      multichain_transactions mt
-    WHERE
-      mt.signature = ss.signature
-      AND mt."timestamp" >= ss.block_timestamp
-      AND mt."timestamp" <= ss.block_timestamp + 3600000000000 -- 1hr in ns
-  ) s ON TRUE
-  LEFT JOIN LATERAL (
-    SELECT
-      mt.address,
-      mt.chain,
-      mt.transaction
-    FROM
-      multichain_transactions mt
-    WHERE
-      mt.r = ss.r
-      AND mt.s = ss.s
-      AND mt."timestamp" >= ss.block_timestamp
-      AND mt."timestamp" <= ss.block_timestamp + 3600000000000 -- 1hr in ns
-  ) rs ON TRUE
 ORDER BY
   ss.block_timestamp ${direction:raw},
   ss.event_index ${direction:raw}

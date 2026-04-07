@@ -1,7 +1,7 @@
 SELECT
   COUNT(*)::TEXT AS count
 FROM
-  multichain_signatures
+  signatures
 WHERE
   block_timestamp >= ${start}::BIGINT
   AND block_timestamp <= ${end}::BIGINT
@@ -12,4 +12,16 @@ WHERE
   AND (
     ${account}::TEXT IS NULL
     OR account_id = ${account}
+  )
+  AND (
+    ${chain}::TEXT IS NULL
+    OR tx_chain = ${chain}
+  )
+  AND (
+    ${address}::TEXT IS NULL
+    OR tx_address = ${address}
+  )
+  AND (
+    ${txn}::TEXT IS NULL
+    OR tx_hash = ${txn}
   )
