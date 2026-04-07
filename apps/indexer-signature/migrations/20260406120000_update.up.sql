@@ -4,13 +4,13 @@ OR REPLACE FUNCTION epoch_nano_seconds () RETURNS BIGINT AS $$ -- epoch in ns
 $$ LANGUAGE SQL STABLE;
 
 SELECT
-  set_integer_now_func ('multichain_signatures', 'epoch_nano_seconds',);
+  set_integer_now_func ('multichain_signatures', 'epoch_nano_seconds');
 
 SELECT
-  set_integer_now_func ('multichain_transactions', 'epoch_nano_seconds',);
+  set_integer_now_func ('multichain_transactions', 'epoch_nano_seconds');
 
 SELECT
-  set_integer_now_func ('signatures', 'epoch_nano_seconds',);
+  set_integer_now_func ('signatures', 'epoch_nano_seconds');
 
 SELECT
   set_chunk_time_interval (
