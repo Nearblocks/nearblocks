@@ -7,7 +7,7 @@ FROM
       'SELECT
         ms.account_id
       FROM
-        multichain_signatures ms
+        signatures ms
       WHERE
         (
           %L::BIGINT IS NULL
@@ -16,10 +16,28 @@ FROM
         AND (
           %L::TEXT IS NULL
           OR ms.account_id = %L
+        )
+        AND (
+          %L::TEXT IS NULL
+          OR ms.tx_chain = %L
+        )
+        AND (
+          %L::TEXT IS NULL
+          OR ms.tx_address = %L
+        )
+        AND (
+          %L::TEXT IS NULL
+          OR ms.tx_hash = %L
         )',
       ${before},
       ${before},
       ${account},
-      ${account}
+      ${account},
+      ${chain},
+      ${chain},
+      ${address},
+      ${address},
+      ${txn},
+      ${txn}
     )
   )

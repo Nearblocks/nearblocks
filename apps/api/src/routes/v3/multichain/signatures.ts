@@ -26,6 +26,22 @@ const routes = (app: Router) => {
    *         schema:
    *           type: string
    *       - in: query
+   *         name: chain
+   *         description: Destination chain to filter results by
+   *         schema:
+   *           type: string
+   *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA]
+   *       - in: query
+   *         name: address
+   *         description: Destination address to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: txn
+   *         description: Destination transaction hash to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
    *         name: before_ts
    *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
    *         schema:
@@ -67,6 +83,22 @@ const routes = (app: Router) => {
    *       - in: query
    *         name: account
    *         description: Account ID to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: chain
+   *         description: Destination chain to filter results by
+   *         schema:
+   *           type: string
+   *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA]
+   *       - in: query
+   *         name: address
+   *         description: Destination address to filter results by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: txn
+   *         description: Destination transaction hash to filter results by
    *         schema:
    *           type: string
    *       - in: query

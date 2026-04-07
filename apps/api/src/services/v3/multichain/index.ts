@@ -24,7 +24,10 @@ const txns = responseHandler(
   async (req: RequestValidator<MCTxnsReq>) => {
     const limit = req.validator.limit;
     const account = req.validator.account;
+    const address = req.validator.address;
     const before = req.validator.before_ts;
+    const chain = req.validator.chain;
+    const txn = req.validator.txn;
     const next = req.validator.next
       ? cursors.decode(request.cursor, req.validator.next)
       : null;
@@ -41,7 +44,9 @@ const txns = responseHandler(
         sql.signatures,
         {
           account,
+          address,
           before,
+          chain,
           cursor: {
             index: cursor?.index,
             timestamp: cursor?.timestamp,
@@ -50,6 +55,7 @@ const txns = responseHandler(
           end,
           limit,
           start,
+          txn,
         },
       );
     };
@@ -111,13 +117,19 @@ const count = responseHandler(
   response.count,
   async (req: RequestValidator<MCTxnCountReq>) => {
     const account = req.validator.account;
+    const address = req.validator.address;
     const before = req.validator.before_ts;
+    const chain = req.validator.chain;
+    const txn = req.validator.txn;
 
     const estimated = await dbMultichain.one<MCTxnCount>(
       sql.signatureEstimate,
       {
         account,
+        address,
         before,
+        chain,
+        txn,
       },
     );
 
@@ -130,9 +142,12 @@ const count = responseHandler(
         (start, end) =>
           dbMultichain.one<{ count: string }>(sql.signatureCount, {
             account,
+            address,
             before,
+            chain,
             end,
             start,
+            txn,
           }),
         { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
       );
