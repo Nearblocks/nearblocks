@@ -25,33 +25,32 @@ export const Actions = ({ loading, txnPromise }: Props) => {
 
   return (
     <Card>
-      <CardContent className="p-3">
-        <div className="flex gap-3">
-          <SkeletonSlot
-            fallback={<Skeleton className="size-10 rounded-full" />}
-            loading={loading || !txn}
-          >
-            {() => <TxnIcon actions={txn!.actions} />}
-          </SkeletonSlot>
-          <div className="flex-1">
-            <h2 className="text-headline-xs mb-1 font-bold uppercase">
+      <CardContent className="px-3 py-3">
+        <div className="flex items-center gap-3">
+          <div className="shrink-0">
+            <SkeletonSlot
+              fallback={<Skeleton className="size-10 rounded-full" />}
+              loading={loading || !txn}
+            >
+              {() => <TxnIcon actions={txn!.actions} />}
+            </SkeletonSlot>
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-headline-xs font-medium uppercase">
               {t('actions.title')}
             </h2>
             <SkeletonSlot
-              fallback={
-                <div className="h-7 space-y-1 pt-1">
-                  <Skeleton className="h-5 w-1/4" />
-                </div>
-              }
+              fallback={<Skeleton className="mt-0.5 h-5 w-1/4" />}
               loading={loading || !txn || txn.actions?.length === 0}
             >
-              {() => (
-                <ScrollableList className="max-h-40">
-                  <div className="space-y-1">
-                    {(txn!.actions[0]?.action === ActionKind.DELEGATE_ACTION
-                      ? [txn!.actions[0]]
-                      : txn!.actions
-                    ).map((action, index) => (
+              {() => {
+                const actions =
+                  txn!.actions[0]?.action === ActionKind.DELEGATE_ACTION
+                    ? [txn!.actions[0]]
+                    : txn!.actions;
+                const content = (
+                  <div className="text-body-sm space-y-1">
+                    {actions.map((action, index) => (
                       <Action
                         action={action}
                         key={index}
@@ -60,8 +59,15 @@ export const Actions = ({ loading, txnPromise }: Props) => {
                       />
                     ))}
                   </div>
-                </ScrollableList>
-              )}
+                );
+                return actions.length > 3 ? (
+                  <ScrollableList className="max-h-40">
+                    {content}
+                  </ScrollableList>
+                ) : (
+                  content
+                );
+              }}
             </SkeletonSlot>
           </div>
         </div>

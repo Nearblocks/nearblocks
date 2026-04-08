@@ -69,15 +69,14 @@ export const Overview = ({
 
   return (
     <Card>
-      <CardContent className="px-3">
+      <CardContent className="px-3 py-3">
+        {network !== 'mainnet' && (
+          <p className="text-red-foreground px-1 py-3">
+            [{t('overview.testnetNotice')}]
+          </p>
+        )}
+        {/* Section 1: Core transaction info */}
         <List pairsPerRow={1}>
-          {network !== 'mainnet' && (
-            <ListItem>
-              <span className="text-red-foreground col-span-2 px-1 py-3">
-                [{t('overview.testnetNotice')}]
-              </span>
-            </ListItem>
-          )}
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>
@@ -88,7 +87,7 @@ export const Overview = ({
               </Tooltip>
               {t('overview.txnHash')}
             </ListLeft>
-            <ListRight className="xl:py-2.5">
+            <ListRight>
               <p className="flex min-w-30 items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-60" />}
@@ -109,7 +108,7 @@ export const Overview = ({
             </ListRight>
           </ListItem>
           <ListItem>
-            <ListLeft className="flex h-13 items-center gap-1">
+            <ListLeft className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
@@ -118,7 +117,7 @@ export const Overview = ({
               </Tooltip>
               {t('overview.status')}
             </ListLeft>
-            <ListRight className="h-13">
+            <ListRight>
               <SkeletonSlot
                 fallback={<Skeleton className="h-6 w-20" />}
                 loading={loading || !txn}
@@ -209,9 +208,14 @@ export const Overview = ({
               </p>
             </ListRight>
           </ListItem>
+        </List>
 
+        <hr className="border-border my-2" />
+
+        {/* Section 2: Addresses & transfers */}
+        <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="flex items-center gap-1">
+            <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />
@@ -227,12 +231,10 @@ export const Overview = ({
                   loading={loading || !txn}
                 >
                   {() => (
-                    <>
-                      <AccountLink
-                        account={txn!.signer_account_id}
-                        textClassName="max-w-60"
-                      />
-                    </>
+                    <AccountLink
+                      account={txn!.signer_account_id}
+                      textClassName="max-w-60"
+                    />
                   )}
                 </SkeletonSlot>
               </p>
@@ -255,20 +257,24 @@ export const Overview = ({
                   loading={loading || !txn}
                 >
                   {() => (
-                    <>
-                      <AccountLink
-                        account={txn!.receiver_account_id}
-                        textClassName="max-w-60"
-                      />
-                    </>
+                    <AccountLink
+                      account={txn!.receiver_account_id}
+                      textClassName="max-w-60"
+                    />
                   )}
                 </SkeletonSlot>
               </p>
             </ListRight>
           </ListItem>
           <Transfers fts={fts} loading={loading} mts={mts} nfts={nfts} />
+        </List>
+
+        <hr className="border-border my-2" />
+
+        {/* Section 3: Fees & gas */}
+        <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="flex items-center gap-1">
+            <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />

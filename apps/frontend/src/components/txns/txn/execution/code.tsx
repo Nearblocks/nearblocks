@@ -28,9 +28,9 @@ export const CodeViewer = ({
   const [isFullHeight, setIsFullHeight] = useState(false);
 
   return (
-    <div className="relative rounded border">
+    <div className="relative w-full min-w-0 rounded border">
       <div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
-        <ToggleGroup>
+        <ToggleGroup className="bg-card shadow-sm">
           {toolbar}
           <Copy className="text-muted-foreground" text={code} />
           <Tooltip>
@@ -56,7 +56,7 @@ export const CodeViewer = ({
       </div>
       <div
         className={cn(
-          'scroll-overlay min-h-35 overflow-auto',
+          'scroll-overlay min-h-17 overflow-auto',
           className,
           !isFullHeight && 'max-h-35',
         )}

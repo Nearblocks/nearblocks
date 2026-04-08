@@ -13,6 +13,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { Near } from '@/icons/near';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, gasFormat, numberFormat } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
@@ -59,11 +60,11 @@ export const Overview = ({
       : 'hidden lg:mx-4 lg:block';
 
   return (
-    <Card className="px-3 py-3">
+    <Card className="px-3 py-1">
       <div className={gridClass}>
         {network === 'mainnet' && (
           <>
-            <div className="divide-y">
+            <div className="divide-y divide-border">
               <div className="flex items-center gap-3 py-3">
                 <div className="bg-muted rounded-lg p-3">
                   <Near className="size-6" />
@@ -72,7 +73,7 @@ export const Overview = ({
                   <h3 className="text-body-xs text-muted-foreground uppercase">
                     {t('overview.price')}
                   </h3>
-                  <p className="text-headline-base mt-0.5 flex flex-wrap items-center gap-1">
+                  <p className="text-headline-base mt-0.5 flex flex-wrap items-center gap-1 font-normal">
                     <SkeletonSlot
                       fallback={<Skeleton className="h-6 w-45" />}
                       loading={loading || !stats}
@@ -80,17 +81,13 @@ export const Overview = ({
                       {() => (
                         <>
                           {currencyFormat(stats!.near_price)}{' '}
-                          <span className="text-muted-foreground">
-                            @
-                            {numberFormat(stats!.near_btc_price, {
+                          <span className="text-body-sm text-muted-foreground">
+                            @{' '}{numberFormat(stats!.near_btc_price, {
                               maximumFractionDigits: 6,
                             })}{' '}
                             BTC
                           </span>{' '}
-                          <PriceChange
-                            change={stats!.change_24h}
-                            className="text-headline-xs"
-                          />
+                          <PriceChange change={stats!.change_24h} />
                         </>
                       )}
                     </SkeletonSlot>
@@ -105,7 +102,7 @@ export const Overview = ({
                   <h3 className="text-body-xs text-muted-foreground uppercase">
                     {t('overview.marketCap')}
                   </h3>
-                  <p className="text-headline-base mt-0.5">
+                  <p className="text-headline-base mt-0.5 font-normal">
                     <SkeletonSlot
                       fallback={<Skeleton className="w-30" />}
                       loading={loading || !stats}
@@ -139,7 +136,7 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground uppercase">
                   {t('overview.transactions')}
                 </h3>
-                <p className="text-headline-base mt-0.5 flex items-center gap-1">
+                <p className="text-headline-base mt-0.5 flex items-center gap-1 font-normal">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-30" />}
                     loading={loading || !stats}
@@ -150,7 +147,7 @@ export const Overview = ({
                           maximumFractionDigits: 2,
                           notation: 'compact',
                         })}{' '}
-                        <span className="text-muted-foreground">
+                        <span className="text-body-sm text-muted-foreground">
                           ({numberFormat(stats!.tps)} TPS)
                         </span>
                       </>
@@ -162,7 +159,7 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground uppercase">
                   {t('overview.gas')}
                 </h3>
-                <p className="text-headline-base mt-0.5 flex items-center gap-1">
+                <p className="text-headline-base mt-0.5 flex items-center gap-1 font-normal">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-32" />}
                     loading={loading || !stats}
@@ -224,14 +221,14 @@ export const Overview = ({
         </div>
         <Separator className={sep1Class} />
         <Separator className={sep2Class} orientation="vertical" />
-        <div className={chartClass}>
-          <h3 className="text-body-xs text-muted-foreground pb-2 uppercase">
+        <div className={cn(chartClass, 'flex flex-col justify-center')}>
+          <h3 className="text-body-xs text-muted-foreground pb-1 uppercase">
             {t('chart.title')}
           </h3>
           <div className="flex items-start">
             <SkeletonSlot
-              fallback={<Skeleton className="h-28.75 w-full" />}
-              loading={loading || !dailyStats}
+              fallback={<Skeleton className="h-24 w-full" />}
+              loading={!!loading}
             >
               {() => <TxnsChart data={dailyStats ?? []} />}
             </SkeletonSlot>

@@ -31,7 +31,7 @@ const BlocksPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('heading')}</h1>
       <ErrorSuspense fallback={<Blocks loading />}>
         <Blocks
           blockCountPromise={blockCountPromise}

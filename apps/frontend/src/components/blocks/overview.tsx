@@ -31,15 +31,14 @@ export const Overview = ({ blockPromise, loading }: Props) => {
 
   return (
     <Card>
-      <CardContent className="px-3">
+      <CardContent className="px-3 py-3">
+        {network !== 'mainnet' && (
+          <p className="text-red-foreground px-3 py-2">
+            [{t('overview.testnetNotice')}]
+          </p>
+        )}
+        {/* Section 1: Core block info */}
         <List pairsPerRow={1}>
-          {network !== 'mainnet' && (
-            <ListItem>
-              <span className="text-red-foreground col-span-2 px-1 py-3">
-                [{t('overview.testnetNotice')}]
-              </span>
-            </ListItem>
-          )}
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>
@@ -184,8 +183,14 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               </p>
             </ListRight>
           </ListItem>
+        </List>
+
+        <hr className="border-border my-2" />
+
+        {/* Section 2: Gas & technical details */}
+        <List pairsPerRow={1}>
           <ListItem>
-            <ListLeft className="flex items-center gap-1">
+            <ListLeft className="flex min-w-60 items-center gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <RiQuestionLine className="size-4" />

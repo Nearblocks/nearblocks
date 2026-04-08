@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import type { TxnReceipt } from 'nb-schemas';
+import type { Stats, TxnReceipt } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
 import { Card, CardContent } from '@/ui/card';
@@ -13,11 +13,18 @@ import { ReceiptBlock } from './receipt';
 type Props = {
   loading?: boolean;
   receiptsPromise?: Promise<null | TxnReceipt>;
+  statsPromise?: Promise<null | Stats>;
   tid?: string;
 };
 
-export const Execution = ({ loading, receiptsPromise, tid }: Props) => {
+export const Execution = ({
+  loading,
+  receiptsPromise,
+  statsPromise,
+  tid,
+}: Props) => {
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
+  const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   return (
     <Card>
@@ -30,7 +37,13 @@ export const Execution = ({ loading, receiptsPromise, tid }: Props) => {
           }
           loading={loading || !receipts}
         >
-          {() => <ExecutionPlan receipts={receipts!} tid={tid} />}
+          {() => (
+            <ExecutionPlan
+              nearPrice={stats?.near_price}
+              receipts={receipts!}
+              tid={tid}
+            />
+          )}
         </SkeletonSlot>
       </CardContent>
     </Card>

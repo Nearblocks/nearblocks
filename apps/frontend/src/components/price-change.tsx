@@ -2,11 +2,10 @@
 
 import { numberFormat, NumberFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 
 type Props = {
   change: NumberFormat;
-} & React.HTMLAttributes<HTMLElement>;
+} & React.HTMLAttributes<HTMLSpanElement>;
 
 export const PriceChange = ({ change, className, ...props }: Props) => {
   if (change === undefined || change === null) return null;
@@ -15,15 +14,15 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
 
   if (changeNumber < 0) {
     return (
-      <Badge className={cn('h-6', className)} variant="red" {...props}>
-        {numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
-      </Badge>
+      <span className={cn('text-body-xs text-red-foreground', className)} {...props}>
+        ({numberFormat(changeNumber, { maximumFractionDigits: 2 })}%)
+      </span>
     );
   }
 
   return (
-    <Badge className={cn('h-6', className)} variant="lime" {...props}>
-      +{numberFormat(changeNumber, { maximumFractionDigits: 2 })}%
-    </Badge>
+    <span className={cn('text-body-xs text-green-500', className)} {...props}>
+      (+{numberFormat(changeNumber, { maximumFractionDigits: 2 })}%)
+    </span>
   );
 };

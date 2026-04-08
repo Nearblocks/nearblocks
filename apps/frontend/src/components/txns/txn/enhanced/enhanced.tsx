@@ -12,11 +12,12 @@ import { RpcContext } from '../execution/context';
 import { EnhancedTree } from './tree';
 
 type Props = {
+  nearPrice?: null | string;
   receipts: TxnReceipt;
   tid?: string;
 };
 
-export const EnhancedPlan = ({ receipts, tid }: Props) => {
+export const EnhancedPlan = ({ nearPrice, receipts, tid }: Props) => {
   const { t } = useLocale('txns');
   const [rpcEnabled, setRpcEnabled] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
@@ -69,6 +70,7 @@ export const EnhancedPlan = ({ receipts, tid }: Props) => {
     <RpcContext.Provider
       value={{
         enableRpc: () => setRpcEnabled(true),
+        nearPrice,
         rpcData,
         rpcLoading,
       }}

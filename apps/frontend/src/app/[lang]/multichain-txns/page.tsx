@@ -30,7 +30,7 @@ const MultichainTxnsPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('title')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
       <ErrorSuspense fallback={<MultichainTxns loading />}>
         <MultichainTxns txnsPromise={txnsPromise} />
       </ErrorSuspense>

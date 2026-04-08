@@ -29,7 +29,7 @@ const BlocksChartPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('blocks.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('blocks.heading')}</h1>
       <ErrorSuspense fallback={<BlocksChart loading />}>
         <BlocksChart statsPromise={statsPromise} />
       </ErrorSuspense>

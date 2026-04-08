@@ -23,15 +23,15 @@ export const ReceiptLogs = ({ logs }: Props) => {
     return <CodeViewer className="min-h-12" code="" language="json" />;
   }
 
-  return logs.map((log, i) => {
-    const text = String(log);
-    const eventPrefix = 'EVENT_JSON:';
-    const display = text.startsWith(eventPrefix)
-      ? beautify(text.slice(eventPrefix.length))
-      : beautify(text);
+  const combined = logs
+    .map((log) => {
+      const text = String(log);
+      const eventPrefix = 'EVENT_JSON:';
+      return text.startsWith(eventPrefix)
+        ? beautify(text.slice(eventPrefix.length))
+        : beautify(text);
+    })
+    .join('\n\n');
 
-    return (
-      <CodeViewer className="min-h-12" code={display} key={i} language="json" />
-    );
-  });
+  return <CodeViewer className="min-h-12" code={combined} language="json" />;
 };

@@ -17,14 +17,14 @@ export const Footer = () => {
   const { t } = useLocale('layout');
 
   return (
-    <footer className="bg-card text-body-sm">
+    <footer className="bg-card text-body-sm border-t">
       <div className="container mx-auto px-4">
         <div className="flex flex-col flex-wrap justify-between gap-6 py-6 md:flex-row lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr]">
           <div className="flex basis-1/1 flex-col gap-4">
             <Link href="/">
-              <Logo className="text-primary h-10" />
+              <Logo className="text-primary h-9" />
             </Link>
-            <p className="max-w-85">{t('footer.description')}</p>
+            <p className="text-muted-foreground max-w-85">{t('footer.description')}</p>
             <div className="flex gap-2">
               <Link
                 className="border-border flex size-8 items-center justify-center rounded-full border"
@@ -56,7 +56,7 @@ export const Footer = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3">
+            <h3 className="text-headline-sm text-primary font-medium pb-3">
               {t('footer.menu.tools.title')}
             </h3>
             <ul className="space-y-1">
@@ -82,7 +82,7 @@ export const Footer = () => {
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3">
+            <h3 className="text-headline-sm text-primary font-medium pb-3">
               {t('footer.menu.explore.title')}
             </h3>
             <ul className="space-y-1">
@@ -103,7 +103,7 @@ export const Footer = () => {
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3">
+            <h3 className="text-headline-sm text-primary font-medium pb-3">
               {t('footer.menu.company.title')}
             </h3>
             <ul className="space-y-1">

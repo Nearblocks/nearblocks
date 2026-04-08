@@ -53,7 +53,7 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
               </Tooltip>
               {t('transfers.ftTitle')}
               {!loading && fts && (
-                <Badge className="ml-1 px-1.5 py-0.5 text-xs" variant="gray">
+                <Badge className="ml-1 px-1.5 text-xs" variant="gray">
                   {
                     fts.filter(
                       (ft) =>
@@ -87,7 +87,7 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
               </Tooltip>
               {t('transfers.nftTitle')}
               {!loading && nfts && (
-                <Badge className="ml-1 px-1.5 py-0.5 text-xs" variant="gray">
+                <Badge className="ml-1 px-1.5 text-xs" variant="gray">
                   {
                     nfts.filter(
                       (nft) =>
@@ -121,7 +121,7 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
               </Tooltip>
               {t('transfers.mtTitle')}
               {!loading && mts && (
-                <Badge className="ml-1 px-1.5 py-0.5 text-xs" variant="gray">
+                <Badge className="ml-1 px-1.5 text-xs" variant="gray">
                   {mtFtCount + mtNftCount}
                 </Badge>
               )}

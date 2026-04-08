@@ -29,7 +29,7 @@ const BlockPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">
+      <h1 className="text-headline-lg mb-4">
         {t('overview.heading')}{' '}
         <span className="text-muted-foreground text-headline-base">#{bid}</span>
       </h1>

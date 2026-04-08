@@ -81,12 +81,12 @@ export const Header = () => {
   const menu = useHeaderMenu();
 
   return (
-    <header className="bg-card">
+    <header className="bg-card border-b">
       <Popover>
         <PopoverAnchor>
-          <div className="container mx-auto flex h-15 items-center px-4">
+          <div className="container mx-auto flex h-[54px] items-center px-4">
             <Link href="/">
-              <Logo className="text-primary h-10" />
+              <Logo className="text-primary h-9" />
             </Link>
             <div className="text-headline-sm ml-auto flex gap-2">
               <Menu menu={menu} />

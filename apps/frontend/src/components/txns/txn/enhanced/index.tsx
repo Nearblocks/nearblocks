@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import type { TxnReceipt } from 'nb-schemas';
+import type { Stats, TxnReceipt } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
 import { Card, CardContent } from '@/ui/card';
@@ -13,11 +13,18 @@ import { EnhancedPlan } from './enhanced';
 type Props = {
   loading?: boolean;
   receiptsPromise?: Promise<null | TxnReceipt>;
+  statsPromise?: Promise<null | Stats>;
   tid?: string;
 };
 
-export const Enhanced = ({ loading, receiptsPromise, tid }: Props) => {
+export const Enhanced = ({
+  loading,
+  receiptsPromise,
+  statsPromise,
+  tid,
+}: Props) => {
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
+  const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   return (
     <Card>
@@ -52,7 +59,13 @@ export const Enhanced = ({ loading, receiptsPromise, tid }: Props) => {
           }
           loading={loading || !receipts}
         >
-          {() => <EnhancedPlan receipts={receipts!} tid={tid} />}
+          {() => (
+            <EnhancedPlan
+              nearPrice={stats?.near_price}
+              receipts={receipts!}
+              tid={tid}
+            />
+          )}
         </SkeletonSlot>
       </CardContent>
     </Card>

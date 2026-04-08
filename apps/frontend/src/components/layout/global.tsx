@@ -1,6 +1,6 @@
 'use client';
 
-import { Inter } from 'next/font/google';
+import { Roboto } from 'next/font/google';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -14,9 +14,10 @@ import { LocaleProvider } from '@/providers/locale';
 import { Theme } from '@/types/enums';
 import type { BaseDictionary, DeepPartial, Translator } from '@/types/types';
 
-const inter = Inter({
+const roboto = Roboto({
   subsets: ['latin'],
   variable: '--font-inter',
+  weight: ['300', '400', '500', '700'],
 });
 
 type Props = {
@@ -82,7 +83,7 @@ export const GlobalLayout = ({ children, head }: Props) => {
     >
       {head}
       <body
-        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} overflow-x-hidden antialiased`}
+        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${roboto.variable} overflow-x-hidden`}
       >
         <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>
