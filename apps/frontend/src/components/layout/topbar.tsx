@@ -28,11 +28,11 @@ export const TopBar = ({ statsPromise }: Props) => {
   return (
     <section
       className={cn(
-        'bg-card border-border-secondary sticky top-0 right-0 left-0 z-50 border-b',
+        'bg-card border-border sticky top-0 right-0 left-0 z-50 border-b',
         isHome ? 'hidden lg:block' : 'block',
       )}
     >
-      <div className="container mx-auto flex h-11 items-center px-4">
+      <div className="container mx-auto flex h-[55px] items-center px-4">
         {network === 'mainnet' ? (
           <ErrorSuspense fallback={<NearPrice loading />}>
             <NearPrice statsPromise={statsPromise} />

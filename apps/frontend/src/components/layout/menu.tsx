@@ -66,9 +66,7 @@ export const Menu = ({ menu }: Props) => {
           <Separator orientation="vertical" />
         </li>
         <NavigationMenuItem>
-          <NavigationMenuLink asChild>
-            <Wallet className={navigationMenuTriggerStyle()} />
-          </NavigationMenuLink>
+          <Wallet />
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

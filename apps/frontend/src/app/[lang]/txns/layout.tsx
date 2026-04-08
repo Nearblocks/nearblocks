@@ -14,7 +14,7 @@ const TxnsLayout = async ({ children, params }: Props) => {
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>
-      <main className="flex flex-1 flex-col pt-6 pb-10">
+      <main className="flex flex-1 flex-col pt-4 pb-10">
         <div className="container mx-auto px-4">{children}</div>
       </main>
     </LocaleProvider>

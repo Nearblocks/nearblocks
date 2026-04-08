@@ -31,7 +31,7 @@ const NftTransfersPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('transfers.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('transfers.heading')}</h1>
       <ErrorSuspense fallback={<NftTokenTransfers loading />}>
         <NftTokenTransfers
           txnCountPromise={txnCountPromise}

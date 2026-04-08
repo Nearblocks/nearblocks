@@ -29,7 +29,7 @@ export const TxnsChart = ({ data }: Props) => {
     () => ({
       chart: {
         backgroundColor: 'transparent',
-        height: 115,
+        height: 95,
         spacingBottom: 0,
         spacingLeft: 10,
         spacingRight: 20,

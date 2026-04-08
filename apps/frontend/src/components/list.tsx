@@ -15,8 +15,8 @@ const mdGridColsByPairs: Record<
   NonNullable<ListProps['pairsPerRow']>,
   string
 > = {
-  1: 'xl:grid-cols-[max-content_auto]',
-  2: 'lg:grid lg:grid-cols-[auto_max-content] xl:grid-cols-[max-content_auto_max-content_auto]',
+  1: 'md:grid-cols-[max-content_minmax(0,1fr)]',
+  2: 'md:grid-cols-[auto_max-content] lg:grid-cols-[max-content_auto_max-content_auto]',
 };
 
 const List = ({
@@ -55,7 +55,7 @@ const List = ({
   return (
     <div
       className={cn(
-        'text-body-sm flex w-full flex-col items-center xl:grid xl:items-start',
+        'text-body-sm flex w-full flex-col items-center md:grid md:items-start',
         mdGridColsByPairs[pairsPerRow],
         className,
       )}
@@ -80,8 +80,8 @@ const ListItem = ({ className, ...props }: ListItemProps) => {
   return (
     <div
       className={cn(
-        'group/list-item flex w-full flex-col xl:contents',
-        'border-b data-[last-item=true]:border-b-0 xl:border-b-0',
+        'group/list-item flex w-full flex-col md:contents',
+        'border-b data-[last-item=true]:border-b-0 md:border-b-0',
         className,
       )}
       data-slot="list-item"
@@ -96,8 +96,8 @@ const ListLeft = ({ className, ...props }: ListLeftProps) => {
   return (
     <h3
       className={cn(
-        'text-muted-foreground border-b-0 px-1 pt-3 pb-1 xl:py-3',
-        'overflow-hidden xl:self-stretch xl:border-b group-data-[last-row=true]/list-item:xl:border-b-0',
+        'text-muted-foreground border-b-0 px-3 py-2 md:py-2',
+        'overflow-hidden md:self-stretch md:items-center md:flex group-data-[last-row=true]/list-item:md:border-b-0',
         className,
       )}
       data-slot="list-left"
@@ -112,8 +112,8 @@ const ListRight = ({ className, ...props }: ListRightProps) => {
   return (
     <div
       className={cn(
-        'w-full border-b-0 px-1 pt-0 pb-3 xl:py-3',
-        'overflow-hidden xl:self-stretch xl:border-b group-data-[last-row=true]/list-item:xl:border-b-0',
+        'w-full min-w-0 border-b-0 px-3 py-2 md:py-2',
+        'overflow-hidden md:self-stretch md:items-center md:flex group-data-[last-row=true]/list-item:md:border-b-0',
         className,
       )}
       data-slot="list-right"

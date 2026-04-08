@@ -96,7 +96,7 @@ export const fts = {
     to: 'To',
     token: 'Token',
     total: 'A total of {{count}} token txns found',
-    txnHash: 'Txn Hash',
+    txnHash: 'Transaction Hash',
   },
   transfersMeta: {
     description:

@@ -1,3 +1,5 @@
+'use client';
+
 import type { JsonData } from 'nb-schemas/src/common';
 
 import type { ActionReceipt } from 'nb-schemas';
@@ -5,6 +7,7 @@ import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
+import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
@@ -22,16 +25,26 @@ export const argsRecord = (args: JsonData): Record<string, JsonData> =>
     : {};
 
 export const Action = ({ action, full = true, receiver, signer }: Props) => {
+  const { t } = useLocale('txns');
   const args = argsRecord(action.args);
 
   if (action.action === ActionKind.FUNCTION_CALL) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Call <Badge variant="blue">{action.method || 'method'}</Badge>
-        {full && (
+        {full ? (
           <>
-            {' '}
-            By <AccountLink account={signer} textClassName="max-w-40" /> On{' '}
+            {t('actions.call')}{' '}
+            <Badge variant="blue">{action.method || 'method'}</Badge>{' '}
+            {t('actions.by')}{' '}
+            <AccountLink account={signer} textClassName="max-w-40" />{' '}
+            {t('actions.on')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
+          </>
+        ) : (
+          <>
+            {t('actions.calledMethod')}{' '}
+            <Badge variant="blue">{action.method || 'method'}</Badge>{' '}
+            {t('actions.inContract')}{' '}
             <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
@@ -42,15 +55,15 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.TRANSFER) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Transfer <NearCircle className="size-4" />
+        {t('actions.transfer')} <NearCircle className="size-4" />
         {nearFormat(String(args.deposit ?? 0))}
         {full && (
           <>
             {' '}
-            From <AccountLink
-              account={signer}
-              textClassName="max-w-40"
-            /> To <AccountLink account={receiver} textClassName="max-w-40" />
+            {t('actions.from')}{' '}
+            <AccountLink account={signer} textClassName="max-w-40" />{' '}
+            {t('actions.to')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>
@@ -60,15 +73,15 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.STAKE) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Stake <NearCircle className="size-4" />
+        {t('actions.stake')} <NearCircle className="size-4" />
         {nearFormat(String(args.stake ?? 0))}
         {full && (
           <>
             {' '}
-            To <AccountLink
-              account={receiver}
-              textClassName="max-w-40"
-            /> By <AccountLink account={signer} textClassName="max-w-40" />
+            {t('actions.to')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />{' '}
+            {t('actions.by')}{' '}
+            <AccountLink account={signer} textClassName="max-w-40" />
           </>
         )}
       </span>
@@ -78,11 +91,12 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.DEPLOY_CONTRACT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Deploy Contract
+        {t('actions.deployContract')}
         {full && (
           <>
             {' '}
-            To <AccountLink account={receiver} textClassName="max-w-40" />
+            {t('actions.to')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>
@@ -97,11 +111,12 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   ) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Deploy Global Contract
+        {t('actions.deployGlobalContract')}
         {full && (
           <>
             {' '}
-            To <AccountLink account={receiver} textClassName="max-w-40" />
+            {t('actions.to')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>
@@ -111,7 +126,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.CREATE_ACCOUNT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Create Account
+        {t('actions.createAccount')}
         {full && (
           <>
             {' '}
@@ -125,7 +140,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.DETERMINISTIC_STATE_INIT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Create Deterministic Account
+        {t('actions.createDeterministicAccount')}
         {full && (
           <>
             {' '}
@@ -139,7 +154,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.DELETE_ACCOUNT) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Delete Account
+        {t('actions.deleteAccount')}
         {full && (
           <>
             {' '}
@@ -153,11 +168,12 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.DELEGATE_ACTION) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Delegate
+        {t('actions.delegate')}
         {full && (
           <>
             {' '}
-            For <AccountLink account={receiver} textClassName="max-w-40" />
+            {t('actions.for')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>
@@ -167,7 +183,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.ADD_KEY) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        New Key{' '}
+        {t('actions.addKey')}{' '}
         <Link
           className="text-link max-w-40 truncate"
           href={`/address/${receiver}/keys`}
@@ -181,7 +197,8 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         {full && (
           <>
             {' '}
-            For <AccountLink account={receiver} textClassName="max-w-40" />
+            {t('actions.for')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>
@@ -191,7 +208,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
   if (action.action === ActionKind.DELETE_KEY) {
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
-        Delete Key{' '}
+        {t('actions.deleteKey')}{' '}
         <Link
           className="text-link max-w-40 truncate"
           href={`/address/${receiver}/keys`}
@@ -205,7 +222,8 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         {full && (
           <>
             {' '}
-            From <AccountLink account={receiver} textClassName="max-w-40" />
+            {t('actions.from')}{' '}
+            <AccountLink account={receiver} textClassName="max-w-40" />
           </>
         )}
       </span>

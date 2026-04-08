@@ -1,9 +1,16 @@
 'use client';
 
-import { Clock, Hourglass } from 'lucide-react';
+import { ChevronDown, Clock, Hourglass } from 'lucide-react';
 
 import { useSettings } from '@/hooks/use-settings';
 import { ageFormat, dateFormat, toMs } from '@/lib/format';
+import { Button } from '@/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/ui/dropdown-menu';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -74,16 +81,31 @@ export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
   const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss.SSS Z', utcMode === 'utc');
 
   return (
-    <>
-      {!hideAge && `${ageFormat(ms)} `}
-      <Tooltip>
-        <TooltipTrigger className="text-left" onClick={toggleUTCMode}>
-          {hideAge ? date : `(${date})`}
-        </TooltipTrigger>
-        <TooltipContent>
-          Click to show {utcMode === 'local' ? 'UTC' : 'Local'} time
-        </TooltipContent>
-      </Tooltip>
-    </>
+    <span className="inline-flex items-center gap-2">
+      <span>
+        {!hideAge && `${ageFormat(ms)} `}
+        {hideAge ? date : `(${date})`}
+      </span>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="xs" variant="outline">
+            {utcMode === 'local' ? 'Local' : 'UTC'}
+            <ChevronDown className="ml-0.5 size-3" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem
+            onClick={() => utcMode !== 'utc' && toggleUTCMode()}
+          >
+            UTC
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => utcMode !== 'local' && toggleUTCMode()}
+          >
+            Local
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </span>
   );
 };

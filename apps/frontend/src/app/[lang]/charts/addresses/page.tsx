@@ -29,7 +29,7 @@ const AddressesPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('addresses.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('addresses.heading')}</h1>
       <ErrorSuspense fallback={<AddressesChart loading />}>
         <AddressesChart statsPromise={statsPromise} />
       </ErrorSuspense>

@@ -72,7 +72,7 @@ export const nfts = {
     method: 'Method',
     to: 'To',
     total: 'A total of {{count}} nft token txns found',
-    txnHash: 'Txn Hash',
+    txnHash: 'Transaction Hash',
   },
   transfers: {
     columns: {

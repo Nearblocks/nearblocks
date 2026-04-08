@@ -1,5 +1,5 @@
 import { useDebounceFn } from 'ahooks';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Search } from 'nb-schemas';
 
@@ -28,8 +28,28 @@ export const SearchPopover = ({
   startTransition,
 }: Props) => {
   const { t } = useLocale('layout');
+  const inputRef = useRef<HTMLInputElement>(null);
   const [keyword, setKeyword] = useState('');
   const [results, setResults] = useState<null | Search>(initialResults);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === '/' &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !['INPUT', 'TEXTAREA', 'SELECT'].includes(
+          (e.target as HTMLElement).tagName,
+        )
+      ) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const { run } = useDebounceFn(
     (value: string) => {
@@ -73,11 +93,12 @@ export const SearchPopover = ({
       <PopoverAnchor asChild>
         <Input
           autoComplete="off"
-          className={cn('bg-card dark:bg-card border-0 shadow-none', className)}
+          className={cn('bg-card dark:bg-card border-0 shadow-none focus-visible:ring-neutral-300/50 focus-visible:border-neutral-300', className)}
           name="keyword"
           onChange={onChange}
           onFocus={onFocus}
           placeholder={t('search.placeholder')}
+          ref={inputRef}
           value={keyword}
         />
       </PopoverAnchor>

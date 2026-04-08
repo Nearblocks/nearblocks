@@ -59,7 +59,7 @@ const NavigationMenuItem = ({
 };
 
 const navigationMenuTriggerStyle = cva(
-  'group inline-flex h-9 w-max items-center justify-center rounded-md bg-card px-4 py-2 text-foreground text-headline-sm hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-muted data-[state=open]:text-foreground data-[state=open]:focus:bg-muted data-[state=open]:bg-muted/50 focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1',
+  'group inline-flex h-9 w-max items-center justify-center px-3 py-2 text-foreground text-body-sm hover:text-link focus:text-link disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-link focus-visible:ring-ring/50 outline-none transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1',
 );
 
 const NavigationMenuTrigger = ({
@@ -69,7 +69,7 @@ const NavigationMenuTrigger = ({
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Trigger>) => {
   return (
     <NavigationMenuPrimitive.Trigger
-      className={cn(navigationMenuTriggerStyle(), 'group', className)}
+      className={cn(navigationMenuTriggerStyle(), 'group cursor-pointer', className)}
       data-slot="navigation-menu-trigger"
       id={`navigation-menu-trigger-${props.id}`}
       {...props}
@@ -77,7 +77,7 @@ const NavigationMenuTrigger = ({
       {children}{' '}
       <ChevronDown
         aria-hidden="true"
-        className="relative top-px ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"
+        className="relative top-px ml-1 size-3.5 transition duration-300 group-data-[state=open]:rotate-180"
       />
     </NavigationMenuPrimitive.Trigger>
   );
@@ -91,7 +91,7 @@ const NavigationMenuContent = ({
     <NavigationMenuPrimitive.Content
       className={cn(
         'data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out top-0 left-0 w-full p-2 pr-2.5 md:absolute md:w-auto',
-        'group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 group-data-[viewport=false]/navigation-menu:top-full group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:overflow-hidden group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-200 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none',
+        'group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 group-data-[viewport=false]/navigation-menu:top-full group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:overflow-hidden group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:border-t-[3px] group-data-[viewport=false]/navigation-menu:border-t-link group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-100 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none',
         className,
       )}
       data-slot="navigation-menu-content"
@@ -112,7 +112,7 @@ const NavigationMenuViewport = ({
     >
       <NavigationMenuPrimitive.Viewport
         className={cn(
-          'origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-(--radix-navigation-menu-viewport-height) w-full overflow-hidden rounded-md border shadow md:w-(--radix-navigation-menu-viewport-width)',
+          'origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-(--radix-navigation-menu-viewport-height) w-full overflow-hidden rounded-md border border-t-2 border-t-primary shadow duration-150 md:w-(--radix-navigation-menu-viewport-width)',
           className,
         )}
         data-slot="navigation-menu-viewport"
@@ -129,7 +129,7 @@ const NavigationMenuLink = ({
   return (
     <NavigationMenuPrimitive.Link
       className={cn(
-        "data-[active=true]:text-link hover:bg-muted hover:text-link focus:bg-muted focus:text-link focus-visible:ring-ring/50 [&_svg:not([class*='text-'])]:text-popover-foreground text-headline-sm flex flex-col gap-1 rounded-sm p-2 transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
+        "data-[active=true]:text-link hover:text-link focus:text-link focus-visible:ring-ring/50 [&_svg:not([class*='text-'])]:text-popover-foreground text-headline-sm flex flex-col gap-1 rounded-sm p-2 transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="navigation-menu-link"

@@ -37,26 +37,28 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-12 w-full" />}
+            fallback={<Skeleton className="h-17.5 w-full" />}
             loading={!receipt || loading}
           >
-            {() => (
-              <CodeViewer
-                className="min-h-12"
-                code={
-                  receipt!.outcome.result
-                    ? typeof receipt!.outcome.result === 'string'
+            {() =>
+              receipt!.outcome.result ? (
+                <CodeViewer
+                  className="min-h-12"
+                  code={
+                    typeof receipt!.outcome.result === 'string'
                       ? receipt!.outcome.result
                       : JSON.stringify(receipt!.outcome.result, null, 2)
-                    : ''
-                }
-              />
-            )}
+                  }
+                />
+              ) : (
+                <p className="text-muted-foreground py-1">Empty Result</p>
+              )
+            }
           </SkeletonSlot>
         </ListRight>
       </ListItem>
       <ListItem>
-        <ListLeft>
+        <ListLeft className="min-w-60">
           <div className="flex items-center gap-1">
             <Tooltip>
               <TooltipTrigger>
@@ -70,7 +72,7 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
         <ListRight>
           <div className="space-y-3">
             <SkeletonSlot
-              fallback={<Skeleton className="h-12 w-full" />}
+              fallback={<Skeleton className="h-17.5 w-full" />}
               loading={!receipt || loading}
             >
               {() => (

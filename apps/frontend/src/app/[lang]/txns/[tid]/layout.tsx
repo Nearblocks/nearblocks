@@ -29,10 +29,7 @@ const TxnLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">
-        {t('tid.title')}{' '}
-        <span className="text-muted-foreground text-headline-base">#{tid}</span>
-      </h1>
+      <h1 className="text-headline-lg mb-4">{t('tid.title')}</h1>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>

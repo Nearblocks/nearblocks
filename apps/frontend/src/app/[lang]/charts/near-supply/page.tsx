@@ -29,7 +29,7 @@ const NearSupplyPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('nearSupply.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('nearSupply.heading')}</h1>
       <ErrorSuspense fallback={<SupplyChart loading />}>
         <SupplyChart statsPromise={statsPromise} />
       </ErrorSuspense>

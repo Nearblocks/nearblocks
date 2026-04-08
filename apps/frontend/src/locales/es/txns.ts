@@ -1,6 +1,24 @@
 export const txns = {
   actions: {
+    addKey: 'New Key',
+    call: 'Call',
+    calledMethod: 'Called method',
+    createAccount: 'Create Account',
+    createDeterministicAccount: 'Create Deterministic Account',
+    delegate: 'Delegate',
+    deleteAccount: 'Delete Account',
+    deleteKey: 'Delete Key',
+    deployContract: 'Deploy Contract',
+    deployGlobalContract: 'Deploy Global Contract',
+    for: 'For',
+    from: 'From',
+    inContract: 'in contract',
+    on: 'On',
+    by: 'By',
+    stake: 'Stake',
     title: 'Transaction Actions',
+    to: 'To',
+    transfer: 'Transfer',
   },
   codeViewer: {
     auto: 'Auto',
@@ -36,7 +54,7 @@ export const txns = {
     method: 'Method',
     to: 'To',
     total: 'A total of {{count}} transactions found',
-    txnHash: 'Txn Hash',
+    txnHash: 'Transaction Hash',
   },
   meta: {
     description:
@@ -68,7 +86,7 @@ export const txns = {
     timestampTip: 'Date and time when transaction was processed',
     to: 'To:',
     toTip: 'Account that received this transaction',
-    txnHash: 'Txn Hash:',
+    txnHash: 'Transaction Hash:',
     txnHashTip: 'Unique identifier (hash) of this transaction',
   },
   receipt: {
@@ -115,7 +133,7 @@ export const txns = {
     execution: 'Execution Plan',
     overview: 'Overview',
     receipts: 'Receipts Summary',
-    title: 'Transaction',
+    title: 'Transaction Details',
   },
   tidMeta: {
     description: 'NEAR Blockchain detailed info for transaction {{tid}}.',

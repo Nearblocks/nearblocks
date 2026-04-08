@@ -71,7 +71,7 @@ export const CodeBlock = ({ className, code, language = 'plain' }: Props) => {
   return (
     <table
       className={cn(
-        'prism-code m-0 w-full border-collapse text-xs leading-relaxed',
+        'prism-code m-0 w-full border-collapse py-2 text-xs leading-relaxed',
         className,
       )}
     >

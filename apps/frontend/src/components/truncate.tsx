@@ -26,7 +26,9 @@ export type TruncateCopyProps = {
 
 export const Truncate = ({ children, className }: TruncateProps) => {
   return (
-    <span className={cn('pointer-events-auto flex items-center', className)}>
+    <span
+      className={cn('pointer-events-auto flex w-fit items-center', className)}
+    >
       {children}
     </span>
   );

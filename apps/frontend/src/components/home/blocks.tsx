@@ -30,7 +30,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <h2 className="text-headline-sm font-semibold">{t('blocks.title')}</h2>
+        <h2 className="text-headline-sm">{t('blocks.title')}</h2>
       </CardHeader>
       <ScrollArea className="h-78.5">
         <CardContent className="@container p-3">
@@ -45,7 +45,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                       </div>
                       <div className="text-body-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-col flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
-                          <h4 className="text-link font-medium">
+                          <h4 className="text-link font-normal">
                             <Skeleton className="w-20" />
                           </h4>
                           <p className="text-body-xs text-muted-foreground mt-0.5">
@@ -85,7 +85,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                       </div>
                       <div className="text-body-sm flex grow grid-cols-[1.5fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
                         <div>
-                          <h4 className="text-link font-medium">
+                          <h4 className="text-link font-normal">
                             <Link href={`/blocks/${block.block_height}`}>
                               {numberFormat(block.block_height)}
                             </Link>
@@ -134,7 +134,9 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
           size="lg"
           variant="secondary"
         >
-          <Link href="/blocks">{t('blocks.button')}</Link>
+          <Link href="/blocks">
+            {t('blocks.button')} <span aria-hidden="true">&rarr;</span>
+          </Link>
         </Button>
       </CardFooter>
     </Card>

@@ -29,7 +29,7 @@ const NearPricePage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('nearPrice.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('nearPrice.heading')}</h1>
       <ErrorSuspense fallback={<PriceChart loading />}>
         <PriceChart statsPromise={statsPromise} />
       </ErrorSuspense>

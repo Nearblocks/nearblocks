@@ -29,7 +29,7 @@ const TxnsPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('txns.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('txns.heading')}</h1>
       <ErrorSuspense fallback={<TxnsChart loading />}>
         <TxnsChart statsPromise={statsPromise} />
       </ErrorSuspense>

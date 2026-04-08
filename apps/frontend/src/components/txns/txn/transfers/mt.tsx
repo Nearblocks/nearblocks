@@ -79,7 +79,7 @@ export const MTTransfers = ({ mts }: Props) => {
           onValueChange={(v) => setTab(v as 'all' | 'net')}
           value={tab}
         >
-          <TabsList className="bg-card">
+          <TabsList>
             <TabsTrigger value="all">{t('transfer.allTransfers')}</TabsTrigger>
             <TabsTrigger value="net">{t('transfer.netTransfers')}</TabsTrigger>
           </TabsList>

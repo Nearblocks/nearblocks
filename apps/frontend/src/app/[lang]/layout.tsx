@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist_Mono, Inter } from 'next/font/google';
+import { Geist_Mono, Roboto } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import { Layout } from '@/components/layout';
@@ -12,9 +12,10 @@ import { Toaster } from '@/ui/sonner';
 
 import '../globals.css';
 
-const inter = Inter({
+const roboto = Roboto({
   subsets: ['latin'],
   variable: '--font-inter',
+  weight: ['300', '400', '500', '700'],
 });
 
 const geist = Geist_Mono({
@@ -69,7 +70,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
       suppressHydrationWarning
     >
       <body
-        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${inter.variable} ${geist.variable} overflow-x-hidden wrap-anywhere antialiased`}
+        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${roboto.variable} ${geist.variable} overflow-x-hidden wrap-anywhere`}
       >
         <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>

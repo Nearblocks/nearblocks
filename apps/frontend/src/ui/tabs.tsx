@@ -25,7 +25,7 @@ const TabsList = ({
   return (
     <TabsPrimitive.List
       className={cn(
-        'bg-background text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-md border p-0.5',
+        'bg-muted text-muted-foreground inline-flex h-8 w-fit items-center justify-center rounded-md border p-0.5',
         className,
       )}
       data-slot="tabs-list"
@@ -41,7 +41,7 @@ const TabsTrigger = ({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        "data-[state=active]:bg-accent focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring text-foreground text-body-sm inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1 whitespace-nowrap transition-[color] focus-visible:ring-2 focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-[state=active]:bg-card data-[state=active]:shadow-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring text-foreground text-body-xs inline-flex h-[calc(100%-1px)] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 py-1 whitespace-nowrap transition-[color,background-color] focus-visible:ring-2 focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       data-slot="tabs-trigger"

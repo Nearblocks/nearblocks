@@ -29,7 +29,7 @@ const MarketCapPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-6">{t('marketCap.heading')}</h1>
+      <h1 className="text-headline-lg mb-4">{t('marketCap.heading')}</h1>
       <ErrorSuspense fallback={<MarketCapChart loading />}>
         <MarketCapChart statsPromise={statsPromise} />
       </ErrorSuspense>

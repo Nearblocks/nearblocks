@@ -11,11 +11,12 @@ import { RpcContext } from './context';
 import { ReceiptTree } from './tree';
 
 type Props = {
+  nearPrice?: null | string;
   receipts: TxnReceipt;
   tid?: string;
 };
 
-export const ExecutionPlan = ({ receipts, tid }: Props) => {
+export const ExecutionPlan = ({ nearPrice, receipts, tid }: Props) => {
   useHashScroll(true);
   const [rpcEnabled, setRpcEnabled] = useState(false);
 
@@ -32,6 +33,7 @@ export const ExecutionPlan = ({ receipts, tid }: Props) => {
     <RpcContext.Provider
       value={{
         enableRpc: () => setRpcEnabled(true),
+        nearPrice,
         rpcData,
         rpcLoading,
       }}
