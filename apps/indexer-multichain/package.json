@@ -20,7 +20,7 @@
     "@scure/btc-signer": "1.8.0",
     "@sentry/node": "7.74.1",
     "envalid": "8.0.0",
-    "undici": "7.8.0"
+    "undici": "7.18.2"
   },
   "devDependencies": {
     "@types/node": "22",
