@@ -13,6 +13,7 @@ import type {
   TxnReq,
   TxnsLatestReq,
   TxnsReq,
+  TxnStats,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/txns/request.js';
 import response from 'nb-schemas/dist/txns/response.js';
@@ -180,6 +181,12 @@ const count = responseHandler(
     return { data: estimated };
   },
 );
+
+const stats = responseHandler(response.stats, async () => {
+  const data = await dbBase.oneOrNone<TxnStats>(sql.stats);
+
+  return { data };
+});
 
 const txn = responseHandler(
   response.txn,
@@ -432,4 +439,4 @@ const mts = responseHandler(
   },
 );
 
-export default { count, fts, latest, mts, nfts, receipts, txn, txns };
+export default { count, fts, latest, mts, nfts, receipts, stats, txn, txns };

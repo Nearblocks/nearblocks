@@ -1,6 +1,12 @@
 import { unionWith } from 'es-toolkit';
 
-import type { MCTxn, MCTxnCount, MCTxnCountReq, MCTxnsReq } from 'nb-schemas';
+import type {
+  MCStats,
+  MCTxn,
+  MCTxnCount,
+  MCTxnCountReq,
+  MCTxnsReq,
+} from 'nb-schemas';
 import request from 'nb-schemas/dist/multichain/request.js';
 import response from 'nb-schemas/dist/multichain/response.js';
 
@@ -159,4 +165,10 @@ const count = responseHandler(
   },
 );
 
-export default { count, txns };
+const stats = responseHandler(response.stats, async () => {
+  const data = await dbMultichain.oneOrNone<MCStats>(sql.stats);
+
+  return { data };
+});
+
+export default { count, stats, txns };

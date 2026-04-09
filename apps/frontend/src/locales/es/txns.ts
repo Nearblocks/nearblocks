@@ -102,6 +102,12 @@ export const txns = {
     receipt: 'Receipt',
     to: 'To',
   },
+  stats: {
+    avgGasFee: 'Avg Gas Fee / Txn (24H)',
+    gasFee: 'Total Gas Fee (24H)',
+    peakTps: 'Peak TPS (24H)',
+    txns: 'Transactions (24H)',
+  },
   tid: {
     description:
       'View NEAR Protocol transaction {{tid}}. Inspect execution plan, receipts, and token transfers.',

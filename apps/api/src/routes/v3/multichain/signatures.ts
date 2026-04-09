@@ -113,6 +113,19 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/signatures/count', validate(request.count), service.count);
+
+  /**
+   * @openapi
+   * /v3/multichain/signatures/stats:
+   *   get:
+   *     summary: Get 24h multichain signature stats
+   *     tags:
+   *       - V3 / Multichain
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/signatures/stats', service.stats);
 };
 
 export default routes;

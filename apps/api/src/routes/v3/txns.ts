@@ -115,6 +115,19 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/txns/stats:
+   *   get:
+   *     summary: Get 24h transaction stats
+   *     tags:
+   *       - V3 / Txns
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/stats', service.stats);
+
+  /**
+   * @openapi
    * /v3/txns/{hash}:
    *   get:
    *     summary: Get a txn

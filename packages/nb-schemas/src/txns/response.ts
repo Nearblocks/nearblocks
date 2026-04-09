@@ -222,6 +222,13 @@ const txnMT = v.object({
   token_meta: mtTokenMeta,
 });
 
+const stats = v.object({
+  avg_gas_fee: v.string(),
+  peak_tps: v.string(),
+  tokens_burnt: v.string(),
+  txns: v.number(),
+});
+
 const txnResponse = responseSchema(txn);
 const txnsResponse = responseSchema(v.array(txnListItem));
 const txnCountResponse = responseSchema(txnCount);
@@ -229,6 +236,7 @@ const txnReceiptsResponse = responseSchema(txnReceipt);
 const txnFTsResponse = responseSchema(v.array(txnFT));
 const txnNFTsResponse = responseSchema(v.array(txnNFT));
 const txnMTsResponse = responseSchema(v.array(txnMT));
+const statsResponse = responseSchema(stats);
 
 export type Txn = v.InferOutput<typeof txn>;
 export type TxnListItem = v.InferOutput<typeof txnListItem>;
@@ -237,6 +245,7 @@ export type TxnCount = v.InferOutput<typeof txnCount>;
 export type TxnFT = v.InferOutput<typeof txnFT>;
 export type TxnNFT = v.InferOutput<typeof txnNFT>;
 export type TxnMT = v.InferOutput<typeof txnMT>;
+export type TxnStats = v.InferOutput<typeof stats>;
 
 export type TxnRes = v.InferOutput<typeof txnResponse>;
 export type TxnsRes = v.InferOutput<typeof txnsResponse>;
@@ -245,6 +254,7 @@ export type TxnReceiptsRes = v.InferOutput<typeof txnReceiptsResponse>;
 export type TxnFTsRes = v.InferOutput<typeof txnFTsResponse>;
 export type TxnNFTsRes = v.InferOutput<typeof txnNFTsResponse>;
 export type TxnMTsRes = v.InferOutput<typeof txnMTsResponse>;
+export type TxnStatsRes = v.InferOutput<typeof statsResponse>;
 
 export default {
   count: txnCountResponse,
@@ -252,6 +262,7 @@ export default {
   mts: txnMTsResponse,
   nfts: txnNFTsResponse,
   receipts: txnReceiptsResponse,
+  stats: statsResponse,
   txn: txnResponse,
   txns: txnsResponse,
 };

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 import { Blocks } from '@/components/blocks';
 import { ErrorSuspense } from '@/components/error-suspense';
-import { fetchBlockCount, fetchBlocks } from '@/data/blocks';
+import { fetchBlockCount, fetchBlocks, fetchBlockStats } from '@/data/blocks';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/blocks'>;
@@ -28,6 +28,7 @@ const BlocksPage = async ({ params, searchParams }: Props) => {
   const t = await translator(locale, 'blocks');
   const blocksPromise = fetchBlocks(filters);
   const blockCountPromise = fetchBlockCount();
+  const blockStatsPromise = fetchBlockStats();
 
   return (
     <>
@@ -36,6 +37,7 @@ const BlocksPage = async ({ params, searchParams }: Props) => {
         <Blocks
           blockCountPromise={blockCountPromise}
           blocksPromise={blocksPromise}
+          blockStatsPromise={blockStatsPromise}
         />
       </ErrorSuspense>
     </>

@@ -14,5 +14,11 @@ export const multichain = {
       'Latest NEAR Protocol multichain transactions. View cross-chain signatures and their destination network details.',
     title: 'Latest Multichain Transactions',
   },
+  stats: {
+    accounts: 'Unique Accounts',
+    addresses: 'Unique Destination Addresses',
+    chains: 'Destination Chains',
+    txns: 'Transactions',
+  },
   title: 'Latest Multichain Transactions',
 } as const;

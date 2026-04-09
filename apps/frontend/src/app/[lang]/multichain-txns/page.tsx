@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { MultichainTxns } from '@/components/multichain';
-import { fetchMCTxns } from '@/data/multichain-txns';
+import { fetchMCStats, fetchMCTxns } from '@/data/multichain-txns';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/multichain-txns'>;
@@ -27,12 +27,16 @@ const MultichainTxnsPage = async ({ params, searchParams }: Props) => {
   const t = await translator(locale, 'multichain');
   const filters = await searchParams;
   const txnsPromise = fetchMCTxns(filters);
+  const mcStatsPromise = fetchMCStats();
 
   return (
     <>
       <h1 className="text-headline-lg mb-6">{t('title')}</h1>
       <ErrorSuspense fallback={<MultichainTxns loading />}>
-        <MultichainTxns txnsPromise={txnsPromise} />
+        <MultichainTxns
+          mcStatsPromise={mcStatsPromise}
+          txnsPromise={txnsPromise}
+        />
       </ErrorSuspense>
     </>
   );

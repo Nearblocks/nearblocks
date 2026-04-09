@@ -4,4 +4,5 @@ export default {
   block: sql('queries/blocks/block.sql'),
   blocks: sql('queries/blocks/blocks.sql'),
   estimate: sql('queries/blocks/estimate.sql'),
+  stats: sql('queries/blocks/stats.sql'),
 };

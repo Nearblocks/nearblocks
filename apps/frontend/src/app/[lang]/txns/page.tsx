@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { Txns } from '@/components/txns';
-import { fetchTxnCount, fetchTxns } from '@/data/txns';
+import { fetchTxnCount, fetchTxns, fetchTxnStats } from '@/data/txns';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/txns'>;
@@ -28,12 +28,17 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
   const filters = await searchParams;
   const txnsPromise = fetchTxns(filters);
   const txnCountPromise = fetchTxnCount(filters);
+  const txnStatsPromise = fetchTxnStats();
 
   return (
     <>
       <h1 className="text-headline-lg mb-6">{t('title')}</h1>
       <ErrorSuspense fallback={<Txns loading />}>
-        <Txns txnCountPromise={txnCountPromise} txnsPromise={txnsPromise} />
+        <Txns
+          txnCountPromise={txnCountPromise}
+          txnsPromise={txnsPromise}
+          txnStatsPromise={txnStatsPromise}
+        />
       </ErrorSuspense>
     </>
   );
