@@ -82,6 +82,19 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/blocks/stats:
+   *   get:
+   *     summary: Get 24h block stats
+   *     tags:
+   *       - V3 / Blocks
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/stats', service.stats);
+
+  /**
+   * @openapi
    * /v3/blocks/{hash}:
    *   get:
    *     summary: Get a block

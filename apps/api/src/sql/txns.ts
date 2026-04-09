@@ -11,6 +11,7 @@ export default {
   nft: sql('queries/txns/nft.sql'),
   receipts: sql('queries/txns/receipts.sql'),
   rlpCte: sql('queries/txns/rlpCte.sql'),
+  stats: sql('queries/txns/stats.sql'),
   txn: sql('queries/txns/txn.sql'),
   txnCte: sql('queries/txns/txnCte.sql'),
   txns: sql('queries/txns/txns.sql'),

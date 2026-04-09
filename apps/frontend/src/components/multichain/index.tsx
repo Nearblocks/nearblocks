@@ -4,20 +4,23 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { MCTxn, MCTxnsRes } from 'nb-schemas';
+import { MCStats, MCTxn, MCTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 type Props = {
   loading?: boolean;
+  mcStatsPromise?: Promise<MCStats | null>;
   txnsPromise?: Promise<MCTxnsRes>;
 };
 
@@ -106,10 +109,15 @@ const ChainIcon = ({ icon, name }: { icon: string; name: string }) => (
   </Tooltip>
 );
 
-export const MultichainTxns = ({ loading, txnsPromise }: Props) => {
+export const MultichainTxns = ({
+  loading,
+  mcStatsPromise,
+  txnsPromise,
+}: Props) => {
   const { t } = useLocale('multichain');
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  const mcStats = !loading && mcStatsPromise ? use(mcStatsPromise) : null;
 
   const columns: DataTableColumnDef<MCTxn>[] = [
     {
@@ -233,19 +241,45 @@ export const MultichainTxns = ({ loading, txnsPromise }: Props) => {
     return `/multichain-txns?${params.toString()}`;
   };
 
+  const statItems = [
+    { label: t('stats.txns'), value: numberFormat(mcStats?.txns) },
+    { label: t('stats.accounts'), value: numberFormat(mcStats?.accounts) },
+    { label: t('stats.chains'), value: numberFormat(mcStats?.chains) },
+    { label: t('stats.addresses'), value: numberFormat(mcStats?.addresses) },
+  ];
+
   return (
-    <Card>
-      <CardContent className="text-body-sm p-0">
-        <DataTable
-          columns={columns}
-          data={txns?.data}
-          emptyMessage={t('list.empty')}
-          getRowKey={(txn) => `${txn.receipt_id}-${txn.event_index}`}
-          loading={loading || !!txns?.errors}
-          onPaginationNavigate={onPaginate}
-          pagination={txns?.meta}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {statItems.map(({ label, value }) => (
+          <Card className="px-4 py-3" key={label}>
+            <p className="text-body-xs text-muted-foreground truncate uppercase">
+              {label}
+            </p>
+            <p className="text-headline-base mt-1">
+              <SkeletonSlot
+                fallback={<Skeleton className="h-5 w-32" />}
+                loading={loading || !mcStats}
+              >
+                {() => <>{value}</>}
+              </SkeletonSlot>
+            </p>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardContent className="text-body-sm p-0">
+          <DataTable
+            columns={columns}
+            data={txns?.data}
+            emptyMessage={t('list.empty')}
+            getRowKey={(txn) => `${txn.receipt_id}-${txn.event_index}`}
+            loading={loading || !!txns?.errors}
+            onPaginationNavigate={onPaginate}
+            pagination={txns?.meta}
+          />
+        </CardContent>
+      </Card>
+    </>
   );
 };

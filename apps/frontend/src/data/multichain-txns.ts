@@ -1,9 +1,14 @@
 import { cache } from 'react';
 
-import { MCTxnsReq, MCTxnsRes } from 'nb-schemas';
+import { MCStats, MCStatsRes, MCTxnsReq, MCTxnsRes } from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
+
+export const fetchMCStats = cache(async (): Promise<MCStats | null> => {
+  const resp = await fetcher<MCStatsRes>(`/v3/multichain/signatures/stats`);
+  return resp.data;
+});
 
 export const fetchMCTxns = cache(
   async (params: SearchParams): Promise<MCTxnsRes> => {

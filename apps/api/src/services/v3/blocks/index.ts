@@ -4,6 +4,7 @@ import type {
   BlockReq,
   BlocksLatestReq,
   BlocksReq,
+  BlockStats,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/blocks/request.js';
 import response from 'nb-schemas/dist/blocks/response.js';
@@ -99,6 +100,12 @@ const count = responseHandler(response.count, async () => {
   return { data: blocks };
 });
 
+const stats = responseHandler(response.stats, async () => {
+  const data = await dbBase.oneOrNone<BlockStats>(sql.stats);
+
+  return { data };
+});
+
 const block = responseHandler(
   response.block,
   async (req: RequestValidator<BlockReq>) => {
@@ -122,4 +129,4 @@ const block = responseHandler(
   },
 );
 
-export default { block, blocks, count, latest };
+export default { block, blocks, count, latest, stats };

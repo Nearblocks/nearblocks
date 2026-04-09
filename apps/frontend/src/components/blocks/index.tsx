@@ -1,8 +1,9 @@
 'use client';
 
+import Big from 'big.js';
 import { use } from 'react';
 
-import { BlockCount, BlockListItem, BlocksRes } from 'nb-schemas';
+import { BlockCount, BlockListItem, BlocksRes, BlockStats } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
@@ -10,25 +11,37 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { gasFee, gasFormat, numberFormat } from '@/lib/format';
+import { gasFee, gasFormat, nearFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   blockCountPromise?: Promise<BlockCount | null>;
   blocksPromise?: Promise<BlocksRes>;
+  blockStatsPromise?: Promise<BlockStats | null>;
   loading?: boolean;
 };
 
 export const Blocks = ({
   blockCountPromise,
   blocksPromise,
+  blockStatsPromise,
   loading,
 }: Props) => {
   const { t } = useLocale('blocks');
   const blocks = !loading && blocksPromise ? use(blocksPromise) : null;
   const blockCount =
     !loading && blockCountPromise ? use(blockCountPromise) : null;
+  const blockStats =
+    !loading && blockStatsPromise ? use(blockStatsPromise) : null;
+
+  const utilization =
+    blockStats && blockStats.gas_limit !== '0'
+      ? Big(blockStats.gas_used)
+          .div(Big(blockStats.gas_limit))
+          .mul(100)
+          .toFixed(2) + '%'
+      : '0%';
 
   const columns: DataTableColumnDef<BlockListItem>[] = [
     {
@@ -79,33 +92,82 @@ export const Blocks = ({
     },
   ];
 
+  const statItems = [
+    {
+      label: t('stats.networkUtilization'),
+      value: utilization,
+    },
+    {
+      label: t('stats.blocks'),
+      value: numberFormat(blockStats?.blocks),
+    },
+    {
+      label: t('stats.gasPrice'),
+      value: blockStats ? (
+        <span className="flex items-center gap-1">
+          <NearCircle className="size-4" />
+          {gasFormat(blockStats.gas_price, { maximumSignificantDigits: 4 })} /
+          TGas
+        </span>
+      ) : null,
+    },
+    {
+      label: t('stats.burntFees'),
+      value: blockStats ? (
+        <span className="flex items-center gap-1">
+          <NearCircle className="size-4" />
+          {nearFormat(blockStats.tokens_burnt)}
+        </span>
+      ) : null,
+    },
+  ];
+
   return (
-    <Card>
-      <CardContent className="text-body-sm p-0">
-        <DataTable
-          columns={columns}
-          data={blocks?.data}
-          emptyMessage={t('empty')}
-          getRowKey={(block) => block.block_hash}
-          header={
-            <SkeletonSlot
-              fallback={<Skeleton className="w-40" />}
-              loading={loading || !blockCount}
-            >
-              {() => (
-                <>
-                  {t('total', {
-                    count: numberFormat(blockCount?.count ?? 0),
-                  })}
-                </>
-              )}
-            </SkeletonSlot>
-          }
-          loading={loading || !!blocks?.errors}
-          onPaginationNavigate={(type, cursor) => `/blocks?${type}=${cursor}`}
-          pagination={blocks?.meta}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {statItems.map(({ label, value }) => (
+          <Card className="px-4 py-3" key={label}>
+            <p className="text-body-xs text-muted-foreground truncate uppercase">
+              {label}
+            </p>
+            <p className="text-headline-base mt-1">
+              <SkeletonSlot
+                fallback={<Skeleton className="h-5 w-32" />}
+                loading={loading || !blockStats}
+              >
+                {() => <>{value}</>}
+              </SkeletonSlot>
+            </p>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardContent className="text-body-sm p-0">
+          <DataTable
+            columns={columns}
+            data={blocks?.data}
+            emptyMessage={t('empty')}
+            getRowKey={(block) => block.block_hash}
+            header={
+              <SkeletonSlot
+                fallback={<Skeleton className="w-40" />}
+                loading={loading || !blockCount}
+              >
+                {() => (
+                  <>
+                    {t('total', {
+                      count: numberFormat(blockCount?.count ?? 0),
+                    })}
+                  </>
+                )}
+              </SkeletonSlot>
+            }
+            loading={loading || !!blocks?.errors}
+            onPaginationNavigate={(type, cursor) => `/blocks?${type}=${cursor}`}
+            pagination={blocks?.meta}
+          />
+        </CardContent>
+      </Card>
+    </>
   );
 };

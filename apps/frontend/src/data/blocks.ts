@@ -7,6 +7,8 @@ import {
   BlockRes,
   BlocksReq,
   BlocksRes,
+  BlockStats,
+  BlockStatsRes,
 } from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
@@ -26,6 +28,11 @@ export const fetchBlocks = cache(
 
 export const fetchBlockCount = cache(async (): Promise<BlockCount | null> => {
   const resp = await fetcher<BlockCountRes>(`/v3/blocks/count`);
+  return resp.data;
+});
+
+export const fetchBlockStats = cache(async (): Promise<BlockStats | null> => {
+  const resp = await fetcher<BlockStatsRes>(`/v3/blocks/stats`);
   return resp.data;
 });
 

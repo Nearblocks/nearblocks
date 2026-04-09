@@ -16,6 +16,8 @@ import {
   TxnRes,
   TxnsReq,
   TxnsRes,
+  TxnStats,
+  TxnStatsRes,
 } from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
@@ -42,6 +44,11 @@ export const fetchTxnCount = cache(
     return resp.data;
   },
 );
+
+export const fetchTxnStats = cache(async (): Promise<null | TxnStats> => {
+  const resp = await fetcher<TxnStatsRes>(`/v3/txns/stats`);
+  return resp.data;
+});
 
 export const fetchTxn = cache(async (txn: string): Promise<null | Txn> => {
   const resp = await fetcher<TxnRes>(`/v3/txns/${txn}`);

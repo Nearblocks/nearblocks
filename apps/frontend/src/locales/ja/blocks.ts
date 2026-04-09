@@ -37,6 +37,12 @@ export const blocks = {
     transactions: '{{count}} transactions',
     txns: 'Transactions:',
   },
+  stats: {
+    blocks: 'Blocks Produced (24H)',
+    burntFees: 'Burnt Fees (24H)',
+    gasPrice: 'Avg Gas Price (24H)',
+    networkUtilization: 'Network Utilization (24H)',
+  },
   tooltips: {
     author: 'The validator who produced this block',
     blockHeight: 'The block height of this block',

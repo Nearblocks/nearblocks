@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { TxnCount, TxnListItem, TxnsRes } from 'nb-schemas';
+import { TxnCount, TxnListItem, TxnsRes, TxnStats } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
@@ -25,14 +25,21 @@ type Props = {
   loading?: boolean;
   txnCountPromise?: Promise<null | TxnCount>;
   txnsPromise?: Promise<TxnsRes>;
+  txnStatsPromise?: Promise<null | TxnStats>;
 };
 
-export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
+export const Txns = ({
+  loading,
+  txnCountPromise,
+  txnsPromise,
+  txnStatsPromise,
+}: Props) => {
   const { t } = useLocale('txns');
   const router = useRouter();
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
+  const txnStats = !loading && txnStatsPromise ? use(txnStatsPromise) : null;
 
   const columns: DataTableColumnDef<TxnListItem>[] = [
     {
@@ -141,35 +148,85 @@ export const Txns = ({ loading, txnCountPromise, txnsPromise }: Props) => {
     return `/txns?${params.toString()}`;
   };
 
+  const statItems = [
+    {
+      label: t('stats.txns'),
+      value: numberFormat(txnStats?.txns),
+    },
+    {
+      label: t('stats.peakTps'),
+      value: txnStats
+        ? numberFormat(txnStats.peak_tps, { maximumFractionDigits: 2 })
+        : null,
+    },
+    {
+      label: t('stats.gasFee'),
+      value: txnStats ? (
+        <span className="flex items-center gap-1">
+          <NearCircle className="size-4" />
+          {nearFormat(txnStats.tokens_burnt)}
+        </span>
+      ) : null,
+    },
+    {
+      label: t('stats.avgGasFee'),
+      value: txnStats ? (
+        <span className="flex items-center gap-1">
+          <NearCircle className="size-4" />
+          {nearFormat(txnStats.avg_gas_fee)}
+        </span>
+      ) : null,
+    },
+  ];
+
   return (
-    <Card>
-      <CardContent className="text-body-sm p-0">
-        <DataTable
-          columns={columns}
-          data={txns?.data}
-          emptyMessage={t('list.empty')}
-          getRowKey={(txn) => txn.transaction_hash}
-          header={
-            <SkeletonSlot
-              fallback={<Skeleton className="w-40" />}
-              loading={loading || !txnCount}
-            >
-              {() => (
-                <>
-                  {t('list.total', {
-                    count: numberFormat(txnCount?.count ?? 0),
-                  })}
-                </>
-              )}
-            </SkeletonSlot>
-          }
-          loading={loading || !!txns?.errors}
-          onClear={onClear}
-          onFilter={onFilter}
-          onPaginationNavigate={onPaginate}
-          pagination={txns?.meta}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {statItems.map(({ label, value }) => (
+          <Card className="px-4 py-3" key={label}>
+            <p className="text-body-xs text-muted-foreground truncate uppercase">
+              {label}
+            </p>
+            <p className="text-headline-base mt-1">
+              <SkeletonSlot
+                fallback={<Skeleton className="h-5 w-32" />}
+                loading={loading || !txnStats}
+              >
+                {() => <>{value}</>}
+              </SkeletonSlot>
+            </p>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardContent className="text-body-sm p-0">
+          <DataTable
+            columns={columns}
+            data={txns?.data}
+            emptyMessage={t('list.empty')}
+            getRowKey={(txn) => txn.transaction_hash}
+            header={
+              <SkeletonSlot
+                fallback={<Skeleton className="w-40" />}
+                loading={loading || !txnCount}
+              >
+                {() => (
+                  <>
+                    {t('list.total', {
+                      count: numberFormat(txnCount?.count ?? 0),
+                    })}
+                  </>
+                )}
+              </SkeletonSlot>
+            }
+            loading={loading || !!txns?.errors}
+            onClear={onClear}
+            onFilter={onFilter}
+            onPaginationNavigate={onPaginate}
+            pagination={txns?.meta}
+          />
+        </CardContent>
+      </Card>
+    </>
   );
 };

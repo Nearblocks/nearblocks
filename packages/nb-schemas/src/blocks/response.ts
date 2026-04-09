@@ -37,20 +37,32 @@ const blockCount = v.object({
   count: v.string(),
 });
 
+const stats = v.object({
+  blocks: v.number(),
+  gas_limit: v.string(),
+  gas_price: v.string(),
+  gas_used: v.string(),
+  tokens_burnt: v.string(),
+});
+
 const blockResponse = responseSchema(block);
 const blocksResponse = responseSchema(v.array(blockListItem));
 const blockCountResponse = responseSchema(blockCount);
+const statsResponse = responseSchema(stats);
 
 export type Block = v.InferOutput<typeof block>;
 export type BlockListItem = v.InferOutput<typeof blockListItem>;
 export type BlockCount = v.InferOutput<typeof blockCount>;
+export type BlockStats = v.InferOutput<typeof stats>;
 
 export type BlockRes = v.InferOutput<typeof blockResponse>;
 export type BlocksRes = v.InferOutput<typeof blocksResponse>;
 export type BlockCountRes = v.InferOutput<typeof blockCountResponse>;
+export type BlockStatsRes = v.InferOutput<typeof statsResponse>;
 
 export default {
   block: blockResponse,
   blocks: blocksResponse,
   count: blockCountResponse,
+  stats: statsResponse,
 };
