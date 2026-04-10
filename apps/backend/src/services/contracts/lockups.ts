@@ -5,9 +5,9 @@ import { dbBase } from '#libs/knex';
 import { getCirculatingSupply } from '#libs/supply';
 import { AccountId, BlockSupply, Raw } from '#types/types';
 
-export const syncNearSupply = async () => {
+export const syncNearSupply = async (end: string) => {
   if (config.network === Network.TESTNET) {
-    return;
+    return null;
   }
 
   const [{ rows: blocks }, { rows: accounts }] = await Promise.all([
@@ -19,11 +19,14 @@ export const syncNearSupply = async () => {
           total_supply
         FROM
           blocks
+        WHERE
+          block_timestamp < $1
         ORDER BY
           block_timestamp DESC
         LIMIT
           1
       `,
+      [end],
     ),
     dbBase.raw<Raw<AccountId>>(
       `
@@ -40,8 +43,8 @@ export const syncNearSupply = async () => {
   ]);
 
   if (blocks.length && accounts.length) {
-    const supply = await getCirculatingSupply(blocks[0], accounts);
-
-    await dbBase('stats').update({ circulating_supply: supply });
+    return await getCirculatingSupply(blocks[0], accounts);
   }
+
+  return null;
 };

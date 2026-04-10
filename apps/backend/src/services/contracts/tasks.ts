@@ -391,7 +391,7 @@ const saveValidatorLists = async () => {
   const mappedValidators =
     data?.mapped_validators as unknown as ValidatorEpochData[];
 
-  if (mappedValidators.length > 0) {
+  if (mappedValidators && mappedValidators.length > 0) {
     const stakeProposals =
       data?.stake_proposals as unknown as CachedTimestampMap<string>;
 
