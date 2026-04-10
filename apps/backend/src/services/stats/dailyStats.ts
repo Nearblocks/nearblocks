@@ -8,7 +8,7 @@ import config from '#config';
 import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbContracts } from '#libs/knex';
-// import { syncNearSupply } from '#services/contracts/lockups';
+import { syncNearSupply } from '#services/contracts/lockups';
 
 export const syncStats = async () => {
   let start = dayjs.utc(config.genesisDate);
@@ -49,7 +49,7 @@ const dayStats = async (day: Dayjs) => {
 
   const price = await marketData(day.clone());
   const [block, address, txn] = await Promise.all([
-    blockData(start),
+    blockData(start, end),
     addressData(start, end),
     txnData(start, price.near_price || '0'),
   ]);
@@ -88,15 +88,15 @@ const marketData = async (date: Dayjs) => {
   };
 };
 
-const blockData = async (start: string) => {
+const blockData = async (start: string, end: string) => {
   const [block, chunk] = await Promise.all([
     dbBase('block_stats').where('date', start).first(),
     dbBase('chunk_stats').where('date', start).first(),
   ]);
 
-  if (!block || !chunk) throw Error('Missing block data!');
+  throwOnMissing(!block || !chunk, start, 'Missing block data!');
 
-  let circulatingSupply = null;
+  let circulatingSupply: null | string = null;
 
   // All Genesis-locked tokens were fully released by October 10, 2025
   const RELEASE_DATE = Big('1760054400000000000');
@@ -105,8 +105,7 @@ const blockData = async (start: string) => {
     if (Big(start).lt(RELEASE_DATE)) {
       circulatingSupply = block.total_supply;
     } else {
-      // TODO update circulating supply calculations and resync historical data
-      // syncNearSupply()
+      circulatingSupply = await syncNearSupply(end);
     }
   }
 
@@ -147,7 +146,11 @@ const txnData = async (start: string, price: string) => {
     dbBase('receipt_stats').where('date', start).first(),
   ]);
 
-  if (!action || !txn || !outcome || !receipt) throw Error('Missing txn data!');
+  throwOnMissing(
+    !action || !txn || !outcome || !receipt,
+    start,
+    'Missing txn data!',
+  );
 
   const txnVolume = yoctoToNear(action.deposit);
   const txnVolumeUsd = Big(txnVolume).mul(price).toFixed();
@@ -169,4 +172,21 @@ const txnData = async (start: string, price: string) => {
     txn_volume_usd: txnVolumeUsd,
     txns: txn.txns,
   };
+};
+
+const throwOnMissing = (data: boolean, start: string, message: string) => {
+  if (data) return;
+
+  if (config.network === Network.MAINNET) {
+    throw Error(message);
+  }
+
+  // Testnet has missing data from genesis (July 31, 2020) to April 1, 2021
+  const PROPER_START = Big('1617235200000000000');
+
+  if (Big(start).gte(PROPER_START)) {
+    throw Error(message);
+  }
+
+  return;
 };

@@ -13,6 +13,12 @@ FROM base AS builder
 COPY --from=prepare /app/out/json/ .
 RUN yarn install
 COPY --from=prepare /app/out/full/ .
+
+ARG GITHUB_SHA
+ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+
 RUN yarn turbo build
 
 FROM base AS runner

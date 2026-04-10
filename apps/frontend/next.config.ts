@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  cacheMaxMemorySize: 0,
+  deploymentId: process.env.GITHUB_SHA,
   experimental: {
     globalNotFound: true,
     optimizePackageImports: ['radix-ui', '@remixicon/react'],
