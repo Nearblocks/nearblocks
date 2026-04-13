@@ -9,7 +9,8 @@ import {
 export const task = async () => {
   try {
     logger.info('pools: job started');
-    await Promise.all([poolIdsCheck(), stakingPoolMetadataCheck()]);
+    await poolIdsCheck();
+    await stakingPoolMetadataCheck();
 
     logger.info('pools: job ended');
   } catch (error) {
