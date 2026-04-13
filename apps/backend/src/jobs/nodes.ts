@@ -11,12 +11,10 @@ import {
 export const task = async () => {
   try {
     logger.info('nodes: job started');
-    await Promise.all([
-      latestBlockCheck(),
-      updatePoolInfoMap(),
-      updateStakingPoolStake(),
-      validatorsCheck(),
-    ]);
+    await latestBlockCheck();
+    await validatorsCheck();
+    await updatePoolInfoMap();
+    await updateStakingPoolStake();
     logger.info('nodes: job ended');
   } catch (error) {
     sentry.captureException(error);

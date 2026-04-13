@@ -24,7 +24,12 @@ export const dbBase = createKnex({
     connectionString: config.dbUrlBase,
     ssl: ssl?.ca ? ssl : false,
   },
-  pool: { max: 1, min: 1 },
+  pool: {
+    acquireTimeoutMillis: 60000,
+    max: 5,
+    min: 1,
+    propagateCreateError: false,
+  },
 });
 
 /**
