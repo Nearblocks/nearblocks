@@ -6,9 +6,7 @@ import sentry from '#libs/sentry';
 export const task = async () => {
   try {
     logger.info('refreshEthAccounts: job started');
-    await Promise.all([
-      dbBase.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY eth_accounts'),
-    ]);
+    await dbBase.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY eth_accounts');
     logger.info('refreshEthAccounts: job ended');
   } catch (error) {
     sentry.captureException(error);

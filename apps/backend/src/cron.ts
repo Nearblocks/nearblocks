@@ -10,6 +10,7 @@ export const scheduleJobs = () => {
     // Stats
     cron.schedule('*/15 * * * * *', './jobs/stats.js', options); // 15s
     cron.schedule('0 1 0 * * *', './jobs/dailyStats.js', options); // every day at 00:01
+    cron.schedule('0 * * * * *', './jobs/dailyStats.js', options); // temp: every minute
 
     // Token jobs
     cron.schedule('*/15 * * * * *', './jobs/tokenSupply.js', options); // 15s

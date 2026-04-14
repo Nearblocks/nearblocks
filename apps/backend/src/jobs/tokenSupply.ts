@@ -6,7 +6,7 @@ import { syncFTSupply } from '#services/fts/supply';
 export const task = async () => {
   try {
     logger.info('tokenSupply: job started');
-    await Promise.all([syncFTSupply()]);
+    await syncFTSupply();
     logger.info('tokenSupply: job ended');
   } catch (error) {
     sentry.captureException(error);

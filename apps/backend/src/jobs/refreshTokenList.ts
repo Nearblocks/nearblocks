@@ -6,10 +6,8 @@ import sentry from '#libs/sentry';
 export const task = async () => {
   try {
     logger.info('refreshTokenList: job started');
-    await Promise.all([
-      dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY ft_list'),
-      dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY nft_list'),
-    ]);
+    await dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY ft_list');
+    await dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY nft_list');
     logger.info('refreshTokenList: job ended');
   } catch (error) {
     sentry.captureException(error);

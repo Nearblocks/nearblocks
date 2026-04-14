@@ -9,7 +9,8 @@ import {
 export const task = async () => {
   try {
     logger.info('genesis: job started');
-    await Promise.all([genesisProtocolInfoFetch(), validatorsTelemetryCheck()]);
+    await genesisProtocolInfoFetch();
+    await validatorsTelemetryCheck();
     logger.info('genesis: job ended');
   } catch (error) {
     sentry.captureException(error);

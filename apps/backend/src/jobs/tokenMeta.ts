@@ -12,15 +12,13 @@ import {
 export const task = async () => {
   try {
     logger.info('tokenMeta: job started');
-    await Promise.all([
-      syncFTMeta(),
-      syncMTMeta(),
-      syncMTTokenMeta(),
-      syncNFTMeta(),
-      syncNFTTokenMeta(),
-      refreshFTMeta(),
-      refreshNFTMeta(),
-    ]);
+    await syncFTMeta();
+    await syncMTMeta();
+    await syncMTTokenMeta();
+    await syncNFTMeta();
+    await syncNFTTokenMeta();
+    await refreshFTMeta();
+    await refreshNFTMeta();
     logger.info('tokenMeta: job ended');
   } catch (error) {
     sentry.captureException(error);

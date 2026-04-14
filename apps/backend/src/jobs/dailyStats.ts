@@ -13,7 +13,7 @@ export const task = async () => {
 
   try {
     logger.info('dailyStats: job started');
-    await Promise.all([syncStats()]);
+    await syncStats();
     logger.info('dailyStats: job ended');
   } catch (error) {
     sentry.captureException(error);
