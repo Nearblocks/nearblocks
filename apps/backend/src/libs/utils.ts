@@ -17,3 +17,13 @@ export const tokenAmount = (
 
   return Big(amount).div(Big(10).pow(decimal)).toFixed();
 };
+
+export const isDataError = (error: unknown) => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code: string }).code === 'string' &&
+    (error as { code: string }).code.startsWith('22')
+  );
+};

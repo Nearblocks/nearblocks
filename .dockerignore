@@ -1,1 +1,24 @@
+# Dependencies
 node_modules
+**/node_modules
+
+# Build outputs
+**/.next
+**/dist
+**/.turbo
+**/*.tsbuildinfo
+**/build
+
+# Version control
+.git
+
+# Dev/local files
+**/*.env
+*.env
+.env*
+**/.env*
+
+# Test/misc
+**/__tests__
+**/coverage
+**/.cache

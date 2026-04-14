@@ -4,6 +4,7 @@ import dayjs from '#libs/dayjs';
 import { upsertError } from '#libs/events';
 import { dbEvents } from '#libs/knex';
 import { fetchMTMeta, fetchMTTokenMeta } from '#libs/near';
+import { isDataError } from '#libs/utils';
 import {
   MetaContract,
   MetaContractToken,
@@ -134,6 +135,10 @@ const updateMeta = async (contract: string, meta: MTContractMetadata) => {
   } catch (error) {
     logger.error(`tokenMeta: updateMeta: ${contract}`);
     logger.error(error);
+
+    if (isDataError(error)) {
+      await upsertError(contract, 'mt', null);
+    }
   }
 };
 

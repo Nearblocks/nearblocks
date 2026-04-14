@@ -4,7 +4,7 @@ import dayjs from '#libs/dayjs';
 import { upsertError } from '#libs/events';
 import { dbEvents } from '#libs/knex';
 import { fetchFTMeta } from '#libs/near';
-import { accountToHex } from '#libs/utils';
+import { accountToHex, isDataError } from '#libs/utils';
 import { FTMetadata, MetaContract, Raw } from '#types/types';
 
 export const syncFTMeta = async () => {
@@ -106,6 +106,10 @@ const updateMeta = async (contract: string, meta: FTMetadata) => {
   } catch (error) {
     logger.error(`tokenMeta: updateMeta: ${contract}`);
     logger.error(error);
+
+    if (isDataError(error)) {
+      await upsertError(contract, 'ft', null);
+    }
   }
 };
 
