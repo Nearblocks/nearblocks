@@ -1,6 +1,7 @@
 import Big from 'big.js';
 import { Dayjs } from 'dayjs';
 
+import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 import { msToNsTime, nsToMsTime, sleep, yoctoToNear } from 'nb-utils';
 
@@ -94,7 +95,9 @@ const blockData = async (start: string, end: string) => {
     dbBase('chunk_stats').where('date', start).first(),
   ]);
 
-  throwOnMissing(!block || !chunk, start, 'Missing block data!');
+  logger.info({ block, chunk, end, start });
+
+  throwOnMissing(block && chunk, start, 'Missing block data!');
 
   let circulatingSupply: null | string = null;
 
@@ -146,8 +149,10 @@ const txnData = async (start: string, price: string) => {
     dbBase('receipt_stats').where('date', start).first(),
   ]);
 
+  logger.info({ action, outcome, receipt, start, txn });
+
   throwOnMissing(
-    !action || !txn || !outcome || !receipt,
+    action && txn && outcome && receipt,
     start,
     'Missing txn data!',
   );

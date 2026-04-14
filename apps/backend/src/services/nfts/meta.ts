@@ -4,6 +4,7 @@ import dayjs from '#libs/dayjs';
 import { upsertError } from '#libs/events';
 import { dbEvents } from '#libs/knex';
 import { fetchNFTMeta, fetchNFTTokenMeta } from '#libs/near';
+import { isDataError } from '#libs/utils';
 import {
   MetaContract,
   MetaContractToken,
@@ -139,6 +140,10 @@ const updateMeta = async (contract: string, meta: NFTMetadata) => {
   } catch (error) {
     logger.error(`tokenMeta: updateMeta: ${contract}`);
     logger.error(error);
+
+    if (isDataError(error)) {
+      await upsertError(contract, 'nft', null);
+    }
   }
 };
 
@@ -183,6 +188,10 @@ const updateTokenMeta = async (
   } catch (error) {
     logger.error(`tokenMeta: updateTokenMeta: ${contract}: ${token}`);
     logger.error(error);
+
+    if (isDataError(error)) {
+      await upsertError(contract, 'nft', token);
+    }
   }
 };
 
