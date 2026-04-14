@@ -6,7 +6,7 @@ import { protocolConfigCheck } from '#services/contracts/tasks';
 export const task = async () => {
   try {
     logger.info('protocol: job started');
-    await Promise.all([protocolConfigCheck()]);
+    await protocolConfigCheck();
     logger.info('protocol: job ended');
   } catch (error) {
     sentry.captureException(error);

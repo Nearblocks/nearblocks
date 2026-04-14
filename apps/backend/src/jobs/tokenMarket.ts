@@ -6,7 +6,8 @@ import { syncFTData, syncFTPrice } from '#services/fts/market';
 export const task = async () => {
   try {
     logger.info('tokenMarket: job started');
-    await Promise.all([syncFTData(), syncFTPrice()]);
+    await syncFTData();
+    await syncFTPrice();
     logger.info('tokenMarket: job ended');
   } catch (error) {
     sentry.captureException(error);

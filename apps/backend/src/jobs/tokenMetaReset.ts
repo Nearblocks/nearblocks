@@ -6,7 +6,7 @@ import { resetMeta } from '#services/contracts/deployments';
 export const task = async () => {
   try {
     logger.info('tokenMetaReset: job started');
-    await Promise.all([resetMeta()]);
+    await resetMeta();
     logger.info('tokenMetaReset job ended');
   } catch (error) {
     sentry.captureException(error);

@@ -1,3 +1,5 @@
+import { logger } from 'nb-logger';
+
 import { dbEvents } from '#libs/knex';
 
 export const upsertError = async (
@@ -5,8 +7,9 @@ export const upsertError = async (
   type: string,
   token: null | string,
 ) => {
-  return dbEvents.raw(
-    `
+  try {
+    await dbEvents.raw(
+      `
       INSERT INTO
         errored_contracts (contract, type, token, attempts)
       VALUES
@@ -15,6 +18,9 @@ export const upsertError = async (
       SET
         attempts = errored_contracts.attempts + 1
     `,
-    [contract, type, token],
-  );
+      [contract, type, token],
+    );
+  } catch (error) {
+    logger.error(error);
+  }
 };
