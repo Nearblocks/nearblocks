@@ -28,9 +28,11 @@ export const prepareCache = (message: Message) => {
       }
     });
     shard.receiptExecutionOutcomes.forEach((outcome) => {
-      const parentHash = lru.peek(outcome.executionOutcome.id);
+      const parentHash =
+        lru.peek(outcome.executionOutcome.id) ?? outcome.txHash;
 
       if (parentHash) {
+        lru.set(outcome.executionOutcome.id, parentHash);
         outcome.executionOutcome.outcome.receiptIds.forEach((receiptId) =>
           lru.set(receiptId, parentHash),
         );
