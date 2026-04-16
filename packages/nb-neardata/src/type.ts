@@ -129,6 +129,7 @@ export type DataReceipt = {
   Data: {
     data: string;
     dataId: string;
+    isPromiseResume?: boolean;
   };
 };
 

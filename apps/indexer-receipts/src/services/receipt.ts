@@ -137,8 +137,13 @@ const storeChunkReceipts = async (
   chunkHash: string,
   blockHash: string,
   blockTimestamp: string,
-  receipts: JReceipt[],
+  originalReceipts: JReceipt[],
 ) => {
+  const receipts = originalReceipts.filter((receipt) =>
+    'Data' in receipt.receipt
+      ? receipt.receipt.Data.isPromiseResume === false
+      : true,
+  );
   const receiptOrDataIds = receipts.map((receipt) =>
     'Data' in receipt.receipt ? receipt.receipt.Data.dataId : receipt.receiptId,
   );
