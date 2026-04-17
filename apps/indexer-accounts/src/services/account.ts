@@ -6,6 +6,7 @@ import { retry } from 'nb-utils';
 import {
   isCreateAccountAction,
   isDeleteAccountAction,
+  isDeterministicStateInitAction,
   isTransferAction,
 } from '#libs/guards';
 import { isEthImplicit, isExecutionSuccess, isNearImplicit } from '#libs/utils';
@@ -108,6 +109,15 @@ const getChunkAccounts = (
             block.timestampNanosec,
             receiptId,
           ),
+        );
+
+        continue;
+      }
+
+      if (isDeterministicStateInitAction(action)) {
+        accounts.set(
+          accountId,
+          getAccountData(accountId, block.timestampNanosec, receiptId),
         );
 
         continue;

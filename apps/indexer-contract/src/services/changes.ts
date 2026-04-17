@@ -7,12 +7,12 @@ import {
   BlockHeader,
   StateChange as BStateChange,
   ExecutionOutcomeWithReceipt,
+  ExecutionStatus,
   Message,
   Shard,
 } from 'nb-neardata';
 import {
   ContractCodeEvent,
-  ContractDataEvent,
   ContractEventType,
   StateChangeCauseView,
 } from 'nb-types';
@@ -21,27 +21,22 @@ import { retry } from 'nb-utils';
 import {
   isContractDeletion,
   isContractUpdate,
-  isDataDeletion,
-  isDataUpdate,
+  isUseGlobalContractAction,
+  isUseGlobalContractByAccountIdAction,
 } from '#libs/guards';
 import {
   ContractCode,
-  ContractData,
   ContractDeletion,
   ContractUpdate,
-  DataDeletion,
-  DataUpdate,
   StateChange,
 } from '#types/types';
 
 type ContractChanges = {
   code: Map<string, ContractCode>;
-  data: Map<string, ContractData>;
 };
 
 type ContractEvents = {
   code: ContractCodeEvent[];
-  data: ContractDataEvent[];
 };
 
 export const storeChanges = async (knex: Knex, message: Message) => {
@@ -70,7 +65,6 @@ export const storeChunkChanges = async (
 const getStateChanges = (stateChanges: BStateChange[]) => {
   const changes: ContractChanges = {
     code: new Map(),
-    data: new Map(),
   };
 
   for (const stateChange of stateChanges) {
@@ -85,6 +79,8 @@ const getStateChanges = (stateChanges: BStateChange[]) => {
             accountId: contractUpdate.accountId,
             codeBase64: contractUpdate.codeBase64,
             codeHash: getCodeHash(contractUpdate.codeBase64),
+            globalAccountId: null,
+            globalCodeHash: null,
             type: ContractEventType.UPDATE,
           });
 
@@ -97,30 +93,11 @@ const getStateChanges = (stateChanges: BStateChange[]) => {
             accountId: contractDeletion.accountId,
             codeBase64: null,
             codeHash: null,
+            globalAccountId: null,
+            globalCodeHash: null,
             type: ContractEventType.DELETE,
           });
-          break;
-        }
-        case isDataUpdate(change): {
-          const dataUpdate = change.change as DataUpdate;
 
-          changes.data.set(change.cause.receiptHash, {
-            accountId: dataUpdate.accountId,
-            keyBase64: dataUpdate.keyBase64,
-            type: ContractEventType.UPDATE,
-            valueBase64: dataUpdate.valueBase64,
-          });
-          break;
-        }
-        case isDataDeletion(change): {
-          const dataDeletion = change.change as DataDeletion;
-
-          changes.data.set(change.cause.receiptHash, {
-            accountId: dataDeletion.accountId,
-            keyBase64: dataDeletion.keyBase64,
-            type: ContractEventType.DELETE,
-            valueBase64: null,
-          });
           break;
         }
 
@@ -140,7 +117,6 @@ const getReceiptChanges = (
 ) => {
   const result: ContractEvents = {
     code: [],
-    data: [],
   };
 
   for (const outcome of outcomes) {
@@ -167,10 +143,50 @@ const getReceiptChanges = (
         code_hash: codeChange.codeHash,
         contract_account_id: codeChange.accountId,
         event_type: codeChange.type,
+        global_account_id: null,
+        global_code_hash: null,
         index_in_chunk: 0, // placeholder; actual value will be set later
         receipt_id: receiptId,
         shard_id: 0, // placeholder; actual value will be set later
       });
+    }
+
+    if (
+      isExecutionSuccess(outcome.executionOutcome.outcome.status) &&
+      'Action' in outcome.receipt.receipt &&
+      outcome.receipt.receipt.Action.actions.length
+    ) {
+      for (const action of outcome.receipt.receipt.Action.actions) {
+        if (isUseGlobalContractAction(action)) {
+          result.code.push({
+            block_height: block.height,
+            block_timestamp: block.timestampNanosec,
+            code_base64: null,
+            code_hash: null,
+            contract_account_id: outcome.receipt.receiverId,
+            event_type: ContractEventType.UPDATE,
+            global_account_id: null,
+            global_code_hash: action.UseGlobalContract.codeHash,
+            index_in_chunk: 0, // placeholder; actual value will be set later
+            receipt_id: receiptId,
+            shard_id: 0, // placeholder; actual value will be set later
+          });
+        } else if (isUseGlobalContractByAccountIdAction(action)) {
+          result.code.push({
+            block_height: block.height,
+            block_timestamp: block.timestampNanosec,
+            code_base64: null,
+            code_hash: null,
+            contract_account_id: outcome.receipt.receiverId,
+            event_type: ContractEventType.UPDATE,
+            global_account_id: action.UseGlobalContractByAccountId.accountId,
+            global_code_hash: null,
+            index_in_chunk: 0, // placeholder; actual value will be set later
+            receipt_id: receiptId,
+            shard_id: 0, // placeholder; actual value will be set later
+          });
+        }
+      }
     }
   }
 
@@ -218,4 +234,12 @@ const insertCodeChanges = async (
       .onConflict(['block_timestamp', 'shard_id', 'index_in_chunk'])
       .ignore();
   });
+};
+
+export const isExecutionSuccess = (status: ExecutionStatus) => {
+  if ('SuccessValue' in status || 'SuccessReceiptId' in status) {
+    return true;
+  }
+
+  return false;
 };

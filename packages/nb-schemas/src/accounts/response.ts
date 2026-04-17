@@ -30,6 +30,8 @@ const contract = v.object({
   account_id: v.string(),
   code_base64: v.nullable(v.string()),
   code_hash: v.nullable(v.string()),
+  global_account_id: v.nullable(v.string()),
+  global_code_hash: v.nullable(v.string()),
 });
 
 const block = v.object({
