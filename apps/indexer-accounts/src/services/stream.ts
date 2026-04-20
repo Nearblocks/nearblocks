@@ -5,7 +5,6 @@ import config from '#config';
 import { db } from '#libs/knex';
 import metrics from '#libs/prom';
 import sentry from '#libs/sentry';
-import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
 
 const indexerKey = 'accounts';
@@ -40,10 +39,7 @@ export const onMessage = async (message: Message) => {
 
     logger.info(`syncing block: ${blockHeight}`);
 
-    await Promise.all([
-      storeAccounts(db, message),
-      storeAccessKeys(db, message),
-    ]);
+    await Promise.all([storeAccounts(db, message)]);
 
     await db('settings')
       .insert({

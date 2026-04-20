@@ -3,13 +3,8 @@ import { BlockHeader, Message, Receipt } from 'nb-neardata';
 import { Account } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import {
-  isCreateAccountAction,
-  isDeleteAccountAction,
-  isDeterministicStateInitAction,
-  isTransferAction,
-} from '#libs/guards';
-import { isEthImplicit, isExecutionSuccess, isNearImplicit } from '#libs/utils';
+import { isDeterministicStateInitAction } from '#libs/guards';
+import { isExecutionSuccess } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
 
@@ -21,7 +16,6 @@ export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
 
 export const storeAccounts = async (knex: Knex, message: Message) => {
   const accounts: AccountMap = new Map();
-  const accountsToUpdate: AccountMap = new Map();
 
   for (const shard of message.shards) {
     for (const outcome of shard.receiptExecutionOutcomes) {
@@ -29,12 +23,7 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
         outcome.receipt &&
         isExecutionSuccess(outcome.executionOutcome.outcome.status)
       ) {
-        getChunkAccounts(
-          message.block.header,
-          outcome.receipt,
-          accounts,
-          accountsToUpdate,
-        );
+        getChunkAccounts(message.block.header, outcome.receipt, accounts);
       }
     }
   }
@@ -50,83 +39,19 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
         );
     });
   }
-
-  if (accountsToUpdate.size) {
-    await Promise.all(
-      [...accountsToUpdate.values()].map(async (account) => {
-        return retry(async () => {
-          return knex('accounts')
-            .update({
-              deleted_by_block_timestamp: account.deleted_by_block_timestamp,
-              deleted_by_receipt_id: account.deleted_by_receipt_id,
-            })
-            .where('account_id', account.account_id)
-            .where(
-              'created_by_block_timestamp',
-              '<=',
-              account.deleted_by_block_timestamp,
-            )
-            .andWhere(function () {
-              this.whereNull('deleted_by_block_timestamp').orWhere(
-                'deleted_by_block_timestamp',
-                '<',
-                account.deleted_by_block_timestamp,
-              );
-            });
-        });
-      }),
-    );
-  }
 };
 
 const getChunkAccounts = (
   block: BlockHeader,
   receipt: Receipt,
   accounts: AccountMap,
-  accountsToUpdate: AccountMap,
 ) => {
   if (receipt?.receipt && 'Action' in receipt.receipt) {
     for (const action of receipt.receipt.Action.actions) {
       const receiptId = receipt.receiptId;
       const accountId = receipt.receiverId;
 
-      if (isCreateAccountAction(action)) {
-        accounts.set(
-          accountId,
-          getAccountData(accountId, block.timestampNanosec, receiptId),
-        );
-
-        continue;
-      }
-
-      if (isDeleteAccountAction(action)) {
-        accountsToUpdate.set(
-          accountId,
-          getAccountData(
-            accountId,
-            block.timestampNanosec,
-            receiptId,
-            block.timestampNanosec,
-            receiptId,
-          ),
-        );
-
-        continue;
-      }
-
       if (isDeterministicStateInitAction(action)) {
-        accounts.set(
-          accountId,
-          getAccountData(accountId, block.timestampNanosec, receiptId),
-        );
-
-        continue;
-      }
-
-      if (
-        isTransferAction(action) &&
-        (isNearImplicit(accountId) || isEthImplicit(accountId))
-      ) {
         accounts.set(
           accountId,
           getAccountData(accountId, block.timestampNanosec, receiptId),
