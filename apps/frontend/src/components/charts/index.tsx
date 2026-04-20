@@ -8,6 +8,7 @@ import { DailyStats } from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { Link } from '@/components/link';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader } from '@/ui/card';
@@ -44,18 +45,24 @@ type HeaderProps = {
 
 export const Charts = ({ statsPromise }: Props) => {
   const { t } = useLocale('charts');
+  const network = useConfig((s) => s.config.network);
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <ChartCard href="/charts/near-price" title={t('nearPrice.miniTitle')}>
-        <ErrorSuspense fallback={<PriceChartMini loading />}>
-          <PriceChartMini statsPromise={statsPromise} />
-        </ErrorSuspense>
-      </ChartCard>
-      <ChartCard href="/charts/market-cap" title={t('marketCap.miniTitle')}>
-        <ErrorSuspense fallback={<MarketCapChartMini loading />}>
-          <MarketCapChartMini statsPromise={statsPromise} />
-        </ErrorSuspense>
-      </ChartCard>
+      {network === 'mainnet' && (
+        <>
+          <ChartCard href="/charts/near-price" title={t('nearPrice.miniTitle')}>
+            <ErrorSuspense fallback={<PriceChartMini loading />}>
+              <PriceChartMini statsPromise={statsPromise} />
+            </ErrorSuspense>
+          </ChartCard>
+          <ChartCard href="/charts/market-cap" title={t('marketCap.miniTitle')}>
+            <ErrorSuspense fallback={<MarketCapChartMini loading />}>
+              <MarketCapChartMini statsPromise={statsPromise} />
+            </ErrorSuspense>
+          </ChartCard>
+        </>
+      )}
       <ChartCard href="/charts/near-supply" title={t('nearSupply.miniTitle')}>
         <ErrorSuspense fallback={<SupplyChartMini loading />}>
           <SupplyChartMini statsPromise={statsPromise} />
@@ -76,16 +83,20 @@ export const Charts = ({ statsPromise }: Props) => {
           <AddressesChartMini statsPromise={statsPromise} />
         </ErrorSuspense>
       </ChartCard>
-      <ChartCard href="/charts/txn-fee" title={t('txnFee.miniTitle')}>
-        <ErrorSuspense fallback={<TxnFeeChartMini loading />}>
-          <TxnFeeChartMini statsPromise={statsPromise} />
-        </ErrorSuspense>
-      </ChartCard>
-      <ChartCard href="/charts/txn-volume" title={t('txnVolume.miniTitle')}>
-        <ErrorSuspense fallback={<TxnVolumeChartMini loading />}>
-          <TxnVolumeChartMini statsPromise={statsPromise} />
-        </ErrorSuspense>
-      </ChartCard>
+      {network === 'mainnet' && (
+        <>
+          <ChartCard href="/charts/txn-fee" title={t('txnFee.miniTitle')}>
+            <ErrorSuspense fallback={<TxnFeeChartMini loading />}>
+              <TxnFeeChartMini statsPromise={statsPromise} />
+            </ErrorSuspense>
+          </ChartCard>
+          <ChartCard href="/charts/txn-volume" title={t('txnVolume.miniTitle')}>
+            <ErrorSuspense fallback={<TxnVolumeChartMini loading />}>
+              <TxnVolumeChartMini statsPromise={statsPromise} />
+            </ErrorSuspense>
+          </ChartCard>
+        </>
+      )}
     </div>
   );
 };
