@@ -152,7 +152,7 @@ export const TokenFaq = ({
                       account={contract?.contract}
                       hideCopy
                       name={name}
-                      textClassName="max-w-60 underline"
+                      textClassName="max-w-60 inline-block underline"
                     />{' '}
                     {t('faq.creationContractCreated')}{' '}
                     <span className="text-foreground">
@@ -167,7 +167,7 @@ export const TokenFaq = ({
                     <AccountLink
                       account={firstDeployment.predecessor_account_id}
                       hideCopy
-                      textClassName="max-w-60 underline"
+                      textClassName="max-w-60 inline-block underline"
                     />{' '}
                     {t('faq.creationThrough')}{' '}
                     <Link

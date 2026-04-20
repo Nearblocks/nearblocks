@@ -30,7 +30,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
   const heatmap = !loading && heatmapPromise ? use(heatmapPromise) : null;
 
   return (
-    <div className="h-105">
+    <div>
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Card className="px-3 py-4">
           <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">

@@ -40,7 +40,7 @@ export const Contract = ({
   return (
     <List pairsPerRow={1}>
       <ListItem>
-        <ListLeft className="flex min-w-40 items-center gap-1">
+        <ListLeft className="flex min-w-50 items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <RiQuestionLine className="size-4" />
@@ -52,9 +52,9 @@ export const Contract = ({
           {t('contract.overview.contractHash')}
         </ListLeft>
         <ListRight className="xl:py-2.5">
-          <p className="flex min-w-30 items-center gap-1">
+          <p className="flex items-center gap-1">
             <SkeletonSlot
-              fallback={<Skeleton className="h-7 w-40" />}
+              fallback={<Skeleton className="h-7 w-70" />}
               loading={loading || !contract}
             >
               {() => (
@@ -71,6 +71,54 @@ export const Contract = ({
           </p>
         </ListRight>
       </ListItem>
+      {contract?.global_account_id && (
+        <ListItem>
+          <ListLeft className="flex min-w-40 items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <RiQuestionLine className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent>
+                {t('contract.overview.globalContractAccountTip')}
+              </TooltipContent>
+            </Tooltip>
+            {t('contract.overview.globalContractAccount')}
+          </ListLeft>
+          <ListRight>
+            <p>
+              <AccountLink
+                account={contract.global_account_id}
+                textClassName="max-w-60"
+              />
+            </p>
+          </ListRight>
+        </ListItem>
+      )}
+      {contract?.global_code_hash && (
+        <ListItem>
+          <ListLeft className="flex min-w-40 items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <RiQuestionLine className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent>
+                {t('contract.overview.globalContractHashTip')}
+              </TooltipContent>
+            </Tooltip>
+            {t('contract.overview.globalContractHash')}
+          </ListLeft>
+          <ListRight className="xl:py-2.5">
+            <p className="flex min-w-30 items-center gap-1">
+              {contract.global_code_hash}{' '}
+              <Copy
+                className="text-muted-foreground"
+                size="icon-xs"
+                text={contract.global_code_hash}
+              />
+            </p>
+          </ListRight>
+        </ListItem>
+      )}
       <ListItem>
         <ListLeft className="flex min-w-40 items-center gap-1">
           <Tooltip>
@@ -84,7 +132,7 @@ export const Contract = ({
           {t('contract.overview.contractLocked')}
         </ListLeft>
         <ListRight>
-          <p>
+          <p className="py-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-20" />}
               loading={loading || !account}
@@ -113,7 +161,7 @@ export const Contract = ({
           {t('contract.overview.lastUpdated')}
         </ListLeft>
         <ListRight>
-          <p>
+          <p className="py-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-60" />}
               loading={loading || !deployments || deployments.length === 0}
@@ -141,14 +189,14 @@ export const Contract = ({
           {t('contract.overview.txnHash')}
         </ListLeft>
         <ListRight>
-          <p>
+          <p className="py-0.5">
             <SkeletonSlot
-              fallback={<Skeleton className="w-30" />}
+              fallback={<Skeleton className="w-50" />}
               loading={loading || !deployments || deployments.length === 0}
             >
               {() => (
                 <Link
-                  className="text-link inline-block w-30 truncate align-middle"
+                  className="text-link inline-block w-50 truncate align-middle"
                   href={`/txns/${
                     deployments?.[1]?.transaction_hash ??
                     deployments![0].transaction_hash
@@ -177,11 +225,14 @@ export const Contract = ({
         <ListRight>
           <p>
             <SkeletonSlot
-              fallback={<Skeleton className="w-20" />}
+              fallback={<Skeleton className="w-30" />}
               loading={loading || !deployments || deployments.length === 0}
             >
               {() => (
-                <AccountLink account={deployments![0].predecessor_account_id} />
+                <AccountLink
+                  account={deployments![0].predecessor_account_id}
+                  textClassName="max-w-60"
+                />
               )}
             </SkeletonSlot>
           </p>
@@ -201,7 +252,7 @@ export const Contract = ({
             {t('contract.overview.txnHash')}
           </ListLeft>
           <ListRight>
-            <p>
+            <p className="py-0.5">
               <SkeletonSlot
                 fallback={<Skeleton className="w-30" />}
                 loading={loading || !deployments || deployments.length === 0}

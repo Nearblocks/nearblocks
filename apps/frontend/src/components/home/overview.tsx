@@ -228,7 +228,7 @@ export const Overview = ({
           <h3 className="text-body-xs text-muted-foreground pb-2 uppercase">
             {t('chart.title')}
           </h3>
-          <div className="flex items-start">
+          <div>
             <SkeletonSlot
               fallback={<Skeleton className="h-28.75 w-full" />}
               loading={loading || !dailyStats}
