@@ -14,7 +14,7 @@ export const PriceChange = ({ change, className, ...props }: Props) => {
 
   if (changeNumber < 0) {
     return (
-      <span className={cn('text-body-xs text-red-foreground', className)} {...props}>
+      <span className={cn('text-body-xs text-red-500', className)} {...props}>
         ({numberFormat(changeNumber, { maximumFractionDigits: 2 })}%)
       </span>
     );

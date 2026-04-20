@@ -34,7 +34,7 @@ export const Wallet = ({ className }: Props) => {
     <button
       className={cn(
         className,
-        'text-body-sm inline-flex w-24 cursor-pointer items-center gap-1.5 px-2 py-2 text-foreground hover:text-link transition-colors disabled:opacity-50',
+        'text-body-sm text-foreground hover:text-link inline-flex w-24 cursor-pointer items-center gap-1.5 px-2 py-2 transition-colors disabled:opacity-50',
       )}
       disabled={!isInitialized}
       onClick={handleClick}

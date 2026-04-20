@@ -13,8 +13,12 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
 import { TxnStatus } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { NearCircle } from '@/icons/near-circle';
-import { gasFormat, nearFiatFormat, nearFormat, numberFormat } from '@/lib/format';
+import {
+  gasFormat,
+  nearFiatFormat,
+  nearFormat,
+  numberFormat,
+} from '@/lib/format';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -303,7 +307,7 @@ export const ReceiptInspectRows = ({
               <span className="flex items-center gap-1">
                 {receipt!.outcome.tokens_burnt &&
                   nearFormat(receipt!.outcome.tokens_burnt)}{' '}
-                <NearCircle className="size-4" />
+                Ⓝ
               </span>
             )}
           </SkeletonSlot>

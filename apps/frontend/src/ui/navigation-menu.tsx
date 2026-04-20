@@ -69,7 +69,11 @@ const NavigationMenuTrigger = ({
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Trigger>) => {
   return (
     <NavigationMenuPrimitive.Trigger
-      className={cn(navigationMenuTriggerStyle(), 'group cursor-pointer', className)}
+      className={cn(
+        navigationMenuTriggerStyle(),
+        'group cursor-pointer',
+        className,
+      )}
       data-slot="navigation-menu-trigger"
       id={`navigation-menu-trigger-${props.id}`}
       {...props}
@@ -91,7 +95,7 @@ const NavigationMenuContent = ({
     <NavigationMenuPrimitive.Content
       className={cn(
         'data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out top-0 left-0 w-full p-2 pr-2.5 md:absolute md:w-auto',
-        'group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 group-data-[viewport=false]/navigation-menu:top-full group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:overflow-hidden group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:border-t-[3px] group-data-[viewport=false]/navigation-menu:border-t-link group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-100 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none',
+        'group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 group-data-[viewport=false]/navigation-menu:border-t-link group-data-[viewport=false]/navigation-menu:top-full group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:overflow-hidden group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:border-t-[3px] group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-100 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none',
         className,
       )}
       data-slot="navigation-menu-content"
@@ -112,7 +116,7 @@ const NavigationMenuViewport = ({
     >
       <NavigationMenuPrimitive.Viewport
         className={cn(
-          'origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-(--radix-navigation-menu-viewport-height) w-full overflow-hidden rounded-md border border-t-2 border-t-primary shadow duration-150 md:w-(--radix-navigation-menu-viewport-width)',
+          'origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 border-t-primary relative mt-1.5 h-(--radix-navigation-menu-viewport-height) w-full overflow-hidden rounded-md border border-t-2 shadow duration-150 md:w-(--radix-navigation-menu-viewport-width)',
           className,
         )}
         data-slot="navigation-menu-viewport"

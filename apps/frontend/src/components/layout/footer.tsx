@@ -24,7 +24,9 @@ export const Footer = () => {
             <Link href="/">
               <Logo className="text-primary h-9" />
             </Link>
-            <p className="text-muted-foreground max-w-85">{t('footer.description')}</p>
+            <p className="text-muted-foreground max-w-85">
+              {t('footer.description')}
+            </p>
             <div className="flex gap-2">
               <Link
                 className="border-border flex size-8 items-center justify-center rounded-full border"
@@ -56,7 +58,7 @@ export const Footer = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary font-medium pb-3">
+            <h3 className="text-headline-sm text-primary pb-3 font-medium">
               {t('footer.menu.tools.title')}
             </h3>
             <ul className="space-y-1">
@@ -82,7 +84,7 @@ export const Footer = () => {
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary font-medium pb-3">
+            <h3 className="text-headline-sm text-primary pb-3 font-medium">
               {t('footer.menu.explore.title')}
             </h3>
             <ul className="space-y-1">
@@ -103,7 +105,7 @@ export const Footer = () => {
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary font-medium pb-3">
+            <h3 className="text-headline-sm text-primary pb-3 font-medium">
               {t('footer.menu.company.title')}
             </h3>
             <ul className="space-y-1">

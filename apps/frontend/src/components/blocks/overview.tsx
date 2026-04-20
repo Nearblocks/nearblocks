@@ -37,7 +37,6 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             [{t('overview.testnetNotice')}]
           </p>
         )}
-        {/* Section 1: Core block info */}
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
@@ -187,7 +186,6 @@ export const Overview = ({ blockPromise, loading }: Props) => {
 
         <hr className="border-border my-2" />
 
-        {/* Section 2: Gas & technical details */}
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">

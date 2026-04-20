@@ -40,10 +40,12 @@ export const SearchPopover = ({
         !e.metaKey &&
         !['INPUT', 'TEXTAREA', 'SELECT'].includes(
           (e.target as HTMLElement).tagName,
-        )
+        ) &&
+        inputRef.current
       ) {
         e.preventDefault();
-        inputRef.current?.focus();
+        e.stopImmediatePropagation();
+        inputRef.current.focus();
       }
     };
 
@@ -93,7 +95,10 @@ export const SearchPopover = ({
       <PopoverAnchor asChild>
         <Input
           autoComplete="off"
-          className={cn('bg-card dark:bg-card border-0 shadow-none focus-visible:ring-neutral-300/50 focus-visible:border-neutral-300', className)}
+          className={cn(
+            'bg-card dark:bg-card border-0 shadow-none focus-visible:border-neutral-300 focus-visible:ring-neutral-300/50',
+            className,
+          )}
           name="keyword"
           onChange={onChange}
           onFocus={onFocus}
