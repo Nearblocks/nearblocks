@@ -38,11 +38,15 @@ export const ContractCode = ({ contract }: Props) => {
       method: 'contract_source_metadata',
     });
   const { data: verifierResponse, isLoading: isLoadingVerifier } =
-    useView<ContractVerifierResponse | null>({
-      args: { code_hash: contract.code_hash },
-      contract: verifier.contract,
-      method: 'get_contracts_by_code_hash',
-    });
+    useView<ContractVerifierResponse | null>(
+      contract.code_hash
+        ? {
+            args: { code_hash: contract.code_hash },
+            contract: verifier.contract,
+            method: 'get_contracts_by_code_hash',
+          }
+        : null,
+    );
 
   const verifierData = useMemo(() => {
     return verifierResponse?.[0]?.[1] || null;
@@ -53,7 +57,8 @@ export const ContractCode = ({ contract }: Props) => {
       sourceMetadata?.standards?.some(
         (s) => s.standard.toLowerCase() === 'nep330',
       ) || false;
-    const isVerified = verifierData?.code_hash === contract.code_hash;
+    const isVerified =
+      !!contract.code_hash && verifierData?.code_hash === contract.code_hash;
 
     return { isNep330, isVerified };
   }, [sourceMetadata, verifierData, contract.code_hash]);

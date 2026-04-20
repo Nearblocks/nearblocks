@@ -11,7 +11,7 @@ import type {
 import response from 'nb-schemas/dist/accounts/response.js';
 
 import config from '#config';
-import { getProvider } from '#libs/near';
+import { getProvider, viewCode } from '#libs/near';
 import { dbBase, dbContract, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
 import { rollingWindow } from '#libs/response';
@@ -20,10 +20,30 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
 
+type RpcCode = { code_base64: string; hash: string } | null;
 type Deployment = {
   block_timestamp: string;
   receipt_id: string;
 };
+
+const globalCode = (account: string): Promise<RpcCode> =>
+  redis.cache<RpcCode>(
+    `v3:contract:${account}:code`,
+    async () => {
+      try {
+        const res = (await viewCode(getProvider(), account)) as {
+          code_base64?: string;
+          hash?: string;
+        };
+        if (!res?.code_base64 || !res?.hash) return null;
+
+        return { code_base64: res.code_base64, hash: res.hash };
+      } catch (error) {
+        return null;
+      }
+    },
+    60 * 5, // 5 mins
+  );
 
 const contract = responseHandler(
   response.contract,
@@ -33,6 +53,24 @@ const contract = responseHandler(
     const data = await dbContract.oneOrNone<Contract>(sql.contracts.contract, {
       account,
     });
+
+    if (!data) return { data: null };
+
+    const isGlobal =
+      !data.code_base64 && !!(data.global_account_id || data.global_code_hash);
+
+    if (isGlobal) {
+      const rpc = await globalCode(account);
+      if (rpc) {
+        return {
+          data: {
+            ...data,
+            code_base64: rpc.code_base64,
+            code_hash: rpc.hash,
+          },
+        };
+      }
+    }
 
     return { data };
   },
@@ -98,18 +136,33 @@ const schema = responseHandler(
       account,
     });
 
-    if (!data || !data?.code_base64) {
+    if (!data) {
       return { data: null };
     }
 
-    const codeBase64 = data.code_base64;
     const provider = getProvider();
-    const [parsed, schema] = await Promise.all([
+
+    const [code, schema] = await Promise.all([
       (async () => {
+        let codeBase64 = data.code_base64;
+        const isGlobal =
+          !data.code_base64 &&
+          !!(data.global_account_id || data.global_code_hash);
+
+        if (!codeBase64 && isGlobal) {
+          const rpc = await globalCode(account);
+          codeBase64 = rpc?.code_base64 ?? null;
+        }
+
+        if (!codeBase64) {
+          return { codeBase64: null, parsed: null };
+        }
+
         try {
-          return await parser.parseContract(codeBase64);
+          const parsed = await parser.parseContract(codeBase64);
+          return { codeBase64, parsed };
         } catch (error) {
-          return null;
+          return { codeBase64, parsed: null };
         }
       })(),
       redis.cache(
@@ -125,10 +178,14 @@ const schema = responseHandler(
       ),
     ]);
 
+    if (!code.codeBase64) {
+      return { data: null };
+    }
+
     return {
       data: {
         account_id: account,
-        method_names: parsed ? parsed.methodNames : [],
+        method_names: code.parsed ? code.parsed.methodNames : [],
         schema,
       },
     };

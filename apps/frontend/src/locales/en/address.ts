@@ -27,6 +27,7 @@ export const address = {
       sent: 'Sent (Out)',
       transfers: 'Transfer Amounts',
     },
+    noData: 'No data to display',
     overview: {
       activeAge: 'Active Age',
       activeAgeTip:
@@ -133,6 +134,12 @@ export const address = {
       contractLocked: 'Contract Locked:',
       contractLockedTip:
         'Locked contract means that there are no access keys allowing the contract code to be re-deployed',
+      globalContractAccount: 'Global Contract Account:',
+      globalContractAccountTip:
+        'This account uses shared global contract code from the specified account.',
+      globalContractHash: 'Global Contract Hash:',
+      globalContractHashTip:
+        'This account uses shared global contract code from the specified hash.',
       lastUpdated: 'Last Updated:',
       lastUpdatedTip: 'The last time the contract was updated.',
       no: 'No',

@@ -7,6 +7,7 @@ import { AccountAssetFT, AccountBalance, Stats } from 'nb-schemas';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, nearFiatFormat, nearFormat } from '@/lib/format';
@@ -32,6 +33,7 @@ export const Overview = ({
   tokensPromise,
 }: Props) => {
   const { t } = useLocale('address');
+  const network = useConfig((s) => s.config.network);
   const stats = !loading && statsPromise ? use(statsPromise) : null;
   const balance = !loading && balancePromise ? use(balancePromise) : null;
 
@@ -58,27 +60,29 @@ export const Overview = ({
               </p>
             </ListRight>
           </ListItem>
-          <ListItem>
-            <ListLeft className="min-w-20">{t('overview.value')}</ListLeft>
-            <ListRight>
-              <p className="flex items-center gap-1">
-                <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
-                  loading={loading || !balance || !stats}
-                >
-                  {() => (
-                    <>
-                      {nearFiatFormat(balance!.amount, stats!.near_price)}{' '}
-                      <span className="text-muted-foreground flex items-center gap-1">
-                        @{currencyFormat(stats!.near_price)} /
-                        <NearCircle className="size-4" />
-                      </span>
-                    </>
-                  )}
-                </SkeletonSlot>
-              </p>
-            </ListRight>
-          </ListItem>
+          {network === 'mainnet' && (
+            <ListItem>
+              <ListLeft className="min-w-20">{t('overview.value')}</ListLeft>
+              <ListRight>
+                <p className="flex items-center gap-1">
+                  <SkeletonSlot
+                    fallback={<Skeleton className="w-20" />}
+                    loading={loading || !balance || !stats}
+                  >
+                    {() => (
+                      <>
+                        {nearFiatFormat(balance!.amount, stats!.near_price)}{' '}
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          @{currencyFormat(stats!.near_price)} /
+                          <NearCircle className="size-4" />
+                        </span>
+                      </>
+                    )}
+                  </SkeletonSlot>
+                </p>
+              </ListRight>
+            </ListItem>
+          )}
           <ListItem>
             <ListLeft className="min-w-20">{t('overview.tokens')}</ListLeft>
             <ListRight className="xl:py-2">

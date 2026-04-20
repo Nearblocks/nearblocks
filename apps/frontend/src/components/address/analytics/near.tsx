@@ -4,10 +4,12 @@ import { Tooltip, XAxis, YAxis } from '@highcharts/react';
 import { Column } from '@highcharts/react/series';
 import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
+import { ChartLine } from 'lucide-react';
 import { use, useMemo } from 'react';
 
 import { AccountNearStats } from 'nb-schemas';
 
+import { EmptyBox } from '@/components/empty';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat, toNear } from '@/lib/format';
@@ -60,7 +62,7 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
       amountOut.push([timestamp, +toNear(item.amount_out)]);
     }
 
-    return { amountIn, amountOut };
+    return { amountIn, amountOut, isEmpty: stats?.length === 0 };
   }, [stats]);
 
   return (
@@ -69,26 +71,35 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
         fallback={<Skeleton className="h-105 w-full" />}
         loading={loading || !stats}
       >
-        {() => (
-          <AnalyticsChart>
-            <XAxis className="stroke-0" type="datetime" />
-            <YAxis
-              className="stroke-0"
-              labels={countLabel}
-              opposite={false}
-              title={{ text: t('analytics.near.transfers') }}
-            />
-            <Column.Series
-              data={data.amountOut}
-              options={{ id: 'amountOut', name: t('analytics.near.sent') }}
-            />
-            <Column.Series
-              data={data.amountIn}
-              options={{ id: 'amountIn', name: t('analytics.near.received') }}
-            />
-            <Tooltip formatter={tooltipFormatter} shared />
-          </AnalyticsChart>
-        )}
+        {() =>
+          data.isEmpty ? (
+            <div className="flex h-full">
+              <EmptyBox
+                description={t('analytics.noData')}
+                icon={<ChartLine />}
+              />
+            </div>
+          ) : (
+            <AnalyticsChart>
+              <XAxis className="stroke-0" type="datetime" />
+              <YAxis
+                className="stroke-0"
+                labels={countLabel}
+                opposite={false}
+                title={{ text: t('analytics.near.transfers') }}
+              />
+              <Column.Series
+                data={data.amountOut}
+                options={{ id: 'amountOut', name: t('analytics.near.sent') }}
+              />
+              <Column.Series
+                data={data.amountIn}
+                options={{ id: 'amountIn', name: t('analytics.near.received') }}
+              />
+              <Tooltip formatter={tooltipFormatter} shared />
+            </AnalyticsChart>
+          )
+        }
       </SkeletonSlot>
     </div>
   );

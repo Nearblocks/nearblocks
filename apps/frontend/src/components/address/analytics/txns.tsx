@@ -4,10 +4,12 @@ import { Tooltip, XAxis, YAxis } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
+import { ChartLine } from 'lucide-react';
 import { use, useMemo } from 'react';
 
 import { AccountTxnStats } from 'nb-schemas';
 
+import { EmptyBox } from '@/components/empty';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat } from '@/lib/format';
@@ -61,7 +63,7 @@ export const TxnsChart = ({ loading, txnsPromise }: Props) => {
       uniqueOut.push([timestamp, +item.unique_address_out]);
     }
 
-    return { txns, uniqueIn, uniqueOut };
+    return { isEmpty: stats?.length === 0, txns, uniqueIn, uniqueOut };
   }, [stats]);
 
   return (
@@ -70,30 +72,39 @@ export const TxnsChart = ({ loading, txnsPromise }: Props) => {
         fallback={<Skeleton className="h-105 w-full" />}
         loading={loading || !stats}
       >
-        {() => (
-          <AnalyticsChart>
-            <XAxis className="stroke-0" type="datetime" />
-            <YAxis
-              className="stroke-0"
-              labels={txnsLabel}
-              opposite={false}
-              title={{ text: t('analytics.txns.count') }}
-            />
-            <Line.Series
-              data={data.txns}
-              options={{ id: 'txns', name: t('analytics.txns.transactions') }}
-            />
-            <Line.Series
-              data={data.uniqueIn}
-              options={{ id: 'in', name: t('analytics.txns.uniqueIn') }}
-            />
-            <Line.Series
-              data={data.uniqueOut}
-              options={{ id: 'out', name: t('analytics.txns.uniqueOut') }}
-            />
-            <Tooltip formatter={tooltipFormatter} shared />
-          </AnalyticsChart>
-        )}
+        {() =>
+          data.isEmpty ? (
+            <div className="flex h-full">
+              <EmptyBox
+                description={t('analytics.noData')}
+                icon={<ChartLine />}
+              />
+            </div>
+          ) : (
+            <AnalyticsChart>
+              <XAxis className="stroke-0" type="datetime" />
+              <YAxis
+                className="stroke-0"
+                labels={txnsLabel}
+                opposite={false}
+                title={{ text: t('analytics.txns.count') }}
+              />
+              <Line.Series
+                data={data.txns}
+                options={{ id: 'txns', name: t('analytics.txns.transactions') }}
+              />
+              <Line.Series
+                data={data.uniqueIn}
+                options={{ id: 'in', name: t('analytics.txns.uniqueIn') }}
+              />
+              <Line.Series
+                data={data.uniqueOut}
+                options={{ id: 'out', name: t('analytics.txns.uniqueOut') }}
+              />
+              <Tooltip formatter={tooltipFormatter} shared />
+            </AnalyticsChart>
+          )
+        }
       </SkeletonSlot>
     </div>
   );

@@ -4,10 +4,12 @@ import { Tooltip, XAxis, YAxis } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
+import { ChartLine } from 'lucide-react';
 import { use, useMemo } from 'react';
 
 import { AccountBalanceStats } from 'nb-schemas';
 
+import { EmptyBox } from '@/components/empty';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { bytesFormat, dateFormat, numberFormat, toNear } from '@/lib/format';
@@ -69,7 +71,7 @@ export const BalanceChart = ({ balancePromise, loading }: Props) => {
       storage.push([timestamp, +item.storage_usage]);
     }
 
-    return { amount, staked, storage };
+    return { amount, isEmpty: stats?.length === 0, staked, storage };
   }, [stats]);
 
   return (
@@ -78,47 +80,56 @@ export const BalanceChart = ({ balancePromise, loading }: Props) => {
         fallback={<Skeleton className="h-105 w-full" />}
         loading={loading || !stats}
       >
-        {() => (
-          <AnalyticsChart>
-            <XAxis className="stroke-0" type="datetime" />
-            <YAxis
-              className="stroke-0"
-              labels={balanceLabel}
-              opposite={false}
-              title={{ text: t('analytics.balance.balance') }}
-            />
-            <Line.Series
-              data={data.amount}
-              options={{
-                id: 'balance',
-                name: t('analytics.balance.balance'),
-                yAxis: 0,
-              }}
-            />
-            <Line.Series
-              data={data.staked}
-              options={{
-                id: 'staked',
-                name: t('analytics.balance.stakedBalance'),
-                yAxis: 0,
-              }}
-            />
-            <YAxis
-              className="stroke-0"
-              labels={storageLabel}
-              title={{ text: t('analytics.balance.storage') }}
-            />
-            <Line.Series
-              data={data.storage}
-              options={{
-                id: 'storage',
-                name: t('analytics.balance.storage'),
-                yAxis: 1,
-              }}
-            />
-            <Tooltip formatter={tooltipFormatter} shared />
-          </AnalyticsChart>
-        )}
+        {() =>
+          data.isEmpty ? (
+            <div className="flex h-full">
+              <EmptyBox
+                description={t('analytics.noData')}
+                icon={<ChartLine />}
+              />
+            </div>
+          ) : (
+            <AnalyticsChart>
+              <XAxis className="stroke-0" type="datetime" />
+              <YAxis
+                className="stroke-0"
+                labels={balanceLabel}
+                opposite={false}
+                title={{ text: t('analytics.balance.balance') }}
+              />
+              <Line.Series
+                data={data.amount}
+                options={{
+                  id: 'balance',
+                  name: t('analytics.balance.balance'),
+                  yAxis: 0,
+                }}
+              />
+              <Line.Series
+                data={data.staked}
+                options={{
+                  id: 'staked',
+                  name: t('analytics.balance.stakedBalance'),
+                  yAxis: 0,
+                }}
+              />
+              <YAxis
+                className="stroke-0"
+                labels={storageLabel}
+                title={{ text: t('analytics.balance.storage') }}
+              />
+              <Line.Series
+                data={data.storage}
+                options={{
+                  id: 'storage',
+                  name: t('analytics.balance.storage'),
+                  yAxis: 1,
+                }}
+              />
+              <Tooltip formatter={tooltipFormatter} shared />
+            </AnalyticsChart>
+          )
+        }
       </SkeletonSlot>
     </div>
   );
