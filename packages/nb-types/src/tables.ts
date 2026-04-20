@@ -23,7 +23,6 @@ export interface TTables {
   blocks: Block;
   chunks: Chunk;
   contract_code_events: ContractCodeEvent;
-  contract_data_events: ContractDataEvent;
   daily_stats: DailyStats;
   deployed_contracts: DeployedContracts;
   dex_events: DexEvents;
@@ -133,21 +132,11 @@ export type ContractCodeEvent = {
   code_hash: null | string;
   contract_account_id: string;
   event_type: ContractEventType;
+  global_account_id: null | string;
+  global_code_hash: null | string;
   index_in_chunk: number;
   receipt_id: string;
   shard_id: number;
-};
-
-export type ContractDataEvent = {
-  block_height: number;
-  block_timestamp: string;
-  contract_account_id: string;
-  event_type: ContractEventType;
-  index_in_chunk: number;
-  key_base64: string;
-  receipt_id: string;
-  shard_id: number;
-  value_base64: null | string;
 };
 
 export type DailyStats = {

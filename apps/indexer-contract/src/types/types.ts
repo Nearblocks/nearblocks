@@ -44,27 +44,11 @@ export type ContractDeletion = {
   accountId: string;
 };
 
-export type DataUpdate = {
-  accountId: string;
-  keyBase64: string;
-  valueBase64: string;
-};
-
-export type DataDeletion = {
-  accountId: string;
-  keyBase64: string;
-};
-
 export type ContractCode = {
   accountId: string;
   codeBase64: null | string;
   codeHash: null | string;
+  globalAccountId: null | string;
+  globalCodeHash: null | string;
   type: ContractEventType;
-};
-
-export type ContractData = {
-  accountId: string;
-  keyBase64: string;
-  type: ContractEventType;
-  valueBase64: null | string;
 };

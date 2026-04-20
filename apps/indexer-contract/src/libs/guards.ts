@@ -1,12 +1,11 @@
+import {
+  Action,
+  UseGlobalContractAction,
+  UseGlobalContractByAccountIdAction,
+} from 'nb-neardata';
 import { StateChangeValueView } from 'nb-types';
 
-import {
-  ContractDeletion,
-  ContractUpdate,
-  DataDeletion,
-  DataUpdate,
-  StateChange,
-} from '#types/types';
+import { ContractDeletion, ContractUpdate, StateChange } from '#types/types';
 
 export const isContractUpdate = (
   stateChange: StateChange<unknown>,
@@ -20,14 +19,13 @@ export const isContractDeletion = (
   (stateChange as StateChange<ContractDeletion>).type ===
   StateChangeValueView.ContractCodeDeletion;
 
-export const isDataUpdate = (
-  stateChange: StateChange<unknown>,
-): stateChange is StateChange<DataUpdate> =>
-  (stateChange as StateChange<DataUpdate>).type ===
-  StateChangeValueView.DataUpdate;
+export const isUseGlobalContractAction = (
+  action: Action,
+): action is UseGlobalContractAction =>
+  (action as UseGlobalContractAction).UseGlobalContract !== undefined;
 
-export const isDataDeletion = (
-  stateChange: StateChange<unknown>,
-): stateChange is StateChange<DataDeletion> =>
-  (stateChange as StateChange<DataDeletion>).type ===
-  StateChangeValueView.DataDeletion;
+export const isUseGlobalContractByAccountIdAction = (
+  action: Action,
+): action is UseGlobalContractByAccountIdAction =>
+  (action as UseGlobalContractByAccountIdAction)
+    .UseGlobalContractByAccountId !== undefined;

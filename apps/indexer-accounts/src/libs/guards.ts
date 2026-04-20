@@ -4,6 +4,7 @@ import {
   AddKeyAction,
   DeleteAccountAction,
   DeleteKeyAction,
+  DeterministicStateInitAction,
   TransferAction,
 } from 'nb-neardata';
 
@@ -30,3 +31,8 @@ export const isDeleteAccountAction = (
   action: Action,
 ): action is DeleteAccountAction =>
   (action as DeleteAccountAction).DeleteAccount !== undefined;
+
+export const isDeterministicStateInitAction = (
+  action: Action,
+): action is DeterministicStateInitAction =>
+  (action as DeterministicStateInitAction).DeterministicStateInit !== undefined;
