@@ -7,7 +7,7 @@ import metrics from '#libs/prom';
 import sentry from '#libs/sentry';
 import { storeChanges } from '#services/changes';
 
-const indexerKey = config.indexerKey;
+const indexerKey = 'contracts-backfill';
 
 export const syncData = async () => {
   const settings = await db('settings').where({ key: indexerKey }).first();
