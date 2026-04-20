@@ -75,7 +75,6 @@ export const Overview = ({
             [{t('overview.testnetNotice')}]
           </p>
         )}
-        {/* Section 1: Core transaction info */}
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
@@ -212,7 +211,6 @@ export const Overview = ({
 
         <hr className="border-border my-2" />
 
-        {/* Section 2: Addresses & transfers */}
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">
@@ -271,7 +269,6 @@ export const Overview = ({
 
         <hr className="border-border my-2" />
 
-        {/* Section 3: Fees & gas */}
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="flex min-w-60 items-center gap-1">

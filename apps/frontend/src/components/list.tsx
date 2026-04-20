@@ -97,7 +97,7 @@ const ListLeft = ({ className, ...props }: ListLeftProps) => {
     <h3
       className={cn(
         'text-muted-foreground border-b-0 px-3 py-2 md:py-2',
-        'overflow-hidden md:self-stretch md:items-center md:flex group-data-[last-row=true]/list-item:md:border-b-0',
+        'overflow-hidden md:flex md:items-center md:self-stretch group-data-[last-row=true]/list-item:md:border-b-0',
         className,
       )}
       data-slot="list-left"
@@ -113,7 +113,7 @@ const ListRight = ({ className, ...props }: ListRightProps) => {
     <div
       className={cn(
         'w-full min-w-0 border-b-0 px-3 py-2 md:py-2',
-        'overflow-hidden md:self-stretch md:items-center md:flex group-data-[last-row=true]/list-item:md:border-b-0',
+        'overflow-hidden md:flex md:items-center md:self-stretch group-data-[last-row=true]/list-item:md:border-b-0',
         className,
       )}
       data-slot="list-right"

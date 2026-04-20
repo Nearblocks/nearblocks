@@ -64,7 +64,7 @@ export const Overview = ({
       <div className={gridClass}>
         {network === 'mainnet' && (
           <>
-            <div className="divide-y divide-border">
+            <div className="divide-border divide-y">
               <div className="flex items-center gap-3 py-3">
                 <div className="bg-muted rounded-lg p-3">
                   <Near className="size-6" />
@@ -82,7 +82,8 @@ export const Overview = ({
                         <>
                           {currencyFormat(stats!.near_price)}{' '}
                           <span className="text-body-sm text-muted-foreground">
-                            @{' '}{numberFormat(stats!.near_btc_price, {
+                            @{' '}
+                            {numberFormat(stats!.near_btc_price, {
                               maximumFractionDigits: 6,
                             })}{' '}
                             BTC

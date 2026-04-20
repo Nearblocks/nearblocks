@@ -178,7 +178,7 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-roboto);
   --font-mono: var(--font-geist);
 
   --text-*: initial;
