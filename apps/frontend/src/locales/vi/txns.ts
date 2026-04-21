@@ -1,6 +1,7 @@
 export const txns = {
   actions: {
     addKey: 'New Key',
+    by: 'By',
     call: 'Call',
     calledMethod: 'Called method',
     createAccount: 'Create Account',
@@ -14,7 +15,6 @@ export const txns = {
     from: 'From',
     inContract: 'in contract',
     on: 'On',
-    by: 'By',
     stake: 'Stake',
     title: 'Transaction Actions',
     to: 'To',

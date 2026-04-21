@@ -146,7 +146,9 @@ export const NftTokens = ({
               />
             ))
           ) : (
-            <EmptyBox description={t('inventory.empty')} icon={<Inbox />} />
+            <div className="col-span-full">
+              <EmptyBox description={t('inventory.empty')} icon={<Inbox />} />
+            </div>
           )}
         </div>
         {!loading && (tokens?.meta?.next_page || tokens?.meta?.prev_page) && (

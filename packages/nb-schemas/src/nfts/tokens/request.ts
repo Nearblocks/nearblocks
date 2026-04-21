@@ -1,10 +1,15 @@
 import * as v from 'valibot';
 
-import { cursorSchema, limitSchema, tsSchema } from '../../common.js';
+import {
+  cursorSchema,
+  limitSchema,
+  limitSchemaMax,
+  tsSchema,
+} from '../../common.js';
 
 const list = v.object({
   contract: v.string(),
-  limit: limitSchema,
+  limit: limitSchemaMax(24),
   next: cursorSchema,
   prev: cursorSchema,
 });

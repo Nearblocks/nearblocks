@@ -38,7 +38,7 @@ export const SearchPopover = ({
         e.key === '/' &&
         !e.ctrlKey &&
         !e.metaKey &&
-        !['INPUT', 'TEXTAREA', 'SELECT'].includes(
+        !['INPUT', 'SELECT', 'TEXTAREA'].includes(
           (e.target as HTMLElement).tagName,
         ) &&
         inputRef.current

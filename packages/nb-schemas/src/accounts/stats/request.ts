@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import { statsLimitSchema } from '../../common.js';
+import { limitSchemaMax } from '../../common.js';
 
 const overview = v.object({
   account: v.string(),
@@ -12,22 +12,22 @@ const heatmap = v.object({
 
 const txns = v.object({
   account: v.string(),
-  limit: statsLimitSchema,
+  limit: limitSchemaMax(365),
 });
 
 const balance = v.object({
   account: v.string(),
-  limit: statsLimitSchema,
+  limit: limitSchemaMax(365),
 });
 
 const near = v.object({
   account: v.string(),
-  limit: statsLimitSchema,
+  limit: limitSchemaMax(365),
 });
 
 const fts = v.object({
   account: v.string(),
-  limit: statsLimitSchema,
+  limit: limitSchemaMax(365),
 });
 
 export type AccountStatsOverviewReq = v.InferOutput<typeof overview>;

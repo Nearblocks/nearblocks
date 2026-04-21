@@ -126,6 +126,12 @@ const AddressLayout = async ({ children, params }: Props) => {
                 </ActiveLink>
               </TabLink>
               <TabLink asChild>
+                <ActiveLink exact={false} href={`/address/${address}/assets`}>
+                  {t('tabs.assets')}
+                  <TabBadge variant="teal">NEW</TabBadge>
+                </ActiveLink>
+              </TabLink>
+              <TabLink asChild>
                 <ActiveLink
                   exact={false}
                   href={`/address/${address}/analytics`}

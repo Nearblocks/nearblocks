@@ -1,41 +1,59 @@
+WITH
+  holdings AS (
+    SELECT
+      fh.contract,
+      fh.amount,
+      fm.name,
+      fm.symbol,
+      fm.decimals,
+      fm.icon,
+      fm.reference,
+      fm.price,
+      COALESCE(
+        fh.amount * fm.price / NULLIF(POWER(10, fm.decimals)::NUMERIC, 0),
+        0
+      ) AS value
+    FROM
+      ft_holders fh
+      JOIN ft_meta fm ON fm.contract = fh.contract
+    WHERE
+      fh.account = ${account}
+      AND fh.amount > 0
+  )
 SELECT
-  fh.contract,
-  fh.amount,
+  contract,
+  amount,
+  value,
   JSONB_BUILD_OBJECT(
     'contract',
-    fm.contract,
+    contract,
     'name',
-    fm.name,
+    name,
     'symbol',
-    fm.symbol,
+    symbol,
     'decimals',
-    fm.decimals,
+    decimals,
     'icon',
-    fm.icon,
+    icon,
     'reference',
-    fm.reference,
+    reference,
     'price',
-    fm.price::TEXT
+    price::TEXT
   ) AS meta
 FROM
-  ft_holders fh
-  JOIN ft_meta fm ON fm.contract = fh.contract
+  holdings
 WHERE
-  fh.account = ${account}
-  AND fh.amount > 0
-  AND (
-    (
-      ${cursor.amount}::NUMERIC IS NULL
-      AND ${cursor.contract}::TEXT IS NULL
-    )
-    OR (fh.amount < ${cursor.amount}::NUMERIC)
-    OR (
-      fh.amount = ${cursor.amount}::NUMERIC
-      AND fh.contract > ${cursor.contract}::TEXT
-    )
+  (
+    ${cursor.value}::NUMERIC IS NULL
+    AND ${cursor.contract}::TEXT IS NULL
+  )
+  OR (value < ${cursor.value}::NUMERIC)
+  OR (
+    value = ${cursor.value}::NUMERIC
+    AND contract > ${cursor.contract}::TEXT
   )
 ORDER BY
-  fh.amount DESC,
-  fh.contract ASC
+  value DESC,
+  contract ASC
 LIMIT
   ${limit}
