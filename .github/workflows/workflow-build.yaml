@@ -1,34 +1,13 @@
 name: Build Docker Images
 on:
   push:
-    branches: ['main', 'feat/api']
+    branches: ['backfill']
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service:
-          [
-            api,
-            api-user,
-            app,
-            frontend,
-            backend,
-            indexer-balance,
-            indexer-base,
-            indexer-events,
-            indexer-dex,
-            indexer-multichain,
-            indexer-signature,
-            indexer-staking,
-            indexer-receipts,
-            indexer-s3,
-            indexer-accounts,
-            indexer-contract,
-            explorer-selector,
-            aggregates,
-            block-proxy,
-          ]
+        service: [indexer-accounts, indexer-contract]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -43,11 +22,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine image tag
         run: |
-          if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ] || [ "${{ matrix.service }}" = "aggregates" ]; then
-            echo "TAG=:v2" >> $GITHUB_ENV
-          else
-            echo "TAG=:latest" >> $GITHUB_ENV
-          fi
+          echo "TAG=:backfill" >> $GITHUB_ENV
       - name: Get current image digest
         run: |
           CURRENT_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }} | jq -r '.config.digest' || echo "")
@@ -73,16 +48,3 @@ jobs:
         run: |
           NEW_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }} | jq -r '.config.digest')
           echo "NEW_DIGEST=$NEW_DIGEST" >> $GITHUB_ENV
-
-#      - name: Deploy testnet
-#        if: |
-#          env.CURRENT_DIGEST != env.NEW_DIGEST &&
-#          matrix.service != 'indexer-dex' &&
-#          matrix.service != 'indexer-s3' &&
-#          matrix.service != 'explorer-selector'
-#        run: |
-#          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
-#          export KUBECONFIG=$(pwd)/kubeconfig
-#
-#          kubectl set -n nearblocks-testnet image deployment/testnet-${{ matrix.service }} ${{ matrix.service }}=ghcr.io/nearblocks/${{ matrix.service }}:${{ github.sha }}
-#          kubectl rollout -n nearblocks-testnet status deployment/testnet-${{ matrix.service }} --timeout=600s
