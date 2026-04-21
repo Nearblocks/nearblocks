@@ -1,10 +1,10 @@
 import * as v from 'valibot';
 
-import { cursorSchema, limitSchema } from '../../common.js';
+import { cursorSchema, limitSchemaMax } from '../../common.js';
 
 const fts = v.object({
   account: v.string(),
-  limit: limitSchema,
+  limit: limitSchemaMax(250),
   next: cursorSchema,
   prev: cursorSchema,
 });
@@ -14,13 +14,13 @@ const ftCount = v.object({
 });
 
 const ftsCursor = v.object({
-  amount: v.string(),
   contract: v.string(),
+  value: v.string(),
 });
 
 const nfts = v.object({
   account: v.string(),
-  limit: limitSchema,
+  limit: limitSchemaMax(24),
   next: cursorSchema,
   prev: cursorSchema,
 });

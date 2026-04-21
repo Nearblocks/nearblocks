@@ -1,10 +1,10 @@
 import * as v from 'valibot';
 
-import { statsLimitSchema } from '../common.js';
+import { limitSchemaMax } from '../common.js';
 
 const daily = v.object({
   date: v.optional(v.pipe(v.string(), v.isoDate())),
-  limit: statsLimitSchema,
+  limit: limitSchemaMax(365),
 });
 
 export type DailyStatsReq = v.InferOutput<typeof daily>;

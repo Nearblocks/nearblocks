@@ -32,24 +32,27 @@ const fts = responseHandler(
     const direction = prev ? 'asc' : 'desc';
     const cursor = prev || next;
 
-    const fts = await dbEvents.manyOrNone<AccountAssetFT>(sql.assets.fts, {
-      account,
-      cursor: {
-        amount: cursor?.amount,
-        contract: cursor?.contract,
+    const fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
+      sql.assets.fts,
+      {
+        account,
+        cursor: {
+          contract: cursor?.contract,
+          value: cursor?.value,
+        },
+        direction,
+        // Fetch one extra to check if there is a next page
+        limit: limit + 1,
       },
-      direction,
-      // Fetch one extra to check if there is a next page
-      limit: limit + 1,
-    });
+    );
 
     return paginateData(
       fts,
       limit,
       direction,
       (ft) => ({
-        amount: ft.amount,
         contract: ft.contract,
+        value: ft.value,
       }),
       !!cursor,
     );

@@ -61,6 +61,13 @@ export const address = {
       uniqueOut: 'Unique Outgoing Addresses',
     },
   },
+  assets: {
+    nfts: {
+      empty: 'No NFT assets found',
+      token: 'Token ID: ',
+      total: 'A total of {{count}} NFT assets found',
+    },
+  },
   contract: {
     code: {
       base64: 'Contract Code (Base64):',
@@ -256,6 +263,7 @@ export const address = {
   tabs: {
     accessKeys: 'Access Keys',
     analytics: 'Analytics',
+    assets: 'NFT Assets',
     multiTokenTxns: 'Multi Token Txns',
     nftTxns: 'NFT Txns',
     receipts: 'Receipts',

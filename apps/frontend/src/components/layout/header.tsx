@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 
 import { Link } from '@/components/link';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { Logo } from '@/icons/logo';
 import { hrefForLocale } from '@/lib/locale';
@@ -40,14 +41,21 @@ const languageChoices: { locale: Locale; title: string }[] = [
   { locale: 'zh-hk', title: '漢語 (Traditional)' },
 ];
 
-const staticMenu: NavMenu<RouteKey<'layout'>> = [
+const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
   { href: '/', key: 'menu.home.title' },
   {
     key: 'menu.blockchain.title',
     menu: [
       { href: '/blocks', key: 'menu.blockchain.blocks' },
       { href: '/txns', key: 'menu.blockchain.txns' },
-      { href: '/multichain-txns', key: 'menu.blockchain.multichain' },
+      ...(isMainnet
+        ? [
+            {
+              href: '/multichain-txns',
+              key: 'menu.blockchain.multichain' as const,
+            },
+          ]
+        : []),
       { href: '/charts', key: 'menu.blockchain.charts' },
       { href: '/validators', key: 'menu.blockchain.nodes' },
     ],
@@ -65,6 +73,7 @@ const staticMenu: NavMenu<RouteKey<'layout'>> = [
 
 const useHeaderMenu = (): NavMenu<RouteKey<'layout'>> => {
   const pathname = usePathname() ?? '/';
+  const network = useConfig((c) => c.config.network);
 
   return useMemo(() => {
     const languageMenu = languageChoices.map(({ locale, title }) => ({
@@ -72,8 +81,11 @@ const useHeaderMenu = (): NavMenu<RouteKey<'layout'>> => {
       title,
     }));
 
-    return [...staticMenu, { key: 'menu.languages.title', menu: languageMenu }];
-  }, [pathname]);
+    return [
+      ...staticMenu(network === 'mainnet'),
+      { key: 'menu.languages.title', menu: languageMenu },
+    ];
+  }, [pathname, network]);
 };
 
 export const Header = () => {

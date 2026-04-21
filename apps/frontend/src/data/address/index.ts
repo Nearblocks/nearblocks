@@ -32,7 +32,7 @@ export const fetchBalance = cache(
 export const fetchTokens = cache(
   async (account: string): Promise<AccountAssetFT[] | null> => {
     const resp = await fetcher<AccountAssetFTsRes>(
-      `/v3/accounts/${account}/assets/fts?limit=100`,
+      `/v3/accounts/${account}/assets/fts?limit=250`,
     );
     return resp.data;
   },
