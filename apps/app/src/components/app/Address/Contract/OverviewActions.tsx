@@ -232,7 +232,7 @@ const OverviewActions = (props: Props) => {
         </Tab>
       </TabList>
       <TabPanel>
-        <Info data={deployments} id={params?.id} />
+        <Info data={deployments} id={params?.id ?? ''} />
       </TabPanel>
       <TabPanel>
         <ContractCode
@@ -292,7 +292,7 @@ const OverviewActions = (props: Props) => {
             >
               {contractInfo?.methodNames?.map((method: any, index: number) => (
                 <ViewOrChange
-                  id={params?.id?.toLowerCase()}
+                  id={params?.id?.toLowerCase() ?? ''}
                   index={index}
                   key={index}
                   method={method}
@@ -349,7 +349,7 @@ const OverviewActions = (props: Props) => {
           >
             {schema?.body?.functions?.map((func: any, index: number) => (
               <ViewOrChangeAbi
-                id={params?.id?.toLowerCase()}
+                id={params?.id?.toLowerCase() ?? ''}
                 index={index}
                 key={index}
                 method={func}

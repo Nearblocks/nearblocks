@@ -63,8 +63,8 @@ export default function TabSkeletion() {
                     className={getClassName(name === tab)}
                     href={
                       name === 'txns'
-                        ? `/address/${params.id}`
-                        : `/address/${params.id}?tab=${name}`
+                        ? `/address/${params?.id}`
+                        : `/address/${params?.id}?tab=${name}`
                     }
                     key={name}
                     scroll={false}

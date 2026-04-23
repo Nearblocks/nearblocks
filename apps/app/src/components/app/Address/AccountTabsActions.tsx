@@ -11,7 +11,7 @@ const AccountTabsActions = ({ children }: { children: React.ReactNode }) => {
   const t = useTranslations();
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
-  const tab = searchParams.get('tab') || 'txns';
+  const tab = searchParams?.get('tab') || 'txns';
 
   const tabs = [
     { label: 'Transactions', message: 'Transactions', name: 'txns' },
