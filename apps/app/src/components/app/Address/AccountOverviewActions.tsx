@@ -1,179 +1,45 @@
 'use client';
 
-import Big from 'big.js';
 import { useTranslations } from 'next-intl';
-import React, { use, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, use } from 'react';
 
 import { useConfig } from '@/hooks/app/useConfig';
 import { dollarFormat, fiatValue, yoctoToNear } from '@/utils/app/libs';
-import {
-  FtInfo,
-  TokenListInfo,
-  IntentsTokenPrices,
-  RefFinanceTokenPrices,
-  StatusInfo,
-  Status,
-} from '@/utils/types';
-import TokenHoldings from '@/components/app/common/TokenHoldings';
+import { StatusInfo, Status } from '@/utils/types';
 import FaExternalLinkAlt from '@/components/app/Icons/FaExternalLinkAlt';
-import { useParams } from 'next/navigation';
 import { useAddressRpc } from '../common/AddressRpcProvider';
-import useRpc from '@/hooks/app/useRpc';
-import { useRpcProvider } from '@/components/app/common/RpcContext';
 import useStatsStore from '@/stores/app/syncStats';
 import Skeleton from '@/components/app/skeleton/common/Skeleton';
 
-type BalanceCache = Record<string, FtInfo>;
-
 const AccountOverviewActions = ({
   accountDataPromise,
-  inventoryDataPromise,
-  loading = false,
-  spamTokensPromise,
   statsDataPromise,
   tokenDataPromise,
-  mtsDataPromise,
-  intentsTokenPricesPromise,
-  refTokenPricesPromise,
   syncDataPromise,
+  children,
 }: {
   accountDataPromise: Promise<any>;
-  inventoryDataPromise: Promise<any>;
-  loading?: boolean;
-  mtsDataPromise: Promise<any>;
-  spamTokensPromise: Promise<any>;
   statsDataPromise: Promise<{ stats: StatusInfo[] }>;
   tokenDataPromise: Promise<any>;
-  intentsTokenPricesPromise: Promise<IntentsTokenPrices[]>;
-  refTokenPricesPromise: Promise<RefFinanceTokenPrices>;
   syncDataPromise: Promise<{ status: Status }>;
+  children?: ReactNode;
 }) => {
   const account = use(accountDataPromise);
   const syncData = use(syncDataPromise);
   const stats = use(statsDataPromise);
   const token = use(tokenDataPromise);
-  const inventory = use(inventoryDataPromise);
-  const spam = use(spamTokensPromise);
-  const mtsData = use(mtsDataPromise);
-  const intentsTokenPrices = use(intentsTokenPricesPromise);
-  const refTokenPrices = use(refTokenPricesPromise);
   const accountData = account?.account?.[0];
   const statsData = useStatsStore((state) => state.latestStats);
   const tokenData = token?.contracts?.[0];
-  const inventoryData = inventory?.inventory;
   const { account: accountView } = useAddressRpc();
-  const [ft, setFT] = useState<FtInfo>({} as FtInfo);
   const t = useTranslations();
   const { networkId } = useConfig();
-  const { ftBalanceOf } = useRpc();
-  const params = useParams<{ id: string }>();
   const indexers = useStatsStore((state) => state.syncStatus);
   const status =
     indexers?.balance?.sync ?? syncData?.status?.indexers?.balance?.sync;
 
   const balance = status ? accountData?.amount : accountView?.amount;
   const nearPrice = statsData?.near_price ?? stats?.stats?.[0]?.near_price;
-  const { rpc: rpcUrl } = useRpcProvider();
-
-  const cacheRef = useRef<BalanceCache>({});
-
-  const spamTokens = useMemo(() => {
-    if (typeof spam === 'string') {
-      try {
-        return JSON.parse(spam);
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  }, [spam]);
-
-  useEffect(() => {
-    const cacheKey = `${params?.id}_${rpcUrl}`;
-    if (cacheRef.current[cacheKey]) {
-      setFT(cacheRef.current[cacheKey]);
-      return;
-    }
-
-    const loadBalances = async () => {
-      // Temporary deduplication for eth.bridge.near contracts
-      // Remove after API v3 migration completes
-      const fts =
-        inventoryData?.fts?.filter(
-          (token: TokenListInfo) =>
-            !(
-              token?.ft_meta?.price === null &&
-              token?.contract === 'eth.bridge.near'
-            ),
-        ) ?? [];
-      let total = Big(0);
-      const tokens: TokenListInfo[] = [];
-      const pricedTokens: TokenListInfo[] = [];
-      await Promise.all(
-        fts?.map(async (ft: TokenListInfo) => {
-          let sum = Big(0);
-          let rpcAmount = Big(0);
-          const amount = await ftBalanceOf(
-            rpcUrl,
-            ft?.contract === 'aurora' ? 'eth.bridge.near' : ft?.contract,
-            params?.id as string,
-          ).catch((error) => {
-            console.error('Error in loadBalances:', error);
-          });
-          if (amount) {
-            const decimals = ft?.ft_meta?.decimals ?? 0;
-            rpcAmount = Big(amount).div(Big(10).pow(Number(decimals)));
-          }
-          const refPrice = refTokenPrices?.[ft?.contract]?.price;
-          const tokenPrice = refPrice ?? ft?.ft_meta?.price;
-
-          if (tokenPrice) {
-            sum = rpcAmount.mul(Big(tokenPrice));
-            total = total.add(sum);
-            return pricedTokens.push({
-              ...ft,
-              ft_meta: {
-                ...ft?.ft_meta,
-                price: tokenPrice,
-              },
-              amountUsd: sum?.toString(),
-              rpcAmount: rpcAmount?.toString(),
-            });
-          }
-          return tokens.push({
-            ...ft,
-            amountUsd: sum?.toString(),
-            rpcAmount: rpcAmount?.toString(),
-          });
-        }),
-      );
-      if (tokens) {
-        tokens?.sort((a, b) => {
-          const first = Big(a?.rpcAmount);
-          const second = Big(b?.rpcAmount);
-          if (first?.lt(second)) return 1;
-          if (first?.gt(second)) return -1;
-          return 0;
-        });
-      }
-      pricedTokens?.sort((a, b) => {
-        const first = Big(a?.amountUsd);
-        const second = Big(b?.amountUsd);
-        if (first?.lt(second)) return 1;
-        if (first?.gt(second)) return -1;
-        return 0;
-      });
-
-      const result = {
-        amount: total.toString(),
-        tokens: [...pricedTokens, ...tokens],
-      };
-      cacheRef.current[cacheKey] = result;
-      setFT(result);
-    };
-    loadBalances();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inventoryData?.fts, params?.id, refTokenPrices, rpcUrl]);
 
   return (
     <div className="w-full">
@@ -240,18 +106,7 @@ const AccountOverviewActions = ({
             <div className="w-36 xl:mb-0 mb-1.5">
               {t('tokens') || 'Tokens:'}
             </div>
-            <div className="break-words -my-1 z-10 flex w-full">
-              <TokenHoldings
-                data={inventoryData}
-                ft={ft}
-                id={params?.id as string}
-                inventoryLoading={loading}
-                loading={loading}
-                spamTokens={spamTokens?.blacklist}
-                mtsData={mtsData}
-                intentsTokenPrices={intentsTokenPrices}
-              />
-            </div>
+            <div className="break-words -my-1 z-10 flex w-full">{children}</div>
           </div>
         </div>
       </div>

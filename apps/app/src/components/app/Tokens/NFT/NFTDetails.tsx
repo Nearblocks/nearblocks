@@ -81,7 +81,7 @@ const NFTDetails = ({
 
   return (
     <div className="container-xxl mx-auto px-5">
-      {isTokenSpam(token?.contract || params?.id) && isVisible && (
+      {isTokenSpam(token?.contract || params?.id || '') && isVisible && (
         <>
           <div className="w-full mt-6 flex justify-between text-left border dark:bg-nearred-500  dark:border-nearred-400 dark:text-nearred-300 bg-red-50 border-red-100 text-red-500 text-sm rounded-lg p-4">
             <p className="items-center">
@@ -230,7 +230,7 @@ const NFTDetails = ({
                       Token ID:
                     </div>
                     <div className="w-full xl:w-3/4 word-break">
-                      {decodeURIComponent(params?.tid)}
+                      {decodeURIComponent(params?.tid ?? '')}
                     </div>
                   </div>
                   <div className="flex p-4">

@@ -1,5 +1,8 @@
+import { Suspense } from 'react';
 import { getRequest } from '@/utils/app/api';
 import AccountOverviewActions from '@/components/app/Address/AccountOverviewActions';
+import TokenHoldingsSection from '@/components/app/Address/TokenHoldingsSection';
+import Skeleton from '@/components/app/skeleton/common/Skeleton';
 import {
   intentsTokenPricesApiUrl,
   refFinanceTokenPricesApiUrl,
@@ -38,14 +41,19 @@ export default async function AccountOverview({ id }: any) {
   return (
     <AccountOverviewActions
       accountDataPromise={accountData}
-      inventoryDataPromise={inventoryData}
-      mtsDataPromise={mtsData}
-      spamTokensPromise={spamList}
       statsDataPromise={statsData}
       tokenDataPromise={tokenData}
-      intentsTokenPricesPromise={intentsTokenPrices}
-      refTokenPricesPromise={refTokenPrices}
       syncDataPromise={syncData}
-    />
+    >
+      <Suspense fallback={<Skeleton className="h-8 w-full" />}>
+        <TokenHoldingsSection
+          inventoryDataPromise={inventoryData}
+          mtsDataPromise={mtsData}
+          spamTokensPromise={spamList}
+          intentsTokenPricesPromise={intentsTokenPrices}
+          refTokenPricesPromise={refTokenPrices}
+        />
+      </Suspense>
+    </AccountOverviewActions>
   );
 }

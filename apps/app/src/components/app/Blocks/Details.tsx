@@ -52,7 +52,7 @@ export default function Details(props: Props) {
       if (!data || data?.blocks?.length === 0 || data?.message === 'Error') {
         setIsLoading(true);
         try {
-          const res = await getBlockDetails(rpc, params?.hash);
+          const res = await getBlockDetails(rpc, params?.hash ?? '');
 
           if (res) {
             let limit = 0;

@@ -1,9 +1,14 @@
+import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import ErrorMessage from '@/components/app/common/ErrorMessage';
 import FaInbox from '@/components/app/Icons/FaInbox';
 import AccountAlerts from '@/components/app/Address/AccountAlerts';
 import AccountMoreInfo from '@/components/app/Address/AccountMoreInfo';
 import AccountOverview from '@/components/app/Address/AccountOverview';
+import {
+  MoreInfoCardSkeleton,
+  OverviewCardSkeleton,
+} from '@/components/app/skeleton/address/balance';
 /* import MultichainInfo from './MultichainInfo'; */
 
 export default async function Balance({ id }: { id: string }) {
@@ -23,15 +28,21 @@ export default async function Balance({ id }: { id: string }) {
   return (
     <>
       <ErrorBoundary fallback={<div />}>
-        <AccountAlerts id={id} />
+        <Suspense fallback={null}>
+          <AccountAlerts id={id} />
+        </Suspense>
       </ErrorBoundary>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ErrorBoundary fallback={errorBoundaryFallback}>
-          <AccountOverview id={id} />
+          <Suspense fallback={<OverviewCardSkeleton />}>
+            <AccountOverview id={id} />
+          </Suspense>
         </ErrorBoundary>
 
         <ErrorBoundary fallback={errorBoundaryFallback}>
-          <AccountMoreInfo id={id} />
+          <Suspense fallback={<MoreInfoCardSkeleton />}>
+            <AccountMoreInfo id={id} />
+          </Suspense>
         </ErrorBoundary>
 
         {/*  <ErrorBoundary fallback={errorBoundaryFallback}>

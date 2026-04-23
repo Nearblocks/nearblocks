@@ -52,7 +52,8 @@ const AccountMoreInfoActions = ({
     isLoading,
   } = useAddressRpc();
   const t = useTranslations();
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
 
   useEffect(() => {
     if (
