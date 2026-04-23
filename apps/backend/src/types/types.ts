@@ -207,6 +207,16 @@ export type RefPrice = {
 
 export type RefData = Record<string, RefPrice>;
 
+export type IntentsToken = {
+  assetId: string;
+  blockchain: string;
+  contractAddress?: string;
+  decimals: number;
+  price: number;
+  priceUpdatedAt: string;
+  symbol: string;
+};
+
 export type AccountId = Pick<Account, 'account_id'>;
 
 export type BlockSupply = Pick<
