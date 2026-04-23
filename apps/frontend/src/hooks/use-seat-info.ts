@@ -17,6 +17,19 @@ type SeatInfo = {
   protocolVersion: null | number;
 };
 
+const findSeatPrice = (
+  validatorList: { stake: string }[],
+  minimumStakeRatio: number[],
+): bigint => {
+  const stakes = validatorList
+    .map((v) => BigInt(v.stake))
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const [ratioNum, ratioDen] = minimumStakeRatio;
+  const stakesSum = stakes.reduce((a, b) => a + b);
+
+  return (stakesSum * BigInt(ratioNum)) / BigInt(ratioDen);
+};
+
 const fetchSeatInfo = async (rpcUrl: string): Promise<SeatInfo> => {
   const client = new NearRpcClient({ endpoint: rpcUrl });
 
@@ -25,19 +38,16 @@ const fetchSeatInfo = async (rpcUrl: string): Promise<SeatInfo> => {
     experimentalProtocolConfig(client, { finality: 'final' }),
   ]);
 
-  const currentStakes = validatorsResp.currentValidators.map((v) =>
-    BigInt(v.stake),
-  );
-  const nextStakes = validatorsResp.nextValidators.map((v) => BigInt(v.stake));
+  const minStakeRatio = protocolConfigResp.minimumStakeRatio ?? [1, 6250];
 
   const currentSeatPrice =
-    currentStakes.length > 0
-      ? currentStakes.reduce((min, s) => (s < min ? s : min))
+    validatorsResp.currentValidators.length > 0
+      ? findSeatPrice(validatorsResp.currentValidators, minStakeRatio)
       : null;
 
   const nextSeatPrice =
-    nextStakes.length > 0
-      ? nextStakes.reduce((min, s) => (s < min ? s : min))
+    validatorsResp.nextValidators.length > 0
+      ? findSeatPrice(validatorsResp.nextValidators, minStakeRatio)
       : null;
 
   return {
