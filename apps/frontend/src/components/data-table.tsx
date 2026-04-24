@@ -39,6 +39,7 @@ export type DataTableColumnDef<TData> = {
   enableFilter?: boolean;
   enableSort?: boolean;
   filterName?: string;
+  filterPlaceholder?: string;
   header?: ((helpers: FilterHelpers) => ReactNode) | ReactNode;
   id?: string;
   skeletonWidth?: string;
@@ -176,6 +177,7 @@ export const DataTable = <TData,>({
                       name={column.filterName}
                       onClear={filterHelpers.onClear}
                       onFilter={filterHelpers.onFilter}
+                      placeholder={column.filterPlaceholder}
                     />
                   </span>
                 ) : (

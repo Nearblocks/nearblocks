@@ -50,6 +50,8 @@ export const txns = {
     deposit: 'Deposit Value',
     empty: 'No transactions found',
     fee: 'Txn Fee',
+    filterAccount: 'Account',
+    filterBlock: 'Block Hash',
     from: 'From',
     method: 'Method',
     to: 'To',
