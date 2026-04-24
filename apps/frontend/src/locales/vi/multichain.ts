@@ -15,10 +15,10 @@ export const multichain = {
     title: 'Latest Multichain Transactions',
   },
   stats: {
-    accounts: 'Unique Accounts',
-    addresses: 'Unique Destination Addresses',
-    chains: 'Destination Chains',
-    txns: 'Transactions',
+    accounts: 'Unique Accounts (24H)',
+    addresses: 'Unique Destination Addresses (24H)',
+    chains: 'Destination Chains (24H)',
+    txns: 'Transactions (24H)',
   },
   title: 'Latest Multichain Transactions',
 } as const;

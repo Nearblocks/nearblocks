@@ -18,7 +18,12 @@ type Props = {
   placeholder?: string;
 };
 
-export const TableFilter = ({ name, onClear, onFilter, placeholder }: Props) => {
+export const TableFilter = ({
+  name,
+  onClear,
+  onFilter,
+  placeholder,
+}: Props) => {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(() => searchParams.get(name) ?? '');
 

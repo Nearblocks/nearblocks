@@ -62,6 +62,7 @@ type DataTableProps<TData> = {
   defaultSort?: string;
   emptyIcon?: ReactNode;
   emptyMessage?: string;
+  extraFilters?: Array<{ label: string; name: string; value: string }>;
   getRowKey?: (row: TData) => string;
   header?: ReactNode;
   loading?: boolean;
@@ -79,6 +80,7 @@ export const DataTable = <TData,>({
   defaultSort,
   emptyIcon = <Inbox />,
   emptyMessage = 'No data found',
+  extraFilters,
   getRowKey,
   header,
   loading = false,
@@ -92,20 +94,27 @@ export const DataTable = <TData,>({
   const searchParams = useSearchParams();
 
   const filterHelpers: FilterHelpers = {
-    onClear: onClear || (() => {}),
-    onFilter: onFilter || (() => {}),
+    onClear: (data) =>
+      (onClear || (() => {}))({ next: undefined, prev: undefined, ...data }),
+    onFilter: (value) =>
+      (onFilter || (() => {}))({ next: undefined, prev: undefined, ...value }),
   };
 
-  const activeFilters = columns
-    .filter(
-      (col) =>
-        col.enableFilter && col.filterName && searchParams.get(col.filterName),
-    )
-    .map((col) => ({
-      label: typeof col.header === 'string' ? col.header : col.filterName!,
-      name: col.filterName!,
-      value: searchParams.get(col.filterName!)!,
-    }));
+  const activeFilters = [
+    ...columns
+      .filter(
+        (col) =>
+          col.enableFilter &&
+          col.filterName &&
+          searchParams.get(col.filterName),
+      )
+      .map((col) => ({
+        label: typeof col.header === 'string' ? col.header : col.filterName!,
+        name: col.filterName!,
+        value: searchParams.get(col.filterName!)!,
+      })),
+    ...(extraFilters?.filter((f) => f.value) ?? []),
+  ];
 
   const currentSort = searchParams.get('sort') ?? defaultSort ?? null;
   const currentOrder = (searchParams.get('order') ?? 'desc') as 'asc' | 'desc';
