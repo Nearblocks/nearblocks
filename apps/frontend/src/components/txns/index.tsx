@@ -118,6 +118,7 @@ export const Txns = ({
       ),
       enableFilter: true,
       filterName: 'block',
+      filterPlaceholder: t('list.filterBlock'),
       header: t('list.block'),
       id: 'block',
     },

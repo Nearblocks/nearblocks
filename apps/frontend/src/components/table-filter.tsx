@@ -15,9 +15,10 @@ type Props = {
   name: string;
   onClear: (value: FilterClearData) => void;
   onFilter: (value: FilterData) => void;
+  placeholder?: string;
 };
 
-export const TableFilter = ({ name, onClear, onFilter }: Props) => {
+export const TableFilter = ({ name, onClear, onFilter, placeholder }: Props) => {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(() => searchParams.get(name) ?? '');
 
@@ -42,7 +43,7 @@ export const TableFilter = ({ name, onClear, onFilter }: Props) => {
         <form onSubmit={onSumbit}>
           <Input
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search"
+            placeholder={placeholder ?? 'Search'}
             type="text"
             value={search}
           />
