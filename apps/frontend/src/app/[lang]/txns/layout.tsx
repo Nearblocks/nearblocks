@@ -10,7 +10,7 @@ const TxnsLayout = async ({ children, params }: Props) => {
 
   if (!hasLocale(lang)) notFound();
 
-  const dictionary = await getDictionary(lang, ['txns']);
+  const dictionary = await getDictionary(lang, ['address', 'txns']);
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>

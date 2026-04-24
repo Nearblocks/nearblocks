@@ -286,6 +286,7 @@ export const address = {
   tokensNa: 'N/A',
   txns: {
     columns: {
+      account: 'Account',
       block: 'Block',
       depositValue: 'Deposit Value',
       from: 'From',
@@ -297,7 +298,9 @@ export const address = {
     empty: 'No transactions found',
     filterFrom: 'Account',
     filterTo: 'Account',
+    latest: 'Latest 25 transactions',
     total: 'A total of {{count}} transactions found',
+    viewAll: 'View all transactions',
   },
   validate: 'Validate Account',
 } as const;
