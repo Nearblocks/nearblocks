@@ -93,8 +93,18 @@ const apiDocumentation = async (app: Application, dir: string) => {
       tags: [
         {
           description:
-            'Retrieve account details, balances, contract metadata, access keys, token holdings, and transaction history for any NEAR account.',
+            'Retrieve account details, balances, contract metadata, access keys, and token holdings.',
           name: 'Accounts',
+        },
+        {
+          description:
+            'List and filter account transactions, token transfers, receipts, and staking activity.',
+          name: 'Account Transactions',
+        },
+        {
+          description:
+            'Account-level analytics including transaction heatmaps, balance history, and token statistics.',
+          name: 'Account Stats',
         },
         {
           description:
@@ -135,6 +145,24 @@ const apiDocumentation = async (app: Application, dir: string) => {
           description:
             'List and filter transactions, retrieve transaction details with receipts, and inspect associated token events.',
           name: 'Txns',
+        },
+      ],
+      'x-tagGroups': [
+        {
+          name: 'Accounts',
+          tags: ['Accounts', 'Account Transactions', 'Account Stats'],
+        },
+        {
+          name: 'Blockchain',
+          tags: ['Blocks', 'Txns', 'Stats'],
+        },
+        {
+          name: 'Tokens',
+          tags: ['FTs', 'NFTs'],
+        },
+        {
+          name: 'Other',
+          tags: ['Keys', 'Search', 'Multichain'],
         },
       ],
     },

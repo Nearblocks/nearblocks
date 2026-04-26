@@ -12,7 +12,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account statistics overview
    *     tags:
-   *       - Accounts
+   *       - Account Stats
    *     parameters:
    *       - in: path
    *         name: account
@@ -31,7 +31,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account transaction heatmap
    *     tags:
-   *       - Accounts
+   *       - Account Stats
    *     parameters:
    *       - in: path
    *         name: account
@@ -55,7 +55,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account transaction statistics
    *     tags:
-   *       - Accounts
+   *       - Account Stats
    *     parameters:
    *       - in: path
    *         name: account
@@ -82,7 +82,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account balance history
    *     tags:
-   *       - Accounts
+   *       - Account Stats
    *     parameters:
    *       - in: path
    *         name: account
@@ -113,7 +113,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account NEAR statistics
    *     tags:
-   *       - Accounts
+   *       - Account Stats
    *     parameters:
    *       - in: path
    *         name: account
@@ -140,7 +140,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account FT statistics
    *     tags:
-   *       - Accounts
+   *       - Account Stats
    *     parameters:
    *       - in: path
    *         name: account
