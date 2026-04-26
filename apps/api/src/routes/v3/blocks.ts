@@ -19,7 +19,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List blocks
    *     tags:
-   *       - V3 / Blocks
+   *       - Blocks
    *     parameters:
    *       - in: query
    *         name: next
@@ -52,7 +52,7 @@ const routes = (app: Router) => {
    *     summary: Get estimated block count
    *     x-internal: true
    *     tags:
-   *       - V3 / Blocks
+   *       - Blocks
    *     responses:
    *       200:
    *         description: Success response
@@ -66,7 +66,7 @@ const routes = (app: Router) => {
    *     summary: List latest blocks
    *     description: ⚠️ Response is cached for 5 seconds
    *     tags:
-   *       - V3 / Blocks
+   *       - Blocks
    *     parameters:
    *       - in: query
    *         name: limit
@@ -88,7 +88,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get 24-hour block statistics
    *     tags:
-   *       - V3 / Blocks
+   *       - Blocks
    *     responses:
    *       200:
    *         description: Success response
@@ -101,7 +101,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get block by hash
    *     tags:
-   *       - V3 / Blocks
+   *       - Blocks
    *     parameters:
    *       - in: path
    *         name: hash

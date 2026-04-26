@@ -24,7 +24,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List top NFT collections
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -76,7 +76,7 @@ const routes = (app: Router) => {
    *     summary: Get NFT collection count
    *     x-internal: true
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -95,7 +95,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List all NFT transfers
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: query
    *         name: before_ts
@@ -135,7 +135,7 @@ const routes = (app: Router) => {
    *     summary: Get NFT transfer count
    *     x-internal: true
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: query
    *         name: before_ts

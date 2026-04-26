@@ -19,7 +19,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List transactions
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: query
    *         name: block
@@ -64,7 +64,7 @@ const routes = (app: Router) => {
    *     summary: Get estimated transaction count
    *     x-internal: true
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: query
    *         name: block
@@ -99,7 +99,7 @@ const routes = (app: Router) => {
    *     summary: List latest transactions
    *     description: ⚠️ Response is cached for 5 seconds
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: query
    *         name: limit
@@ -121,7 +121,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get 24-hour transaction statistics
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     responses:
    *       200:
    *         description: Success response
@@ -134,7 +134,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get transaction by hash
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -154,7 +154,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List transaction receipts
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -174,7 +174,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List transaction FT events
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -194,7 +194,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List transaction NFT events
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -214,7 +214,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List transaction multi-token events
    *     tags:
-   *       - V3 / Txns
+   *       - Txns
    *     parameters:
    *       - in: path
    *         name: hash

@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search all entities
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -37,7 +37,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search accounts
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -56,7 +56,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search blocks
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -75,7 +75,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search access keys
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -94,7 +94,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search fungible tokens
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -113,7 +113,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search NFTs
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -132,7 +132,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search receipts
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -151,7 +151,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search transactions
    *     tags:
-   *       - V3 / Search
+   *       - Search
    *     parameters:
    *       - in: query
    *         name: keyword
