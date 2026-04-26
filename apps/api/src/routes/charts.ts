@@ -15,7 +15,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get charts data
    *     tags:
-   *       - Charts
+   *       - Legacy / Charts
    *     responses:
    *       200:
    *         description: Success response
@@ -28,7 +28,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get latest charts data
    *     tags:
-   *       - Charts
+   *       - Legacy / Charts
    *     responses:
    *       200:
    *         description: Success response
@@ -41,7 +41,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get txns per second by shards chart data
    *     tags:
-   *       - Charts
+   *       - Legacy / Charts
    *     responses:
    *       200:
    *         description: Success response

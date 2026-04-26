@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/txns/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -16,7 +17,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns:
    *   get:
-   *     summary: Get all txns
+   *     summary: List transactions
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -60,7 +61,8 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/count:
    *   get:
-   *     summary: Get estimated txns count
+   *     summary: Get estimated transaction count
+   *     x-internal: true
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -88,13 +90,13 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', validate(request.count), service.count);
+  route.get('/count', internalOnly, validate(request.count), service.count);
 
   /**
    * @openapi
    * /v3/txns/latest:
    *   get:
-   *     summary: Get the latest txns
+   *     summary: List latest transactions
    *     description: ⚠️ Response is cached for 5 seconds
    *     tags:
    *       - V3 / Txns
@@ -117,7 +119,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/stats:
    *   get:
-   *     summary: Get 24h transaction stats
+   *     summary: Get 24-hour transaction statistics
    *     tags:
    *       - V3 / Txns
    *     responses:
@@ -130,7 +132,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/{hash}:
    *   get:
-   *     summary: Get a txn
+   *     summary: Get transaction by hash
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -150,7 +152,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/{hash}/receipts:
    *   get:
-   *     summary: Get txn receipts
+   *     summary: List transaction receipts
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -170,7 +172,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/{hash}/fts:
    *   get:
-   *     summary: Get txn ft events
+   *     summary: List transaction FT events
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -190,7 +192,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/{hash}/nfts:
    *   get:
-   *     summary: Get txn nft events
+   *     summary: List transaction NFT events
    *     tags:
    *       - V3 / Txns
    *     parameters:
@@ -210,7 +212,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/txns/{hash}/mts:
    *   get:
-   *     summary: Get txn mt events
+   *     summary: List transaction multi-token events
    *     tags:
    *       - V3 / Txns
    *     parameters:

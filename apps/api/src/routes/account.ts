@@ -23,7 +23,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account info
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -46,7 +46,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get contract info
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -69,7 +69,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get contract deployment records (first & last)
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -96,7 +96,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get parsed contract info
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -123,7 +123,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get latest action args for contract method
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -159,7 +159,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account ft/nft token inventory
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -186,7 +186,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get possible ft/nft token contracts
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -209,7 +209,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get access keys by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -255,7 +255,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated access keys count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -283,7 +283,7 @@ const routes = (app: Router) => {
    *       - account/{account_id}/txns-only
    *       - account/{account_id}/receipts
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -374,7 +374,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account txns count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -437,7 +437,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account txns without receipts by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -502,7 +502,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account txns without receipts count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -549,7 +549,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account receipts by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -622,7 +622,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account receipts count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -679,7 +679,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account token txns by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -757,7 +757,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account token txns count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -809,7 +809,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account nft txns by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -882,7 +882,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account nft txns count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -929,7 +929,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account stake txns by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -1000,7 +1000,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account stake txns count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -1047,7 +1047,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account balance change activities by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -1089,7 +1089,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account balance change activities count
    *     tags:
-   *       - Account
+   *       - Legacy / Account
    *     parameters:
    *       - in: path
    *         name: account

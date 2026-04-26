@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/fts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/fts';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/ft-txns:
    *   get:
-   *     summary: Get account ft txns
+   *     summary: List account FT transfers
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -65,7 +66,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/ft-txns/count:
    *   get:
-   *     summary: Get estimated account ft txns count
+   *     summary: Get estimated account FT transfer count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -96,7 +98,12 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/ft-txns/count', validate(request.count), service.count);
+  route.get(
+    '/:account/ft-txns/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;

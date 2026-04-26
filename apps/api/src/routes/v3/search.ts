@@ -16,7 +16,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/search:
    *   get:
-   *     summary: Search
+   *     summary: Search all entities
    *     tags:
    *       - V3 / Search
    *     parameters:
@@ -73,7 +73,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/search/keys:
    *   get:
-   *     summary: Search keys
+   *     summary: Search access keys
    *     tags:
    *       - V3 / Search
    *     parameters:
@@ -92,7 +92,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/search/fts:
    *   get:
-   *     summary: Search fts
+   *     summary: Search fungible tokens
    *     tags:
    *       - V3 / Search
    *     parameters:
@@ -111,7 +111,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/search/nfts:
    *   get:
-   *     summary: Search nfts
+   *     summary: Search NFTs
    *     tags:
    *       - V3 / Search
    *     parameters:
@@ -149,7 +149,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/search/txns:
    *   get:
-   *     summary: Search txns
+   *     summary: Search transactions
    *     tags:
    *       - V3 / Search
    *     parameters:

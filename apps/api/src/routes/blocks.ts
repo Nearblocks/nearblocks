@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get blocks by pagination
    *     tags:
-   *       - Blocks
+   *       - Legacy / Blocks
    *     parameters:
    *       - in: query
    *         name: cursor
@@ -52,7 +52,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated total blocks count
    *     tags:
-   *       - Blocks
+   *       - Legacy / Blocks
    *     responses:
    *       200:
    *         description: Success response
@@ -65,7 +65,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get the latest blocks
    *     tags:
-   *       - Blocks
+   *       - Legacy / Blocks
    *     parameters:
    *       - in: query
    *         name: limit
@@ -87,7 +87,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get block info
    *     tags:
-   *       - Blocks
+   *       - Legacy / Blocks
    *     parameters:
    *       - in: path
    *         name: hash

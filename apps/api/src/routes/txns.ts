@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get txns by pagination
    *     tags:
-   *       - Txns
+   *       - Legacy / Txns
    *     parameters:
    *       - in: query
    *         name: block
@@ -94,7 +94,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated total txns count
    *     tags:
-   *       - Txns
+   *       - Legacy / Txns
    *     parameters:
    *       - in: query
    *         name: block
@@ -143,7 +143,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get the latest txns
    *     tags:
-   *       - Txns
+   *       - Legacy / Txns
    *     parameters:
    *       - in: query
    *         name: limit
@@ -165,7 +165,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get txn info
    *     tags:
-   *       - Txns
+   *       - Legacy / Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -188,7 +188,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get txn info with receipts and execution outcomes
    *     tags:
-   *       - Txns
+   *       - Legacy / Txns
    *     parameters:
    *       - in: path
    *         name: hash

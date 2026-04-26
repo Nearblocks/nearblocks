@@ -10,7 +10,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}:
    *   get:
-   *     summary: Get account info
+   *     summary: Get account details
    *     tags:
    *       - V3 / Accounts
    *     parameters:

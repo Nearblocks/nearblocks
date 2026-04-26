@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/fts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -19,7 +20,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts:
    *   get:
-   *     summary: Get top tokens
+   *     summary: List top fungible tokens
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -70,7 +71,8 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/count:
    *   get:
-   *     summary: Get top tokens count
+   *     summary: Get fungible token count
+   *     x-internal: true
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -83,13 +85,13 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', validate(request.count), service.count);
+  route.get('/count', internalOnly, validate(request.count), service.count);
 
   /**
    * @openapi
    * /v3/fts/txns:
    *   get:
-   *     summary: Get all token transfers
+   *     summary: List all FT transfers
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -128,7 +130,8 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/txns/count:
    *   get:
-   *     summary: Get token transfers count
+   *     summary: Get FT transfer count
+   *     x-internal: true
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -143,7 +146,12 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validate(request.txnCount), service.txnCount);
+  route.get(
+    '/txns/count',
+    internalOnly,
+    validate(request.txnCount),
+    service.txnCount,
+  );
 
   return app;
 };

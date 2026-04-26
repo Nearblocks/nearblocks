@@ -12,7 +12,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/stats:
    *   get:
-   *     summary: Stats
+   *     summary: Get network statistics
    *     tags:
    *       - V3 / Stats
    *     responses:
@@ -25,7 +25,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/daily-stats:
    *   get:
-   *     summary: Daily stats
+   *     summary: Get daily network statistics
    *     tags:
    *       - V3 / Stats
    *     parameters:
@@ -55,7 +55,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/tps-stats:
    *   get:
-   *     summary: Tps stats
+   *     summary: Get transactions-per-second statistics
    *     tags:
    *       - V3 / Stats
    *     responses:

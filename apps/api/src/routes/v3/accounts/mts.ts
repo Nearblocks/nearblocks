@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/mts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/mts';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/mt-txns:
    *   get:
-   *     summary: Get account mt txns
+   *     summary: List account multi-token transfers
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -70,7 +71,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/mt-txns/count:
    *   get:
-   *     summary: Get estimated account mt txns count
+   *     summary: Get estimated account multi-token transfer count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -106,7 +108,12 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/mt-txns/count', validate(request.count), service.count);
+  route.get(
+    '/:account/mt-txns/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;

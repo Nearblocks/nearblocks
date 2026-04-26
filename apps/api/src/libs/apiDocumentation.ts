@@ -59,58 +59,155 @@ const apiDocumentation = async (app: Application, dir: string) => {
         { description: 'Testnet', url: config.testnetUrl },
       ],
       tags: [
+        // ── V3 (current) ──────────────────────────────────────────────
         {
-          description: `The "Account" endpoints provide access to various details about NEAR Protocol accounts, including account and contract information, deployment records, token inventories, access keys, and transaction histories. These endpoints also offer estimated counts for transactions, receipts, and balance changes, with support for pagination to efficiently manage large data sets.`,
-          name: 'Account',
-        },
-        {
-          description: `The "Blocks" endpoints allow retrieval of block information on the NEAR Protocol, including specific block details, the latest blocks, and blocks by pagination. They also provide an estimated total count of blocks, helping to manage and navigate the blockchain data efficiently.`,
-          name: 'Blocks',
+          description:
+            'Retrieve account details, balances, contract metadata, access keys, token holdings, and transaction history for any NEAR account.',
+          name: 'V3 / Accounts',
         },
         {
           description:
-            'The "Chain Abstraction" endpoints provide access to multichain data, including retrieving multichain accounts and transactions for a specific account. They support paginated queries for multichain transactions and offer estimated counts for multichain transactions, enabling comprehensive tracking.',
-          name: 'Chain Abstraction',
-        },
-        {
-          description: `The "Charts" endpoints offer chart data related to key blockchain statistics. These charts provide visual insights into the overall performance and metrics of the blockchain.`,
-          name: 'Charts',
-        },
-        {
-          description: `The "DEX" endpoints provide data on decentralized exchange pairs, including information on top pairs, transaction details, and charts. Fetches pair data and transaction history with pagination support, along with charts to visualize the trading activity.`,
-          name: 'DEX',
-        },
-        {
-          description: `The "FTs" endpoints provide data on fungible tokens, including the top tokens, transaction details, token holders, and more. They allow for pagination of token transactions and holders, and provide estimated counts for transactions and holders, along with token-specific information.`,
-          name: 'FTs',
-        },
-        {
-          description: 'Access keys related endpoints.',
-          name: 'Access Keys',
-        },
-        {
-          description: `The "Kitwallet" endpoints focus on account activities, staking pools, and related data. They provide access to staking deposits, account activities, call receivers, and likely tokens or NFTs for an account. Additionally, they offer details about account receipts, along with estimated counts.`,
-          name: 'Kitwallet',
-        },
-        {
-          description: `The "Legacy" endpoints provide information on the Near supply, including total and circulating supply, as well as the daily token burn rate.`,
-          name: 'Legacy',
-        },
-        {
-          description: `The "NFTs" endpoints provide detailed information about non-fungible tokens (NFTs), including top NFTs, transactions, holders, and token data. You can fetch NFT transactions and token info, along with paginated list and estimated counts for transactions, holders, and tokens.`,
-          name: 'NFTs',
+            'Query blocks by hash or height, list recent blocks, and retrieve 24-hour block production statistics.',
+          name: 'V3 / Blocks',
         },
         {
           description:
-            'The "Search" endpoints allow you to search for various blockchain entities, such as transactions, blocks, accounts, receipts, and tokens. You can search by specific identifiers like hash, block height, account ID, receipt ID, and token address.',
-          name: 'Search',
+            'Look up fungible token contracts, list top tokens, and paginate through transfer history and holder data.',
+          name: 'V3 / FTs',
         },
-        { description: 'Statistical data endpoints.', name: 'Stats' },
         {
-          description: `The "Transactions" endpoints provide access to transaction data. You can retrieve transactions by pagination, view the total estimated count, get the latest transactions, and fetch detailed information about specific transactions, including receipts and execution outcomes.`,
-          name: 'Txns',
+          description:
+            'Look up account information associated with a public access key.',
+          name: 'V3 / Keys',
         },
-        { description: 'Validator information endpoints.', name: 'Validators' },
+        {
+          description:
+            'Query chain-signature multichain transactions and daily signing statistics.',
+          name: 'V3 / Multichain',
+        },
+        {
+          description:
+            'Look up NFT contracts and individual tokens, list top collections, and paginate through transfer history and holder data.',
+          name: 'V3 / NFTs',
+        },
+        {
+          description:
+            'Search across transactions, blocks, accounts, receipts, and tokens by hash, height, ID, or address.',
+          name: 'V3 / Search',
+        },
+        {
+          description:
+            'Network-wide statistics including supply, gas usage, active accounts, and daily aggregates.',
+          name: 'V3 / Stats',
+        },
+        {
+          description:
+            'List and filter transactions, retrieve transaction details with receipts, and inspect associated token events.',
+          name: 'V3 / Txns',
+        },
+        // ── Legacy (v1/v2) — deprecated, will be removed ─────────────
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Account',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Access Keys',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Blocks',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Chain Abstraction',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Charts',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / DEX',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / FTs',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Kitwallet',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Supply',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / NFTs',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Search',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Stats',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Txns',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / Validators',
+        },
+        {
+          description: 'Deprecated. These endpoints will be removed.',
+          name: 'Legacy / V2 Account',
+        },
+        {
+          description:
+            'V2 transaction endpoints. Use V3 / Txns for new integrations.',
+          name: 'Legacy / V2 Txns',
+        },
+      ],
+      'x-tagGroups': [
+        {
+          name: 'API',
+          tags: [
+            'V3 / Accounts',
+            'V3 / Blocks',
+            'V3 / FTs',
+            'V3 / Keys',
+            'V3 / Multichain',
+            'V3 / NFTs',
+            'V3 / Search',
+            'V3 / Stats',
+            'V3 / Txns',
+          ],
+        },
+        {
+          name: 'Legacy (Deprecated)',
+          tags: [
+            'Legacy / Account',
+            'Legacy / Access Keys',
+            'Legacy / Blocks',
+            'Legacy / Chain Abstraction',
+            'Legacy / Charts',
+            'Legacy / DEX',
+            'Legacy / FTs',
+            'Legacy / Kitwallet',
+            'Legacy / Supply',
+            'Legacy / NFTs',
+            'Legacy / Search',
+            'Legacy / Stats',
+            'Legacy / Txns',
+            'Legacy / Validators',
+            'Legacy / V2 Account',
+            'Legacy / V2 Txns',
+          ],
+        },
       ],
     },
   };
@@ -140,8 +237,8 @@ const apiDocumentation = async (app: Application, dir: string) => {
         }
           
       `,
+      documentDownloadType: 'none',
       favicon: 'https://nearblocks.io/favicon_32x32.png',
-      hideDownloadButton: true,
       layout: 'modern',
       metaData: {
         description:
@@ -154,10 +251,8 @@ const apiDocumentation = async (app: Application, dir: string) => {
           'NearBlocks REST API documentation for the NEAR Protocol. Provides endpoints to access blockchain data and integrate seamlessly with NEAR.',
         twitterTitle: 'Near(Ⓝ) REST API | NearBlocks',
       },
-      spec: {
-        url: '/openapi.json',
-      },
       theme: 'none',
+      url: '/openapi.json',
     }),
   );
 };

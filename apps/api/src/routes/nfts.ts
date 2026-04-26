@@ -19,7 +19,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top NFTs by pagination
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -68,7 +68,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top NFTs count
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -87,7 +87,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT transactions by pagination
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: query
    *         name: cursor
@@ -124,7 +124,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated NFT transactions count
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     responses:
    *       200:
    *         description: Success response
@@ -137,7 +137,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT info
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -160,7 +160,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT transactions by pagination
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -224,7 +224,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated NFT transaction count
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -262,7 +262,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT holders by pagination
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -308,7 +308,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated NFT holders count
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -335,7 +335,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT tokens list by pagination
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -374,7 +374,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated NFT tokens count
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -401,7 +401,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT token info
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -437,7 +437,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT token transactions by pagination
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -509,7 +509,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated NFT token transactions count
    *     tags:
-   *       - NFTs
+   *       - Legacy / NFTs
    *     parameters:
    *       - in: path
    *         name: contract

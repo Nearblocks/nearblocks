@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get access key info by public key
    *     tags:
-   *       - Access Keys
+   *       - Legacy / Access Keys
    *     parameters:
    *       - in: path
    *         name: key

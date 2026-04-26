@@ -10,7 +10,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/stats:
    *   get:
-   *     summary: Get account stats overview
+   *     summary: Get account statistics overview
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -29,7 +29,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/stats/heatmap:
    *   get:
-   *     summary: Get account txns heatmap
+   *     summary: Get account transaction heatmap
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -53,7 +53,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/stats/txns:
    *   get:
-   *     summary: Get account txn stats
+   *     summary: Get account transaction statistics
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -80,7 +80,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/stats/balance:
    *   get:
-   *     summary: Get account balance stats
+   *     summary: Get account balance history
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -111,7 +111,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/stats/near:
    *   get:
-   *     summary: Get account near stats
+   *     summary: Get account NEAR statistics
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -138,7 +138,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/stats/fts:
    *   get:
-   *     summary: Get account ft stats
+   *     summary: Get account FT statistics
    *     tags:
    *       - V3 / Accounts
    *     parameters:

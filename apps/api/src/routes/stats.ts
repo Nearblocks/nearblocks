@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get stats
    *     tags:
-   *       - Stats
+   *       - Legacy / Stats
    *     responses:
    *       200:
    *         description: Success response
@@ -30,7 +30,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get near price
    *     tags:
-   *       - Stats
+   *       - Legacy / Stats
    *     parameters:
    *       - in: query
    *         name: date
