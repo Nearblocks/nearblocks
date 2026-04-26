@@ -12,7 +12,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account details
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -32,7 +32,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get account balance
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account

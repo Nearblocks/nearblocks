@@ -19,7 +19,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List multichain signature transactions
    *     tags:
-   *       - V3 / Multichain
+   *       - Multichain
    *     parameters:
    *       - in: query
    *         name: account
@@ -80,7 +80,7 @@ const routes = (app: Router) => {
    *     summary: Get estimated multichain signature count
    *     x-internal: true
    *     tags:
-   *       - V3 / Multichain
+   *       - Multichain
    *     parameters:
    *       - in: query
    *         name: account
@@ -127,7 +127,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get 24-hour multichain signature statistics
    *     tags:
-   *       - V3 / Multichain
+   *       - Multichain
    *     responses:
    *       200:
    *         description: Success response

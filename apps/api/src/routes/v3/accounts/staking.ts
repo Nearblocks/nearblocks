@@ -13,7 +13,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account staking transactions
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -64,7 +64,7 @@ const routes = (route: Router) => {
    *     summary: Get estimated account staking transaction count
    *     x-internal: true
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account

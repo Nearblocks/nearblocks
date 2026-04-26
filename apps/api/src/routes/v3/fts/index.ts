@@ -22,7 +22,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List top fungible tokens
    *     tags:
-   *       - V3 / FTs
+   *       - FTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -74,7 +74,7 @@ const routes = (app: Router) => {
    *     summary: Get fungible token count
    *     x-internal: true
    *     tags:
-   *       - V3 / FTs
+   *       - FTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -93,7 +93,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List all FT transfers
    *     tags:
-   *       - V3 / FTs
+   *       - FTs
    *     parameters:
    *       - in: query
    *         name: before_ts
@@ -133,7 +133,7 @@ const routes = (app: Router) => {
    *     summary: Get FT transfer count
    *     x-internal: true
    *     tags:
-   *       - V3 / FTs
+   *       - FTs
    *     parameters:
    *       - in: query
    *         name: before_ts

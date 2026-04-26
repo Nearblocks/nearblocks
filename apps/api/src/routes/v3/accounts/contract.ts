@@ -12,7 +12,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get contract metadata
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: contract
@@ -36,7 +36,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get contract deployment history
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: contract
@@ -60,7 +60,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get contract ABI schema
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: contract
@@ -84,7 +84,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: Get latest action args for a contract method
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: contract

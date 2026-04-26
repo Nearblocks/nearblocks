@@ -14,7 +14,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get network statistics
    *     tags:
-   *       - V3 / Stats
+   *       - Stats
    *     responses:
    *       200:
    *         description: Success response
@@ -27,7 +27,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get daily network statistics
    *     tags:
-   *       - V3 / Stats
+   *       - Stats
    *     parameters:
    *       - in: query
    *         name: limit
@@ -57,7 +57,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get transactions-per-second statistics
    *     tags:
-   *       - V3 / Stats
+   *       - Stats
    *     responses:
    *       200:
    *         description: Success response

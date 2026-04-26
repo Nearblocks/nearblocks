@@ -13,7 +13,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account FT balances
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -52,7 +52,7 @@ const routes = (route: Router) => {
    *     summary: Get account FT balances count
    *     x-internal: true
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -77,7 +77,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account NFT balances
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -116,7 +116,7 @@ const routes = (route: Router) => {
    *     summary: Get account NFT balances count
    *     x-internal: true
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account

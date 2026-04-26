@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT contract details
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -38,7 +38,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List NFT contract transfers
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -88,7 +88,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT contract transfer count
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -124,7 +124,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: List NFT contract holders
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -166,7 +166,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get NFT contract holder count
    *     tags:
-   *       - V3 / NFTs
+   *       - NFTs
    *     parameters:
    *       - in: path
    *         name: contract

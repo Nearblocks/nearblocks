@@ -13,7 +13,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account access keys
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
@@ -52,7 +52,7 @@ const routes = (route: Router) => {
    *     summary: Get account access key count
    *     x-internal: true
    *     tags:
-   *       - V3 / Accounts
+   *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
