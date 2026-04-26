@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search txn by hash, block by height/hash, account by id, receipt by id, tokens by hex address
    *     tags:
-   *       - Search
+   *       - Legacy / Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -37,7 +37,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search txns by hash
    *     tags:
-   *       - Search
+   *       - Legacy / Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -57,7 +57,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search blocks by hash/height
    *     tags:
-   *       - Search
+   *       - Legacy / Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -80,7 +80,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search accounts by id
    *     tags:
-   *       - Search
+   *       - Legacy / Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -100,7 +100,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search receipts by id
    *     tags:
-   *       - Search
+   *       - Legacy / Search
    *     parameters:
    *       - in: query
    *         name: keyword
@@ -120,7 +120,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Search tokens by hex address
    *     tags:
-   *       - Search
+   *       - Legacy / Search
    *     parameters:
    *       - in: query
    *         name: keyword

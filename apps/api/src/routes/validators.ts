@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get validators
    *     tags:
-   *       - Validators
+   *       - Legacy / Validators
    *     parameters:
    *       - in: query
    *         name: page

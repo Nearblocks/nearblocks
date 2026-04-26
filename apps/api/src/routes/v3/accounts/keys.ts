@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/keys/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/keys';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/keys:
    *   get:
-   *     summary: Get account access keys
+   *     summary: List account access keys
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -48,7 +49,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/keys/count:
    *   get:
-   *     summary: Get account access keys count
+   *     summary: Get account access key count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -62,7 +64,12 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/keys/count', validate(request.count), service.count);
+  route.get(
+    '/:account/keys/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;

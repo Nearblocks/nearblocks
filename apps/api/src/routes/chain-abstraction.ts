@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get multi chain accounts of an account
    *     tags:
-   *       - Chain Abstraction
+   *       - Legacy / Chain Abstraction
    *     parameters:
    *       - in: path
    *         name: account
@@ -44,7 +44,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get multi chain txns of the account by pagination
    *     tags:
-   *       - Chain Abstraction
+   *       - Legacy / Chain Abstraction
    *     parameters:
    *       - in: path
    *         name: account
@@ -134,7 +134,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated multi chain txns count of the account
    *     tags:
-   *       - Chain Abstraction
+   *       - Legacy / Chain Abstraction
    *     parameters:
    *       - in: path
    *         name: account
@@ -196,7 +196,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get multi chain txns by pagination
    *     tags:
-   *       - Chain Abstraction
+   *       - Legacy / Chain Abstraction
    *     parameters:
    *       - in: query
    *         name: account
@@ -283,7 +283,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated multi chain txns count
    *     tags:
-   *       - Chain Abstraction
+   *       - Legacy / Chain Abstraction
    *     parameters:
    *       - in: query
    *         name: account

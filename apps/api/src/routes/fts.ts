@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top tokens by pagination
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -67,7 +67,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top tokens count
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: query
    *         name: search
@@ -86,7 +86,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get token txns by pagination
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: query
    *         name: cursor
@@ -123,7 +123,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated token txns count
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     responses:
    *       200:
    *         description: Success response
@@ -136,7 +136,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get token info
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -159,7 +159,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get token txns by pagination
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -223,7 +223,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated token txns count
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -261,7 +261,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get token holders by pagination
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: path
    *         name: contract
@@ -307,7 +307,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated token holders count
    *     tags:
-   *       - FTs
+   *       - Legacy / FTs
    *     parameters:
    *       - in: path
    *         name: contract

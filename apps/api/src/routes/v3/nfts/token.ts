@@ -16,7 +16,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/{contract}/tokens:
    *   get:
-   *     summary: Get nft tokens
+   *     summary: List NFT tokens in a contract
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -54,7 +54,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/{contract}/tokens/count:
    *   get:
-   *     summary: Get nft tokens count
+   *     summary: Get NFT token count in a contract
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -78,7 +78,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/{contract}/tokens/{token}:
    *   get:
-   *     summary: Get nft token info
+   *     summary: Get NFT token details
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -104,7 +104,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/{contract}/tokens/{token}/txns:
    *   get:
-   *     summary: Get nft token transfers
+   *     summary: List NFT token transfers
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -159,7 +159,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/{contract}/tokens/{token}/txns/count:
    *   get:
-   *     summary: Get nft token transfers count
+   *     summary: Get NFT token transfer count
    *     tags:
    *       - V3 / NFTs
    *     parameters:

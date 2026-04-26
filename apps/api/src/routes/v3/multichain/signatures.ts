@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/multichain/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -16,7 +17,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/multichain/signatures:
    *   get:
-   *     summary: Get all multichain signature txns
+   *     summary: List multichain signature transactions
    *     tags:
    *       - V3 / Multichain
    *     parameters:
@@ -76,7 +77,8 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/multichain/signatures/count:
    *   get:
-   *     summary: Get estimated multichain signature txns count
+   *     summary: Get estimated multichain signature count
+   *     x-internal: true
    *     tags:
    *       - V3 / Multichain
    *     parameters:
@@ -112,13 +114,18 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/signatures/count', validate(request.count), service.count);
+  route.get(
+    '/signatures/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 
   /**
    * @openapi
    * /v3/multichain/signatures/stats:
    *   get:
-   *     summary: Get 24h multichain signature stats
+   *     summary: Get 24-hour multichain signature statistics
    *     tags:
    *       - V3 / Multichain
    *     responses:

@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top dex pairs by pagination
    *     tags:
-   *       - DEX
+   *       - Legacy / DEX
    *     parameters:
    *       - in: query
    *         name: search
@@ -67,7 +67,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get top dex pairs count
    *     tags:
-   *       - DEX
+   *       - Legacy / DEX
    *     parameters:
    *       - in: query
    *         name: search
@@ -86,7 +86,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get dex pair info
    *     tags:
-   *       - DEX
+   *       - Legacy / DEX
    *     parameters:
    *       - in: path
    *         name: pair
@@ -109,7 +109,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get dex pair txns by pagination
    *     tags:
-   *       - DEX
+   *       - Legacy / DEX
    *     parameters:
    *       - in: path
    *         name: pair
@@ -150,7 +150,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get dex pair txns count
    *     tags:
-   *       - DEX
+   *       - Legacy / DEX
    *     parameters:
    *       - in: path
    *         name: pair
@@ -178,7 +178,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get dex pair chart data
    *     tags:
-   *       - DEX
+   *       - Legacy / DEX
    *     parameters:
    *       - in: path
    *         name: pair

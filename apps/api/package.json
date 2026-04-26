@@ -24,7 +24,7 @@
     "@opentelemetry/instrumentation-ioredis": "0.47.0",
     "@opentelemetry/instrumentation-pg": "0.50.0",
     "@opentelemetry/instrumentation-pino": "0.46.0",
-    "@scalar/express-api-reference": "0.4.173",
+    "@scalar/express-api-reference": "0.9.10",
     "@sentry/node": "7.119.0",
     "big.js": "6.2.1",
     "cors": "2.8.5",

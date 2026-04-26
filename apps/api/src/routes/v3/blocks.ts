@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/blocks/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -16,7 +17,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/blocks:
    *   get:
-   *     summary: Get all blocks
+   *     summary: List blocks
    *     tags:
    *       - V3 / Blocks
    *     parameters:
@@ -48,20 +49,21 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/blocks/count:
    *   get:
-   *     summary: Get estimated blocks count
+   *     summary: Get estimated block count
+   *     x-internal: true
    *     tags:
    *       - V3 / Blocks
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/count', service.count);
+  route.get('/count', internalOnly, service.count);
 
   /**
    * @openapi
    * /v3/blocks/latest:
    *   get:
-   *     summary: Get the latest blocks
+   *     summary: List latest blocks
    *     description: ⚠️ Response is cached for 5 seconds
    *     tags:
    *       - V3 / Blocks
@@ -84,7 +86,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/blocks/stats:
    *   get:
-   *     summary: Get 24h block stats
+   *     summary: Get 24-hour block statistics
    *     tags:
    *       - V3 / Blocks
    *     responses:
@@ -97,7 +99,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/blocks/{hash}:
    *   get:
-   *     summary: Get a block
+   *     summary: Get block by hash
    *     tags:
    *       - V3 / Blocks
    *     parameters:

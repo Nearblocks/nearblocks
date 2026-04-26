@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/nfts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -21,7 +22,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts:
    *   get:
-   *     summary: Get top nfts
+   *     summary: List top NFT collections
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -72,7 +73,8 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/count:
    *   get:
-   *     summary: Get top nfts count
+   *     summary: Get NFT collection count
+   *     x-internal: true
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -85,13 +87,13 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', validate(request.count), service.count);
+  route.get('/count', internalOnly, validate(request.count), service.count);
 
   /**
    * @openapi
    * /v3/nfts/txns:
    *   get:
-   *     summary: Get all nft transfers
+   *     summary: List all NFT transfers
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -130,7 +132,8 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/nfts/txns/count:
    *   get:
-   *     summary: Get nft transfers count
+   *     summary: Get NFT transfer count
+   *     x-internal: true
    *     tags:
    *       - V3 / NFTs
    *     parameters:
@@ -145,7 +148,12 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validate(request.txnCount), service.txnCount);
+  route.get(
+    '/txns/count',
+    internalOnly,
+    validate(request.txnCount),
+    service.txnCount,
+  );
 
   return app;
 };

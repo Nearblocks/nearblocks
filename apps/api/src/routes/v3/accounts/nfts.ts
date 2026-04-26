@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/nfts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/nfts';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/nft-txns:
    *   get:
-   *     summary: Get account nft txns
+   *     summary: List account NFT transfers
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -70,7 +71,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/nft-txns/count:
    *   get:
-   *     summary: Get estimated account nft txns count
+   *     summary: Get estimated account NFT transfer count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -106,7 +108,12 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/nft-txns/count', validate(request.count), service.count);
+  route.get(
+    '/:account/nft-txns/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;

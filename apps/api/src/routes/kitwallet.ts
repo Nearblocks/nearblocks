@@ -19,7 +19,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get all staking pools
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     responses:
    *       200:
    *         description: Success response
@@ -32,7 +32,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get staking deposits for an account
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -59,7 +59,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get accounts by public key
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: key
@@ -86,7 +86,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get activities for an account
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -113,7 +113,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get call receivers for an account
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -140,7 +140,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get likely tokens for an account
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -167,7 +167,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get likely tokens for an account from block
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -199,7 +199,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get likely NFTs for an account
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -226,7 +226,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get likely NFTs for an account from block
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -258,7 +258,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account receipts
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account
@@ -335,7 +335,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account receipts count
    *     tags:
-   *       - Kitwallet
+   *       - Legacy / Kitwallet
    *     parameters:
    *       - in: path
    *         name: account

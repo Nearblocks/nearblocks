@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get total near supply
    *     tags:
-   *       - Legacy
+   *       - Legacy / Supply
    *     parameters:
    *       - in: query
    *         name: unit
@@ -45,7 +45,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get circulating near supply
    *     tags:
-   *       - Legacy
+   *       - Legacy / Supply
    *     parameters:
    *       - in: query
    *         name: unit
@@ -73,7 +73,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get tokens burnt per day
    *     tags:
-   *       - Legacy
+   *       - Legacy / Supply
    *     parameters:
    *       - in: query
    *         name: period

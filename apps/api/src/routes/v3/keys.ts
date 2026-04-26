@@ -16,7 +16,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/keys/{key}:
    *   get:
-   *     summary: Get access keys
+   *     summary: Get access key info
    *     tags:
    *       - V3 / Keys
    *     parameters:

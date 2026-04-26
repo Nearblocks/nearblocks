@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/staking/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/staking';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/staking-txns:
    *   get:
-   *     summary: Get account staking txns
+   *     summary: List account staking transactions
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -60,7 +61,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/staking-txns/count:
    *   get:
-   *     summary: Get estimated account staking txns count
+   *     summary: Get estimated account staking transaction count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -88,6 +90,7 @@ const routes = (route: Router) => {
    */
   route.get(
     '/:account/staking-txns/count',
+    internalOnly,
     validate(request.count),
     service.count,
   );

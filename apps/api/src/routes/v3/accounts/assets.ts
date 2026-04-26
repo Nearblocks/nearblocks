@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/assets/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/assets';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/assets/fts:
    *   get:
-   *     summary: Get account ft assets
+   *     summary: List account FT balances
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -48,7 +49,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/assets/fts/count:
    *   get:
-   *     summary: Get account ft assets count
+   *     summary: Get account FT balances count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -64,6 +66,7 @@ const routes = (route: Router) => {
    */
   route.get(
     '/:account/assets/fts/count',
+    internalOnly,
     validate(request.ftCount),
     service.ftCount,
   );
@@ -72,7 +75,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/assets/nfts:
    *   get:
-   *     summary: Get account nft assets
+   *     summary: List account NFT balances
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -110,7 +113,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/assets/nfts/count:
    *   get:
-   *     summary: Get account nft assets count
+   *     summary: Get account NFT balances count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -126,6 +130,7 @@ const routes = (route: Router) => {
    */
   route.get(
     '/:account/assets/nfts/count',
+    internalOnly,
     validate(request.nftCount),
     service.nftCount,
   );

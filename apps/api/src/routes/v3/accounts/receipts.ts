@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/accounts/receipts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/accounts/receipts';
 
@@ -10,7 +11,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/receipts:
    *   get:
-   *     summary: Get account receipts
+   *     summary: List account receipts
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -75,7 +76,8 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/receipts/count:
    *   get:
-   *     summary: Get estimated account receipts count
+   *     summary: Get estimated account receipt count
+   *     x-internal: true
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -116,7 +118,12 @@ const routes = (route: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/receipts/count', validate(request.count), service.count);
+  route.get(
+    '/:account/receipts/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;

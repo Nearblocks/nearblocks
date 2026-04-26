@@ -18,7 +18,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get account receipts by pagination
    *     tags:
-   *       - Account
+   *       - Legacy / V2 Account
    *     parameters:
    *       - in: path
    *         name: account
@@ -95,7 +95,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get estimated account receipts count
    *     tags:
-   *       - Account
+   *       - Legacy / V2 Account
    *     parameters:
    *       - in: path
    *         name: account

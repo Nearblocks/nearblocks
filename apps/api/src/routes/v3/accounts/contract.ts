@@ -10,7 +10,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/contract:
    *   get:
-   *     summary: Get contract info
+   *     summary: Get contract metadata
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -34,7 +34,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/contract/deployments:
    *   get:
-   *     summary: Get contract deployments (first & last)
+   *     summary: Get contract deployment history
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -58,7 +58,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/contract/schema:
    *   get:
-   *     summary: Get contract abi schema
+   *     summary: Get contract ABI schema
    *     tags:
    *       - V3 / Accounts
    *     parameters:
@@ -82,7 +82,7 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/contract/{method}/action:
    *   get:
-   *     summary: Get latest action args for method
+   *     summary: Get latest action args for a contract method
    *     tags:
    *       - V3 / Accounts
    *     parameters:

@@ -159,7 +159,7 @@ const rateLimiter = catchAsync(
   },
 );
 
-const checkIPInSubnets = (ipAddress: string): boolean => {
+export const checkIPInSubnets = (ipAddress: string): boolean => {
   for (const subnet of SUBNETS) {
     if (ip.cidrSubnet(subnet).contains(ipAddress)) {
       return true;

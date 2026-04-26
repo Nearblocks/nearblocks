@@ -17,7 +17,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get txn info with receipts and execution outcomes
    *     tags:
-   *       - Txns
+   *       - Legacy / V2 Txns
    *     parameters:
    *       - in: path
    *         name: hash
@@ -40,7 +40,7 @@ const routes = (app: Router) => {
    *   get:
    *     summary: Get txn receipts
    *     tags:
-   *       - Txns
+   *       - Legacy / V2 Txns
    *     parameters:
    *       - in: path
    *         name: hash

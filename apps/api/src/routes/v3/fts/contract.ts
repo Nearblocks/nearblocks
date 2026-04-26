@@ -16,7 +16,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/{contract}:
    *   get:
-   *     summary: Get token info
+   *     summary: Get FT contract details
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -36,7 +36,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/{contract}/txns:
    *   get:
-   *     summary: Get token transfers
+   *     summary: List FT contract transfers
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -86,7 +86,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/{contract}/txns/count:
    *   get:
-   *     summary: Get token transfers count
+   *     summary: Get FT contract transfer count
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -122,7 +122,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/{contract}/holders:
    *   get:
-   *     summary: Get token holders
+   *     summary: List FT contract holders
    *     tags:
    *       - V3 / FTs
    *     parameters:
@@ -164,7 +164,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/fts/{contract}/holders/count:
    *   get:
-   *     summary: Get token holders count
+   *     summary: Get FT contract holder count
    *     tags:
    *       - V3 / FTs
    *     parameters:
