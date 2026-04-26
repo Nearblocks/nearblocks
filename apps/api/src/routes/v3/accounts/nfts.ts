@@ -13,7 +13,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account NFT transfers
    *     tags:
-   *       - Accounts
+   *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account
@@ -74,7 +74,7 @@ const routes = (route: Router) => {
    *     summary: Get estimated account NFT transfer count
    *     x-internal: true
    *     tags:
-   *       - Accounts
+   *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account

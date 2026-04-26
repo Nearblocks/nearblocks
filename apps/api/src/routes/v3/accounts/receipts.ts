@@ -13,7 +13,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account receipts
    *     tags:
-   *       - Accounts
+   *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account
@@ -79,7 +79,7 @@ const routes = (route: Router) => {
    *     summary: Get estimated account receipt count
    *     x-internal: true
    *     tags:
-   *       - Accounts
+   *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account

@@ -13,7 +13,7 @@ const routes = (route: Router) => {
    *   get:
    *     summary: List account multi-token transfers
    *     tags:
-   *       - Accounts
+   *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account
@@ -74,7 +74,7 @@ const routes = (route: Router) => {
    *     summary: Get estimated account multi-token transfer count
    *     x-internal: true
    *     tags:
-   *       - Accounts
+   *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account
