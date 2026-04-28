@@ -11,7 +11,6 @@ import dayjs from '#libs/dayjs';
 import knex from '#libs/knex';
 // import lcw from '#libs/lcw';
 import { ftMeta, ftTotalSupply } from '#libs/near';
-import ref from '#libs/ref';
 import { accountToHex, tokenAmount } from '#libs/utils';
 
 type RawResp = {
@@ -187,15 +186,13 @@ export const syncMarketData = async () => {
 
 export const updateMarketData = async (meta: FTMeta) => {
   try {
-    const [refData, cmcData, cgData] = await Promise.all([
-      ref.marketData(meta.contract),
+    const [cmcData, cgData] = await Promise.all([
       // meta.livecoinwatch_id ? lcw.marketData(meta.livecoinwatch_id) : null,
       meta.coinmarketcap_id ? cmc.marketData(meta.coinmarketcap_id) : null,
       meta.coingecko_id ? cg.marketData(meta.coingecko_id) : null,
     ]);
 
     const marketData = {
-      ...omitBy(refData, isNull),
       // ...omitBy(lcwData, isNull),
       ...omitBy(cmcData, isNull),
       ...omitBy(cgData, isNull),
