@@ -8,7 +8,6 @@ import cg from '#libs/cg';
 import cmc from '#libs/cmc';
 import dayjs from '#libs/dayjs';
 import { dbEvents } from '#libs/knex';
-import ref from '#libs/ref';
 import { MetaContract, Raw } from '#types/types';
 
 export const syncFTData = async () => {
@@ -32,39 +31,6 @@ export const syncFTData = async () => {
   );
 
   await Promise.all(fts.map((ft) => updateFTData(ft.contract)));
-};
-
-export const syncFTPrice = async () => {
-  if (config.network === Network.TESTNET) {
-    return;
-  }
-
-  const data = await ref.price();
-
-  if (!data) {
-    return;
-  }
-
-  const keys = Object.keys(data);
-  const values = keys.map(() => `(?, ?)`).join(',');
-  const bindings = keys.flatMap((key) => [key, data[key].price]);
-
-  await dbEvents.raw(
-    `
-      UPDATE ft_meta AS t
-      SET
-        price = v.price::numeric,
-        refreshed_at = now()
-      FROM
-        (
-          VALUES
-            ${values}
-        ) AS v (contract, price)
-      WHERE
-        t.contract = v.contract
-    `,
-    bindings,
-  );
 };
 
 const updateFTData = async (contract: string) => {
