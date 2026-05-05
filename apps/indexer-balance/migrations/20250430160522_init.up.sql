@@ -75,6 +75,8 @@ SELECT
     schedule_interval => INTERVAL '1 hour'
   );
 
+CREATE INDEX IF NOT EXISTS ca_ans_account_idx ON account_balances (account);
+
 CREATE TABLE account_balances (
   storage_usage BIGINT NOT NULL,
   amount NUMERIC(40) NOT NULL,

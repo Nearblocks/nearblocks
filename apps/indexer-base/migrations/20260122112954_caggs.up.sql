@@ -4,6 +4,7 @@ WITH
 SELECT
   time_bucket (86400000000000, r.included_in_block_timestamp) AS date, -- 1d in ns
   u.account AS account,
+  COUNT(DISTINCT r.receipt_id) AS receipts,
   COUNT(DISTINCT r.originated_from_transaction_hash) AS txns,
   COUNT(DISTINCT u.counterparty) FILTER (
     WHERE
@@ -44,6 +45,8 @@ SELECT
     schedule_interval => INTERVAL '1 hour',
     if_not_exists => true
   );
+
+CREATE INDEX IF NOT EXISTS ca_ars_account_idx ON account_receipt_stats (account);
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS account_near_stats
 WITH
@@ -97,3 +100,5 @@ SELECT
     schedule_interval => INTERVAL '1 hour',
     if_not_exists => true
   );
+
+CREATE INDEX IF NOT EXISTS ca_ans_account_idx ON account_near_stats (account);
