@@ -22,16 +22,21 @@ import { nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  address?: string;
+  basePath?: string;
   loading?: boolean;
   receiptCountPromise?: Promise<AccountReceiptCount | null>;
   receiptsPromise?: Promise<AccountReceiptsRes>;
 };
 
 export const Receipts = ({
+  address: addressProp,
+  basePath,
   loading,
   receiptCountPromise,
   receiptsPromise,
@@ -41,27 +46,40 @@ export const Receipts = ({
   const receiptCount =
     !loading && receiptCountPromise ? use(receiptCountPromise) : null;
 
-  const { address } = useParams<{ address: string }>();
+  const params = useParams<{ address?: string }>();
+  const resolvedAddress = addressProp ?? params.address ?? '';
   const router = useRouter();
   const searchParams = useSearchParams();
+  const base = basePath ?? `/address/${resolvedAddress}/receipts`;
 
   const onFilter = (value: FilterData) => {
-    const params = buildParams(searchParams, value);
-    router.push(`/address/${address}/receipts?${params.toString()}`);
+    const p = buildParams(searchParams, value);
+    router.push(`${base}?${p.toString()}`);
   };
 
   const onClear = (data: FilterClearData) => {
-    const params = buildParams(searchParams, data);
-    router.push(`/address/${address}/receipts?${params.toString()}`);
+    const p = buildParams(searchParams, data);
+    router.push(`${base}?${p.toString()}`);
   };
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
+    const p = buildParams(searchParams, {
       [type]: cursor,
       [type === 'next' ? 'prev' : 'next']: '',
     });
-    return `/address/${address}/receipts?${params.toString()}`;
+    return `${base}?${p.toString()}`;
   };
+
+  const accountFilter = basePath ? searchParams.get('account') : null;
+  const extraFilters = accountFilter
+    ? [
+        {
+          label: t('txns.columns.account'),
+          name: 'account',
+          value: accountFilter,
+        },
+      ]
+    : undefined;
 
   const columns: DataTableColumnDef<AccountReceipt>[] = [
     {
@@ -122,7 +140,7 @@ export const Receipts = ({
     {
       cell: (receipt) => (
         <TxnDirection
-          address={address}
+          address={resolvedAddress}
           from={receipt.predecessor_account_id}
           to={receipt.receiver_account_id}
         />
@@ -167,6 +185,7 @@ export const Receipts = ({
           columns={columns}
           data={receipts?.data}
           emptyMessage={t('receipts.empty')}
+          extraFilters={extraFilters}
           getRowKey={(receipt) => receipt.receipt_id}
           header={
             <SkeletonSlot
@@ -175,9 +194,15 @@ export const Receipts = ({
             >
               {() => (
                 <>
-                  {t('receipts.total', {
-                    count: numberFormat(receiptCount?.count ?? 0),
-                  })}
+                  {basePath ? (
+                    t('receipts.total', {
+                      count: numberFormat(receiptCount?.count ?? 0),
+                    })
+                  ) : receipts?.data?.length ? (
+                    t('receipts.latest')
+                  ) : (
+                    <span>&nbsp;</span>
+                  )}
                 </>
               )}
             </SkeletonSlot>
@@ -186,8 +211,18 @@ export const Receipts = ({
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
-          pagination={receipts?.meta}
+          pagination={basePath ? receipts?.meta : undefined}
         />
+        {!basePath && receipts?.meta?.next_page && (
+          <div className="border-t px-4 py-3">
+            <Button asChild className="h-8 w-full" variant="ghost">
+              <Link href={`/receipts?account=${resolvedAddress}`}>
+                {t('receipts.viewAll')}
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

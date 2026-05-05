@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 
+import { FTTxns } from '@/components/address/fts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { TokenTransfers } from '@/components/tokens/transfers';
+import {
+  fetchFTTxnCount as fetchAddressFTTxnCount,
+  fetchFTTxns as fetchAddressFTTxns,
+} from '@/data/address/fts';
 import { fetchFTTxnCount, fetchFTTxns } from '@/data/tokens';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -26,6 +31,28 @@ const TransfersPage = async ({ params, searchParams }: Props) => {
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'fts');
   const filters = await searchParams;
+  const account =
+    typeof filters.account === 'string' ? filters.account : undefined;
+
+  if (account) {
+    const ftsPromise = fetchAddressFTTxns(account, filters);
+    const ftCountPromise = fetchAddressFTTxnCount(account, filters);
+
+    return (
+      <>
+        <h1 className="text-headline-lg mb-4">{t('transfers.title')}</h1>
+        <ErrorSuspense fallback={<FTTxns loading />}>
+          <FTTxns
+            address={account}
+            basePath="/tokens/transfers"
+            ftCountPromise={ftCountPromise}
+            ftsPromise={ftsPromise}
+          />
+        </ErrorSuspense>
+      </>
+    );
+  }
+
   const txnsPromise = fetchFTTxns(filters);
   const txnCountPromise = fetchFTTxnCount(filters);
 

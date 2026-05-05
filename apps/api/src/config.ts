@@ -47,6 +47,8 @@ const balanceStart =
   env.NETWORK === Network.MAINNET ? 1595368210762782796n : 1617306016933517888n;
 const eventsStart =
   env.NETWORK === Network.MAINNET ? 1613604394034862539n : 1636002073366363339n;
+const stakingStart =
+  env.NETWORK === Network.MAINNET ? 1598366210034965101n : 1617308117501240699n;
 
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
@@ -85,6 +87,7 @@ const config: Config = {
   redisUrl: env.REDIS_URL,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
+  stakingStart,
   testnetUrl: env.TESTNET_URL,
   userDbUrl: env.DB_URL_USER,
 };
