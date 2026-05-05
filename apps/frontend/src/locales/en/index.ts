@@ -8,8 +8,11 @@ import { contact } from './contact';
 import { fts } from './fts';
 import { home } from './home';
 import { layout } from './layout';
+import { mts } from './mts';
 import { multichain } from './multichain';
 import { nfts } from './nfts';
+import { receipts } from './receipts';
+import { staking } from './staking';
 import { txns } from './txns';
 import { validators } from './validators';
 
@@ -24,8 +27,11 @@ export const dictionary = {
   fts,
   home,
   layout,
+  mts,
   multichain,
   nfts,
+  receipts,
+  staking,
   txns,
   validators,
 };

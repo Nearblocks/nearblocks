@@ -95,3 +95,5 @@ SELECT
     schedule_interval => INTERVAL '1 hour',
     if_not_exists => true
   );
+
+CREATE INDEX IF NOT EXISTS ca_afs_account_idx ON account_ft_stats (account);

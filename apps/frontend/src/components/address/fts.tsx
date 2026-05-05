@@ -17,16 +17,25 @@ import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  address?: string;
+  basePath?: string;
   ftCountPromise?: Promise<AccountFTTxnCount | null>;
   ftsPromise?: Promise<AccountFTTxnsRes>;
   loading?: boolean;
 };
 
-export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
+export const FTTxns = ({
+  address: addressProp,
+  basePath,
+  ftCountPromise,
+  ftsPromise,
+  loading,
+}: Props) => {
   const { t } = useLocale('address');
   const fts = !loading && ftsPromise ? use(ftsPromise) : null;
   const ftCount = !loading && ftCountPromise ? use(ftCountPromise) : null;
@@ -127,27 +136,40 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
     },
   ];
 
-  const { address } = useParams<{ address: string }>();
+  const params = useParams<{ address?: string }>();
+  const resolvedAddress = addressProp ?? params.address ?? '';
   const router = useRouter();
   const searchParams = useSearchParams();
+  const base = basePath ?? `/address/${resolvedAddress}/tokens`;
 
   const onFilter = (value: FilterData) => {
-    const params = buildParams(searchParams, value);
-    router.push(`/address/${address}/tokens?${params.toString()}`);
+    const p = buildParams(searchParams, value);
+    router.push(`${base}?${p.toString()}`);
   };
 
   const onClear = (data: FilterClearData) => {
-    const params = buildParams(searchParams, data);
-    router.push(`/address/${address}/tokens?${params.toString()}`);
+    const p = buildParams(searchParams, data);
+    router.push(`${base}?${p.toString()}`);
   };
 
   const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
+    const p = buildParams(searchParams, {
       [type]: cursor,
       [type === 'next' ? 'prev' : 'next']: '',
     });
-    return `/address/${address}/tokens?${params.toString()}`;
+    return `${base}?${p.toString()}`;
   };
+
+  const accountFilter = basePath ? searchParams.get('account') : null;
+  const extraFilters = accountFilter
+    ? [
+        {
+          label: t('txns.columns.account'),
+          name: 'account',
+          value: accountFilter,
+        },
+      ]
+    : undefined;
 
   return (
     <Card>
@@ -156,6 +178,7 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
           columns={columns}
           data={fts?.data}
           emptyMessage={t('fts.empty')}
+          extraFilters={extraFilters}
           getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
           header={
             <SkeletonSlot
@@ -164,7 +187,15 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
             >
               {() => (
                 <>
-                  {t('fts.total', { count: numberFormat(ftCount?.count ?? 0) })}
+                  {basePath ? (
+                    t('fts.total', {
+                      count: numberFormat(ftCount?.count ?? 0),
+                    })
+                  ) : fts?.data?.length ? (
+                    t('fts.latest')
+                  ) : (
+                    <span>&nbsp;</span>
+                  )}
                 </>
               )}
             </SkeletonSlot>
@@ -173,8 +204,18 @@ export const FTTxns = ({ ftCountPromise, ftsPromise, loading }: Props) => {
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
-          pagination={fts?.meta}
+          pagination={basePath ? fts?.meta : undefined}
         />
+        {!basePath && fts?.meta?.next_page && (
+          <div className="border-t px-4 py-3">
+            <Button asChild className="h-8 w-full" variant="ghost">
+              <Link href={`/tokens/transfers?account=${resolvedAddress}`}>
+                {t('fts.viewAll')}
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

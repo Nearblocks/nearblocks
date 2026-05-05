@@ -181,11 +181,15 @@ export const Txns = ({
             >
               {() => (
                 <>
-                  {basePath
-                    ? t('txns.total', {
-                        count: numberFormat(txnCount?.count ?? 0),
-                      })
-                    : t('txns.latest')}
+                  {basePath ? (
+                    t('txns.total', {
+                      count: numberFormat(txnCount?.count ?? 0),
+                    })
+                  ) : txns?.data?.length ? (
+                    t('txns.latest')
+                  ) : (
+                    <span>&nbsp;</span>
+                  )}
                 </>
               )}
             </SkeletonSlot>
@@ -196,9 +200,9 @@ export const Txns = ({
           onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? txns?.meta : undefined}
         />
-        {!basePath && (
-          <div className="border-t p-4">
-            <Button asChild className="w-full" variant="outline">
+        {!basePath && txns?.meta?.next_page && (
+          <div className="border-t px-4 py-3">
+            <Button asChild className="h-8 w-full" variant="ghost">
               <Link href={`/txns?account=${resolvedAddress}`}>
                 {t('txns.viewAll')}
                 <span aria-hidden="true">&rarr;</span>

@@ -1,4 +1,7 @@
 export type * from './accounts/index.js';
+export type * from './receipts/index.js';
+export type * from './mts/index.js';
+export type * from './staking/index.js';
 export type * from './blocks/index.js';
 export type * from './fts/index.js';
 export type * from './keys/index.js';

@@ -49,6 +49,7 @@ export type Config = {
   redisUrl: string;
   rpcUrl: string;
   sentryDsn?: string;
+  stakingStart: bigint;
   testnetUrl: string;
   userDbUrl: string;
 };
