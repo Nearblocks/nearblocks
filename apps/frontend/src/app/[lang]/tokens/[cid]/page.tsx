@@ -8,7 +8,8 @@ import {
 type Props = PageProps<'/[lang]/tokens/[cid]'>;
 
 const TokenPage = async ({ params, searchParams }: Props) => {
-  const [{ cid }, filters] = await Promise.all([params, searchParams]);
+  const [{ cid }, raw] = await Promise.all([params, searchParams]);
+  const filters = { ...raw, affected: raw.account ?? raw.affected };
   const txnsPromise = fetchFTContractTxns(cid, filters);
   const txnCountPromise = fetchFTContractTxnCount(cid, filters);
 

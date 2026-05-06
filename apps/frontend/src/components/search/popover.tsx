@@ -1,4 +1,5 @@
 import { useDebounceFn } from 'ahooks';
+import { Clock, Trash, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Search } from 'nb-schemas';
@@ -6,6 +7,7 @@ import { Search } from 'nb-schemas';
 import { useLocale } from '@/hooks/use-locale';
 import { initialResults, searchKeyword } from '@/lib/search';
 import { cn } from '@/lib/utils';
+import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Popover, PopoverAnchor, PopoverContent } from '@/ui/popover';
 
@@ -14,16 +16,24 @@ import { SearchLink } from './link';
 
 type Props = {
   className?: string;
+  clearHistory: () => void;
   filter: string;
+  history: string[];
+  navigateByKeyword: (kw: string) => void;
   open: boolean;
+  removeFromHistory: (query: string) => void;
   setOpen: (open: boolean) => void;
   startTransition: (callback: () => void) => void;
 };
 
 export const SearchPopover = ({
   className,
+  clearHistory,
   filter,
+  history,
+  navigateByKeyword,
   open,
+  removeFromHistory,
   setOpen,
   startTransition,
 }: Props) => {
@@ -81,6 +91,10 @@ export const SearchPopover = ({
   };
 
   const onFocus = () => {
+    if (!keyword && history.length > 0) {
+      setOpen(true);
+      return;
+    }
     setOpen(
       !!results &&
         (results.accounts.length > 0 ||
@@ -89,6 +103,13 @@ export const SearchPopover = ({
           results.txns.length > 0),
     );
   };
+
+  const hasLiveResults =
+    !!results &&
+    (results.accounts.length > 0 ||
+      results.blocks.length > 0 ||
+      results.fts.length > 0 ||
+      results.txns.length > 0);
 
   return (
     <Popover onOpenChange={(open) => setOpen(open)} open={open}>
@@ -112,12 +133,50 @@ export const SearchPopover = ({
         onOpenAutoFocus={(event) => event.preventDefault()}
         sideOffset={12}
       >
+        {!hasLiveResults && history.length > 0 && (
+          <SearchItem
+            button={
+              <Button
+                className="-my-1"
+                onClick={clearHistory}
+                size="icon-xs"
+                variant="ghost"
+              >
+                <Trash className="size-3" />
+              </Button>
+            }
+            title={t('search.history')}
+          >
+            {history.map((q) => (
+              <div className="flex items-center" key={q}>
+                <SearchLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateByKeyword(q);
+                  }}
+                >
+                  <Clock className="text-muted-foreground mr-2 inline size-3" />
+                  {q}
+                </SearchLink>
+                <Button
+                  onClick={() => removeFromHistory(q)}
+                  size="icon-xs"
+                  variant="ghost"
+                >
+                  <X className="size-3" />
+                </Button>
+              </div>
+            ))}
+          </SearchItem>
+        )}
         {results && results.accounts.length > 0 && (
           <SearchItem title={t('search.addresses')}>
             {results.accounts.map((account) => (
               <SearchLink
                 href={`/address/${account.account_id}`}
                 key={account.account_id}
+                onClick={() => navigateByKeyword(keyword)}
               >
                 {account.account_id}
               </SearchLink>
@@ -130,6 +189,7 @@ export const SearchPopover = ({
               <SearchLink
                 href={`/blocks/${block.block_hash}`}
                 key={block.block_hash}
+                onClick={() => navigateByKeyword(keyword)}
               >
                 {block.block_hash}
               </SearchLink>
@@ -139,7 +199,11 @@ export const SearchPopover = ({
         {results && results.fts.length > 0 && (
           <SearchItem title={t('search.tokens')}>
             {results.fts.map((ft) => (
-              <SearchLink href={`/tokens/${ft.contract}`} key={ft.contract}>
+              <SearchLink
+                href={`/tokens/${ft.contract}`}
+                key={ft.contract}
+                onClick={() => navigateByKeyword(keyword)}
+              >
                 {ft.contract}
               </SearchLink>
             ))}
@@ -151,6 +215,7 @@ export const SearchPopover = ({
               <SearchLink
                 href={`/txns/${txn.transaction_hash}`}
                 key={txn.transaction_hash}
+                onClick={() => navigateByKeyword(keyword)}
               >
                 {txn.transaction_hash}
               </SearchLink>

@@ -111,8 +111,11 @@ export const NFTTxns = ({
           </Truncate>
         </Link>
       ),
+      enableFilter: true,
+      filterName: 'contract',
+      filterPlaceholder: t('nfts.filterToken'),
       header: t('nfts.columns.tokenId'),
-      id: 'token_id',
+      id: 'token',
     },
     {
       cell: (nft) => (
@@ -130,10 +133,10 @@ export const NFTTxns = ({
         </span>
       ),
       enableFilter: true,
-      filterName: 'token',
-      filterPlaceholder: t('nfts.filterToken'),
+      filterName: 'contract',
+      filterPlaceholder: t('nfts.filterContract'),
       header: t('nfts.columns.token'),
-      id: 'token',
+      id: 'contract',
     },
     {
       cell: (nft) =>

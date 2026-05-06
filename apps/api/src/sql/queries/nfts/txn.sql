@@ -30,4 +30,5 @@ FROM
   AND b.block_timestamp >= ${block_timestamp}::BIGINT - 300000000000 -- 5m in ns
 WHERE
   r.receipt_id = ${receipt_id}::TEXT
-  AND r.included_in_block_timestamp = ${block_timestamp}::BIGINT
+  AND r.included_in_block_timestamp <= ${block_timestamp}::BIGINT
+  AND r.included_in_block_timestamp >= ${block_timestamp}::BIGINT - 300000000000 -- 5m in ns

@@ -92,6 +92,7 @@ export const layout = {
     addresses: 'Addresses',
     blocks: 'Blocks',
     filters: 'All Filters',
+    history: 'Recent Searches',
     placeholder: 'Search by Account ID / Txn Hash / Block',
     tokens: 'Tokens',
     txns: 'Txns',
