@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
+import { useSearchHistory } from '@/hooks/use-search-history';
 import { searchKeyword } from '@/lib/search';
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
@@ -22,27 +23,42 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const [isPending, startTransition] = useTransition();
+  const { addToHistory, clearHistory, history, removeFromHistory } =
+    useSearchHistory();
 
   const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilter(e.target.value);
   };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const form = new FormData(e.currentTarget);
-
+  const navigateByKeyword = (kw: string) => {
     startTransition(async () => {
-      const resp = await searchKeyword(form.get('keyword') as string, filter);
+      const resp = await searchKeyword(kw, filter);
 
-      if (resp?.accounts.length)
+      const hasResults =
+        resp &&
+        (resp.accounts.length > 0 ||
+          resp.blocks.length > 0 ||
+          resp.fts.length > 0 ||
+          resp.txns.length > 0);
+
+      if (!hasResults) return;
+
+      addToHistory(kw);
+
+      if (resp.accounts.length)
         router.push(`/address/${resp.accounts[0].account_id}`);
-      if (resp?.blocks.length)
+      if (resp.blocks.length)
         router.push(`/blocks/${resp.blocks[0].block_hash}`);
-      if (resp?.fts.length) router.push(`/tokens/${resp.fts[0].contract}`);
-      if (resp?.txns.length)
+      if (resp.fts.length) router.push(`/tokens/${resp.fts[0].contract}`);
+      if (resp.txns.length)
         router.push(`/txns/${resp.txns[0].transaction_hash}`);
     });
+  };
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    navigateByKeyword(form.get('keyword') as string);
   };
 
   return (
@@ -64,8 +80,12 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
         <ButtonGroup className="grow">
           <SearchPopover
             className={size === 'lg' ? 'h-9' : 'h-7'}
+            clearHistory={clearHistory}
             filter={filter}
+            history={history}
+            navigateByKeyword={navigateByKeyword}
             open={open}
+            removeFromHistory={removeFromHistory}
             setOpen={setOpen}
             startTransition={startTransition}
           />

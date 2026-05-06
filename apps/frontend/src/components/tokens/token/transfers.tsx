@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
 import { FTTxn, FTTxnCountRes, FTTxnsRes } from 'nb-schemas';
@@ -35,7 +35,9 @@ export const TokenTransfers = ({
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const account = searchParams.get('account');
 
   const columns: DataTableColumnDef<FTTxn>[] = [
     {
@@ -151,6 +153,17 @@ export const TokenTransfers = ({
           columns={columns}
           data={txn?.data}
           emptyMessage={t('transfers.empty')}
+          extraFilters={
+            account
+              ? [
+                  {
+                    label: t('transfers.account'),
+                    name: 'account',
+                    value: account,
+                  },
+                ]
+              : undefined
+          }
           getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
           header={
             <SkeletonSlot
@@ -167,6 +180,14 @@ export const TokenTransfers = ({
             </SkeletonSlot>
           }
           loading={loading || !!txn?.errors}
+          onClear={(data) => {
+            const params = buildParams(searchParams, {
+              ...data,
+              next: '',
+              prev: '',
+            });
+            router.push(`${pathname}?${params.toString()}`);
+          }}
           onPaginationNavigate={onPaginate}
           pagination={txn?.meta}
         />

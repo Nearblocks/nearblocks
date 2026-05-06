@@ -10,7 +10,7 @@ const NftTokensLayout = async ({ children, params }: Props) => {
 
   if (!hasLocale(lang)) notFound();
 
-  const dictionary = await getDictionary(lang, ['nfts']);
+  const dictionary = await getDictionary(lang, ['address', 'nfts']);
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>

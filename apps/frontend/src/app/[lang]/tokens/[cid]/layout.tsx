@@ -4,6 +4,7 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { ActiveLink } from '@/components/link';
 import { TabLink, TabLinks } from '@/components/tab-links';
 import { TokenHeader } from '@/components/tokens/token/header';
+import { HolderFilter } from '@/components/tokens/token/holder-filter';
 import { Overview } from '@/components/tokens/token/overview';
 import { Profile } from '@/components/tokens/token/profile';
 import {
@@ -61,7 +62,7 @@ const TokenLayout = async ({ children, params }: Props) => {
           <TokenHeader cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </h1>
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+      <div className="mt-6 mb-10 grid gap-4 lg:grid-cols-2">
         <ErrorSuspense fallback={<Overview loading />}>
           <Overview
             contractPromise={contractPromise}
@@ -73,7 +74,10 @@ const TokenLayout = async ({ children, params }: Props) => {
           <Profile cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </div>
-      <ScrollArea className="mt-10 mb-3 w-full whitespace-nowrap">
+      <ErrorSuspense fallback={null}>
+        <HolderFilter cid={cid} contractPromise={contractPromise} />
+      </ErrorSuspense>
+      <ScrollArea className="mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>
             <ActiveLink exact href={`/tokens/${cid}`}>

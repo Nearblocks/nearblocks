@@ -10,7 +10,7 @@ const TokensLayout = async ({ children, params }: Props) => {
 
   if (!hasLocale(lang)) notFound();
 
-  const dictionary = await getDictionary(lang, ['fts']);
+  const dictionary = await getDictionary(lang, ['address', 'fts']);
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>

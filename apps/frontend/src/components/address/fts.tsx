@@ -117,10 +117,10 @@ export const FTTxns = ({
         </span>
       ),
       enableFilter: true,
-      filterName: 'token',
-      filterPlaceholder: t('fts.filterToken'),
+      filterName: 'contract',
+      filterPlaceholder: t('fts.filterContract'),
       header: t('fts.columns.token'),
-      id: 'token',
+      id: 'contract',
     },
     {
       cell: (ft) =>

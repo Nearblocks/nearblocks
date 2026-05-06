@@ -36,4 +36,5 @@ FROM
   ) m ON TRUE
 WHERE
   ft.receipt_id = ${receipt_id}::TEXT
-  AND ft.block_timestamp = ${block_timestamp}::BIGINT
+  AND ft.block_timestamp <= ${block_timestamp}::BIGINT
+  AND ft.block_timestamp >= ${block_timestamp}::BIGINT - 300000000000 -- 5m in ns

@@ -53,12 +53,15 @@ export const fts = {
     title: 'NEAR Tokens Tracker (NEP-141)',
   },
   overview: {
+    balance: 'Balance',
     circulatingMC: 'Circulating Supply Market Cap:',
+    filteredBy: 'Token holder',
     holders: 'Holders:',
     price: 'Price:',
     title: 'Overview',
     totalSupply: 'Total Supply:',
     transfers: 'Transfers:',
+    value: 'Value',
   },
   profile: {
     contract: 'Contract:',
@@ -87,6 +90,7 @@ export const fts = {
     volume: 'Volume (24H)',
   },
   transfers: {
+    account: 'Account',
     block: 'Block',
     empty: 'No token transfers found',
     from: 'From',

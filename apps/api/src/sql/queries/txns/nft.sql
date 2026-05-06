@@ -58,4 +58,5 @@ FROM
   ) tm ON TRUE
 WHERE
   nft.receipt_id = ${receipt_id}::TEXT
-  AND nft.block_timestamp = ${block_timestamp}::BIGINT
+  AND nft.block_timestamp <= ${block_timestamp}::BIGINT
+  AND nft.block_timestamp >= ${block_timestamp}::BIGINT - 300000000000 -- 5m in ns
