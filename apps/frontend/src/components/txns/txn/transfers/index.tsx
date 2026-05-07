@@ -20,9 +20,10 @@ type Props = {
   loading?: boolean;
   mts: null | TxnMT[];
   nfts: null | TxnNFT[];
+  spamPatterns?: string[];
 };
 
-export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
+export const Transfers = ({ fts, loading, mts, nfts, spamPatterns }: Props) => {
   const { t } = useLocale('txns');
 
   const mtFtCount =
@@ -70,7 +71,7 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
               fallback={<Skeleton className="h-19 w-full" />}
               loading={!!(loading || !fts)}
             >
-              {() => <FTTransfers fts={fts!} />}
+              {() => <FTTransfers fts={fts!} spamPatterns={spamPatterns} />}
             </SkeletonSlot>
           </ListRight>
         </ListItem>
@@ -104,7 +105,7 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
               fallback={<Skeleton className="h-13 w-full" />}
               loading={!!(loading || !nfts)}
             >
-              {() => <NFTTransfers nfts={nfts!} />}
+              {() => <NFTTransfers nfts={nfts!} spamPatterns={spamPatterns} />}
             </SkeletonSlot>
           </ListRight>
         </ListItem>
@@ -132,7 +133,7 @@ export const Transfers = ({ fts, loading, mts, nfts }: Props) => {
               fallback={<Skeleton className="h-19 w-full" />}
               loading={!!(loading || !mts)}
             >
-              {() => <MTTransfers mts={mts!} />}
+              {() => <MTTransfers mts={mts!} spamPatterns={spamPatterns} />}
             </SkeletonSlot>
           </ListRight>
         </ListItem>

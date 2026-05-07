@@ -88,3 +88,15 @@ export const getCommitHash = (url: string) => {
 
   return hash ? hash : url.slice(0, 40);
 };
+
+export const isSpamToken = (contract: string, patterns: string[]): boolean => {
+  return patterns.some((pattern) => {
+    if (pattern.startsWith('*.')) {
+      const suffix = pattern.slice(2);
+
+      return contract === suffix || contract.endsWith(`.${suffix}`);
+    }
+
+    return contract === pattern;
+  });
+};

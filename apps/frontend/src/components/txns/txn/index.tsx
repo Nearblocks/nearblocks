@@ -30,6 +30,7 @@ import { Transfers } from './transfers';
 type Props = {
   loading?: boolean;
   receiptsPromise?: Promise<null | TxnReceipt>;
+  spamPatterns?: string[];
   statsPromise?: Promise<null | Stats>;
   txnFTsPromise?: Promise<null | TxnFT[]>;
   txnMTsPromise?: Promise<null | TxnMT[]>;
@@ -40,6 +41,7 @@ type Props = {
 export const Overview = ({
   loading,
   receiptsPromise,
+  spamPatterns,
   statsPromise,
   txnFTsPromise,
   txnMTsPromise,
@@ -264,7 +266,13 @@ export const Overview = ({
               </p>
             </ListRight>
           </ListItem>
-          <Transfers fts={fts} loading={loading} mts={mts} nfts={nfts} />
+          <Transfers
+            fts={fts}
+            loading={loading}
+            mts={mts}
+            nfts={nfts}
+            spamPatterns={spamPatterns}
+          />
         </List>
 
         <hr className="border-border my-2" />

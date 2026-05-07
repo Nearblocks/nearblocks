@@ -6,6 +6,7 @@ import { NftTokenHeader } from '@/components/nft-tokens/token/header';
 import { Overview } from '@/components/nft-tokens/token/overview';
 import { Profile } from '@/components/nft-tokens/token/profile';
 import { TabLink, TabLinks } from '@/components/tab-links';
+import { SpamAlert } from '@/components/tokens/spam-alert';
 import {
   fetchNFTContract,
   fetchNFTContractHolderCount,
@@ -61,6 +62,14 @@ const NftTokenLayout = async ({ children, params }: Props) => {
           <NftTokenHeader cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </h1>
+      <ErrorSuspense fallback={null}>
+        <SpamAlert
+          after={t('spam.after')}
+          before={t('spam.before')}
+          cid={cid}
+          linkLabel={t('spam.linkLabel')}
+        />
+      </ErrorSuspense>
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <ErrorSuspense fallback={<Overview loading />}>
           <Overview

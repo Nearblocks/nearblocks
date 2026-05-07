@@ -41,6 +41,12 @@ export const nfts = {
       'The list of Non-Fungible (NEP-171) Tokens (NFT) and their daily transfers in the NEAR Protocol on NearBlocks',
     title: 'NEAR NFT Token Tracker (NEP-171)',
   },
+  spam: {
+    after: ' for details.',
+    before:
+      'This token has been flagged as spam by the community. Exercise caution when interacting with it. See the ',
+    linkLabel: 'spam token list',
+  },
   tidMeta: {
     description:
       'All you need to know about the {{contract}} {{name}} NFT : Owner, standard, description, media and latest transactions.',

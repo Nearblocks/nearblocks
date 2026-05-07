@@ -40,7 +40,7 @@ export const getDictionary = async (
   if (namespaces) {
     const result: DeepPartial<BaseDictionary> = {};
     namespaces.forEach((namespace) => {
-      result[namespace] = dict[namespace];
+      Object.assign(result, { [namespace]: dict[namespace] });
     });
     return result;
   }

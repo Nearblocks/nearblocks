@@ -8,12 +8,15 @@ import { AccountLink } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
 import { MTLink, NFTMedia, TokenAmount, TokenImage } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
+import { isSpamToken } from '@/lib/utils';
+import { Badge } from '@/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
 import { TransferSummary } from './transfer';
 
 type Props = {
   mts: TxnMT[];
+  spamPatterns?: string[];
 };
 
 type NetTransfer = {
@@ -24,7 +27,7 @@ type NetTransfer = {
   token_id: string;
 };
 
-export const MTTransfers = ({ mts }: Props) => {
+export const MTTransfers = ({ mts, spamPatterns }: Props) => {
   const { t } = useLocale('txns');
   const [tab, setTab] = useState<'all' | 'net'>('all');
 
@@ -108,6 +111,10 @@ export const MTTransfers = ({ mts }: Props) => {
                       symbol={mt.base_meta?.symbol}
                       token={mt.token_id}
                     />
+                    {spamPatterns &&
+                      isSpamToken(mt.contract_account_id, spamPatterns) && (
+                        <Badge variant="amber">{t('transfer.spam')}</Badge>
+                      )}
                   </TransferSummary>
                 </div>
               ))}
@@ -142,6 +149,10 @@ export const MTTransfers = ({ mts }: Props) => {
                     symbol={net.meta?.symbol}
                     token={net.token_id}
                   />
+                  {spamPatterns &&
+                    isSpamToken(net.contract_account_id, spamPatterns) && (
+                      <Badge variant="amber">{t('transfer.spam')}</Badge>
+                    )}
                 </div>
               ))}
             </TabsContent>
@@ -182,6 +193,10 @@ export const MTTransfers = ({ mts }: Props) => {
                       symbol={mt.base_meta?.symbol}
                       token={mt.token_id}
                     />
+                    {spamPatterns &&
+                      isSpamToken(mt.contract_account_id, spamPatterns) && (
+                        <Badge variant="amber">{t('transfer.spam')}</Badge>
+                      )}
                   </div>
                   <div className="flex flex-wrap items-center gap-1">
                     <TransferSummary

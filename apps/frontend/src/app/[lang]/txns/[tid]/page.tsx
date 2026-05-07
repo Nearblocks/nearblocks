@@ -2,6 +2,7 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { Overview } from '@/components/txns/txn';
 import { Actions } from '@/components/txns/txn/actions';
 import { fetchStats } from '@/data/layout';
+import { fetchSpamTokens } from '@/data/spam-tokens';
 import {
   fetchTxn,
   fetchTxnFTs,
@@ -20,6 +21,7 @@ const TxnPage = async ({ params }: Props) => {
   const txnNFTsPromise = fetchTxnNFTs(tid);
   const txnReceiptsPromise = fetchTxnReceipts(tid);
   const statsPromise = fetchStats();
+  const spamPatterns = await fetchSpamTokens();
 
   return (
     <div className="flex flex-col gap-4">
@@ -29,6 +31,7 @@ const TxnPage = async ({ params }: Props) => {
       <ErrorSuspense fallback={<Overview loading />}>
         <Overview
           receiptsPromise={txnReceiptsPromise}
+          spamPatterns={spamPatterns}
           statsPromise={statsPromise}
           txnFTsPromise={txnFTsPromise}
           txnMTsPromise={txnMTsPromise}
