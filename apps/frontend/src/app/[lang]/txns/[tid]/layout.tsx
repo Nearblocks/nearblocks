@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 
 import { ActiveLink } from '@/components/link';
+import { RpcSelector } from '@/components/rpc';
 import { TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
+import { Validate } from '@/components/txns/validate';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
@@ -29,7 +31,13 @@ const TxnLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('tid.title')}</h1>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-headline-lg">{t('tid.title')}</h1>
+        <div className="flex items-center gap-2">
+          <RpcSelector />
+          <Validate tid={tid} />
+        </div>
+      </div>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>
