@@ -1,4 +1,8 @@
 export const address = {
+  alerts: {
+    deleted: 'This account was deleted on {{date}}',
+    noFullAccessKeys: 'This account has no full access keys',
+  },
   analytics: {
     balance: {
       balance: 'Balance',
@@ -269,6 +273,7 @@ export const address = {
     total: 'A total of {{count}} receipts found',
     viewAll: 'View all receipts',
   },
+  spam: 'Spam',
   staking: {
     columns: {
       amount: 'Amount',

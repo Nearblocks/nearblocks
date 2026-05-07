@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { ActiveLink } from '@/components/link';
 import { TabLink, TabLinks } from '@/components/tab-links';
+import { SpamAlert } from '@/components/tokens/spam-alert';
 import { TokenHeader } from '@/components/tokens/token/header';
 import { HolderFilter } from '@/components/tokens/token/holder-filter';
 import { Overview } from '@/components/tokens/token/overview';
@@ -62,6 +63,14 @@ const TokenLayout = async ({ children, params }: Props) => {
           <TokenHeader cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </h1>
+      <ErrorSuspense fallback={null}>
+        <SpamAlert
+          after={t('spam.after')}
+          before={t('spam.before')}
+          cid={cid}
+          linkLabel={t('spam.linkLabel')}
+        />
+      </ErrorSuspense>
       <div className="mt-6 mb-10 grid gap-4 lg:grid-cols-2">
         <ErrorSuspense fallback={<Overview loading />}>
           <Overview

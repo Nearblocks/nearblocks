@@ -8,12 +8,15 @@ import { AccountLink } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
+import { isSpamToken } from '@/lib/utils';
+import { Badge } from '@/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 
 import { TransferSummary } from './transfer';
 
 type Props = {
   fts: TxnFT[];
+  spamPatterns?: string[];
 };
 
 type NetTransfer = {
@@ -23,7 +26,7 @@ type NetTransfer = {
   meta: TxnFT['meta'];
 };
 
-export const FTTransfers = ({ fts }: Props) => {
+export const FTTransfers = ({ fts, spamPatterns }: Props) => {
   const { t } = useLocale('txns');
   const [tab, setTab] = useState<'all' | 'net'>('all');
 
@@ -92,6 +95,10 @@ export const FTTransfers = ({ fts }: Props) => {
                   name={ft.meta?.name}
                   symbol={ft.meta?.symbol}
                 />
+                {spamPatterns &&
+                  isSpamToken(ft.contract_account_id, spamPatterns) && (
+                    <Badge variant="amber">{t('transfer.spam')}</Badge>
+                  )}
               </TransferSummary>
             </div>
           ))}
@@ -123,6 +130,10 @@ export const FTTransfers = ({ fts }: Props) => {
                 name={net.meta?.name}
                 symbol={net.meta?.symbol}
               />
+              {spamPatterns &&
+                isSpamToken(net.contract_account_id, spamPatterns) && (
+                  <Badge variant="amber">{t('transfer.spam')}</Badge>
+                )}
             </div>
           ))}
         </TabsContent>

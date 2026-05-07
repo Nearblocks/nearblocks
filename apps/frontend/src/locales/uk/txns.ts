@@ -152,6 +152,7 @@ export const txns = {
     netTransfers: 'Net Transfers',
     received: 'received',
     sent: 'sent',
+    spam: 'Spam',
     to: 'To',
     token: 'Token',
     transfer: 'Transfer',
@@ -164,4 +165,5 @@ export const txns = {
     nftTip: 'Non-fungible token transfers involving this transaction',
     nftTitle: 'NFT Token Transfers:',
   },
+  validate: 'Validate Transaction',
 } as const;

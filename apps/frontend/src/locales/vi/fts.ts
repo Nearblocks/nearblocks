@@ -70,6 +70,12 @@ export const fts = {
     socialProfiles: 'Social Profiles:',
     title: 'Profile Summary',
   },
+  spam: {
+    after: ' for details.',
+    before:
+      'This token has been flagged as spam by the community. Exercise caution when interacting with it. See the ',
+    linkLabel: 'spam token list',
+  },
   tabs: {
     faq: 'FAQ',
     holders: 'Holders',

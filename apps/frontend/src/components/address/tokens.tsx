@@ -13,6 +13,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { useTokenBalances } from '@/hooks/use-token-balances';
 import { currencyFormat, numberFormat, toTokenAmount } from '@/lib/format';
 import { mergeTokens, sortTokens } from '@/lib/token';
+import { isSpamToken } from '@/lib/utils';
 import { TokenCache } from '@/types/types';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -24,12 +25,14 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
+  spamPatterns?: string[];
   tokenCachePromise?: Promise<null | TokenCache[]>;
   tokensPromise?: Promise<AccountAssetFT[] | null>;
 };
 
 export const Tokens = ({
   loading,
+  spamPatterns,
   tokenCachePromise,
   tokensPromise,
 }: Props) => {
@@ -131,14 +134,21 @@ export const Tokens = ({
                           )}
                         </span>
                         <span className="flex flex-col gap-1 text-right">
-                          <span>{currencyFormat(token.price)}</span>
-                          {token.meta?.price && (
-                            <span>
-                              @$
-                              {numberFormat(token.meta?.price, {
-                                maximumFractionDigits: 6,
-                              })}
-                            </span>
+                          {spamPatterns &&
+                          isSpamToken(token.contract, spamPatterns) ? (
+                            <Badge variant="amber">{t('spam')}</Badge>
+                          ) : (
+                            <>
+                              <span>{currencyFormat(token.price)}</span>
+                              {token.meta?.price && (
+                                <span>
+                                  @$
+                                  {numberFormat(token.meta?.price, {
+                                    maximumFractionDigits: 6,
+                                  })}
+                                </span>
+                              )}
+                            </>
                           )}
                         </span>
                       </Link>

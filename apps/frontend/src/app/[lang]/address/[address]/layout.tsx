@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+import { AccountAlerts } from '@/components/address/alerts';
 import { ContractTab } from '@/components/address/contract/tab';
 import { Info } from '@/components/address/info';
 import { Overview } from '@/components/address/overview';
@@ -20,6 +21,7 @@ import {
 } from '@/data/address';
 import { fetchContract, fetchDeployments } from '@/data/address/contract';
 import { fetchStats } from '@/data/layout';
+import { fetchSpamTokens } from '@/data/spam-tokens';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
@@ -50,6 +52,7 @@ const AddressLayout = async ({ children, params }: Props) => {
   const deploymentsPromise = fetchDeployments(address);
   const tokensPromise = fetchTokens(address);
   const tokenCachePromise = fetchTokenCache(address);
+  const spamPatterns = await fetchSpamTokens();
 
   if (!hasLocale(lang)) notFound();
 
@@ -74,10 +77,17 @@ const AddressLayout = async ({ children, params }: Props) => {
               <Validate address={address} />
             </div>
           </div>
+          <ErrorSuspense fallback={null}>
+            <AccountAlerts
+              accountPromise={accountPromise}
+              contractPromise={contractPromise}
+            />
+          </ErrorSuspense>
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             <ErrorSuspense fallback={<Overview loading />}>
               <Overview
                 balancePromise={balancePromise}
+                spamPatterns={spamPatterns}
                 statsPromise={statsPromise}
                 tokenCachePromise={tokenCachePromise}
                 tokensPromise={tokensPromise}

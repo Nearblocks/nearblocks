@@ -10,6 +10,10 @@ import { Copy } from '@/components/copy';
 import { useLocale } from '@/hooks/use-locale';
 import { useViewMutation } from '@/hooks/use-rpc';
 import { useWallet } from '@/hooks/use-wallet';
+import {
+  generateSampleArgs,
+  generateSampleValueFromData,
+} from '@/lib/contract';
 import { toGas, toYocto } from '@/lib/format';
 import { FormData, formSchema } from '@/lib/schema/contract';
 import { zodResolver } from '@/lib/zod';
@@ -23,7 +27,6 @@ import { Info } from './info';
 import { MethodSelector } from './method';
 import { ExecutionMode } from './mode';
 import { ChangeOptions, ViewOptions } from './options';
-import { generateSampleArgs, generateSampleValueFromData } from './utils';
 
 export type Props = {
   loading?: boolean;

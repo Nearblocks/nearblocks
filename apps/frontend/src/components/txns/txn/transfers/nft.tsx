@@ -6,14 +6,17 @@ import { Link } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
 import { NFTMedia, TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
+import { isSpamToken } from '@/lib/utils';
+import { Badge } from '@/ui/badge';
 
 import { TransferSummary } from './transfer';
 
 type Props = {
   nfts: TxnNFT[];
+  spamPatterns?: string[];
 };
 
-export const NFTTransfers = ({ nfts }: Props) => {
+export const NFTTransfers = ({ nfts, spamPatterns }: Props) => {
   const { t } = useLocale('txns');
   const displayNfts = nfts.filter(
     (nft) => nft.delta_amount > 0 || nft.involved_account_id === null,
@@ -56,6 +59,10 @@ export const NFTTransfers = ({ nfts }: Props) => {
                   symbol={nft.meta?.symbol}
                   type="nft-tokens"
                 />
+                {spamPatterns &&
+                  isSpamToken(nft.contract_account_id, spamPatterns) && (
+                    <Badge variant="amber">{t('transfer.spam')}</Badge>
+                  )}
               </div>
               <div className="flex flex-wrap items-center gap-1">
                 <TransferSummary

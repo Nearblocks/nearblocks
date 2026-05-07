@@ -20,6 +20,7 @@ import { Tokens } from './tokens';
 type Props = {
   balancePromise?: Promise<AccountBalance | null>;
   loading?: boolean;
+  spamPatterns?: string[];
   statsPromise?: Promise<null | Stats>;
   tokenCachePromise?: Promise<null | TokenCache[]>;
   tokensPromise?: Promise<AccountAssetFT[] | null>;
@@ -28,6 +29,7 @@ type Props = {
 export const Overview = ({
   balancePromise,
   loading,
+  spamPatterns,
   statsPromise,
   tokenCachePromise,
   tokensPromise,
@@ -88,6 +90,7 @@ export const Overview = ({
             <ListRight className="xl:py-2">
               <ErrorSuspense fallback={<Tokens loading />}>
                 <Tokens
+                  spamPatterns={spamPatterns}
                   tokenCachePromise={tokenCachePromise}
                   tokensPromise={tokensPromise}
                 />
