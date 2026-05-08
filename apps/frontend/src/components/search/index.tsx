@@ -43,15 +43,31 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
 
       if (!hasResults) return;
 
-      addToHistory(kw);
-
-      if (resp.accounts.length)
-        router.push(`/address/${resp.accounts[0].account_id}`);
-      if (resp.blocks.length)
-        router.push(`/blocks/${resp.blocks[0].block_hash}`);
-      if (resp.fts.length) router.push(`/tokens/${resp.fts[0].contract}`);
-      if (resp.txns.length)
-        router.push(`/txns/${resp.txns[0].transaction_hash}`);
+      if (resp.accounts.length) {
+        const href = `/address/${resp.accounts[0].account_id}`;
+        addToHistory({
+          href,
+          label: resp.accounts[0].account_id,
+          type: 'account',
+        });
+        router.push(href);
+      } else if (resp.blocks.length) {
+        const href = `/blocks/${resp.blocks[0].block_hash}`;
+        addToHistory({ href, label: resp.blocks[0].block_hash, type: 'block' });
+        router.push(href);
+      } else if (resp.fts.length) {
+        const href = `/tokens/${resp.fts[0].contract}`;
+        addToHistory({ href, label: resp.fts[0].contract, type: 'token' });
+        router.push(href);
+      } else if (resp.txns.length) {
+        const href = `/txns/${resp.txns[0].transaction_hash}`;
+        addToHistory({
+          href,
+          label: resp.txns[0].transaction_hash,
+          type: 'txn',
+        });
+        router.push(href);
+      }
     });
   };
 
@@ -79,11 +95,11 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
         <ButtonGroupSeparator className="bg-border hidden h-8! self-auto md:flex" />
         <ButtonGroup className="grow">
           <SearchPopover
+            addToHistory={addToHistory}
             className={size === 'lg' ? 'h-9' : 'h-7'}
             clearHistory={clearHistory}
             filter={filter}
             history={history}
-            navigateByKeyword={navigateByKeyword}
             open={open}
             removeFromHistory={removeFromHistory}
             setOpen={setOpen}

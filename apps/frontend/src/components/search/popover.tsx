@@ -1,10 +1,12 @@
 import { useDebounceFn } from 'ahooks';
-import { Clock, Trash, X } from 'lucide-react';
+import { ArrowLeftRight, Box, Coins, Trash, User, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { Search } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
+import type { HistoryEntry } from '@/hooks/use-search-history';
 import { initialResults, searchKeyword } from '@/lib/search';
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
@@ -15,29 +17,37 @@ import { SearchItem } from './item';
 import { SearchLink } from './link';
 
 type Props = {
+  addToHistory: (entry: HistoryEntry) => void;
   className?: string;
   clearHistory: () => void;
   filter: string;
-  history: string[];
-  navigateByKeyword: (kw: string) => void;
+  history: HistoryEntry[];
   open: boolean;
-  removeFromHistory: (query: string) => void;
+  removeFromHistory: (href: string) => void;
   setOpen: (open: boolean) => void;
   startTransition: (callback: () => void) => void;
 };
 
+const HISTORY_ICONS = {
+  account: User,
+  block: Box,
+  token: Coins,
+  txn: ArrowLeftRight,
+} as const;
+
 export const SearchPopover = ({
+  addToHistory,
   className,
   clearHistory,
   filter,
   history,
-  navigateByKeyword,
   open,
   removeFromHistory,
   setOpen,
   startTransition,
 }: Props) => {
   const { t } = useLocale('layout');
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [keyword, setKeyword] = useState('');
   const [results, setResults] = useState<null | Search>(initialResults);
@@ -147,27 +157,31 @@ export const SearchPopover = ({
             }
             title={t('search.history')}
           >
-            {history.map((q) => (
-              <div className="flex items-center" key={q}>
-                <SearchLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateByKeyword(q);
-                  }}
-                >
-                  <Clock className="text-muted-foreground mr-2 inline size-3" />
-                  {q}
-                </SearchLink>
-                <Button
-                  onClick={() => removeFromHistory(q)}
-                  size="icon-xs"
-                  variant="ghost"
-                >
-                  <X className="size-3" />
-                </Button>
-              </div>
-            ))}
+            {history.map((item) => {
+              const Icon = HISTORY_ICONS[item.type];
+              return (
+                <div className="flex items-center" key={item.href}>
+                  <SearchLink
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(item.href);
+                      setOpen(false);
+                    }}
+                  >
+                    <Icon className="text-muted-foreground mr-2 inline size-3 shrink-0" />
+                    {item.label}
+                  </SearchLink>
+                  <Button
+                    onClick={() => removeFromHistory(item.href)}
+                    size="icon-xs"
+                    variant="ghost"
+                  >
+                    <X className="size-3" />
+                  </Button>
+                </div>
+              );
+            })}
           </SearchItem>
         )}
         {results && results.accounts.length > 0 && (
@@ -176,7 +190,13 @@ export const SearchPopover = ({
               <SearchLink
                 href={`/address/${account.account_id}`}
                 key={account.account_id}
-                onClick={() => navigateByKeyword(keyword)}
+                onClick={() =>
+                  addToHistory({
+                    href: `/address/${account.account_id}`,
+                    label: account.account_id,
+                    type: 'account',
+                  })
+                }
               >
                 {account.account_id}
               </SearchLink>
@@ -189,7 +209,13 @@ export const SearchPopover = ({
               <SearchLink
                 href={`/blocks/${block.block_hash}`}
                 key={block.block_hash}
-                onClick={() => navigateByKeyword(keyword)}
+                onClick={() =>
+                  addToHistory({
+                    href: `/blocks/${block.block_hash}`,
+                    label: block.block_hash,
+                    type: 'block',
+                  })
+                }
               >
                 {block.block_hash}
               </SearchLink>
@@ -202,7 +228,13 @@ export const SearchPopover = ({
               <SearchLink
                 href={`/tokens/${ft.contract}`}
                 key={ft.contract}
-                onClick={() => navigateByKeyword(keyword)}
+                onClick={() =>
+                  addToHistory({
+                    href: `/tokens/${ft.contract}`,
+                    label: ft.contract,
+                    type: 'token',
+                  })
+                }
               >
                 {ft.contract}
               </SearchLink>
@@ -215,7 +247,13 @@ export const SearchPopover = ({
               <SearchLink
                 href={`/txns/${txn.transaction_hash}`}
                 key={txn.transaction_hash}
-                onClick={() => navigateByKeyword(keyword)}
+                onClick={() =>
+                  addToHistory({
+                    href: `/txns/${txn.transaction_hash}`,
+                    label: txn.transaction_hash,
+                    type: 'txn',
+                  })
+                }
               >
                 {txn.transaction_hash}
               </SearchLink>
