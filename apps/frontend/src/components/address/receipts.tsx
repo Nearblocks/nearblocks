@@ -199,7 +199,9 @@ export const Receipts = ({
                       count: numberFormat(receiptCount?.count ?? 0),
                     })
                   ) : receipts?.data?.length ? (
-                    t('receipts.latest')
+                    t('receipts.latest', {
+                      count: numberFormat(receipts.data.length),
+                    })
                   ) : (
                     <span>&nbsp;</span>
                   )}

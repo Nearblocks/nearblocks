@@ -208,7 +208,7 @@ export const NFTTxns = ({
                       count: numberFormat(nftCount?.count ?? 0),
                     })
                   ) : nfts?.data?.length ? (
-                    t('nfts.latest')
+                    t('nfts.latest', { count: numberFormat(nfts.data.length) })
                   ) : (
                     <span>&nbsp;</span>
                   )}

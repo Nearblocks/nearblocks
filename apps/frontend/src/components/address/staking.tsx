@@ -174,7 +174,9 @@ export const StakingTxns = ({
                       count: numberFormat(stakingCount?.count ?? 0),
                     })
                   ) : staking?.data?.length ? (
-                    t('staking.latest')
+                    t('staking.latest', {
+                      count: numberFormat(staking.data.length),
+                    })
                   ) : (
                     <span>&nbsp;</span>
                   )}

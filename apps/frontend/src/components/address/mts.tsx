@@ -205,7 +205,7 @@ export const MTTxns = ({
                       count: numberFormat(mtCount?.count ?? 0),
                     })
                   ) : mts?.data?.length ? (
-                    t('mts.latest')
+                    t('mts.latest', { count: numberFormat(mts.data.length) })
                   ) : (
                     <span>&nbsp;</span>
                   )}
