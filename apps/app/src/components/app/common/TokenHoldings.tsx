@@ -195,6 +195,7 @@ const TokenHoldings = (props: Props) => {
                                 alt={token?.ft_meta?.name ?? 'Token Icon'}
                                 className="w-4 h-4"
                                 height={16}
+                                loading="lazy"
                                 onError={(e) => {
                                   e.currentTarget.onerror = null;
                                   e.currentTarget.src =
@@ -283,6 +284,7 @@ const TokenHoldings = (props: Props) => {
                                 alt={token?.mt_meta?.name ?? 'MT Token Icon'}
                                 className="w-4 h-4"
                                 height={16}
+                                loading="lazy"
                                 onError={(e) => {
                                   e.currentTarget.onerror = null;
                                   e.currentTarget.src =
@@ -380,6 +382,7 @@ const TokenHoldings = (props: Props) => {
                                 alt={nft?.nft_meta?.name}
                                 className="w-4 h-4"
                                 height={16}
+                                loading="lazy"
                                 onError={(e) => {
                                   e.currentTarget.src =
                                     '/images/tokenplaceholder.svg';

@@ -88,9 +88,11 @@ const TokenHoldingsSection = ({
           ).catch((error) => {
             console.error('Error in loadBalances:', error);
           });
-          if (amount) {
-            const decimals = ft?.ft_meta?.decimals ?? 0;
+          const decimals = ft?.ft_meta?.decimals ?? 0;
+          if (amount != null) {
             rpcAmount = Big(amount).div(Big(10).pow(Number(decimals)));
+          } else if (ft?.amount) {
+            rpcAmount = Big(ft.amount).div(Big(10).pow(Number(decimals)));
           }
           const refPrice = refTokenPrices?.[ft?.contract]?.price;
           const tokenPrice = refPrice ?? ft?.ft_meta?.price;
