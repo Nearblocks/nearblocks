@@ -24,6 +24,7 @@ import { useParams } from 'next/navigation';
 import { useConfig } from '@/hooks/app/useConfig';
 import { useAddressRpc } from '../../common/AddressRpcProvider';
 import { useRpcProvider } from '@/components/app/common/RpcContext';
+import { contractCode } from '@/utils/app/actions';
 
 interface Props {
   schema?: SchemaInfo;
@@ -75,7 +76,7 @@ const OverviewActions = (props: Props) => {
   const { contractInfo: onChainResponse } = useAddressRpc();
 
   const [contractData, setContractData] = useState<ContractData>({
-    base64Code: (onChainResponse as OnChainResponse)?.code_base64 || '',
+    base64Code: '',
     contractMetadata: null,
     onChainCodeHash: (onChainResponse as OnChainResponse)?.hash || '',
   });
@@ -101,8 +102,10 @@ const OverviewActions = (props: Props) => {
         }
         const onChainHash = (onChainResponse as OnChainResponse)?.hash || '';
 
-        const base64Code =
-          (onChainResponse as OnChainResponse)?.code_base64 || '';
+        const codeResult = await contractCode(accountId as string).catch(
+          () => null,
+        );
+        const base64Code = (codeResult as OnChainResponse)?.code_base64 || '';
 
         setContractData({
           base64Code: base64Code,

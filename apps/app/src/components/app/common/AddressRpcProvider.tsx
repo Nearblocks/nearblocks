@@ -72,8 +72,6 @@ export const AddressRpcProvider: React.FC<AddressRpcProviderProps> = ({
     if (!accountId) return;
     const fetchData = async () => {
       setLoading(true);
-      const t = performance.now();
-      console.log(`[AddressRpcProvider] start account=${accountId}`);
       try {
         const [code, keys, acct]: any = await Promise.all([
           contractError && !contractCodeInfo
@@ -94,11 +92,6 @@ export const AddressRpcProvider: React.FC<AddressRpcProviderProps> = ({
             return null;
           }),
         ]);
-        console.log(
-          `[AddressRpcProvider] done ms=${(performance.now() - t).toFixed(
-            0,
-          )} account=${accountId} hadCode=${!!code} hadKeys=${!!keys} hadAcct=${!!acct}`,
-        );
         if (contractError && !contractCodeInfo) {
           if (code?.code_base64) {
             setContractInfo((prev) => {

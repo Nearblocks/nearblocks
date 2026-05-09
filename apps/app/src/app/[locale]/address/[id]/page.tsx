@@ -23,9 +23,18 @@ export default async function AddressIndex(props: {
   const { id: address } = params;
   const id = address?.toLowerCase();
   const contractPromise = getRequest(`v1/account/${id}/contract`);
+  const contractMetaPromise = contractPromise.then((data: any) => {
+    if (data?.contract?.[0]?.code_base64) {
+      return {
+        ...data,
+        contract: [{ ...data.contract[0], code_base64: '1' }],
+      };
+    }
+    return data;
+  });
 
   return (
-    <AddressRpcProvider contractPromise={contractPromise} accountId={id}>
+    <AddressRpcProvider contractPromise={contractMetaPromise} accountId={id}>
       <Balance id={id} />
       <div className="py-2"></div>
       <AccountTabs

@@ -22,7 +22,6 @@ export const getRequest = async (
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
-  const t = Date.now();
   try {
     const headers = new Headers({
       Authorization: `Bearer ${fetchKey}`,
@@ -43,23 +42,10 @@ export const getRequest = async (
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       const isJson = contentType?.includes('json');
-      const data = isJson ? await response.json() : await response.text();
-      if (typeof window === 'undefined') {
-        const size = JSON.stringify(data).length;
-        console.log(
-          `[getRequest] ms=${Date.now() - t} size=${size} url=${url}`,
-        );
-      }
-      return data;
+      return isJson ? response.json() : response.text();
     }
   } catch (error: any) {
     clearTimeout(timeoutId);
-    if (typeof window === 'undefined') {
-      console.log(
-        `[getRequest] ms=${Date.now() - t} error=${(error as any)
-          ?.name} url=${url}`,
-      );
-    }
     if (
       error?.name === 'AbortError' ||
       error?.message === 'The operation was aborted.'
