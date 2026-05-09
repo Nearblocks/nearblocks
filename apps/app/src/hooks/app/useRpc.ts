@@ -14,7 +14,10 @@ export const fetchJsonRpc = async (
   rpcUrl: string,
   params: any,
   method: string = 'query',
+  timeoutMs: number = 5000,
 ): Promise<QueryResponse> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(rpcUrl, {
       method: 'POST',
@@ -25,7 +28,9 @@ export const fetchJsonRpc = async (
         method,
         params,
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     const text = await res.text();
     let body;
     try {
@@ -50,6 +55,7 @@ export const fetchJsonRpc = async (
       ...(res.ok ? { data: body } : { error: body }),
     };
   } catch (fetchError) {
+    clearTimeout(timeoutId);
     console.error('Fetch error:', fetchError);
     return {
       statusCode: 0,
