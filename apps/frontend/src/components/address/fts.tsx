@@ -192,7 +192,7 @@ export const FTTxns = ({
                       count: numberFormat(ftCount?.count ?? 0),
                     })
                   ) : fts?.data?.length ? (
-                    t('fts.latest')
+                    t('fts.latest', { count: numberFormat(fts.data.length) })
                   ) : (
                     <span>&nbsp;</span>
                   )}

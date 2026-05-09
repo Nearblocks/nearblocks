@@ -186,7 +186,7 @@ export const Txns = ({
                       count: numberFormat(txnCount?.count ?? 0),
                     })
                   ) : txns?.data?.length ? (
-                    t('txns.latest')
+                    t('txns.latest', { count: numberFormat(txns.data.length) })
                   ) : (
                     <span>&nbsp;</span>
                   )}
