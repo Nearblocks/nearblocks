@@ -6,7 +6,7 @@ import { Link } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
 import { NFTMedia, TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { isSpamToken } from '@/lib/utils';
+import { encodeToken, isSpamToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 
 import { TransferSummary } from './transfer';
@@ -29,7 +29,7 @@ export const NFTTransfers = ({ nfts, spamPatterns }: Props) => {
           <div className="flex items-center gap-2" key={i}>
             <Link
               className="text-link size-11"
-              href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
+              href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(nft.token_id)}`}
             >
               <NFTMedia
                 alt={nft.token_meta?.title ?? nft.token_id}
@@ -44,7 +44,7 @@ export const NFTTransfers = ({ nfts, spamPatterns }: Props) => {
                 <span>{t('transfer.token')}</span>
                 <Link
                   className="text-link"
-                  href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
+                  href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(nft.token_id)}`}
                 >
                   {nft.token_id}
                 </Link>

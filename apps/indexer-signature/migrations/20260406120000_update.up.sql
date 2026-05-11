@@ -10,9 +10,6 @@ SELECT
   set_integer_now_func ('multichain_transactions', 'epoch_nano_seconds');
 
 SELECT
-  set_integer_now_func ('signatures', 'epoch_nano_seconds');
-
-SELECT
   set_chunk_time_interval (
     'multichain_signatures',
     BIGINT '86400000000000' -- 1d in ns
@@ -68,6 +65,9 @@ SELECT
     create_default_indexes => false,
     if_not_exists => true
   );
+
+SELECT
+  set_integer_now_func ('signatures', 'epoch_nano_seconds');
 
 CREATE UNIQUE INDEX IF NOT EXISTS s_receipt_chain_hash_uidx ON signatures (
   receipt_id,

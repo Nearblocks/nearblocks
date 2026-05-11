@@ -8,3 +8,5 @@ FROM
 WHERE
   nh.account = ${account}
   AND nh.quantity > 0
+  AND nm.modified_at IS NOT NULL
+  AND ntm.modified_at IS NOT NULL

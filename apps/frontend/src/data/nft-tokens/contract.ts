@@ -20,6 +20,7 @@ import {
 } from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
+import { encodeToken } from '@/lib/utils';
 import { SearchParams } from '@/types/types';
 
 export const fetchNFTContract = cache(
@@ -113,7 +114,7 @@ export const fetchNFTContractTokenCount = cache(
 export const fetchNFTToken = cache(
   async (contract: string, token: string): Promise<NFTTokenRes> => {
     const resp = await fetcher<NFTTokenRes>(
-      `/v3/nfts/${contract}/tokens/${token}`,
+      `/v3/nfts/${contract}/tokens/${encodeToken(token)}`,
     );
     return resp;
   },
@@ -134,7 +135,7 @@ export const fetchNFTTokenTxns = cache(
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<NFTTokenTxnsRes>(
-      `/v3/nfts/${contract}/tokens/${token}/txns?${queryParams.toString()}`,
+      `/v3/nfts/${contract}/tokens/${encodeToken(token)}/txns?${queryParams.toString()}`,
     );
     return resp;
   },
@@ -150,7 +151,7 @@ export const fetchNFTTokenTxnCount = cache(
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<NFTTokenTxnCountRes>(
-      `/v3/nfts/${contract}/tokens/${token}/txns/count?${queryParams.toString()}`,
+      `/v3/nfts/${contract}/tokens/${encodeToken(token)}/txns/count?${queryParams.toString()}`,
     );
     return resp;
   },

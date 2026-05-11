@@ -57,7 +57,7 @@ export const limitSchema = v.optional(
 export const limitSchemaMax = (max = 100) =>
   v.optional(
     v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(max)),
-    25,
+    max < 25 ? max : 25,
   );
 
 export const cursorSchema = v.optional(v.pipe(v.string(), v.base64()));

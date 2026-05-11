@@ -17,7 +17,7 @@ import { NFTMedia, TokenImage } from '@/components/token';
 import { Truncate, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
-import { buildParams } from '@/lib/utils';
+import { buildParams, encodeToken } from '@/lib/utils';
 import {
   Pagination,
   PaginationContent,
@@ -53,7 +53,7 @@ const NFTCard = ({ label, nft }: { label: string; nft: AccountAssetNFT }) => (
         <span className="text-muted-foreground">{label}</span>
         <Link
           className="text-link"
-          href={`/nft-tokens/${nft.contract}/tokens/${nft.token}`}
+          href={`/nft-tokens/${nft.contract}/tokens/${encodeToken(nft.token)}`}
         >
           {nft.token}
         </Link>
