@@ -17,7 +17,7 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { NFTMedia } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
-import { buildParams } from '@/lib/utils';
+import { buildParams, encodeToken } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import {
   Pagination,
@@ -67,7 +67,7 @@ const TokenCard = ({
         <span className="text-muted-foreground">{titleLabel}</span>
         <Link
           className="text-link"
-          href={`/nft-tokens/${contract}/tokens/${token.token}`}
+          href={`/nft-tokens/${contract}/tokens/${encodeToken(token.token)}`}
         >
           {token.token}
         </Link>

@@ -14,7 +14,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
-import { buildParams } from '@/lib/utils';
+import { buildParams, encodeToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -101,7 +101,7 @@ export const NftTokenTransfers = ({
       cell: (nft) => (
         <Link
           className="text-link"
-          href={`/nft-tokens/${nft.contract_account_id}/tokens/${nft.token_id}`}
+          href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(nft.token_id)}`}
         >
           <Truncate>
             <TruncateText text={nft.token_id} />

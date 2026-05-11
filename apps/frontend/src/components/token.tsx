@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { numberFormat, toTokenAmount } from '@/lib/format';
 import { parseMTToken } from '@/lib/token';
-import { cn } from '@/lib/utils';
+import { cn, encodeToken } from '@/lib/utils';
 
 import { Link } from './link';
 import { Truncate, TruncateText } from './truncate';
@@ -241,7 +241,7 @@ export const MTLink = ({
       href = `/nft-tokens/${parsed.contract}`;
       text = name ?? parsed.contract;
     } else {
-      href = `/nft-tokens/${parsed.contract}/tokens/${parsed.token}`;
+      href = `/nft-tokens/${parsed.contract}/tokens/${encodeToken(parsed.token)}`;
       text = name ?? parsed.token;
       showSymbol = false;
     }

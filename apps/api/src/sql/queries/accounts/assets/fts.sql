@@ -19,6 +19,7 @@ WITH
     WHERE
       fh.account = ${account}
       AND fh.amount > 0
+      AND fm.modified_at IS NOT NULL
   )
 SELECT
   contract,
