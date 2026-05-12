@@ -94,6 +94,13 @@ const routes = (route: Router) => {
     validate(request.count),
     service.count,
   );
+
+  route.get(
+    '/:account/staking-txns/export',
+    internalOnly,
+    validate(request.export),
+    service.exports,
+  );
 };
 
 export default routes;

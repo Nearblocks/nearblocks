@@ -103,7 +103,9 @@ export const NFTTxns = ({
       cell: (nft) => (
         <Link
           className="text-link"
-          href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(nft.token_id)}`}
+          href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(
+            nft.token_id,
+          )}`}
         >
           <Truncate>
             <TruncateText text={nft.token_id} />

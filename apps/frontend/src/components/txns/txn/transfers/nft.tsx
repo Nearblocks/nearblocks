@@ -29,7 +29,9 @@ export const NFTTransfers = ({ nfts, spamPatterns }: Props) => {
           <div className="flex items-center gap-2" key={i}>
             <Link
               className="text-link size-11"
-              href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(nft.token_id)}`}
+              href={`/nft-tokens/${
+                nft.contract_account_id
+              }/tokens/${encodeToken(nft.token_id)}`}
             >
               <NFTMedia
                 alt={nft.token_meta?.title ?? nft.token_id}
@@ -44,7 +46,9 @@ export const NFTTransfers = ({ nfts, spamPatterns }: Props) => {
                 <span>{t('transfer.token')}</span>
                 <Link
                   className="text-link"
-                  href={`/nft-tokens/${nft.contract_account_id}/tokens/${encodeToken(nft.token_id)}`}
+                  href={`/nft-tokens/${
+                    nft.contract_account_id
+                  }/tokens/${encodeToken(nft.token_id)}`}
                 >
                   {nft.token_id}
                 </Link>

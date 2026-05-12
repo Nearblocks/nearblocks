@@ -1,14 +1,20 @@
+import { stringify } from 'csv-stringify';
+import { NextFunction, Response } from 'express';
+
 import type {
   AccountReceipt,
   AccountReceiptCount,
   AccountReceiptCountReq,
+  AccountReceiptExportReq,
   AccountReceiptsReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/accounts/receipts/request.js';
 import response from 'nb-schemas/dist/accounts/receipts/response.js';
 
 import config from '#config';
+import catchAsync from '#libs/async';
 import cursors from '#libs/cursors';
+import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
 import {
   paginateData,
@@ -18,9 +24,11 @@ import {
   WindowListQuery,
   windowStart,
 } from '#libs/response';
+import { msToNsTime, nsToMsTime, yoctoToNear } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
+import { ActionKind } from '#types/enums';
 
 const receipts = responseHandler(
   response.receipts,
@@ -159,4 +167,73 @@ const count = responseHandler(
   },
 );
 
-export default { count, receipts };
+const exports = catchAsync(
+  async (
+    req: RequestValidator<AccountReceiptExportReq>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { account, end: endDate, start: startDate } = req.validator;
+    const start = msToNsTime(
+      dayjs(startDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+    const end = msToNsTime(
+      dayjs(endDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+
+    const cte = pgp.as.format(sql.receipts.exportCte, { account, end, start });
+    const rows = await dbBase.manyOrNone(sql.receipts.receipts, {
+      cte,
+      direction: 'asc',
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=receipts.csv');
+
+    const stringifier = stringify({
+      columns: [
+        { header: 'Status', key: 'status' },
+        { header: 'Receipt', key: 'receipt' },
+        { header: 'Txn Hash', key: 'hash' },
+        { header: 'Method', key: 'method' },
+        { header: 'Deposit Value', key: 'deposit' },
+        { header: 'From', key: 'from' },
+        { header: 'To', key: 'to' },
+        { header: 'Block', key: 'block' },
+        { header: 'Time', key: 'timestamp' },
+      ],
+      header: true,
+    });
+
+    stringifier.on('error', (error) => {
+      next(error);
+    });
+
+    stringifier.pipe(res);
+
+    rows.forEach((row) => {
+      const status = row.outcome?.status;
+      const action = row.actions?.[0]?.action;
+      const method = row.actions?.[0]?.method ?? 'Unknown';
+
+      stringifier.write({
+        block: row.block?.block_height,
+        deposit: yoctoToNear(row.actions_agg?.deposit ?? '0'),
+        from: row.predecessor_account_id || 'system',
+        hash: row.transaction_hash,
+        method:
+          !action || action === ActionKind.FUNCTION_CALL ? method : action,
+        receipt: row.receipt_id,
+        status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
+        timestamp: dayjs(+nsToMsTime(row.included_in_block_timestamp)).format(
+          'YYYY-MM-DD HH:mm:ss',
+        ),
+        to: row.receiver_account_id || 'system',
+      });
+    });
+
+    stringifier.end();
+  },
+);
+
+export default { count, exports, receipts };

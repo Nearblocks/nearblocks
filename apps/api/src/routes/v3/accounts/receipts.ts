@@ -124,6 +124,13 @@ const routes = (route: Router) => {
     validate(request.count),
     service.count,
   );
+
+  route.get(
+    '/:account/receipts/export',
+    internalOnly,
+    validate(request.export),
+    service.exports,
+  );
 };
 
 export default routes;

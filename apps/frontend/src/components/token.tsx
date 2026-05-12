@@ -241,7 +241,9 @@ export const MTLink = ({
       href = `/nft-tokens/${parsed.contract}`;
       text = name ?? parsed.contract;
     } else {
-      href = `/nft-tokens/${parsed.contract}/tokens/${encodeToken(parsed.token)}`;
+      href = `/nft-tokens/${parsed.contract}/tokens/${encodeToken(
+        parsed.token,
+      )}`;
       text = name ?? parsed.token;
       showSymbol = false;
     }

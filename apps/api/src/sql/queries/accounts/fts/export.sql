@@ -1,0 +1,47 @@
+SELECT
+  ft.block_timestamp,
+  ft.shard_id,
+  ft.event_type,
+  ft.event_index,
+  ft.receipt_id,
+  ft.contract_account_id,
+  ft.affected_account_id,
+  ft.involved_account_id,
+  ft.cause,
+  ft.delta_amount,
+  m.meta
+FROM
+  ft_events ft
+  JOIN LATERAL (
+    SELECT
+      JSONB_BUILD_OBJECT(
+        'contract',
+        contract,
+        'name',
+        name,
+        'symbol',
+        symbol,
+        'decimals',
+        decimals,
+        'icon',
+        icon,
+        'reference',
+        reference
+      ) AS meta
+    FROM
+      ft_meta fm
+    WHERE
+      fm.contract = ft.contract_account_id
+      AND fm.modified_at IS NOT NULL
+  ) m ON TRUE
+WHERE
+  ft.affected_account_id = ${account}
+  AND ft.block_timestamp >= ${start}::BIGINT
+  AND ft.block_timestamp <= ${end}::BIGINT
+ORDER BY
+  ft.block_timestamp ASC,
+  ft.shard_id ASC,
+  ft.event_type ASC,
+  ft.event_index ASC
+LIMIT
+  5000

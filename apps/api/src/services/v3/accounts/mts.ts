@@ -1,16 +1,21 @@
+import { stringify } from 'csv-stringify';
 import { unionWith } from 'es-toolkit';
+import { NextFunction, Response } from 'express';
 
 import type {
   AccountMTTxn,
   AccountMTTxnCount,
   AccountMTTxnCountReq,
+  AccountMTTxnExportReq,
   AccountMTTxnsReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/accounts/mts/request.js';
 import response from 'nb-schemas/dist/accounts/mts/response.js';
 
 import config from '#config';
+import catchAsync from '#libs/async';
 import cursors from '#libs/cursors';
+import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   paginateData,
@@ -20,6 +25,7 @@ import {
   WindowListQuery,
   windowStart,
 } from '#libs/response';
+import { msToNsTime, nsToMsTime, tokenAmount } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
@@ -172,4 +178,87 @@ const count = responseHandler(
   },
 );
 
-export default { count, txns };
+const exports = catchAsync(
+  async (
+    req: RequestValidator<AccountMTTxnExportReq>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { account, end: endDate, start: startDate } = req.validator;
+    const start = msToNsTime(
+      dayjs(startDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+    const end = msToNsTime(
+      dayjs(endDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+
+    const events = await dbEvents.manyOrNone(sql.mts.export, {
+      account,
+      end,
+      start,
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=mt-txns.csv');
+
+    const stringifier = stringify({
+      columns: [
+        { header: 'Status', key: 'status' },
+        { header: 'Txn Hash', key: 'hash' },
+        { header: 'Method', key: 'method' },
+        { header: 'Affected', key: 'affected' },
+        { header: 'Involved', key: 'involved' },
+        { header: 'Direction', key: 'direction' },
+        { header: 'Token ID', key: 'id' },
+        { header: 'Quantity', key: 'quantity' },
+        { header: 'Token', key: 'token' },
+        { header: 'Contract', key: 'contract' },
+        { header: 'Block', key: 'block' },
+        { header: 'Time', key: 'timestamp' },
+      ],
+      header: true,
+    });
+
+    stringifier.on('error', (error) => {
+      next(error);
+    });
+
+    stringifier.pipe(res);
+
+    if (events.length > 0) {
+      const ids = events.map((e) => e.receipt_id);
+      const txnRows = await dbBase.manyOrNone(sql.mts.exportTxn, { ids });
+      const txnMap = new Map(txnRows.map((t) => [t.receipt_id, t]));
+
+      events.forEach((event) => {
+        const txn = txnMap.get(event.receipt_id);
+        const status = txn?.outcomes?.status;
+        const baseMeta = event.base_meta;
+
+        stringifier.write({
+          affected: event.affected_account_id || 'system',
+          block: txn?.block?.block_height ?? '',
+          contract: baseMeta?.contract ?? event.contract_account_id,
+          direction: BigInt(event.delta_amount) > 0n ? 'In' : 'Out',
+          hash: txn?.transaction_hash ?? '',
+          id: event.token_id,
+          involved: event.involved_account_id || 'system',
+          method: event.cause,
+          quantity:
+            baseMeta?.decimals != null
+              ? tokenAmount(event.delta_amount, baseMeta.decimals)
+              : event.delta_amount,
+          status: status ? 'Success' : status === null ? 'Pending' : 'Failed',
+          timestamp: dayjs(+nsToMsTime(event.block_timestamp)).format(
+            'YYYY-MM-DD HH:mm:ss',
+          ),
+          token: baseMeta ? `${baseMeta.name} (${baseMeta.symbol})` : '',
+        });
+      });
+    }
+
+    stringifier.end();
+  },
+);
+
+export default { count, exports, txns };

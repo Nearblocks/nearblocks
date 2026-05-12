@@ -1,15 +1,22 @@
+import { stringify } from 'csv-stringify';
+import { NextFunction, Response } from 'express';
+
 import type {
   AccountKey,
   AccountKeyCount,
   AccountKeyCountReq,
+  AccountKeyExportReq,
   AccountKeysReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/accounts/keys/request.js';
 import response from 'nb-schemas/dist/accounts/keys/response.js';
 
+import catchAsync from '#libs/async';
 import cursors from '#libs/cursors';
+import dayjs from '#libs/dayjs';
 import { dbBase } from '#libs/pgp';
 import { paginateData } from '#libs/response';
+import { msToNsTime, nsToMsTime } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
@@ -65,4 +72,68 @@ const count = responseHandler(
   },
 );
 
-export default { count, keys };
+const exports = catchAsync(
+  async (
+    req: RequestValidator<AccountKeyExportReq>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    const { account, end: endDate, start: startDate } = req.validator;
+    const start = msToNsTime(
+      dayjs(startDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+    const end = msToNsTime(
+      dayjs(endDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+    );
+
+    const rows = await dbBase.manyOrNone(sql.keys.export, {
+      account,
+      end,
+      start,
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=keys.csv');
+
+    const stringifier = stringify({
+      columns: [
+        { header: 'Public Key', key: 'key' },
+        { header: 'Permission', key: 'permission' },
+        { header: 'Created Txn', key: 'createdTxn' },
+        { header: 'Created Time', key: 'createdTime' },
+        { header: 'Deleted Txn', key: 'deletedTxn' },
+        { header: 'Deleted Time', key: 'deletedTime' },
+      ],
+      header: true,
+    });
+
+    stringifier.on('error', (error) => {
+      next(error);
+    });
+
+    stringifier.pipe(res);
+
+    rows.forEach((row) => {
+      stringifier.write({
+        createdTime: row.created?.block?.block_timestamp
+          ? dayjs(+nsToMsTime(row.created.block.block_timestamp)).format(
+              'YYYY-MM-DD HH:mm:ss',
+            )
+          : '',
+        createdTxn: row.created?.transaction_hash ?? '',
+        deletedTime: row.deleted?.block?.block_timestamp
+          ? dayjs(+nsToMsTime(row.deleted.block.block_timestamp)).format(
+              'YYYY-MM-DD HH:mm:ss',
+            )
+          : '',
+        deletedTxn: row.deleted?.transaction_hash ?? '',
+        key: row.public_key,
+        permission: row.permission_kind,
+      });
+    });
+
+    stringifier.end();
+  },
+);
+
+export default { count, exports, keys };
