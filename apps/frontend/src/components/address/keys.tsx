@@ -1,9 +1,11 @@
 'use client';
 
+import { Download } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
 import { AccountKey, AccountKeyCount, AccountKeysRes } from 'nb-schemas';
+import { ExportType } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
@@ -17,6 +19,7 @@ import { nearFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { AccessKeyPermission } from '@/types/types';
 import { Badge } from '@/ui/badge';
+import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -173,6 +176,16 @@ export const AccessKeys = ({
     <Card>
       <CardContent className="text-body-sm p-0">
         <DataTable
+          actions={
+            <Button asChild size="xs" variant="outline">
+              <Link
+                href={`/export-csv?account=${address}&type=${ExportType.KEYS}`}
+              >
+                <Download className="size-3" />
+                {t('csvExport')}
+              </Link>
+            </Button>
+          }
           columns={columns}
           data={keys?.data}
           emptyMessage={t('keys.empty')}

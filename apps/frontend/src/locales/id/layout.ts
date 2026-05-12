@@ -75,6 +75,10 @@ export const layout = {
       topNFTs: 'Top NFTs',
       topTokens: 'Top Tokens',
     },
+    tools: {
+      csvExport: 'CSV Export',
+      title: 'Tools',
+    },
     wallet: {
       signIn: 'Sign In',
     },

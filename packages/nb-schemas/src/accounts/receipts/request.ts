@@ -37,10 +37,11 @@ const dateSchema = v.pipe(
   v.check((val) => !isNaN(new Date(val).getTime()), 'Invalid date'),
 );
 
-const exportSchema = v.pipe(
+const dateExportSchema = v.pipe(
   v.object({
     account: v.string(),
     end: dateSchema,
+    filter: v.literal('date'),
     start: dateSchema,
   }),
   v.check(
@@ -48,6 +49,21 @@ const exportSchema = v.pipe(
     'End date must be after or equal to start date',
   ),
 );
+
+const blockExportSchema = v.pipe(
+  v.object({
+    account: v.string(),
+    block_end: v.pipe(v.string(), v.regex(/^\d+$/), v.transform(Number)),
+    block_start: v.pipe(v.string(), v.regex(/^\d+$/), v.transform(Number)),
+    filter: v.literal('block'),
+  }),
+  v.check(
+    (val) => val.block_end >= val.block_start,
+    'End block must be after or equal to start block',
+  ),
+);
+
+const exportSchema = v.union([dateExportSchema, blockExportSchema]);
 
 export type AccountReceiptsReq = v.InferOutput<typeof receipts>;
 export type AccountReceiptCountReq = v.InferOutput<typeof count>;

@@ -57,6 +57,7 @@ export type PaginationMeta = {
 };
 
 type DataTableProps<TData> = {
+  actions?: ReactNode;
   columns: DataTableColumnDef<TData>[];
   data?: null | TData[];
   defaultSort?: string;
@@ -75,6 +76,7 @@ type DataTableProps<TData> = {
 };
 
 export const DataTable = <TData,>({
+  actions,
   columns,
   data,
   defaultSort,
@@ -150,28 +152,31 @@ export const DataTable = <TData,>({
 
   return (
     <>
-      {(header || activeFilters.length > 0) && (
+      {(header || activeFilters.length > 0 || actions) && (
         <div className="text-body-sm flex flex-wrap items-center justify-between gap-1 border-b px-4 py-3">
           <div className="leading-7">{header}</div>
-          {activeFilters.length > 0 && !loading && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-muted-foreground shrink-0">
-                Filtered By:
-              </span>
-              {activeFilters.map((filter) => (
-                <Button
-                  key={filter.name}
-                  onClick={() => onClear?.({ [filter.name]: undefined })}
-                  size="xs"
-                  variant="outline"
-                >
-                  <span className="font-medium">{filter.label}:</span>
-                  <span className="max-w-20 truncate">{filter.value}</span>
-                  <X className="size-3" />
-                </Button>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {activeFilters.length > 0 && !loading && (
+              <>
+                <span className="text-muted-foreground shrink-0">
+                  Filtered By:
+                </span>
+                {activeFilters.map((filter) => (
+                  <Button
+                    key={filter.name}
+                    onClick={() => onClear?.({ [filter.name]: undefined })}
+                    size="xs"
+                    variant="outline"
+                  >
+                    <span className="font-medium">{filter.label}:</span>
+                    <span className="max-w-20 truncate">{filter.value}</span>
+                    <X className="size-3" />
+                  </Button>
+                ))}
+              </>
+            )}
+            {actions}
+          </div>
         </div>
       )}
       <Table>

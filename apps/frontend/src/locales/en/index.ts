@@ -13,6 +13,7 @@ import { multichain } from './multichain';
 import { nfts } from './nfts';
 import { receipts } from './receipts';
 import { staking } from './staking';
+import { tools } from './tools';
 import { txns } from './txns';
 import { validators } from './validators';
 
@@ -32,6 +33,7 @@ export const dictionary = {
   nfts,
   receipts,
   staking,
+  tools,
   txns,
   validators,
 };

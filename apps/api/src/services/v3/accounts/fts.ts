@@ -28,6 +28,7 @@ import {
 import { msToNsTime, nsToMsTime, tokenAmount } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
+import { blockRange as blockRangeSql } from '#sql/accounts';
 import sql from '#sql/accounts';
 
 const txns = responseHandler(
@@ -182,13 +183,36 @@ const exports = catchAsync(
     res: Response,
     next: NextFunction,
   ) => {
-    const { account, end: endDate, start: startDate } = req.validator;
-    const start = msToNsTime(
-      dayjs(startDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
-    );
-    const end = msToNsTime(
-      dayjs(endDate, 'YYYY-MM-DD', true).startOf('day').valueOf(),
-    );
+    const { account } = req.validator;
+    let start: string;
+    let end: string;
+
+    if (req.validator.filter === 'date') {
+      start = msToNsTime(
+        dayjs(req.validator.start, 'YYYY-MM-DD', true).startOf('day').valueOf(),
+      );
+      end = msToNsTime(
+        dayjs(req.validator.end, 'YYYY-MM-DD', true).endOf('day').valueOf(),
+      );
+    } else {
+      const range = await dbBase.oneOrNone(blockRangeSql, {
+        block_end: req.validator.block_end,
+        block_start: req.validator.block_start,
+      });
+
+      if (!range?.start_ts) {
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader(
+          'Content-Disposition',
+          'attachment; filename=ft-txns.csv',
+        );
+        res.end();
+        return;
+      }
+
+      start = range.start_ts;
+      end = range.end_ts;
+    }
 
     const events = await dbEvents.manyOrNone(sql.fts.export, {
       account,
