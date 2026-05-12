@@ -1,5 +1,7 @@
 import { sql } from '#sql/index';
 
+export const blockRange = sql('queries/accounts/blockRange.sql');
+
 export default {
   account: sql('queries/accounts/account.sql'),
   assets: {

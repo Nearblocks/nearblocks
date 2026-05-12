@@ -161,3 +161,13 @@ export enum DestinationChain {
   POLYGON = 'POLYGON',
   SOLANA = 'SOLANA',
 }
+
+export enum ExportType {
+  FT_TRANSFERS = 'ft_transfers',
+  KEYS = 'keys',
+  MT_TRANSFERS = 'mt_transfers',
+  NFT_TRANSFERS = 'nft_transfers',
+  RECEIPTS = 'receipts',
+  STAKING = 'staking',
+  TRANSACTIONS = 'transactions',
+}

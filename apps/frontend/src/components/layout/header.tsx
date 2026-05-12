@@ -69,6 +69,10 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
       { href: '/nft-tokens/transfers', key: 'menu.tokens.nftTransfers' },
     ],
   },
+  {
+    key: 'menu.tools.title',
+    menu: [{ href: '/export-csv', key: 'menu.tools.csvExport' }],
+  },
 ];
 
 const useHeaderMenu = (): NavMenu<RouteKey<'layout'>> => {

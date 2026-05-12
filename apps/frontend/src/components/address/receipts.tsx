@@ -1,5 +1,6 @@
 'use client';
 
+import { Download } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
@@ -8,6 +9,7 @@ import {
   AccountReceiptCount,
   AccountReceiptsRes,
 } from 'nb-schemas';
+import { ExportType } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
@@ -182,6 +184,16 @@ export const Receipts = ({
     <Card>
       <CardContent className="text-body-sm p-0">
         <DataTable
+          actions={
+            <Button asChild size="xs" variant="outline">
+              <Link
+                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.RECEIPTS}`}
+              >
+                <Download className="size-3" />
+                {t('csvExport')}
+              </Link>
+            </Button>
+          }
           columns={columns}
           data={receipts?.data}
           emptyMessage={t('receipts.empty')}

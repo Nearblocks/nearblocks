@@ -166,6 +166,7 @@ export const address = {
       overview: 'Overview',
     },
   },
+  csvExport: 'CSV Export',
   fts: {
     columns: {
       affected: 'Affected',
