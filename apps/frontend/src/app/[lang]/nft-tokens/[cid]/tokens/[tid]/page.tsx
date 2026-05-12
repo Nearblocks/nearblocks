@@ -35,13 +35,17 @@ export const generateMetadata = async ({
       : cid;
 
     return {
-      alternates: { canonical: `/nft-tokens/${cid}/tokens/${encodeToken(tid)}` },
+      alternates: {
+        canonical: `/nft-tokens/${cid}/tokens/${encodeToken(tid)}`,
+      },
       description: t('tidMeta.description', { contract, name }),
       title: t('tidMeta.title', { contract, name }),
     };
   } catch {
     return {
-      alternates: { canonical: `/nft-tokens/${cid}/tokens/${encodeToken(tid)}` },
+      alternates: {
+        canonical: `/nft-tokens/${cid}/tokens/${encodeToken(tid)}`,
+      },
       description: t('tidMeta.description', { contract: cid, name: tid }),
       title: t('tidMeta.title', { contract: cid, name: tid }),
     };

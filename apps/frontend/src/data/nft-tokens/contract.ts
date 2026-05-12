@@ -135,7 +135,9 @@ export const fetchNFTTokenTxns = cache(
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<NFTTokenTxnsRes>(
-      `/v3/nfts/${contract}/tokens/${encodeToken(token)}/txns?${queryParams.toString()}`,
+      `/v3/nfts/${contract}/tokens/${encodeToken(
+        token,
+      )}/txns?${queryParams.toString()}`,
     );
     return resp;
   },
@@ -151,7 +153,9 @@ export const fetchNFTTokenTxnCount = cache(
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<NFTTokenTxnCountRes>(
-      `/v3/nfts/${contract}/tokens/${encodeToken(token)}/txns/count?${queryParams.toString()}`,
+      `/v3/nfts/${contract}/tokens/${encodeToken(
+        token,
+      )}/txns/count?${queryParams.toString()}`,
     );
     return resp;
   },
