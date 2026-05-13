@@ -74,6 +74,8 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
     menu: [
       { href: '/export-csv', key: 'menu.tools.csvExport' },
       { href: '/account-balance', key: 'menu.tools.accountBalance' },
+      { href: '/unit-converter', key: 'menu.tools.unitConverter' },
+      { href: '/keypair', key: 'menu.tools.keypair' },
     ],
   },
 ];

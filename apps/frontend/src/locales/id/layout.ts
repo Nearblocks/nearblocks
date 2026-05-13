@@ -78,7 +78,9 @@ export const layout = {
     tools: {
       accountBalance: 'Balance Checker',
       csvExport: 'CSV Export',
+      keypair: 'Keypair Generator',
       title: 'Tools',
+      unitConverter: 'Unit Converter',
     },
     wallet: {
       signIn: 'Sign In',
