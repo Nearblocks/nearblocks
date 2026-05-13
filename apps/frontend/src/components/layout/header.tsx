@@ -71,7 +71,10 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
   },
   {
     key: 'menu.tools.title',
-    menu: [{ href: '/export-csv', key: 'menu.tools.csvExport' }],
+    menu: [
+      { href: '/export-csv', key: 'menu.tools.csvExport' },
+      { href: '/account-balance', key: 'menu.tools.accountBalance' },
+    ],
   },
 ];
 

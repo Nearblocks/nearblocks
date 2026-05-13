@@ -23,6 +23,8 @@ const balance = v.object({
   account_id: v.string(),
   amount: v.string(),
   amount_staked: v.string(),
+  block_height: v.optional(v.string()),
+  block_timestamp: v.optional(v.string()),
   storage_usage: v.string(),
 });
 

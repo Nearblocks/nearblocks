@@ -1,4 +1,24 @@
 export const tools = {
+  balance: {
+    accountLabel: 'Account',
+    blockInput: 'Block Height',
+    blockMode: 'Block Height',
+    check: 'Check Balance',
+    dateInput: 'Date',
+    dateMode: 'Date',
+    filterMode: 'Filter by',
+    notFound:
+      'No balance record found for this account at the specified point.',
+    reset: 'Reset',
+    resultBlockHeight: 'Block Height',
+    resultBlockTimestamp: 'Timestamp',
+    resultStaked: 'Staked Balance',
+    resultStorage: 'Storage Used',
+    resultTitle: 'Balance Result',
+    resultTotal: 'Balance',
+    subtitle: "Look up an account's NEAR balance at any point in time.",
+    title: 'Account Balance Checker',
+  },
   export: {
     accountLabel: 'Account',
     blockEnd: 'End Block',
@@ -25,6 +45,7 @@ export const tools = {
     },
   },
   nav: {
+    accountBalance: 'Balance Checker',
     csvExport: 'CSV Export',
     tools: 'Tools',
   },

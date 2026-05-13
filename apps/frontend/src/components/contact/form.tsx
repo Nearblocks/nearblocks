@@ -1,7 +1,7 @@
 'use client';
 
 import { Turnstile } from '@marsidev/react-turnstile';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -28,10 +28,8 @@ export const ContactForm = ({ subject }: Props) => {
   const { t } = useLocale('contact');
   const turnstileSiteKey = useConfig((state) => state.config.turnstileSiteKey);
   const tokenRef = useRef<string>('');
-  const [submitting, setSubmitting] = useState(false);
-
   const {
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
     reset,
@@ -43,7 +41,6 @@ export const ContactForm = ({ subject }: Props) => {
       return;
     }
 
-    setSubmitting(true);
     try {
       const result = await submitContactForm({
         description: values.description,
@@ -60,10 +57,8 @@ export const ContactForm = ({ subject }: Props) => {
       } else {
         toast.error(result.error ?? 'Failed to send message');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to send message');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -139,8 +134,8 @@ export const ContactForm = ({ subject }: Props) => {
       />
 
       <div>
-        <Button disabled={submitting} type="submit" variant="secondary">
-          {submitting ? t('form.sending') : t('form.send')}
+        <Button disabled={isSubmitting} type="submit" variant="secondary">
+          {t('form.send')}
         </Button>
       </div>
     </form>
