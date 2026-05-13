@@ -1,14 +1,10 @@
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
 
 import { ToolsSidebar } from '@/components/tools/sidebar';
 import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 
-type Props = {
-  children: ReactNode;
-  params: Promise<{ lang: string }>;
-};
+type Props = LayoutProps<'/[lang]'>;
 
 const ToolsLayout = async ({ children, params }: Props) => {
   const { lang } = await params;

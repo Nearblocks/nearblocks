@@ -3,8 +3,19 @@
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { ExportType } from 'nb-types';
+
+const EXPORT_FILENAMES: Record<ExportType, string> = {
+  [ExportType.FT_TRANSFERS]: 'ft-txns.csv',
+  [ExportType.KEYS]: 'keys.csv',
+  [ExportType.MT_TRANSFERS]: 'mt-txns.csv',
+  [ExportType.NFT_TRANSFERS]: 'nft-txns.csv',
+  [ExportType.RECEIPTS]: 'receipts.csv',
+  [ExportType.STAKING]: 'staking-txns.csv',
+  [ExportType.TRANSACTIONS]: 'txns.csv',
+};
 
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
@@ -46,7 +57,7 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
 
   const {
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
     reset,
@@ -65,7 +76,7 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
 
   const filterMode = watch('filterMode');
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     const params = new URLSearchParams();
     params.set('type', data.exportType);
     params.set('account', data.account);
@@ -81,7 +92,21 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
       params.set('block_end', data.blockEnd);
     }
 
-    window.location.href = `/api/export-csv?${params.toString()}`;
+    const res = await fetch(`/api/export-csv?${params}`);
+
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      toast.error((json as { error?: string }).error ?? 'Export failed');
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = EXPORT_FILENAMES[data.exportType];
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const onReset = () => {
@@ -279,7 +304,11 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
           </div>
 
           <div className="flex gap-3">
-            <Button disabled={!captchaReady} type="submit" variant="secondary">
+            <Button
+              disabled={!captchaReady || isSubmitting}
+              type="submit"
+              variant="secondary"
+            >
               {t('export.download')}
             </Button>
             <Button onClick={onReset} type="button" variant="outline">

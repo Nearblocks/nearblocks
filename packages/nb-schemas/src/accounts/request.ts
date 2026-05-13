@@ -6,6 +6,8 @@ const account = v.object({
 
 const balance = v.object({
   account: v.string(),
+  block: v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
+  date: v.optional(v.pipe(v.string(), v.regex(/^\d{4}-\d{2}-\d{2}$/))),
 });
 
 const contract = v.object({

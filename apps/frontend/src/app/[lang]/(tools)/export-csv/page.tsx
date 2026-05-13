@@ -5,10 +5,7 @@ import { ExportType } from 'nb-types';
 import { ExportCsvForm } from '@/components/tools/export-csv/form';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
-type Props = {
-  params: Promise<{ lang: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
+type Props = PageProps<'/[lang]/export-csv'>;
 
 export const generateMetadata = async ({
   params,

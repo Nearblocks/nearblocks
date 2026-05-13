@@ -18,6 +18,11 @@ export const ToolsSidebar = () => {
           <TabLink asChild className="justify-start">
             <ActiveLink href="/export-csv">{t('nav.csvExport')}</ActiveLink>
           </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/account-balance">
+              {t('nav.accountBalance')}
+            </ActiveLink>
+          </TabLink>
         </TabLinks>
         <ScrollBar className="md:hidden" orientation="horizontal" />
       </ScrollArea>

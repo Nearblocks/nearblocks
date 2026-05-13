@@ -11,6 +11,7 @@ export default {
     nfts: sql('queries/accounts/assets/nfts.sql'),
   },
   balance: sql('queries/accounts/balance.sql'),
+  balanceHistory: sql('queries/accounts/balanceHistory.sql'),
   contracts: {
     action: sql('queries/accounts/contracts/action.sql'),
     contract: sql('queries/accounts/contracts/contract.sql'),

@@ -76,6 +76,7 @@ export const layout = {
       topTokens: 'Top Tokens',
     },
     tools: {
+      accountBalance: 'Balance Checker',
       csvExport: 'CSV Export',
       title: 'Tools',
     },
