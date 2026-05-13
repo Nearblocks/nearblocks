@@ -13,7 +13,7 @@ import { MTLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -163,7 +163,7 @@ export const MtTokenTransfers = ({
               {() => (
                 <>
                   {t('transfers.total', {
-                    count: numberFormat(txnCount?.count ?? 0),
+                    count: countFormat(txnCount?.count ?? 0),
                   })}
                 </>
               )}

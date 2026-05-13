@@ -14,7 +14,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { nearFormat, countFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -144,7 +144,7 @@ export const StakingTxns = ({
               {() => (
                 <>
                   {t('list.total', {
-                    count: numberFormat(stakingCount?.count ?? 0),
+                    count: countFormat(stakingCount?.count ?? 0),
                   })}
                 </>
               )}

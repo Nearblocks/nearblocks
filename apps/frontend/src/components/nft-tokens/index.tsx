@@ -9,7 +9,7 @@ import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -107,7 +107,7 @@ export const NftTokens = ({
               {() => (
                 <>
                   {t('tokens.contractsTotal', {
-                    count: numberFormat(tokenCount?.data?.count ?? 0),
+                    count: countFormat(tokenCount?.data?.count ?? 0),
                   })}
                 </>
               )}

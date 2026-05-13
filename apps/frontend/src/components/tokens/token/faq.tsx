@@ -12,7 +12,13 @@ import {
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { currencyFormat, dateFormat, numberFormat, toMs } from '@/lib/format';
+import {
+  currencyFormat,
+  dateFormat,
+  countFormat,
+  numberFormat,
+  toMs,
+} from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -185,7 +191,7 @@ export const TokenFaq = ({
                   <>
                     {t('faq.creationSince', { name })}{' '}
                     <span className="text-foreground">
-                      {numberFormat(txnCount.count)}
+                      {countFormat(txnCount.count)}
                     </span>{' '}
                     {t('faq.creationTransfers')}
                   </>

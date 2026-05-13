@@ -8,6 +8,29 @@ import { Network } from 'nb-types';
 
 import config from '#config';
 
+// Removes operations flagged `x-internal: true` (and paths that become empty
+// as a result) from an OpenAPI spec, mutating it in place. The `internalOnly`
+// middleware gates runtime access but swagger-jsdoc/Scalar don't honor the
+// x-internal extension, so without this filter public docs still advertise
+// internal-only endpoints.
+type OpenAPIOperation = { 'x-internal'?: boolean };
+type OpenAPIPaths = Record<string, Record<string, OpenAPIOperation>>;
+
+const stripInternalPaths = (spec: { paths?: OpenAPIPaths }) => {
+  if (!spec.paths) return;
+  for (const [pathKey, ops] of Object.entries(spec.paths)) {
+    if (!ops || typeof ops !== 'object') continue;
+    for (const method of Object.keys(ops)) {
+      if (ops[method]?.['x-internal'] === true) {
+        delete ops[method];
+      }
+    }
+    if (Object.keys(ops).length === 0) {
+      delete spec.paths[pathKey];
+    }
+  }
+};
+
 const scalarCss = `
   .light-mode .introduction-section {
     background: url(https://nearblocks.io/images/nearblocksblack.svg) no-repeat;
@@ -54,14 +77,10 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
       },
       info: {
-        description: `<p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
-        <p><h2>Attribution Requirements:</h2></p>
-        <p>The APIs are offered as a community service and are provided without any warranty. Please use them responsibly and only for what you need.</p>
-        <p>For any usage other than personal or private, attribution is required. This can be done by either:</p>
-        <ul>
-        <li>Including a link back to Nearblocks.io, or</li>
-        <li>Mentioning that your app is &quot;Powered by Nearblocks.io APIs.&quot;</li>
-        </ul>
+        description: `<div style="padding:12px 16px;border-left:4px solid #00c1de;background:rgba(0,193,222,0.08);margin-bottom:16px;">
+          <strong>Looking for v1 or v2 endpoints?</strong> The deprecated legacy API documentation lives at <a href="/api-docs/legacy"><strong>/api-docs/legacy</strong></a>. v1/v2 remain available but will be removed in a future release — please migrate to v3.
+        </div>
+        <p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
         <p>NearBlocks provides subscription-based API plans that provide higher rate limits for power users and commercial solutions. To upgrade to a paid API Plan, head over to the <a href="https://nearblocks.io/apis">APIs</a> page and select a plan that suits your needs. Once payment has been made, you can create API keys to make requests to our endpoints.</p>
         <h2>Resources</h2>
         <ul>
@@ -82,8 +101,6 @@ const apiDocumentation = async (app: Application, dir: string) => {
             ? config.mainnetUrl
             : config.testnetUrl
         }/v3/accounts/wrap.near"</pre></code></p>
-        <h2>Legacy API</h2>
-        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. These endpoints will be removed in a future release.</p>
         `,
         title: ' ',
         version: '1.0.0',
@@ -215,6 +232,9 @@ const apiDocumentation = async (app: Application, dir: string) => {
 
   const mainSpec = swaggerJsdoc(mainOptions);
   const legacySpec = swaggerJsdoc(legacyOptions);
+
+  stripInternalPaths(mainSpec);
+  stripInternalPaths(legacySpec);
 
   app.get('/openapi.json', (_, res) => {
     res.json(mainSpec);

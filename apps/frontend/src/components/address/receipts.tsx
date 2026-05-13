@@ -20,7 +20,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { nearFormat, countFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -208,7 +208,7 @@ export const Receipts = ({
                 <>
                   {basePath ? (
                     t('receipts.total', {
-                      count: numberFormat(receiptCount?.count ?? 0),
+                      count: countFormat(receiptCount?.count ?? 0),
                     })
                   ) : receipts?.data?.length ? (
                     t('receipts.latest', {

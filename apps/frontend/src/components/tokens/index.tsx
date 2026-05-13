@@ -10,7 +10,12 @@ import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { currencyFormat, numberFormat, toTokenAmount } from '@/lib/format';
+import {
+  currencyFormat,
+  countFormat,
+  numberFormat,
+  toTokenAmount,
+} from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -155,7 +160,7 @@ export const Tokens = ({
               {() => (
                 <>
                   {t('tokens.total', {
-                    count: numberFormat(tokenCount?.data?.count ?? 0),
+                    count: countFormat(tokenCount?.data?.count ?? 0),
                   })}
                 </>
               )}

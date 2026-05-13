@@ -34,6 +34,26 @@ export const numberFormat = (
   return new Intl.NumberFormat('en-US', options).format(data);
 };
 
+// COUNT_CAP must match the LIMIT used in the v3 estimate.sql files. When the API
+// returns count == COUNT_CAP, the SQL LIMIT was hit and the true count is unknown
+// (potentially millions). Display "10,000+" to communicate this honestly.
+export const COUNT_CAP = 10000;
+
+export const countFormat = (
+  value: NumberFormat,
+  options?: Intl.NumberFormatOptions,
+) => {
+  if (value === undefined || value === null) return '';
+
+  const n = typeof value === 'bigint' ? Number(value) : Number(value);
+
+  if (Number.isFinite(n) && n >= COUNT_CAP) {
+    return `${numberFormat(COUNT_CAP, options)}+`;
+  }
+
+  return numberFormat(value, options);
+};
+
 export const nearFormat = (
   yoctoNear: BigSource | null | undefined,
   options?: Intl.NumberFormatOptions,
