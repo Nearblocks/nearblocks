@@ -1,19 +1,17 @@
+-- LIMIT-and-cap: exact count when total <= 10000, otherwise 10000.
+-- Cost > maxQueryCost (400000) short-circuits the service's rolling-window fallback.
 SELECT
-  count,
-  cost
+  LEAST(COUNT(*), 10000)::TEXT AS count,
+  '500000'::TEXT AS cost
 FROM
-  count_cost_estimate (
-    FORMAT(
-      'SELECT
-        account
-      FROM
-        staking_events
-      WHERE
-        (
-          %L::BIGINT IS NULL
-          OR block_timestamp < %L
-        )',
-      ${before},
-      ${before}
-    )
-  )
+  (
+    SELECT
+      1
+    FROM
+      staking_events
+    WHERE
+      ${before}::BIGINT IS NULL
+      OR block_timestamp < ${before}
+    LIMIT
+      10001
+  ) sub

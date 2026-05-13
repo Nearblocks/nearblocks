@@ -1,43 +1,36 @@
+-- LIMIT-and-cap: exact count when total <= 10000, otherwise 10000.
+-- Cost > maxQueryCost (400000) short-circuits the service's rolling-window fallback.
+-- signatures is a TimescaleDB hypertable with (account_id, block_timestamp DESC) index.
 SELECT
-  count,
-  cost
+  LEAST(COUNT(*), 10000)::TEXT AS count,
+  '500000'::TEXT AS cost
 FROM
-  count_cost_estimate (
-    FORMAT(
-      'SELECT
-        ms.account_id
-      FROM
-        signatures ms
-      WHERE
-        (
-          %L::BIGINT IS NULL
-          OR block_timestamp < %L
-        )
-        AND (
-          %L::TEXT IS NULL
-          OR ms.account_id = %L
-        )
-        AND (
-          %L::TEXT IS NULL
-          OR ms.tx_chain = %L
-        )
-        AND (
-          %L::TEXT IS NULL
-          OR ms.tx_address = %L
-        )
-        AND (
-          %L::TEXT IS NULL
-          OR ms.tx_hash = %L
-        )',
-      ${before},
-      ${before},
-      ${account},
-      ${account},
-      ${chain},
-      ${chain},
-      ${address},
-      ${address},
-      ${txn},
-      ${txn}
-    )
-  )
+  (
+    SELECT
+      1
+    FROM
+      signatures
+    WHERE
+      (
+        ${before}::BIGINT IS NULL
+        OR block_timestamp < ${before}
+      )
+      AND (
+        ${account}::TEXT IS NULL
+        OR account_id = ${account}
+      )
+      AND (
+        ${chain}::TEXT IS NULL
+        OR tx_chain = ${chain}
+      )
+      AND (
+        ${address}::TEXT IS NULL
+        OR tx_address = ${address}
+      )
+      AND (
+        ${txn}::TEXT IS NULL
+        OR tx_hash = ${txn}
+      )
+    LIMIT
+      10001
+  ) sub
