@@ -23,6 +23,31 @@ export const ToolsSidebar = () => {
               {t('nav.accountBalance')}
             </ActiveLink>
           </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/unit-converter">
+              {t('nav.unitConverter')}
+            </ActiveLink>
+          </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/keypair">{t('nav.keypair')}</ActiveLink>
+          </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/gas-converter">
+              {t('nav.gasConverter')}
+            </ActiveLink>
+          </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/base64">{t('nav.base64')}</ActiveLink>
+          </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/timestamp">{t('nav.timestamp')}</ActiveLink>
+          </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/storage-cost">{t('nav.storageCost')}</ActiveLink>
+          </TabLink>
+          <TabLink asChild className="justify-start">
+            <ActiveLink href="/shard-mapper">{t('nav.shardMapper')}</ActiveLink>
+          </TabLink>
         </TabLinks>
         <ScrollBar className="md:hidden" orientation="horizontal" />
       </ScrollArea>
