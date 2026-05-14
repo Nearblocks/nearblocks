@@ -13,7 +13,7 @@ import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -156,7 +156,7 @@ export const TokenTransfers = ({
               {() => (
                 <>
                   {t('transfers.total', {
-                    count: numberFormat(txnCount?.data?.count ?? 0),
+                    count: countFormat(txnCount?.data?.count ?? 0),
                   })}
                 </>
               )}

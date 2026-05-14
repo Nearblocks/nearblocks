@@ -160,6 +160,7 @@ const routes = (app: Router) => {
    * /v3/nfts/{contract}/tokens/{token}/txns/count:
    *   get:
    *     summary: Get NFT token transfer count
+   *     x-internal: true
    *     tags:
    *       - NFTs
    *     parameters:

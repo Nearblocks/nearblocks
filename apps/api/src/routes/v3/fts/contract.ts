@@ -87,6 +87,7 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/txns/count:
    *   get:
    *     summary: Get FT contract transfer count
+   *     x-internal: true
    *     tags:
    *       - FTs
    *     parameters:

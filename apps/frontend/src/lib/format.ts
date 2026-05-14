@@ -45,7 +45,7 @@ export const countFormat = (
 ) => {
   if (value === undefined || value === null) return '';
 
-  const n = typeof value === 'bigint' ? Number(value) : Number(value);
+  const n = Number(value);
 
   if (Number.isFinite(n) && n >= COUNT_CAP) {
     return `${numberFormat(COUNT_CAP, options)}+`;

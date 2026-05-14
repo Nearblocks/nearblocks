@@ -12,7 +12,7 @@ import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -147,7 +147,7 @@ export const NftTokenTransfers = ({
               {() => (
                 <>
                   {t('transfers.total', {
-                    count: numberFormat(nftCount?.data?.count ?? 0),
+                    count: countFormat(nftCount?.data?.count ?? 0),
                   })}
                 </>
               )}
