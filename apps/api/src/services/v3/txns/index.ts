@@ -22,8 +22,8 @@ import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
 import {
-  approximateCount,
   cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindow,
   rollingWindowCount,
@@ -144,7 +144,24 @@ const count = responseHandler(
 
     if (!block && !before) {
       const result = await dbBase.one<{ count: string }>(sql.countCagg);
-      return { data: { count: approximateCount(result.count) } };
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbBase.one<{ count: string }>(sql.count, {
+                before,
+                block,
+                end,
+                limit,
+                start,
+              }),
+            { limit: config.maxQueryCount, start: config.baseStart },
+          ),
+      );
+
+      return { data: { count } };
     }
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;

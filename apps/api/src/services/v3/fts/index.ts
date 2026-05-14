@@ -16,8 +16,8 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
-  approximateCount,
   cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -185,7 +185,26 @@ const txnCount = responseHandler(
 
     if (!before) {
       const result = await dbEvents.one<{ count: string }>(sql.txnCountCagg);
-      return { data: { count: approximateCount(result.count) } };
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.txnCount, {
+                before,
+                end,
+                limit,
+                start,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
+      );
+
+      return { data: { count } };
     }
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;

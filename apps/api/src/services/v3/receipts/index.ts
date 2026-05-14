@@ -6,8 +6,8 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, pgp } from '#libs/pgp';
 import {
-  approximateCount,
   cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -124,7 +124,24 @@ const count = responseHandler(
 
     if (!block && !before) {
       const result = await dbBase.one<{ count: string }>(sql.countCagg);
-      return { data: { count: approximateCount(result.count) } };
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbBase.one<{ count: string }>(sql.count, {
+                before,
+                block,
+                end,
+                limit,
+                start,
+              }),
+            { limit: config.maxQueryCount, start: config.baseStart },
+          ),
+      );
+
+      return { data: { count } };
     }
 
     if (block) {

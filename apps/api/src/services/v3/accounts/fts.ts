@@ -17,8 +17,8 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
-  approximateCount,
   cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -146,7 +146,30 @@ const count = responseHandler(
         account,
         contract,
       });
-      return { data: { count: approximateCount(result.count) } };
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.fts.count, {
+                account,
+                before,
+                cause,
+                contract,
+                end,
+                involved,
+                limit,
+                start,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
+      );
+
+      return { data: { count } };
     }
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;

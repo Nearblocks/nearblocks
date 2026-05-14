@@ -16,8 +16,8 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
 import {
-  approximateCount,
   cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -113,7 +113,25 @@ const count = responseHandler(
       const result = await dbBase.one<{ count: string }>(sql.txns.countCagg, {
         account,
       });
-      return { data: { count: approximateCount(result.count) } };
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbBase.one<{ count: string }>(sql.txns.countUnion, {
+                before,
+                end,
+                limit,
+                receiver: account,
+                signer: account,
+                start,
+              }),
+            { limit: config.maxQueryCount, start: config.baseStart },
+          ),
+      );
+
+      return { data: { count } };
     }
 
     const countSql = signer || receiver ? sql.txns.count : sql.txns.countUnion;

@@ -48,6 +48,20 @@ export const cappedCount = (count: number | string, limit: number) => {
   return `${count}${capped ? '+' : ''}`;
 };
 
+export const countFromCagg = async (
+  count: number | string,
+  limit: number,
+  exactCount: () => Promise<number | string>,
+) => {
+  const value = Number(count);
+
+  if (!Number.isFinite(value) || value >= limit) {
+    return approximateCount(count);
+  }
+
+  return cappedCount(await exactCount(), limit);
+};
+
 /**
  * Collects results by repeatedly querying over rolling time windows, moving backwards in time.
  * Continues querying until the specified limit of results is reached or the start boundary is hit.
