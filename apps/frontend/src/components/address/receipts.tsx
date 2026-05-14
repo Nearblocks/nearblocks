@@ -185,14 +185,16 @@ export const Receipts = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           actions={
-            <Button asChild size="xs" variant="outline">
-              <Link
-                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.RECEIPTS}`}
-              >
-                <Download className="size-3" />
-                {t('csvExport')}
-              </Link>
-            </Button>
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.RECEIPTS}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
           }
           columns={columns}
           data={receipts?.data}

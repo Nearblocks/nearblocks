@@ -175,7 +175,7 @@ export const DataTable = <TData,>({
                 ))}
               </>
             )}
-            {actions}
+            {loading ? <Skeleton className="h-7 w-40" /> : actions}
           </div>
         </div>
       )}
