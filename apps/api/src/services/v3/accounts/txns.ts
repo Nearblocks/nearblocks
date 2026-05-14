@@ -13,6 +13,7 @@ import response from 'nb-schemas/dist/accounts/txns/response.js';
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
@@ -107,11 +108,14 @@ const count = responseHandler(
       return { data: { count: 0 } };
     }
 
-    const estimated = await dbBase.one<AccountTxnCount>(sql.txns.estimate, {
-      before,
-      receiver: receiver || account,
-      signer: signer || account,
-    });
+    const estimated = await dbBase.one<AccountTxnCount>(
+      sql.txns.estimate,
+      withCap({
+        before,
+        receiver: receiver || account,
+        signer: signer || account,
+      }),
+    );
 
     return { data: estimated };
   },

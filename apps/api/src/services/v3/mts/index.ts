@@ -5,6 +5,7 @@ import request from 'nb-schemas/dist/mts/request.js';
 import response from 'nb-schemas/dist/mts/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -108,7 +109,10 @@ const count = responseHandler(
   async (req: RequestValidator<MTTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<MTTxnCount>(sql.estimate, { before });
+    const estimated = await dbEvents.one<MTTxnCount>(
+      sql.estimate,
+      withCap({ before }),
+    );
 
     return { data: estimated };
   },

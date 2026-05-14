@@ -13,6 +13,7 @@ import response from 'nb-schemas/dist/accounts/receipts/response.js';
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
@@ -132,13 +133,13 @@ const count = responseHandler(
 
     const estimated = await dbBase.one<AccountReceiptCount>(
       sql.receipts.estimate,
-      {
+      withCap({
         action,
         before,
         method,
         predecessor: predecessor || account,
         receiver: receiver || account,
-      },
+      }),
     );
 
     return { data: estimated };

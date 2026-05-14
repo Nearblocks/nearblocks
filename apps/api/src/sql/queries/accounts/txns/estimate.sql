@@ -1,12 +1,7 @@
--- UNION ALL split is critical here: Postgres can't cleanly use two indexes for an OR condition
--- in one pass. The OR plan does BitmapOr+sort. UNION ALL gives two clean index range scans on
--- (signer_account_id, block_timestamp DESC) and (receiver_account_id, block_timestamp DESC),
--- each terminating at LIMIT independently. Measured 30x speedup on relay.aurora (514ms -> 17ms).
--- Cap at 10000 - frontend displays "10,000+" when LIMIT hits.
--- Cost set above config.maxQueryCost (400000) to short-circuit the service's rolling-window fallback.
+-- Capped exact count: returns LEAST(real, ${cap}); frontend renders "+" when at the cap.
 SELECT
-  LEAST(COUNT(*), 10000)::TEXT AS count,
-  '500000'::TEXT AS cost
+  LEAST(COUNT(*), ${cap})::TEXT AS count,
+  '0'::TEXT AS cost
 FROM
   (
     (
@@ -21,7 +16,7 @@ FROM
           OR block_timestamp < ${before}
         )
       LIMIT
-        10001
+        ${cap} + 1
     )
     UNION ALL
     (
@@ -37,8 +32,8 @@ FROM
           OR block_timestamp < ${before}
         )
       LIMIT
-        10001
+        ${cap} + 1
     )
     LIMIT
-      10001
+      ${cap} + 1
   ) sub

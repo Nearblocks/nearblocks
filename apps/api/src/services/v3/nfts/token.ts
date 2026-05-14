@@ -16,6 +16,7 @@ import request from 'nb-schemas/dist/nfts/tokens/request.js';
 import response from 'nb-schemas/dist/nfts/tokens/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -198,7 +199,7 @@ const txnCount = responseHandler(
 
     const estimated = await dbEvents.one<NFTTokenTxnCount>(
       sql.tokens.tokenTxnEstimate,
-      { before, contract, token },
+      withCap({ before, contract, token }),
     );
 
     return { data: estimated };

@@ -8,6 +8,7 @@ import request from 'nb-schemas/dist/receipts/request.js';
 import response from 'nb-schemas/dist/receipts/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, pgp } from '#libs/pgp';
 import {
@@ -145,10 +146,13 @@ const count = responseHandler(
       return { data: { cost: '0', count: result.count } };
     }
 
-    const estimated = await dbBase.one<ReceiptCount>(sql.estimate, {
-      before,
-      block,
-    });
+    const estimated = await dbBase.one<ReceiptCount>(
+      sql.estimate,
+      withCap({
+        before,
+        block,
+      }),
+    );
 
     return { data: estimated };
   },

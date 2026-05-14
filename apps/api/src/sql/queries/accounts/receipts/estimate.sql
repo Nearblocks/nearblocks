@@ -1,11 +1,7 @@
--- UNION ALL split avoids the BitmapOr plan from "predecessor = X OR receiver = X".
--- Each leg uses (predecessor_account_id, included_in_block_timestamp DESC) or
--- (receiver_account_id, included_in_block_timestamp DESC) cleanly, with LIMIT terminating early.
--- Cap at 10000 - frontend displays "10,000+" when LIMIT hits.
--- Cost set above config.maxQueryCost (400000) to short-circuit the service's rolling-window fallback.
+-- Capped exact count: returns LEAST(real, ${cap}); frontend renders "+" when at the cap.
 SELECT
-  LEAST(COUNT(*), 10000)::TEXT AS count,
-  '500000'::TEXT AS cost
+  LEAST(COUNT(*), ${cap})::TEXT AS count,
+  '0'::TEXT AS cost
 FROM
   (
     (
@@ -37,7 +33,7 @@ FROM
             )
         )
       LIMIT
-        10001
+        ${cap} + 1
     )
     UNION ALL
     (
@@ -70,8 +66,8 @@ FROM
             )
         )
       LIMIT
-        10001
+        ${cap} + 1
     )
     LIMIT
-      10001
+      ${cap} + 1
   ) sub

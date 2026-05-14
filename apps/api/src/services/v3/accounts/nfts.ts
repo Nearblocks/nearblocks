@@ -14,6 +14,7 @@ import response from 'nb-schemas/dist/accounts/nfts/response.js';
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
@@ -140,14 +141,14 @@ const count = responseHandler(
 
     const estimated = await dbEvents.one<AccountNFTTxnCount>(
       sql.nfts.estimate,
-      {
+      withCap({
         account,
         before,
         cause,
         contract,
         involved,
         token,
-      },
+      }),
     );
 
     return { data: estimated };

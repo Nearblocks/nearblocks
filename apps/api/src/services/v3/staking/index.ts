@@ -10,6 +10,7 @@ import request from 'nb-schemas/dist/staking/request.js';
 import response from 'nb-schemas/dist/staking/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbStaking, pgp } from '#libs/pgp';
 import {
@@ -112,9 +113,12 @@ const count = responseHandler(
   async (req: RequestValidator<StakingTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbStaking.one<StakingTxnCount>(sql.estimate, {
-      before,
-    });
+    const estimated = await dbStaking.one<StakingTxnCount>(
+      sql.estimate,
+      withCap({
+        before,
+      }),
+    );
 
     return { data: estimated };
   },

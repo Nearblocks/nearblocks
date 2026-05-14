@@ -16,6 +16,7 @@ import request from 'nb-schemas/dist/fts/request.js';
 import response from 'nb-schemas/dist/fts/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -146,7 +147,7 @@ const txnCount = responseHandler(
 
     const estimated = await dbEvents.one<FTContractTxnCount>(
       sql.contractTxnEstimate,
-      { affected, before, contract },
+      withCap({ affected, before, contract }),
     );
 
     return { data: estimated };

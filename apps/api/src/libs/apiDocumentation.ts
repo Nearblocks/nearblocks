@@ -8,54 +8,19 @@ import { Network } from 'nb-types';
 
 import config from '#config';
 
-// Returns a copy of the OpenAPI spec with operations flagged `x-internal: true`
-// removed, plus any path that ends up with zero operations. The `internalOnly`
-// middleware gates runtime access but swagger-jsdoc/Scalar don't honor the
-// x-internal extension, so without this filter public docs still advertise
-// internal-only endpoints.
-//
-// Only HTTP-method keys are considered candidates for deletion - path-level
-// fields like `summary`, `description`, `parameters`, `servers` are preserved.
-// We also check operations remain *after* filtering before declaring a path
-// "empty"; a path with only metadata and only internal ops correctly drops.
-type OpenAPIOperation = { 'x-internal'?: boolean };
-type OpenAPIPathItem = Record<string, OpenAPIOperation | unknown>;
-type OpenAPIPaths = Record<string, OpenAPIPathItem>;
-
-const HTTP_METHODS = new Set([
-  'get',
-  'post',
-  'put',
-  'delete',
-  'patch',
-  'head',
-  'options',
-  'trace',
-]);
-
-const stripInternalPaths = <T extends { paths?: OpenAPIPaths }>(spec: T): T => {
-  // structuredClone keeps the source spec usable downstream (e.g. if a future
-  // caller wants the unfiltered version) and avoids subtle bugs from cached
-  // spec objects being mutated across requests.
-  const out = structuredClone(spec);
-  if (!out.paths) return out;
-  for (const [pathKey, pathItem] of Object.entries(out.paths)) {
-    if (!pathItem || typeof pathItem !== 'object') continue;
-    let remainingMethodOps = 0;
-    for (const key of Object.keys(pathItem)) {
-      if (!HTTP_METHODS.has(key)) continue;
-      const op = pathItem[key] as OpenAPIOperation | undefined;
-      if (op && typeof op === 'object' && op['x-internal'] === true) {
-        delete pathItem[key];
-      } else {
-        remainingMethodOps += 1;
-      }
+// Drop operations flagged `x-internal: true` from the OpenAPI spec.
+// swagger-jsdoc/Scalar don't honor the extension natively.
+const stripInternalPaths = <T extends object>(spec: T): T => {
+  const out = structuredClone(spec) as {
+    paths?: Record<string, Record<string, { 'x-internal'?: boolean }>>;
+  };
+  for (const [pathKey, ops] of Object.entries(out.paths ?? {})) {
+    for (const [method, op] of Object.entries(ops)) {
+      if (op?.['x-internal']) delete ops[method];
     }
-    if (remainingMethodOps === 0) {
-      delete out.paths[pathKey];
-    }
+    if (Object.keys(ops).length === 0) delete out.paths![pathKey];
   }
-  return out;
+  return out as T;
 };
 
 const scalarCss = `

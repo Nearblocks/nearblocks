@@ -1,8 +1,7 @@
--- LIMIT-and-cap: exact count when total <= 10000, otherwise 10000.
--- Cost > maxQueryCost (400000) short-circuits the service's rolling-window fallback.
+-- Capped exact count: returns LEAST(real, ${cap}); frontend renders "+" when at the cap.
 SELECT
-  LEAST(COUNT(*), 10000)::TEXT AS count,
-  '500000'::TEXT AS cost
+  LEAST(COUNT(*), ${cap})::TEXT AS count,
+  '0'::TEXT AS cost
 FROM
   (
     SELECT
@@ -25,5 +24,5 @@ FROM
         OR delta_amount >= 0
       )
     LIMIT
-      10001
+      ${cap} + 1
   ) sub

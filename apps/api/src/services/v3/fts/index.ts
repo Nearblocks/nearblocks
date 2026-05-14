@@ -14,6 +14,7 @@ import request from 'nb-schemas/dist/fts/request.js';
 import response from 'nb-schemas/dist/fts/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -181,9 +182,12 @@ const txnCount = responseHandler(
   async (req: RequestValidator<FTTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<FTTxnCount>(sql.txnEstimate, {
-      before,
-    });
+    const estimated = await dbEvents.one<FTTxnCount>(
+      sql.txnEstimate,
+      withCap({
+        before,
+      }),
+    );
 
     return { data: estimated };
   },

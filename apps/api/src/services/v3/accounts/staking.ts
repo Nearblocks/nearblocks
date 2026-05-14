@@ -14,6 +14,7 @@ import response from 'nb-schemas/dist/accounts/staking/response.js';
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbStaking, pgp } from '#libs/pgp';
@@ -134,12 +135,12 @@ const count = responseHandler(
 
     const estimated = await dbStaking.one<AccountStakingTxnCount>(
       sql.staking.estimate,
-      {
+      withCap({
         account,
         before,
         contract,
         type,
-      },
+      }),
     );
 
     return { data: estimated };

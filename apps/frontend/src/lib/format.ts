@@ -34,9 +34,8 @@ export const numberFormat = (
   return new Intl.NumberFormat('en-US', options).format(data);
 };
 
-// COUNT_CAP must match the LIMIT used in the v3 estimate.sql files. When the API
-// returns count == COUNT_CAP, the SQL LIMIT was hit and the true count is unknown
-// (potentially millions). Display "10,000+" to communicate this honestly.
+// Mirrors config.countCap in apps/api/src/config.ts. When the API returns
+// count == COUNT_CAP the cap was hit (true count is unknown, often millions).
 export const COUNT_CAP = 10000;
 
 export const countFormat = (

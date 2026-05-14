@@ -19,6 +19,7 @@ import request from 'nb-schemas/dist/txns/request.js';
 import response from 'nb-schemas/dist/txns/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
@@ -157,7 +158,10 @@ const count = responseHandler(
       return { data: { cost: '0', count: String(count) } };
     }
 
-    const estimated = await dbBase.one<TxnCount>(sql.estimate, { before });
+    const estimated = await dbBase.one<TxnCount>(
+      sql.estimate,
+      withCap({ before }),
+    );
 
     return { data: estimated };
   },

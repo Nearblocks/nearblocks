@@ -14,6 +14,7 @@ import response from 'nb-schemas/dist/accounts/mts/response.js';
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
@@ -138,14 +139,17 @@ const count = responseHandler(
     const cause = req.validator.cause;
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<AccountMTTxnCount>(sql.mts.estimate, {
-      account,
-      before,
-      cause,
-      contract,
-      involved,
-      token,
-    });
+    const estimated = await dbEvents.one<AccountMTTxnCount>(
+      sql.mts.estimate,
+      withCap({
+        account,
+        before,
+        cause,
+        contract,
+        involved,
+        token,
+      }),
+    );
 
     return { data: estimated };
   },

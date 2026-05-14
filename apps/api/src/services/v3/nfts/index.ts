@@ -14,6 +14,7 @@ import request from 'nb-schemas/dist/nfts/request.js';
 import response from 'nb-schemas/dist/nfts/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
@@ -177,9 +178,12 @@ const txnCount = responseHandler(
   async (req: RequestValidator<NFTTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<NFTTxnCount>(sql.txnEstimate, {
-      before,
-    });
+    const estimated = await dbEvents.one<NFTTxnCount>(
+      sql.txnEstimate,
+      withCap({
+        before,
+      }),
+    );
 
     return { data: estimated };
   },

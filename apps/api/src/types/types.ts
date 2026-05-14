@@ -18,6 +18,7 @@ export type Config = {
   balanceStart: bigint;
   baseStart: bigint;
   campaignsPublicUrl: string;
+  countCap: number;
   dbCa: string;
   dbCert: string;
   dbKey: string;

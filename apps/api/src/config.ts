@@ -56,6 +56,9 @@ const config: Config = {
   balanceStart,
   baseStart,
   campaignsPublicUrl: env.CAMPAIGNS_PUBLIC_URL,
+  // Cap for v3 /count endpoints. Counts >= countCap return countCap and the
+  // UI displays "<cap>+". Mirrored in apps/frontend/src/lib/format.ts.
+  countCap: 10000,
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,

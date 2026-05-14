@@ -11,6 +11,7 @@ import request from 'nb-schemas/dist/multichain/request.js';
 import response from 'nb-schemas/dist/multichain/response.js';
 
 import config from '#config';
+import { withCap } from '#libs/count';
 import cursors from '#libs/cursors';
 import { dbBase, dbMultichain, pgp } from '#libs/pgp';
 import {
@@ -129,13 +130,13 @@ const count = responseHandler(
 
     const estimated = await dbMultichain.one<MCTxnCount>(
       sql.signatureEstimate,
-      {
+      withCap({
         account,
         address,
         before,
         chain,
         txn,
-      },
+      }),
     );
 
     return { data: estimated };
