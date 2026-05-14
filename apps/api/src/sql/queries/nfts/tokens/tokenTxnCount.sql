@@ -1,17 +1,43 @@
 SELECT
   COUNT(*)::TEXT AS count
 FROM
-  nft_events
-WHERE
-  contract_account_id = ${contract}
-  AND token_id = ${token}
-  AND block_timestamp >= ${start}::BIGINT
-  AND block_timestamp <= ${end}::BIGINT
-  AND (
-    ${before}::BIGINT IS NULL
-    OR block_timestamp < ${before}
-  )
-  AND (
-    cause = 'BURN'
-    OR delta_amount >= 0
-  )
+  (
+    SELECT
+      1
+    FROM
+      nft_events ne
+    WHERE
+      ne.contract_account_id = ${contract}
+      AND ne.token_id = ${token}
+      AND ne.block_timestamp >= ${start}::BIGINT
+      AND ne.block_timestamp <= ${end}::BIGINT
+      AND (
+        ${before}::BIGINT IS NULL
+        OR ne.block_timestamp < ${before}
+      )
+      AND (
+        ne.cause = 'BURN'
+        OR ne.delta_amount >= 0
+      )
+      AND EXISTS (
+        SELECT
+          1
+        FROM
+          nft_meta nm
+        WHERE
+          nm.contract = ne.contract_account_id
+          AND nm.modified_at IS NOT NULL
+      )
+      AND EXISTS (
+        SELECT
+          1
+        FROM
+          nft_token_meta ntm
+        WHERE
+          ntm.contract = ne.contract_account_id
+          AND ntm.token = ne.token_id
+          AND ntm.modified_at IS NOT NULL
+      )
+    LIMIT
+      ${limit}::INT
+  ) limited

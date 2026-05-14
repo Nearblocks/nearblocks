@@ -20,7 +20,8 @@ export default {
   },
   fts: {
     count: sql('queries/accounts/fts/count.sql'),
-    estimate: sql('queries/accounts/fts/estimate.sql'),
+    countCagg: sql('queries/accounts/fts/countCagg.sql'),
+    countCaggContract: sql('queries/accounts/fts/countCaggContract.sql'),
     export: sql('queries/accounts/fts/export.sql'),
     exportTxn: sql('queries/accounts/fts/exportTxn.sql'),
     txn: sql('queries/accounts/fts/txn.sql'),
@@ -33,7 +34,7 @@ export default {
   },
   mts: {
     count: sql('queries/accounts/mts/count.sql'),
-    estimate: sql('queries/accounts/mts/estimate.sql'),
+    countCagg: sql('queries/accounts/mts/countCagg.sql'),
     export: sql('queries/accounts/mts/export.sql'),
     exportTxn: sql('queries/accounts/mts/exportTxn.sql'),
     txn: sql('queries/accounts/mts/txn.sql'),
@@ -41,7 +42,7 @@ export default {
   },
   nfts: {
     count: sql('queries/accounts/nfts/count.sql'),
-    estimate: sql('queries/accounts/nfts/estimate.sql'),
+    countCagg: sql('queries/accounts/nfts/countCagg.sql'),
     export: sql('queries/accounts/nfts/export.sql'),
     exportTxn: sql('queries/accounts/nfts/exportTxn.sql'),
     txn: sql('queries/accounts/nfts/txn.sql'),
@@ -49,15 +50,15 @@ export default {
   },
   receipts: {
     count: sql('queries/accounts/receipts/count.sql'),
+    countCagg: sql('queries/accounts/receipts/countCagg.sql'),
+    countUnion: sql('queries/accounts/receipts/countUnion.sql'),
     cte: sql('queries/accounts/receipts/cte.sql'),
     cteUnion: sql('queries/accounts/receipts/cteUnion.sql'),
-    estimate: sql('queries/accounts/receipts/estimate.sql'),
     exportCte: sql('queries/accounts/receipts/exportCte.sql'),
     receipts: sql('queries/accounts/receipts/receipts.sql'),
   },
   staking: {
     count: sql('queries/accounts/staking/count.sql'),
-    estimate: sql('queries/accounts/staking/estimate.sql'),
     export: sql('queries/accounts/staking/export.sql'),
     exportTxn: sql('queries/accounts/staking/exportTxn.sql'),
     txn: sql('queries/accounts/staking/txn.sql'),
@@ -72,9 +73,10 @@ export default {
   },
   txns: {
     count: sql('queries/accounts/txns/count.sql'),
+    countCagg: sql('queries/accounts/txns/countCagg.sql'),
+    countUnion: sql('queries/accounts/txns/countUnion.sql'),
     cte: sql('queries/accounts/txns/cte.sql'),
     cteUnion: sql('queries/accounts/txns/cteUnion.sql'),
-    estimate: sql('queries/accounts/txns/estimate.sql'),
     exportCte: sql('queries/accounts/txns/exportCte.sql'),
     txns: sql('queries/accounts/txns/txns.sql'),
   },

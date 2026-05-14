@@ -14,7 +14,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { countFormat, nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -161,7 +161,7 @@ export const Receipts = ({
               {() => (
                 <>
                   {t('list.total', {
-                    count: numberFormat(receiptCount?.count ?? 0),
+                    count: countFormat(receiptCount?.count ?? 0),
                   })}
                 </>
               )}

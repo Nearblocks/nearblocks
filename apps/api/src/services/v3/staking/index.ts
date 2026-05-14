@@ -2,7 +2,6 @@ import { unionWith } from 'es-toolkit';
 
 import type {
   StakingTxn,
-  StakingTxnCount,
   StakingTxnCountReq,
   StakingTxnsReq,
 } from 'nb-schemas';
@@ -13,6 +12,7 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbStaking, pgp } from '#libs/pgp';
 import {
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -113,29 +113,23 @@ const count = responseHandler(
   async (req: RequestValidator<StakingTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbStaking.one<StakingTxnCount>(sql.estimate, {
-      before,
-    });
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbStaking.one<{ count: string }>(sql.count, {
+          before,
+          end,
+          limit,
+          start,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.stakingStart,
+      },
+    );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbStaking.one<{ count: string }>(sql.count, { before, end, start }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.stakingStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

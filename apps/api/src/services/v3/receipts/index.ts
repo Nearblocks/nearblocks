@@ -1,9 +1,4 @@
-import type {
-  Receipt,
-  ReceiptCount,
-  ReceiptCountReq,
-  ReceiptsReq,
-} from 'nb-schemas';
+import type { Receipt, ReceiptCountReq, ReceiptsReq } from 'nb-schemas';
 import request from 'nb-schemas/dist/receipts/request.js';
 import response from 'nb-schemas/dist/receipts/response.js';
 
@@ -11,6 +6,8 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, pgp } from '#libs/pgp';
 import {
+  approximateCount,
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -125,6 +122,11 @@ const count = responseHandler(
     const block = req.validator.block;
     const before = req.validator.before_ts;
 
+    if (!block && !before) {
+      const result = await dbBase.one<{ count: string }>(sql.countCagg);
+      return { data: { count: approximateCount(result.count) } };
+    }
+
     if (block) {
       const blockRow = await dbBase.oneOrNone<{ block_timestamp: string }>(
         sql.blockTs,
@@ -132,7 +134,7 @@ const count = responseHandler(
       );
 
       if (!blockRow) {
-        return { data: { cost: '0', count: '0' } };
+        return { data: { count: '0' } };
       }
 
       const blockTs = BigInt(blockRow.block_timestamp);
@@ -140,37 +142,29 @@ const count = responseHandler(
         before,
         block,
         end: blockTs,
+        limit: config.maxQueryCount,
         start: blockTs,
       });
 
-      return { data: { cost: '0', count: result.count } };
+      return {
+        data: { count: cappedCount(result.count, config.maxQueryCount) },
+      };
     }
 
-    const estimated = await dbBase.one<ReceiptCount>(sql.estimate, {
-      before,
-      block,
-    });
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbBase.one<{ count: string }>(sql.count, {
+          before,
+          block,
+          end,
+          limit,
+          start,
+        }),
+      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
+    );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbBase.one<{ count: string }>(sql.count, {
-            before,
-            block,
-            end,
-            start,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

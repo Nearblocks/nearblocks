@@ -4,7 +4,6 @@ import { NextFunction, Response } from 'express';
 
 import type {
   AccountStakingTxn,
-  AccountStakingTxnCount,
   AccountStakingTxnCountReq,
   AccountStakingTxnExportReq,
   AccountStakingTxnsReq,
@@ -18,6 +17,7 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbStaking, pgp } from '#libs/pgp';
 import {
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -133,38 +133,22 @@ const count = responseHandler(
     const type = req.validator.type;
     const before = req.validator.before_ts;
 
-    const estimated = await dbStaking.one<AccountStakingTxnCount>(
-      sql.staking.estimate,
-      {
-        account,
-        before,
-        contract,
-        type,
-      },
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbStaking.one<{ count: string }>(sql.staking.count, {
+          account,
+          before,
+          contract,
+          end,
+          limit,
+          start,
+          type,
+        }),
+      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
     );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbStaking.one<{ count: string }>(sql.staking.count, {
-            account,
-            before,
-            contract,
-            end,
-            start,
-            type,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

@@ -8,7 +8,6 @@ import type {
   NFTTokenListReq,
   NFTTokenReq,
   NFTTokenTxn,
-  NFTTokenTxnCount,
   NFTTokenTxnCountReq,
   NFTTokenTxnsReq,
 } from 'nb-schemas/dist/nfts/tokens/index.js';
@@ -19,6 +18,7 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -197,36 +197,25 @@ const txnCount = responseHandler(
     const token = req.validator.token;
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<NFTTokenTxnCount>(
-      sql.tokens.tokenTxnEstimate,
-      { before, contract, token },
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
+          before,
+          contract,
+          end,
+          limit,
+          start,
+          token,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.eventsStart,
+      },
     );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
-            before,
-            contract,
-            end,
-            start,
-            token,
-          }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

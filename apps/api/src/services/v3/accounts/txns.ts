@@ -3,7 +3,6 @@ import { NextFunction, Response } from 'express';
 
 import type {
   AccountTxn,
-  AccountTxnCount,
   AccountTxnCountReq,
   AccountTxnExportReq,
   AccountTxnsReq,
@@ -17,6 +16,8 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
 import {
+  approximateCount,
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -105,36 +106,32 @@ const count = responseHandler(
     const before = req.validator.before_ts;
 
     if (signer && receiver && signer !== account && receiver !== account) {
-      return { data: { count: 0 } };
+      return { data: { count: '0' } };
     }
 
-    const estimated = await dbBase.one<AccountTxnCount>(sql.txns.estimate, {
-      before,
-      receiver: receiver || account,
-      signer: signer || account,
-    });
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbBase.one<{ count: string }>(sql.txns.count, {
-            before,
-            end,
-            receiver: receiver || account,
-            signer: signer || account,
-            start,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
+    if (!signer && !receiver && !before) {
+      const result = await dbBase.one<{ count: string }>(sql.txns.countCagg, {
+        account,
+      });
+      return { data: { count: approximateCount(result.count) } };
     }
 
-    return { data: estimated };
+    const countSql = signer || receiver ? sql.txns.count : sql.txns.countUnion;
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbBase.one<{ count: string }>(countSql, {
+          before,
+          end,
+          limit,
+          receiver: receiver || account,
+          signer: signer || account,
+          start,
+        }),
+      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
+    );
+
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

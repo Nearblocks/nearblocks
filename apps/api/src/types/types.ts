@@ -31,6 +31,7 @@ export type Config = {
   eventsStart: bigint;
   mainnetUrl: string;
   maxQueryCost: number;
+  maxQueryCount: number;
   maxQueryRows: number;
   network: string;
   otelExporterApiKey?: string;

@@ -6,7 +6,6 @@ import type {
   FTList,
   FTListReq,
   FTTxn,
-  FTTxnCount,
   FTTxnCountReq,
   FTTxnsReq,
 } from 'nb-schemas';
@@ -17,6 +16,8 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
+  approximateCount,
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -182,33 +183,28 @@ const txnCount = responseHandler(
   async (req: RequestValidator<FTTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<FTTxnCount>(sql.txnEstimate, {
-      before,
-    });
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.txnCount, {
-            before,
-            end,
-            start,
-          }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
+    if (!before) {
+      const result = await dbEvents.one<{ count: string }>(sql.txnCountCagg);
+      return { data: { count: approximateCount(result.count) } };
     }
 
-    return { data: estimated };
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbEvents.one<{ count: string }>(sql.txnCount, {
+          before,
+          end,
+          limit,
+          start,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.eventsStart,
+      },
+    );
+
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

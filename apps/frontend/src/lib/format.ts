@@ -34,6 +34,18 @@ export const numberFormat = (
   return new Intl.NumberFormat('en-US', options).format(data);
 };
 
+export const countFormat = (
+  value: NumberFormat,
+  options?: Intl.NumberFormatOptions,
+) => {
+  if (value === undefined || value === null) return '';
+
+  const hasApproxSuffix = typeof value === 'string' && value.endsWith('+');
+  const rawValue = hasApproxSuffix ? value.slice(0, -1) : value;
+
+  return `${numberFormat(rawValue, options)}${hasApproxSuffix ? '+' : ''}`;
+};
+
 export const nearFormat = (
   yoctoNear: BigSource | null | undefined,
   options?: Intl.NumberFormatOptions,
