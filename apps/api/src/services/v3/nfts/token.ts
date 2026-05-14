@@ -20,7 +20,6 @@ import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   paginateData,
-  rollingWindowCount,
   rollingWindowList,
   windowEnd,
   WindowListQuery,
@@ -201,30 +200,6 @@ const txnCount = responseHandler(
       sql.tokens.tokenTxnEstimate,
       { before, contract, token },
     );
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
-            before,
-            contract,
-            end,
-            start,
-            token,
-          }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
 
     return { data: estimated };
   },

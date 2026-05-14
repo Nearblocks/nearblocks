@@ -18,7 +18,6 @@ import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
 import {
   paginateData,
-  rollingWindowCount,
   rollingWindowList,
   windowEnd,
   WindowListQuery,
@@ -113,26 +112,6 @@ const count = responseHandler(
       receiver: receiver || account,
       signer: signer || account,
     });
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbBase.one<{ count: string }>(sql.txns.count, {
-            before,
-            end,
-            receiver: receiver || account,
-            signer: signer || account,
-            start,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
 
     return { data: estimated };
   },

@@ -30,6 +30,27 @@ OVERRIDE_ACCOUNT="${1:-}"
 CSV_OUT="${CSV_OUT:-validate-counts.csv}"
 echo "scenario,account,strategy,window,count,ms" > "$CSV_OUT"
 
+# Probe for the Postgres helper functions this script expects. Without these,
+# sections of the report would silently produce empty rows (the previous
+# behaviour) instead of obvious errors.
+probe_function() {
+  local fn="$1"
+  local label="$2"
+  local present
+  present="$(psql "$DB_URL" -At -c "SELECT to_regprocedure('${fn}') IS NOT NULL" 2>/dev/null || echo f)"
+  if [[ "$present" != "t" ]]; then
+    echo "WARN: ${label} function '${fn}' missing on target DB - related rows will be skipped." >&2
+    return 1
+  fi
+  return 0
+}
+
+HAS_EPOCH_NS=1
+HAS_COUNT_COST_ESTIMATE=1
+probe_function "epoch_nano_seconds()"                              "head-window helper"      || HAS_EPOCH_NS=0
+probe_function "count_cost_estimate(text)"                         "legacy planner estimator" || HAS_COUNT_COST_ESTIMATE=0
+probe_function "approximate_row_count(text)"                       "TimescaleDB row count"   || true
+
 # BSD `date` doesn't support %N - it prints the literal string "N" with exit 0,
 # so we must try gdate first. macOS users need coreutils (`brew install coreutils`).
 ts_ns() {
@@ -74,13 +95,20 @@ heading() {
 
 # Pick a random small account by sampling a recent 1-day window.
 # We pull DISTINCT signers from a random chunk near head (avoiding the very latest hour
-# which the cagg policy hasn't covered).
+# which the cagg policy hasn't covered). Falls back to a Unix-epoch-derived bound when
+# epoch_nano_seconds() isn't available so the script still works on plain Postgres.
 pick_random_account() {
+  local head_expr
+  if [[ "$HAS_EPOCH_NS" == "1" ]]; then
+    head_expr="epoch_nano_seconds()"
+  else
+    head_expr="(EXTRACT(EPOCH FROM NOW()) * 1000000000)::BIGINT"
+  fi
   local sql="
     SELECT signer_account_id
     FROM transactions
-    WHERE block_timestamp >= epoch_nano_seconds() - 7776000000000000  -- last 90 days
-      AND block_timestamp <  epoch_nano_seconds() - 86400000000000     -- exclude last 1 day
+    WHERE block_timestamp >= ${head_expr} - 7776000000000000  -- last 90 days
+      AND block_timestamp <  ${head_expr} - 86400000000000     -- exclude last 1 day
     LIMIT 1 OFFSET (random() * 100)::int
   "
   run_sql "$sql" | head -1 | tr -d '[:space:]'
@@ -109,11 +137,13 @@ printf "| Table | Strategy | Count | Time (ms) |\n"
 printf "|---|---|---:|---:|\n"
 
 for table in blocks transactions receipts; do
-  # OLD: count_cost_estimate
-  res="$(timed_sql "SELECT count::TEXT FROM count_cost_estimate('SELECT 1 FROM ${table}')")"
-  count="${res%|*}"; ms="${res#*|}"
-  printf "| %s | count_cost_estimate (OLD) | %s | %s |\n" "$table" "$count" "$ms"
-  log_csv "totals" "-" "count_cost_estimate" "$table" "$count" "$ms"
+  # OLD: count_cost_estimate - skip if the function isn't installed.
+  if [[ "$HAS_COUNT_COST_ESTIMATE" == "1" ]]; then
+    res="$(timed_sql "SELECT count::TEXT FROM count_cost_estimate('SELECT 1 FROM ${table}')")"
+    count="${res%|*}"; ms="${res#*|}"
+    printf "| %s | count_cost_estimate (OLD) | %s | %s |\n" "$table" "$count" "$ms"
+    log_csv "totals" "-" "count_cost_estimate" "$table" "$count" "$ms"
+  fi
 
   # NEW: approximate_row_count
   res="$(timed_sql "SELECT approximate_row_count('${table}')::TEXT")"
@@ -133,16 +163,19 @@ printf "|---|---|---|---:|---:|\n"
 while IFS='|' read -r account class; do
   [[ -z "$account" ]] && continue
 
-  # OLD: count_cost_estimate on OR
-  sql_old="SELECT count::TEXT FROM count_cost_estimate(
-    \$\$SELECT block_timestamp FROM transactions
-       WHERE signer_account_id = '${account}'
-          OR receiver_account_id = '${account}'\$\$
-  )"
-  res="$(timed_sql "$sql_old")"
-  printf "| %s | %s | count_cost_estimate OR (OLD) | %s | %s |\n" \
-    "$account" "$class" "${res%|*}" "${res#*|}"
-  log_csv "account_txns" "$account" "count_cost_estimate_OR" "all-time" "${res%|*}" "${res#*|}"
+  # OLD: count_cost_estimate on OR - skip if absent so the comparison row
+  # doesn't print empty values.
+  if [[ "$HAS_COUNT_COST_ESTIMATE" == "1" ]]; then
+    sql_old="SELECT count::TEXT FROM count_cost_estimate(
+      \$\$SELECT block_timestamp FROM transactions
+         WHERE signer_account_id = '${account}'
+            OR receiver_account_id = '${account}'\$\$
+    )"
+    res="$(timed_sql "$sql_old")"
+    printf "| %s | %s | count_cost_estimate OR (OLD) | %s | %s |\n" \
+      "$account" "$class" "${res%|*}" "${res#*|}"
+    log_csv "account_txns" "$account" "count_cost_estimate_OR" "all-time" "${res%|*}" "${res#*|}"
+  fi
 
   # Single LIMIT 10001 with OR (naive)
   sql_or="SELECT COUNT(*)::TEXT FROM (

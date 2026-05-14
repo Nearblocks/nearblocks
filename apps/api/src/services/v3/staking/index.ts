@@ -14,7 +14,6 @@ import cursors from '#libs/cursors';
 import { dbBase, dbStaking, pgp } from '#libs/pgp';
 import {
   paginateData,
-  rollingWindowCount,
   rollingWindowList,
   windowEnd,
   WindowListQuery,
@@ -116,24 +115,6 @@ const count = responseHandler(
     const estimated = await dbStaking.one<StakingTxnCount>(sql.estimate, {
       before,
     });
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbStaking.one<{ count: string }>(sql.count, { before, end, start }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.stakingStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
 
     return { data: estimated };
   },

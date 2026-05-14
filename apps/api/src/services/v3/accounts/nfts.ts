@@ -19,7 +19,6 @@ import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   paginateData,
-  rollingWindowCount,
   rollingWindowList,
   windowEnd,
   WindowListQuery,
@@ -150,33 +149,6 @@ const count = responseHandler(
         token,
       },
     );
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.nfts.count, {
-            account,
-            before,
-            cause,
-            contract,
-            end,
-            involved,
-            start,
-            token,
-          }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
 
     return { data: estimated };
   },
