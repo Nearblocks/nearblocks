@@ -30,4 +30,11 @@ export const chainBlocksProcessed = new client.Counter({
   registers: [register],
 });
 
+export const chainLastBlockTimestamp = new client.Gauge({
+  help: 'Unix timestamp (seconds) of the most recent block processed per chain',
+  labelNames: ['chain'],
+  name: 'multichain_chain_last_block_timestamp_seconds',
+  registers: [register],
+});
+
 export default metrics;

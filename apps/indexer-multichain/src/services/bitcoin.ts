@@ -12,7 +12,11 @@ import {
 } from '#libs/bitcoin';
 import { NotFoundError } from '#libs/errors';
 import { db } from '#libs/knex';
-import { chainBlockHeight, chainBlocksProcessed } from '#libs/prom';
+import {
+  chainBlockHeight,
+  chainBlocksProcessed,
+  chainLastBlockTimestamp,
+} from '#libs/prom';
 import {
   getStartBlock,
   retry,
@@ -91,6 +95,8 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
   if (!block) {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
   }
+
+  chainLastBlockTimestamp.set({ chain }, block.timestamp);
 
   if (!block.tx?.length) return;
 

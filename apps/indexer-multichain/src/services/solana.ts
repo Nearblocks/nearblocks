@@ -7,7 +7,11 @@ import { sleep } from 'nb-utils';
 import config from '#config';
 import { NotFoundError } from '#libs/errors';
 import { db } from '#libs/knex';
-import { chainBlockHeight, chainBlocksProcessed } from '#libs/prom';
+import {
+  chainBlockHeight,
+  chainBlocksProcessed,
+  chainLastBlockTimestamp,
+} from '#libs/prom';
 import { getBlock, getLatestSlot } from '#libs/solana';
 import {
   getStartBlock,
@@ -88,6 +92,8 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     logger.info(`${chain}: block missing, skipping: ${height}`);
     return;
   }
+
+  chainLastBlockTimestamp.set({ chain }, block.blockTime);
 
   if (!block.transactions?.length) return;
 
