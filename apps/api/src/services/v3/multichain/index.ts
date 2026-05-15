@@ -1,12 +1,6 @@
 import { unionWith } from 'es-toolkit';
 
-import type {
-  MCStats,
-  MCTxn,
-  MCTxnCount,
-  MCTxnCountReq,
-  MCTxnsReq,
-} from 'nb-schemas';
+import type { MCStats, MCTxn, MCTxnCountReq, MCTxnsReq } from 'nb-schemas';
 import request from 'nb-schemas/dist/multichain/request.js';
 import response from 'nb-schemas/dist/multichain/response.js';
 
@@ -14,6 +8,7 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbMultichain, pgp } from '#libs/pgp';
 import {
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -128,40 +123,23 @@ const count = responseHandler(
     const chain = req.validator.chain;
     const txn = req.validator.txn;
 
-    const estimated = await dbMultichain.one<MCTxnCount>(
-      sql.signatureEstimate,
-      {
-        account,
-        address,
-        before,
-        chain,
-        txn,
-      },
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbMultichain.one<{ count: string }>(sql.signatureCount, {
+          account,
+          address,
+          before,
+          chain,
+          end,
+          limit,
+          start,
+          txn,
+        }),
+      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
     );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbMultichain.one<{ count: string }>(sql.signatureCount, {
-            account,
-            address,
-            before,
-            chain,
-            end,
-            start,
-            txn,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

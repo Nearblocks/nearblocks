@@ -16,7 +16,7 @@ import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -178,14 +178,16 @@ export const FTTxns = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           actions={
-            <Button asChild size="xs" variant="outline">
-              <Link
-                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.FT_TRANSFERS}`}
-              >
-                <Download className="size-3" />
-                {t('csvExport')}
-              </Link>
-            </Button>
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.FT_TRANSFERS}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
           }
           columns={columns}
           data={fts?.data}
@@ -201,7 +203,7 @@ export const FTTxns = ({
                 <>
                   {basePath ? (
                     t('fts.total', {
-                      count: numberFormat(ftCount?.count ?? 0),
+                      count: countFormat(ftCount?.count ?? 0),
                     })
                   ) : fts?.data?.length ? (
                     t('fts.latest', { count: numberFormat(fts.data.length) })

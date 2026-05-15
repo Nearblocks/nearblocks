@@ -2,7 +2,7 @@ import { sql } from '#sql/index';
 
 export default {
   count: sql('queries/txns/count.sql'),
-  estimate: sql('queries/txns/estimate.sql'),
+  countCagg: sql('queries/txns/countCagg.sql'),
   events: sql('queries/txns/events.sql'),
   eventsRlp: sql('queries/txns/eventsRlp.sql'),
   ft: sql('queries/txns/ft.sql'),

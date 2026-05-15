@@ -12,7 +12,7 @@ import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { currencyFormat, numberFormat } from '@/lib/format';
+import { countFormat, currencyFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
@@ -155,7 +155,7 @@ export const Overview = ({
                 {() => (
                   <>
                     {txCount?.data?.count ? (
-                      numberFormat(txCount.data.count)
+                      countFormat(txCount.data.count)
                     ) : (
                       <span className="text-muted-foreground">N/A</span>
                     )}

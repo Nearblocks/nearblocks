@@ -38,7 +38,6 @@ const receipt = v.object({
 });
 
 const receiptCount = v.object({
-  cost: v.string(),
   count: v.string(),
 });
 

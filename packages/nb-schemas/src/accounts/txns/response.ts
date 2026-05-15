@@ -42,7 +42,6 @@ const txn = v.object({
 });
 
 const txnCount = v.object({
-  cost: v.string(),
   count: v.string(),
 });
 

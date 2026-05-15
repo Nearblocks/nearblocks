@@ -10,6 +10,7 @@ export type WindowListQuery<T> = (
 export type WindowCountQuery = (
   start: string,
   end: string,
+  limit: number,
 ) => Promise<{ count: string }>;
 
 export type WindowQuery<T> = (start: string, end: string) => Promise<null | T>;
@@ -37,6 +38,29 @@ export type PaginatedResponse<T> = {
 };
 
 const WINDOW_SIZE = BigInt(60 * 60 * 24 * 30 * 12) * 1_000_000_000n; // 1yr in ns
+
+export const approximateCount = (count: number | string) => `${count}+`;
+
+export const cappedCount = (count: number | string, limit: number) => {
+  const value = Number(count);
+  const capped = Number.isFinite(value) && value >= limit;
+
+  return `${count}${capped ? '+' : ''}`;
+};
+
+export const countFromCagg = async (
+  count: number | string,
+  limit: number,
+  exactCount: () => Promise<number | string>,
+) => {
+  const value = Number(count);
+
+  if (!Number.isFinite(value) || value >= limit) {
+    return approximateCount(count);
+  }
+
+  return cappedCount(await exactCount(), limit);
+};
 
 /**
  * Collects results by repeatedly querying over rolling time windows, moving backwards in time.
@@ -128,15 +152,20 @@ export const rollingWindowCount = async (
 
   while (endNs >= start) {
     const windowStart = endNs - windowSize > start ? endNs - windowSize : start;
-    const result = await queryFn(windowStart.toString(), endNs.toString());
+    const remaining = limit ? limit - total : Number.MAX_SAFE_INTEGER;
+    const result = await queryFn(
+      windowStart.toString(),
+      endNs.toString(),
+      remaining,
+    );
     total += Number(result.count);
 
-    if (limit && total >= limit) return total;
+    if (limit && total >= limit) return limit;
     if (windowStart === start) break;
     endNs = windowStart - 1n;
   }
 
-  return total;
+  return limit ? Math.min(total, limit) : total;
 };
 
 /**

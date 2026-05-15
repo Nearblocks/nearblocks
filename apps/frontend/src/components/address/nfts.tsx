@@ -20,7 +20,7 @@ import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -196,14 +196,16 @@ export const NFTTxns = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           actions={
-            <Button asChild size="xs" variant="outline">
-              <Link
-                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.NFT_TRANSFERS}`}
-              >
-                <Download className="size-3" />
-                {t('csvExport')}
-              </Link>
-            </Button>
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.NFT_TRANSFERS}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
           }
           columns={columns}
           data={nfts?.data}
@@ -219,7 +221,7 @@ export const NFTTxns = ({
                 <>
                   {basePath ? (
                     t('nfts.total', {
-                      count: numberFormat(nftCount?.count ?? 0),
+                      count: countFormat(nftCount?.count ?? 0),
                     })
                   ) : nfts?.data?.length ? (
                     t('nfts.latest', { count: numberFormat(nfts.data.length) })

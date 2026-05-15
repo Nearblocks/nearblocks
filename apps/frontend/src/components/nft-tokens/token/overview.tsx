@@ -11,7 +11,7 @@ import {
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -104,7 +104,7 @@ export const Overview = ({
                 {() => (
                   <>
                     {txCount?.data?.count ? (
-                      numberFormat(txCount.data.count)
+                      countFormat(txCount.data.count)
                     ) : (
                       <span className="text-muted-foreground">
                         {t('contract.overview.na')}

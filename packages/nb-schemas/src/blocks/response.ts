@@ -33,7 +33,6 @@ const block = v.object({
 });
 
 const blockCount = v.object({
-  cost: v.string(),
   count: v.string(),
 });
 

@@ -20,7 +20,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { countFormat, nearFormat, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -183,7 +183,7 @@ export const StakingTxns = ({
                 <>
                   {basePath ? (
                     t('staking.total', {
-                      count: numberFormat(stakingCount?.count ?? 0),
+                      count: countFormat(stakingCount?.count ?? 0),
                     })
                   ) : staking?.data?.length ? (
                     t('staking.latest', {

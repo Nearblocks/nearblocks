@@ -67,7 +67,7 @@ FROM
 WHERE
   nft.contract_account_id = ${contract}
   AND (
-    ${affected}::BIGINT IS NULL
+    ${affected}::TEXT IS NULL
     OR nft.affected_account_id = ${affected}
   )
   AND (
@@ -104,7 +104,7 @@ WHERE
     OR nft.block_timestamp < ${before}
   )
   AND (
-    ${affected}::BIGINT IS NOT NULL
+    ${affected}::TEXT IS NOT NULL
     OR nft.cause = 'BURN'
     OR nft.delta_amount >= 0
   )

@@ -69,6 +69,7 @@ const config: Config = {
   eventsStart,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
+  maxQueryCount: 10000,
   maxQueryRows: 5000,
   network: env.NETWORK,
   otelExporterApiKey: env.OTEL_EXPORTER_API_KEY,

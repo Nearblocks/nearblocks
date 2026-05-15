@@ -20,7 +20,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { countFormat, nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -185,14 +185,16 @@ export const Receipts = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           actions={
-            <Button asChild size="xs" variant="outline">
-              <Link
-                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.RECEIPTS}`}
-              >
-                <Download className="size-3" />
-                {t('csvExport')}
-              </Link>
-            </Button>
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.RECEIPTS}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
           }
           columns={columns}
           data={receipts?.data}
@@ -208,7 +210,7 @@ export const Receipts = ({
                 <>
                   {basePath ? (
                     t('receipts.total', {
-                      count: numberFormat(receiptCount?.count ?? 0),
+                      count: countFormat(receiptCount?.count ?? 0),
                     })
                   ) : receipts?.data?.length ? (
                     t('receipts.latest', {

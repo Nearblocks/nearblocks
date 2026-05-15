@@ -4,7 +4,6 @@ import { NextFunction, Response } from 'express';
 
 import type {
   AccountMTTxn,
-  AccountMTTxnCount,
   AccountMTTxnCountReq,
   AccountMTTxnExportReq,
   AccountMTTxnsReq,
@@ -18,6 +17,8 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
+  cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -139,43 +140,59 @@ const count = responseHandler(
     const cause = req.validator.cause;
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<AccountMTTxnCount>(sql.mts.estimate, {
-      account,
-      before,
-      cause,
-      contract,
-      involved,
-      token,
-    });
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.mts.count, {
-            account,
-            before,
-            cause,
-            contract,
-            end,
-            involved,
-            start,
-            token,
-          }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
+    if (!contract && !token && !involved && !cause && !before) {
+      const result = await dbEvents.one<{ count: string }>(sql.mts.countCagg, {
+        account,
+      });
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.mts.count, {
+                account,
+                before,
+                cause,
+                contract,
+                end,
+                involved,
+                limit,
+                start,
+                token,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
       );
 
-      return { data: { cost: estimated.cost, count: String(count) } };
+      return { data: { count } };
     }
 
-    return { data: estimated };
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbEvents.one<{ count: string }>(sql.mts.count, {
+          account,
+          before,
+          cause,
+          contract,
+          end,
+          involved,
+          limit,
+          start,
+          token,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.eventsStart,
+      },
+    );
+
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

@@ -1,6 +1,5 @@
 import type {
   Txn,
-  TxnCount,
   TxnCountReq,
   TxnFT,
   TxnFTsReq,
@@ -23,6 +22,8 @@ import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
 import {
+  cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindow,
   rollingWindowCount,
@@ -141,44 +142,42 @@ const count = responseHandler(
     const block = req.validator.block;
     const before = req.validator.before_ts;
 
-    if (block) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbBase.one<{ count: string }>(sql.count, {
-            before,
-            block,
-            end,
-            start,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
+    if (!block && !before) {
+      const result = await dbBase.one<{ count: string }>(sql.countCagg);
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbBase.one<{ count: string }>(sql.count, {
+                before,
+                block,
+                end,
+                limit,
+                start,
+              }),
+            { limit: config.maxQueryCount, start: config.baseStart },
+          ),
       );
 
-      return { data: { cost: '0', count: String(count) } };
+      return { data: { count } };
     }
 
-    const estimated = await dbBase.one<TxnCount>(sql.estimate, { before });
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbBase.one<{ count: string }>(sql.count, {
+          before,
+          block,
+          end,
+          limit,
+          start,
+        }),
+      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
+    );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbBase.one<{ count: string }>(sql.count, {
-            before,
-            block,
-            end,
-            start,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

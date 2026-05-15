@@ -4,7 +4,6 @@ import { NextFunction, Response } from 'express';
 
 import type {
   AccountNFTTxn,
-  AccountNFTTxnCount,
   AccountNFTTxnCountReq,
   AccountNFTTxnExportReq,
   AccountNFTTxnsReq,
@@ -18,6 +17,8 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
+  cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -139,46 +140,59 @@ const count = responseHandler(
     const cause = req.validator.cause;
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<AccountNFTTxnCount>(
-      sql.nfts.estimate,
-      {
+    if (!contract && !token && !involved && !cause && !before) {
+      const result = await dbEvents.one<{ count: string }>(sql.nfts.countCagg, {
         account,
-        before,
-        cause,
-        contract,
-        involved,
-        token,
+      });
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.nfts.count, {
+                account,
+                before,
+                cause,
+                contract,
+                end,
+                involved,
+                limit,
+                start,
+                token,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
+      );
+
+      return { data: { count } };
+    }
+
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbEvents.one<{ count: string }>(sql.nfts.count, {
+          account,
+          before,
+          cause,
+          contract,
+          end,
+          involved,
+          limit,
+          start,
+          token,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.eventsStart,
       },
     );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.nfts.count, {
-            account,
-            before,
-            cause,
-            contract,
-            end,
-            involved,
-            start,
-            token,
-          }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

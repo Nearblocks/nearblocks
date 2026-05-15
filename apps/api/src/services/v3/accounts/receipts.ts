@@ -3,7 +3,6 @@ import { NextFunction, Response } from 'express';
 
 import type {
   AccountReceipt,
-  AccountReceiptCount,
   AccountReceiptCountReq,
   AccountReceiptExportReq,
   AccountReceiptsReq,
@@ -17,6 +16,8 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, pgp } from '#libs/pgp';
 import {
+  cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -128,43 +129,56 @@ const count = responseHandler(
       predecessor !== account &&
       receiver !== account
     ) {
-      return { data: { count: 0 } };
+      return { data: { count: '0' } };
     }
 
-    const estimated = await dbBase.one<AccountReceiptCount>(
-      sql.receipts.estimate,
-      {
-        action,
-        before,
-        method,
-        predecessor: predecessor || account,
-        receiver: receiver || account,
-      },
-    );
-
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbBase.one<{ count: string }>(sql.receipts.count, {
-            action,
-            before,
-            end,
-            method,
-            predecessor: predecessor || account,
-            receiver: receiver || account,
-            start,
-          }),
-        { end: beforeTs, limit: config.maxQueryRows, start: config.baseStart },
+    if (!predecessor && !receiver && !action && !method && !before) {
+      const result = await dbBase.one<{ count: string }>(
+        sql.receipts.countCagg,
+        { account },
+      );
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbBase.one<{ count: string }>(sql.receipts.countUnion, {
+                action,
+                before,
+                end,
+                limit,
+                method,
+                predecessor: account,
+                receiver: account,
+                start,
+              }),
+            { limit: config.maxQueryCount, start: config.baseStart },
+          ),
       );
 
-      return { data: { cost: estimated.cost, count: String(count) } };
+      return { data: { count } };
     }
 
-    return { data: estimated };
+    const countSql =
+      predecessor || receiver ? sql.receipts.count : sql.receipts.countUnion;
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbBase.one<{ count: string }>(countSql, {
+          action,
+          before,
+          end,
+          limit,
+          method,
+          predecessor: predecessor || account,
+          receiver: receiver || account,
+          start,
+        }),
+      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
+    );
+
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 

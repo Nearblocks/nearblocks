@@ -1,6 +1,5 @@
 import type {
   Block,
-  BlockCount,
   BlockReq,
   BlocksLatestReq,
   BlocksReq,
@@ -14,6 +13,7 @@ import cursors from '#libs/cursors';
 import { dbBase } from '#libs/pgp';
 import redis from '#libs/redis';
 import {
+  approximateCount,
   paginateData,
   rollingWindow,
   rollingWindowList,
@@ -95,9 +95,9 @@ const blocks = responseHandler(
 );
 
 const count = responseHandler(response.count, async () => {
-  const blocks = await dbBase.one<BlockCount>(sql.estimate);
+  const result = await dbBase.one<{ count: string }>(sql.countCagg);
 
-  return { data: blocks };
+  return { data: { count: approximateCount(result.count) } };
 });
 
 const stats = responseHandler(response.stats, async () => {

@@ -16,7 +16,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { countFormat, nearFormat, numberFormat } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -172,14 +172,16 @@ export const Txns = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           actions={
-            <Button asChild size="xs" variant="outline">
-              <Link
-                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.TRANSACTIONS}`}
-              >
-                <Download className="size-3" />
-                {t('csvExport')}
-              </Link>
-            </Button>
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.TRANSACTIONS}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
           }
           columns={columns}
           data={txns?.data}
@@ -195,7 +197,7 @@ export const Txns = ({
                 <>
                   {basePath ? (
                     t('txns.total', {
-                      count: numberFormat(txnCount?.count ?? 0),
+                      count: countFormat(txnCount?.count ?? 0),
                     })
                   ) : txns?.data?.length ? (
                     t('txns.latest', { count: numberFormat(txns.data.length) })

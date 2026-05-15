@@ -11,7 +11,13 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { gasFee, gasFormat, nearFormat, numberFormat } from '@/lib/format';
+import {
+  countFormat,
+  gasFee,
+  gasFormat,
+  nearFormat,
+  numberFormat,
+} from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -156,7 +162,7 @@ export const Blocks = ({
                 {() => (
                   <>
                     {t('total', {
-                      count: numberFormat(blockCount?.count ?? 0),
+                      count: countFormat(blockCount?.count ?? 0),
                     })}
                   </>
                 )}

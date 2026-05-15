@@ -1,6 +1,6 @@
 import { unionWith } from 'es-toolkit';
 
-import type { MTTxn, MTTxnCount, MTTxnCountReq, MTTxnsReq } from 'nb-schemas';
+import type { MTTxn, MTTxnCountReq, MTTxnsReq } from 'nb-schemas';
 import request from 'nb-schemas/dist/mts/request.js';
 import response from 'nb-schemas/dist/mts/response.js';
 
@@ -8,6 +8,7 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
+  cappedCount,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -109,27 +110,23 @@ const count = responseHandler(
   async (req: RequestValidator<MTTxnCountReq>) => {
     const before = req.validator.before_ts;
 
-    const estimated = await dbEvents.one<MTTxnCount>(sql.estimate, { before });
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbEvents.one<{ count: string }>(sql.count, {
+          before,
+          end,
+          limit,
+          start,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.eventsStart,
+      },
+    );
 
-    if (
-      +estimated.count < config.maxQueryRows ||
-      +estimated.cost < config.maxQueryCost
-    ) {
-      const beforeTs = before ? BigInt(before) - 1n : undefined;
-      const count = await rollingWindowCount(
-        (start, end) =>
-          dbEvents.one<{ count: string }>(sql.count, { before, end, start }),
-        {
-          end: beforeTs,
-          limit: config.maxQueryRows,
-          start: config.eventsStart,
-        },
-      );
-
-      return { data: { cost: estimated.cost, count: String(count) } };
-    }
-
-    return { data: estimated };
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
   },
 );
 
