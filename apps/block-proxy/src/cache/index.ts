@@ -160,7 +160,7 @@ export class CacheStore {
     );
 
     try {
-      await fsp.writeFile(tmpPath, jsonBytes);
+      await fsp.writeFile(tmpPath, new Uint8Array(jsonBytes));
       await fsp.rename(tmpPath, filePath);
       logger.debug({ bytes: jsonBytes.length, height }, 'cache write complete');
     } catch (err) {

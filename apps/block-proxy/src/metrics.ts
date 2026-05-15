@@ -59,6 +59,13 @@ export const upstreamDuration = new client.Histogram({
   registers: [register],
 });
 
+export const upstreamRateLimited = new client.Counter({
+  help: 'Total upstream rate-limited (HTTP 429) response count by source',
+  labelNames: ['source'] as const,
+  name: 'block_proxy_upstream_rate_limited',
+  registers: [register],
+});
+
 export const tipHeight = new client.Gauge({
   help: 'Latest known chain tip height',
   name: 'block_proxy_tip_height',
