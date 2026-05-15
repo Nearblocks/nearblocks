@@ -1208,6 +1208,77 @@
           }
         }
       ]
+    },
+    {
+      "collapsed": true,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 56 },
+      "id": 108,
+      "title": "Block Proxy",
+      "type": "row",
+      "panels": [
+        {
+          "id": 20,
+          "title": "Block Proxy Upstream Rate Limited (429) Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 57 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "rate(block_proxy_upstream_rate_limited[5m])",
+              "legendFormat": "{{source}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 15,
+                "lineWidth": 2,
+                "pointSize": 5,
+                "showPoints": "never"
+              }
+            }
+          }
+        },
+        {
+          "id": 21,
+          "title": "Block Proxy Upstream 429s (1h total)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 65 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "increase(block_proxy_upstream_rate_limited[1h])",
+              "legendFormat": "{{source}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "decimals": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              }
+            }
+          },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "orientation": "auto"
+          }
+        }
+      ]
     }
   ],
   "refresh": "30s",
