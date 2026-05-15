@@ -1,4 +1,12 @@
 export const layout = {
+  banner: {
+    newUi: {
+      dismiss: 'Dismiss banner',
+      feedbackLink: 'Send feedback',
+      legacyLink: 'Switch to legacy UI',
+      message: 'You’re on the new NearBlocks experience.',
+    },
+  },
   errors: {
     footer: {
       button: 'Return Home',
@@ -90,6 +98,10 @@ export const layout = {
     description:
       'NearBlocks is the leading blockchain explorer dedicated to the NEAR ecosystem. Powered by NEAR Protocol.',
     title: 'NEAR Protocol Explorer | NearBlocks',
+  },
+  notice: {
+    outOfSync:
+      'Due to unexpected maintenance NearBlocks is out of sync. Some blocks or transactions may be delayed.',
   },
   scrollable: {
     more: 'Scroll for more',

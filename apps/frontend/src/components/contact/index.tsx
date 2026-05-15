@@ -34,6 +34,7 @@ export const Contact = () => {
     { label: t('subjects.bug'), value: '4' },
     { label: t('subjects.feature'), value: '5' },
     { label: t('subjects.tokenRequest'), value: '6' },
+    { label: t('subjects.feedback'), value: '7' },
   ];
 
   const handleSubjectChange = (value: string) => {
@@ -123,7 +124,7 @@ export const Contact = () => {
         {subject === '1' && (
           <ContactFaq onContactClick={() => setSubject('2')} />
         )}
-        {(subject === '2' || subject === '3') && (
+        {(subject === '2' || subject === '3' || subject === '7') && (
           <ContactForm
             subject={
               subjects.find((s) => s.value === subject)?.label ?? subject

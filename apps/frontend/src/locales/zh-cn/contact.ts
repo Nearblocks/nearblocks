@@ -149,6 +149,7 @@ export const contact = {
     apiSupport: '2. API Support',
     bug: '4. Issue / Fix / Bug',
     feature: '5. Feature Request',
+    feedback: '7. Feedback',
     generalInquiry: '1. General Inquiry',
     tokenRequest: '6. Legacy Token Request',
   },
