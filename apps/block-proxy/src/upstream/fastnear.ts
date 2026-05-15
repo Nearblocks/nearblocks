@@ -1,6 +1,7 @@
 import { logger } from 'nb-logger';
 
 import type { Config } from '#config';
+import * as metrics from '#metrics';
 
 const MAX_BODY_SIZE = 100 * 1024 * 1024; // 100 MB
 
@@ -36,6 +37,20 @@ export class FastnearUpstream {
       ) as Error & { notFound: boolean };
       err.notFound = true;
       throw err;
+    }
+
+    if (response.status === 429) {
+      metrics.upstreamRateLimited.inc({ source: 'fastnear' });
+      logger.warn(
+        {
+          height,
+          latency_ms: Date.now() - start,
+          retry_after: response.headers.get('retry-after'),
+          source: 'fastnear',
+          status: 429,
+        },
+        'fastnear upstream rate limited',
+      );
     }
 
     if (!response.ok) {
@@ -85,6 +100,19 @@ export class FastnearUpstream {
 
     if (response.status === 404) {
       throw new Error('last_block/final not found on fastnear');
+    }
+
+    if (response.status === 429) {
+      metrics.upstreamRateLimited.inc({ source: 'fastnear' });
+      logger.warn(
+        {
+          latency_ms: Date.now() - start,
+          retry_after: response.headers.get('retry-after'),
+          source: 'fastnear',
+          status: 429,
+        },
+        'fastnear upstream rate limited on last_block/final',
+      );
     }
 
     if (!response.ok) {
