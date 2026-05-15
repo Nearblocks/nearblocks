@@ -6,7 +6,11 @@ import config from '#config';
 import { NotFoundError } from '#libs/errors';
 import { getBlock, getLatestBlock, isValid } from '#libs/evm';
 import { db } from '#libs/knex';
-import { chainBlockHeight, chainBlocksProcessed } from '#libs/prom';
+import {
+  chainBlockHeight,
+  chainBlocksProcessed,
+  chainLastBlockTimestamp,
+} from '#libs/prom';
 import {
   getStartBlock,
   retry,
@@ -85,6 +89,8 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
   if (!block) {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
   }
+
+  chainLastBlockTimestamp.set({ chain }, parseInt(block.timestamp, 16));
 
   if (!block.transactions?.length) return;
 

@@ -64,7 +64,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "time() - max by (indexer) (indexer_last_block_timestamp_seconds{network=~\"$network\", indexer=~\"$indexer\"})",
+          "expr": "time() - max by (indexer) (indexer_last_block_timestamp_seconds{network=~\"$network\", indexer=~\"$indexer\", indexer!=\"multichain\"})",
           "format": "time_series",
           "instant": true,
           "legendFormat": "{{indexer}}",
@@ -202,7 +202,7 @@
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "time() - max by (indexer) (indexer_last_block_timestamp_seconds{network=~\"$network\", indexer=~\"$indexer\"})",
+          "expr": "time() - max by (indexer) (indexer_last_block_timestamp_seconds{network=~\"$network\", indexer=~\"$indexer\", indexer!=\"multichain\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -352,7 +352,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "time() - max by (indexer) (indexer_last_block_timestamp_seconds{network=~\"$network\", indexer=~\"$indexer\"})",
+          "expr": "time() - max by (indexer) (indexer_last_block_timestamp_seconds{network=~\"$network\", indexer=~\"$indexer\", indexer!=\"multichain\"})",
           "legendFormat": "{{indexer}}",
           "refId": "A"
         }
@@ -1112,10 +1112,46 @@
           }
         },
         {
+          "id": 19,
+          "title": "Multichain Sync Lag (per chain)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 34 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "time() - multichain_chain_last_block_timestamp_seconds{network=~\"$network\", indexer=\"multichain\"}",
+              "legendFormat": "{{chain}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 120 },
+                  { "color": "orange", "value": 300 },
+                  { "color": "red", "value": 600 }
+                ]
+              }
+            }
+          },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "orientation": "auto"
+          }
+        },
+        {
           "id": 16,
           "title": "Multichain Blocks Processed (per chain)",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 34 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 40 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "targets": [
             {
@@ -1142,7 +1178,7 @@
           "id": 18,
           "title": "Multichain Errors",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 42 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 48 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "targets": [
             {
@@ -1169,6 +1205,77 @@
                 "showPoints": "never"
               }
             }
+          }
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 56 },
+      "id": 108,
+      "title": "Block Proxy",
+      "type": "row",
+      "panels": [
+        {
+          "id": 20,
+          "title": "Block Proxy Upstream Rate Limited (429) Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 57 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "rate(block_proxy_upstream_rate_limited[5m])",
+              "legendFormat": "{{source}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops",
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 15,
+                "lineWidth": 2,
+                "pointSize": 5,
+                "showPoints": "never"
+              }
+            }
+          }
+        },
+        {
+          "id": 21,
+          "title": "Block Proxy Upstream 429s (1h total)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 65 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "increase(block_proxy_upstream_rate_limited[1h])",
+              "legendFormat": "{{source}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "decimals": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
+                ]
+              }
+            }
+          },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "orientation": "auto"
           }
         }
       ]
