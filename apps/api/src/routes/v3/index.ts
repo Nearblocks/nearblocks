@@ -11,6 +11,7 @@ import receipts from '#routes/v3/receipts';
 import search from '#routes/v3/search';
 import staking from '#routes/v3/staking';
 import stats from '#routes/v3/stats';
+import sync from '#routes/v3/sync';
 import txns from '#routes/v3/txns';
 
 const routes = () => {
@@ -27,6 +28,7 @@ const routes = () => {
   search(app);
   staking(app);
   stats(app);
+  sync(app);
   txns(app);
 
   return app;

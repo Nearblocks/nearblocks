@@ -14,6 +14,7 @@ export const serverEnvSchema = z.object({
 
 export const publicEnvSchema = z.object({
   NEXT_PUBLIC_FASTNEAR_RPC_KEY: z.string(),
+  NEXT_PUBLIC_LEGACY_UI_URL: z.optional(z.url()),
   NEXT_PUBLIC_MAINNET_URL: z._default(z.url(), 'https://nearblocks.io'),
   NEXT_PUBLIC_NETWORK_ID: z.enum(ONetwork),
   NEXT_PUBLIC_REOWN_PROJECT_ID: z.string(),
@@ -126,6 +127,7 @@ const verifierSchema = z.object({
 
 const configSchema = z.object({
   fastNearRpcKey: publicEnvSchema.shape.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
+  legacyUiUrl: publicEnvSchema.shape.NEXT_PUBLIC_LEGACY_UI_URL,
   mainnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_MAINNET_URL,
   metaTemplate: z.string(),
   network: publicEnvSchema.shape.NEXT_PUBLIC_NETWORK_ID,
@@ -159,6 +161,7 @@ export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
       NEXT_PUBLIC_FASTNEAR_RPC_KEY: process.env.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
+      NEXT_PUBLIC_LEGACY_UI_URL: process.env.NEXT_PUBLIC_LEGACY_UI_URL,
       NEXT_PUBLIC_MAINNET_URL: process.env.NEXT_PUBLIC_MAINNET_URL,
       NEXT_PUBLIC_NETWORK_ID: process.env.NEXT_PUBLIC_NETWORK_ID,
       NEXT_PUBLIC_REOWN_PROJECT_ID: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
@@ -180,6 +183,7 @@ export const getRuntimeConfig = (): Config => {
 
   return {
     fastNearRpcKey: cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
+    legacyUiUrl: cachedPublicConfig.NEXT_PUBLIC_LEGACY_UI_URL,
     mainnetUrl,
     metaTemplate,
     network,

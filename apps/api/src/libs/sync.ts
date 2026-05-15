@@ -103,3 +103,22 @@ export const getLatestStats = async () => {
     EXPIRY,
   );
 };
+
+export const getLatestDailyStats = async () => {
+  return redis.cache(
+    'sync:daily_stats',
+    async () => {
+      return sql`
+        SELECT
+          TO_CHAR(TO_TIMESTAMP(date / 1e9), 'YYYY-MM-DD') AS date
+        FROM
+          daily_stats
+        ORDER BY
+          date DESC
+        LIMIT
+          1
+      `;
+    },
+    EXPIRY,
+  );
+};
