@@ -77,6 +77,8 @@ export const layout = {
       title: 'Languages',
     },
     tokens: {
+      mtTransfers: 'MT Transfers',
+      nearIntents: 'Near Intents Transfers',
       nftTransfers: 'NFT Transfers',
       title: 'Tokens',
       tokenTransfers: 'Token Transfers',

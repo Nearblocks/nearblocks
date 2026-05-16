@@ -39,13 +39,25 @@ export const syncFTPrice = async () => {
     return;
   }
 
+  const whitelist = await ref.whitelist();
+
+  if (!whitelist?.length) {
+    return;
+  }
+
   const data = await ref.price();
 
   if (!data) {
     return;
   }
 
-  const keys = Object.keys(data);
+  const whitelistSet = new Set(whitelist);
+  const keys = Object.keys(data).filter((key) => whitelistSet.has(key));
+
+  if (!keys.length) {
+    return;
+  }
+
   const values = keys.map(() => `(?, ?)`).join(',');
   const bindings = keys.flatMap((key) => [key, data[key].price]);
 

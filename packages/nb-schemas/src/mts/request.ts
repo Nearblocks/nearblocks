@@ -19,8 +19,27 @@ const cursor = v.object({
   timestamp: v.string(),
 });
 
+const contractTxns = v.object({
+  affected: v.optional(v.string()),
+  before_ts: tsSchema,
+  contract: v.string(),
+  limit: limitSchema,
+  next: cursorSchema,
+  prev: cursorSchema,
+  token: v.optional(v.string()),
+});
+
+const contractTxnCount = v.object({
+  affected: v.optional(v.string()),
+  before_ts: tsSchema,
+  contract: v.string(),
+  token: v.optional(v.string()),
+});
+
 export type MTTxnsReq = v.InferOutput<typeof txns>;
 export type MTTxnCountReq = v.InferOutput<typeof count>;
 export type MTTxnsCursor = v.InferOutput<typeof cursor>;
+export type MTContractTxnsReq = v.InferOutput<typeof contractTxns>;
+export type MTContractTxnCountReq = v.InferOutput<typeof contractTxnCount>;
 
-export default { count, cursor, txns };
+export default { contractTxnCount, contractTxns, count, cursor, txns };

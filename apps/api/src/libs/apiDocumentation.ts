@@ -158,7 +158,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
         {
           name: 'Tokens',
-          tags: ['FTs', 'NFTs'],
+          tags: ['FTs', 'NFTs', 'MTs'],
         },
         {
           name: 'Other',

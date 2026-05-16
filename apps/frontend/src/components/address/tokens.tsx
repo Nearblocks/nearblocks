@@ -94,17 +94,17 @@ export const Tokens = ({
                   <Fragment key={token.contract}>
                     <CommandItem asChild>
                       <Link
-                        className="text-body-xs flex items-center justify-between gap-2"
+                        className="text-body-xs grid grid-flow-col items-center justify-between gap-2"
                         href={`/tokens/${token.contract}?account=${address}`}
                       >
-                        <span className="flex flex-col gap-1">
+                        <span className="flex flex-col gap-1 truncate">
                           <span className="flex items-center gap-2">
                             <TokenImage
                               alt={token.meta?.name ?? ''}
                               className="m-px size-5 rounded-full border"
                               src={token.meta?.icon ?? ''}
                             />
-                            <span className="flex items-center">
+                            <span className="flex items-center truncate">
                               <span className="max-w-30 truncate pr-1">
                                 {token.meta?.name}
                               </span>

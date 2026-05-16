@@ -63,10 +63,19 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
   {
     key: 'menu.tokens.title',
     menu: [
+      ...(isMainnet
+        ? [
+            {
+              href: '/near-intents',
+              key: 'menu.tokens.nearIntents' as const,
+            },
+          ]
+        : []),
       { href: '/tokens', key: 'menu.tokens.topTokens' },
       { href: '/tokens/transfers', key: 'menu.tokens.tokenTransfers' },
       { href: '/nft-tokens', key: 'menu.tokens.topNFTs' },
       { href: '/nft-tokens/transfers', key: 'menu.tokens.nftTransfers' },
+      { href: '/mt-tokens/transfers', key: 'menu.tokens.mtTransfers' },
     ],
   },
   {

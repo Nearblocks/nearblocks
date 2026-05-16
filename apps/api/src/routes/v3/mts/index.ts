@@ -11,15 +11,15 @@ import service from '#services/v3/mts/index';
 const route = Router();
 
 const routes = (app: Router) => {
-  app.use('/mt-txns', bearerAuth, rateLimiter, route);
+  app.use('/mts', bearerAuth, rateLimiter, route);
 
   /**
    * @openapi
-   * /v3/mt-txns:
+   * /v3/mts/txns:
    *   get:
-   *     summary: List multi-token transfers
+   *     summary: List all MT transfers
    *     tags:
-   *       - Multi-Token
+   *       - MTs
    *     parameters:
    *       - in: query
    *         name: before_ts
@@ -50,16 +50,16 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validate(request.txns), service.txns);
+  route.get('/txns', validate(request.txns), service.txns);
 
   /**
    * @openapi
-   * /v3/mt-txns/count:
+   * /v3/mts/txns/count:
    *   get:
-   *     summary: Get estimated multi-token transfer count
+   *     summary: Get MT transfer count
    *     x-internal: true
    *     tags:
-   *       - Multi-Token
+   *       - MTs
    *     parameters:
    *       - in: query
    *         name: before_ts
@@ -72,7 +72,12 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', internalOnly, validate(request.count), service.count);
+  route.get(
+    '/txns/count',
+    internalOnly,
+    validate(request.count),
+    service.count,
+  );
 };
 
 export default routes;
