@@ -1,8 +1,16 @@
 export const mts = {
+  nearIntents: {
+    heading: 'Near Intents Transfers',
+    meta: {
+      description:
+        'Browse NEAR Intents multi-token transfers on the NEAR Protocol blockchain.',
+      title: 'Near Intents Transfers',
+    },
+  },
   transfers: {
     affected: 'Affected',
     empty: 'No mt token txns found',
-    heading: 'MT Token Transfers',
+    heading: 'Token Transfers (NEP-245)',
     involved: 'Involved',
     method: 'Method',
     quantity: 'Quantity',
@@ -13,6 +21,6 @@ export const mts = {
   transfersMeta: {
     description:
       'Browse all NEAR Protocol multi-token transfers. Track multi-token movements, accounts, collections, and amounts.',
-    title: 'MT Token Transfers',
+    title: 'MT Token Transfers (NEP-245)',
   },
 } as const;

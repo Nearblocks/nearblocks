@@ -4,7 +4,8 @@ import accounts from '#routes/v3/accounts/index';
 import blocks from '#routes/v3/blocks';
 import fts from '#routes/v3/fts/index';
 import keys from '#routes/v3/keys';
-import mts from '#routes/v3/mts';
+import mtsContract from '#routes/v3/mts/contract';
+import mts from '#routes/v3/mts/index';
 import multichain from '#routes/v3/multichain/index';
 import nfts from '#routes/v3/nfts/index';
 import receipts from '#routes/v3/receipts';
@@ -22,6 +23,7 @@ const routes = () => {
   fts(app);
   keys(app);
   mts(app);
+  mtsContract(app);
   multichain(app);
   nfts(app);
   receipts(app);

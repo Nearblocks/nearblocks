@@ -55,7 +55,6 @@ const txn = v.object({
 });
 
 const txnCount = v.object({
-  cost: v.string(),
   count: v.string(),
 });
 
@@ -104,7 +103,6 @@ const contractTxn = v.object({
 });
 
 const contractTxnCount = v.object({
-  cost: v.string(),
   count: v.string(),
 });
 

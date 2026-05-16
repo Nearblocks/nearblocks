@@ -59,14 +59,22 @@ const txnCount = v.object({
 
 const txnsResponse = responseSchema(v.array(txn));
 const txnCountResponse = responseSchema(txnCount);
+const contractTxnsResponse = responseSchema(v.array(txn));
+const contractTxnCountResponse = responseSchema(txnCount);
 
 export type MTTxn = v.InferOutput<typeof txn>;
 export type MTTxnCount = v.InferOutput<typeof txnCount>;
 
 export type MTTxnsRes = v.InferOutput<typeof txnsResponse>;
 export type MTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
+export type MTContractTxnsRes = v.InferOutput<typeof contractTxnsResponse>;
+export type MTContractTxnCountRes = v.InferOutput<
+  typeof contractTxnCountResponse
+>;
 
 export default {
+  contractTxnCount: contractTxnCountResponse,
+  contractTxns: contractTxnsResponse,
   count: txnCountResponse,
   txns: txnsResponse,
 };

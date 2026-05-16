@@ -17,7 +17,7 @@ export const fetchMTTxns = cache(
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<MTTxnsRes>(
-      `/v3/mt-txns?${queryParams.toString()}`,
+      `/v3/mts/txns?${queryParams.toString()}`,
     );
     return resp;
   },
@@ -29,7 +29,7 @@ export const fetchMTTxnCount = cache(
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<MTTxnCountRes>(
-      `/v3/mt-txns/count?${queryParams.toString()}`,
+      `/v3/mts/txns/count?${queryParams.toString()}`,
     );
     return resp.data;
   },
