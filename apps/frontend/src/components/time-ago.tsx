@@ -11,5 +11,5 @@ type Props = {
 export const TimeAgo = ({ ns }: Props) => {
   const formatted = useMemo(() => (ns ? ageFormat(toMs(ns)) : null), [ns]);
 
-  return formatted;
+  return <span suppressHydrationWarning>{formatted}</span>;
 };
