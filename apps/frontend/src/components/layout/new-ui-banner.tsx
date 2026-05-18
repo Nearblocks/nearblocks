@@ -2,15 +2,30 @@
 
 import { ArrowUpRight, MessageSquareText } from 'lucide-react';
 
-import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { Button } from '@/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 
+// The Formbricks SDK has no "show survey by id" API — surveys are
+// fired by Action codes configured in the Formbricks dashboard.
+// In the dashboard, create an Action with this code, then link it to
+// survey id `cmpb5wrl8448lvv01fx5acdw0` (or whichever survey).
+const FEEDBACK_ACTION = 'beta_feedback';
+
 export const NewUiBanner = () => {
   const { t } = useLocale('layout');
   const legacyUiUrl = useConfig((state) => state.config.legacyUiUrl);
+  const formbricksEnvId = useConfig((state) => state.config.formbricksEnvId);
+
+  const onFeedback = async () => {
+    if (formbricksEnvId) {
+      const { default: formbricks } = await import('@formbricks/js');
+      await formbricks.track(FEEDBACK_ACTION);
+      return;
+    }
+    window.location.href = '/contact?subject=7';
+  };
 
   return (
     <Popover>
@@ -33,13 +48,14 @@ export const NewUiBanner = () => {
         <p className="text-muted-foreground text-body-xs px-2 pt-1 pb-2">
           {t('banner.newUi.message')}
         </p>
-        <Link
-          className="text-body-sm hover:bg-muted flex items-center justify-between rounded-md px-2 py-1.5"
-          href="/contact?subject=7"
+        <button
+          className="text-body-sm hover:bg-muted flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left"
+          onClick={onFeedback}
+          type="button"
         >
           <span>{t('banner.newUi.feedbackLink')}</span>
           <ArrowUpRight className="text-muted-foreground size-3.5" />
-        </Link>
+        </button>
         {legacyUiUrl && (
           <a
             className="text-body-sm hover:bg-muted flex items-center justify-between rounded-md px-2 py-1.5"
