@@ -173,13 +173,11 @@ export const Blocks = ({
                 fallback={<Skeleton className="w-40" />}
                 loading={loading || !blockCount}
               >
-                {() => (
-                  <>
-                    {t('total', {
-                      count: countFormat(blockCount?.count ?? 0),
-                    })}
-                  </>
-                )}
+                {() => {
+                  const count = blockCount?.count;
+                  if (!count || count === '0') return null;
+                  return <>{t('total', { count: countFormat(count) })}</>;
+                }}
               </SkeletonSlot>
             }
             loading={loading || !!blocks?.errors}

@@ -222,9 +222,10 @@ export const NFTTxns = ({
             >
               {() => {
                 const count = nftCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count) ? 'nfts.total' : 'nfts.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

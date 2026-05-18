@@ -204,9 +204,10 @@ export const FTTxns = ({
             >
               {() => {
                 const count = ftCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count) ? 'fts.total' : 'fts.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

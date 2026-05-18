@@ -184,9 +184,10 @@ export const StakingTxns = ({
             >
               {() => {
                 const count = stakingCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count) ? 'staking.total' : 'staking.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

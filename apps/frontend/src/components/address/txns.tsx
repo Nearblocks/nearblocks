@@ -203,9 +203,10 @@ export const Txns = ({
             >
               {() => {
                 const count = txnCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count) ? 'txns.total' : 'txns.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>
