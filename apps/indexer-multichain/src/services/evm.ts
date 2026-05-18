@@ -90,7 +90,12 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
   }
 
-  chainLastBlockTimestamp.set({ chain }, parseInt(block.timestamp, 16));
+  const blockTimestamp = parseInt(block.timestamp, 16);
+  // parseInt yields NaN if the upstream response omits the timestamp; skip
+  // the gauge update so the series is not poisoned with NaN.
+  if (Number.isFinite(blockTimestamp)) {
+    chainLastBlockTimestamp.set({ chain }, blockTimestamp);
+  }
 
   if (!block.transactions?.length) return;
 

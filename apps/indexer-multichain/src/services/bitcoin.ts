@@ -96,7 +96,11 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
   }
 
-  chainLastBlockTimestamp.set({ chain }, block.timestamp);
+  // Guard against missing timestamp on malformed RPC responses; skip the
+  // gauge update rather than throwing inside the block processor.
+  if (typeof block.timestamp === 'number' && Number.isFinite(block.timestamp)) {
+    chainLastBlockTimestamp.set({ chain }, block.timestamp);
+  }
 
   if (!block.tx?.length) return;
 
