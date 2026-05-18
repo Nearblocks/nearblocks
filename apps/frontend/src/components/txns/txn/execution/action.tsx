@@ -161,7 +161,7 @@ export const ReceiptAction = ({
               <>
                 {ENCODINGS.map(({ label, value }) => (
                   <Button
-                    className="border-0"
+                    className="cursor-pointer border-0"
                     key={value}
                     onClick={() => onEncodingClick(value)}
                     size="xs"

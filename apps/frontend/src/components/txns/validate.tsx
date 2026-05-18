@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, CircleCheckBig } from 'lucide-react';
+import { Check, ChevronDown, ListChecks } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
@@ -24,8 +24,13 @@ export const Validate = ({ tid }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="cursor-pointer" size="icon-sm" variant="outline">
-          <CircleCheckBig className="h-4 w-4" />
+        <Button
+          className="cursor-pointer gap-0.5 px-1.5"
+          size="icon-sm"
+          variant="outline"
+        >
+          <ListChecks className="size-4" />
+          <ChevronDown className="size-3.5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -37,7 +42,7 @@ export const Validate = ({ tid }: Props) => {
             target="_blank"
           >
             <span>{t('validate')}</span>
-            <span className="inline-flex size-4 items-center justify-center rounded-full bg-green-500">
+            <span className="inline-flex size-4 items-center justify-center rounded-full bg-green-400">
               <Check className="size-2.5 text-white" strokeWidth={3} />
             </span>
           </Link>
