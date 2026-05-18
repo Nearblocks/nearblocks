@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 import type { ActionReceipt, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
@@ -11,15 +11,17 @@ import { Action, argsRecord } from '../actions/action';
 import { ReceiptIcon } from '../actions/icon';
 import { AuroraArgsViewer } from './aurora';
 import { CodeViewer } from './code';
-import { deepUnescape, isAuroraAction } from './utils';
+import { RpcContext } from './context';
+import { deepUnescape, findRawArgs, isAuroraAction } from './utils';
 
-type Encoding = 'base64' | 'hex' | 'json' | 'utf8';
+type Encoding = 'base64' | 'hex' | 'json' | 'raw' | 'utf8';
 
 const ENCODINGS: { label: string; value: Encoding }[] = [
   { label: 'JSON', value: 'json' },
   { label: 'UTF-8', value: 'utf8' },
   { label: 'Hex', value: 'hex' },
   { label: 'Base64', value: 'base64' },
+  { label: 'Raw', value: 'raw' },
 ];
 
 const base64ToBytes = (b64: string): null | Uint8Array => {
@@ -88,12 +90,19 @@ const encodeArgs = (
 
 type Props = {
   action: ActionReceipt;
+  index: number;
   onlyArgs?: boolean;
   receipt: TxnReceipt;
 };
 
-export const ReceiptAction = ({ action, onlyArgs = false, receipt }: Props) => {
+export const ReceiptAction = ({
+  action,
+  index,
+  onlyArgs = false,
+  receipt,
+}: Props) => {
   const [encoding, setEncoding] = useState<Encoding>('json');
+  const { enableRpc, rpcData, rpcLoading } = useContext(RpcContext);
 
   const { args, argsBase64, hasArgs, method } = useMemo(() => {
     const args = argsRecord(action.args);
@@ -122,11 +131,20 @@ export const ReceiptAction = ({ action, onlyArgs = false, receipt }: Props) => {
 
   const isAurora = isAuroraAction(method, receipt.receiver_account_id);
   const showEncodingToggle = !!method && (!!argsBase64 || hasArgs);
+  const rawArgs = findRawArgs(rpcData, receipt.receipt_id, index);
+  const rawCode = rawArgs ?? (rpcLoading ? 'Loading...' : 'No data');
   const displayCode = showEncodingToggle
-    ? encodeArgs(encoding, argsBase64, args, hasArgs)
+    ? encoding === 'raw'
+      ? rawCode
+      : encodeArgs(encoding, argsBase64, args, hasArgs)
     : hasArgs
     ? JSON.stringify(deepUnescape(args), null, 2)
     : argsBase64;
+
+  const onEncodingClick = (value: Encoding) => {
+    setEncoding(value);
+    if (value === 'raw' && !rpcData) enableRpc();
+  };
 
   const codeBlock =
     isAurora && argsBase64 ? (
@@ -145,7 +163,7 @@ export const ReceiptAction = ({ action, onlyArgs = false, receipt }: Props) => {
                   <Button
                     className="border-0"
                     key={value}
-                    onClick={() => setEncoding(value)}
+                    onClick={() => onEncodingClick(value)}
                     size="xs"
                     variant={encoding === value ? 'secondary' : 'outline'}
                   >

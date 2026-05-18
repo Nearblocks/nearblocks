@@ -166,7 +166,13 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
   return (
     <div className="border-border bg-card mt-1 space-y-3 rounded-lg border p-3">
       {actions.map((action, i) => (
-        <ReceiptAction action={action} key={i} onlyArgs receipt={receipt} />
+        <ReceiptAction
+          action={action}
+          index={i}
+          key={i}
+          onlyArgs
+          receipt={receipt}
+        />
       ))}
 
       <Tabs defaultValue="output">

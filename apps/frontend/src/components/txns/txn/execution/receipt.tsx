@@ -60,6 +60,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
                     ).map((action, i) => (
                       <ReceiptAction
                         action={action}
+                        index={i}
                         key={i}
                         receipt={receipt!}
                       />

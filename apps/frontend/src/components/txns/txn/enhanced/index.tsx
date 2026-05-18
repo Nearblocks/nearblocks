@@ -14,9 +14,15 @@ type Props = {
   loading?: boolean;
   receiptsPromise?: Promise<null | TxnReceipt>;
   statsPromise?: Promise<null | Stats>;
+  tid?: string;
 };
 
-export const Enhanced = ({ loading, receiptsPromise, statsPromise }: Props) => {
+export const Enhanced = ({
+  loading,
+  receiptsPromise,
+  statsPromise,
+  tid,
+}: Props) => {
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
@@ -54,7 +60,11 @@ export const Enhanced = ({ loading, receiptsPromise, statsPromise }: Props) => {
           loading={loading || !receipts}
         >
           {() => (
-            <EnhancedPlan nearPrice={stats?.near_price} receipts={receipts!} />
+            <EnhancedPlan
+              nearPrice={stats?.near_price}
+              receipts={receipts!}
+              tid={tid}
+            />
           )}
         </SkeletonSlot>
       </CardContent>

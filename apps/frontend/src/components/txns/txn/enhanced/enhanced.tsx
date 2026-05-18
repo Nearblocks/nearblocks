@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import type { TxnReceipt } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
+import { useTxnStatus } from '@/hooks/use-rpc';
 import { Button } from '@/ui/button';
 
 import { RpcContext } from '../execution/context';
@@ -13,11 +14,19 @@ import { EnhancedTree } from './tree';
 type Props = {
   nearPrice?: null | string;
   receipts: TxnReceipt;
+  tid?: string;
 };
 
-export const EnhancedPlan = ({ nearPrice, receipts }: Props) => {
+export const EnhancedPlan = ({ nearPrice, receipts, tid }: Props) => {
   const { t } = useLocale('txns');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
+  const [rpcEnabled, setRpcEnabled] = useState(false);
+
+  const { data: rpcData, isLoading: rpcLoading } = useTxnStatus(
+    rpcEnabled && tid
+      ? { senderAccountId: receipts.predecessor_account_id, txHash: tid }
+      : null,
+  );
 
   const allKeys = useMemo(() => {
     const keys: string[] = [];
@@ -55,7 +64,14 @@ export const EnhancedPlan = ({ nearPrice, receipts }: Props) => {
   };
 
   return (
-    <RpcContext.Provider value={{ nearPrice }}>
+    <RpcContext.Provider
+      value={{
+        enableRpc: () => setRpcEnabled(true),
+        nearPrice,
+        rpcData,
+        rpcLoading,
+      }}
+    >
       <div className="flex w-full flex-col">
         <div className="hidden justify-end px-4 md:flex md:px-8">
           <Button
