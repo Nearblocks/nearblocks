@@ -928,7 +928,8 @@ g.highcharts-series,
 
 /* Various series-specific */
 .highcharts-area {
-  fill-opacity: 0.75;
+  fill: url(#highcharts-area-gradient-0);
+  fill-opacity: 1;
   stroke-width: 0;
 }
 
