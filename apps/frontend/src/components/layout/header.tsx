@@ -19,6 +19,8 @@ import {
   PopoverTrigger,
 } from '@/ui/popover';
 
+import { Badge } from '@/ui/badge';
+
 import { Menu } from './menu';
 import { MobileMenu } from './mobile-menu';
 import { NetworkSwitcher } from './network';
@@ -121,8 +123,14 @@ export const Header = () => {
       <Popover>
         <PopoverAnchor>
           <div className="container mx-auto flex h-14 items-center px-4">
-            <Link href="/">
+            <Link className="flex items-center gap-2" href="/">
               <Logo className="text-primary h-10" />
+              <Badge
+                className="text-body-xs px-1.5 py-0 tracking-wide uppercase"
+                variant="teal"
+              >
+                Beta
+              </Badge>
             </Link>
             <div className="text-headline-sm ml-auto flex gap-2">
               <Menu menu={menu} />

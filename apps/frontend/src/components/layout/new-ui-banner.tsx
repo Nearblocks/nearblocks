@@ -1,69 +1,57 @@
 'use client';
 
-import { X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowUpRight, MessageSquareText } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
-import { Alert, AlertDescription } from '@/ui/alert';
 import { Button } from '@/ui/button';
-
-const BANNER_DISMISSED_KEY = 'new-ui-banner-dismissed';
+import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
 
 export const NewUiBanner = () => {
   const { t } = useLocale('layout');
   const legacyUiUrl = useConfig((state) => state.config.legacyUiUrl);
-  const [dismissed, setDismissed] = useState(true);
-
-  useEffect(() => {
-    if (!legacyUiUrl) {
-      setDismissed(true);
-      return;
-    }
-
-    setDismissed(localStorage.getItem(BANNER_DISMISSED_KEY) === '1');
-  }, [legacyUiUrl]);
-
-  if (!legacyUiUrl || dismissed) return null;
-
-  const handleDismiss = () => {
-    localStorage.setItem(BANNER_DISMISSED_KEY, '1');
-    setDismissed(true);
-  };
 
   return (
-    <Alert className="bg-teal-background border-0 py-2 pr-2 pl-3">
-      <AlertDescription className="text-teal-foreground flex items-center justify-between gap-2">
-        <div className="flex grow flex-wrap items-center justify-center gap-x-1 gap-y-1">
-          <span className="text-center">{t('banner.newUi.message')}</span>
-          <Link
-            className="font-medium underline underline-offset-2"
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-4 bottom-4 z-50 size-10 cursor-pointer rounded-full shadow-lg"
+          size="icon"
+          variant="default"
+        >
+          <MessageSquareText className="size-4" />
+          <span className="sr-only">{t('banner.newUi.feedbackLink')}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        className="w-64 p-2"
+        side="top"
+        sideOffset={8}
+      >
+        <p className="text-muted-foreground text-body-xs px-2 pt-1 pb-2">
+          {t('banner.newUi.message')}
+        </p>
+        <Link
+          className="text-body-sm hover:bg-muted flex items-center justify-between rounded-md px-2 py-1.5"
+          href="/contact?subject=7"
+        >
+          <span>{t('banner.newUi.feedbackLink')}</span>
+          <ArrowUpRight className="text-muted-foreground size-3.5" />
+        </Link>
+        {legacyUiUrl && (
+          <a
+            className="text-body-sm hover:bg-muted flex items-center justify-between rounded-md px-2 py-1.5"
             href={legacyUiUrl}
             rel="noopener noreferrer"
             target="_blank"
           >
-            {t('banner.newUi.legacyLink')}
-          </Link>
-          <span>·</span>
-          <Link
-            className="font-medium underline underline-offset-2"
-            href="/contact?subject=7"
-          >
-            {t('banner.newUi.feedbackLink')}
-          </Link>
-        </div>
-        <Button
-          aria-label={t('banner.newUi.dismiss')}
-          className="text-teal-foreground"
-          onClick={handleDismiss}
-          size="icon-xs"
-          type="button"
-          variant="ghost"
-        >
-          <X />
-        </Button>
-      </AlertDescription>
-    </Alert>
+            <span>{t('banner.newUi.legacyLink')}</span>
+            <ArrowUpRight className="text-muted-foreground size-3.5" />
+          </a>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 };
