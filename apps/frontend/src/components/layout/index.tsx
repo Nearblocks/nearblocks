@@ -28,6 +28,26 @@ export const Layout = ({ children }: Props) => {
       {children}
       <Footer />
       <Formbricks />
+      <svg
+        aria-hidden
+        className="absolute size-0"
+        height="0"
+        width="0"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient
+            id="highcharts-area-gradient-0"
+            x1="0"
+            x2="0"
+            y1="0"
+            y2="1"
+          >
+            <stop offset="0" stopColor="#0f5e59" stopOpacity={0.8} />
+            <stop offset="1" stopColor="#0f5e59" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+      </svg>
     </>
   );
 };
