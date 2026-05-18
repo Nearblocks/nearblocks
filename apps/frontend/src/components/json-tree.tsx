@@ -33,13 +33,16 @@ const Primitive = ({ value }: { value: Json }) => {
   return null;
 };
 
+const MAX_DEPTH = 50;
+
 type NodeProps = {
+  depth?: number;
   isLast?: boolean;
   name?: string;
   value: Json;
 };
 
-const Node = ({ isLast = true, name, value }: NodeProps) => {
+const Node = ({ depth = 0, isLast = true, name, value }: NodeProps) => {
   const [open, setOpen] = useState(true);
   const isArr = Array.isArray(value);
   const isObj = isObject(value);
@@ -51,6 +54,18 @@ const Node = ({ isLast = true, name, value }: NodeProps) => {
       <Punct>: </Punct>
     </>
   );
+
+  if (collapsible && depth >= MAX_DEPTH) {
+    return (
+      <div className="leading-relaxed">
+        {label}
+        <span className="text-muted-foreground/60">
+          {isArr ? '[…]' : '{…}'}
+        </span>
+        {!isLast && <Punct>,</Punct>}
+      </div>
+    );
+  }
 
   if (!collapsible) {
     return (
@@ -115,6 +130,7 @@ const Node = ({ isLast = true, name, value }: NodeProps) => {
           <div className="ml-4">
             {items.map((it, i) => (
               <Node
+                depth={depth + 1}
                 isLast={i === items.length - 1}
                 key={it.key}
                 name={it.name}
