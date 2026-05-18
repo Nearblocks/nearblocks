@@ -18,7 +18,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@radix-ui/react-use-effect-event": "0.0.2",
     "eslint-config-custom-nextjs": "*",
     "eslint-config-custom-node": "*",
     "husky": "8.0.0",

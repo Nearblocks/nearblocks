@@ -183,6 +183,7 @@ export const address = {
     filterMethod: 'Method',
     latest: 'Latest {{count}} token transfers',
     total: 'More than {{count}} token transfers found',
+    totalExact: 'More than {{count}} token transfers found',
     viewAll: 'View all token transfers',
   },
   heading: 'NEAR Account:',
@@ -231,6 +232,7 @@ export const address = {
     filterMethod: 'Method',
     latest: 'Latest {{count}} MT transfers',
     total: 'More than {{count}} MT transfers found',
+    totalExact: 'More than {{count}} MT transfers found',
     viewAll: 'View all MT transfers',
   },
   nfts: {
@@ -249,6 +251,7 @@ export const address = {
     filterToken: 'NFT token',
     latest: 'Latest {{count}} NFT transfers',
     total: 'More than {{count}} NFT transfers found',
+    totalExact: 'More than {{count}} NFT transfers found',
     viewAll: 'View all NFT transfers',
   },
   overview: {
@@ -273,6 +276,7 @@ export const address = {
     filterTo: 'Account',
     latest: 'Latest {{count}} receipts',
     total: 'More than {{count}} receipts found',
+    totalExact: 'More than {{count}} receipts found',
     viewAll: 'View all receipts',
   },
   spam: 'Spam',
@@ -288,6 +292,7 @@ export const address = {
     filterMethod: 'Method',
     latest: 'Latest {{count}} staking txns',
     total: 'More than {{count}} staking txns found',
+    totalExact: 'More than {{count}} staking txns found',
     viewAll: 'View all staking txns',
   },
   tabs: {
@@ -318,6 +323,7 @@ export const address = {
     filterTo: 'Account',
     latest: 'Latest {{count}} transactions',
     total: 'More than {{count}} transactions found',
+    totalExact: 'More than {{count}} transactions found',
     viewAll: 'View all transactions',
   },
   validate: 'Validate Account',
