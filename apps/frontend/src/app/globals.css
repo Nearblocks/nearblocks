@@ -10,6 +10,7 @@
 
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f5;
+  --color-neutral-150: #ededed;
   --color-neutral-200: #e5e5e5;
   --color-neutral-300: #d4d4d4;
   --color-neutral-400: #a3a3a3;
@@ -85,7 +86,7 @@
   --color-lime-background: #0a6c2e1a;
   --color-lime-foreground: #0a6c2e;
 
-  --background: var(--color-neutral-100);
+  --background: color-mix(in oklch, var(--color-neutral-50) 92%, var(--color-teal-50));
   --foreground: var(--color-neutral-800);
   --card: var(--color-white-950);
   --card-foreground: var(--color-neutral-800);
@@ -140,7 +141,7 @@
   --color-lime-background: #b4f35a1a;
   --color-lime-foreground: rgb(180, 243, 90);
 
-  --background: var(--color-neutral-950);
+  --background: color-mix(in oklch, var(--color-neutral-950) 85%, var(--color-teal-900));
   --foreground: var(--color-neutral-50);
   --card: var(--color-neutral-800);
   --card-foreground: var(--color-neutral-50);
@@ -202,13 +203,13 @@
   --text-headline-2xl--font-weight: 500;
   --text-headline-3xl: 2rem;
   --text-headline-3xl--line-height: 2.5rem;
-  --text-headline-3xl--font-weight: 700;
+  --text-headline-3xl--font-weight: 500;
   --text-headline-4xl: 2.5rem;
   --text-headline-4xl--line-height: 3rem;
-  --text-headline-4xl--font-weight: 700;
+  --text-headline-4xl--font-weight: 500;
   --text-headline-5xl: 3rem;
   --text-headline-5xl--line-height: 3.75rem;
-  --text-headline-5xl--font-weight: 700;
+  --text-headline-5xl--font-weight: 500;
   --text-body-xs: 0.75rem;
   --text-body-xs--line-height: 1.125rem;
   --text-body-xs--font-weight: 400;
@@ -256,6 +257,7 @@
 
   --color-neutral-50: var(--color-neutral-50);
   --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-150: var(--color-neutral-150);
   --color-neutral-200: var(--color-neutral-200);
   --color-neutral-300: var(--color-neutral-300);
   --color-neutral-400: var(--color-neutral-400);
@@ -427,9 +429,6 @@
 
 .prism-code {
   color: var(--prism-text);
-  background: var(--prism-bg);
-  white-space: pre;
-  word-wrap: normal;
   tab-size: 4;
 }
 

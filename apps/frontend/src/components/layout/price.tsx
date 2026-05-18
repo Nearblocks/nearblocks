@@ -30,7 +30,9 @@ export const NearPrice = ({ loading = false, statsPromise }: Props) => {
       >
         {() => (
           <>
-            {currencyFormat(stats!.near_price)}{' '}
+            <span className="text-link">
+              {currencyFormat(stats!.near_price)}
+            </span>{' '}
             <PriceChange change={stats!.change_24h} />
           </>
         )}

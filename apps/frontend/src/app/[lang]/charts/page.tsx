@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 import { Charts } from '@/components/charts';
+import { PageHeading } from '@/components/page-heading';
 import { fetchDailyStats } from '@/data/charts';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -28,7 +29,7 @@ const ChartsPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+      <PageHeading apiTag="" title={t('title')} />
       <Charts statsPromise={statsPromise} />
     </>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { PriceChart } from '@/components/charts/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { fetchDailyStats } from '@/data/charts';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -29,7 +30,7 @@ const NearPricePage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('nearPrice.heading')}</h1>
+      <PageHeading apiTag="" title={t('nearPrice.heading')} />
       <ErrorSuspense fallback={<PriceChart loading />}>
         <PriceChart statsPromise={statsPromise} />
       </ErrorSuspense>

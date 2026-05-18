@@ -17,7 +17,7 @@ export const Footer = () => {
   const { t } = useLocale('layout');
 
   return (
-    <footer className="bg-card text-body-sm border-t">
+    <footer className="text-body-sm bg-neutral-100 dark:bg-neutral-900">
       <div className="container mx-auto px-4">
         <div className="flex flex-col flex-wrap justify-between gap-6 py-6 md:flex-row lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr]">
           <div className="flex basis-1/1 flex-col gap-4">

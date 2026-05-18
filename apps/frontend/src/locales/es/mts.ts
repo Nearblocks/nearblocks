@@ -15,7 +15,7 @@ export const mts = {
     method: 'Method',
     quantity: 'Quantity',
     token: 'Token',
-    total: 'A total of {{count}} mt token txns found',
+    total: 'More than {{count}} mt token txns found',
     txnHash: 'Transaction Hash',
   },
   transfersMeta: {

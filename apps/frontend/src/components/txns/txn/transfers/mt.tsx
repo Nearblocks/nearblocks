@@ -86,8 +86,8 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
             <TabsTrigger value="all">{t('transfer.allTransfers')}</TabsTrigger>
             <TabsTrigger value="net">{t('transfer.netTransfers')}</TabsTrigger>
           </TabsList>
-          <ScrollableList className="max-h-53">
-            <TabsContent className="flex flex-col gap-3 pt-3" value="all">
+          <ScrollableList className="max-h-60">
+            <TabsContent className="flex flex-col gap-2 pt-3" value="all">
               {ftLike.map((mt, i) => (
                 <div className="flex flex-wrap items-center gap-1" key={i}>
                   <TransferSummary
@@ -120,8 +120,8 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
               ))}
             </TabsContent>
           </ScrollableList>
-          <ScrollableList className="max-h-53">
-            <TabsContent className="flex flex-col gap-3 pt-3" value="net">
+          <ScrollableList className="max-h-60">
+            <TabsContent className="flex flex-col gap-2 pt-3" value="net">
               {netMts.map((net, i) => (
                 <div className="flex flex-wrap items-center gap-1" key={i}>
                   <AccountLink

@@ -8,14 +8,13 @@ import { MCStats, MCTxn, MCTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
-import { SkeletonSlot } from '@/components/skeleton';
+import { StatCard } from '@/components/stat-card';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
-import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 type Props = {
@@ -233,11 +232,14 @@ export const MultichainTxns = ({
     },
   ];
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const params =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `/multichain-txns?${params.toString()}`;
   };
 
@@ -252,19 +254,12 @@ export const MultichainTxns = ({
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statItems.map(({ label, value }) => (
-          <Card className="px-4 py-3" key={label}>
-            <p className="text-body-xs text-muted-foreground truncate uppercase">
-              {label}
-            </p>
-            <p className="text-headline-base mt-1">
-              <SkeletonSlot
-                fallback={<Skeleton className="h-5 w-32" />}
-                loading={loading || !mcStats}
-              >
-                {() => <>{value}</>}
-              </SkeletonSlot>
-            </p>
-          </Card>
+          <StatCard
+            key={label}
+            label={label}
+            loading={loading || !mcStats}
+            value={value}
+          />
         ))}
       </div>
       <Card>

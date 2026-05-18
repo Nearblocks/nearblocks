@@ -14,14 +14,12 @@ type Props = {
   loading?: boolean;
   receiptsPromise?: Promise<null | TxnReceipt>;
   statsPromise?: Promise<null | Stats>;
-  tid?: string;
 };
 
 export const Execution = ({
   loading,
   receiptsPromise,
   statsPromise,
-  tid,
 }: Props) => {
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
   const stats = !loading && statsPromise ? use(statsPromise) : null;
@@ -38,11 +36,7 @@ export const Execution = ({
           loading={loading || !receipts}
         >
           {() => (
-            <ExecutionPlan
-              nearPrice={stats?.near_price}
-              receipts={receipts!}
-              tid={tid}
-            />
+            <ExecutionPlan nearPrice={stats?.near_price} receipts={receipts!} />
           )}
         </SkeletonSlot>
       </CardContent>

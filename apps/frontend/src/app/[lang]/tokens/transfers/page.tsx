@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { FTTxns } from '@/components/address/fts';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { TokenTransfers } from '@/components/tokens/transfers';
 import {
   fetchFTTxnCount as fetchAddressFTTxnCount,
@@ -40,7 +41,7 @@ const TransfersPage = async ({ params, searchParams }: Props) => {
 
     return (
       <>
-        <h1 className="text-headline-lg mb-4">{t('transfers.title')}</h1>
+        <PageHeading apiTag="fts" title={t('transfers.title')} />
         <ErrorSuspense fallback={<FTTxns loading />}>
           <FTTxns
             address={account}
@@ -58,7 +59,7 @@ const TransfersPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('transfers.title')}</h1>
+      <PageHeading apiTag="fts" title={t('transfers.title')} />
       <ErrorSuspense fallback={<TokenTransfers loading />}>
         <TokenTransfers
           txnCountPromise={txnCountPromise}

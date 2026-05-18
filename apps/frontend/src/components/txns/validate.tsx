@@ -24,7 +24,7 @@ export const Validate = ({ tid }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon-xs" variant="secondary">
+        <Button className="cursor-pointer" size="icon-sm" variant="outline">
           <CircleCheckBig className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

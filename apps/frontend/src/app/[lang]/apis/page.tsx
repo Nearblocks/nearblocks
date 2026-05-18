@@ -21,10 +21,8 @@ export const generateMetadata = async ({
 const ApisPage = async () => {
   const plansPromise = fetchPlans();
   return (
-    <main className="flex flex-1 flex-col py-10">
-      <div className="container mx-auto px-4">
-        <Apis plansPromise={plansPromise} />
-      </div>
+    <main className="flex flex-1 flex-col">
+      <Apis plansPromise={plansPromise} />
     </main>
   );
 };

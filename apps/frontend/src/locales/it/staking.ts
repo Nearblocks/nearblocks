@@ -5,7 +5,7 @@ export const staking = {
     contract: 'Contract',
     empty: 'No staking txns found',
     method: 'Method',
-    total: 'A total of {{count}} staking txns found',
+    total: 'More than {{count}} staking txns found',
     txnHash: 'Transaction Hash',
   },
   meta: {

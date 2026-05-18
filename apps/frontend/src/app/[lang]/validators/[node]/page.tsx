@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { PageHeading } from '@/components/page-heading';
 import { RpcSelector } from '@/components/rpc';
 import { NodeDetails } from '@/components/validators/details';
 import { hasLocale, translator } from '@/locales/dictionaries';
@@ -27,10 +28,9 @@ const NodeDetailsPage = async ({ params }: Props) => {
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-headline-lg">{t('nodeTitle')}</h1>
+      <PageHeading apiTag="staking" title={t('nodeTitle')}>
         <RpcSelector />
-      </div>
+      </PageHeading>
       <NodeDetails node={node} />
     </>
   );

@@ -15,7 +15,6 @@ const ExecutionPage = async ({ params }: Props) => {
       <Execution
         receiptsPromise={receiptsPromise}
         statsPromise={statsPromise}
-        tid={tid}
       />
     </ErrorSuspense>
   );

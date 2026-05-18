@@ -10,6 +10,7 @@ import { Validate } from '@/components/address/validate';
 import { Copy } from '@/components/copy';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { ActiveLink } from '@/components/link';
+import { PageHeading } from '@/components/page-heading';
 import { RpcSelector } from '@/components/rpc';
 import { TabBadge, TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
@@ -63,27 +64,29 @@ const AddressLayout = async ({ children, params }: Props) => {
     <LocaleProvider dictionary={dictionary} locale={lang}>
       <main className="flex flex-1 flex-col pt-6 pb-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 wrap-anywhere">
-            <div>
-              <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
-                {t('heading')}{' '}
-                <span className="text-foreground">{address}</span>{' '}
+          <PageHeading
+            apiTag="accounts"
+            title={
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-muted-foreground">{t('heading')}</span>
+                <span>{address}</span>
                 <Copy text={address} />
                 <AccountQr address={address} />
-              </h1>
-            </div>
+              </span>
+            }
+          >
             <div className="flex items-center gap-2">
               <RpcSelector />
               <Validate address={address} />
             </div>
-          </div>
+          </PageHeading>
           <ErrorSuspense fallback={null}>
             <AccountAlerts
               accountPromise={accountPromise}
               contractPromise={contractPromise}
             />
           </ErrorSuspense>
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <ErrorSuspense fallback={<Overview loading />}>
               <Overview
                 balancePromise={balancePromise}

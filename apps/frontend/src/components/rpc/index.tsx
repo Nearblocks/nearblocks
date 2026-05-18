@@ -70,7 +70,7 @@ export const RpcSelector = () => {
     <>
       <DropdownMenu onOpenChange={setDropdownOpen} open={dropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <Button size="icon-xs" variant="secondary">
+          <Button className="cursor-pointer" size="icon-sm" variant="outline">
             <Globe className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>

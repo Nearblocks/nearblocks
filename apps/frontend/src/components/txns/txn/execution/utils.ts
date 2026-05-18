@@ -1,7 +1,3 @@
-import {
-  FinalExecutionOutcomeWithReceiptView,
-  RpcTransactionResponse,
-} from '@near-js/jsonrpc-types';
 import { deserialize } from 'borsh';
 import { decodeBase64, hexlify, Transaction } from 'ethers';
 
@@ -46,27 +42,6 @@ export const deepUnescape = (value: unknown): unknown => {
   }
 
   return value;
-};
-
-export const findRawArgs = (
-  rpcData: RpcTransactionResponse | undefined,
-  receiptId: string,
-  actionIndex: number,
-): null | string => {
-  const receipts = (rpcData as FinalExecutionOutcomeWithReceiptView)?.receipts;
-  if (!Array.isArray(receipts)) return null;
-
-  const receipt = receipts.find((r) => r.receiptId === receiptId);
-  const actionReceipt =
-    receipt?.receipt && 'Action' in receipt.receipt
-      ? receipt.receipt.Action
-      : null;
-  const action = actionReceipt?.actions?.[actionIndex];
-
-  if (!action || typeof action === 'string' || !('FunctionCall' in action))
-    return null;
-
-  return action.FunctionCall.args ?? null;
 };
 
 export const isAuroraAction = (

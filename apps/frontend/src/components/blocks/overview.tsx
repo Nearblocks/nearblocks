@@ -49,7 +49,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.blockHeight')}
             </ListLeft>
             <ListRight>
-              <p className="flex items-center gap-1">
+              <p className="flex h-7 items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-25" />}
                   loading={loading || !block}
@@ -79,7 +79,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.hash')}
             </ListLeft>
             <ListRight>
-              <p className="flex min-w-30 items-center gap-1">
+              <p className="flex h-7 min-w-30 items-center gap-1 whitespace-nowrap">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-70" />}
                   loading={loading || !block}
@@ -109,9 +109,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
-              <p>
+              <p className="flex h-7 items-center">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-60" />}
+                  fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !block}
                 >
                   {() => <LongDate ns={block!.block_timestamp} />}
@@ -130,7 +130,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.author')}
             </ListLeft>
             <ListRight>
-              <p className="flex items-center gap-1">
+              <p className="flex h-7 items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-30" />}
                   loading={loading || !block}
@@ -162,7 +162,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                   loading={loading || !block}
                 >
                   {() => (
-                    <>
+                    <span className="flex flex-wrap items-center gap-1.5">
                       <Badge asChild variant="teal">
                         <Link
                           className="text-link"
@@ -172,11 +172,19 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                             count: numberFormat(block!.transactions_agg.count),
                           })}
                         </Link>
-                      </Badge>{' '}
-                      {t('overview.receipts', {
-                        count: numberFormat(block!.receipts_agg.count),
-                      })}
-                    </>
+                      </Badge>
+                      <span className="text-muted-foreground">and</span>
+                      <Badge asChild variant="teal">
+                        <Link
+                          className="text-link"
+                          href={`/receipts?block=${block!.block_hash}`}
+                        >
+                          {t('overview.receipts', {
+                            count: numberFormat(block!.receipts_agg.count),
+                          })}
+                        </Link>
+                      </Badge>
+                    </span>
                   )}
                 </SkeletonSlot>
               </p>
@@ -203,9 +211,21 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                   fallback={<Skeleton className="w-25" />}
                   loading={loading || !block}
                 >
-                  {() => (
-                    <span>{gasFormat(block!.chunks_agg.gas_used)} Tgas</span>
-                  )}
+                  {() => {
+                    const used = Number(block!.chunks_agg.gas_used);
+                    const limit = Number(block!.chunks_agg.gas_limit);
+                    const utilization = limit > 0 ? (used / limit) * 100 : 0;
+                    return (
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span>
+                          {gasFormat(block!.chunks_agg.gas_used)} Tgas
+                        </span>
+                        <span className="text-muted-foreground text-body-sm">
+                          ({utilization.toFixed(2)}%)
+                        </span>
+                      </span>
+                    );
+                  }}
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -320,7 +340,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.parentHash')}
             </ListLeft>
             <ListRight>
-              <p className="flex min-w-30 items-center gap-1">
+              <p className="flex h-7 min-w-30 items-center gap-1 whitespace-nowrap">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-70" />}
                   loading={loading || !block}

@@ -31,7 +31,7 @@ export const blocks = {
     hash: 'Hash:',
     heading: 'Block',
     parentHash: 'Parent Hash:',
-    receipts: 'and {{count}} receipts',
+    receipts: '{{count}} receipts',
     testnetNotice: 'This is a Testnet block only.',
     timestamp: 'Timestamp:',
     transactions: '{{count}} transactions',
@@ -56,5 +56,5 @@ export const blocks = {
     timestamp: 'Date and time when this block was produced',
     txns: 'Number of transactions and receipts in this block',
   },
-  total: 'A total of {{count}} blocks found',
+  total: 'More than {{count}} blocks found',
 } as const;

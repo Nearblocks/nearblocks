@@ -12,11 +12,7 @@ const EnhancedPage = async ({ params }: Props) => {
 
   return (
     <ErrorSuspense fallback={<Enhanced loading />}>
-      <Enhanced
-        receiptsPromise={receiptsPromise}
-        statsPromise={statsPromise}
-        tid={tid}
-      />
+      <Enhanced receiptsPromise={receiptsPromise} statsPromise={statsPromise} />
     </ErrorSuspense>
   );
 };

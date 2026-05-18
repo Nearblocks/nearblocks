@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ActiveLink } from '@/components/link';
+import { PageHeading } from '@/components/page-heading';
 import { RpcSelector } from '@/components/rpc';
 import { TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
@@ -31,13 +32,12 @@ const TxnLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-headline-lg">{t('tid.title')}</h1>
+      <PageHeading apiTag="txns" title={t('tid.title')}>
         <div className="flex items-center gap-2">
           <RpcSelector />
           <Validate tid={tid} />
         </div>
-      </div>
+      </PageHeading>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
         <TabLinks>
           <TabLink asChild>

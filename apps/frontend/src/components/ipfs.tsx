@@ -279,6 +279,7 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
                       <CodeBlock
                         code={content}
                         language={getLanguage(file.name)}
+                        lineNumbers
                       />
                     </div>
                   </>

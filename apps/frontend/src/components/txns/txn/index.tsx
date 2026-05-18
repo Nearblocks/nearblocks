@@ -178,9 +178,9 @@ export const Overview = ({
               {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
-              <p>
+              <p className="flex h-7 items-center">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-60" />}
+                  fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !txn}
                 >
                   {() => <LongDate ns={txn!.block_timestamp} />}

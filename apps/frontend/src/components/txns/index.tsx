@@ -8,13 +8,19 @@ import { TxnCount, TxnListItem, TxnsRes, TxnStats } from 'nb-schemas';
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
+import { StatCard } from '@/components/stat-card';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { countFormat, nearFormat, numberFormat } from '@/lib/format';
+import {
+  countFormat,
+  isApproxCount,
+  nearFormat,
+  numberFormat,
+} from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -23,6 +29,7 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
+  showStats?: boolean;
   txnCountPromise?: Promise<null | TxnCount>;
   txnsPromise?: Promise<TxnsRes>;
   txnStatsPromise?: Promise<null | TxnStats>;
@@ -30,6 +37,7 @@ type Props = {
 
 export const Txns = ({
   loading,
+  showStats,
   txnCountPromise,
   txnsPromise,
   txnStatsPromise,
@@ -47,6 +55,7 @@ export const Txns = ({
       className: 'w-5',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-4 rounded-full" />,
     },
     {
       cell: (txn) => (
@@ -57,12 +66,15 @@ export const Txns = ({
           </Truncate>
         </Link>
       ),
+      csvLabel: 'Transaction Hash',
+      csvValue: (txn) => txn.transaction_hash,
       header: t('list.txnHash'),
       id: 'txn_hash',
+      skeletonWidth: 'w-36',
     },
     {
       cell: (txn) => (
-        <Badge variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0" variant="teal">
           <Truncate>
             <TruncateText
               className="max-w-20"
@@ -71,8 +83,11 @@ export const Txns = ({
           </Truncate>
         </Badge>
       ),
+      csvLabel: 'Method',
+      csvValue: (txn) => actionMethod(txn.actions),
       header: t('list.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-16 rounded-md" />,
     },
     {
       cell: (txn) => (
@@ -81,8 +96,16 @@ export const Txns = ({
           {nearFormat(txn.actions_agg?.deposit)}
         </span>
       ),
+      csvLabel: 'Deposit Value (NEAR)',
+      csvValue: (txn) => nearFormat(txn.actions_agg?.deposit),
       header: t('list.deposit'),
       id: 'deposit',
+      skeletonCell: (
+        <span className="flex items-center gap-1">
+          <Skeleton className="size-4 rounded-full" />
+          <Skeleton className="w-16" />
+        </span>
+      ),
     },
     {
       cell: (txn) => (
@@ -91,24 +114,39 @@ export const Txns = ({
           {nearFormat(txn.outcomes_agg?.transaction_fee)}
         </span>
       ),
+      csvLabel: 'Txn Fee (NEAR)',
+      csvValue: (txn) => nearFormat(txn.outcomes_agg?.transaction_fee),
       header: t('list.fee'),
       id: 'txn_fee',
+      skeletonCell: (
+        <span className="flex items-center gap-1">
+          <Skeleton className="size-4 rounded-full" />
+          <Skeleton className="w-16" />
+        </span>
+      ),
     },
     {
       cell: (txn) => <AccountLink account={txn.signer_account_id} />,
+      csvLabel: 'From',
+      csvValue: (txn) => txn.signer_account_id ?? '',
       header: t('list.from'),
       id: 'from',
+      skeletonWidth: 'w-32',
     },
     {
       cell: () => <TxnDirectionIcon />,
       className: 'w-12',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="size-5 rounded-md" />,
     },
     {
       cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
+      csvLabel: 'To',
+      csvValue: (txn) => txn.receiver_account_id ?? '',
       header: t('list.to'),
       id: 'to',
+      skeletonWidth: 'w-32',
     },
     {
       cell: (txn) => (
@@ -116,18 +154,24 @@ export const Txns = ({
           {numberFormat(txn.block?.block_height)}
         </Link>
       ),
+      csvLabel: 'Block',
+      csvValue: (txn) => txn.block?.block_height ?? '',
       enableFilter: true,
       filterName: 'block',
       filterPlaceholder: t('list.filterBlock'),
       header: t('list.block'),
       id: 'block',
+      skeletonWidth: 'w-20',
     },
     {
       cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Block Timestamp',
+      csvValue: (txn) => txn.block?.block_timestamp ?? '',
       header: <TimestampToggle />,
       id: 'age',
+      skeletonWidth: 'w-24',
     },
   ];
 
@@ -141,27 +185,37 @@ export const Txns = ({
     router.push(`/txns?${params.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const params =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `/txns?${params.toString()}`;
   };
 
   const statItems = [
     {
+      href: '/charts/txns',
       label: t('stats.txns'),
+      skeletonWidth: 'w-24',
       value: numberFormat(txnStats?.txns),
     },
     {
+      href: '/charts/txns',
       label: t('stats.peakTps'),
+      skeletonWidth: 'w-12',
       value: txnStats
         ? numberFormat(txnStats.peak_tps, { maximumFractionDigits: 2 })
         : null,
     },
     {
+      href: '/charts/txn-fee',
       label: t('stats.gasFee'),
+      skeletonIcon: true,
+      skeletonWidth: 'w-20',
       value: txnStats ? (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
@@ -170,7 +224,10 @@ export const Txns = ({
       ) : null,
     },
     {
+      href: '/charts/txn-fee',
       label: t('stats.avgGasFee'),
+      skeletonIcon: true,
+      skeletonWidth: 'w-24',
       value: txnStats ? (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
@@ -182,28 +239,29 @@ export const Txns = ({
 
   return (
     <>
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {statItems.map(({ label, value }) => (
-          <Card className="px-4 py-3" key={label}>
-            <p className="text-body-xs text-muted-foreground truncate uppercase">
-              {label}
-            </p>
-            <p className="text-headline-base mt-1">
-              <SkeletonSlot
-                fallback={<Skeleton className="h-5 w-32" />}
+      {showStats && (
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {statItems.map(
+            ({ href, label, skeletonIcon, skeletonWidth, value }) => (
+              <StatCard
+                href={href}
+                key={label}
+                label={label}
                 loading={loading || !txnStats}
-              >
-                {() => <>{value}</>}
-              </SkeletonSlot>
-            </p>
-          </Card>
-        ))}
-      </div>
+                skeletonIcon={skeletonIcon}
+                skeletonWidth={skeletonWidth}
+                value={value}
+              />
+            ),
+          )}
+        </div>
+      )}
       <Card>
         <CardContent className="text-body-sm p-0">
           <DataTable
             columns={columns}
             data={txns?.data}
+            downloadFilename="nearblocks-txns"
             emptyMessage={t('list.empty')}
             getRowKey={(txn) => txn.transaction_hash}
             header={
@@ -211,13 +269,13 @@ export const Txns = ({
                 fallback={<Skeleton className="w-40" />}
                 loading={loading || !txnCount}
               >
-                {() => (
-                  <>
-                    {t('list.total', {
-                      count: countFormat(txnCount?.count ?? 0),
-                    })}
-                  </>
-                )}
+                {() => {
+                  const count = txnCount?.count;
+                  return t(
+                    isApproxCount(count) ? 'list.total' : 'list.totalExact',
+                    { count: countFormat(count ?? 0) },
+                  );
+                }}
               </SkeletonSlot>
             }
             loading={loading || !!txns?.errors}

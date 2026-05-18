@@ -14,7 +14,12 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { countFormat, nearFormat, numberFormat } from '@/lib/format';
+import {
+  countFormat,
+  isApproxCount,
+  nearFormat,
+  numberFormat,
+} from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -63,7 +68,7 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Badge variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0" variant="teal">
           <Truncate>
             <TruncateText
               className="max-w-20"
@@ -137,11 +142,14 @@ export const Receipts = ({
     router.push(`/receipts?${params.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const params =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `/receipts?${params.toString()}`;
   };
 
@@ -158,13 +166,13 @@ export const Receipts = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !receiptCount}
             >
-              {() => (
-                <>
-                  {t('list.total', {
-                    count: countFormat(receiptCount?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = receiptCount?.count;
+                return t(
+                  isApproxCount(count) ? 'list.total' : 'list.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!receipts?.errors}

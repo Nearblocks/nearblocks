@@ -42,7 +42,7 @@ export const Overview = ({
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">
+        <CardTitle className="text-headline-base">
           {t('overview.title')}
         </CardTitle>
       </CardHeader>
@@ -55,9 +55,15 @@ export const Overview = ({
                 <NearCircle className="size-4" />{' '}
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={loading || !balance}
+                  loading={!!loading}
                 >
-                  {() => <>{nearFormat(balance!.amount)}</>}
+                  {() =>
+                    balance ? (
+                      <>{nearFormat(balance.amount)}</>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -66,20 +72,26 @@ export const Overview = ({
             <ListItem>
               <ListLeft className="min-w-20">{t('overview.value')}</ListLeft>
               <ListRight>
-                <p className="flex items-center gap-1">
+                <p className="flex flex-wrap items-center gap-1">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-20" />}
-                    loading={loading || !balance || !stats}
+                    loading={!!loading}
                   >
-                    {() => (
-                      <>
-                        {nearFiatFormat(balance!.amount, stats!.near_price)}{' '}
-                        <span className="text-muted-foreground flex items-center gap-1">
-                          @{currencyFormat(stats!.near_price)} /
-                          <NearCircle className="size-4" />
-                        </span>
-                      </>
-                    )}
+                    {() =>
+                      balance && stats ? (
+                        <>
+                          <span>
+                            {nearFiatFormat(balance.amount, stats.near_price)}
+                          </span>
+                          <span className="text-muted-foreground inline-flex items-center gap-1">
+                            @{currencyFormat(stats.near_price)} /
+                            <NearCircle className="size-4" />
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )
+                    }
                   </SkeletonSlot>
                 </p>
               </ListRight>

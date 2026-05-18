@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { RpcSelector } from '@/components/rpc';
 import { Validators } from '@/components/validators';
 import { fetchBlocks } from '@/data/home';
@@ -35,10 +36,9 @@ const ValidatorsPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-headline-lg">{t('title')}</h1>
+      <PageHeading apiTag="staking" title={t('title')}>
         <RpcSelector />
-      </div>
+      </PageHeading>
       <ErrorSuspense fallback={<Validators loading />}>
         <Validators
           latestBlocksPromise={latestBlocksPromise}

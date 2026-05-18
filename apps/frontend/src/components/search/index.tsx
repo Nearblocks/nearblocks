@@ -106,16 +106,13 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
             startTransition={startTransition}
           />
         </ButtonGroup>
-        <kbd className="text-muted-foreground bg-muted hidden size-6 items-center justify-center rounded-md font-mono text-xs md:inline-flex">
-          /
-        </kbd>
         <ButtonGroup className={size === 'lg' ? 'pr-2' : 'pr-1'}>
           <Button
             className={cn('rounded-lg', size === 'lg' && 'w-9')}
             disabled={isPending}
             size={size === 'lg' ? 'icon-sm' : 'icon-xs'}
             type="submit"
-            variant="secondary"
+            variant="default"
           >
             {isPending ? (
               <Spinner className="size-4" />

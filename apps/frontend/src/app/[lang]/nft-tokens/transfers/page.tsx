@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { NFTTxns } from '@/components/address/nfts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { NftTokenTransfers } from '@/components/nft-tokens/transfers';
+import { PageHeading } from '@/components/page-heading';
 import {
   fetchNFTTxnCount as fetchAddressNFTTxnCount,
   fetchNFTTxns as fetchAddressNFTTxns,
@@ -40,7 +41,7 @@ const NftTransfersPage = async ({ params, searchParams }: Props) => {
 
     return (
       <>
-        <h1 className="text-headline-lg mb-4">{t('transfers.heading')}</h1>
+        <PageHeading apiTag="nfts" title={t('transfers.heading')} />
         <ErrorSuspense fallback={<NFTTxns loading />}>
           <NFTTxns
             address={account}
@@ -58,7 +59,7 @@ const NftTransfersPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('transfers.heading')}</h1>
+      <PageHeading apiTag="nfts" title={t('transfers.heading')} />
       <ErrorSuspense fallback={<NftTokenTransfers loading />}>
         <NftTokenTransfers
           txnCountPromise={txnCountPromise}

@@ -56,5 +56,5 @@ export const blocks = {
     timestamp: 'Date and time when this block was produced',
     txns: 'Number of transactions and receipts in this block',
   },
-  total: 'A total of {{count}} blocks found',
+  total: 'More than {{count}} blocks found',
 } as const;

@@ -55,7 +55,8 @@ export const txns = {
     from: 'From',
     method: 'Method',
     to: 'To',
-    total: 'A total of {{count}} transactions found',
+    total: 'More than {{count}} transactions found',
+    totalExact: 'More than {{count}} transactions found',
     txnHash: 'Transaction Hash',
   },
   meta: {
@@ -143,6 +144,7 @@ export const txns = {
     title: 'NEAR Transaction {{tid}}',
   },
   title: 'Latest NEAR Protocol Transactions',
+  titleByBlock: 'Transactions in Block',
   transfer: {
     allTransfers: 'All Transfers',
     burn: 'Burn',

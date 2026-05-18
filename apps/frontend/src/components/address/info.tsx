@@ -29,10 +29,10 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">{t('info.title')}</CardTitle>
+        <CardTitle className="text-headline-base">{t('info.title')}</CardTitle>
       </CardHeader>
       <CardContent className="px-3">
-        <List pairsPerRow={2}>
+        <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-30">{t('info.stakedBalance')}</ListLeft>
             <ListRight>
@@ -40,9 +40,15 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
                 <NearCircle className="size-4" />{' '}
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={loading || !balance || !balance?.amount_staked}
+                  loading={!!loading}
                 >
-                  {() => <>{nearFormat(balance!.amount_staked)}</>}
+                  {() =>
+                    balance?.amount_staked ? (
+                      <>{nearFormat(balance.amount_staked)}</>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -53,35 +59,43 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
               <p className="flex items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={loading || !balance || !balance?.storage_usage}
+                  loading={!!loading}
                 >
-                  {() => <>{bytesFormat(balance!.storage_usage)}</>}
+                  {() =>
+                    balance?.storage_usage ? (
+                      <>{bytesFormat(balance.storage_usage)}</>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
           </ListItem>
           <ListItem>
             <ListLeft className="min-w-30">{t('info.created')}</ListLeft>
-            <ListRight className="col-span-2">
+            <ListRight>
               <p className="min-w-30">
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={
-                    loading || !account || !account?.created?.block_timestamp
-                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <>
-                      <TimeAgo ns={account!.created.block_timestamp} />{' '}
-                      {t('info.atTxn')}{' '}
-                      <Link
-                        className="text-link inline-block w-30 truncate align-middle"
-                        href={`/txns/${account!.created.transaction_hash}`}
-                      >
-                        {account!.created.transaction_hash}
-                      </Link>
-                    </>
-                  )}
+                  {() =>
+                    account?.created?.block_timestamp ? (
+                      <>
+                        <TimeAgo ns={account.created.block_timestamp} />{' '}
+                        {t('info.atTxn')}{' '}
+                        <Link
+                          className="text-link inline-block w-30 truncate align-middle"
+                          href={`/txns/${account.created.transaction_hash}`}
+                        >
+                          {account.created.transaction_hash}
+                        </Link>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>

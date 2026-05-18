@@ -20,7 +20,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { countFormat, nearFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, nearFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -63,11 +63,14 @@ export const StakingTxns = ({
     router.push(`${base}?${p.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const p = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const p =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `${base}?${p.toString()}`;
   };
 
@@ -179,21 +182,13 @@ export const StakingTxns = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !stakingCount}
             >
-              {() => (
-                <>
-                  {basePath ? (
-                    t('staking.total', {
-                      count: countFormat(stakingCount?.count ?? 0),
-                    })
-                  ) : staking?.data?.length ? (
-                    t('staking.latest', {
-                      count: numberFormat(staking.data.length),
-                    })
-                  ) : (
-                    <span>&nbsp;</span>
-                  )}
-                </>
-              )}
+              {() => {
+                const count = stakingCount?.count;
+                return t(
+                  isApproxCount(count) ? 'staking.total' : 'staking.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!staking?.errors}

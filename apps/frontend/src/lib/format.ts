@@ -40,11 +40,14 @@ export const countFormat = (
 ) => {
   if (value === undefined || value === null) return '';
 
-  const hasApproxSuffix = typeof value === 'string' && value.endsWith('+');
-  const rawValue = hasApproxSuffix ? value.slice(0, -1) : value;
+  const isApprox = typeof value === 'string' && value.endsWith('+');
+  const rawValue = isApprox ? value.slice(0, -1) : value;
 
-  return `${numberFormat(rawValue, options)}${hasApproxSuffix ? '+' : ''}`;
+  return `${numberFormat(rawValue, options)}${isApprox ? '+' : ''}`;
 };
+
+export const isApproxCount = (value: NumberFormat): boolean =>
+  typeof value === 'string' && value.endsWith('+');
 
 export const nearFormat = (
   yoctoNear: BigSource | null | undefined,

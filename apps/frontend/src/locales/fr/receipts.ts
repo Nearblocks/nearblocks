@@ -8,7 +8,7 @@ export const receipts = {
     method: 'Method',
     receiptId: 'Receipt ID',
     to: 'To',
-    total: 'A total of {{count}} receipts found',
+    total: 'More than {{count}} receipts found',
   },
   meta: {
     description:

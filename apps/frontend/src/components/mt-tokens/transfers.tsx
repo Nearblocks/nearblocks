@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
 import { MTTxn, MTTxnCount, MTTxnsRes } from 'nb-schemas';
@@ -13,7 +13,8 @@ import { MTLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat } from '@/lib/format';
+import { pathnameWithoutLocale } from '@/lib/locale';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -35,6 +36,7 @@ export const MtTokenTransfers = ({
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const columns: DataTableColumnDef<MTTxn>[] = [
     {
@@ -60,7 +62,7 @@ export const MtTokenTransfers = ({
     },
     {
       cell: (mt) => (
-        <Badge variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0" variant="teal">
           <Truncate>
             <TruncateText className="max-w-20" text={mt.cause} />
           </Truncate>
@@ -139,12 +141,16 @@ export const MtTokenTransfers = ({
     },
   ];
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
-    return `/mt-tokens/transfers?${params.toString()}`;
+  const basePath = pathnameWithoutLocale(pathname ?? '/mt-tokens/transfers');
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const params =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
+    return `${basePath}?${params.toString()}`;
   };
 
   return (
@@ -160,13 +166,15 @@ export const MtTokenTransfers = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !txnCount}
             >
-              {() => (
-                <>
-                  {t('transfers.total', {
-                    count: countFormat(txnCount?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = txnCount?.count;
+                return t(
+                  isApproxCount(count)
+                    ? 'transfers.total'
+                    : 'transfers.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!txns?.errors}
