@@ -19,10 +19,13 @@ export const NewUiBanner = () => {
   const formbricksEnvId = useConfig((state) => state.config.formbricksEnvId);
 
   const onFeedback = async () => {
-    if (formbricksEnvId) {
-      const { default: formbricks } = await import('@formbricks/js');
-      await formbricks.track(FEEDBACK_ACTION);
-      return;
+    if (formbricksEnvId && typeof window !== 'undefined' && window.formbricks) {
+      try {
+        await window.formbricks.track(FEEDBACK_ACTION);
+        return;
+      } catch (err) {
+        console.warn('Formbricks track failed', err);
+      }
     }
     window.location.href = '/contact?subject=7';
   };
