@@ -8,6 +8,8 @@ export const multichain = {
     notIndexed: 'Destination network not indexed',
     receiptId: 'Receipt ID',
     sourceTxn: 'Source Txn Hash',
+    total: 'More than {{count}} multichain transactions found',
+    totalExact: 'More than {{count}} multichain transactions found',
   },
   meta: {
     description:

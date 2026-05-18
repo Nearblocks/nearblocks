@@ -1,6 +1,14 @@
 import { cache } from 'react';
 
-import { MCStats, MCStatsRes, MCTxnsReq, MCTxnsRes } from 'nb-schemas';
+import {
+  MCStats,
+  MCStatsRes,
+  MCTxnCount,
+  MCTxnCountReq,
+  MCTxnCountRes,
+  MCTxnsReq,
+  MCTxnsRes,
+} from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
@@ -19,5 +27,23 @@ export const fetchMCTxns = cache(
       `/v3/multichain/signatures?${queryParams.toString()}`,
     );
     return resp;
+  },
+);
+
+export const fetchMCTxnCount = cache(
+  async (params: SearchParams): Promise<MCTxnCount | null> => {
+    const keys: (keyof MCTxnCountReq)[] = [
+      'account',
+      'address',
+      'before_ts',
+      'chain',
+      'txn',
+    ];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<MCTxnCountRes>(
+      `/v3/multichain/signatures/count?${queryParams.toString()}`,
+    );
+    return resp.data;
   },
 );

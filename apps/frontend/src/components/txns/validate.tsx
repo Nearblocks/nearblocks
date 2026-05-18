@@ -1,6 +1,6 @@
 'use client';
 
-import { CircleCheckBig } from 'lucide-react';
+import { Check, CircleCheckBig } from 'lucide-react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
@@ -29,13 +29,17 @@ export const Validate = ({ tid }: Props) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link
+            className="flex items-center gap-2"
             href={`https://nearvalidate.org/txns/${tid}?network=${network}`}
             rel="noopener noreferrer"
             target="_blank"
           >
-            {t('validate')}
+            <span>{t('validate')}</span>
+            <span className="bg-lime-foreground inline-flex size-4 items-center justify-center rounded-full">
+              <Check className="size-2.5 text-white" strokeWidth={3} />
+            </span>
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

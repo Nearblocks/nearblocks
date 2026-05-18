@@ -4,22 +4,25 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { MCStats, MCTxn, MCTxnsRes } from 'nb-schemas';
+import { MCStats, MCTxn, MCTxnCount, MCTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
+import { SkeletonSlot } from '@/components/skeleton';
 import { StatCard } from '@/components/stat-card';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 type Props = {
   loading?: boolean;
   mcStatsPromise?: Promise<MCStats | null>;
+  txnCountPromise?: Promise<MCTxnCount | null>;
   txnsPromise?: Promise<MCTxnsRes>;
 };
 
@@ -111,12 +114,14 @@ const ChainIcon = ({ icon, name }: { icon: string; name: string }) => (
 export const MultichainTxns = ({
   loading,
   mcStatsPromise,
+  txnCountPromise,
   txnsPromise,
 }: Props) => {
   const { t } = useLocale('multichain');
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
   const mcStats = !loading && mcStatsPromise ? use(mcStatsPromise) : null;
+  const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const columns: DataTableColumnDef<MCTxn>[] = [
     {
@@ -269,6 +274,20 @@ export const MultichainTxns = ({
             data={txns?.data}
             emptyMessage={t('list.empty')}
             getRowKey={(txn) => `${txn.receipt_id}-${txn.event_index}`}
+            header={
+              <SkeletonSlot
+                fallback={<Skeleton className="w-40" />}
+                loading={loading || !txnCount}
+              >
+                {() => {
+                  const count = txnCount?.count;
+                  return t(
+                    isApproxCount(count) ? 'list.total' : 'list.totalExact',
+                    { count: countFormat(count ?? 0) },
+                  );
+                }}
+              </SkeletonSlot>
+            }
             loading={loading || !!txns?.errors}
             onPaginationNavigate={onPaginate}
             pagination={txns?.meta}
