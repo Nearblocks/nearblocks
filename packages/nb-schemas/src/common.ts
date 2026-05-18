@@ -49,16 +49,13 @@ export const jsonSchema: v.GenericSchema<JsonData> = v.lazy(() =>
   ]),
 );
 
-export const limitSchema = v.optional(
-  v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)),
-  25,
-);
+export const limit = (max = 100) =>
+  v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(max));
+
+export const limitSchema = v.optional(limit(100), 25);
 
 export const limitSchemaMax = (max = 100) =>
-  v.optional(
-    v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(max)),
-    max < 25 ? max : 25,
-  );
+  v.optional(limit(100), max < 25 ? max : 25);
 
 export const cursorSchema = v.optional(v.pipe(v.string(), v.base64()));
 

@@ -7,6 +7,8 @@ export default {
   assets: {
     ftCount: sql('queries/accounts/assets/ftCount.sql'),
     fts: sql('queries/accounts/assets/fts.sql'),
+    mtCount: sql('queries/accounts/assets/mtCount.sql'),
+    mts: sql('queries/accounts/assets/mts.sql'),
     nftCount: sql('queries/accounts/assets/nftCount.sql'),
     nfts: sql('queries/accounts/assets/nfts.sql'),
   },

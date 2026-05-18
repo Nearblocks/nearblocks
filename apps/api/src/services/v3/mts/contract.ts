@@ -1,6 +1,10 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
+  MTContractHolderCount,
+  MTContractHolderCountReq,
+  MTContractHolders,
+  MTContractHoldersReq,
   MTContractTxnCountReq,
   MTContractTxnsReq,
   MTTxn,
@@ -148,4 +152,60 @@ const txnCount = responseHandler(
   },
 );
 
-export default { txnCount, txns };
+const holders = responseHandler(
+  response.contractHolders,
+  async (req: RequestValidator<MTContractHoldersReq>) => {
+    const contract = req.validator.contract;
+    const token = req.validator.token;
+    const limit = req.validator.limit;
+    const next = req.validator.next
+      ? cursors.decode(request.contractHoldersCursor, req.validator.next)
+      : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.contractHoldersCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const accountDirection = prev ? 'desc' : 'asc';
+    const cursor = prev || next;
+
+    const data = await dbEvents.manyOrNone<MTContractHolders>(sql.holders, {
+      accountDirection,
+      contract,
+      cursor: {
+        account: cursor?.account,
+        amount: cursor?.amount,
+      },
+      direction,
+      limit: limit + 1,
+      token: token ?? null,
+    });
+
+    return paginateData(
+      data,
+      limit,
+      direction,
+      (holder) => ({
+        account: holder.account,
+        amount: holder.amount,
+      }),
+      !!cursor,
+    );
+  },
+);
+
+const holderCount = responseHandler(
+  response.contractHolderCount,
+  async (req: RequestValidator<MTContractHolderCountReq>) => {
+    const contract = req.validator.contract;
+    const token = req.validator.token;
+
+    const data = await dbEvents.one<MTContractHolderCount>(sql.holderCount, {
+      contract,
+      token: token ?? null,
+    });
+
+    return { data };
+  },
+);
+
+export default { holderCount, holders, txnCount, txns };

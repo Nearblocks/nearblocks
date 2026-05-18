@@ -3,6 +3,10 @@ import type {
   AccountAssetFTCount,
   AccountAssetFTCountReq,
   AccountAssetFTsReq,
+  AccountAssetMT,
+  AccountAssetMTCount,
+  AccountAssetMTCountReq,
+  AccountAssetMTsReq,
   AccountAssetNFT,
   AccountAssetNFTCount,
   AccountAssetNFTCountReq,
@@ -126,4 +130,54 @@ const nftCount = responseHandler(
   },
 );
 
-export default { ftCount, fts, nftCount, nfts };
+const mts = responseHandler(
+  response.mts,
+  async (req: RequestValidator<AccountAssetMTsReq>) => {
+    const account = req.validator.account;
+    const limit = req.validator.limit;
+    const next = req.validator.next
+      ? cursors.decode(request.mtsCursor, req.validator.next)
+      : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.mtsCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
+
+    const data = await dbEvents.manyOrNone<AccountAssetMT>(sql.assets.mts, {
+      account,
+      cursor: {
+        contract: cursor?.contract,
+        token: cursor?.token,
+      },
+      direction,
+      limit: limit + 1,
+    });
+
+    return paginateData(
+      data,
+      limit,
+      direction,
+      (mt) => ({
+        contract: mt.contract,
+        token: mt.token,
+      }),
+      !!cursor,
+    );
+  },
+);
+
+const mtCount = responseHandler(
+  response.mtCount,
+  async (req: RequestValidator<AccountAssetMTCountReq>) => {
+    const account = req.validator.account;
+
+    const count = await dbEvents.one<AccountAssetMTCount>(sql.assets.mtCount, {
+      account,
+    });
+
+    return { data: count };
+  },
+);
+
+export default { ftCount, fts, mtCount, mts, nftCount, nfts };

@@ -34,11 +34,40 @@ const nftsCursor = v.object({
   token: v.string(),
 });
 
+const mts = v.object({
+  account: v.string(),
+  limit: limitSchemaMax(24),
+  next: cursorSchema,
+  prev: cursorSchema,
+});
+
+const mtCount = v.object({
+  account: v.string(),
+});
+
+const mtsCursor = v.object({
+  contract: v.string(),
+  token: v.string(),
+});
+
 export type AccountAssetFTsReq = v.InferOutput<typeof fts>;
 export type AccountAssetFTCountReq = v.InferOutput<typeof ftCount>;
 export type AccountAssetFTsCursor = v.InferOutput<typeof ftsCursor>;
 export type AccountAssetNFTsReq = v.InferOutput<typeof nfts>;
 export type AccountAssetNFTCountReq = v.InferOutput<typeof nftCount>;
 export type AccountAssetNFTsCursor = v.InferOutput<typeof nftsCursor>;
+export type AccountAssetMTsReq = v.InferOutput<typeof mts>;
+export type AccountAssetMTCountReq = v.InferOutput<typeof mtCount>;
+export type AccountAssetMTsCursor = v.InferOutput<typeof mtsCursor>;
 
-export default { ftCount, fts, ftsCursor, nftCount, nfts, nftsCursor };
+export default {
+  ftCount,
+  fts,
+  ftsCursor,
+  mtCount,
+  mts,
+  mtsCursor,
+  nftCount,
+  nfts,
+  nftsCursor,
+};

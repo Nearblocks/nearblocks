@@ -134,6 +134,70 @@ const routes = (route: Router) => {
     validate(request.nftCount),
     service.nftCount,
   );
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/assets/mts:
+   *   get:
+   *     summary: List account MT balances
+   *     tags:
+   *       - Accounts
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: next
+   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: prev
+   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account/assets/mts', validate(request.mts), service.mts);
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/assets/mts/count:
+   *   get:
+   *     summary: Get account MT balances count
+   *     x-internal: true
+   *     tags:
+   *       - Accounts
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:account/assets/mts/count',
+    internalOnly,
+    validate(request.mtCount),
+    service.mtCount,
+  );
 };
 
 export default routes;

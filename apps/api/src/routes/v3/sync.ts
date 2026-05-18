@@ -19,6 +19,12 @@ const routes = (app: Router) => {
     service.nftHolders,
   );
   app.get(
+    '/sync/status/mt-holders',
+    bearerAuth,
+    rateLimiter,
+    service.mtHolders,
+  );
+  app.get(
     '/sync/status/indexer-balance',
     bearerAuth,
     rateLimiter,
