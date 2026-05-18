@@ -181,7 +181,7 @@ export const TokenAmount = ({
   const display = hideSign ? formatted.replace(/^-/, '') : formatted;
 
   return +amount > 0 ? (
-    <span className={cn('text-lime-foreground', className)}>
+    <span className={cn('text-primary', className)}>
       {!hideSign && '+'}
       {display}
     </span>

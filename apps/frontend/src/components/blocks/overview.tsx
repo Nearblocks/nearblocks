@@ -31,7 +31,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
 
   return (
     <Card>
-      <CardContent className="px-3 py-3">
+      <CardContent className="px-2 py-2">
         {network !== 'mainnet' && (
           <p className="text-red-foreground px-3 py-2">
             [{t('overview.testnetNotice')}]
