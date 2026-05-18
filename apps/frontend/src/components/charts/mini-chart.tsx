@@ -23,6 +23,36 @@ export const MiniChart = ({ children, height = 220 }: Props) => {
         styledMode: true,
       },
       credits: { enabled: false },
+      defs: {
+        areaGradient0: {
+          attributes: {
+            id: 'highcharts-area-gradient-0',
+            x1: 0,
+            x2: 0,
+            y1: 0,
+            y2: 1,
+          },
+          children: [
+            {
+              attributes: {
+                offset: 0,
+                'stop-color': '#0f5e59',
+                'stop-opacity': 0.8,
+              },
+              tagName: 'stop',
+            },
+            {
+              attributes: {
+                offset: 1,
+                'stop-color': '#0f5e59',
+                'stop-opacity': 0,
+              },
+              tagName: 'stop',
+            },
+          ],
+          tagName: 'linearGradient',
+        },
+      },
       exporting: { enabled: false },
       legend: { enabled: false },
       navigator: { enabled: false },

@@ -1,7 +1,7 @@
 'use client';
 
 import { Tooltip, XAxis, YAxis } from '@highcharts/react';
-import { Area, Line } from '@highcharts/react/series';
+import { Area } from '@highcharts/react/series';
 import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
 import { use, useMemo, useState } from 'react';
@@ -103,7 +103,7 @@ export const TxnFeeChartMini = ({ loading, statsPromise }: Props) => {
       >
         {() => (
           <MiniChart height={220}>
-            <Line.Series data={data} options={{ name: t('txnFee.series') }} />
+            <Area.Series data={data} options={{ name: t('txnFee.series') }} />
             <Tooltip formatter={tooltipFormatter} shared />
           </MiniChart>
         )}
