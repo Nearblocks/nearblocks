@@ -16,6 +16,7 @@ const dateStatus = v.object({
 const syncStatus = v.object({
   aggregates: v.object({
     ft_holders: blockStatus,
+    mt_holders: blockStatus,
     nft_holders: blockStatus,
   }),
   indexers: v.object({
@@ -52,6 +53,7 @@ export default {
   dailyStats: dateStatusResponse,
   events: blockStatusResponse,
   ftHolders: blockStatusResponse,
+  mtHolders: blockStatusResponse,
   nftHolders: blockStatusResponse,
   receipts: blockStatusResponse,
   signature: blockStatusResponse,

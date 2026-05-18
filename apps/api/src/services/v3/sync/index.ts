@@ -112,6 +112,23 @@ const getNFTHoldersStatus = async (): Promise<BlockStatus> => {
   };
 };
 
+const getMTHoldersStatus = async (): Promise<BlockStatus> => {
+  const mtSetting = await dbEvents.oneOrNone<{ value: { sync: string } }>(
+    'SELECT value FROM settings WHERE key = $1',
+    ['mt_holders'],
+  );
+  const mtHoldersTs = mtSetting?.value?.sync;
+
+  if (!mtHoldersTs) return { height: null, sync: false, timestamp: null };
+
+  // aggregates store nanosecond timestamps, not block heights
+  return {
+    height: null,
+    sync: isInSync(String(mtHoldersTs)),
+    timestamp: String(mtHoldersTs),
+  };
+};
+
 const getStatStatus = async (): Promise<DateStatus> => {
   const stats = await dbBase.oneOrNone<{ date: string }>(
     "SELECT TO_CHAR(TO_TIMESTAMP(date / 1e9), 'YYYY-MM-DD') AS date FROM daily_stats ORDER BY date DESC LIMIT 1",
@@ -151,6 +168,10 @@ const nftHolders = responseHandler(response.nftHolders, async () => ({
   data: await getNFTHoldersStatus(),
 }));
 
+const mtHolders = responseHandler(response.mtHolders, async () => ({
+  data: await getMTHoldersStatus(),
+}));
+
 const receipts = responseHandler(response.receipts, async () => ({
   data: await getReceiptsStatus(),
 }));
@@ -179,6 +200,7 @@ const status = responseHandler(response.status, async () => {
     stakingData,
     ftData,
     nftData,
+    mtData,
     statsData,
   ] = await Promise.all([
     getBaseStatus(),
@@ -191,12 +213,14 @@ const status = responseHandler(response.status, async () => {
     getStakingStatus(),
     getFTHoldersStatus(),
     getNFTHoldersStatus(),
+    getMTHoldersStatus(),
     getStatStatus(),
   ]);
 
   const data: SyncStatus = {
     aggregates: {
       ft_holders: ftData,
+      mt_holders: mtData,
       nft_holders: nftData,
     },
     indexers: {
@@ -225,6 +249,7 @@ export default {
   dailyStats,
   events,
   ftHolders,
+  mtHolders,
   nftHolders,
   receipts,
   signature,
