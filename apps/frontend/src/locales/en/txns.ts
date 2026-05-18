@@ -21,11 +21,9 @@ export const txns = {
     transfer: 'Transfer',
   },
   codeViewer: {
-    auto: 'Auto',
     collapse: 'Collapse',
     default: 'Default',
     expand: 'Expand',
-    raw: 'Raw',
     rlpDecoded: 'RLP Decoded',
     table: 'Table',
   },

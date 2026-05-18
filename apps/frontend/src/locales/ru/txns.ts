@@ -21,11 +21,9 @@ export const txns = {
     transfer: 'Transfer',
   },
   codeViewer: {
-    auto: 'Auto',
     collapse: 'Collapse',
     default: 'Default',
     expand: 'Expand',
-    raw: 'Raw',
     rlpDecoded: 'RLP Decoded',
     table: 'Table',
   },
@@ -144,6 +142,7 @@ export const txns = {
     title: 'NEAR Transaction {{tid}}',
   },
   title: 'Latest NEAR Protocol Transactions',
+  titleByBlock: 'Transactions in Block',
   transfer: {
     allTransfers: 'All Transfers',
     burn: 'Burn',

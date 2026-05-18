@@ -37,7 +37,9 @@ export const Validate = ({ tid }: Props) => {
         <DropdownMenuItem asChild>
           <Link
             className="flex items-center gap-2"
-            href={`https://nearvalidate.org/txns/${tid}?network=${network}`}
+            href={`https://nearvalidate.org/txns/${encodeURIComponent(
+              tid,
+            )}?network=${network}`}
             rel="noopener noreferrer"
             target="_blank"
           >

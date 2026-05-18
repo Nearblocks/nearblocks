@@ -17,4 +17,6 @@ export const receipts = {
     title: 'Latest NEAR Protocol Receipts',
   },
   title: 'Latest NEAR Protocol Receipts',
+  titleByAccount: 'Receipts for',
+  titleByBlock: 'Receipts in Block',
 } as const;
