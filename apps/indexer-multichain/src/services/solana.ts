@@ -93,7 +93,11 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     return;
   }
 
-  chainLastBlockTimestamp.set({ chain }, block.blockTime);
+  // Solana RPC returns null blockTime for blocks without a confirmed timestamp;
+  // skip the gauge update rather than reporting a misleading value.
+  if (typeof block.blockTime === 'number' && Number.isFinite(block.blockTime)) {
+    chainLastBlockTimestamp.set({ chain }, block.blockTime);
+  }
 
   if (!block.transactions?.length) return;
 
