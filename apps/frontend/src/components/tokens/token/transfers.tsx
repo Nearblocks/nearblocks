@@ -63,7 +63,7 @@ export const TokenTransfers = ({
     },
     {
       cell: (ft) => (
-        <Badge variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0" variant="teal">
           <Truncate>
             <TruncateText className="max-w-20" text={ft.cause} />
           </Truncate>
