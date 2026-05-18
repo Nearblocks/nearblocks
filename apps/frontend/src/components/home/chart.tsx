@@ -1,7 +1,7 @@
 'use client';
 
 import { Chart } from '@highcharts/react';
-import { Line } from '@highcharts/react/series';
+import { Spline } from '@highcharts/react/series';
 import { useMemo } from 'react';
 
 import { DailyStats } from 'nb-schemas';
@@ -90,7 +90,7 @@ export const TxnsChart = ({ data }: Props) => {
 
   return (
     <Chart options={chartOptions}>
-      <Line.Series data={chartData} />
+      <Spline.Series data={chartData} />
     </Chart>
   );
 };
