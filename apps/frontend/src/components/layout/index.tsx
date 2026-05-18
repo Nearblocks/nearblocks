@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { fetchStats, fetchSyncStatus } from '@/data/layout';
 
 import { Footer } from './footer';
+import { Formbricks } from './formbricks';
 import { Header } from './header';
 import { NewUiBanner } from './new-ui-banner';
 import { Notice } from './notice';
@@ -26,6 +27,7 @@ export const Layout = ({ children }: Props) => {
       <Header />
       {children}
       <Footer />
+      <Formbricks />
     </>
   );
 };
