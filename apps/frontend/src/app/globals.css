@@ -83,8 +83,8 @@
   --color-purple-foreground: #7c3aed;
   --color-pink-background: #db27771a;
   --color-pink-foreground: #db2777;
-  --color-lime-background: #0a6c2e1a;
-  --color-lime-foreground: #0a6c2e;
+  --color-lime-background: #10b9811a;
+  --color-lime-foreground: #10b981;
 
   --background: color-mix(in oklch, var(--color-neutral-50) 92%, var(--color-teal-50));
   --foreground: var(--color-neutral-800);
