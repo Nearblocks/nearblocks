@@ -42,31 +42,33 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
             </div>
           </ListLeft>
           <ListRight>
-            <SkeletonSlot
-              fallback={
-                <div className="flex flex-col">
-                  <Skeleton className="mb-1 h-6 w-30" />
-                  <Skeleton className="h-17.5 w-full" />
-                </div>
-              }
-              loading={!receipt || loading}
-            >
-              {() => (
-                <div className="flex flex-col gap-3">
-                  {(receipt!.actions[0]?.action === ActionKind.DELEGATE_ACTION
-                    ? [receipt!.actions[0]]
-                    : receipt!.actions
-                  ).map((action, i) => (
-                    <ReceiptAction
-                      action={action}
-                      index={i}
-                      key={i}
-                      receipt={receipt!}
-                    />
-                  ))}
-                </div>
-              )}
-            </SkeletonSlot>
+            <div className="w-full">
+              <SkeletonSlot
+                fallback={
+                  <div className="flex flex-col">
+                    <Skeleton className="mb-1 h-6 w-30" />
+                    <Skeleton className="h-17.5 w-full" />
+                  </div>
+                }
+                loading={!receipt || loading}
+              >
+                {() => (
+                  <div className="flex w-full flex-col gap-3">
+                    {(receipt!.actions[0]?.action === ActionKind.DELEGATE_ACTION
+                      ? [receipt!.actions[0]]
+                      : receipt!.actions
+                    ).map((action, i) => (
+                      <ReceiptAction
+                        action={action}
+                        index={i}
+                        key={i}
+                        receipt={receipt!}
+                      />
+                    ))}
+                  </div>
+                )}
+              </SkeletonSlot>
+            </div>
           </ListRight>
         </ListItem>
       </List>

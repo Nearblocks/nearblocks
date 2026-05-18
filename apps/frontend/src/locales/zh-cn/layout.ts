@@ -70,6 +70,11 @@ export const layout = {
       title: 'Blockchain',
       txns: 'Transactions',
     },
+    developers: {
+      apiDocs: 'API Documentation',
+      apiPlans: 'API Plans',
+      title: 'Developers',
+    },
     home: {
       title: 'Home',
     },

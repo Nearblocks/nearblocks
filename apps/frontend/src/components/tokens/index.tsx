@@ -120,11 +120,14 @@ export const Tokens = ({
     },
   ];
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const params =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `/tokens?${params.toString()}`;
   };
 

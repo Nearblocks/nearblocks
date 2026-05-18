@@ -8,6 +8,7 @@ import { BlockCount, BlockListItem, BlocksRes, BlockStats } from 'nb-schemas';
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
+import { StatCard } from '@/components/stat-card';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
@@ -56,26 +57,36 @@ export const Blocks = ({
           {numberFormat(block.block_height)}
         </Link>
       ),
+      csvLabel: 'Block',
+      csvValue: (block) => block.block_height,
       header: t('columns.block'),
       id: 'block',
     },
     {
       cell: (block) => <AccountLink account={block.author_account_id} />,
+      csvLabel: 'Author',
+      csvValue: (block) => block.author_account_id ?? '',
       header: t('columns.author'),
       id: 'author',
     },
     {
       cell: (block) => numberFormat(block.transactions_agg.count),
+      csvLabel: 'Txns',
+      csvValue: (block) => block.transactions_agg.count,
       header: t('columns.txns'),
       id: 'txns_count',
     },
     {
       cell: (block) => `${gasFormat(block.chunks_agg.gas_used)} Tgas`,
+      csvLabel: 'Gas Used (Tgas)',
+      csvValue: (block) => gasFormat(block.chunks_agg.gas_used),
       header: t('columns.gasUsed'),
       id: 'gas_used',
     },
     {
       cell: (block) => `${gasFormat(block.chunks_agg.gas_limit)} Tgas`,
+      csvLabel: 'Gas Limit (Tgas)',
+      csvValue: (block) => gasFormat(block.chunks_agg.gas_limit),
       header: t('columns.gasLimit'),
       id: 'gas_limit',
     },
@@ -86,6 +97,8 @@ export const Blocks = ({
           {gasFee(block.chunks_agg.gas_used, block.gas_price)}
         </span>
       ),
+      csvLabel: 'Gas Fee (NEAR)',
+      csvValue: (block) => gasFee(block.chunks_agg.gas_used, block.gas_price),
       header: t('columns.gasFee'),
       id: 'gas_fee',
     },
@@ -93,6 +106,8 @@ export const Blocks = ({
       cell: (block) => <TimestampCell ns={block.block_timestamp} />,
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Block Timestamp',
+      csvValue: (block) => block.block_timestamp ?? '',
       header: <TimestampToggle />,
       id: 'age',
     },
@@ -100,14 +115,17 @@ export const Blocks = ({
 
   const statItems = [
     {
+      href: '/charts/blocks',
       label: t('stats.networkUtilization'),
       value: utilization,
     },
     {
+      href: '/charts/blocks',
       label: t('stats.blocks'),
       value: numberFormat(blockStats?.blocks),
     },
     {
+      href: '/charts/txn-fee',
       label: t('stats.gasPrice'),
       value: blockStats ? (
         <span className="flex items-center gap-1">
@@ -118,6 +136,7 @@ export const Blocks = ({
       ) : null,
     },
     {
+      href: '/charts/txn-fee',
       label: t('stats.burntFees'),
       value: blockStats ? (
         <span className="flex items-center gap-1">
@@ -131,20 +150,14 @@ export const Blocks = ({
   return (
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {statItems.map(({ label, value }) => (
-          <Card className="px-4 py-3" key={label}>
-            <p className="text-body-xs text-muted-foreground truncate uppercase">
-              {label}
-            </p>
-            <p className="text-headline-base mt-1">
-              <SkeletonSlot
-                fallback={<Skeleton className="h-5 w-32" />}
-                loading={loading || !blockStats}
-              >
-                {() => <>{value}</>}
-              </SkeletonSlot>
-            </p>
-          </Card>
+        {statItems.map(({ href, label, value }) => (
+          <StatCard
+            href={href}
+            key={label}
+            label={label}
+            loading={loading || !blockStats}
+            value={value}
+          />
         ))}
       </div>
       <Card>
@@ -152,6 +165,7 @@ export const Blocks = ({
           <DataTable
             columns={columns}
             data={blocks?.data}
+            downloadFilename="nearblocks-blocks"
             emptyMessage={t('empty')}
             getRowKey={(block) => block.block_hash}
             header={
@@ -169,7 +183,9 @@ export const Blocks = ({
               </SkeletonSlot>
             }
             loading={loading || !!blocks?.errors}
-            onPaginationNavigate={(type, cursor) => `/blocks?${type}=${cursor}`}
+            onPaginationNavigate={(type, cursor) =>
+              type === 'first' ? '/blocks' : `/blocks?${type}=${cursor}`
+            }
             pagination={blocks?.meta}
           />
         </CardContent>

@@ -274,7 +274,7 @@ export const MethodsForm = ({
                 <Copy size="sm" text={result} />
               </div>
               <div className="scroll-overlay max-h-116 overflow-auto">
-                <CodeBlock code={result} language="json" />
+                <CodeBlock code={result} language="json" lineNumbers />
               </div>
             </Field>
           )}

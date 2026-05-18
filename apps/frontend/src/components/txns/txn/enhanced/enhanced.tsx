@@ -19,15 +19,12 @@ type Props = {
 
 export const EnhancedPlan = ({ nearPrice, receipts, tid }: Props) => {
   const { t } = useLocale('txns');
-  const [rpcEnabled, setRpcEnabled] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
+  const [rpcEnabled, setRpcEnabled] = useState(false);
 
   const { data: rpcData, isLoading: rpcLoading } = useTxnStatus(
     rpcEnabled && tid
-      ? {
-          senderAccountId: receipts.predecessor_account_id,
-          txHash: tid,
-        }
+      ? { senderAccountId: receipts.predecessor_account_id, txHash: tid }
       : null,
   );
 

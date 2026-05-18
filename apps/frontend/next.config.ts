@@ -106,6 +106,111 @@ const nextConfig: NextConfig = {
         permanent: true,
         source: '/ua/:path*',
       },
+      {
+        destination: '/charts/addresses',
+        permanent: true,
+        source: '/charts/active-accounts',
+      },
+      {
+        destination: '/charts/txns',
+        permanent: true,
+        source: '/charts/tps',
+      },
+      {
+        destination: '/multichain-txns',
+        permanent: true,
+        source: '/charts/multichain-txns',
+      },
+      {
+        destination: '/validators/:slug',
+        permanent: true,
+        source: '/node-explorer/:slug',
+      },
+      {
+        destination: '/export-csv',
+        permanent: true,
+        source: '/exportdata',
+      },
+      {
+        destination: '/tokens',
+        permanent: true,
+        source: '/token/exportdata',
+      },
+      {
+        destination: '/nft-tokens',
+        permanent: true,
+        source: '/nft-token/exportdata',
+      },
+      {
+        destination: '/mt-tokens/transfers',
+        permanent: true,
+        source: '/mt-token/:slug',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/verify-contract',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/login',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/register',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/resend',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/reset',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/lostpassword',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/confirmemail',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/updateemail',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/plans',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/user/:path*',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/publisher/:path*',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/campaign/:path*',
+      },
+      {
+        destination: '/',
+        permanent: true,
+        source: '/campaign',
+      },
     ];
   },
 };

@@ -20,7 +20,7 @@ import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -172,11 +172,14 @@ export const NFTTxns = ({
     router.push(`${base}?${p.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const p = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const p =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `${base}?${p.toString()}`;
   };
 
@@ -217,19 +220,13 @@ export const NFTTxns = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !nftCount}
             >
-              {() => (
-                <>
-                  {basePath ? (
-                    t('nfts.total', {
-                      count: countFormat(nftCount?.count ?? 0),
-                    })
-                  ) : nfts?.data?.length ? (
-                    t('nfts.latest', { count: numberFormat(nfts.data.length) })
-                  ) : (
-                    <span>&nbsp;</span>
-                  )}
-                </>
-              )}
+              {() => {
+                const count = nftCount?.count;
+                return t(
+                  isApproxCount(count) ? 'nfts.total' : 'nfts.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!nfts?.errors}

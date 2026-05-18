@@ -8,7 +8,8 @@ export const receipts = {
     method: 'Method',
     receiptId: 'Receipt ID',
     to: 'To',
-    total: 'A total of {{count}} receipts found',
+    total: 'More than {{count}} receipts found',
+    totalExact: 'More than {{count}} receipts found',
   },
   meta: {
     description:
@@ -16,4 +17,6 @@ export const receipts = {
     title: 'Latest NEAR Protocol Receipts',
   },
   title: 'Latest NEAR Protocol Receipts',
+  titleByAccount: 'Receipts for',
+  titleByBlock: 'Receipts in Block',
 } as const;

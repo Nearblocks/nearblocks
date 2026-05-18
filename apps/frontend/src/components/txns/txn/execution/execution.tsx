@@ -22,10 +22,7 @@ export const ExecutionPlan = ({ nearPrice, receipts, tid }: Props) => {
 
   const { data: rpcData, isLoading: rpcLoading } = useTxnStatus(
     rpcEnabled && tid
-      ? {
-          senderAccountId: receipts.predecessor_account_id,
-          txHash: tid,
-        }
+      ? { senderAccountId: receipts.predecessor_account_id, txHash: tid }
       : null,
   );
 

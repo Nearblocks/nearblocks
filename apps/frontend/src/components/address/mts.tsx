@@ -14,7 +14,7 @@ import { MTLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -165,11 +165,14 @@ export const MTTxns = ({
     router.push(`${base}?${p.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const p = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const p =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `${base}?${p.toString()}`;
   };
 
@@ -198,19 +201,13 @@ export const MTTxns = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !mtCount}
             >
-              {() => (
-                <>
-                  {basePath ? (
-                    t('mts.total', {
-                      count: countFormat(mtCount?.count ?? 0),
-                    })
-                  ) : mts?.data?.length ? (
-                    t('mts.latest', { count: numberFormat(mts.data.length) })
-                  ) : (
-                    <span>&nbsp;</span>
-                  )}
-                </>
-              )}
+              {() => {
+                const count = mtCount?.count;
+                return t(
+                  isApproxCount(count) ? 'mts.total' : 'mts.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!mts?.errors}

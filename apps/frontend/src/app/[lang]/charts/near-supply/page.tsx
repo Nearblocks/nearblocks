@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { SupplyChart } from '@/components/charts/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { fetchDailyStats } from '@/data/charts';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -29,7 +30,7 @@ const NearSupplyPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('nearSupply.heading')}</h1>
+      <PageHeading apiTag="" title={t('nearSupply.heading')} />
       <ErrorSuspense fallback={<SupplyChart loading />}>
         <SupplyChart statsPromise={statsPromise} />
       </ErrorSuspense>

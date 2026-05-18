@@ -34,7 +34,9 @@ export const Copy = ({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          className={className}
+          className={`text-muted-foreground/70 hover:text-foreground ${
+            className ?? ''
+          }`}
           onClick={onCopy}
           size={size}
           variant={variant}

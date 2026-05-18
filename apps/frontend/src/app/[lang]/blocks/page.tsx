@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { Blocks } from '@/components/blocks';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { fetchBlockCount, fetchBlocks, fetchBlockStats } from '@/data/blocks';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -32,7 +33,7 @@ const BlocksPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('heading')}</h1>
+      <PageHeading apiTag="blocks" title={t('heading')} />
       <ErrorSuspense fallback={<Blocks loading />}>
         <Blocks
           blockCountPromise={blockCountPromise}

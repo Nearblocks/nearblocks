@@ -32,7 +32,7 @@ export const TopBar = ({ statsPromise }: Props) => {
         isHome ? 'hidden lg:block' : 'block',
       )}
     >
-      <div className="container mx-auto flex h-[55px] items-center px-4">
+      <div className="container mx-auto flex h-12 items-center px-4">
         {network === 'mainnet' ? (
           <ErrorSuspense fallback={<NearPrice loading />}>
             <NearPrice statsPromise={statsPromise} />

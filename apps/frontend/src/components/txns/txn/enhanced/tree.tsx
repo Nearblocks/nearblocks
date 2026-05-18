@@ -54,7 +54,7 @@ export const EnhancedTree = ({
             <span className="bg-border size-4 shrink-0 rounded-full" />
             <AccountLink
               account={receipt.predecessor_account_id}
-              textClassName="max-w-60 text-body-sm font-medium"
+              textClassName="max-w-60 text-body-sm"
             />
           </div>
         )}
@@ -91,7 +91,7 @@ export const EnhancedTree = ({
           <span className="bg-border size-4 shrink-0 rounded-full" />
           <AccountLink
             account={receipt.receiver_account_id}
-            textClassName="max-w-60 text-body-sm font-medium"
+            textClassName="max-w-60 text-body-sm"
           />
         </div>
       </div>

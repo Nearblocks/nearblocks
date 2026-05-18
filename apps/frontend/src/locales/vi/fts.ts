@@ -34,7 +34,7 @@ export const fts = {
     empty: 'No token holders found',
     percentage: 'Percentage',
     quantity: 'Quantity',
-    total: 'A total of {{count}} token holders found',
+    total: 'More than {{count}} token holders found',
     value: 'Value',
   },
   info: {
@@ -91,7 +91,7 @@ export const fts = {
     onchainMC: 'On-Chain MC',
     price: 'Price',
     title: 'TOKEN',
-    total: 'A total of {{count}} Token Contracts found',
+    total: 'More than {{count}} Token Contracts found',
     totalSupply: 'Total Supply',
     volume: 'Volume (24H)',
   },
@@ -105,7 +105,7 @@ export const fts = {
     title: 'Token Transfers (NEP-141)',
     to: 'To',
     token: 'Token',
-    total: 'A total of {{count}} token txns found',
+    total: 'More than {{count}} token txns found',
     txnHash: 'Transaction Hash',
   },
   transfersMeta: {

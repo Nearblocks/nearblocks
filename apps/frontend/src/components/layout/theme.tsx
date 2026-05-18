@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
     <Button
       disabled={isPending}
       onClick={onToggle}
-      size="icon-xs"
+      size="icon-md"
       title={t('header.toggleTheme')}
       variant="secondary"
     >

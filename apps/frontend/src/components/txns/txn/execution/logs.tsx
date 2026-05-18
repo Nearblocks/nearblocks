@@ -20,7 +20,7 @@ const beautify = (raw: string): string => {
 
 export const ReceiptLogs = ({ logs }: Props) => {
   if (logs.length === 0) {
-    return <CodeViewer className="min-h-12" code="" language="json" />;
+    return <p className="text-muted-foreground py-1">No Logs</p>;
   }
 
   const combined = logs
@@ -33,5 +33,7 @@ export const ReceiptLogs = ({ logs }: Props) => {
     })
     .join('\n\n');
 
-  return <CodeViewer className="min-h-12" code={combined} language="json" />;
+  return (
+    <CodeViewer className="min-h-12" code={combined} language="json" wrap />
+  );
 };

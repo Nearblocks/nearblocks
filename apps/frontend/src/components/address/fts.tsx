@@ -16,7 +16,7 @@ import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -154,11 +154,14 @@ export const FTTxns = ({
     router.push(`${base}?${p.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const p = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const p =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `${base}?${p.toString()}`;
   };
 
@@ -199,19 +202,13 @@ export const FTTxns = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !ftCount}
             >
-              {() => (
-                <>
-                  {basePath ? (
-                    t('fts.total', {
-                      count: countFormat(ftCount?.count ?? 0),
-                    })
-                  ) : fts?.data?.length ? (
-                    t('fts.latest', { count: numberFormat(fts.data.length) })
-                  ) : (
-                    <span>&nbsp;</span>
-                  )}
-                </>
-              )}
+              {() => {
+                const count = ftCount?.count;
+                return t(
+                  isApproxCount(count) ? 'fts.total' : 'fts.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!fts?.errors}

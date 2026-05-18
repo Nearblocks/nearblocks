@@ -4,15 +4,16 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { MCStats, MCTxn, MCTxnsRes } from 'nb-schemas';
+import { MCStats, MCTxn, MCTxnCount, MCTxnsRes } from 'nb-schemas';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
+import { StatCard } from '@/components/stat-card';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -21,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 type Props = {
   loading?: boolean;
   mcStatsPromise?: Promise<MCStats | null>;
+  txnCountPromise?: Promise<MCTxnCount | null>;
   txnsPromise?: Promise<MCTxnsRes>;
 };
 
@@ -112,12 +114,14 @@ const ChainIcon = ({ icon, name }: { icon: string; name: string }) => (
 export const MultichainTxns = ({
   loading,
   mcStatsPromise,
+  txnCountPromise,
   txnsPromise,
 }: Props) => {
   const { t } = useLocale('multichain');
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
   const mcStats = !loading && mcStatsPromise ? use(mcStatsPromise) : null;
+  const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const columns: DataTableColumnDef<MCTxn>[] = [
     {
@@ -233,11 +237,14 @@ export const MultichainTxns = ({
     },
   ];
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const params = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const params =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `/multichain-txns?${params.toString()}`;
   };
 
@@ -252,19 +259,12 @@ export const MultichainTxns = ({
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statItems.map(({ label, value }) => (
-          <Card className="px-4 py-3" key={label}>
-            <p className="text-body-xs text-muted-foreground truncate uppercase">
-              {label}
-            </p>
-            <p className="text-headline-base mt-1">
-              <SkeletonSlot
-                fallback={<Skeleton className="h-5 w-32" />}
-                loading={loading || !mcStats}
-              >
-                {() => <>{value}</>}
-              </SkeletonSlot>
-            </p>
-          </Card>
+          <StatCard
+            key={label}
+            label={label}
+            loading={loading || !mcStats}
+            value={value}
+          />
         ))}
       </div>
       <Card>
@@ -274,6 +274,20 @@ export const MultichainTxns = ({
             data={txns?.data}
             emptyMessage={t('list.empty')}
             getRowKey={(txn) => `${txn.receipt_id}-${txn.event_index}`}
+            header={
+              <SkeletonSlot
+                fallback={<Skeleton className="w-40" />}
+                loading={loading || !txnCount}
+              >
+                {() => {
+                  const count = txnCount?.count;
+                  return t(
+                    isApproxCount(count) ? 'list.total' : 'list.totalExact',
+                    { count: countFormat(count ?? 0) },
+                  );
+                }}
+              </SkeletonSlot>
+            }
             loading={loading || !!txns?.errors}
             onPaginationNavigate={onPaginate}
             pagination={txns?.meta}

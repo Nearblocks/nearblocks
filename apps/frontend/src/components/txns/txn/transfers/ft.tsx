@@ -68,8 +68,8 @@ export const FTTransfers = ({ fts, spamPatterns }: Props) => {
         <TabsTrigger value="all">{t('transfer.allTransfers')}</TabsTrigger>
         <TabsTrigger value="net">{t('transfer.netTransfers')}</TabsTrigger>
       </TabsList>
-      <ScrollableList className="max-h-53">
-        <TabsContent className="flex flex-col gap-3 pt-3" value="all">
+      <ScrollableList className="max-h-60">
+        <TabsContent className="flex flex-col gap-2 pt-3" value="all">
           {transfers.map((ft, i) => (
             <div className="flex flex-wrap items-center gap-1" key={i}>
               <TransferSummary
@@ -79,9 +79,6 @@ export const FTTransfers = ({ fts, spamPatterns }: Props) => {
               >
                 <TokenAmount
                   amount={ft.delta_amount}
-                  className={
-                    ft.cause === 'TRANSFER' ? 'text-blue-foreground' : ''
-                  }
                   decimals={ft.meta?.decimals ?? 0}
                   hideSign
                 />
@@ -104,8 +101,8 @@ export const FTTransfers = ({ fts, spamPatterns }: Props) => {
           ))}
         </TabsContent>
       </ScrollableList>
-      <ScrollableList className="max-h-53">
-        <TabsContent className="flex flex-col gap-3 pt-3" value="net">
+      <ScrollableList className="max-h-60">
+        <TabsContent className="flex flex-col gap-2 pt-3" value="net">
           {netFts.map((net, i) => (
             <div className="flex flex-wrap items-center gap-1" key={i}>
               <AccountLink

@@ -71,7 +71,7 @@ export const Overview = ({
 
   return (
     <Card>
-      <CardContent className="px-3 py-3">
+      <CardContent className="px-2 py-2">
         {network !== 'mainnet' && (
           <p className="text-red-foreground px-1 py-3">
             [{t('overview.testnetNotice')}]
@@ -178,9 +178,9 @@ export const Overview = ({
               {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
-              <p>
+              <p className="flex h-7 items-center">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-60" />}
+                  fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !txn}
                 >
                   {() => <LongDate ns={txn!.block_timestamp} />}

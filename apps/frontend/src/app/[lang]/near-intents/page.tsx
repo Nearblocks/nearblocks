@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { MtTokenTransfers } from '@/components/mt-tokens/transfers';
+import { PageHeading } from '@/components/page-heading';
 import {
   fetchNearIntentsTxnCount,
   fetchNearIntentsTxns,
@@ -35,7 +36,7 @@ const NearIntentsPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('nearIntents.heading')}</h1>
+      <PageHeading apiTag="mts" title={t('nearIntents.heading')} />
       <ErrorSuspense fallback={<MtTokenTransfers loading />}>
         <MtTokenTransfers
           txnCountPromise={txnCountPromise}

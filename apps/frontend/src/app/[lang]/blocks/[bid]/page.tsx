@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { Overview } from '@/components/blocks/overview';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { fetchBlock } from '@/data/blocks';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -29,10 +30,15 @@ const BlockPage = async ({ params }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">
-        {t('overview.heading')}{' '}
-        <span className="text-muted-foreground text-headline-base">#{bid}</span>
-      </h1>
+      <PageHeading
+        apiTag="blocks"
+        title={
+          <>
+            {t('overview.heading')}{' '}
+            <span className="text-muted-foreground text-body-base">#{bid}</span>
+          </>
+        }
+      />
       <ErrorSuspense fallback={<Overview loading />}>
         <Overview blockPromise={blockPromise} />
       </ErrorSuspense>

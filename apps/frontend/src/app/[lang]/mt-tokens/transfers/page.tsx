@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { MTTxns as AddressMTTxns } from '@/components/address/mts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { MtTokenTransfers } from '@/components/mt-tokens/transfers';
+import { PageHeading } from '@/components/page-heading';
 import {
   fetchMTTxnCount as fetchAddressMTTxnCount,
   fetchMTTxns as fetchAddressMTTxns,
@@ -40,7 +41,7 @@ const MtTransfersPage = async ({ params, searchParams }: Props) => {
 
     return (
       <>
-        <h1 className="text-headline-lg mb-4">{t('transfers.heading')}</h1>
+        <PageHeading apiTag="mts" title={t('transfers.heading')} />
         <ErrorSuspense fallback={<AddressMTTxns loading />}>
           <AddressMTTxns
             address={account}
@@ -58,7 +59,7 @@ const MtTransfersPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('transfers.heading')}</h1>
+      <PageHeading apiTag="mts" title={t('transfers.heading')} />
       <ErrorSuspense fallback={<MtTokenTransfers loading />}>
         <MtTokenTransfers
           txnCountPromise={txnCountPromise}

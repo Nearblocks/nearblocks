@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { NftTokens } from '@/components/nft-tokens';
+import { PageHeading } from '@/components/page-heading';
 import { fetchNFTTokenCount, fetchNFTTokens } from '@/data/nft-tokens';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -31,7 +32,7 @@ const NftTokensPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+      <PageHeading apiTag="nfts" title={t('title')} />
       <ErrorSuspense fallback={<NftTokens loading />}>
         <NftTokens
           nftTokenCountPromise={nftTokenCountPromise}

@@ -68,13 +68,20 @@ export type NavMenuLeafItem<K extends string = string> = KeyOrTitle<K> & {
   href: string;
   menu?: never;
 };
+export type NavMenuDivider = { divider: true };
+export type NavMenuSubItem<K extends string = string> =
+  | NavMenuDivider
+  | NavMenuLeafItem<K>;
 type HrefOrMenu<K extends string = string> =
   | { href: string; menu?: never }
-  | { href?: never; menu: NavMenuLeafItem<K>[] };
+  | { href?: never; menu: NavMenuSubItem<K>[] };
 
 export type NavMenuItem<K extends string = string> = KeyOrTitle<K> &
   HrefOrMenu<K>;
 export type NavMenu<K extends string = string> = NavMenuItem<K>[];
+
+export const isNavMenuDivider = (item: unknown): item is NavMenuDivider =>
+  typeof item === 'object' && item !== null && 'divider' in item;
 
 export type TokensCacheRes = {
   account_id: string;

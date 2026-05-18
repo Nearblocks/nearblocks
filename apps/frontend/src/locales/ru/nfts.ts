@@ -28,13 +28,13 @@ export const nfts = {
     na: 'N/A',
     percentage: 'Percentage',
     quantity: 'Quantity',
-    total: 'A total of {{count}} token holders found',
+    total: 'More than {{count}} token holders found',
   },
   inventory: {
     empty: 'No NFT tokens found',
     owner: 'Owner: ',
     title: 'Token ID: ',
-    total: 'A total of {{count}} tokens found',
+    total: 'More than {{count}} tokens found',
   },
   meta: {
     description:
@@ -77,7 +77,7 @@ export const nfts = {
     from: 'From',
     method: 'Method',
     to: 'To',
-    total: 'A total of {{count}} nft token txns found',
+    total: 'More than {{count}} nft token txns found',
     txnHash: 'Transaction Hash',
   },
   transfers: {
@@ -91,7 +91,7 @@ export const nfts = {
     },
     empty: 'No NFT token transfers found',
     heading: 'NFT Token Transfers (NEP-171)',
-    total: 'A total of {{count}} nft token txns found',
+    total: 'More than {{count}} nft token txns found',
   },
   transfersMeta: {
     description:

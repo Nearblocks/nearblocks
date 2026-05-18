@@ -94,14 +94,14 @@ export const Tokens = ({
                   <Fragment key={token.contract}>
                     <CommandItem asChild>
                       <Link
-                        className="text-body-xs grid grid-flow-col items-center justify-between gap-2"
+                        className="text-body-xs grid grid-flow-col items-center justify-between gap-2 py-1.5"
                         href={`/tokens/${token.contract}?account=${address}`}
                       >
-                        <span className="flex flex-col gap-1 truncate">
-                          <span className="flex items-center gap-2">
+                        <span className="flex flex-col truncate">
+                          <span className="flex items-center gap-1.5">
                             <TokenImage
                               alt={token.meta?.name ?? ''}
-                              className="m-px size-5 rounded-full border"
+                              className="size-4 rounded-full border"
                               src={token.meta?.icon ?? ''}
                             />
                             <span className="flex items-center truncate">
@@ -120,7 +120,7 @@ export const Tokens = ({
                             </span>
                           </span>
                           {token.meta?.decimals && (
-                            <span>
+                            <span className="text-muted-foreground pl-5.5">
                               {numberFormat(
                                 toTokenAmount(
                                   token.amount,
@@ -133,7 +133,7 @@ export const Tokens = ({
                             </span>
                           )}
                         </span>
-                        <span className="flex flex-col gap-1 text-right">
+                        <span className="flex flex-col text-right">
                           {spamPatterns &&
                           isSpamToken(token.contract, spamPatterns) ? (
                             <Badge variant="amber">{t('spam')}</Badge>
@@ -141,7 +141,7 @@ export const Tokens = ({
                             <>
                               <span>{currencyFormat(token.price)}</span>
                               {token.meta?.price && (
-                                <span>
+                                <span className="text-muted-foreground">
                                   @$
                                   {numberFormat(token.meta?.price, {
                                     maximumFractionDigits: 6,
@@ -153,9 +153,7 @@ export const Tokens = ({
                         </span>
                       </Link>
                     </CommandItem>
-                    {index < inventory.tokens.length - 1 && (
-                      <Separator className="my-1" />
-                    )}
+                    {index < inventory.tokens.length - 1 && <Separator />}
                   </Fragment>
                 ))}
               </CommandGroup>

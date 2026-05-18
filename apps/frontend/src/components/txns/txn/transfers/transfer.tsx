@@ -59,13 +59,13 @@ export const TransferSummary = ({
 export const TransferIcon = ({ type }: IconProps) => {
   const { t } = useLocale('txns');
   return (
-    <>
+    <span className="inline-flex items-center gap-1">
       {type === 'mint' ? (
-        <Pickaxe className="text-lime-foreground size-3" />
+        <Pickaxe className="text-primary size-3.5 shrink-0" />
       ) : type === 'burn' ? (
-        <Flame className="text-red-foreground size-3" />
+        <Flame className="text-red-foreground size-3.5 shrink-0" />
       ) : (
-        <Send className="text-blue-foreground size-3" />
+        <Send className="text-blue-foreground size-3.5 shrink-0" />
       )}
       <span>
         {type === 'mint'
@@ -74,6 +74,6 @@ export const TransferIcon = ({ type }: IconProps) => {
           ? t('transfer.burn')
           : t('transfer.transfer')}
       </span>
-    </>
+    </span>
   );
 };

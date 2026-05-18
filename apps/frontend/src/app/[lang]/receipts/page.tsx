@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { Receipts as AddressReceipts } from '@/components/address/receipts';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { Receipts } from '@/components/receipts';
 import {
   fetchReceiptCount as fetchAddressReceiptCount,
@@ -40,7 +41,17 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
 
     return (
       <>
-        <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+        <PageHeading
+          apiTag="receipts"
+          title={
+            <>
+              {t('titleByAccount')}{' '}
+              <span className="text-muted-foreground text-body-base">
+                {account}
+              </span>
+            </>
+          }
+        />
         <ErrorSuspense fallback={<AddressReceipts loading />}>
           <AddressReceipts
             address={account}
@@ -53,12 +64,24 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
     );
   }
 
+  const block = typeof filters.block === 'string' ? filters.block : undefined;
   const receiptsPromise = fetchReceipts(filters);
   const receiptCountPromise = fetchReceiptCount(filters);
 
+  const title = block ? (
+    <>
+      {t('titleByBlock')}{' '}
+      <span className="text-muted-foreground text-body-base">
+        {block.length > 12 ? `${block.slice(0, 8)}…${block.slice(-4)}` : block}
+      </span>
+    </>
+  ) : (
+    t('title')
+  );
+
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+      <PageHeading apiTag="receipts" title={title} />
       <ErrorSuspense fallback={<Receipts loading />}>
         <Receipts
           receiptCountPromise={receiptCountPromise}

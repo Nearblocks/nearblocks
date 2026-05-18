@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { StakingTxns as AddressStakingTxns } from '@/components/address/staking';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { StakingTxns } from '@/components/staking';
 import {
   fetchStaking as fetchAddressStaking,
@@ -40,7 +41,7 @@ const StakingTxnsPage = async ({ params, searchParams }: Props) => {
 
     return (
       <>
-        <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+        <PageHeading apiTag="staking" title={t('title')} />
         <ErrorSuspense fallback={<AddressStakingTxns loading />}>
           <AddressStakingTxns
             address={account}
@@ -58,7 +59,7 @@ const StakingTxnsPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+      <PageHeading apiTag="staking" title={t('title')} />
       <ErrorSuspense fallback={<StakingTxns loading />}>
         <StakingTxns
           stakingCountPromise={stakingCountPromise}

@@ -26,7 +26,11 @@ type Props = PropsWithChildren<LinkProps> &
   };
 
 type ActiveLinkProps = PropsWithChildren<
-  LinkProps & { className?: string; exact?: boolean }
+  LinkProps &
+    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+      className?: string;
+      exact?: boolean;
+    }
 >;
 
 type AccountLinkProps = {

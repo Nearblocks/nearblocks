@@ -141,12 +141,7 @@ export const ActionCard = ({ action, expanded, receipt, toggle }: Props) => {
           action={action.action}
           className={cn('size-3.5', variant.color)}
         />
-        <span
-          className={cn(
-            'text-body-sm max-w-60 truncate font-medium',
-            variant.color,
-          )}
-        >
+        <span className={cn('text-body-sm max-w-60 truncate', variant.color)}>
           {actionLabel}
         </span>
         {receipt.outcome.status === false && (

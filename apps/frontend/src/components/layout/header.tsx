@@ -79,8 +79,14 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
     ],
   },
   {
-    key: 'menu.tools.title',
+    key: 'menu.developers.title',
     menu: [
+      { href: '/apis', key: 'menu.developers.apiPlans' },
+      {
+        href: 'https://api.nearblocks.io/api-docs',
+        key: 'menu.developers.apiDocs',
+      },
+      { divider: true },
       { href: '/export-csv', key: 'menu.tools.csvExport' },
       { href: '/account-balance', key: 'menu.tools.accountBalance' },
       { href: '/unit-converter', key: 'menu.tools.unitConverter' },
@@ -114,9 +120,9 @@ export const Header = () => {
     <header className="bg-card border-b">
       <Popover>
         <PopoverAnchor>
-          <div className="container mx-auto flex h-[54px] items-center px-4">
+          <div className="container mx-auto flex h-14 items-center px-4">
             <Link href="/">
-              <Logo className="text-primary h-9" />
+              <Logo className="text-primary h-10" />
             </Link>
             <div className="text-headline-sm ml-auto flex gap-2">
               <Menu menu={menu} />

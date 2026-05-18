@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { Txns as AddressTxns } from '@/components/address/txns';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { Txns } from '@/components/txns';
 import {
   fetchTxnCount as fetchAddressTxnCount,
@@ -40,7 +41,7 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
 
     return (
       <>
-        <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+        <PageHeading apiTag="txns" title={t('title')} />
         <ErrorSuspense fallback={<AddressTxns loading />}>
           <AddressTxns
             address={account}
@@ -53,15 +54,29 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
     );
   }
 
+  const block = typeof filters.block === 'string' ? filters.block : undefined;
+  const isFiltered = !!block;
   const txnsPromise = fetchTxns(filters);
   const txnCountPromise = fetchTxnCount(filters);
-  const txnStatsPromise = fetchTxnStats();
+  const txnStatsPromise = isFiltered ? undefined : fetchTxnStats();
+
+  const title = block ? (
+    <>
+      {t('titleByBlock')}{' '}
+      <span className="text-muted-foreground text-body-base">
+        {block.length > 12 ? `${block.slice(0, 8)}…${block.slice(-4)}` : block}
+      </span>
+    </>
+  ) : (
+    t('title')
+  );
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
-      <ErrorSuspense fallback={<Txns loading />}>
+      <PageHeading apiTag="txns" title={title} />
+      <ErrorSuspense fallback={<Txns loading showStats={!isFiltered} />}>
         <Txns
+          showStats={!isFiltered}
           txnCountPromise={txnCountPromise}
           txnsPromise={txnsPromise}
           txnStatsPromise={txnStatsPromise}

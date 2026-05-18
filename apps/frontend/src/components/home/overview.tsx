@@ -44,20 +44,11 @@ export const Overview = ({
     !loading && dailyStatsPromise ? use(dailyStatsPromise) : null;
   const gridClass =
     network === 'mainnet'
-      ? 'lg:grid lg:grid-cols-[1fr_auto_1fr_auto] lg:items-stretch xl:grid-cols-[1fr_auto_1fr_auto_1fr]'
+      ? 'lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-stretch'
       : 'lg:grid lg:grid-cols-[1fr_auto_1fr_auto] lg:items-stretch';
-  const chartClass =
-    network === 'mainnet'
-      ? 'z-0 col-span-3 min-w-0 xl:col-auto'
-      : 'z-0 min-w-0';
-  const sep1Class =
-    network === 'mainnet'
-      ? 'col-span-3 my-2 xl:my-0 xl:hidden'
-      : 'col-span-3 my-2 lg:my-0 lg:hidden';
-  const sep2Class =
-    network === 'mainnet'
-      ? 'hidden xl:mx-4 xl:block'
-      : 'hidden lg:mx-4 lg:block';
+  const chartClass = 'z-0 min-w-0';
+  const sep1Class = 'col-span-3 my-2 lg:my-0 lg:hidden';
+  const sep2Class = 'hidden lg:mx-4 lg:block';
 
   return (
     <Card className="px-3 py-1">
@@ -73,7 +64,7 @@ export const Overview = ({
                   <h3 className="text-body-xs text-muted-foreground uppercase">
                     {t('overview.price')}
                   </h3>
-                  <p className="text-headline-base mt-0.5 flex flex-wrap items-center gap-1 font-normal">
+                  <p className="text-body-base text-foreground/80 mt-0.5 font-normal whitespace-nowrap">
                     <SkeletonSlot
                       fallback={<Skeleton className="h-6 w-45" />}
                       loading={loading || !stats}
@@ -81,7 +72,7 @@ export const Overview = ({
                       {() => (
                         <>
                           {currencyFormat(stats!.near_price)}{' '}
-                          <span className="text-body-sm text-muted-foreground">
+                          <span className="text-muted-foreground">
                             @{' '}
                             {numberFormat(stats!.near_btc_price, {
                               maximumFractionDigits: 6,
@@ -103,7 +94,7 @@ export const Overview = ({
                   <h3 className="text-body-xs text-muted-foreground uppercase">
                     {t('overview.marketCap')}
                   </h3>
-                  <p className="text-headline-base mt-0.5 font-normal">
+                  <p className="text-body-base text-foreground/80 mt-0.5 font-normal">
                     <SkeletonSlot
                       fallback={<Skeleton className="w-30" />}
                       loading={loading || !stats}
@@ -137,7 +128,7 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground uppercase">
                   {t('overview.transactions')}
                 </h3>
-                <p className="text-headline-base mt-0.5 flex items-center gap-1 font-normal">
+                <p className="text-body-base text-foreground/80 mt-0.5 font-normal">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-30" />}
                     loading={loading || !stats}
@@ -160,7 +151,7 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground uppercase">
                   {t('overview.gas')}
                 </h3>
-                <p className="text-headline-base mt-0.5 flex items-center gap-1 font-normal">
+                <p className="text-body-base text-foreground/80 mt-0.5 flex items-center gap-1 font-normal">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-32" />}
                     loading={loading || !stats}
@@ -188,7 +179,7 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground uppercase">
                   {t('overview.validators')}
                 </h3>
-                <p className="text-headline-base mt-0.5">
+                <p className="text-body-base text-foreground/80 mt-0.5">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-10" />}
                     loading={loading || !stats}
@@ -201,7 +192,7 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground uppercase">
                   {t('overview.blockTime')}
                 </h3>
-                <p className="text-headline-base mt-0.5">
+                <p className="text-body-base text-foreground/80 mt-0.5">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-15" />}
                     loading={loading || !stats}

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
+import { PageHeading } from '@/components/page-heading';
 import { Tokens } from '@/components/tokens';
 import { fetchTokenCount, fetchTokens } from '@/data/tokens';
 import { hasLocale, translator } from '@/locales/dictionaries';
@@ -31,7 +32,7 @@ const TokensPage = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <h1 className="text-headline-lg mb-4">{t('title')}</h1>
+      <PageHeading apiTag="fts" title={t('title')} />
       <ErrorSuspense fallback={<Tokens loading />}>
         <Tokens
           tokenCountPromise={tokenCountPromise}

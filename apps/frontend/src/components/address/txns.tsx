@@ -16,7 +16,12 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { countFormat, nearFormat, numberFormat } from '@/lib/format';
+import {
+  countFormat,
+  isApproxCount,
+  nearFormat,
+  numberFormat,
+} from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -59,11 +64,14 @@ export const Txns = ({
     router.push(`${base}?${p.toString()}`);
   };
 
-  const onPaginate = (type: 'next' | 'prev', cursor: string) => {
-    const p = buildParams(searchParams, {
-      [type]: cursor,
-      [type === 'next' ? 'prev' : 'next']: '',
-    });
+  const onPaginate = (type: 'first' | 'next' | 'prev', cursor: string) => {
+    const p =
+      type === 'first'
+        ? buildParams(searchParams, { next: '', prev: '' })
+        : buildParams(searchParams, {
+            [type]: cursor,
+            [type === 'next' ? 'prev' : 'next']: '',
+          });
     return `${base}?${p.toString()}`;
   };
 
@@ -193,19 +201,13 @@ export const Txns = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !txnCount}
             >
-              {() => (
-                <>
-                  {basePath ? (
-                    t('txns.total', {
-                      count: countFormat(txnCount?.count ?? 0),
-                    })
-                  ) : txns?.data?.length ? (
-                    t('txns.latest', { count: numberFormat(txns.data.length) })
-                  ) : (
-                    <span>&nbsp;</span>
-                  )}
-                </>
-              )}
+              {() => {
+                const count = txnCount?.count;
+                return t(
+                  isApproxCount(count) ? 'txns.total' : 'txns.totalExact',
+                  { count: countFormat(count ?? 0) },
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!txns?.errors}

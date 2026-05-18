@@ -3,7 +3,7 @@
 import { ChevronRight } from 'lucide-react';
 
 import { useLocale } from '@/hooks/use-locale';
-import { NavMenu, RouteKey } from '@/types/types';
+import { isNavMenuDivider, NavMenu, RouteKey } from '@/types/types';
 import { Collapsible, CollapsibleContent } from '@/ui/collapsible';
 import {
   mobileNavigationCollapsibleTriggerStyle,
@@ -41,15 +41,31 @@ export const MobileMenu = ({ menu }: Props) => {
               </MobileNavigationMenuCollapsibleTrigger>
               <CollapsibleContent>
                 <ul className="border-border my-2 ml-4 border-l pl-2">
-                  {item.menu?.map((subItem) => (
-                    <MobileNavigationMenuItem
-                      key={subItem.title || subItem.key}
-                    >
-                      <MobileNavigationMenuLink href={subItem.href}>
-                        {subItem.key ? t(subItem.key) : subItem.title}
-                      </MobileNavigationMenuLink>
-                    </MobileNavigationMenuItem>
-                  ))}
+                  {item.menu?.map((subItem, idx) => {
+                    if (isNavMenuDivider(subItem)) {
+                      return (
+                        <li className="my-1" key={`divider-${idx}`}>
+                          <Separator orientation="horizontal" />
+                        </li>
+                      );
+                    }
+                    const isExternal =
+                      subItem.href.startsWith('http://') ||
+                      subItem.href.startsWith('https://');
+                    return (
+                      <MobileNavigationMenuItem
+                        key={subItem.title || subItem.key}
+                      >
+                        <MobileNavigationMenuLink
+                          href={subItem.href}
+                          rel={isExternal ? 'noopener noreferrer' : undefined}
+                          target={isExternal ? '_blank' : undefined}
+                        >
+                          {subItem.key ? t(subItem.key) : subItem.title}
+                        </MobileNavigationMenuLink>
+                      </MobileNavigationMenuItem>
+                    );
+                  })}
                 </ul>
               </CollapsibleContent>
             </MobileNavigationMenuItem>

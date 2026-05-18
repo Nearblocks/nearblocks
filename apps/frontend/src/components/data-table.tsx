@@ -1,6 +1,13 @@
 'use client';
 
-import { ArrowDown, ArrowUp, ArrowUpDown, Inbox, X } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Download,
+  Inbox,
+  X,
+} from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { ReactNode } from 'react';
 
@@ -16,6 +23,7 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
+  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from '@/ui/pagination';
@@ -36,14 +44,34 @@ export type DataTableColumnDef<TData> = {
   cell: (row: TData) => ReactNode;
   cellClassName?: string;
   className?: string;
+  csvLabel?: string;
+  csvValue?: (row: TData) => number | string;
   enableFilter?: boolean;
   enableSort?: boolean;
   filterName?: string;
   filterPlaceholder?: string;
   header?: ((helpers: FilterHelpers) => ReactNode) | ReactNode;
   id?: string;
+  skeletonCell?: ReactNode;
   skeletonWidth?: string;
   sortName?: string;
+};
+
+const csvEscape = (value: number | string) => {
+  const str = String(value);
+  return /[",\n\r]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+};
+
+const downloadCsv = (filename: string, csv: string) => {
+  const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 };
 
 export type FilterHelpers = {
@@ -61,6 +89,7 @@ type DataTableProps<TData> = {
   columns: DataTableColumnDef<TData>[];
   data?: null | TData[];
   defaultSort?: string;
+  downloadFilename?: string;
   emptyIcon?: ReactNode;
   emptyMessage?: string;
   extraFilters?: Array<{ label: string; name: string; value: string }>;
@@ -69,7 +98,10 @@ type DataTableProps<TData> = {
   loading?: boolean;
   onClear?: (data: FilterClearData) => void;
   onFilter?: (value: FilterData) => void;
-  onPaginationNavigate?: (type: 'next' | 'prev', cursor: string) => string;
+  onPaginationNavigate?: (
+    type: 'first' | 'next' | 'prev',
+    cursor: string,
+  ) => string;
   onSortNavigate?: (sort: string, order: 'asc' | 'desc') => string;
   pagination?: null | PaginationMeta;
   skeletonRows?: number;
@@ -80,6 +112,7 @@ export const DataTable = <TData,>({
   columns,
   data,
   defaultSort,
+  downloadFilename,
   emptyIcon = <Inbox />,
   emptyMessage = 'No data found',
   extraFilters,
@@ -94,6 +127,61 @@ export const DataTable = <TData,>({
   skeletonRows = 25,
 }: DataTableProps<TData>) => {
   const searchParams = useSearchParams();
+
+  const csvColumns = columns.filter(
+    (
+      c,
+    ): c is DataTableColumnDef<TData> & {
+      csvLabel: string;
+      csvValue: (row: TData) => number | string;
+    } => !!c.csvLabel && !!c.csvValue,
+  );
+  const canDownload =
+    !!downloadFilename &&
+    csvColumns.length > 0 &&
+    !!data &&
+    data.length > 0 &&
+    !loading;
+
+  const onDownload = () => {
+    if (!data || !downloadFilename) return;
+    const header = csvColumns.map((c) => csvEscape(c.csvLabel)).join(',');
+    const rows = data.map((row) =>
+      csvColumns.map((c) => csvEscape(c.csvValue(row))).join(','),
+    );
+    downloadCsv(downloadFilename, [header, ...rows].join('\n'));
+  };
+
+  const hasPagination = !!pagination?.next_page || !!pagination?.prev_page;
+  const renderPagination = () => (
+    <Pagination className="mx-0 w-auto">
+      <PaginationContent>
+        {pagination?.prev_page && onPaginationNavigate && (
+          <PaginationItem>
+            <PaginationLink href={onPaginationNavigate('first', '')} size="sm">
+              First
+            </PaginationLink>
+          </PaginationItem>
+        )}
+        {pagination?.prev_page && onPaginationNavigate && (
+          <PaginationItem>
+            <PaginationPrevious
+              href={onPaginationNavigate('prev', pagination.prev_page)}
+              size="sm"
+            />
+          </PaginationItem>
+        )}
+        {pagination?.next_page && onPaginationNavigate && (
+          <PaginationItem>
+            <PaginationNext
+              href={onPaginationNavigate('next', pagination.next_page)}
+              size="sm"
+            />
+          </PaginationItem>
+        )}
+      </PaginationContent>
+    </Pagination>
+  );
 
   const filterHelpers: FilterHelpers = {
     onClear: (data) =>
@@ -152,8 +240,12 @@ export const DataTable = <TData,>({
 
   return (
     <>
-      {(header || activeFilters.length > 0 || actions) && (
-        <div className="text-body-sm flex flex-wrap items-center justify-between gap-1 border-b px-4 py-3">
+      {(header ||
+        activeFilters.length > 0 ||
+        actions ||
+        canDownload ||
+        hasPagination) && (
+        <div className="text-body-sm flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
           <div className="leading-7">{header}</div>
           <div className="flex flex-wrap items-center gap-2">
             {activeFilters.length > 0 && !loading && (
@@ -176,6 +268,18 @@ export const DataTable = <TData,>({
               </>
             )}
             {loading ? <Skeleton className="h-7 w-40" /> : actions}
+            {canDownload && (
+              <Button
+                onClick={onDownload}
+                size="sm"
+                title="Download visible rows as CSV"
+                variant="outline"
+              >
+                <Download className="size-3.5" />
+                Download Page Data
+              </Button>
+            )}
+            {!loading && hasPagination && renderPagination()}
           </div>
         </div>
       )}
@@ -207,10 +311,15 @@ export const DataTable = <TData,>({
               {[...Array(skeletonRows)].map((_, i) => (
                 <TableRow className="h-15" key={i}>
                   {columns.map((column, j) => (
-                    <TableCell key={column.id ?? j}>
-                      <Skeleton
-                        className={cn('w-[60%]', column.skeletonWidth)}
-                      />
+                    <TableCell
+                      className={cn('truncate px-3', column.cellClassName)}
+                      key={column.id ?? j}
+                    >
+                      {column.skeletonCell ?? (
+                        <Skeleton
+                          className={cn('w-[60%]', column.skeletonWidth)}
+                        />
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -262,34 +371,9 @@ export const DataTable = <TData,>({
       >
         {() => (
           <>
-            {(pagination?.next_page || pagination?.prev_page) && (
-              <div className="flex items-center border-t p-4 py-3">
-                <Pagination className="justify-end">
-                  <PaginationContent>
-                    {pagination?.prev_page && onPaginationNavigate && (
-                      <PaginationItem>
-                        <PaginationPrevious
-                          href={onPaginationNavigate(
-                            'prev',
-                            pagination.prev_page,
-                          )}
-                          size="sm"
-                        />
-                      </PaginationItem>
-                    )}
-                    {pagination?.next_page && onPaginationNavigate && (
-                      <PaginationItem>
-                        <PaginationNext
-                          href={onPaginationNavigate(
-                            'next',
-                            pagination.next_page,
-                          )}
-                          size="sm"
-                        />
-                      </PaginationItem>
-                    )}
-                  </PaginationContent>
-                </Pagination>
+            {hasPagination && (
+              <div className="flex items-center justify-end border-t p-4 py-3">
+                {renderPagination()}
               </div>
             )}
           </>
