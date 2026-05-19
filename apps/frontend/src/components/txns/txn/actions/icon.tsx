@@ -55,7 +55,7 @@ const variants = (action: ActionKind) => {
   }
 };
 
-const badgeClass = 'rounded-full size-10 p-0';
+const badgeClass = 'rounded-full size-12 p-0';
 
 export const TxnIcon = ({ actions }: Props) => {
   if (!actions || actions?.length === 0) {
