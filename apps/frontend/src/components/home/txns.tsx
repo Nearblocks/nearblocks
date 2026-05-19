@@ -52,7 +52,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                           <div className="bg-muted shrink-0 rounded-lg p-2">
                             <ArrowLeftRight className="size-6" />
                           </div>
-                          <div className="text-body-sm flex flex-col">
+                          <div className="text-body-sm flex flex-col leading-tight">
                             <h4 className="text-link font-medium">
                               <Skeleton className="w-40" />
                             </h4>
@@ -107,7 +107,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                             <div className="bg-muted shrink-0 rounded-lg p-2">
                               <ArrowLeftRight className="size-6" />
                             </div>
-                            <div className="text-body-sm flex min-w-0 flex-col">
+                            <div className="text-body-sm flex min-w-0 flex-col leading-tight">
                               <h4 className="text-link flex font-medium">
                                 <Link
                                   className="inline-block w-40 truncate"
