@@ -35,7 +35,7 @@ export const Actions = ({ loading, txnPromise }: Props) => {
               {() => <TxnIcon actions={txn!.actions} />}
             </SkeletonSlot>
           </div>
-          <div className="min-w-0 flex-1 leading-tight">
+          <div className="min-w-0 flex-1">
             <h2 className="text-headline-xs font-medium uppercase">
               {t('actions.title')}
             </h2>
