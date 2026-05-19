@@ -50,14 +50,14 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                     <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="bg-muted shrink-0 rounded-lg p-1.5">
+                          <div className="bg-muted shrink-0 rounded-lg p-2">
                             <Box className="size-5" />
                           </div>
                           <div className="text-body-sm flex flex-col">
                             <h4 className="text-link font-normal">
                               <Skeleton className="w-20" />
                             </h4>
-                            <p className="text-body-xs text-muted-foreground mt-0.5">
+                            <p className="text-body-xs text-muted-foreground">
                               <Skeleton className="w-20" />
                             </p>
                           </div>
@@ -74,7 +74,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         <h4 className="flex gap-1 font-normal whitespace-nowrap">
                           {t('blocks.author')} <Skeleton className="w-40" />
                         </h4>
-                        <p className="text-body-xs text-muted-foreground mt-0.5">
+                        <p className="text-body-xs text-muted-foreground">
                           <Skeleton className="w-20" />
                         </p>
                       </div>
@@ -104,7 +104,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                       <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                         <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                           <div className="flex min-w-0 items-center gap-3">
-                            <div className="bg-muted shrink-0 rounded-lg p-1.5">
+                            <div className="bg-muted shrink-0 rounded-lg p-2">
                               <Box className="size-5" />
                             </div>
                             <div className="text-body-sm flex flex-col">
@@ -113,7 +113,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                                   {numberFormat(block.block_height)}
                                 </Link>
                               </h4>
-                              <p className="text-body-xs text-muted-foreground mt-0.5">
+                              <p className="text-body-xs text-muted-foreground">
                                 <TimeAgo ns={block.block_timestamp} />
                               </p>
                             </div>
@@ -136,7 +136,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                               {block.author_account_id}
                             </Link>
                           </h4>
-                          <p className="text-body-xs text-muted-foreground mt-0.5">
+                          <p className="text-body-xs text-muted-foreground">
                             {block.transactions_agg.count} {t('blocks.txns')}
                           </p>
                         </div>

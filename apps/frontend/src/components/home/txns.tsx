@@ -49,14 +49,14 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                     <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="bg-muted shrink-0 rounded-lg p-1.5">
+                          <div className="bg-muted shrink-0 rounded-lg p-2">
                             <ArrowLeftRight className="size-5" />
                           </div>
                           <div className="text-body-sm flex flex-col">
                             <h4 className="text-link font-normal">
                               <Skeleton className="w-40" />
                             </h4>
-                            <p className="text-body-xs text-muted-foreground mt-0.5">
+                            <p className="text-body-xs text-muted-foreground">
                               <Skeleton className="w-20" />
                             </p>
                           </div>
@@ -104,7 +104,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                       <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                         <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                           <div className="flex min-w-0 items-center gap-3">
-                            <div className="bg-muted shrink-0 rounded-lg p-1.5">
+                            <div className="bg-muted shrink-0 rounded-lg p-2">
                               <ArrowLeftRight className="size-5" />
                             </div>
                             <div className="text-body-sm flex min-w-0 flex-col">
@@ -116,7 +116,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                                   {txn.transaction_hash}
                                 </Link>
                               </h4>
-                              <p className="text-body-xs text-muted-foreground mt-0.5">
+                              <p className="text-body-xs text-muted-foreground">
                                 <TimeAgo ns={txn.block?.block_timestamp} />
                               </p>
                             </div>
