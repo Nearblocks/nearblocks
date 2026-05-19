@@ -46,10 +46,10 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
               <>
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Fragment key={i}>
-                    <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
+                    <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="bg-muted shrink-0 rounded-lg p-2">
+                          <div className="bg-muted shrink-0 rounded-lg p-2.5">
                             <ArrowLeftRight className="size-5" />
                           </div>
                           <div className="text-body-sm flex flex-col">
@@ -69,7 +69,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                           <Skeleton className="w-10" />
                         </Badge>
                       </div>
-                      <div className="text-body-sm @lg:flex-1">
+                      <div className="text-body-sm flex flex-col gap-1 @lg:flex-1">
                         <h4 className="flex gap-1 font-normal">
                           {t('txns.from')} <Skeleton className="w-40" />
                         </h4>
@@ -101,10 +101,10 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                   });
                   return (
                     <Fragment key={txn.transaction_hash}>
-                      <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
+                      <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                         <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                           <div className="flex min-w-0 items-center gap-3">
-                            <div className="bg-muted shrink-0 rounded-lg p-2">
+                            <div className="bg-muted shrink-0 rounded-lg p-2.5">
                               <ArrowLeftRight className="size-5" />
                             </div>
                             <div className="text-body-sm flex min-w-0 flex-col">
@@ -129,7 +129,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                             {amount}
                           </Badge>
                         </div>
-                        <div className="text-body-sm @lg:flex-1">
+                        <div className="text-body-sm flex flex-col gap-1 @lg:flex-1">
                           <h4 className="flex gap-1 font-normal whitespace-nowrap">
                             {t('txns.from')}{' '}
                             <Link

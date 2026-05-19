@@ -47,10 +47,10 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
               <>
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Fragment key={i}>
-                    <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
+                    <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="bg-muted shrink-0 rounded-lg p-2">
+                          <div className="bg-muted shrink-0 rounded-lg p-2.5">
                             <Box className="size-5" />
                           </div>
                           <div className="text-body-sm flex flex-col">
@@ -101,10 +101,10 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                   })} Tgas`;
                   return (
                     <Fragment key={block.block_height}>
-                      <div className="flex flex-col gap-1 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
+                      <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                         <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                           <div className="flex min-w-0 items-center gap-3">
-                            <div className="bg-muted shrink-0 rounded-lg p-2">
+                            <div className="bg-muted shrink-0 rounded-lg p-2.5">
                               <Box className="size-5" />
                             </div>
                             <div className="text-body-sm flex flex-col">
