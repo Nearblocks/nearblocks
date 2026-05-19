@@ -150,7 +150,7 @@ export const TxnReceiptErrors = ({ receipts }: ErrorsProps) => {
   return (
     <>
       {!isTxnFailed && (
-        <Badge className="text-body-xs" variant="red">
+        <Badge variant="red">
           {failed} Failed Receipt{failed > 1 ? 's' : ''}
         </Badge>
       )}
