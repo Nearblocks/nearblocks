@@ -37,7 +37,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-base">{t('txns.title')}</CardTitle>
+        <CardTitle className="text-headline-sm">{t('txns.title')}</CardTitle>
       </CardHeader>
       <ScrollArea className="h-78.5">
         <CardContent className="@container p-3">
@@ -52,11 +52,11 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                           <div className="bg-muted shrink-0 rounded-lg p-2.5">
                             <ArrowLeftRight className="size-5" />
                           </div>
-                          <div className="text-body-sm flex flex-col">
+                          <div className="text-body-sm flex flex-col leading-tight">
                             <h4 className="text-link font-medium">
                               <Skeleton className="w-40" />
                             </h4>
-                            <p className="text-body-xs text-muted-foreground">
+                            <p className="text-body-2xs text-muted-foreground">
                               <Skeleton className="w-20" />
                             </p>
                           </div>
@@ -107,7 +107,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                             <div className="bg-muted shrink-0 rounded-lg p-2.5">
                               <ArrowLeftRight className="size-5" />
                             </div>
-                            <div className="text-body-sm flex min-w-0 flex-col">
+                            <div className="text-body-sm flex min-w-0 flex-col leading-tight">
                               <h4 className="text-link flex font-medium">
                                 <Link
                                   className="inline-block w-40 truncate"
@@ -116,7 +116,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                                   {txn.transaction_hash}
                                 </Link>
                               </h4>
-                              <p className="text-body-xs text-muted-foreground">
+                              <p className="text-body-2xs text-muted-foreground">
                                 <TimeAgo ns={txn.block?.block_timestamp} />
                               </p>
                             </div>

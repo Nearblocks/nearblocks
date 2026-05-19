@@ -36,9 +36,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-base">
-          {t('blocks.title')}
-        </CardTitle>
+        <CardTitle className="text-headline-sm">{t('blocks.title')}</CardTitle>
       </CardHeader>
       <ScrollArea className="h-78.5">
         <CardContent className="@container p-3">
@@ -53,11 +51,11 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                           <div className="bg-muted shrink-0 rounded-lg p-2.5">
                             <Box className="size-5" />
                           </div>
-                          <div className="text-body-sm flex flex-col">
+                          <div className="text-body-sm flex flex-col leading-tight">
                             <h4 className="text-link font-medium">
                               <Skeleton className="w-20" />
                             </h4>
-                            <p className="text-body-xs text-muted-foreground">
+                            <p className="text-body-2xs text-muted-foreground">
                               <Skeleton className="w-20" />
                             </p>
                           </div>
@@ -74,7 +72,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         <h4 className="flex gap-1 font-normal whitespace-nowrap">
                           {t('blocks.author')} <Skeleton className="w-40" />
                         </h4>
-                        <p className="text-body-xs text-muted-foreground">
+                        <p className="text-body-2xs text-muted-foreground">
                           <Skeleton className="w-20" />
                         </p>
                       </div>
@@ -107,13 +105,13 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                             <div className="bg-muted shrink-0 rounded-lg p-2.5">
                               <Box className="size-5" />
                             </div>
-                            <div className="text-body-sm flex flex-col">
+                            <div className="text-body-sm flex flex-col leading-tight">
                               <h4 className="text-link font-medium">
                                 <Link href={`/blocks/${block.block_height}`}>
                                   {numberFormat(block.block_height)}
                                 </Link>
                               </h4>
-                              <p className="text-body-xs text-muted-foreground">
+                              <p className="text-body-2xs text-muted-foreground">
                                 <TimeAgo ns={block.block_timestamp} />
                               </p>
                             </div>
@@ -136,7 +134,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                               {block.author_account_id}
                             </Link>
                           </h4>
-                          <p className="text-body-xs text-muted-foreground">
+                          <p className="text-body-2xs text-muted-foreground">
                             {block.transactions_agg.count} {t('blocks.txns')}
                           </p>
                         </div>
