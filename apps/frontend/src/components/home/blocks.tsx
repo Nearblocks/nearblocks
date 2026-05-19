@@ -51,7 +51,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                           <div className="bg-muted shrink-0 rounded-lg p-2">
                             <Box className="size-5" />
                           </div>
-                          <div className="text-body-sm flex flex-col leading-tight">
+                          <div className="text-body-sm flex flex-col">
                             <h4 className="text-link font-medium">
                               <Skeleton className="w-20" />
                             </h4>
@@ -105,7 +105,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                             <div className="bg-muted shrink-0 rounded-lg p-2">
                               <Box className="size-5" />
                             </div>
-                            <div className="text-body-sm flex flex-col leading-tight">
+                            <div className="text-body-sm flex flex-col">
                               <h4 className="text-link font-medium">
                                 <Link href={`/blocks/${block.block_height}`}>
                                   {numberFormat(block.block_height)}
