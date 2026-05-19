@@ -24,7 +24,7 @@ export const Footer = () => {
             <Link href="/">
               <Logo className="text-primary h-9" />
             </Link>
-            <p className="text-muted-foreground max-w-85">
+            <p className="text-foreground/80 max-w-85">
               {t('footer.description')}
             </p>
             <div className="flex gap-2">
@@ -142,13 +142,13 @@ export const Footer = () => {
           <p className="text-body-sm text-primary">
             {t('footer.copyright')} {new Date().getFullYear()}
           </p>
-          <p className="text-body-sm text-muted-foreground flex items-center gap-2">
+          <p className="text-body-sm text-foreground/80 flex items-center gap-2">
             {t('footer.disclaimer')}{' '}
             <Link href="https://www.coingecko.com/" target="_blank">
               <CoinGecko className="size-5" />
             </Link>
           </p>
-          <p className="text-body-sm text-muted-foreground">
+          <p className="text-body-sm text-foreground/80">
             {t('footer.trademark')}
           </p>
         </div>
