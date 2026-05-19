@@ -9,7 +9,7 @@ import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -107,13 +107,19 @@ export const NftTokens = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !tokenCount}
             >
-              {() => (
-                <>
-                  {t('tokens.contractsTotal', {
-                    count: numberFormat(tokenCount?.data?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = tokenCount?.data?.count ?? 0;
+                return (
+                  <>
+                    {t(
+                      isApproxCount(count)
+                        ? 'tokens.contractsTotal'
+                        : 'tokens.contractsTotalExact',
+                      { count: countFormat(count) },
+                    )}
+                  </>
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!tokens?.errors}

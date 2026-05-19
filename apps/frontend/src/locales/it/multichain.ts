@@ -9,7 +9,7 @@ export const multichain = {
     receiptId: 'Receipt ID',
     sourceTxn: 'Source Txn Hash',
     total: 'More than {{count}} multichain transactions found',
-    totalExact: 'More than {{count}} multichain transactions found',
+    totalExact: 'A total of {{count}} multichain transactions found',
   },
   meta: {
     description:

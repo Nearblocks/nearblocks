@@ -14,7 +14,7 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { countFormat, nearFormat } from '@/lib/format';
+import { countFormat, isApproxCount, nearFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -147,7 +147,14 @@ export const StakingTxns = ({
               {() => {
                 const count = stakingCount?.count;
                 if (!count || count === '0') return null;
-                return <>{t('list.total', { count: countFormat(count) })}</>;
+                return (
+                  <>
+                    {t(
+                      isApproxCount(count) ? 'list.total' : 'list.totalExact',
+                      { count: countFormat(count) },
+                    )}
+                  </>
+                );
               }}
             </SkeletonSlot>
           }

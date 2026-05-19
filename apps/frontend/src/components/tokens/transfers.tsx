@@ -13,7 +13,7 @@ import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -160,7 +160,14 @@ export const TokenTransfers = ({
                 const count = txnCount?.data?.count;
                 if (!count || count === '0') return null;
                 return (
-                  <>{t('transfers.total', { count: countFormat(count) })}</>
+                  <>
+                    {t(
+                      isApproxCount(count)
+                        ? 'transfers.total'
+                        : 'transfers.totalExact',
+                      { count: countFormat(count) },
+                    )}
+                  </>
                 );
               }}
             </SkeletonSlot>

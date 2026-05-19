@@ -54,7 +54,7 @@ export const txns = {
     method: 'Method',
     to: 'To',
     total: 'More than {{count}} transactions found',
-    totalExact: 'More than {{count}} transactions found',
+    totalExact: 'A total of {{count}} transactions found',
     txnHash: 'Transaction Hash',
   },
   meta: {

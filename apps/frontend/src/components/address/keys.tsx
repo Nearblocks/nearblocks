@@ -15,7 +15,7 @@ import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { nearFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, nearFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { AccessKeyPermission } from '@/types/types';
 import { Badge } from '@/ui/badge';
@@ -198,13 +198,17 @@ export const AccessKeys = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !keyCount}
             >
-              {() => (
-                <>
-                  {t('keys.total', {
-                    count: numberFormat(keyCount?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = keyCount?.count ?? 0;
+                return (
+                  <>
+                    {t(
+                      isApproxCount(count) ? 'keys.total' : 'keys.totalExact',
+                      { count: countFormat(count) },
+                    )}
+                  </>
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!keys?.errors}

@@ -12,7 +12,7 @@ import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -155,7 +155,12 @@ export const NftTransfers = ({
                 if (!count || count === '0') return null;
                 return (
                   <>
-                    {t('tokenTransfers.total', { count: countFormat(count) })}
+                    {t(
+                      isApproxCount(count)
+                        ? 'tokenTransfers.total'
+                        : 'tokenTransfers.totalExact',
+                      { count: countFormat(count) },
+                    )}
                   </>
                 );
               }}
