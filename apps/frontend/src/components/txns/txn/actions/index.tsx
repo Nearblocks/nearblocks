@@ -29,14 +29,14 @@ export const Actions = ({ loading, txnPromise }: Props) => {
         <div className="flex items-center gap-3">
           <div className="shrink-0">
             <SkeletonSlot
-              fallback={<Skeleton className="size-10 rounded-full" />}
+              fallback={<Skeleton className="size-12 rounded-full" />}
               loading={loading || !txn}
             >
               {() => <TxnIcon actions={txn!.actions} />}
             </SkeletonSlot>
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-headline-xs font-medium uppercase">
+            <h2 className="text-headline-xs leading-normal font-medium uppercase">
               {t('actions.title')}
             </h2>
             <SkeletonSlot
