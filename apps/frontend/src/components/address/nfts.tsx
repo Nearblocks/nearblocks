@@ -72,7 +72,7 @@ export const NFTTxns = ({
       cell: (nft) => (
         <Badge variant="teal">
           <Truncate>
-            <TruncateText className="max-w-20" text={nft.cause} />
+            <TruncateText as="code" className="max-w-20" text={nft.cause} />
           </Truncate>
         </Badge>
       ),

@@ -112,6 +112,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
         <Badge className="text-body-xs px-1.5 py-0.5" variant="blue">
           <Truncate>
             <TruncateText
+              as="code"
               className="max-w-30"
               text={row.action.method ?? row.action.action}
             />

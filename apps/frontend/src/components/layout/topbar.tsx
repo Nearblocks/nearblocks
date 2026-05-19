@@ -38,7 +38,7 @@ export const TopBar = ({ statsPromise }: Props) => {
             <NearPrice statsPromise={statsPromise} />
           </ErrorSuspense>
         ) : (
-          <span className="text-body-xs text-red-foreground shrink-0 whitespace-nowrap">
+          <span className="text-body-xs text-red-foreground shrink-0 px-2 whitespace-nowrap">
             {t('header.testnetNetwork')}
           </span>
         )}

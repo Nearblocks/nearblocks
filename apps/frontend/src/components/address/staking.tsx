@@ -114,7 +114,7 @@ export const StakingTxns = ({
       cell: (staking) => (
         <Badge variant="teal">
           <Truncate>
-            <TruncateText className="max-w-20" text={staking.type} />
+            <TruncateText as="code" className="max-w-20" text={staking.type} />
           </Truncate>
         </Badge>
       ),

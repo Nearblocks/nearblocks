@@ -66,7 +66,7 @@ export const MTTxns = ({
       cell: (mt) => (
         <Badge variant="teal">
           <Truncate>
-            <TruncateText className="max-w-20" text={mt.cause} />
+            <TruncateText as="code" className="max-w-20" text={mt.cause} />
           </Truncate>
         </Badge>
       ),

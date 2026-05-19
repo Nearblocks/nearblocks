@@ -118,6 +118,7 @@ export const Receipts = ({
         <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
           <Truncate>
             <TruncateText
+              as="code"
               className="max-w-20"
               text={actionMethod(receipt.actions)}
             />
