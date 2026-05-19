@@ -53,7 +53,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                             <ArrowLeftRight className="size-5" />
                           </div>
                           <div className="text-body-sm flex flex-col">
-                            <h4 className="text-link font-normal">
+                            <h4 className="text-link font-medium">
                               <Skeleton className="w-40" />
                             </h4>
                             <p className="text-body-xs text-muted-foreground">
@@ -108,7 +108,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                               <ArrowLeftRight className="size-5" />
                             </div>
                             <div className="text-body-sm flex min-w-0 flex-col">
-                              <h4 className="text-link flex font-normal">
+                              <h4 className="text-link flex font-medium">
                                 <Link
                                   className="inline-block w-40 truncate"
                                   href={`/txns/${txn.transaction_hash}`}
