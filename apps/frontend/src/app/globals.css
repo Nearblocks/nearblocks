@@ -352,6 +352,7 @@
 
   code {
     @apply font-mono;
+    font-size: 0.9em;
   }
 }
 
@@ -430,8 +431,10 @@
   --prism-attribute: #d2a8ff;
 }
 
-.prism-code {
+.prism-code,
+.prism-code code {
   color: var(--prism-text);
+  font-size: 0.8125rem;
   tab-size: 4;
 }
 

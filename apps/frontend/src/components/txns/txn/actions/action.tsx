@@ -34,7 +34,9 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         {full ? (
           <>
             {t('actions.call')}{' '}
-            <Badge variant="blue">{action.method || 'method'}</Badge>{' '}
+            <Badge variant="blue">
+              <code>{action.method || 'method'}</code>
+            </Badge>{' '}
             {t('actions.by')}{' '}
             <AccountLink account={signer} textClassName="max-w-40" />{' '}
             {t('actions.on')}{' '}
@@ -43,7 +45,9 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         ) : (
           <>
             {t('actions.calledMethod')}{' '}
-            <Badge variant="blue">{action.method || 'method'}</Badge>{' '}
+            <Badge variant="blue">
+              <code>{action.method || 'method'}</code>
+            </Badge>{' '}
             {t('actions.inContract')}{' '}
             <AccountLink account={receiver} textClassName="max-w-40" />
           </>
