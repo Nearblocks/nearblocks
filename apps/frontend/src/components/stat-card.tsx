@@ -26,7 +26,7 @@ const StatBody = ({
   <Card
     className={
       href
-        ? 'hover:border-primary group relative h-full px-4 py-3 transition-colors'
+        ? 'group relative h-full px-4 py-3 transition-colors'
         : 'h-full px-4 py-3'
     }
   >

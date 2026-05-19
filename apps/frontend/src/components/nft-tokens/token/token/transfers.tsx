@@ -60,7 +60,7 @@ export const NftTransfers = ({
     },
     {
       cell: (nft) => (
-        <Badge variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
           <Truncate>
             <TruncateText className="max-w-20" text={nft.cause} />
           </Truncate>

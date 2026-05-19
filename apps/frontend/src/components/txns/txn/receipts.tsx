@@ -109,7 +109,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
     },
     {
       cell: (row) => (
-        <Badge variant="blue">
+        <Badge className="text-body-xs px-1.5 py-0.5" variant="blue">
           <Truncate>
             <TruncateText
               className="max-w-30"

@@ -99,8 +99,8 @@ export const TxnDirection = ({ address, amount, from, to }: DirectionProps) => {
 };
 
 export const TxnDirectionIcon = () => (
-  <div className="bg-teal-background flex size-6 items-center justify-center rounded-full">
-    <MoveRight className="text-teal-foreground size-4" />
+  <div className="bg-teal-background flex size-5 items-center justify-center rounded-full">
+    <MoveRight className="text-teal-foreground size-3" />
   </div>
 );
 
