@@ -37,6 +37,7 @@ export const TxnsChart = ({ data }: Props) => {
         styledMode: true,
       },
       credits: { enabled: false },
+      exporting: { enabled: false },
       legend: { enabled: false },
       plotOptions: {
         series: {
