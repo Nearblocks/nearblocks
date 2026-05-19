@@ -203,9 +203,10 @@ export const MTTxns = ({
             >
               {() => {
                 const count = mtCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count) ? 'mts.total' : 'mts.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

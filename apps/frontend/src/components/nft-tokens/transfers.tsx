@@ -60,7 +60,7 @@ export const NftTokenTransfers = ({
     },
     {
       cell: (nft) => (
-        <Badge variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
           <Truncate>
             <TruncateText className="max-w-20" text={nft.cause} />
           </Truncate>
@@ -165,13 +165,13 @@ export const NftTokenTransfers = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !txnCount}
             >
-              {() => (
-                <>
-                  {t('transfers.total', {
-                    count: countFormat(txnCount?.data?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = txnCount?.data?.count;
+                if (!count || count === '0') return null;
+                return (
+                  <>{t('transfers.total', { count: countFormat(count) })}</>
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!txns?.errors}

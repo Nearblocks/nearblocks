@@ -73,7 +73,7 @@ export const Overview = ({
     <Card>
       <CardContent className="px-2 py-2">
         {network !== 'mainnet' && (
-          <p className="text-red-foreground px-1 py-3">
+          <p className="text-red-foreground text-body-xs px-1 py-2">
             [{t('overview.testnetNotice')}]
           </p>
         )}

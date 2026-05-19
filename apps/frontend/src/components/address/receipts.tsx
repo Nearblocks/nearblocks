@@ -216,11 +216,12 @@ export const Receipts = ({
             >
               {() => {
                 const count = receiptCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count)
                     ? 'receipts.total'
                     : 'receipts.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

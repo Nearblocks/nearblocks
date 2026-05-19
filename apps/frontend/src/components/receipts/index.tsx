@@ -68,7 +68,7 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => (
-        <Badge className="text-body-xs px-1.5 py-0" variant="teal">
+        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
           <Truncate>
             <TruncateText
               className="max-w-20"
@@ -168,9 +168,10 @@ export const Receipts = ({
             >
               {() => {
                 const count = receiptCount?.count;
+                if (!count || count === '0') return null;
                 return t(
                   isApproxCount(count) ? 'list.total' : 'list.totalExact',
-                  { count: countFormat(count ?? 0) },
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

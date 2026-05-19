@@ -144,13 +144,11 @@ export const StakingTxns = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !stakingCount}
             >
-              {() => (
-                <>
-                  {t('list.total', {
-                    count: countFormat(stakingCount?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = stakingCount?.count;
+                if (!count || count === '0') return null;
+                return <>{t('list.total', { count: countFormat(count) })}</>;
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!staking?.errors}

@@ -150,13 +150,15 @@ export const NftTransfers = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !txnCount}
             >
-              {() => (
-                <>
-                  {t('tokenTransfers.total', {
-                    count: countFormat(txnCount?.data?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = txnCount?.data?.count;
+                if (!count || count === '0') return null;
+                return (
+                  <>
+                    {t('tokenTransfers.total', { count: countFormat(count) })}
+                  </>
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!txns?.errors}
