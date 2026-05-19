@@ -50,7 +50,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
                           <div className="bg-muted shrink-0 rounded-lg p-2">
-                            <ArrowLeftRight className="size-5" />
+                            <ArrowLeftRight className="size-6" />
                           </div>
                           <div className="text-body-sm flex flex-col">
                             <h4 className="text-link font-medium">
@@ -105,7 +105,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                         <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                           <div className="flex min-w-0 items-center gap-3">
                             <div className="bg-muted shrink-0 rounded-lg p-2">
-                              <ArrowLeftRight className="size-5" />
+                              <ArrowLeftRight className="size-6" />
                             </div>
                             <div className="text-body-sm flex min-w-0 flex-col">
                               <h4 className="text-link flex font-medium">
