@@ -8,9 +8,14 @@ import { useMemo } from 'react';
 type Props = {
   children: React.ReactNode;
   height?: number;
+  showRangeSelector?: boolean;
 };
 
-export const AnalyticsChart = ({ children, height = 420 }: Props) => {
+export const AnalyticsChart = ({
+  children,
+  height = 420,
+  showRangeSelector = true,
+}: Props) => {
   const options = useMemo(() => {
     const options = {
       chart: {
@@ -38,28 +43,30 @@ export const AnalyticsChart = ({ children, height = 420 }: Props) => {
           marker: { enabled: false },
         },
       },
-      rangeSelector: {
-        allButtonsEnabled: true,
-        buttonPosition: {
-          // align: 'right' as const,
-          x: -20,
-          y: -4,
-        },
-        buttonSpacing: 8,
-        buttonTheme: {
-          height: 28,
-          padding: 0,
-          r: 8,
-          width: 32,
-        },
-        floating: false,
-        inputEnabled: false,
-      },
+      rangeSelector: showRangeSelector
+        ? {
+            allButtonsEnabled: true,
+            buttonPosition: {
+              // align: 'right' as const,
+              x: -20,
+              y: -4,
+            },
+            buttonSpacing: 8,
+            buttonTheme: {
+              height: 28,
+              padding: 0,
+              r: 8,
+              width: 32,
+            },
+            floating: false,
+            inputEnabled: false,
+          }
+        : { enabled: false },
       scrollbar: { enabled: false },
     };
 
     return options;
-  }, [height]);
+  }, [height, showRangeSelector]);
 
   return (
     <Chart chartConstructor="stockChart" options={options}>

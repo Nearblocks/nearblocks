@@ -327,4 +327,48 @@ export const address = {
     viewAll: 'View all transactions',
   },
   validate: 'Validate Account',
+  verifyContract: {
+    alreadyVerified: 'Contract already verified',
+    errorMessage: 'Failed to submit verification',
+    form: {
+      address: 'Contract Address',
+      buildEnv: 'Build Environment',
+      buildEnvRequired: 'Build environment is required',
+      language: 'Language',
+      nep330Required: 'Contract needs to be NEP-330 standard for verification',
+      sourceCode: 'Source Code',
+      sourceCodeRequired: 'Source code is required',
+      standard: 'Standard',
+      submit: 'Verify Contract',
+      verifier: 'Contract Verifier',
+    },
+    instructions: {
+      description:
+        'If you are the contract owner and wish to verify your smart contract, you need to make your source code publicly available. Check out the',
+      link: 'Verification Guide',
+      suffix: 'for detailed instructions.',
+      title: 'Verification Instructions',
+    },
+    meta: {
+      description: 'Verify a smart contract on the NEAR blockchain.',
+      title: 'Verify Contract',
+    },
+    nep330: {
+      description:
+        'This contract cannot be verified as it does not implement the NEP-330 standard, which is required for contract source metadata and verification.',
+      docsLink: 'NEP-330 Documentation',
+      guideLink: 'Verification Guide',
+      title: 'NEP-330 Standard Required',
+    },
+    noAccount:
+      'Enter a contract address in the URL to verify. Example: /verify-contract?account=your-contract.near',
+    notFound: {
+      description:
+        'Unable to retrieve contract information. Please verify the contract address and try again.',
+      guideLink: 'Verification Guide',
+      title: 'Contract Not Found',
+    },
+    successMessage: 'Verification submitted successfully',
+    title: 'Verify & Publish Contract Source Code',
+  },
 } as const;

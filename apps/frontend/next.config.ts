@@ -112,11 +112,6 @@ const nextConfig: NextConfig = {
         source: '/charts/active-accounts',
       },
       {
-        destination: '/charts/txns',
-        permanent: true,
-        source: '/charts/tps',
-      },
-      {
         destination: '/multichain-txns',
         permanent: true,
         source: '/charts/multichain-txns',
@@ -145,11 +140,6 @@ const nextConfig: NextConfig = {
         destination: '/mt-tokens/transfers',
         permanent: true,
         source: '/mt-token/:slug',
-      },
-      {
-        destination: '/',
-        permanent: true,
-        source: '/verify-contract',
       },
       {
         destination: '/',

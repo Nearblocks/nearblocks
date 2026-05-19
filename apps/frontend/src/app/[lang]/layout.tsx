@@ -66,6 +66,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
       className={`${
         theme === 'dark' ? 'dark highcharts-dark' : 'highcharts-light'
       } scroll-smooth`}
+      data-scroll-behavior="smooth"
       lang={locale}
       suppressHydrationWarning
     >

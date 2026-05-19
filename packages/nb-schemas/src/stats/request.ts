@@ -7,6 +7,11 @@ const daily = v.object({
   limit: v.optional(limit(365)),
 });
 
-export type DailyStatsReq = v.InferOutput<typeof daily>;
+const tps = v.object({
+  limit: v.optional(limit(60)),
+});
 
-export default { daily };
+export type DailyStatsReq = v.InferOutput<typeof daily>;
+export type TpsStatsReq = v.InferOutput<typeof tps>;
+
+export default { daily, tps };

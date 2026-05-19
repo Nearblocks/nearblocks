@@ -58,11 +58,23 @@ const routes = (app: Router) => {
    *     summary: Get transactions-per-second statistics
    *     tags:
    *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return (max 60).
+   *         schema:
+   *           type: integer
    *     responses:
    *       200:
    *         description: Success response
    */
-  app.get('/tps-stats', bearerAuth, rateLimiter, service.tps);
+  app.get(
+    '/tps-stats',
+    bearerAuth,
+    rateLimiter,
+    validate(request.tps),
+    service.tps,
+  );
 };
 
 export default routes;

@@ -3,17 +3,39 @@
 import { useState } from 'react';
 
 import { useLocale } from '@/hooks/use-locale';
-import { mapAccountToShard, SHARD_COUNT } from '@/lib/shard-layout';
+import { useProtocolConfig } from '@/hooks/use-protocol-config';
+import { mapAccountToShard } from '@/lib/shard-layout';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Field, FieldContent, FieldLabel, FieldSet } from '@/ui/field';
 import { Input } from '@/ui/input';
 
+type ShardLayout = {
+  V1?: { boundaryAccounts: string[] };
+  V2?: { boundaryAccounts: string[] };
+  V3?: { boundaryAccounts: string[] };
+};
+
+const getShardBoundaries = (layout: ShardLayout): string[] => {
+  if ('V3' in layout && layout.V3) return layout.V3.boundaryAccounts;
+  if ('V2' in layout && layout.V2) return layout.V2.boundaryAccounts;
+  if ('V1' in layout && layout.V1) return layout.V1.boundaryAccounts;
+  return [];
+};
+
 export const ShardMapperForm = () => {
   const { t } = useLocale('tools');
   const [account, setAccount] = useState('');
 
-  const shard = account.trim() ? mapAccountToShard(account.trim()) : null;
+  const { data: protocolConfig, error: configError } = useProtocolConfig();
+  const boundaries = protocolConfig?.shardLayout
+    ? getShardBoundaries(protocolConfig.shardLayout as ShardLayout)
+    : [];
+  const shardCount = boundaries.length + 1;
+  const shard =
+    account.trim() && boundaries.length > 0
+      ? mapAccountToShard(account.trim(), boundaries)
+      : null;
 
   return (
     <div className="bg-card rounded-lg p-6">
@@ -48,19 +70,28 @@ export const ShardMapperForm = () => {
         </FieldSet>
       </form>
 
+      {configError && (
+        <p className="text-destructive mt-4 max-w-xl text-sm">
+          {configError instanceof Error ? configError.message : 'RPC error'}
+        </p>
+      )}
+
+      {account.trim() && !protocolConfig && !configError && (
+        <div className="mt-6 max-w-xl">
+          <div className="bg-muted h-8 w-40 animate-pulse rounded" />
+        </div>
+      )}
+
       {shard !== null && (
         <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
           <div className="flex items-center gap-3">
             <Badge variant="blue">
-              {t('shard.shardOf', { count: shard, total: SHARD_COUNT })}
+              {t('shard.shardOf', { count: shard, total: shardCount })}
             </Badge>
             <span className="text-muted-foreground font-mono text-sm break-all">
               {account.trim()}
             </span>
           </div>
-          <p className="text-muted-foreground mt-4 text-xs">
-            {t('shard.hint')}
-          </p>
         </div>
       )}
     </div>
