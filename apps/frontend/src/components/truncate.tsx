@@ -13,6 +13,7 @@ export type TruncateProps = {
 };
 
 export type TruncateTextProps = {
+  as?: 'code' | 'span';
   className?: string;
   text: string;
   tooltipClassName?: string;
@@ -35,6 +36,7 @@ export const Truncate = ({ children, className }: TruncateProps) => {
 };
 
 export const TruncateText = ({
+  as: Component = 'span',
   className,
   text,
   tooltipClassName,
@@ -43,12 +45,12 @@ export const TruncateText = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span
+        <Component
           className={cn('inline-block max-w-30 truncate', className)}
           {...props}
         >
           {text}
-        </span>
+        </Component>
       </TooltipTrigger>
       <TooltipContent
         className={cn('max-w-50 wrap-break-word', tooltipClassName)}

@@ -35,6 +35,7 @@ export const fts = {
     percentage: 'Percentage',
     quantity: 'Quantity',
     total: 'More than {{count}} token holders found',
+    totalExact: 'A total of {{count}} token holders found',
     value: 'Value',
   },
   info: {
@@ -92,6 +93,7 @@ export const fts = {
     price: 'Price',
     title: 'TOKEN',
     total: 'More than {{count}} Token Contracts found',
+    totalExact: 'A total of {{count}} Token Contracts found',
     totalSupply: 'Total Supply',
     volume: 'Volume (24H)',
   },
@@ -106,6 +108,7 @@ export const fts = {
     to: 'To',
     token: 'Token',
     total: 'More than {{count}} token txns found',
+    totalExact: 'A total of {{count}} token txns found',
     txnHash: 'Transaction Hash',
   },
   transfersMeta: {

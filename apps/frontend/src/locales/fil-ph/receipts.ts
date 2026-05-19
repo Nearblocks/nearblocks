@@ -9,7 +9,7 @@ export const receipts = {
     receiptId: 'Receipt ID',
     to: 'To',
     total: 'More than {{count}} receipts found',
-    totalExact: 'More than {{count}} receipts found',
+    totalExact: 'A total of {{count}} receipts found',
   },
   meta: {
     description:

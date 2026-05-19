@@ -15,7 +15,7 @@ import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -119,13 +119,19 @@ export const NftTokenHolders = ({
               fallback={<Skeleton className="w-40" />}
               loading={loading || !holderCount}
             >
-              {() => (
-                <>
-                  {t('holders.total', {
-                    count: numberFormat(holderCount?.data?.count ?? 0),
-                  })}
-                </>
-              )}
+              {() => {
+                const count = holderCount?.data?.count ?? 0;
+                return (
+                  <>
+                    {t(
+                      isApproxCount(count)
+                        ? 'holders.total'
+                        : 'holders.totalExact',
+                      { count: countFormat(count) },
+                    )}
+                  </>
+                );
+              }}
             </SkeletonSlot>
           }
           loading={loading || !!holders?.errors}

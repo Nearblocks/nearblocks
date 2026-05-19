@@ -16,7 +16,7 @@ import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { NFTMedia } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import {
@@ -116,13 +116,19 @@ export const NftTokens = ({
           fallback={<Skeleton className="h-7 w-40" />}
           loading={loading || !tokenCount}
         >
-          {() => (
-            <span className="leading-7">
-              {t('inventory.total', {
-                count: numberFormat(tokenCount?.data?.count ?? 0),
-              })}
-            </span>
-          )}
+          {() => {
+            const count = tokenCount?.data?.count ?? 0;
+            return (
+              <span className="leading-7">
+                {t(
+                  isApproxCount(count)
+                    ? 'inventory.total'
+                    : 'inventory.totalExact',
+                  { count: countFormat(count) },
+                )}
+              </span>
+            );
+          }}
         </SkeletonSlot>
       </div>
       <CardContent className="text-body-sm p-4">
