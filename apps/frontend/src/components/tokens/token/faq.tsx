@@ -156,9 +156,10 @@ export const TokenFaq = ({
                     The{' '}
                     <AccountLink
                       account={contract?.contract}
+                      className="inline-flex"
                       hideCopy
                       name={name}
-                      textClassName="max-w-60 inline-block underline"
+                      textClassName="max-w-60 underline"
                     />{' '}
                     {t('faq.creationContractCreated')}{' '}
                     <span className="text-foreground">
@@ -172,12 +173,13 @@ export const TokenFaq = ({
                     {t('faq.creationBy')}{' '}
                     <AccountLink
                       account={firstDeployment.predecessor_account_id}
+                      className="inline-flex"
                       hideCopy
-                      textClassName="max-w-60 inline-block underline"
+                      textClassName="max-w-60 underline"
                     />{' '}
                     {t('faq.creationThrough')}{' '}
                     <Link
-                      className="text-link underline"
+                      className="text-link inline-block underline"
                       href={`/txns/${firstDeployment.transaction_hash}`}
                     >
                       {t('faq.creationThisTxn')}
