@@ -219,7 +219,7 @@ export const Overview = ({
           </h3>
           <div>
             <SkeletonSlot
-              fallback={<Skeleton className="h-24 w-full" />}
+              fallback={<Skeleton className="h-28 w-full" />}
               loading={!!loading}
             >
               {() => <TxnsChart data={dailyStats ?? []} />}
