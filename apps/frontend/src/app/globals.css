@@ -87,7 +87,7 @@
   --color-lime-foreground: #10b981;
 
   --background: color-mix(in oklch, var(--color-neutral-50) 92%, var(--color-teal-50));
-  --foreground: var(--color-neutral-600);
+  --foreground: #625f5f;
   --card: var(--color-white-950);
   --card-foreground: var(--color-neutral-800);
   --popover: var(--color-white-950);

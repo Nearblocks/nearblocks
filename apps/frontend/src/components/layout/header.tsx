@@ -156,14 +156,12 @@ export const Header = () => {
         <PopoverContent
           align="center"
           autoFocus={false}
-          className="w-(--radix-popper-available-width) rounded-t-none"
+          className="w-(--radix-popper-available-width) rounded-t-none p-2"
           onOpenAutoFocus={(event) => event.preventDefault()}
           side="bottom"
           sideOffset={0}
         >
-          <div className="container mx-auto px-4">
-            <MobileMenu menu={menu} />
-          </div>
+          <MobileMenu menu={menu} />
         </PopoverContent>
       </Popover>
     </header>
