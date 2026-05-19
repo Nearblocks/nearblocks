@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 
 import { DailyStats } from 'nb-schemas';
 
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { currencyFormat, dateFormat, numberFormat } from '@/lib/format';
 
@@ -15,6 +16,8 @@ type Props = {
 
 export const TxnsChart = ({ data }: Props) => {
   const { t } = useLocale('home');
+  const network = useConfig((s) => s.config.network);
+  const showPrice = network === 'mainnet';
 
   const chartData = useMemo(() => {
     return data
@@ -50,6 +53,11 @@ export const TxnsChart = ({ data }: Props) => {
             price?: number;
           },
         ) {
+          const priceLine = showPrice
+            ? `<br/>${t('chart.price')}: <strong>${currencyFormat(
+                this.price,
+              )}</strong>`
+            : '';
           return `
           <span style="font-size:10px">${dateFormat(
             this.x,
@@ -57,10 +65,7 @@ export const TxnsChart = ({ data }: Props) => {
           )}</span>
           <br/>${t('chart.transactions')}: <strong>${numberFormat(this.y, {
             maximumFractionDigits: 0,
-          })}</strong>
-          <br/>${t('chart.price')}: <strong>${currencyFormat(
-            this.price,
-          )}</strong>
+          })}</strong>${priceLine}
         `;
         },
       },
@@ -86,7 +91,7 @@ export const TxnsChart = ({ data }: Props) => {
         title: { text: undefined },
       },
     }),
-    [t],
+    [t, showPrice],
   );
 
   return (
