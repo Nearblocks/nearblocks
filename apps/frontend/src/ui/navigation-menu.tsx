@@ -78,10 +78,10 @@ const NavigationMenuTrigger = ({
       id={`navigation-menu-trigger-${props.id}`}
       {...props}
     >
-      {children}{' '}
+      {children}
       <ChevronDown
         aria-hidden="true"
-        className="relative top-px ml-1 size-3.5 transition duration-300 group-data-[state=open]:rotate-180"
+        className="ml-1 size-3.5 shrink-0 transition duration-300 group-data-[state=open]:rotate-180"
       />
     </NavigationMenuPrimitive.Trigger>
   );

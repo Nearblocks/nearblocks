@@ -40,7 +40,11 @@ export const Menu = ({ menu }: Props) => {
   const pathname = stripLocale(usePathname() ?? '/');
 
   return (
-    <NavigationMenu className="z-1 hidden lg:block" viewport={false}>
+    <NavigationMenu
+      className="z-1 hidden lg:block"
+      delayDuration={0}
+      viewport={false}
+    >
       <NavigationMenuList className="flex-wrap">
         {menu.map((item) => {
           const hasActiveChild =

@@ -40,10 +40,12 @@ export const countFormat = (
 ) => {
   if (value === undefined || value === null) return '';
 
-  const isApprox = typeof value === 'string' && value.endsWith('+');
-  const rawValue = isApprox ? value.slice(0, -1) : value;
+  const rawValue =
+    typeof value === 'string' && value.endsWith('+')
+      ? value.slice(0, -1)
+      : value;
 
-  return `${numberFormat(rawValue, options)}${isApprox ? '+' : ''}`;
+  return numberFormat(rawValue, options);
 };
 
 export const isApproxCount = (value: NumberFormat): boolean =>
