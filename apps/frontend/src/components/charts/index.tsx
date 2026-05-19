@@ -4,7 +4,7 @@ import { RiQuestionLine } from '@remixicon/react';
 import { ChevronRight } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
-import { DailyStats } from 'nb-schemas';
+import { DailyStats, TpsStats } from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { Link } from '@/components/link';
@@ -22,6 +22,7 @@ import {
   MarketCapChartMini,
   PriceChartMini,
   SupplyChartMini,
+  TpsChartMini,
   TxnFeeChartMini,
   TxnsChartMini,
   TxnVolumeChartMini,
@@ -29,6 +30,7 @@ import {
 
 type Props = {
   statsPromise: Promise<DailyStats[] | null>;
+  tpsStatsPromise: Promise<null | TpsStats[]>;
 };
 
 type CardProps = {
@@ -43,7 +45,7 @@ type HeaderProps = {
   setLogView: Dispatch<SetStateAction<boolean>>;
 };
 
-export const Charts = ({ statsPromise }: Props) => {
+export const Charts = ({ statsPromise, tpsStatsPromise }: Props) => {
   const { t } = useLocale('charts');
   const network = useConfig((s) => s.config.network);
 
@@ -81,6 +83,11 @@ export const Charts = ({ statsPromise }: Props) => {
       <ChartCard href="/charts/addresses" title={t('addresses.miniTitle')}>
         <ErrorSuspense fallback={<AddressesChartMini loading />}>
           <AddressesChartMini statsPromise={statsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
+      <ChartCard href="/charts/tps" title={t('tps.miniTitle')}>
+        <ErrorSuspense fallback={<TpsChartMini loading />}>
+          <TpsChartMini statsPromise={tpsStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       {network === 'mainnet' && (

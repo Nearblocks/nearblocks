@@ -13,10 +13,12 @@ WHERE
     EXTRACT(
       EPOCH
       FROM
-        NOW() - INTERVAL '1 month'
+        NOW() - INTERVAL '1 week'
     ) * 1e9
   )::BIGINT
 GROUP BY
   date
 ORDER BY
   date DESC
+LIMIT
+  ${limit}

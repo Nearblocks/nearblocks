@@ -73,6 +73,19 @@ export const charts = {
     yAxis: 'NEAR Supply',
   },
   title: 'NEAR Charts & Statistics',
+  tps: {
+    description:
+      'NEAR TPS chart shows the number of transactions per second on the NEAR protocol, broken down by shard.',
+    heading: 'NEAR Transactions Per Second (TPS) Chart',
+    meta: {
+      description:
+        'NEAR TPS chart shows per-second transaction throughput with per-shard breakdown. Data is real-time and pulled directly from NEAR blockchain.',
+      title: 'NEAR TPS Chart',
+    },
+    miniTitle: 'NEAR TPS (1H)',
+    series: 'Total TPS',
+    yAxis: 'Transactions per Second',
+  },
   txnFee: {
     description:
       'Transaction Fee chart shows the total transaction fees paid per day in USD.',
@@ -112,5 +125,5 @@ export const charts = {
     series: 'Transaction Volume (USD)',
     yAxis: 'Transaction Volume (USD)',
   },
-  view: 'View',
+  view: 'View All',
 } as const;

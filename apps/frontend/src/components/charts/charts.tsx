@@ -83,3 +83,13 @@ export const TxnVolumeChartMini = dynamic(
   () => import('./txn-volume').then((m) => m.TxnVolumeChartMini),
   { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
 );
+
+export const TpsChart = dynamic(() => import('./tps').then((m) => m.TpsChart), {
+  loading: () => <Skeleton className="h-161 w-full" />,
+  ssr: false,
+});
+
+export const TpsChartMini = dynamic(
+  () => import('./tps').then((m) => m.TpsChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);

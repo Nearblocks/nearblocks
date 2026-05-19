@@ -95,7 +95,6 @@ export const tools = {
   },
   shard: {
     account: 'Account ID',
-    hint: 'Shard layout may change after future resharding events.',
     reset: 'Reset',
     shardOf: 'Shard {{count}} of {{total}}',
     subtitle:

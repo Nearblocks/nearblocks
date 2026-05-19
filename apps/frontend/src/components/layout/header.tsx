@@ -11,6 +11,7 @@ import { Logo } from '@/icons/logo';
 import { hrefForLocale } from '@/lib/locale';
 import type { Locale } from '@/locales/config';
 import { NavMenu, RouteKey } from '@/types/types';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import {
   Popover,
@@ -18,8 +19,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/ui/popover';
-
-import { Badge } from '@/ui/badge';
 
 import { Menu } from './menu';
 import { MobileMenu } from './mobile-menu';

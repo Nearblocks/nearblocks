@@ -4,25 +4,29 @@ import Big from 'big.js';
 import { useState } from 'react';
 
 import { useLocale } from '@/hooks/use-locale';
+import { useProtocolConfig } from '@/hooks/use-protocol-config';
 import { NearCircle } from '@/icons/near-circle';
 import { bytesFormat, nearFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
 import { Field, FieldContent, FieldLabel, FieldSet } from '@/ui/field';
 import { Input } from '@/ui/input';
 
-const PRICE_PER_BYTE_YOCTO = Big('10000000000000000000');
-
 export const StorageCostForm = () => {
   const { t } = useLocale('tools');
   const [bytes, setBytes] = useState('1000');
   const [invalid, setInvalid] = useState(false);
 
+  const { data: protocolConfig, error: configError } = useProtocolConfig();
+
+  const storageAmountPerByte =
+    protocolConfig?.runtimeConfig?.storageAmountPerByte;
+
   const compute = () => {
-    if (!bytes) return null;
+    if (!bytes || !storageAmountPerByte) return null;
     try {
       const b = Big(bytes);
       if (b.lt(0)) return null;
-      return b.mul(PRICE_PER_BYTE_YOCTO);
+      return b.mul(Big(storageAmountPerByte));
     } catch {
       return null;
     }
@@ -80,6 +84,22 @@ export const StorageCostForm = () => {
           </div>
         </FieldSet>
       </form>
+
+      {configError && (
+        <p className="text-destructive mt-4 max-w-xl text-sm">
+          {configError instanceof Error ? configError.message : 'RPC error'}
+        </p>
+      )}
+
+      {!storageAmountPerByte && !configError && (
+        <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
+          <div className="space-y-3">
+            <div className="bg-muted h-4 w-1/3 animate-pulse rounded" />
+            <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
+            <div className="bg-muted h-3 w-full animate-pulse rounded" />
+          </div>
+        </div>
+      )}
 
       {yocto && (
         <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">

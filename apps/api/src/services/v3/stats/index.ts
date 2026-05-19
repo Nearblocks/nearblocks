@@ -1,4 +1,10 @@
-import type { DailyStats, DailyStatsReq, Stats, TpsStats } from 'nb-schemas';
+import type {
+  DailyStats,
+  DailyStatsReq,
+  Stats,
+  TpsStats,
+  TpsStatsReq,
+} from 'nb-schemas';
 import response from 'nb-schemas/dist/stats/response.js';
 
 import { dbBase } from '#libs/pgp';
@@ -30,10 +36,14 @@ const daily = responseHandler(
   },
 );
 
-const tps = responseHandler(response.tps, async () => {
-  const data = await dbBase.manyOrNone<TpsStats>(sql.tps);
+const tps = responseHandler(
+  response.tps,
+  async (req: RequestValidator<TpsStatsReq>) => {
+    const limit = req.validator.limit ?? 60;
+    const data = await dbBase.manyOrNone<TpsStats>(sql.tps, { limit });
 
-  return { data };
-});
+    return { data };
+  },
+);
 
 export default { daily, stats, tps };
