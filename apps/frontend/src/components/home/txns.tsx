@@ -37,7 +37,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-base">{t('txns.title')}</CardTitle>
+        <CardTitle className="text-headline-sm">{t('txns.title')}</CardTitle>
       </CardHeader>
       <ScrollArea className="h-78.5">
         <CardContent className="@container p-3">
@@ -46,34 +46,44 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
               <>
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Fragment key={i}>
-                    <div className="flex items-center gap-3 *:leading-tight">
-                      <div className="bg-muted rounded-lg p-2">
-                        <ArrowLeftRight className="size-6" />
+                    <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
+                      <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="bg-muted shrink-0 rounded-lg p-2">
+                            <ArrowLeftRight className="size-6" />
+                          </div>
+                          <div className="text-body-sm flex flex-col leading-tight">
+                            <h4 className="text-link font-medium">
+                              <Skeleton className="w-40" />
+                            </h4>
+                            <p className="text-body-2xs text-muted-foreground">
+                              <Skeleton className="w-20" />
+                            </p>
+                          </div>
+                        </div>
+                        <Badge
+                          className="text-body-xs h-6 shrink-0 @lg:hidden"
+                          variant="teal"
+                        >
+                          <NearCircle />
+                          <Skeleton className="w-10" />
+                        </Badge>
                       </div>
-                      <div className="text-body-sm flex grow grid-cols-[2fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
-                        <div>
-                          <h4 className="text-link font-normal">
-                            <Skeleton className="w-40" />
-                          </h4>
-                          <p className="text-body-xs text-muted-foreground mt-0.5">
-                            <Skeleton className="w-20" />
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="flex gap-1 font-normal">
-                            {t('txns.from')} <Skeleton className="w-40" />
-                          </h4>
-                          <h4 className="flex gap-1 pt-0 font-normal">
-                            {t('txns.to')} <Skeleton className="w-40" />
-                          </h4>
-                        </div>
-                        <div className="@lg:ml-auto">
-                          <Badge className="text-body-xs h-6" variant="teal">
-                            <NearCircle />
-                            <Skeleton className="w-10" />
-                          </Badge>
-                        </div>
+                      <div className="text-body-sm flex flex-col gap-1 @lg:flex-1">
+                        <h4 className="flex gap-1 font-normal">
+                          {t('txns.from')} <Skeleton className="w-40" />
+                        </h4>
+                        <h4 className="flex gap-1 pt-0 font-normal">
+                          {t('txns.to')} <Skeleton className="w-40" />
+                        </h4>
                       </div>
+                      <Badge
+                        className="text-body-xs hidden h-6 @lg:ml-auto @lg:inline-flex"
+                        variant="teal"
+                      >
+                        <NearCircle />
+                        <Skeleton className="w-10" />
+                      </Badge>
                     </div>
                     {i != 9 && <Separator className="my-2.5" />}
                   </Fragment>
@@ -84,27 +94,42 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
           >
             {() => (
               <>
-                {txns?.map((txn, i) => (
-                  <Fragment key={txn.transaction_hash}>
-                    <div className="flex items-center gap-3 *:leading-tight">
-                      <div className="bg-muted rounded-lg p-2">
-                        <ArrowLeftRight className="size-6" />
-                      </div>
-                      <div className="text-body-sm flex grow grid-cols-[2fr_2fr_1fr] flex-wrap gap-x-3 gap-y-1 @lg:grid @lg:items-center">
-                        <div>
-                          <h4 className="text-link flex font-normal">
-                            <Link
-                              className="inline-block w-40 truncate"
-                              href={`/txns/${txn.transaction_hash}`}
-                            >
-                              {txn.transaction_hash}
-                            </Link>
-                          </h4>
-                          <p className="text-body-xs text-muted-foreground mt-0.5">
-                            <TimeAgo ns={txn.block?.block_timestamp} />
-                          </p>
+                {txns?.map((txn, i) => {
+                  const amount = nearFormat(txn.actions_agg.deposit, {
+                    maximumFractionDigits: 2,
+                    notation: 'compact',
+                  });
+                  return (
+                    <Fragment key={txn.transaction_hash}>
+                      <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
+                        <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <div className="bg-muted shrink-0 rounded-lg p-2">
+                              <ArrowLeftRight className="size-6" />
+                            </div>
+                            <div className="text-body-sm flex min-w-0 flex-col leading-tight">
+                              <h4 className="text-link flex font-medium">
+                                <Link
+                                  className="inline-block w-40 truncate"
+                                  href={`/txns/${txn.transaction_hash}`}
+                                >
+                                  {txn.transaction_hash}
+                                </Link>
+                              </h4>
+                              <p className="text-body-2xs text-muted-foreground">
+                                <TimeAgo ns={txn.block?.block_timestamp} />
+                              </p>
+                            </div>
+                          </div>
+                          <Badge
+                            className="text-body-xs h-6 shrink-0 @lg:hidden"
+                            variant="teal"
+                          >
+                            <NearCircle />
+                            {amount}
+                          </Badge>
                         </div>
-                        <div>
+                        <div className="text-body-sm flex flex-col gap-1 @lg:flex-1">
                           <h4 className="flex gap-1 font-normal whitespace-nowrap">
                             {t('txns.from')}{' '}
                             <Link
@@ -124,20 +149,18 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                             </Link>
                           </h4>
                         </div>
-                        <div className="@lg:ml-auto">
-                          <Badge className="text-body-xs h-6" variant="teal">
-                            <NearCircle />
-                            {nearFormat(txn.actions_agg.deposit, {
-                              maximumFractionDigits: 2,
-                              notation: 'compact',
-                            })}
-                          </Badge>
-                        </div>
+                        <Badge
+                          className="text-body-xs hidden h-6 @lg:ml-auto @lg:inline-flex"
+                          variant="teal"
+                        >
+                          <NearCircle />
+                          {amount}
+                        </Badge>
                       </div>
-                    </div>
-                    {txns.length != i + 1 && <Separator className="my-2.5" />}
-                  </Fragment>
-                ))}
+                      {txns.length != i + 1 && <Separator className="my-2.5" />}
+                    </Fragment>
+                  );
+                })}
               </>
             )}
           </SkeletonSlot>

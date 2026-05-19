@@ -140,7 +140,7 @@ export const Header = () => {
                 <PopoverTrigger asChild>
                   <Button
                     className="group relative"
-                    size="icon-xs"
+                    size="icon-md"
                     title={t('header.toggleMenu')}
                     variant="secondary"
                   >
