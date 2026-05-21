@@ -135,9 +135,14 @@ const isPathActive = (
   pathname: string,
   exact: boolean,
 ): boolean => {
-  if (exact) return linkUrl === pathname;
+  const normalizedLink = decodeURIComponent(linkUrl);
+  const normalizedPath = decodeURIComponent(pathname);
+  if (exact) return normalizedLink === normalizedPath;
 
-  return linkUrl === pathname || pathname.startsWith(linkUrl + '/');
+  return (
+    normalizedLink === normalizedPath ||
+    normalizedPath.startsWith(normalizedLink + '/')
+  );
 };
 
 export const ActiveLink = ({
