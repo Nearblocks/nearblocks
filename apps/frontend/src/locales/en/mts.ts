@@ -1,10 +1,88 @@
 export const mts = {
+  cidMeta: {
+    description:
+      'All you need to know about the {{name}} MT Contract : Statistics, total holders, latest transactions & meta-data.',
+    label: 'NEAR MT',
+    title: '{{name}} MT Stats, Holders & Transactions',
+  },
+  contract: {
+    inventory: 'Tokens',
+    label: 'MT Contract:',
+    overview: {
+      holders: 'Holders:',
+      na: 'N/A',
+      title: 'Overview',
+      tokens: 'Tokens:',
+      transfers: 'Transfers:',
+    },
+    profile: {
+      contract: 'Contract:',
+      title: 'Profile Summary',
+    },
+    transfers: 'Transfers',
+  },
+  holders: {
+    address: 'Address',
+    amount: 'Amount',
+    empty: 'No token holders found',
+    na: 'N/A',
+    quantity: 'Quantity',
+    token: 'Token',
+    total: 'More than {{count}} token holders found',
+    totalExact: 'A total of {{count}} token holders found',
+    value: 'Value',
+  },
+  inventory: {
+    decimals: 'Decimals: ',
+    empty: 'No MT tokens found',
+    ftTab: 'FT Tokens',
+    nftTab: 'NFT Tokens',
+    owner: 'Owner: ',
+    price: 'Price: ',
+    symbol: 'Symbol: ',
+    title: 'Token ID: ',
+    total: 'More than {{count}} tokens found',
+    totalExact: 'A total of {{count}} tokens found',
+  },
   nearIntents: {
     heading: 'Near Intents Transfers',
     meta: {
       description:
         'Browse NEAR Intents multi-token transfers on the NEAR Protocol blockchain.',
       title: 'Near Intents Transfers',
+    },
+  },
+  tidMeta: {
+    description:
+      'All you need to know about the {{contract}} {{name}} MT Token : Owner, standard, description, media and latest transactions.',
+    label: 'NEAR MT Token',
+    title: '{{name}} | {{contract}}',
+  },
+  token: {
+    contract: 'Contract Address:',
+    decimals: 'Decimals:',
+    description: 'Description:',
+    ftHolders: 'Holders',
+    ftHoldersTab: 'Holders',
+    ftTransfersTab: 'Transfers',
+    label: 'MT Token:',
+    nep245: 'NEP-245',
+    overview: 'Overview',
+    owner: 'Owner:',
+    price: 'Price:',
+    standard: 'Token Standard:',
+    symbol: 'Symbol:',
+    tokenId: 'Token ID:',
+    tokenTransfers: {
+      block: 'Block',
+      empty: 'No MT token transfers found',
+      from: 'From',
+      method: 'Method',
+      quantity: 'Quantity',
+      to: 'To',
+      total: 'More than {{count}} mt token txns found',
+      totalExact: 'A total of {{count}} mt token txns found',
+      txnHash: 'Transaction Hash',
     },
   },
   transfers: {

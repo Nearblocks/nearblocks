@@ -9,7 +9,7 @@ import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
-import { MTLink, TokenAmount, TokenImage } from '@/components/token';
+import { MTTokenLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
@@ -115,12 +115,12 @@ export const MtTokenTransfers = ({
             className="m-px size-5 rounded-full border"
             src={mt.token_meta?.media ?? mt.base_meta?.icon ?? ''}
           />
-          <MTLink
+          <MTTokenLink
             contract={mt.contract_account_id}
+            decimals={mt.base_meta?.decimals}
             name={mt.token_meta?.title ?? mt.base_meta?.name}
             symbol={mt.base_meta?.symbol}
             token={mt.token_id}
-            type="token"
           />
         </span>
       ),

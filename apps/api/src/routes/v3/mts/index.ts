@@ -6,12 +6,15 @@ import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
+import token from '#routes/v3/mts/token';
 import service from '#services/v3/mts/index';
 
 const route = Router();
 
 const routes = (app: Router) => {
   app.use('/mts', bearerAuth, rateLimiter, route);
+
+  token(app);
 
   /**
    * @openapi
