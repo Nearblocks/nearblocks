@@ -22,8 +22,6 @@ import {
 
 import { Menu } from './menu';
 import { MobileMenu } from './mobile-menu';
-import { NetworkSwitcher } from './network';
-import { ThemeToggle } from './theme';
 
 const languageChoices: { locale: Locale; title: string }[] = [
   { locale: 'en', title: 'English' },
@@ -134,8 +132,6 @@ export const Header = () => {
             <div className="text-headline-sm ml-auto flex gap-2">
               <Menu menu={menu} />
               <div className="flex items-center gap-2 lg:hidden">
-                <NetworkSwitcher />
-                <ThemeToggle />
                 <PopoverTrigger asChild>
                   <Button
                     className="group relative"
@@ -155,14 +151,13 @@ export const Header = () => {
         <PopoverContent
           align="center"
           autoFocus={false}
-          className="w-(--radix-popper-available-width) rounded-t-none"
+          className="w-(--radix-popper-available-width) rounded-none border-x-0 px-0"
+          collisionPadding={0}
           onOpenAutoFocus={(event) => event.preventDefault()}
           side="bottom"
           sideOffset={0}
         >
-          <div className="container mx-auto px-4">
-            <MobileMenu menu={menu} />
-          </div>
+          <MobileMenu menu={menu} />
         </PopoverContent>
       </Popover>
     </header>

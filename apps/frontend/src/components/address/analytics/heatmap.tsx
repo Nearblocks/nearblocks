@@ -212,9 +212,11 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
 
   return (
     <div className="heatmap-chart">
-      <Chart options={options}>
-        <HeatmapSeries.Series data={points} />
-      </Chart>
+      <div className="overflow-x-auto">
+        <Chart options={options}>
+          <HeatmapSeries.Series data={points} />
+        </Chart>
+      </div>
       <div className="text-body-xs text-muted-foreground flex items-center justify-end gap-1">
         <div className="mr-2">{t('analytics.heatmap.less')}</div>
         {ranges.map((range, index) => (

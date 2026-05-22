@@ -44,7 +44,7 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
       <CardHeader className="border-b py-3">
         <CardTitle className="text-headline-sm">{t('profile.title')}</CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-28">{t('profile.contract')}</ListLeft>

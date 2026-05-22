@@ -31,11 +31,14 @@ export const Overview = ({ blockPromise, loading }: Props) => {
 
   return (
     <Card>
-      <CardContent className="px-2 py-2">
+      <CardContent className="px-0 py-2">
         {network !== 'mainnet' && (
-          <p className="text-red-foreground text-body-2xs px-1 py-2">
-            [{t('overview.testnetNotice')}]
-          </p>
+          <>
+            <p className="text-red-foreground text-body-2xs px-3 py-2">
+              [{t('overview.testnetNotice')}]
+            </p>
+            <hr className="border-border" />
+          </>
         )}
         <List pairsPerRow={1}>
           <ListItem>
@@ -109,7 +112,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
-              <p className="flex h-7 items-center">
+              <p className="flex items-center">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !block}
@@ -192,7 +195,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
           </ListItem>
         </List>
 
-        <hr className="border-border my-2" />
+        <hr className="border-border" />
 
         <List pairsPerRow={1}>
           <ListItem>

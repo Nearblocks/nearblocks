@@ -1,7 +1,7 @@
 export const txns = {
   actions: {
     addKey: 'New Key',
-    by: 'By',
+    by: 'by',
     call: 'Call',
     calledMethod: 'Called method',
     createAccount: 'Create Account',
@@ -11,10 +11,10 @@ export const txns = {
     deleteKey: 'Delete Key',
     deployContract: 'Deploy Contract',
     deployGlobalContract: 'Deploy Global Contract',
-    for: 'For',
-    from: 'From',
+    for: 'for',
+    from: 'from',
     inContract: 'in contract',
-    on: 'On',
+    on: 'on',
     stake: 'Stake',
     title: 'Transaction Actions',
     to: 'To',

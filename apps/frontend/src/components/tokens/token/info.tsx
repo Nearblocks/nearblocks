@@ -52,7 +52,7 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
             {t('info.marketTitle')}
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3">
+        <CardContent className="px-1">
           <List pairsPerRow={2}>
             <ListItem>
               <ListLeft className="min-w-36">{t('info.marketCap')}</ListLeft>

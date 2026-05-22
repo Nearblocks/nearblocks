@@ -22,6 +22,7 @@ import { Badge } from '@/ui/badge';
 
 type Props = {
   actions: null | Txn['actions'];
+  size?: 'default' | 'sm';
 };
 
 type IconProps = {
@@ -55,13 +56,17 @@ const variants = (action: ActionKind) => {
   }
 };
 
-const badgeClass = 'rounded-full size-10 p-0';
+export const TxnIcon = ({ actions, size = 'default' }: Props) => {
+  const badgeClass = cn(
+    'rounded-full p-0',
+    size === 'sm' ? 'size-6' : 'size-10',
+  );
+  const iconClass = size === 'sm' ? 'size-3!' : 'size-4!';
 
-export const TxnIcon = ({ actions }: Props) => {
   if (!actions || actions?.length === 0) {
     return (
       <Badge className={badgeClass} variant="gray">
-        <ActionIcon action={ActionKind.UNKNOWN} className="size-4!" />
+        <ActionIcon action={ActionKind.UNKNOWN} className={iconClass} />
       </Badge>
     );
   }
@@ -71,7 +76,7 @@ export const TxnIcon = ({ actions }: Props) => {
   if (actions?.length === 1) {
     return (
       <Badge className={cn(badgeClass, variant.bg, variant.color)}>
-        <ActionIcon action={actions[0].action} className="size-4!" />
+        <ActionIcon action={actions[0].action} className={iconClass} />
       </Badge>
     );
   }
@@ -79,14 +84,14 @@ export const TxnIcon = ({ actions }: Props) => {
   if (actions?.[0].action === ActionKind.DELEGATE_ACTION) {
     return (
       <Badge className={cn(badgeClass, variant.bg, variant.color)}>
-        <ActionIcon action={ActionKind.DELEGATE_ACTION} className="size-4!" />
+        <ActionIcon action={ActionKind.DELEGATE_ACTION} className={iconClass} />
       </Badge>
     );
   }
 
   return (
     <Badge className={badgeClass} variant="purple">
-      <Layers className="size-4!" />
+      <Layers className={iconClass} />
     </Badge>
   );
 };

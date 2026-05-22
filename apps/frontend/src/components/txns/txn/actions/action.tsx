@@ -15,6 +15,7 @@ import { Badge } from '@/ui/badge';
 type Props = {
   action: ActionReceipt;
   full?: boolean;
+  hideCopy?: boolean;
   receiver: string;
   signer: string;
 };
@@ -24,7 +25,13 @@ export const argsRecord = (args: JsonData): Record<string, JsonData> =>
     ? (args as Record<string, JsonData>)
     : {};
 
-export const Action = ({ action, full = true, receiver, signer }: Props) => {
+export const Action = ({
+  action,
+  full = true,
+  hideCopy = false,
+  receiver,
+  signer,
+}: Props) => {
   const { t } = useLocale('txns');
   const args = argsRecord(action.args);
 
@@ -38,9 +45,17 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
               <code>{action.method || 'method'}</code>
             </Badge>{' '}
             {t('actions.by')}{' '}
-            <AccountLink account={signer} textClassName="max-w-40" />{' '}
+            <AccountLink
+              account={signer}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />{' '}
             {t('actions.on')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         ) : (
           <>
@@ -49,7 +64,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
               <code>{action.method || 'method'}</code>
             </Badge>{' '}
             {t('actions.inContract')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -65,9 +84,17 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.from')}{' '}
-            <AccountLink account={signer} textClassName="max-w-40" />{' '}
+            <AccountLink
+              account={signer}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />{' '}
             {t('actions.to')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -83,9 +110,17 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.to')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />{' '}
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />{' '}
             {t('actions.by')}{' '}
-            <AccountLink account={signer} textClassName="max-w-40" />
+            <AccountLink
+              account={signer}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -100,7 +135,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.to')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -120,7 +159,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.to')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -134,7 +177,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         {full && (
           <>
             {' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -148,7 +195,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         {full && (
           <>
             {' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -162,7 +213,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
         {full && (
           <>
             {' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -177,7 +232,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.for')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -189,7 +248,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.addKey')}{' '}
         <Link
-          className="text-link max-w-40 truncate"
+          className="text-link max-w-32 truncate sm:max-w-40"
           href={`/address/${receiver}/keys`}
         >
           {String(args.public_key ?? '')}
@@ -202,7 +261,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.for')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>
@@ -214,7 +277,7 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.deleteKey')}{' '}
         <Link
-          className="text-link max-w-40 truncate"
+          className="text-link max-w-32 truncate sm:max-w-40"
           href={`/address/${receiver}/keys`}
         >
           {String(args.public_key ?? '')}
@@ -227,7 +290,11 @@ export const Action = ({ action, full = true, receiver, signer }: Props) => {
           <>
             {' '}
             {t('actions.from')}{' '}
-            <AccountLink account={receiver} textClassName="max-w-40" />
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
           </>
         )}
       </span>

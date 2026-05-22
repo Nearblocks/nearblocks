@@ -78,17 +78,21 @@ export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
   if (!ns || !hasHydrated) return <Skeleton className="w-60" />;
 
   const ms = toMs(ns);
-  const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss.SSS Z', utcMode === 'utc');
+  const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss Z', utcMode === 'utc');
 
   return (
-    <span className="inline-flex items-center gap-2">
+    <span>
       <span>
         {!hideAge && `${ageFormat(ms)} `}
         {hideAge ? date : `(${date})`}
       </span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="xs" variant="outline">
+          <Button
+            className="ml-1 inline-flex align-middle"
+            size="xs"
+            variant="outline"
+          >
             {utcMode === 'local' ? 'Local' : 'UTC'}
             <ChevronDown className="ml-0.5 size-3" />
           </Button>

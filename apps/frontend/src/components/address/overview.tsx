@@ -42,11 +42,11 @@ export const Overview = ({
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-base">
+        <CardTitle className="text-headline-sm">
           {t('overview.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-20">{t('overview.balance')}</ListLeft>

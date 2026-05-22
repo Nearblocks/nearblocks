@@ -36,7 +36,7 @@ const StatBody = ({
     {href && (
       <ArrowUpRight className="text-muted-foreground group-hover:text-primary absolute top-3 right-3 size-4 opacity-0 transition-opacity group-hover:opacity-100" />
     )}
-    <p className="text-body-lg text-foreground mt-1 flex h-7 items-center gap-1">
+    <p className="text-body-lg text-foreground mt-1 flex min-h-7 items-center gap-1">
       <SkeletonSlot
         fallback={
           <>

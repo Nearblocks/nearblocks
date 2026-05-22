@@ -62,14 +62,14 @@ const AddressLayout = async ({ children, params }: Props) => {
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>
-      <main className="flex flex-1 flex-col pt-6 pb-10">
+      <main className="flex flex-1 flex-col pt-4 pb-10">
         <div className="container mx-auto px-4">
           <PageHeading
             apiTag="accounts"
             title={
-              <span className="flex flex-wrap items-center gap-2">
+              <span className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className="text-muted-foreground">{t('heading')}</span>
-                <span>{address}</span>
+                <span className="break-all">{address}</span>
                 <Copy text={address} />
                 <AccountQr address={address} />
               </span>

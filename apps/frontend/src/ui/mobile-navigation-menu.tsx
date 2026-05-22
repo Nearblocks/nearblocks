@@ -24,7 +24,7 @@ const MobileNavigationMenu = ({
 }: MobileNavigationMenuProps) => {
   return (
     <nav>
-      <ul className={cn('space-y-2', className)} {...props} />
+      <ul className={cn('space-y-0.5', className)} {...props} />
     </nav>
   );
 };
