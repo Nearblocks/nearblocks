@@ -35,6 +35,7 @@ export default {
     keys: sql('queries/accounts/keys/keys.sql'),
   },
   mts: {
+    contractCountCagg: sql('queries/accounts/mts/contractCountCagg.sql'),
     count: sql('queries/accounts/mts/count.sql'),
     countCagg: sql('queries/accounts/mts/countCagg.sql'),
     export: sql('queries/accounts/mts/export.sql'),
