@@ -29,9 +29,9 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
   return (
     <Card>
       <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-base">{t('info.title')}</CardTitle>
+        <CardTitle className="text-headline-sm">{t('info.title')}</CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-30">{t('info.stakedBalance')}</ListLeft>

@@ -205,14 +205,10 @@ export const AccountLink = ({
     <Link className={cn('text-link', className)} href={`/address/${account}`}>
       <Truncate>
         <TruncateText
-          className={cn(
-            textClassName,
-            'rounded-md border border-transparent px-1',
-            {
-              'bg-amber-background border-amber-foreground/20 border-dashed':
-                highlighted === account,
-            },
-          )}
+          className={cn(textClassName, '-ml-1 rounded-md px-1', {
+            'bg-amber-background outline-amber-foreground/20 outline-1 outline-dashed':
+              highlighted === account,
+          })}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
           text={name ?? account}

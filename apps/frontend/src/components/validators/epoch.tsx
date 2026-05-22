@@ -56,7 +56,7 @@ export const EpochInfo = ({ loading, validators }: Props) => {
           {t('epochInfo.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft>{t('epochInfo.epochElapsed')}</ListLeft>

@@ -71,11 +71,14 @@ export const Overview = ({
 
   return (
     <Card>
-      <CardContent className="px-2 py-2">
+      <CardContent className="px-0 py-2">
         {network !== 'mainnet' && (
-          <p className="text-red-foreground text-body-2xs px-1 py-2">
-            [{t('overview.testnetNotice')}]
-          </p>
+          <>
+            <p className="text-red-foreground text-body-2xs px-3 py-2">
+              [{t('overview.testnetNotice')}]
+            </p>
+            <hr className="border-border" />
+          </>
         )}
         <List pairsPerRow={1}>
           <ListItem>
@@ -89,7 +92,7 @@ export const Overview = ({
               {t('overview.txnHash')}
             </ListLeft>
             <ListRight>
-              <p className="flex min-w-30 items-center gap-1">
+              <p className="min-w-30 break-all">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !txn}
@@ -98,7 +101,7 @@ export const Overview = ({
                     <>
                       {txn!.transaction_hash}{' '}
                       <Copy
-                        className="text-muted-foreground"
+                        className="text-muted-foreground inline-flex align-middle"
                         size="icon-xs"
                         text={txn!.transaction_hash || ''}
                       />
@@ -178,7 +181,7 @@ export const Overview = ({
               {t('overview.timestamp')}
             </ListLeft>
             <ListRight>
-              <p className="flex h-7 items-center">
+              <p className="flex items-center">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-60" />}
                   loading={loading || !txn}
@@ -211,7 +214,7 @@ export const Overview = ({
           </ListItem>
         </List>
 
-        <hr className="border-border my-2" />
+        <hr className="border-border" />
 
         <List pairsPerRow={1}>
           <ListItem>
@@ -275,7 +278,7 @@ export const Overview = ({
           />
         </List>
 
-        <hr className="border-border my-2" />
+        <hr className="border-border" />
 
         <List pairsPerRow={1}>
           <ListItem>

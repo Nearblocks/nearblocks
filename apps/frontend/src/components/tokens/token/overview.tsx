@@ -44,7 +44,7 @@ export const Overview = ({
           {t('overview.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         <List pairsPerRow={2}>
           <ListItem>
             <div>

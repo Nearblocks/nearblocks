@@ -39,7 +39,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
       <CardHeader className="border-b py-3">
         <CardTitle className="text-headline-sm">{t('txns.title')}</CardTitle>
       </CardHeader>
-      <ScrollArea className="h-78.5">
+      <ScrollArea className="h-110 lg:h-78.5">
         <CardContent className="@container p-3">
           <SkeletonSlot
             fallback={
@@ -69,13 +69,15 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                           <Skeleton className="w-10" />
                         </Badge>
                       </div>
-                      <div className="text-body-sm flex flex-col gap-1 @lg:flex-1">
-                        <h4 className="flex gap-1 font-normal">
-                          {t('txns.from')} <Skeleton className="w-40" />
+                      <div className="text-body-sm grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1 gap-y-1 @lg:flex-1">
+                        <h4 className="font-normal whitespace-nowrap">
+                          {t('txns.from')}
                         </h4>
-                        <h4 className="flex gap-1 pt-0 font-normal">
-                          {t('txns.to')} <Skeleton className="w-40" />
+                        <Skeleton className="w-40" />
+                        <h4 className="font-normal whitespace-nowrap">
+                          {t('txns.to')}
                         </h4>
+                        <Skeleton className="w-40" />
                       </div>
                       <Badge
                         className="text-body-xs hidden h-6 @lg:ml-auto @lg:inline-flex"
@@ -129,25 +131,25 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                             {amount}
                           </Badge>
                         </div>
-                        <div className="text-body-sm flex flex-col gap-1 @lg:flex-1">
-                          <h4 className="flex gap-1 font-normal whitespace-nowrap">
-                            {t('txns.from')}{' '}
-                            <Link
-                              className="text-link inline-block w-40 truncate"
-                              href={`/address/${txn.signer_account_id}`}
-                            >
-                              {txn.signer_account_id}
-                            </Link>
+                        <div className="text-body-sm grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1 gap-y-1 @lg:flex-1">
+                          <h4 className="font-normal whitespace-nowrap">
+                            {t('txns.from')}
                           </h4>
-                          <h4 className="flex gap-1 pt-0 font-normal whitespace-nowrap">
-                            {t('txns.to')}{' '}
-                            <Link
-                              className="text-link inline-block w-40 truncate"
-                              href={`/address/${txn.receiver_account_id}`}
-                            >
-                              {txn.receiver_account_id}
-                            </Link>
+                          <Link
+                            className="text-link inline-block w-40 truncate"
+                            href={`/address/${txn.signer_account_id}`}
+                          >
+                            {txn.signer_account_id}
+                          </Link>
+                          <h4 className="font-normal whitespace-nowrap">
+                            {t('txns.to')}
                           </h4>
+                          <Link
+                            className="text-link inline-block w-40 truncate"
+                            href={`/address/${txn.receiver_account_id}`}
+                          >
+                            {txn.receiver_account_id}
+                          </Link>
                         </div>
                         <Badge
                           className="text-body-xs hidden h-6 @lg:ml-auto @lg:inline-flex"

@@ -25,9 +25,9 @@ export const Actions = ({ loading, txnPromise }: Props) => {
 
   return (
     <Card>
-      <CardContent className="px-3 py-3">
+      <CardContent className="px-3 py-2.5">
         <div className="flex items-center gap-3">
-          <div className="shrink-0">
+          <div className="hidden shrink-0 sm:block">
             <SkeletonSlot
               fallback={<Skeleton className="size-10 rounded-full" />}
               loading={loading || !txn}
@@ -36,11 +36,21 @@ export const Actions = ({ loading, txnPromise }: Props) => {
             </SkeletonSlot>
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-headline-xs leading-normal font-medium uppercase">
-              {t('actions.title')}
-            </h2>
+            <div className="flex items-center gap-2">
+              <div className="shrink-0 sm:hidden">
+                <SkeletonSlot
+                  fallback={<Skeleton className="size-6 rounded-full" />}
+                  loading={loading || !txn}
+                >
+                  {() => <TxnIcon actions={txn!.actions} size="sm" />}
+                </SkeletonSlot>
+              </div>
+              <h2 className="text-headline-xs leading-normal font-medium uppercase">
+                {t('actions.title')}
+              </h2>
+            </div>
             <SkeletonSlot
-              fallback={<Skeleton className="mt-0.5 h-5 w-1/4" />}
+              fallback={<Skeleton className="mt-1.5 h-5 w-1/2" />}
               loading={loading || !txn || txn.actions?.length === 0}
             >
               {() => {
@@ -53,6 +63,7 @@ export const Actions = ({ loading, txnPromise }: Props) => {
                     {actions.map((action, index) => (
                       <Action
                         action={action}
+                        hideCopy
                         key={index}
                         receiver={txn!.receiver_account_id}
                         signer={txn!.signer_account_id}
@@ -60,12 +71,16 @@ export const Actions = ({ loading, txnPromise }: Props) => {
                     ))}
                   </div>
                 );
-                return actions.length > 3 ? (
-                  <ScrollableList className="max-h-40">
-                    {content}
-                  </ScrollableList>
-                ) : (
-                  content
+                return (
+                  <div className="mt-1">
+                    {actions.length > 3 ? (
+                      <ScrollableList className="max-h-40">
+                        {content}
+                      </ScrollableList>
+                    ) : (
+                      content
+                    )}
+                  </div>
                 );
               }}
             </SkeletonSlot>

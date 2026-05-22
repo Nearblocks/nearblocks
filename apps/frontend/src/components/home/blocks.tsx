@@ -38,7 +38,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
       <CardHeader className="border-b py-3">
         <CardTitle className="text-headline-sm">{t('blocks.title')}</CardTitle>
       </CardHeader>
-      <ScrollArea className="h-78.5">
+      <ScrollArea className="h-110 lg:h-78.5">
         <CardContent className="@container p-3">
           <SkeletonSlot
             fallback={
