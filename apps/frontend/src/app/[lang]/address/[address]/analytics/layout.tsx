@@ -42,6 +42,16 @@ const AnalyticsLayout = async ({ children, params }: Props) => {
                 {t('analytics.tabs.tokens')}
               </ActiveLink>
             </TabLink>
+            <TabLink asChild>
+              <ActiveLink href={`/address/${address}/analytics/nfts`}>
+                {t('analytics.tabs.nfts')}
+              </ActiveLink>
+            </TabLink>
+            <TabLink asChild>
+              <ActiveLink href={`/address/${address}/analytics/mts`}>
+                {t('analytics.tabs.mts')}
+              </ActiveLink>
+            </TabLink>
           </TabLinks>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>

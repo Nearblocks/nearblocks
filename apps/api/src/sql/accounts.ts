@@ -70,7 +70,9 @@ export default {
   stats: {
     balance: sql('queries/accounts/stats/balance.sql'),
     fts: sql('queries/accounts/stats/fts.sql'),
+    mts: sql('queries/accounts/stats/mts.sql'),
     near: sql('queries/accounts/stats/near.sql'),
+    nfts: sql('queries/accounts/stats/nfts.sql'),
     overview: sql('queries/accounts/stats/overview.sql'),
     txns: sql('queries/accounts/stats/txns.sql'),
   },

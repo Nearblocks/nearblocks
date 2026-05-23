@@ -30,11 +30,23 @@ const fts = v.object({
   limit: limitSchemaMax(365),
 });
 
+const nfts = v.object({
+  account: v.string(),
+  limit: limitSchemaMax(365),
+});
+
+const mts = v.object({
+  account: v.string(),
+  limit: limitSchemaMax(365),
+});
+
 export type AccountStatsOverviewReq = v.InferOutput<typeof overview>;
 export type AccountTxnsHeatmapReq = v.InferOutput<typeof heatmap>;
 export type AccountTxnStatsReq = v.InferOutput<typeof txns>;
 export type AccountBalanceStatsReq = v.InferOutput<typeof balance>;
 export type AccountNearStatsReq = v.InferOutput<typeof near>;
 export type AccountFTStatsReq = v.InferOutput<typeof fts>;
+export type AccountNFTStatsReq = v.InferOutput<typeof nfts>;
+export type AccountMTStatsReq = v.InferOutput<typeof mts>;
 
-export default { balance, fts, heatmap, near, overview, txns };
+export default { balance, fts, heatmap, mts, near, nfts, overview, txns };
