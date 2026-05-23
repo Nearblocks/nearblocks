@@ -10,7 +10,6 @@ import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { useLocale } from '@/hooks/use-locale';
 import { gasFormat, nearFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { Separator } from '@/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -187,7 +186,7 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
 
         <TabsContent value="inspect">
           <ReceiptInspectRows receipt={receipt} />
-          <Separator />
+          <hr className="border-border" />
           <List pairsPerRow={1}>
             <ListItem>
               <ListLeft className="min-w-60">

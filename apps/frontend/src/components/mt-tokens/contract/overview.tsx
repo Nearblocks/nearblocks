@@ -34,7 +34,7 @@ export const Overview = ({
           {t('contract.overview.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-36">

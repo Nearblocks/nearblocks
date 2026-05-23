@@ -28,7 +28,7 @@ export const Execution = ({
 
   return (
     <Card>
-      <CardContent className="px-0 py-1">
+      <CardContent className="px-0 py-2">
         <SkeletonSlot
           fallback={
             <div className="border-border ml-0 border-l-4">

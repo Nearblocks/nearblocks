@@ -67,20 +67,20 @@ export const ReceiptInspectRows = ({
             loading={!receipt || loading}
           >
             {() => (
-              <span className="flex items-center gap-1 break-all">
-                {receipt!.receipt_id}
+              <p className="min-w-30 break-all">
+                {receipt!.receipt_id}{' '}
                 <Copy
-                  className="text-muted-foreground shrink-0"
+                  className="text-muted-foreground inline-flex align-middle"
                   size="icon-xs"
                   text={receipt!.receipt_id}
                 />
-              </span>
+              </p>
             )}
           </SkeletonSlot>
         </ListRight>
       </ListItem>
       <ListItem>
-        <ListLeft className="h-13">
+        <ListLeft>
           <div className="flex items-center gap-1">
             <Tooltip>
               <TooltipTrigger>
@@ -91,7 +91,7 @@ export const ReceiptInspectRows = ({
             {t('receipt.status')}
           </div>
         </ListLeft>
-        <ListRight className="h-13">
+        <ListRight>
           <SkeletonSlot
             fallback={<Skeleton className="h-6 w-20" />}
             loading={!receipt || loading}
@@ -152,7 +152,11 @@ export const ReceiptInspectRows = ({
             fallback={<Skeleton className="h-6 w-60" />}
             loading={!receipt || loading}
           >
-            {() => <LongDate hideAge ns={receipt!.block.block_timestamp} />}
+            {() => (
+              <p className="flex items-center">
+                <LongDate hideAge ns={receipt!.block.block_timestamp} />
+              </p>
+            )}
           </SkeletonSlot>
         </ListRight>
       </ListItem>

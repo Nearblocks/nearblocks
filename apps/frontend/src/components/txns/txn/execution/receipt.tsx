@@ -8,7 +8,6 @@ import { ActionKind } from 'nb-types';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -27,7 +26,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
   return (
     <div className="mx-3 scroll-mt-11" id={receipt?.receipt_id}>
       <ReceiptInspectRows loading={loading} receipt={receipt} showPublicKey />
-      <Separator />
+      <hr className="border-border" />
       <List pairsPerRow={1}>
         <ListItem>
           <ListLeft className="min-w-60">
@@ -72,7 +71,7 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
           </ListRight>
         </ListItem>
       </List>
-      <Separator />
+      <hr className="border-border" />
       <ReceiptOutputRows loading={loading} receipt={receipt} />
     </div>
   );

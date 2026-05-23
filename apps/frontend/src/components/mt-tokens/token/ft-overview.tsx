@@ -13,7 +13,6 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, currencyFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
-import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -43,7 +42,7 @@ export const MtFtOverview = ({
           {t('contract.overview.title')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="px-1">
         {(token?.price || loading) && (
           <>
             <List pairsPerRow={1}>
@@ -63,7 +62,7 @@ export const MtFtOverview = ({
                 </ListRight>
               </ListItem>
             </List>
-            <Separator />
+            <hr className="border-border" />
           </>
         )}
         <List pairsPerRow={1}>

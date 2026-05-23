@@ -9,7 +9,6 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { currencyFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
-import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -44,7 +43,7 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
                 )}
               </SkeletonSlot>
             </CardContent>
-            <Separator />
+            <hr className="border-border" />
           </>
         )}
         <CardHeader className="border-b py-3">
