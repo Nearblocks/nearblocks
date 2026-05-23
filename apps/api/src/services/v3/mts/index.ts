@@ -9,6 +9,7 @@ import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
   cappedCount,
+  countFromCagg,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -109,6 +110,30 @@ const count = responseHandler(
   response.count,
   async (req: RequestValidator<MTTxnCountReq>) => {
     const before = req.validator.before_ts;
+
+    if (!before) {
+      const result = await dbEvents.one<{ count: string }>(sql.txnCountCagg);
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.count, {
+                before,
+                end,
+                limit,
+                start,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
+      );
+
+      return { data: { count } };
+    }
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;
     const count = await rollingWindowCount(

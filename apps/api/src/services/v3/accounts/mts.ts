@@ -171,6 +171,38 @@ const count = responseHandler(
       return { data: { count } };
     }
 
+    if (contract && !involved && !cause && !before) {
+      const result = await dbEvents.one<{ count: string }>(
+        sql.mts.contractCountCagg,
+        { account, contract, token: token ?? null },
+      );
+      const count = await countFromCagg(
+        result.count,
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.mts.count, {
+                account,
+                before,
+                cause,
+                contract,
+                end,
+                involved,
+                limit,
+                start,
+                token,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
+      );
+
+      return { data: { count } };
+    }
+
     const beforeTs = before ? BigInt(before) - 1n : undefined;
     const count = await rollingWindowCount(
       (start, end, limit) =>

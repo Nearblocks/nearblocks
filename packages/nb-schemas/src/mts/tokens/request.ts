@@ -47,8 +47,8 @@ const txnCount = v.object({
 });
 
 const txnCursor = v.object({
-  index: v.string(),
-  shard: v.string(),
+  index: v.number(),
+  shard: v.number(),
   timestamp: v.string(),
 });
 
