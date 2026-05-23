@@ -5,8 +5,12 @@ import {
   AccountBalanceStatsRes,
   AccountFTStats,
   AccountFTStatsRes,
+  AccountMTStats,
+  AccountMTStatsRes,
   AccountNearStats,
   AccountNearStatsRes,
+  AccountNFTStats,
+  AccountNFTStatsRes,
   AccountStatsOverview,
   AccountStatsOverviewRes,
   AccountTxnStats,
@@ -64,6 +68,24 @@ export const fetchFTStats = cache(
   async (account: string): Promise<AccountFTStats[] | null> => {
     const resp = await fetcher<AccountFTStatsRes>(
       `/v3/accounts/${account}/stats/fts`,
+    );
+    return resp.data;
+  },
+);
+
+export const fetchNFTStats = cache(
+  async (account: string): Promise<AccountNFTStats[] | null> => {
+    const resp = await fetcher<AccountNFTStatsRes>(
+      `/v3/accounts/${account}/stats/nfts`,
+    );
+    return resp.data;
+  },
+);
+
+export const fetchMTStats = cache(
+  async (account: string): Promise<AccountMTStats[] | null> => {
+    const resp = await fetcher<AccountMTStatsRes>(
+      `/v3/accounts/${account}/stats/mts`,
     );
     return resp.data;
   },

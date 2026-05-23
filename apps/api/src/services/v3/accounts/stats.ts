@@ -3,8 +3,12 @@ import type {
   AccountBalanceStatsReq,
   AccountFTStats,
   AccountFTStatsReq,
+  AccountMTStats,
+  AccountMTStatsReq,
   AccountNearStats,
   AccountNearStatsReq,
+  AccountNFTStats,
+  AccountNFTStatsReq,
   AccountStatsOverview,
   AccountStatsOverviewReq,
   AccountTxnsHeatmapReq,
@@ -113,4 +117,34 @@ const fts = responseHandler(
   },
 );
 
-export default { balance, fts, heatmap, near, overview, txns };
+const nfts = responseHandler(
+  response.nfts,
+  async (req: RequestValidator<AccountNFTStatsReq>) => {
+    const account = req.validator.account;
+    const limit = req.validator.limit;
+
+    const stats = await dbEvents.manyOrNone<AccountNFTStats>(sql.stats.nfts, {
+      account,
+      limit,
+    });
+
+    return { data: stats };
+  },
+);
+
+const mts = responseHandler(
+  response.mts,
+  async (req: RequestValidator<AccountMTStatsReq>) => {
+    const account = req.validator.account;
+    const limit = req.validator.limit;
+
+    const stats = await dbEvents.manyOrNone<AccountMTStats>(sql.stats.mts, {
+      account,
+      limit,
+    });
+
+    return { data: stats };
+  },
+);
+
+export default { balance, fts, heatmap, mts, near, nfts, overview, txns };

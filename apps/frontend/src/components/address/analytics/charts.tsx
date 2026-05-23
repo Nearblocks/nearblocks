@@ -35,3 +35,19 @@ export const NearChart = dynamic(
     ssr: false,
   },
 );
+
+export const NFTsChart = dynamic(
+  () => import('./nfts').then((mod) => mod.NFTsChart),
+  {
+    loading: () => <Skeleton className="h-105 w-full" />,
+    ssr: false,
+  },
+);
+
+export const MTsChart = dynamic(
+  () => import('./mts').then((mod) => mod.MTsChart),
+  {
+    loading: () => <Skeleton className="h-105 w-full" />,
+    ssr: false,
+  },
+);

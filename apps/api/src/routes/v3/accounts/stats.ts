@@ -160,6 +160,60 @@ const routes = (route: Router) => {
    *         description: Success response
    */
   route.get('/:account/stats/fts', validate(request.fts), service.fts);
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/stats/nfts:
+   *   get:
+   *     summary: Get account NFT statistics
+   *     tags:
+   *       - Account Stats
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account/stats/nfts', validate(request.nfts), service.nfts);
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/stats/mts:
+   *   get:
+   *     summary: Get account MT statistics
+   *     tags:
+   *       - Account Stats
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account/stats/mts', validate(request.mts), service.mts);
 };
 
 export default routes;

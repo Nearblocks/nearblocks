@@ -47,28 +47,54 @@ const ft = v.object({
   unique_address_out: v.string(),
 });
 
+const nft = v.object({
+  account: v.string(),
+  contracts: v.string(),
+  date: v.string(),
+  transfers: v.string(),
+  unique_address_in: v.string(),
+  unique_address_out: v.string(),
+});
+
+const mt = v.object({
+  account: v.string(),
+  contracts: v.string(),
+  date: v.string(),
+  transfers: v.string(),
+  unique_address_in: v.string(),
+  unique_address_out: v.string(),
+});
+
 const overviewResponse = responseSchema(overview);
 const txnResponse = responseSchema(v.array(txn));
 const balanceResponse = responseSchema(v.array(balance));
 const nearResponse = responseSchema(v.array(near));
 const ftResponse = responseSchema(v.array(ft));
+const nftResponse = responseSchema(v.array(nft));
+const mtResponse = responseSchema(v.array(mt));
 
 export type AccountStatsOverview = v.InferOutput<typeof overview>;
 export type AccountTxnStats = v.InferOutput<typeof txn>;
 export type AccountBalanceStats = v.InferOutput<typeof balance>;
 export type AccountNearStats = v.InferOutput<typeof near>;
 export type AccountFTStats = v.InferOutput<typeof ft>;
+export type AccountNFTStats = v.InferOutput<typeof nft>;
+export type AccountMTStats = v.InferOutput<typeof mt>;
 
 export type AccountStatsOverviewRes = v.InferOutput<typeof overviewResponse>;
 export type AccountTxnStatsRes = v.InferOutput<typeof txnResponse>;
 export type AccountBalanceStatsRes = v.InferOutput<typeof balanceResponse>;
 export type AccountNearStatsRes = v.InferOutput<typeof nearResponse>;
 export type AccountFTStatsRes = v.InferOutput<typeof ftResponse>;
+export type AccountNFTStatsRes = v.InferOutput<typeof nftResponse>;
+export type AccountMTStatsRes = v.InferOutput<typeof mtResponse>;
 
 export default {
   balance: balanceResponse,
   fts: ftResponse,
+  mts: mtResponse,
   near: nearResponse,
+  nfts: nftResponse,
   overview: overviewResponse,
   txns: txnResponse,
 };

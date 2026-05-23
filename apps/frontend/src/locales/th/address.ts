@@ -26,10 +26,26 @@ export const address = {
       txns: 'txns',
       wed: 'Wed',
     },
+    mts: {
+      contracts: 'MT Contracts',
+      count: 'Count',
+      transfers: 'Transfers',
+      transfersCount: 'Transfers Count',
+      uniqueIn: 'Unique Addresses Received',
+      uniqueOut: 'Unique Addresses Sent',
+    },
     near: {
       received: 'Received (In)',
       sent: 'Sent (Out)',
       transfers: 'Transfer Amounts',
+    },
+    nfts: {
+      contracts: 'NFT Contracts',
+      count: 'Count',
+      transfers: 'Transfers',
+      transfersCount: 'Transfers Count',
+      uniqueIn: 'Unique Addresses Received',
+      uniqueOut: 'Unique Addresses Sent',
     },
     noData: 'No data to display',
     overview: {
@@ -53,7 +69,9 @@ export const address = {
     },
     tabs: {
       balance: 'Balance',
+      mts: 'MT Transfers',
       near: 'NEAR Transfers',
+      nfts: 'NFT Transfers',
       overview: 'Overview',
       tokens: 'Token Transfers',
       txns: 'Transactions',
