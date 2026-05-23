@@ -14,7 +14,6 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, currencyFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
-import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
@@ -101,7 +100,7 @@ export const Overview = ({
             </div>
           </ListItem>
         </List>
-        <Separator />
+        <hr className="border-border" />
         <List pairsPerRow={1}>
           <ListItem>
             <ListLeft className="min-w-36">

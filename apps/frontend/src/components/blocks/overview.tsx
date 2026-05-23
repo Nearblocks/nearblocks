@@ -52,7 +52,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.blockHeight')}
             </ListLeft>
             <ListRight>
-              <p className="flex h-7 items-center gap-1">
+              <p className="flex items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-25" />}
                   loading={loading || !block}
@@ -82,7 +82,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.hash')}
             </ListLeft>
             <ListRight>
-              <p className="flex h-7 min-w-30 items-center gap-1 whitespace-nowrap">
+              <p className="min-w-30 break-all">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-70" />}
                   loading={loading || !block}
@@ -91,7 +91,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                     <>
                       {block!.block_hash}{' '}
                       <Copy
-                        className="text-muted-foreground"
+                        className="text-muted-foreground inline-flex align-middle"
                         size="icon-xs"
                         text={block!.block_hash}
                       />
@@ -133,7 +133,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.author')}
             </ListLeft>
             <ListRight>
-              <p className="flex h-7 items-center gap-1">
+              <p className="flex items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-30" />}
                   loading={loading || !block}
@@ -343,7 +343,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               {t('overview.parentHash')}
             </ListLeft>
             <ListRight>
-              <p className="flex h-7 min-w-30 items-center gap-1 whitespace-nowrap">
+              <p className="min-w-30 break-all">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-70" />}
                   loading={loading || !block}
@@ -355,9 +355,9 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                         href={`/blocks/${block!.prev_block_hash}`}
                       >
                         {block!.prev_block_hash}
-                      </Link>
+                      </Link>{' '}
                       <Copy
-                        className="text-muted-foreground"
+                        className="text-muted-foreground inline-flex align-middle"
                         size="icon-xs"
                         text={block!.prev_block_hash}
                       />

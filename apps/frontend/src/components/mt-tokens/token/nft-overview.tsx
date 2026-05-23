@@ -47,7 +47,7 @@ export const MtNftOverview = ({ cid, loading, tokenPromise }: Props) => {
             {t('token.overview')}
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3">
+        <CardContent className="px-1">
           <List pairsPerRow={1}>
             <ListItem>
               <ListLeft className="min-w-40">{t('token.owner')}</ListLeft>
