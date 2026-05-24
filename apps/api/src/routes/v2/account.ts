@@ -1,16 +1,53 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
+
+import v3Request from 'nb-schemas/dist/accounts/receipts/request.js';
 
 import schema from '#libs/schema/v2/account';
+import {
+  countEnvelope,
+  listEnvelope,
+  proxyResponse,
+  renameQuery,
+} from '#libs/v2Proxy';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
+import { validate as validateV3 } from '#middlewares/validate';
 import validator from '#middlewares/validator';
 import account from '#services/v2/account/index';
-import receipts from '#services/v2/account/receipts';
+import v3Receipts from '#services/v3/accounts/receipts';
 
 const route = Router();
 
 const routes = (app: Router) => {
   app.use('/account', bearerAuth, rateLimiter, route);
+
+  // These legacy v2 endpoints are served from the v3 implementation: rename
+  // v2 query params -> v3, validate with the v3 schema, then re-shape the v3
+  // `{ data, meta }` envelope back to the v2 shape.
+  // NOTE: `after_timestamp`/`after_date` and `order=asc` have no direct v3
+  // equivalent and are dropped; cursors are passed through opaquely (clients
+  // must paginate using the cursor returned by the proxy).
+  const receiptsHandlers: RequestHandler[] = [
+    renameQuery({
+      before_timestamp: 'before_ts',
+      cursor: 'next',
+      from: 'predecessor',
+      per_page: 'limit',
+      to: 'receiver',
+    }),
+    validateV3(v3Request.receipts),
+    proxyResponse(v3Receipts.receipts, listEnvelope('txns')),
+  ];
+
+  const receiptsCountHandlers: RequestHandler[] = [
+    renameQuery({
+      before_date: 'before_ts',
+      from: 'predecessor',
+      to: 'receiver',
+    }),
+    validateV3(v3Request.count),
+    proxyResponse(v3Receipts.count, countEnvelope('txns')),
+  ];
 
   /**
    * @openapi
@@ -83,11 +120,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/receipts',
-    validator(schema.receipts),
-    receipts.receipts,
-  );
+  route.get('/:account/receipts', ...receiptsHandlers);
 
   /**
    * @openapi
@@ -140,11 +173,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/receipts/count',
-    validator(schema.receiptsCount),
-    receipts.receiptsCount,
-  );
+  route.get('/:account/receipts/count', ...receiptsCountHandlers);
 
   route.get(
     '/:account/inventory/mts',
