@@ -68,6 +68,15 @@ const apiDocumentation = async (app: Application, dir: string) => {
           <p><strong>⚠️ Deprecation notice:</strong> The v1 and v2 API endpoints are deprecated and will be removed in a future release. New integrations should use the current v3 API documented below. Documentation for the deprecated endpoints remains available at <a href="/api-docs/legacy">/api-docs/legacy</a>.</p>
         </div>
         <p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
+        <h2>Migrating from v1/v2</h2>
+        <p>v3 is not a drop-in replacement for v1/v2. The main differences to plan for:</p>
+        <ul>
+        <li><strong>Numbers are strings.</strong> Token amounts, balances, deposits, gas and supply are returned as plain decimal strings (for example <code>"1234500000000000000000000000"</code>), never JSON numbers. Parse them with a big-number/decimal library &mdash; <code>Number()</code> or <code>parseInt()</code> will silently lose precision. (Some v1 aggregate amounts were returned as numbers and could appear in scientific notation such as <code>1e+24</code>; v3 never does.)</li>
+        <li><strong>Response envelope.</strong> Every response is wrapped as <code>{ "data": ..., "meta": ... }</code>, with any errors under <code>errors</code>, instead of a resource-named key.</li>
+        <li><strong>Cursor pagination.</strong> v3 uses opaque <code>next</code>/<code>prev</code> cursors together with <code>limit</code> (max 100). There is no <code>page</code>/<code>per_page</code>/<code>offset</code>; totals are exposed via separate <code>/count</code> endpoints.</li>
+        <li><strong>Nested structure.</strong> Related fields are grouped into objects such as <code>actions_agg</code> and <code>outcomes_agg</code> plus a nested <code>block</code>, and transaction receipts are returned as a nested tree.</li>
+        </ul>
+        <p>Documentation for the deprecated endpoints remains at <a href="/api-docs/legacy">/api-docs/legacy</a>.</p>
         <h2>Attribution Requirements</h2>
         <p>The APIs are offered as a community service and are provided without any warranty. Please use them responsibly and only for what you need.</p>
         <p>Attribution is required on the free plan only. You can attribute by either including a link back to Nearblocks.io or stating that your app is &quot;Powered by Nearblocks.io APIs.&quot; Paid plans do not require attribution.</p>
