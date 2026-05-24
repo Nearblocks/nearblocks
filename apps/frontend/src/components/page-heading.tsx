@@ -4,15 +4,8 @@ import { Code2 } from 'lucide-react';
 import { ReactNode } from 'react';
 
 import { useConfig } from '@/hooks/use-config';
+import { apiDocsUrl } from '@/lib/api-docs';
 import { cn } from '@/lib/utils';
-
-const apiDocsUrl = (network: 'mainnet' | 'testnet', tag?: string) => {
-  const base =
-    network === 'mainnet'
-      ? 'https://api.nearblocks.io/api-docs'
-      : 'https://api-testnet.nearblocks.io/api-docs';
-  return tag ? `${base}#tag/${tag}` : base;
-};
 
 export const ApiBadge = ({
   className,

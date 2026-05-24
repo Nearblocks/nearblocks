@@ -1,5 +1,10 @@
 export const layout = {
   banner: {
+    apiDeprecation: {
+      dismiss: 'Dismiss banner',
+      link: 'View the new API docs',
+      message: 'We’re updating our API.',
+    },
     newUi: {
       dismiss: 'Dismiss banner',
       feedbackLink: 'Send feedback',

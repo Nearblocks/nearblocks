@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { fetchStats, fetchSyncStatus } from '@/data/layout';
 
+import { ApiDeprecationBanner } from './api-deprecation-banner';
 import { Footer } from './footer';
 import { Formbricks } from './formbricks';
 import { Header } from './header';
@@ -19,6 +20,7 @@ export const Layout = ({ children }: Props) => {
 
   return (
     <>
+      <ApiDeprecationBanner />
       <Suspense fallback={null}>
         <Notice syncStatusPromise={syncStatusPromise} />
       </Suspense>

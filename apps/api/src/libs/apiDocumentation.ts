@@ -21,6 +21,16 @@ const scalarCss = `
     padding-top: 60px;
     margin-top: 12px;
   }
+  .deprecation-callout {
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 0 0 20px;
+  }
+  .deprecation-callout p { margin: 0; }
+  .deprecation-callout a { color: inherit; text-decoration: underline; }
+  .light-mode .deprecation-callout { background: #fffbeb; color: #92400e; }
+  .dark-mode .deprecation-callout { background: rgba(245, 158, 11, 0.12); color: #fbbf24; }
 `;
 
 const scalarMeta = {
@@ -54,15 +64,14 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
       },
       info: {
-        description: `<p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
-        <p><h2>Attribution Requirements:</h2></p>
+        description: `<div class="deprecation-callout">
+          <p><strong>⚠️ Deprecation notice:</strong> The v1 and v2 API endpoints are deprecated and will be removed in a future release. New integrations should use the current v3 API documented below. Documentation for the deprecated endpoints remains available at <a href="/api-docs/legacy">/api-docs/legacy</a>.</p>
+        </div>
+        <p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
+        <h2>Attribution Requirements</h2>
         <p>The APIs are offered as a community service and are provided without any warranty. Please use them responsibly and only for what you need.</p>
-        <p>For any usage other than personal or private, attribution is required. This can be done by either:</p>
-        <ul>
-        <li>Including a link back to Nearblocks.io, or</li>
-        <li>Mentioning that your app is &quot;Powered by Nearblocks.io APIs.&quot;</li>
-        </ul>
-        <p>NearBlocks provides subscription-based API plans that provide higher rate limits for power users and commercial solutions. To upgrade to a paid API Plan, head over to the <a href="https://nearblocks.io/apis">APIs</a> page and select a plan that suits your needs. Once payment has been made, you can create API keys to make requests to our endpoints.</p>
+        <p>Attribution is required on the free plan only. You can attribute by either including a link back to Nearblocks.io or stating that your app is &quot;Powered by Nearblocks.io APIs.&quot; Paid plans do not require attribution.</p>
+        <p>To upgrade to a paid API plan with higher rate limits, head over to the <a href="https://nearblocks.io/apis">APIs</a> page and select a plan that suits your needs. Once payment has been made, you can create API keys to make requests to our endpoints.</p>
         <h2>Resources</h2>
         <ul>
           <li><a href="https://nearblocks.io/">Near Protocol Explorer</a></li>
@@ -82,8 +91,6 @@ const apiDocumentation = async (app: Application, dir: string) => {
             ? config.mainnetUrl
             : config.testnetUrl
         }/v3/accounts/wrap.near"</pre></code></p>
-        <h2>Legacy API</h2>
-        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. These endpoints will be removed in a future release.</p>
         `,
         title: ' ',
         version: '1.0.0',
@@ -184,8 +191,9 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
       },
       info: {
-        description: `<p><strong>These are deprecated endpoints. They will be removed in a future release.</strong></p>
-        <p>For new integrations, use the <a href="/api-docs">current API</a>.</p>
+        description: `<div class="deprecation-callout">
+          <p><strong>⚠️ Deprecated:</strong> These v1/v2 endpoints are deprecated and will be removed in a future release. For new integrations, use the <a href="/api-docs">current v3 API</a>.</p>
+        </div>
         `,
         title: ' ',
         version: '1.0.0',

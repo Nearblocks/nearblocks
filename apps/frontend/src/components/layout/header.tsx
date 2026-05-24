@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
+import { apiDocsUrl } from '@/lib/api-docs';
 import { useLocale } from '@/hooks/use-locale';
 import { Logo } from '@/icons/logo';
 import { hrefForLocale } from '@/lib/locale';
@@ -82,7 +83,7 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
     menu: [
       { href: '/apis', key: 'menu.developers.apiPlans' },
       {
-        href: 'https://api.nearblocks.io/api-docs',
+        href: apiDocsUrl(isMainnet ? 'mainnet' : 'testnet'),
         key: 'menu.developers.apiDocs',
       },
       { divider: true },
