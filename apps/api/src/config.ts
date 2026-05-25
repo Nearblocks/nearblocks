@@ -1,4 +1,4 @@
-import { cleanEnv, str, url } from 'envalid';
+import { cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -39,6 +39,9 @@ const env = cleanEnv(process.env, {
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
   TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
+  // Hard ceiling on the buffered usage events; bounds memory if the
+  // consumer stalls. ~500k events ≈ tens of MB. Set 0 to disable capture.
+  USAGE_STREAM_MAXLEN: num({ default: 500_000 }),
 });
 
 const baseStart =
@@ -90,6 +93,7 @@ const config: Config = {
   sentryDsn: env.SENTRY_DSN,
   stakingStart,
   testnetUrl: env.TESTNET_URL,
+  usageStreamMaxLen: env.USAGE_STREAM_MAXLEN,
   userDbUrl: env.DB_URL_USER,
 };
 

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
+import config from '#config';
 import logger from '#libs/logger';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 
@@ -9,7 +10,6 @@ import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
  * never throws into the request path; the cap keeps it bounded.
  */
 const STREAM_KEY = 'api:usage:events';
-const STREAM_MAXLEN = 1_000_000;
 
 type UsageUser = { id?: number; key_id?: number };
 
@@ -23,6 +23,9 @@ export const usageEvents = (
   res: Response,
   next: NextFunction,
 ) => {
+  // Kill-switch: set USAGE_STREAM_MAXLEN=0 to disable capture entirely.
+  if (config.usageStreamMaxLen <= 0) return next();
+
   const start = process.hrtime.bigint();
 
   res.on('finish', () => {
@@ -52,7 +55,7 @@ export const usageEvents = (
           STREAM_KEY,
           'MAXLEN',
           '~',
-          STREAM_MAXLEN,
+          config.usageStreamMaxLen,
           '*',
           'd',
           JSON.stringify(event),
