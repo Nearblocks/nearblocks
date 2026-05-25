@@ -11,6 +11,10 @@ import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
  */
 const STREAM_KEY = 'api:usage:events';
 
+// Path prefixes excluded from usage capture (high-volume noise we don't track,
+// e.g. legacy supply/fees/ping/nodes polling).
+const SKIP_PREFIXES = ['/v1/legacy'];
+
 type UsageUser = { id?: number; key_id?: number };
 
 const versionOf = (url: string): null | string => {
@@ -30,6 +34,9 @@ export const usageEvents = (
 
   res.on('finish', () => {
     try {
+      const path = req.originalUrl.split('?')[0];
+      if (SKIP_PREFIXES.some((prefix) => path.startsWith(prefix))) return;
+
       const user = req.user as undefined | UsageUser;
       // Normalized route pattern (e.g. /v1/blocks/:hash), not the raw URL.
       const pattern =
@@ -43,7 +50,7 @@ export const usageEvents = (
         method: req.method,
         ms: Number((process.hrtime.bigint() - start) / 1_000_000n),
         network: config.network,
-        path: req.originalUrl.split('?')[0],
+        path,
         route: pattern || req.path,
         status: res.statusCode,
         t: Date.now(),
