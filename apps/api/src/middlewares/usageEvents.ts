@@ -42,6 +42,7 @@ export const usageEvents = (
         key_id: user?.key_id ?? null,
         method: req.method,
         ms: Number((process.hrtime.bigint() - start) / 1_000_000n),
+        network: config.network,
         path: req.originalUrl.split('?')[0],
         route: pattern || req.path,
         status: res.statusCode,
