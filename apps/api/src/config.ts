@@ -4,6 +4,14 @@ import { Network } from 'nb-types';
 
 import { Config } from '#types/types';
 
+// Backwards compatibility: older deployments configured a single DATABASE_URL.
+// When set, it becomes the default for every per-domain connection string, so a
+// single-database setup keeps working without listing each DB_URL_* var. Any
+// individual var still overrides it. Without DATABASE_URL the vars stay required.
+const dbFallback = process.env.DATABASE_URL
+  ? { default: process.env.DATABASE_URL }
+  : {};
+
 const env = cleanEnv(process.env, {
   API_ACCESS_KEY: str(),
   API_URL: str({ default: 'https://api.nearblocks.io' }),
@@ -11,14 +19,14 @@ const env = cleanEnv(process.env, {
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
-  DB_URL_BALANCE: str(),
-  DB_URL_BASE: str(),
-  DB_URL_CONTRACT: str(),
-  DB_URL_EVENTS: str(),
-  DB_URL_MULTICHAIN: str(),
-  DB_URL_STAKING: str(),
-  DB_URL_USER: str(),
-  DB_WRITE_URL_BASE: str(),
+  DB_URL_BALANCE: str(dbFallback),
+  DB_URL_BASE: str(dbFallback),
+  DB_URL_CONTRACT: str(dbFallback),
+  DB_URL_EVENTS: str(dbFallback),
+  DB_URL_MULTICHAIN: str(dbFallback),
+  DB_URL_STAKING: str(dbFallback),
+  DB_URL_USER: str(dbFallback),
+  DB_WRITE_URL_BASE: str(dbFallback),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
