@@ -125,6 +125,7 @@ const rateLimiter = catchAsync(
     // Validators endpoint always counts as 1 query regardless of per_page
     const consumeCount =
       baseUrl === '/validators' ? 1 : Math.ceil(+perPage / 25);
+    res.locals.usageCredits = consumeCount;
 
     try {
       if (keyId) {
@@ -182,6 +183,7 @@ const useFreePlan = async (
   const perPage = req?.query?.per_page || 25;
   // Validators endpoint always counts as 1 query regardless of per_page
   const consumeCount = baseUrl === '/validators' ? 1 : Math.ceil(+perPage / 25);
+  res.locals.usageCredits = consumeCount;
 
   const plan = await getPlan(baseUrl, token);
 

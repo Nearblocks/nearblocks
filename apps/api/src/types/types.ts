@@ -52,6 +52,7 @@ export type Config = {
   sentryDsn?: string;
   stakingStart: bigint;
   testnetUrl: string;
+  usageStreamMaxLen: number;
   userDbUrl: string;
 };
 

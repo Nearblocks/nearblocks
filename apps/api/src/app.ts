@@ -12,6 +12,7 @@ import apiDocumentation from '#libs/apiDocumentation';
 import logger from '#libs/logger';
 import sentry from '#libs/sentry';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
+import { usageEvents } from '#middlewares/usageEvents';
 import routes from '#routes/index';
 import routesV2 from '#routes/v2/index';
 import routesV3 from '#routes/v3/index';
@@ -54,6 +55,8 @@ passport.use(anonymousStrategy);
 
 app.set('trust proxy', 2);
 app.get('/ip', (req, res) => res.send(req.ip));
+
+app.use(usageEvents);
 
 app.use('/v1', routes());
 app.use('/v2', routesV2());
