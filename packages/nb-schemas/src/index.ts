@@ -11,3 +11,4 @@ export type * from './search/index.js';
 export type * from './stats/index.js';
 export type * from './sync/index.js';
 export type * from './txns/index.js';
+export type * from './validators/index.js';

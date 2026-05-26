@@ -10,8 +10,14 @@ export const dynamic = 'force-dynamic';
 
 const loadManifest = () => {
   const candidates = [
-    path.join(process.cwd(), '.next/routes-manifest.json'),
-    path.join(process.cwd(), 'apps/frontend/.next/routes-manifest.json'),
+    path.join(
+      /*turbopackIgnore: true*/ process.cwd(),
+      '.next/routes-manifest.json',
+    ),
+    path.join(
+      /*turbopackIgnore: true*/ process.cwd(),
+      'apps/frontend/.next/routes-manifest.json',
+    ),
   ];
 
   for (const p of candidates) {

@@ -2,7 +2,6 @@ import { logger } from 'nb-logger';
 
 import sentry from '#libs/sentry';
 import {
-  latestBlockCheck,
   updatePoolInfoMap,
   updateStakingPoolStake,
   validatorsCheck,
@@ -11,7 +10,6 @@ import {
 export const task = async () => {
   try {
     logger.info('nodes: job started');
-    await latestBlockCheck();
     await validatorsCheck();
     await updatePoolInfoMap();
     await updateStakingPoolStake();

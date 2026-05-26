@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  cacheMaxMemorySize: 0,
+  cacheMaxMemorySize: process.env.NODE_ENV === 'production' ? 0 : undefined,
   deploymentId: process.env.GITHUB_SHA,
   experimental: {
     globalNotFound: true,

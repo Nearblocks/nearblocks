@@ -4,9 +4,8 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { RpcSelector } from '@/components/rpc';
 import { Validators } from '@/components/validators';
-import { fetchBlocks } from '@/data/home';
 import { fetchStats } from '@/data/layout';
-import { fetchValidators } from '@/data/validators';
+import { fetchValidatorInfo, fetchValidatorList } from '@/data/validators';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/validators'>;
@@ -30,9 +29,9 @@ const ValidatorsPage = async ({ params, searchParams }: Props) => {
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'validators');
   const filters = await searchParams;
-  const validatorsPromise = fetchValidators(filters);
+  const validatorListPromise = fetchValidatorList(filters);
+  const validatorInfoPromise = fetchValidatorInfo();
   const statsPromise = fetchStats();
-  const latestBlocksPromise = fetchBlocks();
 
   return (
     <>
@@ -41,9 +40,9 @@ const ValidatorsPage = async ({ params, searchParams }: Props) => {
       </PageHeading>
       <ErrorSuspense fallback={<Validators loading />}>
         <Validators
-          latestBlocksPromise={latestBlocksPromise}
           statsPromise={statsPromise}
-          validatorsPromise={validatorsPromise}
+          validatorInfoPromise={validatorInfoPromise}
+          validatorListPromise={validatorListPromise}
         />
       </ErrorSuspense>
     </>

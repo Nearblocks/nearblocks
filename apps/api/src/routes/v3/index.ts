@@ -14,6 +14,7 @@ import staking from '#routes/v3/staking';
 import stats from '#routes/v3/stats';
 import sync from '#routes/v3/sync';
 import txns from '#routes/v3/txns';
+import validators from '#routes/v3/validators';
 
 const routes = () => {
   const app = Router();
@@ -32,6 +33,7 @@ const routes = () => {
   stats(app);
   sync(app);
   txns(app);
+  validators(app);
 
   return app;
 };

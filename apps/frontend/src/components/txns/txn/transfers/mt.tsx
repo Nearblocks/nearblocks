@@ -6,7 +6,12 @@ import { TxnMT } from 'nb-schemas';
 
 import { AccountLink } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
-import { MTLink, NFTMedia, TokenAmount, TokenImage } from '@/components/token';
+import {
+  MTTokenLink,
+  NFTMedia,
+  TokenAmount,
+  TokenImage,
+} from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import { isSpamToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -105,9 +110,10 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
                       className="m-px size-5 rounded-full border"
                       src={mt.base_meta?.icon ?? ''}
                     />
-                    <MTLink
+                    <MTTokenLink
                       contract={mt.contract_account_id}
-                      name={mt.base_meta?.name}
+                      decimals={mt.base_meta?.decimals}
+                      name={mt.token_meta?.title ?? mt.base_meta?.name}
                       symbol={mt.base_meta?.symbol}
                       token={mt.token_id}
                     />
@@ -143,8 +149,9 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
                     className="m-px size-5 rounded-full border"
                     src={net.meta?.icon ?? ''}
                   />
-                  <MTLink
+                  <MTTokenLink
                     contract={net.contract_account_id}
+                    decimals={net.meta?.decimals}
                     name={net.meta?.name}
                     symbol={net.meta?.symbol}
                     token={net.token_id}
@@ -176,20 +183,15 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span>{t('transfer.token')}</span>
-                    <MTLink
-                      contract={mt.contract_account_id}
-                      name={mt.token_meta?.title ?? mt.base_meta?.name}
-                      token={mt.token_id}
-                      type="token"
-                    />
                     <TokenImage
                       alt={mt.token_meta?.title ?? mt.base_meta?.name ?? ''}
                       className="m-px size-5 rounded-full border"
                       src={mt.base_meta?.icon ?? ''}
                     />
-                    <MTLink
+                    <MTTokenLink
                       contract={mt.contract_account_id}
-                      name={mt.base_meta?.name}
+                      decimals={mt.base_meta?.decimals}
+                      name={mt.token_meta?.title ?? mt.base_meta?.name}
                       symbol={mt.base_meta?.symbol}
                       token={mt.token_id}
                     />

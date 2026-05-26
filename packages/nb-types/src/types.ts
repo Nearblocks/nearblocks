@@ -104,6 +104,7 @@ export type ValidatorTelemetry = {
 };
 
 export type ValidatorDescription = {
+  city?: string;
   country?: string;
   country_code?: string;
   description?: string;
