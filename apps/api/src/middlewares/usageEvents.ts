@@ -37,6 +37,13 @@ export const usageEvents = (
       const path = req.originalUrl.split('?')[0];
       if (SKIP_PREFIXES.some((prefix) => path.startsWith(prefix))) return;
 
+      // Skip our own first-party traffic (the site uses the internal access
+      // key). It isn't a third-party consumer and would otherwise inflate the
+      // anonymous bucket.
+      const auth = req.headers.authorization || '';
+      const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+      if (config.apiAccessKey && token === config.apiAccessKey) return;
+
       const user = req.user as undefined | UsageUser;
       // Normalized route pattern (e.g. /v1/blocks/:hash), not the raw URL.
       const pattern =
