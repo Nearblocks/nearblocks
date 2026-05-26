@@ -13,9 +13,8 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
-import type { ValidatorEpochData } from 'nb-types';
+import type { Validator, ValidatorsListRes } from 'nb-schemas';
 
-import type { ValidatorsRes } from '@/data/validators';
 import { useLocale } from '@/hooks/use-locale';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
@@ -32,8 +31,6 @@ import {
 
 import { AccountLink } from '../link';
 import { Truncate, TruncateCopy, TruncateText } from '../truncate';
-
-const PAGE_SIZE = 25;
 
 const statusVariant = (
   status: string,
@@ -55,43 +52,66 @@ const statusVariant = (
 };
 
 type Props = {
-  latestBlockHeight?: number;
+  lastEpochApy?: null | string;
   loading?: boolean;
-  validators?: null | ValidatorsRes;
+  meta?: ValidatorsListRes['meta'];
+  networkHolderIndex?: null | number;
+  total?: null | number;
+  validators?: null | Validator[];
 };
 
 export const ValidatorsTable = ({
-  latestBlockHeight = 0,
+  lastEpochApy,
   loading,
+  meta,
+  networkHolderIndex,
+  total,
   validators,
 }: Props) => {
   const { t } = useLocale('validators');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get('page') ?? '1');
-  const [expanded, setExpanded] = useState<number[]>([]);
+  const [expanded, setExpanded] = useState<string[]>([]);
 
-  const toggleRow = (index: number) =>
+  const toggleRow = (accountId: string) =>
     setExpanded((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
+      prev.includes(accountId)
+        ? prev.filter((id) => id !== accountId)
+        : [...prev, accountId],
     );
 
-  const pageData: ValidatorEpochData[] = validators?.validatorFullData ?? [];
-  const totalPages = Math.ceil((validators?.total ?? 0) / PAGE_SIZE);
+  const pageData: Validator[] = validators ?? [];
 
   const warningIndex = !loading
-    ? pageData.findIndex(
-        (v) =>
-          v.cumulativeStake &&
-          Number(v.cumulativeStake.cumulativePercent) >= 33,
-      )
+    ? pageData.findIndex((v) => v.is_network_holder_warning === true)
     : -1;
 
-  const updatePage = (newPage: number) => {
+  const onNext = () => {
+    if (!meta?.next_page) return;
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', String(newPage));
+    params.set('next', meta.next_page);
+    params.delete('prev');
     router.push(`?${params.toString()}`);
   };
+
+  const onPrev = () => {
+    if (!meta?.prev_page) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('prev', meta.prev_page);
+    params.delete('next');
+    router.push(`?${params.toString()}`);
+  };
+
+  const onFirst = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('next');
+    params.delete('prev');
+    router.push(`?${params.toString()}`);
+  };
+
+  const hasPrev = !!meta?.prev_page;
+  const hasNext = !!meta?.next_page;
+  const isFirstPage = !searchParams.get('next') && !searchParams.get('prev');
 
   return (
     <Card>
@@ -99,8 +119,8 @@ export const ValidatorsTable = ({
         <div className="text-body-sm border-b px-4 py-3 leading-7">
           {loading ? (
             <Skeleton className="h-4 w-40 align-middle" />
-          ) : pageData.length > 0 ? (
-            t('table.total', { count: numberFormat(validators?.total ?? 0) })
+          ) : total != null ? (
+            t('table.total', { count: numberFormat(total) })
           ) : null}
         </div>
         <div className="overflow-x-auto">
@@ -148,22 +168,16 @@ export const ValidatorsTable = ({
                     </TableRow>
                   ))
                 : pageData.flatMap((row, localIdx) => {
-                    const globalIdx = (page - 1) * PAGE_SIZE + localIdx;
                     const rows = [
                       <ValidatorRows
                         expanded={expanded}
-                        key={row.accountId}
-                        lastBlockHeight={latestBlockHeight}
-                        lastEpochApy={validators?.lastEpochApy ?? '0'}
+                        key={row.account_id}
+                        lastEpochApy={lastEpochApy ?? '0'}
                         row={row}
-                        telemetry={
-                          validators?.validatorTelemetry?.[row.accountId] ??
-                          null
-                        }
                         toggleRow={toggleRow}
                       />,
                     ];
-                    if (warningIndex >= 0 && globalIdx === warningIndex) {
+                    if (warningIndex >= 0 && localIdx === warningIndex) {
                       rows.push(
                         <TableRow key="decentralization-warning">
                           <TableCell
@@ -171,7 +185,9 @@ export const ValidatorsTable = ({
                             colSpan={11}
                           >
                             {t('table.warning', {
-                              index: (page - 1) * PAGE_SIZE + warningIndex + 1,
+                              index: networkHolderIndex
+                                ? networkHolderIndex + 1
+                                : localIdx + 1,
                             })}
                           </TableCell>
                         </TableRow>,
@@ -182,22 +198,27 @@ export const ValidatorsTable = ({
             </TableBody>
           </Table>
         </div>
-        {!loading && totalPages > 1 && (
+        {!loading && (hasPrev || hasNext || !isFirstPage) && (
           <div className="text-body-sm flex items-center justify-end gap-2 border-t px-4 py-3">
+            {!isFirstPage && (
+              <button
+                className="rounded border px-3 py-1 disabled:opacity-40"
+                onClick={onFirst}
+              >
+                {t('table.first')}
+              </button>
+            )}
             <button
               className="rounded border px-3 py-1 disabled:opacity-40"
-              disabled={page <= 1}
-              onClick={() => updatePage(page - 1)}
+              disabled={!hasPrev}
+              onClick={onPrev}
             >
               {t('table.prev')}
             </button>
-            <span>
-              {page} / {totalPages}
-            </span>
             <button
               className="rounded border px-3 py-1 disabled:opacity-40"
-              disabled={page >= totalPages}
-              onClick={() => updatePage(page + 1)}
+              disabled={!hasNext}
+              onClick={onNext}
             >
               {t('table.next')}
             </button>
@@ -209,66 +230,49 @@ export const ValidatorsTable = ({
 };
 
 type ValidatorRowsProps = {
-  expanded: number[];
-  lastBlockHeight: number;
+  expanded: string[];
   lastEpochApy: string;
-  row: ValidatorEpochData;
-  telemetry: {
-    agentBuild?: string;
-    agentName?: string;
-    agentVersion?: string;
-    lastHeight?: number;
-    lastSeen?: number;
-    status?: string;
-  } | null;
-  toggleRow: (index: number) => void;
+  row: Validator;
+  toggleRow: (accountId: string) => void;
 };
 
 const ValidatorRows = ({
   expanded,
-  lastBlockHeight,
   lastEpochApy,
   row,
-  telemetry,
   toggleRow,
 }: ValidatorRowsProps) => {
   const { t } = useLocale('validators');
-  const idx = row.index ?? 0;
-  const isExpanded = expanded.includes(idx);
+  const isExpanded = expanded.includes(row.account_id);
 
   const stake =
-    row.currentEpoch?.stake ??
-    row.nextEpoch?.stake ??
-    row.afterNextEpoch?.stake ??
-    row.contractStake;
+    row.current_epoch_stake ??
+    row.next_epoch_stake ??
+    row.after_next_epoch_stake ??
+    row.contract_stake;
 
-  const fee = row.poolInfo?.fee ?? null;
-  const feeDisplay = fee
-    ? `${((fee.numerator / fee.denominator) * 100).toFixed(0)}%`
-    : 'N/A';
+  const feeDisplay =
+    row.fee_numerator != null && row.fee_denominator != null
+      ? `${((row.fee_numerator / row.fee_denominator) * 100).toFixed(0)}%`
+      : 'N/A';
 
   const apyNum =
-    fee && lastEpochApy
+    row.fee_numerator != null && row.fee_denominator != null && lastEpochApy
       ? Number(lastEpochApy) -
-        Number(lastEpochApy) * (fee.numerator / fee.denominator)
+        Number(lastEpochApy) * (row.fee_numerator / row.fee_denominator)
       : null;
   const apyDisplay =
     apyNum !== null ? (apyNum === 0 ? '0%' : `${apyNum.toFixed(2)}%`) : 'N/A';
 
-  const progress = row.currentEpoch?.progress;
-  const productivityRatio = progress
-    ? (progress.blocks.produced + progress.chunks.produced) /
-      (progress.blocks.total + progress.chunks.total)
-    : 0;
-
-  const lastHeightColor =
-    telemetry?.lastHeight && lastBlockHeight
-      ? Math.abs(telemetry.lastHeight - lastBlockHeight) > 1000
-        ? 'text-red-500'
-        : Math.abs(telemetry.lastHeight - lastBlockHeight) > 50
-        ? 'text-amber-500'
-        : ''
-      : '';
+  const blocksProduced = row.current_epoch_blocks_produced ?? 0;
+  const chunksProduced = row.current_epoch_chunks_produced ?? 0;
+  const blocksExpected = row.current_epoch_blocks_expected ?? 0;
+  const chunksExpected = row.current_epoch_chunks_expected ?? 0;
+  const totalExpected = blocksExpected + chunksExpected;
+  const productivityRatio =
+    totalExpected > 0
+      ? (blocksProduced + chunksProduced) / totalExpected
+      : null;
 
   const statusLabel = (status: string) => {
     switch (status) {
@@ -291,19 +295,7 @@ const ValidatorRows = ({
     }
   };
 
-  const timeAgoFromMs = (ms: number) => {
-    const diff = Date.now() - ms;
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return t('table.timeAgo.justNow');
-    if (minutes < 60) return t('table.timeAgo.minutesAgo', { minutes });
-    return t('table.timeAgo.hoursAgo', { hours: Math.floor(minutes / 60) });
-  };
-
-  const socialMedia =
-    row.description?.twitter ||
-    row.description?.discord ||
-    row.description?.github ||
-    row.description?.telegram;
+  const socialMedia = row.twitter || row.discord || row.github || row.telegram;
 
   return (
     <>
@@ -311,7 +303,7 @@ const ValidatorRows = ({
         <TableCell>
           <button
             className="flex items-center justify-center p-1"
-            onClick={() => toggleRow(idx)}
+            onClick={() => toggleRow(row.account_id)}
           >
             {isExpanded ? (
               <ChevronUp className="size-4" />
@@ -321,12 +313,12 @@ const ValidatorRows = ({
           </button>
         </TableCell>
         <TableCell>
-          {row.description?.country_code ? (
+          {row.country_code ? (
             <Image
-              alt={row.description.country ?? 'location'}
+              alt={row.country ?? 'location'}
               height={20}
-              src={`https://flagcdn.com/48x36/${row.description.country_code.toLowerCase()}.png`}
-              title={row.description.country}
+              src={`https://flagcdn.com/48x36/${row.country_code.toLowerCase()}.png`}
+              title={row.country ?? undefined}
               unoptimized
               width={20}
             />
@@ -337,23 +329,23 @@ const ValidatorRows = ({
           )}
         </TableCell>
         <TableCell>
-          <Badge variant={statusVariant(row.stakingStatus ?? '')}>
-            {statusLabel(row.stakingStatus ?? '')}
+          <Badge variant={statusVariant(row.staking_status ?? '')}>
+            {statusLabel(row.staking_status ?? '')}
           </Badge>
         </TableCell>
         <TableCell>
           <div className="flex flex-col gap-0.5">
             <AccountLink
-              account={row.accountId}
+              account={row.account_id}
               textClassName="text-body-sm max-w-40"
             />
-            {row.publicKey && (
+            {row.public_key && (
               <Truncate>
                 <TruncateText
                   className="text-body-xs max-w-40 px-2"
-                  text={row.publicKey}
-                ></TruncateText>
-                <TruncateCopy text={row.publicKey} />
+                  text={row.public_key}
+                />
+                <TruncateCopy text={row.public_key} />
               </Truncate>
             )}
           </div>
@@ -361,41 +353,42 @@ const ValidatorRows = ({
         <TableCell>{feeDisplay}</TableCell>
         <TableCell>{apyDisplay}</TableCell>
         <TableCell>
-          {row.poolInfo?.delegatorsCount !== undefined &&
-          row.poolInfo?.delegatorsCount !== null
-            ? numberFormat(row.poolInfo.delegatorsCount)
+          {row.delegators_count != null
+            ? numberFormat(row.delegators_count)
             : 'N/A'}
         </TableCell>
         <TableCell className="whitespace-nowrap">
           {stake ? `${nearFormat(stake, { maximumFractionDigits: 0 })} Ⓝ` : ''}
         </TableCell>
-        <TableCell>{row.percent ? `${row.percent}%` : ''}</TableCell>
+        <TableCell>
+          {row.own_stake_percent ? `${row.own_stake_percent}%` : ''}
+        </TableCell>
         <TableCell>
           <div className="bg-muted relative h-7 w-36 overflow-hidden rounded-xl">
             <div
               className="bg-link absolute inset-0 h-full"
               style={{
-                width: `${row.cumulativeStake?.cumulativePercent ?? 0}%`,
+                width: `${row.cumulative_stake_percent ?? 0}%`,
               }}
             />
             <span className="text-body-xs absolute inset-0 flex items-center justify-center font-medium text-white">
-              {row.cumulativeStake?.cumulativePercent
-                ? `${row.cumulativeStake.cumulativePercent}%`
+              {row.cumulative_stake_percent
+                ? `${row.cumulative_stake_percent}%`
                 : 'N/A'}
             </span>
           </div>
         </TableCell>
         <TableCell>
-          {row.stakeChange?.value ? (
+          {row.stake_change_value ? (
             <span
               className={
-                row.stakeChange.symbol === '+'
+                row.stake_change_symbol === '+'
                   ? 'text-lime-foreground'
                   : 'text-red-foreground'
               }
             >
-              {row.stakeChange.symbol}
-              {row.stakeChange.value} Ⓝ
+              {row.stake_change_symbol}
+              {row.stake_change_value} Ⓝ
             </span>
           ) : stake ? (
             <span className="text-muted-foreground">
@@ -407,70 +400,26 @@ const ValidatorRows = ({
 
       {isExpanded && (
         <>
-          {telemetry && (
+          {productivityRatio !== null && (
             <TableRow className="bg-muted/40 hover:bg-muted/40">
-              <TableCell className="py-2 pl-8 align-top" colSpan={2}>
+              <TableCell className="py-2 pl-8 align-top" colSpan={11}>
                 <div className="text-muted-foreground text-headline-xs uppercase">
                   {t('table.expanded.uptime')}
                 </div>
                 <div className="text-body-xs mt-1">
-                  {!isNaN(productivityRatio)
-                    ? `${
-                        productivityRatio * 100 === 100
-                          ? 100
-                          : (productivityRatio * 100).toFixed(3)
-                      }%`
-                    : '-'}
-                </div>
-              </TableCell>
-              <TableCell className="py-2 align-top" colSpan={2}>
-                <div className="text-muted-foreground text-headline-xs uppercase">
-                  {t('table.expanded.latestBlock')}
-                </div>
-                <div className={`text-body-xs mt-1 ${lastHeightColor}`}>
-                  {telemetry.lastHeight ?? '-'}
-                </div>
-              </TableCell>
-              <TableCell className="py-2 align-top" colSpan={3}>
-                <div className="text-muted-foreground text-headline-xs uppercase">
-                  {t('table.expanded.latestTelemetry')}
-                </div>
-                <div className="text-body-xs mt-1">
-                  {telemetry.lastSeen ? timeAgoFromMs(telemetry.lastSeen) : '-'}
-                </div>
-              </TableCell>
-              <TableCell className="py-2 align-top" colSpan={2}>
-                <div className="text-muted-foreground text-headline-xs uppercase">
-                  {t('table.expanded.agentName')}
-                </div>
-                <div className="text-body-xs mt-1">
-                  {telemetry.agentName ? (
-                    <span className="bg-muted rounded px-1 py-0.5">
-                      {telemetry.agentName}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
-                </div>
-              </TableCell>
-              <TableCell className="py-2 align-top" colSpan={2}>
-                <div className="text-muted-foreground text-headline-xs uppercase">
-                  {t('table.expanded.agentVersion')}
-                </div>
-                <div className="text-body-xs mt-1">
-                  {telemetry.agentVersion || telemetry.agentBuild ? (
-                    <span className="bg-muted rounded px-1 py-0.5">
-                      {telemetry.agentVersion}/{telemetry.agentBuild}
-                    </span>
-                  ) : (
-                    '-'
-                  )}
+                  {productivityRatio * 100 === 100
+                    ? '100%'
+                    : `${(productivityRatio * 100).toFixed(3)}%`}
                 </div>
               </TableCell>
             </TableRow>
           )}
 
-          {row.description ? (
+          {row.name ||
+          row.description ||
+          row.url ||
+          row.email ||
+          socialMedia ? (
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableCell
                 className="p-3 align-top whitespace-normal"
@@ -479,9 +428,7 @@ const ValidatorRows = ({
                 <div className="text-muted-foreground text-headline-xs uppercase">
                   {t('table.expanded.name')}
                 </div>
-                <div className="text-body-sm mt-2">
-                  {row.description.name ?? '-'}
-                </div>
+                <div className="text-body-sm mt-2">{row.name ?? '-'}</div>
               </TableCell>
               <TableCell
                 className="p-3 align-top whitespace-normal"
@@ -491,14 +438,14 @@ const ValidatorRows = ({
                   {t('table.expanded.socialMedia')}
                 </div>
                 <div className="mt-3 flex items-center gap-2">
-                  {socialMedia ? (
+                  {socialMedia || row.url || row.email ? (
                     <>
-                      {row.description.url && (
+                      {row.url && (
                         <a
                           href={
-                            row.description.url.startsWith('http')
-                              ? row.description.url
-                              : `http://${row.description.url}`
+                            row.url.startsWith('http')
+                              ? row.url
+                              : `http://${row.url}`
                           }
                           rel="noreferrer noopener"
                           target="_blank"
@@ -506,21 +453,21 @@ const ValidatorRows = ({
                           <Globe className="text-link size-4" />
                         </a>
                       )}
-                      {row.description.email && (
+                      {row.email && (
                         <a
-                          href={`mailto:${row.description.email}`}
+                          href={`mailto:${row.email}`}
                           rel="noreferrer noopener"
                           target="_blank"
                         >
                           <Mail className="text-link size-4" />
                         </a>
                       )}
-                      {row.description.twitter && (
+                      {row.twitter && (
                         <a
                           href={
-                            row.description.twitter.includes('http')
-                              ? row.description.twitter
-                              : `https://twitter.com/${row.description.twitter}`
+                            row.twitter.includes('http')
+                              ? row.twitter
+                              : `https://twitter.com/${row.twitter}`
                           }
                           rel="noreferrer noopener"
                           target="_blank"
@@ -528,12 +475,12 @@ const ValidatorRows = ({
                           <RiTwitterXFill className="text-link size-4" />
                         </a>
                       )}
-                      {row.description.discord && (
+                      {row.discord && (
                         <a
                           href={
-                            row.description.discord.includes('http')
-                              ? row.description.discord
-                              : `https://discord.com/invite/${row.description.discord}`
+                            row.discord.includes('http')
+                              ? row.discord
+                              : `https://discord.com/invite/${row.discord}`
                           }
                           rel="noreferrer noopener"
                           target="_blank"
@@ -541,12 +488,12 @@ const ValidatorRows = ({
                           <MessageCircle className="text-link size-4" />
                         </a>
                       )}
-                      {row.description.github && (
+                      {row.github && (
                         <a
                           href={
-                            row.description.github.includes('http')
-                              ? row.description.github
-                              : `https://github.com/${row.description.github}`
+                            row.github.includes('http')
+                              ? row.github
+                              : `https://github.com/${row.github}`
                           }
                           rel="noreferrer noopener"
                           target="_blank"
@@ -554,12 +501,12 @@ const ValidatorRows = ({
                           <RiGithubFill className="text-link size-4" />
                         </a>
                       )}
-                      {row.description.telegram && (
+                      {row.telegram && (
                         <a
                           href={
-                            row.description.telegram.startsWith('http')
-                              ? row.description.telegram
-                              : `https://t.me/${row.description.telegram}`
+                            row.telegram.startsWith('http')
+                              ? row.telegram
+                              : `https://t.me/${row.telegram}`
                           }
                           rel="noreferrer noopener"
                           target="_blank"
@@ -581,7 +528,7 @@ const ValidatorRows = ({
                   {t('table.expanded.description')}
                 </div>
                 <div className="text-body-sm mt-2">
-                  {row.description.description ?? '-'}
+                  {row.description ?? '-'}
                 </div>
               </TableCell>
             </TableRow>

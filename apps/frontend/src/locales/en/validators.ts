@@ -63,6 +63,7 @@ export const validators = {
       socialMedia: 'Social Media',
       uptime: 'Uptime',
     },
+    first: 'First',
     next: 'Next',
     prev: 'Prev',
     statuses: {

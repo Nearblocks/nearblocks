@@ -1,7 +1,8 @@
 'use client';
 
+import type { ValidatorInfo } from 'nb-schemas';
+
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
-import type { ValidatorsRes } from '@/data/validators';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
@@ -9,16 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  info?: null | ValidatorInfo;
   loading?: boolean;
   totalSupply?: null | string;
-  validators?: null | ValidatorsRes;
 };
 
-export const StakingOverview = ({
-  loading,
-  totalSupply,
-  validators,
-}: Props) => {
+export const StakingOverview = ({ info, loading, totalSupply }: Props) => {
   const { t } = useLocale('validators');
 
   return (
@@ -34,7 +31,7 @@ export const StakingOverview = ({
               {loading ? (
                 <Skeleton className="h-4 w-10" />
               ) : (
-                numberFormat(validators?.currentValidators)
+                numberFormat(info?.current_validators_count)
               )}
             </ListRight>
           </ListItem>
@@ -43,10 +40,10 @@ export const StakingOverview = ({
             <ListRight>
               {loading ? (
                 <Skeleton className="h-4 w-20" />
-              ) : validators?.totalStake ? (
+              ) : info?.total_stake ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />
-                  {nearFormat(validators.totalStake, {
+                  {nearFormat(info.total_stake, {
                     maximumFractionDigits: 0,
                   })}
                 </span>

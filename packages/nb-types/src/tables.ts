@@ -43,7 +43,10 @@ export interface TTables {
   stats: Stats;
   tps: TPS;
   transactions: Transaction;
+  validator_config: ValidatorConfig;
   validator_data: ValidatorData;
+  validator_epoch_data: ValidatorEpochRecord;
+  validator_pool_metadata: ValidatorPoolMetadata;
 }
 
 export type AccessKey = {
@@ -507,6 +510,72 @@ export type ValidatorData = {
   validator_lists: JsonObject;
   validator_telemetry: JsonObject;
   validators_promise: JsonObject;
+};
+
+export type ValidatorConfig = {
+  epoch_seat_price: null | string;
+  epoch_start_height: null | number;
+  epoch_start_timestamp: null | number;
+  epoch_start_total_supply: null | string;
+  genesis_account_count: null | string;
+  genesis_height: null | number;
+  genesis_min_stake_ratio: null | number[];
+  genesis_protocol_version: null | number;
+  genesis_timestamp: null | number;
+  genesis_total_supply: null | string;
+  id: number;
+  last_epoch_apy: null | string;
+  latest_block_height: null | number;
+  latest_block_timestamp: null | number;
+  network_holder_index: null | number;
+  protocol_epoch_length: null | number;
+  protocol_max_inflation_rate: null | number[];
+  protocol_max_seats: null | number;
+  protocol_treasury_fraction: null | number[];
+  protocol_version: null | number;
+  total_stake: null | string;
+  updated_at: Date | string;
+};
+
+export type ValidatorEpochRecord = {
+  account_id: string;
+  accumulated_stake_percent: null | string;
+  after_next_epoch_stake: null | string;
+  contract_stake: null | string;
+  cumulative_stake_percent: null | string;
+  current_epoch_blocks_expected: null | number;
+  current_epoch_blocks_produced: null | number;
+  current_epoch_chunks_expected: null | number;
+  current_epoch_chunks_produced: null | number;
+  current_epoch_stake: null | string;
+  delegators_count: null | number;
+  fee_denominator: null | number;
+  fee_numerator: null | number;
+  is_network_holder_warning: boolean | null;
+  next_epoch_stake: null | string;
+  own_stake_percent: null | string;
+  public_key: null | string;
+  stake_change_symbol: null | string;
+  stake_change_value: null | string;
+  staking_status: null | string;
+  updated_at: Date | string;
+};
+
+export type ValidatorPoolMetadata = {
+  account_id: string;
+  city: null | string;
+  country: null | string;
+  country_code: null | string;
+  description: null | string;
+  discord: null | string;
+  email: null | string;
+  github: null | string;
+  logo: null | string;
+  name: null | string;
+  telegram: null | string;
+  twitter: null | string;
+  updated_at: Date | string;
+  url: null | string;
 };
 
 export type Campaign = {

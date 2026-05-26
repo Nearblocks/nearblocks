@@ -32,7 +32,7 @@ type LinkProps = {
 };
 type MTTokenLinkProps = {
   contract: string;
-  decimals?: null | number;
+  decimals: null | number | undefined;
   name?: null | string;
   symbol?: null | string;
   textClassName?: string;

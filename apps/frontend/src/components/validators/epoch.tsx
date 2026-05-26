@@ -3,15 +3,16 @@
 import Big from 'big.js';
 import { useEffect, useState } from 'react';
 
+import type { ValidatorInfo } from 'nb-schemas';
+
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
-import type { ValidatorsRes } from '@/data/validators';
 import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  info?: null | ValidatorInfo;
   loading?: boolean;
-  validators?: null | ValidatorsRes;
 };
 
 export const secondsToTime = (totalSeconds: number) => {
@@ -24,17 +25,34 @@ export const secondsToTime = (totalSeconds: number) => {
   )}M ${String(s).padStart(2, '0')}S`;
 };
 
-export const EpochInfo = ({ loading, validators }: Props) => {
+export const EpochInfo = ({ info, loading }: Props) => {
   const { t } = useLocale('validators');
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [progressPct, setProgressPct] = useState(0);
 
   useEffect(() => {
-    if (validators) {
-      setTimeRemaining(validators.totalSeconds ?? 0);
-      setElapsedTime(validators.elapsedTimeData ?? 0);
+    if (info) {
+      const epochStartMs = Number(info.epoch_start_timestamp ?? 0) / 1e6;
+      const latestBlockMs = Number(info.latest_block_timestamp ?? 0) / 1e6;
+
+      const elapsedSeconds = Math.max(0, (Date.now() - epochStartMs) / 1000);
+
+      const blocksElapsed =
+        Number(info.latest_block_height ?? 0) -
+        Number(info.epoch_start_height ?? 0);
+      const epochLength = info.protocol_epoch_length ?? 0;
+      const pct = epochLength > 0 ? (blocksElapsed / epochLength) * 100 : 0;
+
+      const elapsedSinceEpochMs = latestBlockMs - epochStartMs;
+      const remainingSeconds =
+        pct > 0 ? ((elapsedSinceEpochMs / pct) * (100 - pct)) / 1000 : 0;
+
+      setElapsedTime(elapsedSeconds);
+      setTimeRemaining(Math.max(0, remainingSeconds));
+      setProgressPct(pct);
     }
-  }, [validators]);
+  }, [info]);
 
   useEffect(() => {
     const id = setInterval(
@@ -42,12 +60,12 @@ export const EpochInfo = ({ loading, validators }: Props) => {
       1000,
     );
     return () => clearInterval(id);
-  }, [validators]);
+  }, [info]);
 
   useEffect(() => {
     const id = setInterval(() => setElapsedTime((t) => t + 1), 1000);
     return () => clearInterval(id);
-  }, [validators]);
+  }, [info]);
 
   return (
     <Card className="md:col-span-2 xl:col-auto">
@@ -83,8 +101,8 @@ export const EpochInfo = ({ loading, validators }: Props) => {
             <ListRight>
               {loading ? (
                 <Skeleton className="h-4 w-12" />
-              ) : validators?.lastEpochApy ? (
-                `${validators.lastEpochApy}%`
+              ) : info?.last_epoch_apy ? (
+                `${info.last_epoch_apy}%`
               ) : (
                 '0%'
               )}
@@ -95,24 +113,20 @@ export const EpochInfo = ({ loading, validators }: Props) => {
             <ListRight>
               {loading ? (
                 <Skeleton className="h-4 w-24" />
-              ) : validators != null ? (
+              ) : info != null ? (
                 <div className="flex items-center gap-2">
                   <div className="bg-muted h-2 w-28 rounded-full">
                     <div
                       className="bg-link h-2 rounded-full"
                       style={{
                         width: `${Math.min(
-                          Number(
-                            Big(validators.epochProgressData ?? 0).toFixed(1),
-                          ),
+                          Number(Big(progressPct).toFixed(1)),
                           100,
                         )}%`,
                       }}
                     />
                   </div>
-                  <span>
-                    {Big(validators.epochProgressData ?? 0).toFixed(0)}%
-                  </span>
+                  <span>{Big(progressPct).toFixed(0)}%</span>
                 </div>
               ) : null}
             </ListRight>

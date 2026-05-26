@@ -2,59 +2,56 @@
 
 import { use } from 'react';
 
-import type { BlockListItem } from 'nb-schemas';
-import type { Stats } from 'nb-schemas';
+import type { Stats, ValidatorInfoRes, ValidatorsListRes } from 'nb-schemas';
 
-import type { ValidatorsRes } from '@/data/validators';
 import { nearFormat } from '@/lib/format';
 
 import { EpochInfo } from './epoch';
 import { StakingOverview } from './staking';
-import { ValidatorInfo } from './validator';
+import { ValidatorInfo as ValidatorInfoCard } from './validator';
 import { ValidatorsTable } from './validators';
 
 type Props = {
-  latestBlocksPromise?: Promise<BlockListItem[] | null>;
   loading?: boolean;
   statsPromise?: Promise<null | Stats>;
-  validatorsPromise?: Promise<ValidatorsRes>;
+  validatorInfoPromise?: Promise<ValidatorInfoRes>;
+  validatorListPromise?: Promise<ValidatorsListRes>;
 };
 
 export const Validators = ({
-  latestBlocksPromise,
   loading,
   statsPromise,
-  validatorsPromise,
+  validatorInfoPromise,
+  validatorListPromise,
 }: Props) => {
-  const validators =
-    !loading && validatorsPromise ? use(validatorsPromise) : null;
+  const list =
+    !loading && validatorListPromise ? use(validatorListPromise) : null;
+  const info =
+    !loading && validatorInfoPromise ? use(validatorInfoPromise) : null;
   const stats = !loading && statsPromise ? use(statsPromise) : null;
-  const latestBlocks =
-    !loading && latestBlocksPromise ? use(latestBlocksPromise) : null;
 
   const totalSupply = stats?.total_supply
     ? nearFormat(stats.total_supply, { maximumFractionDigits: 0 })
     : null;
 
-  const latestBlockHeight = latestBlocks?.[0]?.block_height
-    ? Number(latestBlocks[0].block_height)
-    : 0;
-
   return (
     <div className="space-y-10">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <StakingOverview
+          info={info?.data ?? null}
           loading={loading}
           totalSupply={totalSupply}
-          validators={validators}
         />
-        <ValidatorInfo loading={loading} />
-        <EpochInfo loading={loading} validators={validators} />
+        <ValidatorInfoCard loading={loading} />
+        <EpochInfo info={info?.data ?? null} loading={loading} />
       </div>
       <ValidatorsTable
-        latestBlockHeight={latestBlockHeight}
+        lastEpochApy={info?.data?.last_epoch_apy ?? null}
         loading={loading}
-        validators={validators}
+        meta={list?.meta}
+        networkHolderIndex={info?.data?.network_holder_index ?? null}
+        total={info?.data?.total_validators_count ?? null}
+        validators={list?.data ?? null}
       />
     </div>
   );
