@@ -107,13 +107,17 @@ const rateLimiter = catchAsync(
           );
         }
       } catch (error) {
-        logger.error(error); // plan lookup failed — visibility into free-plan fallback
+        // Plan lookup errored -> free tier. A spike = DB outage, not per-customer.
+        logger.error(error, `rate limit: plan lookup failed for user ${id}, applying free plan`);
 
         return await useFreePlan(req, res, next, req.ip!);
       }
     }
 
     if (!selectedPlan) {
+      // No active plan -> free tier. A spike here = mass demotion (plan/DB outage).
+      logger.warn(`rate limit: no active plan for user ${id}, applying free plan`);
+
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
         return await useFreePlan(req, res, next, id, tokenKey);
@@ -200,16 +204,8 @@ const useFreePlan = async (
 
   const plan = await getPlan(baseUrl, token);
 
-  try {
-    await ratelimiterRedisClient.set(
-      `user_plan:${key}`,
-      JSON.stringify(plan),
-      'EX',
-      86400,
-    );
-  } catch (redisError) {
-    // logger.error(redisError, 'Error caching user plan in Redis.');
-  }
+  // Never cache this fallback under user_plan:${key}: for a real user id a
+  // transient empty lookup would pin them to free for 24h (free_plan is cached separately).
   const { limiters, rateLimit } = rateLimiterUnion(plan, baseUrl);
 
   try {

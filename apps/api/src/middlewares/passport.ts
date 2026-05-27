@@ -46,9 +46,15 @@ const bearerVerify: VerifyFunction = async (token, done) => {
       return done(null, user);
     }
 
+    // Token supplied but no matching user. A spike = silent mass demotion to free.
+    logger.warn(
+      { token: token.slice(0, 6) },
+      'auth: bearer token did not resolve to a user, treating as anonymous',
+    );
     return done(null, false);
   } catch (error) {
-    logger.error(error);
+    // Auth lookup errored (DB/redis) -> anonymous. A spike = fleet-wide outage.
+    logger.error(error, 'auth: token lookup failed, treating request as anonymous');
     return done(null, false);
   }
 };
