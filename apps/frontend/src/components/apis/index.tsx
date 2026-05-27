@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { use, useState } from 'react';
 
 import type { ApiPlan } from '@/data/plans';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
+import { apiDocsUrl } from '@/lib/api-docs';
 import { numberFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -35,6 +37,8 @@ type Props = {
 
 export const Apis = ({ plansPromise }: Props) => {
   const { t } = useLocale('apis');
+  const network = useConfig((s) => s.config.network);
+  const docsUrl = apiDocsUrl(network);
   const [isAnnual, setIsAnnual] = useState(true);
   const plans = use(plansPromise);
 
@@ -64,11 +68,7 @@ export const Apis = ({ plansPromise }: Props) => {
                 </a>
               </Button>
               <Button asChild size="lg" variant="ghost">
-                <a
-                  href="https://api.nearblocks.io/api-docs"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
+                <a href={docsUrl} rel="noopener noreferrer" target="_blank">
                   {t('docs')}
                   <ArrowUpRight className="mt-2 -ml-1 size-3 self-start" />
                 </a>
@@ -272,11 +272,7 @@ export const Apis = ({ plansPromise }: Props) => {
         <div className="container mx-auto flex flex-col items-center gap-4 px-4 text-center sm:flex-row sm:justify-center">
           <p className="text-body-lg">{t('footer.description')}</p>
           <Button asChild size="lg" variant="secondary">
-            <a
-              href="https://api.nearblocks.io/api-docs"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
+            <a href={docsUrl} rel="noopener noreferrer" target="_blank">
               {t('footer.cta')}
               <ArrowUpRight className="mt-2 -ml-1 size-3 self-start" />
             </a>
