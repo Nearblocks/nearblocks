@@ -108,16 +108,16 @@ const rateLimiter = catchAsync(
         }
       } catch (error) {
         // Plan lookup errored -> free tier. A spike = DB outage, not per-customer.
-        logger.error(error, `rate limit: plan lookup failed for user ${id}, applying free plan`);
+        logger.error(
+          error,
+          `rate limit: plan lookup failed for user ${id}, applying free plan`,
+        );
 
         return await useFreePlan(req, res, next, req.ip!);
       }
     }
 
     if (!selectedPlan) {
-      // No active plan -> free tier. A spike here = mass demotion (plan/DB outage).
-      logger.warn(`rate limit: no active plan for user ${id}, applying free plan`);
-
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
         return await useFreePlan(req, res, next, id, tokenKey);

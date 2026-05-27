@@ -39,6 +39,12 @@ if (!config.ratelimiterRedisUrl && config.ratelimiterRedisSentinelName) {
   }
 }
 
+// On READONLY (Dragonfly failover left us pinned to a read-only node), force a
+// reconnect + resend so we re-resolve to the current master instead of failing
+// every write until a manual pod restart.
+ratelimiterOptions.reconnectOnError = (err: Error) =>
+  err.message.includes('READONLY') ? 2 : false;
+
 const ratelimiterRedis = new Redis(
   `user-api:${config.network}`,
   ratelimiterOptions,
