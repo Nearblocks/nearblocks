@@ -13,7 +13,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
-import { CodeViewer } from './code';
+import { EncodedData } from './encoded-data';
 import { ReceiptLogs } from './logs';
 
 const collectReceiptIds = (
@@ -89,14 +89,18 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
                     </span>
                   );
                 }
+                // A SUCCESS_VALUE result is the contract's base64-encoded
+                // return value — decode it so JSON/UTF-8/Hex/Base64 views all
+                // work. Any other (already-structured) result is passed as-is.
+                const isSuccessValue =
+                  statusKey === ExecutionOutcomeStatus.SUCCESS_VALUE &&
+                  typeof result === 'string';
+
                 return (
-                  <CodeViewer
+                  <EncodedData
+                    base64={isSuccessValue ? (result as string) : undefined}
                     className="min-h-12"
-                    code={
-                      typeof result === 'string'
-                        ? result
-                        : JSON.stringify(result, null, 2)
-                    }
+                    json={isSuccessValue ? undefined : result}
                   />
                 );
               }}

@@ -3,6 +3,8 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
+import { Copy } from '@/components/copy';
+
 type Json =
   | { [k: string]: Json }
   | boolean
@@ -28,7 +30,9 @@ const Primitive = ({ value }: { value: Json }) => {
     return <span className="text-[var(--prism-number)]">{value}</span>;
   if (typeof value === 'string')
     return (
-      <span className="text-[var(--prism-string)]">&quot;{value}&quot;</span>
+      <span className="break-all text-[var(--prism-string)]">
+        &quot;{value}&quot;
+      </span>
     );
   return null;
 };
@@ -95,34 +99,43 @@ const Node = ({ depth = 0, isLast = true, name, value }: NodeProps) => {
   const closeBracket = isArr ? ']' : '}';
 
   return (
-    <div className="leading-relaxed">
-      <span
-        className="inline-flex cursor-pointer items-center select-none"
-        onClick={empty ? undefined : () => setOpen((p) => !p)}
-      >
+    <div className="group/node leading-relaxed">
+      <span className="inline-flex max-w-full items-center">
+        <span
+          className="inline-flex cursor-pointer items-center select-none"
+          onClick={empty ? undefined : () => setOpen((p) => !p)}
+        >
+          {!empty && (
+            <span className="text-muted-foreground/60 -ml-3.5 inline-flex w-3.5">
+              {open$ ? (
+                <ChevronDown className="size-3.5" />
+              ) : (
+                <ChevronRight className="size-3.5" />
+              )}
+            </span>
+          )}
+          {label}
+          <Punct>{openBracket}</Punct>
+          {!open$ && (
+            <>
+              {!empty && (
+                <span className="text-muted-foreground/60 mx-1">
+                  {isArr
+                    ? `${items.length} item${items.length === 1 ? '' : 's'}`
+                    : `${items.length} field${items.length === 1 ? '' : 's'}`}
+                </span>
+              )}
+              <Punct>{closeBracket}</Punct>
+              {!isLast && <Punct>,</Punct>}
+            </>
+          )}
+        </span>
         {!empty && (
-          <span className="text-muted-foreground/60 -ml-3.5 inline-flex w-3.5">
-            {open$ ? (
-              <ChevronDown className="size-3.5" />
-            ) : (
-              <ChevronRight className="size-3.5" />
-            )}
-          </span>
-        )}
-        {label}
-        <Punct>{openBracket}</Punct>
-        {!open$ && (
-          <>
-            {!empty && (
-              <span className="text-muted-foreground/60 mx-1">
-                {isArr
-                  ? `${items.length} item${items.length === 1 ? '' : 's'}`
-                  : `${items.length} field${items.length === 1 ? '' : 's'}`}
-              </span>
-            )}
-            <Punct>{closeBracket}</Punct>
-            {!isLast && <Punct>,</Punct>}
-          </>
+          <Copy
+            className="ml-1 size-5 opacity-0 transition-opacity group-hover/node:opacity-100"
+            size="icon-xs"
+            text={JSON.stringify(value, null, 2)}
+          />
         )}
       </span>
       {open$ && (
@@ -155,7 +168,7 @@ type Props = {
 
 export const JsonTree = ({ className, value }: Props) => (
   <div
-    className={`prism-code text-body-sm py-2 pr-4 pl-8 font-mono ${
+    className={`prism-code text-body-sm min-w-0 py-2 pr-4 pl-8 font-mono break-words ${
       className ?? ''
     }`}
   >
