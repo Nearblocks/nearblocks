@@ -48,7 +48,14 @@ const bearerVerify: VerifyFunction = async (token, done) => {
 
     return done(null, false);
   } catch (error) {
-    logger.error(error);
+    // Auth lookup failed (e.g. DB unreachable / stale connection). Falling back
+    // to anonymous means every affected request degrades to free-tier limits —
+    // when this fires fleet-wide it's the signature of an outage (all customers
+    // 429), not a bad token. Log it explicitly so it can't hide as silent noise.
+    logger.error(
+      error,
+      'auth: token lookup failed, treating request as anonymous',
+    );
     return done(null, false);
   }
 };
