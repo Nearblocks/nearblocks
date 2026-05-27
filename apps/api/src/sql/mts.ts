@@ -7,6 +7,8 @@ export default {
   count: sql('queries/mts/count.sql'),
   holderCount: sql('queries/mts/holderCount.sql'),
   holders: sql('queries/mts/holders.sql'),
+  list: sql('queries/mts/list.sql'),
+  listCount: sql('queries/mts/listCount.sql'),
   tokens: {
     token: sql('queries/mts/tokens/token.sql'),
     tokenCount: sql('queries/mts/tokens/tokenCount.sql'),

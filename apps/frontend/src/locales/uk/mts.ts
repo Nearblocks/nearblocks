@@ -44,6 +44,11 @@ export const mts = {
     total: 'More than {{count}} tokens found',
     totalExact: 'A total of {{count}} tokens found',
   },
+  meta: {
+    description:
+      'A curated list of all NEP-245 Multi-Tokens on NEAR Protocol. Discover statistics, holders, and transfers.',
+    title: 'NEAR MT Token Tracker (NEP-245)',
+  },
   nearIntents: {
     heading: 'Near Intents Transfers',
     meta: {
@@ -58,6 +63,7 @@ export const mts = {
     label: 'NEAR MT Token',
     title: '{{name}} | {{contract}}',
   },
+  title: 'MT Token Tracker (NEP-245)',
   token: {
     contract: 'Contract Address:',
     decimals: 'Decimals:',
@@ -84,6 +90,15 @@ export const mts = {
       totalExact: 'A total of {{count}} mt token txns found',
       txnHash: 'Transaction Hash',
     },
+  },
+  tokens: {
+    empty: 'No MT tokens found',
+    holders: 'Holders',
+    price: 'Price',
+    title: 'TOKEN',
+    total: 'More than {{count}} MT Token Contracts found',
+    totalExact: 'A total of {{count}} MT Token Contracts found',
+    transfers: 'Transfers',
   },
   transfers: {
     affected: 'Affected',

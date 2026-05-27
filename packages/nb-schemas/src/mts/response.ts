@@ -4,6 +4,24 @@ import { EventCause } from 'nb-types';
 
 import { responseSchema } from '../common.js';
 
+const list = v.object({
+  base_uri: v.nullable(v.string()),
+  contract: v.string(),
+  decimals: v.nullable(v.number()),
+  holders: v.string(),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  price: v.nullable(v.string()),
+  reference: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
+  token: v.string(),
+  transfers: v.string(),
+});
+
+const listCount = v.object({
+  count: v.string(),
+});
+
 const block = v.object({
   block_hash: v.optional(v.string()),
   block_height: v.optional(v.string()),
@@ -67,6 +85,8 @@ const contractHolderCount = v.object({
   count: v.string(),
 });
 
+const listResponse = responseSchema(v.array(list));
+const listCountResponse = responseSchema(listCount);
 const txnsResponse = responseSchema(v.array(txn));
 const txnCountResponse = responseSchema(txnCount);
 const contractTxnsResponse = responseSchema(v.array(txn));
@@ -74,11 +94,15 @@ const contractTxnCountResponse = responseSchema(txnCount);
 const contractHoldersResponse = responseSchema(v.array(contractHolders));
 const contractHolderCountResponse = responseSchema(contractHolderCount);
 
+export type MTList = v.InferOutput<typeof list>;
+export type MTListCount = v.InferOutput<typeof listCount>;
 export type MTTxn = v.InferOutput<typeof txn>;
 export type MTTxnCount = v.InferOutput<typeof txnCount>;
 export type MTContractHolders = v.InferOutput<typeof contractHolders>;
 export type MTContractHolderCount = v.InferOutput<typeof contractHolderCount>;
 
+export type MTListRes = v.InferOutput<typeof listResponse>;
+export type MTListCountRes = v.InferOutput<typeof listCountResponse>;
 export type MTTxnsRes = v.InferOutput<typeof txnsResponse>;
 export type MTTxnCountRes = v.InferOutput<typeof txnCountResponse>;
 export type MTContractTxnsRes = v.InferOutput<typeof contractTxnsResponse>;
@@ -98,5 +122,7 @@ export default {
   contractTxnCount: contractTxnCountResponse,
   contractTxns: contractTxnsResponse,
   count: txnCountResponse,
+  list: listResponse,
+  listCount: listCountResponse,
   txns: txnsResponse,
 };
