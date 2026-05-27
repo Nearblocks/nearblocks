@@ -18,7 +18,10 @@ if (config.usageStreamRedisUrl) {
     port: +url.port,
   };
 
-  const password = url.password || config.ratelimiterRedisPassword;
+  const password =
+    url.password ||
+    config.usageStreamRedisPassword ||
+    config.ratelimiterRedisPassword;
   if (password) {
     options.password = password;
   }
