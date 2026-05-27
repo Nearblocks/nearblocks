@@ -41,6 +41,22 @@ const servers = [
 ];
 
 const apiDocumentation = async (app: Application, dir: string) => {
+  // Mainnet v3 isn't ready yet (duplicate receipts), so mainnet keeps the
+  // legacy v1/v2 docs as its primary docs at /api-docs. Testnet has moved to
+  // v3 and leads with it. config.network is fixed per deployment, so this is a
+  // simple per-pod switch.
+  const isMainnet = config.network === Network.MAINNET;
+
+  // The legacy spec is framed as "deprecated, use v3" on testnet, but on
+  // mainnet v1/v2 are still the current recommended endpoints — not deprecated.
+  const legacyDescription = isMainnet
+    ? `<p>These are the current NearBlocks REST API endpoints for NEAR mainnet (v1/v2).</p>
+        <p>A v3 API is in development for mainnet and will be announced when it's ready.</p>
+        `
+    : `<p><strong>These are deprecated endpoints. They will be removed in a future release.</strong></p>
+        <p>For new integrations, use the <a href="/api-docs">current API</a>.</p>
+        `;
+
   // ── Main API docs (v3 only) ───────────────────────────────────────
   const mainOptions = {
     apis: [path.join(dir, 'routes/v3/**/*.{ts,js}')],
@@ -184,9 +200,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
       },
       info: {
-        description: `<p><strong>These are deprecated endpoints. They will be removed in a future release.</strong></p>
-        <p>For new integrations, use the <a href="/api-docs">current API</a>.</p>
-        `,
+        description: legacyDescription,
         title: ' ',
         version: '1.0.0',
       },
@@ -246,7 +260,8 @@ const apiDocumentation = async (app: Application, dir: string) => {
       layout: 'modern',
       metaData: scalarMeta,
       theme: 'none',
-      url: '/openapi.json',
+      // Mainnet leads with legacy v1/v2 until v3 is ready; testnet leads with v3.
+      url: isMainnet ? '/openapi-legacy.json' : '/openapi.json',
     }),
   );
 };
