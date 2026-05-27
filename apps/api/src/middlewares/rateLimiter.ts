@@ -107,23 +107,15 @@ const rateLimiter = catchAsync(
           );
         }
       } catch (error) {
-        // Plan lookup failed (e.g. DB unreachable / stale connection). The user
-        // is demoted to free-tier; if this fires fleet-wide it's an outage, not
-        // a per-customer issue — log loudly with context.
-        logger.error(
-          error,
-          `rate limit: plan lookup failed for user ${id}, applying free plan`,
-        );
+        // Plan lookup errored -> free tier. A spike = DB outage, not per-customer.
+        logger.error(error, `rate limit: plan lookup failed for user ${id}, applying free plan`);
 
         return await useFreePlan(req, res, next, req.ip!);
       }
     }
 
     if (!selectedPlan) {
-      // Authenticated user resolved to no active plan -> free-tier limits.
-      // Expected for genuinely free accounts, but a spike across many users is
-      // the signature of a plan-resolution/DB outage (paying customers silently
-      // demoted and 429'd fleet-wide), so make it visible.
+      // No active plan -> free tier. A spike here = mass demotion (plan/DB outage).
       logger.warn(`rate limit: no active plan for user ${id}, applying free plan`);
 
       if (keyId) {
@@ -212,13 +204,8 @@ const useFreePlan = async (
 
   const plan = await getPlan(baseUrl, token);
 
-  // Deliberately do NOT cache this fallback under `user_plan:${key}`. `key` is
-  // often a real user id (when an authenticated user's plan lookup transiently
-  // returns empty, e.g. a DB blip), and caching the free plan there would pin a
-  // paying customer to free-tier for the full 24h TTL — a single transient
-  // failure becomes a day-long outage for that account. The free plan is
-  // already cached independently via `free_plan` (getFreePlan), so skipping
-  // this adds no extra lookup cost.
+  // Never cache this fallback under user_plan:${key}: for a real user id a
+  // transient empty lookup would pin them to free for 24h (free_plan is cached separately).
   const { limiters, rateLimit } = rateLimiterUnion(plan, baseUrl);
 
   try {
