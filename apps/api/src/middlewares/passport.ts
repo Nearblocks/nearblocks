@@ -54,7 +54,10 @@ const bearerVerify: VerifyFunction = async (token, done) => {
     return done(null, false);
   } catch (error) {
     // Auth lookup errored (DB/redis) -> anonymous. A spike = fleet-wide outage.
-    logger.error(error, 'auth: token lookup failed, treating request as anonymous');
+    logger.error(
+      error,
+      'auth: token lookup failed, treating request as anonymous',
+    );
     return done(null, false);
   }
 };
