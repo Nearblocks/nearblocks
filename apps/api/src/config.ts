@@ -50,6 +50,10 @@ const env = cleanEnv(process.env, {
   // Hard ceiling on the buffered usage events; bounds memory if the
   // consumer stalls. ~500k events ≈ tens of MB. Set 0 to disable capture.
   USAGE_STREAM_MAXLEN: num({ default: 500_000 }),
+  // Optional dedicated store for the usage event stream; falls back to the
+  // rate-limiter store when unset.
+  USAGE_STREAM_REDIS_PASSWORD: str({ default: '' }),
+  USAGE_STREAM_REDIS_URL: url({ default: '' }),
 });
 
 const baseStart =
@@ -102,6 +106,8 @@ const config: Config = {
   stakingStart,
   testnetUrl: env.TESTNET_URL,
   usageStreamMaxLen: env.USAGE_STREAM_MAXLEN,
+  usageStreamRedisPassword: env.USAGE_STREAM_REDIS_PASSWORD,
+  usageStreamRedisUrl: env.USAGE_STREAM_REDIS_URL,
   userDbUrl: env.DB_URL_USER,
 };
 

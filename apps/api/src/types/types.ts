@@ -53,6 +53,8 @@ export type Config = {
   stakingStart: bigint;
   testnetUrl: string;
   usageStreamMaxLen: number;
+  usageStreamRedisPassword: string;
+  usageStreamRedisUrl: string;
   userDbUrl: string;
 };
 

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import config from '#config';
 import logger from '#libs/logger';
-import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
+import { usageStreamRedisClient } from '#libs/usageStreamRedis';
 
 /**
  * Records a lightweight usage event per request to a capped Redis stream for
@@ -65,7 +65,7 @@ export const usageEvents = (
         version: versionOf(req.originalUrl),
       };
 
-      void ratelimiterRedisClient
+      void usageStreamRedisClient
         .xadd(
           STREAM_KEY,
           'MAXLEN',

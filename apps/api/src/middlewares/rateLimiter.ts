@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import ip from 'ip';
-import { RateLimiterRedis, RateLimiterUnion } from 'rate-limiter-flexible';
+import {
+  RateLimiterMemory,
+  RateLimiterRedis,
+  RateLimiterUnion,
+} from 'rate-limiter-flexible';
 
 import config from '#config';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
-// import logger from '#libs/logger';
+import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
 import { SubscriptionStatus } from '#types/enums';
@@ -103,7 +107,7 @@ const rateLimiter = catchAsync(
           );
         }
       } catch (error) {
-        // logger.error(error);
+        logger.error(error); // plan lookup failed — visibility into free-plan fallback
 
         return await useFreePlan(req, res, next, req.ip!);
       }
@@ -155,6 +159,15 @@ const rateLimiter = catchAsync(
 
       return next();
     } catch (error) {
+      // rate-limiter-flexible rejects with a RateLimiterRes when an actual limit
+      // is hit (-> 429), but with an Error on a store failure. Fail OPEN on store
+      // failures so a Redis blip never blocks a paying customer — the in-memory
+      // insuranceLimiter still applies a coarse per-instance cap in that case.
+      if (error instanceof Error) {
+        logger.error(error);
+        return next();
+      }
+
       return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
     }
   },
@@ -227,6 +240,12 @@ const useFreePlan = async (
 
     return next();
   } catch (error) {
+    // Fail open on store failures (Error); 429 only on a real limit (RateLimiterRes).
+    if (error instanceof Error) {
+      logger.error(error);
+      return next();
+    }
+
     return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
   }
 };
@@ -318,6 +337,21 @@ const isLimitReached = async (
   return false;
 };
 
+// In-memory fallback limiters used when the rate-limiter store is unreachable
+// (RateLimiterRedis `insuranceLimiter`). Cached per plan+window as module-level
+// singletons so they actually accumulate across requests — recreating one per
+// request would never count. They provide a coarse per-instance cap during an
+// outage, so failing open is "open within reason" rather than unlimited.
+const insuranceCache = new Map<string, RateLimiterMemory>();
+const insurance = (key: string, points: number, duration: number) => {
+  let limiter = insuranceCache.get(key);
+  if (!limiter) {
+    limiter = new RateLimiterMemory({ duration, points });
+    insuranceCache.set(key, limiter);
+  }
+  return limiter;
+};
+
 const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
   const pointsMinute = plan.limit_per_minute;
   const pointsDay = plan.limit_per_day;
@@ -325,18 +359,25 @@ const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
 
   const minuteRateLimiter = new RateLimiterRedis({
     duration: 60, // 1 min
+    insuranceLimiter: insurance(`${plan.id}_minute`, pointsMinute, 60),
     keyPrefix: `plan_${plan.id}_minute`,
     points: pointsMinute,
     storeClient: ratelimiterRedisClient,
   });
   const dayRateLimiter = new RateLimiterRedis({
     duration: 60 * 60 * 24, // 1 day
+    insuranceLimiter: insurance(`${plan.id}_day`, pointsDay, 60 * 60 * 24),
     keyPrefix: `plan_${plan.id}_day`,
     points: pointsDay,
     storeClient: ratelimiterRedisClient,
   });
   const monthRateLimiter = new RateLimiterRedis({
     duration: 60 * 60 * 24 * 30, // 30 days
+    insuranceLimiter: insurance(
+      `${plan.id}_month`,
+      pointsMonth,
+      60 * 60 * 24 * 30,
+    ),
     keyPrefix: `plan_${plan.id}_month`,
     points: pointsMonth,
     storeClient: ratelimiterRedisClient,
