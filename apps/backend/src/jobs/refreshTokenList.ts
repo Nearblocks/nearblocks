@@ -7,6 +7,7 @@ export const task = async () => {
   try {
     logger.info('refreshTokenList: job started');
     await dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY ft_list');
+    await dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY mt_list');
     await dbEvents.raw('REFRESH MATERIALIZED VIEW CONCURRENTLY nft_list');
     logger.info('refreshTokenList: job ended');
   } catch (error) {

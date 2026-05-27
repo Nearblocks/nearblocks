@@ -2,6 +2,37 @@ import * as v from 'valibot';
 
 import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 
+export const MTListSort = {
+  HOLDERS: 'holders',
+  NAME: 'name',
+  PRICE: 'price',
+  TRANSFERS: 'transfers',
+} as const;
+
+export const MTListOrder = {
+  ASC: 'asc',
+  DESC: 'desc',
+} as const;
+
+const list = v.object({
+  limit: limitSchema,
+  next: cursorSchema,
+  order: v.optional(v.enum(MTListOrder), 'desc'),
+  prev: cursorSchema,
+  search: v.optional(v.string()),
+  sort: v.optional(v.enum(MTListSort), 'transfers'),
+});
+
+const listCursor = v.object({
+  contract: v.string(),
+  sort: v.nullable(v.string()),
+  token: v.string(),
+});
+
+const listCount = v.object({
+  search: v.optional(v.string()),
+});
+
 const txns = v.object({
   before_ts: tsSchema,
   limit: limitSchema,
@@ -54,6 +85,9 @@ const contractHoldersCursor = v.object({
   amount: v.string(),
 });
 
+export type MTListReq = v.InferOutput<typeof list>;
+export type MTListCursor = v.InferOutput<typeof listCursor>;
+export type MTListCountReq = v.InferOutput<typeof listCount>;
 export type MTTxnsReq = v.InferOutput<typeof txns>;
 export type MTTxnCountReq = v.InferOutput<typeof count>;
 export type MTTxnsCursor = v.InferOutput<typeof cursor>;
@@ -75,5 +109,8 @@ export default {
   contractTxns,
   count,
   cursor,
+  list,
+  listCount,
+  listCursor,
   txns,
 };

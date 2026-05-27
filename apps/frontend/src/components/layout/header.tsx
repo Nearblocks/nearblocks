@@ -74,6 +74,7 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
       { href: '/tokens/transfers', key: 'menu.tokens.tokenTransfers' },
       { href: '/nft-tokens', key: 'menu.tokens.topNFTs' },
       { href: '/nft-tokens/transfers', key: 'menu.tokens.nftTransfers' },
+      { href: '/mt-tokens', key: 'menu.tokens.topMTs' },
       { href: '/mt-tokens/transfers', key: 'menu.tokens.mtTransfers' },
     ],
   },

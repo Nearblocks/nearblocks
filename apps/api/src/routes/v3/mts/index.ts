@@ -18,6 +18,82 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/mts:
+   *   get:
+   *     summary: List top multi-tokens (FT)
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: next
+   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: prev
+   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 25
+   *       - in: query
+   *         name: sort
+   *         description: Sort field
+   *         schema:
+   *           type: string
+   *           enum: [holders, name, price, transfers]
+   *           default: transfers
+   *       - in: query
+   *         name: order
+   *         description: Sort order
+   *         schema:
+   *           type: string
+   *           enum: [desc, asc]
+   *           default: desc
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/', validate(request.list), service.list);
+
+  /**
+   * @openapi
+   * /v3/mts/count:
+   *   get:
+   *     summary: Get multi-token (FT) count
+   *     x-internal: true
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: query
+   *         name: search
+   *         description: Search keyword
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/count',
+    internalOnly,
+    validate(request.listCount),
+    service.listCount,
+  );
+
+  /**
+   * @openapi
    * /v3/mts/txns:
    *   get:
    *     summary: List all MT transfers

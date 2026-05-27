@@ -1,6 +1,14 @@
 import { unionWith } from 'es-toolkit';
 
-import type { MTTxn, MTTxnCountReq, MTTxnsReq } from 'nb-schemas';
+import type {
+  MTList,
+  MTListCount,
+  MTListCountReq,
+  MTListReq,
+  MTTxn,
+  MTTxnCountReq,
+  MTTxnsReq,
+} from 'nb-schemas';
 import request from 'nb-schemas/dist/mts/request.js';
 import response from 'nb-schemas/dist/mts/response.js';
 
@@ -20,6 +28,64 @@ import {
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/mts';
+
+const list = responseHandler(
+  response.list,
+  async (req: RequestValidator<MTListReq>) => {
+    const search = req.validator.search;
+    const sort = req.validator.sort;
+    const order = req.validator.order;
+    const limit = req.validator.limit;
+    const next = req.validator.next
+      ? cursors.decode(request.listCursor, req.validator.next)
+      : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.listCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const cursor = prev || next;
+
+    const items = await dbEvents.manyOrNone<MTList>(sql.list, {
+      cursor: {
+        contract: cursor?.contract,
+        sort: cursor?.sort,
+        token: cursor?.token,
+      },
+      direction,
+      has_cursor: !!cursor,
+      limit: limit + 1,
+      order,
+      order_by: order === 'desc' ? 'NULLS LAST' : 'NULLS FIRST',
+      search: search ? `%${search}%` : null,
+      sort,
+    });
+
+    return paginateData(
+      items,
+      limit,
+      direction,
+      (item) => ({
+        contract: item.contract,
+        sort: item[sort as keyof MTList],
+        token: item.token,
+      }),
+      !!cursor,
+    );
+  },
+);
+
+const listCount = responseHandler(
+  response.listCount,
+  async (req: RequestValidator<MTListCountReq>) => {
+    const search = req.validator.search;
+
+    const result = await dbEvents.one<MTListCount>(sql.listCount, {
+      search: search ? `%${search}%` : null,
+    });
+
+    return { data: result };
+  },
+);
 
 const txns = responseHandler(
   response.txns,
@@ -155,4 +221,4 @@ const count = responseHandler(
   },
 );
 
-export default { count, txns };
+export default { count, list, listCount, txns };

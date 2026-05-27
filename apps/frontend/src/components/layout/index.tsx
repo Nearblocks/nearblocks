@@ -1,7 +1,6 @@
-import { Suspense } from 'react';
-
 import { fetchStats, fetchSyncStatus } from '@/data/layout';
 
+import { ErrorSuspense } from '../error-suspense';
 import { Footer } from './footer';
 import { Formbricks } from './formbricks';
 import { Header } from './header';
@@ -19,9 +18,9 @@ export const Layout = ({ children }: Props) => {
 
   return (
     <>
-      <Suspense fallback={null}>
+      <ErrorSuspense fallback={null}>
         <Notice syncStatusPromise={syncStatusPromise} />
-      </Suspense>
+      </ErrorSuspense>
       <NewUiBanner />
       <TopBar statsPromise={statsPromise} />
       <Header />

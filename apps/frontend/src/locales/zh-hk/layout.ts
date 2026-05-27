@@ -87,6 +87,7 @@ export const layout = {
       nftTransfers: 'NFT Transfers',
       title: 'Tokens',
       tokenTransfers: 'Token Transfers',
+      topMTs: 'Top MT Tokens',
       topNFTs: 'Top NFTs',
       topTokens: 'Top Tokens',
     },
