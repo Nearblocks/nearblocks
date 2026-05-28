@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+
 import passport from 'passport';
 import { Strategy as AnonymousStrategy } from 'passport-anonymous';
 import {
@@ -9,6 +11,14 @@ import config from '#config';
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
 import { ratelimiterRedisClient } from '#libs/ratelimiterRedis';
+
+// 16-char SHA-256 prefix of the bearer token. One-way; reveals nothing about
+// the token itself. Lets log readers cross-reference a failing request to an
+// exact api__keys row via the same hash computed in SQL — answering "is the
+// customer sending one of our real tokens (so our request path is corrupting
+// it) or a genuinely different/stale string" without exposing secrets.
+const tokenHash = (token: string): string =>
+  createHash('sha256').update(token).digest('hex').slice(0, 16);
 
 const bearerVerify: VerifyFunction = async (token, done) => {
   if (config.apiAccessKey && token === config.apiAccessKey) {
@@ -48,14 +58,14 @@ const bearerVerify: VerifyFunction = async (token, done) => {
 
     // Token supplied but no matching user. A spike = silent mass demotion to free.
     logger.warn(
-      { token: token.slice(0, 6) },
+      { token: token.slice(0, 6), hash: tokenHash(token) },
       'auth: bearer token did not resolve to a user, treating as anonymous',
     );
     return done(null, false);
   } catch (error) {
     // Auth lookup errored (DB/redis) -> anonymous. A spike = fleet-wide outage.
     logger.error(
-      error,
+      { err: error, hash: tokenHash(token) },
       'auth: token lookup failed, treating request as anonymous',
     );
     return done(null, false);
