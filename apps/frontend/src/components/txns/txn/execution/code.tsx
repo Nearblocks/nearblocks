@@ -52,9 +52,9 @@ export const CodeViewer = ({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded border bg-(--prism-bg)">
-      <div className="bg-card/40 flex items-center justify-between gap-2 border-b px-2 py-1">
+      <div className="bg-card/40 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b px-2 py-1">
         <button
-          className="text-muted-foreground hover:text-foreground text-body-xs inline-flex items-center gap-1"
+          className="text-muted-foreground hover:text-foreground text-body-xs inline-flex shrink-0 items-center gap-1 whitespace-nowrap"
           onClick={() => setIsOpen((p) => !p)}
           type="button"
         >
