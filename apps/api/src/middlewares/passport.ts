@@ -58,7 +58,7 @@ const bearerVerify: VerifyFunction = async (token, done) => {
 
     // Token supplied but no matching user. A spike = silent mass demotion to free.
     logger.warn(
-      { token: token.slice(0, 6), hash: tokenHash(token) },
+      { hash: tokenHash(token), token: token.slice(0, 6) },
       'auth: bearer token did not resolve to a user, treating as anonymous',
     );
     return done(null, false);
