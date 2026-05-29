@@ -72,22 +72,23 @@ const Node = ({ depth = 0, isLast = true, name, value }: NodeProps) => {
   }
 
   if (!collapsible) {
+    // Plain inline flow (not inline-flex) so long strings with break-all
+    // wrap naturally after the label without splitting the row visually.
+    // Copy is shown only on strings — numbers/booleans/null are rarely
+    // worth copying and per-element copy on byte arrays is visual noise.
+    const showCopy = typeof value === 'string';
     return (
       <div className="group/node leading-relaxed">
-        <span className="inline-flex max-w-full items-center">
-          <span className="inline-flex items-center">
-            {label}
-            <Primitive value={value} />
-            {!isLast && <Punct>,</Punct>}
-          </span>
-          {value !== null && value !== undefined && (
-            <Copy
-              className="ml-1 size-5 opacity-0 transition-opacity group-hover/node:opacity-100"
-              size="icon-xs"
-              text={String(value)}
-            />
-          )}
-        </span>
+        {label}
+        <Primitive value={value} />
+        {!isLast && <Punct>,</Punct>}
+        {showCopy && (
+          <Copy
+            className="ml-1 inline-flex size-5 align-middle opacity-0 transition-opacity group-hover/node:opacity-100"
+            size="icon-xs"
+            text={value as string}
+          />
+        )}
       </div>
     );
   }
