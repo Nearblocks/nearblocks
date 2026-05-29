@@ -162,9 +162,21 @@ export const Action = ({
     action.action === ActionKind.USE_GLOBAL_CONTRACT ||
     action.action === ActionKind.USE_GLOBAL_CONTRACT_BY_ACCOUNT_ID
   ) {
+    // The first three carry a code_hash; the fourth (USE_..._BY_ACCOUNT_ID)
+    // carries an account_id instead — the guard naturally skips that case.
+    const codeHash =
+      typeof args.code_hash === 'string' ? args.code_hash : undefined;
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.deployGlobalContract')}
+        {codeHash && (
+          <>
+            <Badge variant="gray">
+              <code className="max-w-32 truncate sm:max-w-40">{codeHash}</code>
+            </Badge>
+            <Copy className="text-muted-foreground" text={codeHash} />
+          </>
+        )}
         {full && (
           <>
             {' '}
