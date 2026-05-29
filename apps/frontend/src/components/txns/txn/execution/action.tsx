@@ -1,92 +1,19 @@
 'use client';
 
-import { useContext, useMemo, useState } from 'react';
+import type { JsonData } from 'nb-schemas/src/common';
+import { useContext, useMemo } from 'react';
 
 import type { ActionReceipt, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
-
-import { Button } from '@/ui/button';
 
 import { Action, argsRecord } from '../actions/action';
 import { ReceiptIcon } from '../actions/icon';
 import { AuroraArgsViewer } from './aurora';
 import { CodeViewer } from './code';
 import { RpcContext } from './context';
+import { hasJsonValue } from './encode';
+import { EncodedData } from './encoded-data';
 import { deepUnescape, findRawArgs, isAuroraAction } from './utils';
-
-type Encoding = 'base64' | 'hex' | 'json' | 'raw' | 'utf8';
-
-const ENCODINGS: { label: string; value: Encoding }[] = [
-  { label: 'JSON', value: 'json' },
-  { label: 'UTF-8', value: 'utf8' },
-  { label: 'Hex', value: 'hex' },
-  { label: 'Base64', value: 'base64' },
-  { label: 'Raw', value: 'raw' },
-];
-
-const base64ToBytes = (b64: string): null | Uint8Array => {
-  try {
-    const bin = atob(b64);
-    const bytes = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    return bytes;
-  } catch {
-    return null;
-  }
-};
-
-const utf8ToBytes = (text: string): Uint8Array =>
-  new TextEncoder().encode(text);
-
-const bytesToUtf8 = (bytes: Uint8Array): string =>
-  new TextDecoder('utf-8', { fatal: false }).decode(bytes);
-
-const bytesToHex = (bytes: Uint8Array): string =>
-  Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-
-const bytesToBase64 = (bytes: Uint8Array): string => {
-  let bin = '';
-  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-  return btoa(bin);
-};
-
-const encodeArgs = (
-  encoding: Encoding,
-  argsBase64: string | undefined,
-  decoded: Record<string, unknown> | undefined,
-  hasArgs: boolean,
-): string => {
-  try {
-    const bytes = argsBase64
-      ? base64ToBytes(argsBase64)
-      : hasArgs && decoded
-      ? utf8ToBytes(JSON.stringify(deepUnescape(decoded)))
-      : null;
-
-    if (encoding === 'json') {
-      if (hasArgs && decoded) {
-        return JSON.stringify(deepUnescape(decoded), null, 2);
-      }
-      if (bytes) {
-        const text = bytesToUtf8(bytes);
-        try {
-          return JSON.stringify(JSON.parse(text), null, 2);
-        } catch {
-          return text;
-        }
-      }
-      return '';
-    }
-    if (!bytes) return '<invalid encoding>';
-    if (encoding === 'utf8') return bytesToUtf8(bytes);
-    if (encoding === 'hex') return bytesToHex(bytes);
-    return bytesToBase64(bytes);
-  } catch {
-    return '<unable to decode args>';
-  }
-};
 
 type Props = {
   action: ActionReceipt;
@@ -101,83 +28,63 @@ export const ReceiptAction = ({
   onlyArgs = false,
   receipt,
 }: Props) => {
-  const [encoding, setEncoding] = useState<Encoding>('json');
   const { enableRpc, rpcData, rpcLoading } = useContext(RpcContext);
 
-  const { args, argsBase64, hasArgs, method } = useMemo(() => {
-    const args = argsRecord(action.args);
+  const { argsBase64, argsValue, hasArgs, method } = useMemo(() => {
+    const wrapper = argsRecord(action.args);
     let method: string | undefined =
       typeof action.method === 'string' ? action.method : undefined;
-    let hasArgs = Object.keys(args).length > 0;
-    let argsJson: Record<string, unknown> | undefined;
+    // For function calls the indexer wraps args as { args_json, args_base64,
+    // method_name, ... }. `args_json` may be any JSON value — including a
+    // top-level array — so it must not be coerced to a record. For every other
+    // action kind the raw args object is shown as-is.
+    let argsValue: JsonData | undefined;
     let argsBase64: string | undefined;
 
     if (action.action === ActionKind.FUNCTION_CALL) {
-      if (Object.keys(args).length > 0) {
-        if (!method && 'method_name' in args) {
-          method = args.method_name as string;
-        }
-        argsBase64 =
-          typeof args.args_base64 === 'string'
-            ? (args.args_base64 as string)
-            : undefined;
-        argsJson = argsRecord(args.args_json);
-        hasArgs = Object.keys(argsJson).length > 0;
+      if (!method && typeof wrapper.method_name === 'string') {
+        method = wrapper.method_name;
       }
+      argsBase64 =
+        typeof wrapper.args_base64 === 'string'
+          ? wrapper.args_base64
+          : undefined;
+      argsValue = wrapper.args_json ?? undefined;
+    } else {
+      argsValue = action.args ?? undefined;
     }
 
-    return { args: argsJson ?? args, argsBase64, hasArgs, method };
+    return { argsBase64, argsValue, hasArgs: hasJsonValue(argsValue), method };
   }, [action]);
 
   const isAurora = isAuroraAction(method, receipt.receiver_account_id);
   const showEncodingToggle = !!method && (!!argsBase64 || hasArgs);
   const rawArgs = findRawArgs(rpcData, receipt.receipt_id, index);
   const rawCode = rawArgs ?? (rpcLoading ? 'Loading...' : 'No data');
-  const displayCode = showEncodingToggle
-    ? encoding === 'raw'
-      ? rawCode
-      : encodeArgs(encoding, argsBase64, args, hasArgs)
-    : hasArgs
-    ? JSON.stringify(deepUnescape(args), null, 2)
-    : argsBase64;
-
-  const onEncodingClick = (value: Encoding) => {
-    setEncoding(value);
-    if (value === 'raw' && !rpcData) enableRpc();
-  };
 
   const codeBlock =
     isAurora && argsBase64 ? (
       <AuroraArgsViewer argsBase64={argsBase64} method={method!} />
-    ) : (
-      displayCode && (
-        <CodeViewer
-          className="min-h-17"
-          code={displayCode}
-          language={encoding === 'json' ? 'json' : 'plain'}
-          showByteSize
-          toolbar={
-            showEncodingToggle && (
-              <>
-                {ENCODINGS.map(({ label, value }) => (
-                  <Button
-                    className="cursor-pointer border-0"
-                    key={value}
-                    onClick={() => onEncodingClick(value)}
-                    size="xs"
-                    variant={encoding === value ? 'secondary' : 'outline'}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </>
-            )
-          }
-          tree={encoding === 'json'}
-          wrap={encoding !== 'json'}
-        />
-      )
-    );
+    ) : showEncodingToggle ? (
+      <EncodedData
+        base64={argsBase64}
+        className="min-h-17"
+        json={argsValue}
+        onRawSelect={() => {
+          if (!rpcData) enableRpc();
+        }}
+        rawCode={rawCode}
+      />
+    ) : hasArgs ? (
+      <CodeViewer
+        className="min-h-17"
+        code={JSON.stringify(deepUnescape(argsValue), null, 2)}
+        showByteSize
+        tree
+      />
+    ) : argsBase64 ? (
+      <CodeViewer className="min-h-17" code={argsBase64} showByteSize />
+    ) : null;
 
   if (onlyArgs) {
     return <>{codeBlock}</>;

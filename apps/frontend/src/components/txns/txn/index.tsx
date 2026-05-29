@@ -1,10 +1,12 @@
 'use client';
 
 import { RiQuestionLine } from '@remixicon/react';
+import { Radio } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { use, useEffect } from 'react';
 
 import { Stats, Txn, TxnFT, TxnMT, TxnNFT, TxnReceipt } from 'nb-schemas';
+import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
@@ -21,10 +23,12 @@ import {
   nearFormat,
   numberFormat,
 } from '@/lib/format';
+import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
+import { argsRecord } from './actions/action';
 import { Transfers } from './transfers';
 
 type Props = {
@@ -228,17 +232,56 @@ export const Overview = ({
               {t('overview.from')}
             </ListLeft>
             <ListRight>
-              <p className="flex items-center gap-1">
+              <p className="flex flex-wrap items-center gap-1">
                 <SkeletonSlot
                   fallback={<Skeleton className="h-7 w-30" />}
                   loading={loading || !txn}
                 >
-                  {() => (
-                    <AccountLink
-                      account={txn!.signer_account_id}
-                      textClassName="max-w-60"
-                    />
-                  )}
+                  {() => {
+                    // Meta-transaction: the on-chain signer is the relayer.
+                    // The real sender lives inside the DelegateAction's args.
+                    const delegate = txn!.actions?.find(
+                      (a) => a.action === ActionKind.DELEGATE_ACTION,
+                    );
+                    const delegateArgs = delegate
+                      ? argsRecord(delegate.args)
+                      : null;
+                    const realSender =
+                      delegateArgs && typeof delegateArgs.sender_id === 'string'
+                        ? delegateArgs.sender_id
+                        : null;
+
+                    return (
+                      <>
+                        <AccountLink
+                          account={realSender ?? txn!.signer_account_id}
+                          textClassName="max-w-60"
+                        />
+                        {realSender && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                className="inline-flex cursor-help items-center gap-1"
+                                variant="gray"
+                              >
+                                <Radio className="size-3" />
+                                via
+                                <Link
+                                  className="text-link max-w-32 truncate sm:max-w-40"
+                                  href={`/address/${txn!.signer_account_id}`}
+                                >
+                                  {txn!.signer_account_id}
+                                </Link>
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Meta-transaction relayed on behalf of the sender
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </>
+                    );
+                  }}
                 </SkeletonSlot>
               </p>
             </ListRight>
