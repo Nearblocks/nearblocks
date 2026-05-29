@@ -73,10 +73,21 @@ const Node = ({ depth = 0, isLast = true, name, value }: NodeProps) => {
 
   if (!collapsible) {
     return (
-      <div className="leading-relaxed">
-        {label}
-        <Primitive value={value} />
-        {!isLast && <Punct>,</Punct>}
+      <div className="group/node leading-relaxed">
+        <span className="inline-flex max-w-full items-center">
+          <span className="inline-flex items-center">
+            {label}
+            <Primitive value={value} />
+            {!isLast && <Punct>,</Punct>}
+          </span>
+          {value !== null && value !== undefined && (
+            <Copy
+              className="ml-1 size-5 opacity-0 transition-opacity group-hover/node:opacity-100"
+              size="icon-xs"
+              text={String(value)}
+            />
+          )}
+        </span>
       </div>
     );
   }

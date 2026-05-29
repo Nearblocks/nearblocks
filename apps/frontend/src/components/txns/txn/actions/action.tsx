@@ -128,9 +128,19 @@ export const Action = ({
   }
 
   if (action.action === ActionKind.DEPLOY_CONTRACT) {
+    const codeHash =
+      typeof args.code_hash === 'string' ? args.code_hash : undefined;
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.deployContract')}
+        {codeHash && (
+          <>
+            <Badge variant="gray">
+              <code className="max-w-32 truncate sm:max-w-40">{codeHash}</code>
+            </Badge>
+            <Copy className="text-muted-foreground" text={codeHash} />
+          </>
+        )}
         {full && (
           <>
             {' '}
