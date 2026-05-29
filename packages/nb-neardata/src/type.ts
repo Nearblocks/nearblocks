@@ -96,6 +96,7 @@ export type Shard = {
 export type Chunk = {
   author: string;
   header: ChunkHeader;
+  instantReceipts: Receipt[];
   localReceipts: Receipt[];
   receipts: Receipt[];
   transactions: IndexerTransactionWithOutcome[];

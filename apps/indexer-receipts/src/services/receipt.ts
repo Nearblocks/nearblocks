@@ -40,6 +40,7 @@ export const storeReceipts = async (knex: Knex, message: Message) => {
         const chunkReceipts = [
           ...(shardChunk.chunk.receipts || []),
           ...(shardChunk.chunk.localReceipts || []),
+          ...(shardChunk.chunk.instantReceipts || []),
         ];
 
         if (chunkReceipts.length) {
