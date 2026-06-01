@@ -1,6 +1,8 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { RiCloseLine } from '@remixicon/react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 import useSWR from 'swr';
 
@@ -27,6 +29,7 @@ type Props = {
 
 export const HolderFilter = ({ cid, contractPromise }: Props) => {
   const { t } = useLocale('fts');
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const account = searchParams.get('account');
 
@@ -59,6 +62,11 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
   const loading =
     rawBalance === null && (cacheLoading || (cacheUnavailable && rpcLoading));
 
+  const params = new URLSearchParams(searchParams.toString());
+  params.delete('account');
+  const closeHref =
+    params.size > 0 ? `${pathname}?${params.toString()}` : pathname;
+
   return (
     <Card className="mb-4">
       <CardContent className="flex flex-col divide-y px-0 md:flex-row md:divide-x md:divide-y-0">
@@ -66,8 +74,14 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
           <div className="text-muted-foreground text-body-xs mb-2 uppercase">
             {t('overview.filteredBy')}
           </div>
-          <div className="text-body-sm">
-            <AccountLink account={account} />
+          <div className="text-body-sm flex items-center gap-1">
+            <AccountLink account={account} hideCopy />
+            <Link
+              className="text-muted-foreground hover:text-foreground"
+              href={closeHref}
+            >
+              <RiCloseLine className="size-4" />
+            </Link>
           </div>
         </div>
         <div className="flex-1 px-4 py-3">

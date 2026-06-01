@@ -9,6 +9,12 @@ export default {
   holders: sql('queries/mts/holders.sql'),
   list: sql('queries/mts/list.sql'),
   listCount: sql('queries/mts/listCount.sql'),
+  stats: {
+    accounts: sql('queries/mts/stats/statsAccounts.sql'),
+    heatmap: sql('queries/mts/stats/statsHeatmap.sql'),
+    overview: sql('queries/mts/stats/statsOverview.sql'),
+    transfers: sql('queries/mts/stats/statsTransfers.sql'),
+  },
   tokens: {
     token: sql('queries/mts/tokens/token.sql'),
     tokenCount: sql('queries/mts/tokens/tokenCount.sql'),

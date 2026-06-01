@@ -5,7 +5,7 @@ import { ActiveLink } from '@/components/link';
 import { MtFtHeader } from '@/components/mt-tokens/token/ft-header';
 import { MtFtOverview } from '@/components/mt-tokens/token/ft-overview';
 import { MtFtProfile } from '@/components/mt-tokens/token/ft-profile';
-import { TabLink, TabLinks } from '@/components/tab-links';
+import { TabBadge, TabLink, TabLinks } from '@/components/tab-links';
 import {
   fetchMTToken,
   fetchMTTokenHolderCount,
@@ -86,6 +86,15 @@ const FtTokenLayout = async ({ children, params }: Props) => {
           <TabLink asChild>
             <ActiveLink href={`/mt-tokens/${cid}/tokens/ft/${tid}/holders`}>
               {t('token.ftHoldersTab')}
+            </ActiveLink>
+          </TabLink>
+          <TabLink asChild>
+            <ActiveLink
+              exact={false}
+              href={`/mt-tokens/${cid}/tokens/ft/${tid}/analytics`}
+            >
+              {t('token.analyticsTab')}
+              <TabBadge variant="teal">NEW</TabBadge>
             </ActiveLink>
           </TabLink>
         </TabLinks>

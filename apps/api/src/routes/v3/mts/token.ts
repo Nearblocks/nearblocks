@@ -1,10 +1,12 @@
 import { Router } from 'express';
 
+import statsRequest from 'nb-schemas/dist/mts/stats/request.js';
 import request from 'nb-schemas/dist/mts/tokens/request.js';
 
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
+import statsService from '#services/v3/mts/stats';
 import service from '#services/v3/mts/token';
 
 const route = Router({ mergeParams: true });
@@ -265,6 +267,148 @@ const routes = (app: Router) => {
     '/:contract/tokens/:token/holders/count',
     validate(request.tokenHolderCount),
     service.holderCount,
+  );
+
+  /**
+   * @openapi
+   * /v3/mts/{contract}/tokens/{token}/stats/overview:
+   *   get:
+   *     summary: Get MT token stats overview
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/tokens/:token/stats/overview',
+    validate(statsRequest.overview),
+    statsService.overview,
+  );
+
+  /**
+   * @openapi
+   * /v3/mts/{contract}/tokens/{token}/stats/heatmap:
+   *   get:
+   *     summary: Get MT token transfer heatmap (last 11 months, daily)
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/tokens/:token/stats/heatmap',
+    validate(statsRequest.heatmap),
+    statsService.heatmap,
+  );
+
+  /**
+   * @openapi
+   * /v3/mts/{contract}/tokens/{token}/stats/transfers:
+   *   get:
+   *     summary: Get MT token daily transfer stats
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: Number of days to return (max 365)
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/tokens/:token/stats/transfers',
+    validate(statsRequest.transfers),
+    statsService.transfers,
+  );
+
+  /**
+   * @openapi
+   * /v3/mts/{contract}/tokens/{token}/stats/{account}/transfers:
+   *   get:
+   *     summary: Get daily MT transfer stats for a specific account on a token
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: Number of days to return (max 365)
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/tokens/:token/stats/:account/transfers',
+    validate(statsRequest.accountTransfers),
+    statsService.accountTransfers,
   );
 };
 

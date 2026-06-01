@@ -1,11 +1,13 @@
 import { Router } from 'express';
 
 import request from 'nb-schemas/dist/fts/request.js';
+import statsRequest from 'nb-schemas/dist/fts/stats/request.js';
 
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
 import service from '#services/v3/fts/contract';
+import statsService from '#services/v3/fts/stats';
 
 const route = Router();
 
@@ -182,6 +184,124 @@ const routes = (app: Router) => {
     '/:contract/holders/count',
     validate(request.contractHolderCount),
     service.holderCount,
+  );
+
+  /**
+   * @openapi
+   * /v3/fts/{contract}/stats/overview:
+   *   get:
+   *     summary: Get FT contract stats overview
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/stats/overview',
+    validate(statsRequest.overview),
+    statsService.overview,
+  );
+
+  /**
+   * @openapi
+   * /v3/fts/{contract}/stats/heatmap:
+   *   get:
+   *     summary: Get FT contract transfer heatmap (last 11 months, daily)
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/stats/heatmap',
+    validate(statsRequest.heatmap),
+    statsService.heatmap,
+  );
+
+  /**
+   * @openapi
+   * /v3/fts/{contract}/stats/transfers:
+   *   get:
+   *     summary: Get FT contract daily transfer stats
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: Number of days to return (max 365)
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/stats/transfers',
+    validate(statsRequest.transfers),
+    statsService.transfers,
+  );
+
+  /**
+   * @openapi
+   * /v3/fts/{contract}/stats/{account}/transfers:
+   *   get:
+   *     summary: Get daily FT transfer stats for a specific account on a contract
+   *     tags:
+   *       - FTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: Number of days to return (max 365)
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *           default: 25
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/stats/:account/transfers',
+    validate(statsRequest.accountTransfers),
+    statsService.accountTransfers,
   );
 };
 
