@@ -1,4 +1,34 @@
 export const mts = {
+  analytics: {
+    noData: 'No data available',
+    overview: {
+      activeAge: 'Active Age',
+      activeAgeTip: 'Total time span from first to last transfer day',
+      day: 'day',
+      days: 'days',
+      heatmap: 'Transfer Activity',
+      longestStreak: 'Longest Streak',
+      longestStreakTip: 'Longest consecutive daily transfer streak',
+      since: 'Since',
+      to: 'to',
+      totalTransfers: 'Total Transfers',
+      uniqueDays: 'Unique Active Days',
+      uniqueDaysTip: 'Number of distinct days with at least one transfer',
+      year: 'year',
+      years: 'years',
+    },
+    tabs: {
+      overview: 'Overview',
+      transfers: 'Transfers',
+    },
+    transfers: {
+      count: 'Unique Addresses',
+      receivers: 'Unique Receivers',
+      senders: 'Unique Senders',
+      transfers: 'Transfers',
+      transfersCount: 'Daily Transfers',
+    },
+  },
   cidMeta: {
     description:
       'All you need to know about the {{name}} MT Contract : Statistics, total holders, latest transactions & meta-data.',
@@ -65,6 +95,7 @@ export const mts = {
   },
   title: 'MT Token Tracker (NEP-245)',
   token: {
+    analyticsTab: 'Analytics',
     contract: 'Contract Address:',
     decimals: 'Decimals:',
     description: 'Description:',

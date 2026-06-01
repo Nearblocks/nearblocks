@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
-import { ActiveLink } from '@/components/link';
-import { TabLink, TabLinks } from '@/components/tab-links';
 import { SpamAlert } from '@/components/tokens/spam-alert';
 import { TokenHeader } from '@/components/tokens/token/header';
 import { HolderFilter } from '@/components/tokens/token/holder-filter';
 import { Overview } from '@/components/tokens/token/overview';
 import { Profile } from '@/components/tokens/token/profile';
+import { TokenTabLinks } from '@/components/tokens/token/tab-links';
 import {
   fetchFTContract,
   fetchFTContractHolderCount,
@@ -87,26 +86,14 @@ const TokenLayout = async ({ children, params }: Props) => {
         <HolderFilter cid={cid} contractPromise={contractPromise} />
       </ErrorSuspense>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
-        <TabLinks>
-          <TabLink asChild>
-            <ActiveLink exact href={`/tokens/${cid}`}>
-              {t('tabs.transfers')}
-            </ActiveLink>
-          </TabLink>
-          <TabLink asChild>
-            <ActiveLink href={`/tokens/${cid}/holders`}>
-              {t('tabs.holders')}
-            </ActiveLink>
-          </TabLink>
-          <TabLink asChild>
-            <ActiveLink href={`/tokens/${cid}/info`}>
-              {t('tabs.info')}
-            </ActiveLink>
-          </TabLink>
-          <TabLink asChild>
-            <ActiveLink href={`/tokens/${cid}/faq`}>{t('tabs.faq')}</ActiveLink>
-          </TabLink>
-        </TabLinks>
+        <TokenTabLinks
+          analytics={t('tabs.analytics')}
+          cid={cid}
+          faq={t('tabs.faq')}
+          holders={t('tabs.holders')}
+          info={t('tabs.info')}
+          transfers={t('tabs.transfers')}
+        />
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       {children}
