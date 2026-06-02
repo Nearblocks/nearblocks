@@ -82,6 +82,10 @@ WHERE
   mt.contract_account_id = ${contract}
   AND mt.token_id = ${token}
   AND (
+    ${affected}::TEXT IS NULL
+    OR mt.affected_account_id = ${affected}
+  )
+  AND (
     p.block_timestamp IS NULL
     OR (
       (

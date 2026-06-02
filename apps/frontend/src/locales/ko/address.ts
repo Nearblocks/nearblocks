@@ -254,6 +254,7 @@ export const address = {
     totalExact: 'A total of {{count}} MT transfers found',
     viewAll: 'View all MT transfers',
   },
+  mtTokensLabel: 'MT Tokens',
   nfts: {
     columns: {
       affected: 'Affected',
@@ -318,13 +319,14 @@ export const address = {
     accessKeys: 'Access Keys',
     analytics: 'Analytics',
     assets: 'NFT Assets',
-    multiTokenTxns: 'Multi Token Txns',
+    multiTokenTxns: 'MT Token Txns',
     nftTxns: 'NFT Txns',
     receipts: 'Receipts',
     stakingTxns: 'Staking Txns',
     tokenTxns: 'Token Txns',
     transactions: 'Transactions',
   },
+  tokensLabel: 'Tokens',
   tokensNa: 'N/A',
   txns: {
     columns: {

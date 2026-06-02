@@ -117,6 +117,7 @@ const txns = responseHandler(
   async (req: RequestValidator<MTTokenTxnsReq>) => {
     const contract = req.validator.contract;
     const token = req.validator.token;
+    const affected = req.validator.affected;
     const before = req.validator.before_ts;
     const limit = req.validator.limit;
     const next = req.validator.next
@@ -134,6 +135,7 @@ const txns = responseHandler(
       return dbEvents.manyOrNone<
         Omit<MTTokenTxn, 'block' | 'transaction_hash'>
       >(sql.tokens.tokenTxns, {
+        affected,
         before,
         contract,
         cursor: {
@@ -207,9 +209,10 @@ const txnCount = responseHandler(
   async (req: RequestValidator<MTTokenTxnCountReq>) => {
     const contract = req.validator.contract;
     const token = req.validator.token;
+    const affected = req.validator.affected;
     const before = req.validator.before_ts;
 
-    if (!before) {
+    if (!before && !affected) {
       const result = await dbEvents.one<{ count: string }>(
         sql.tokens.tokenTxnCountCagg,
         { contract, token },
@@ -221,6 +224,7 @@ const txnCount = responseHandler(
           rollingWindowCount(
             (start, end, limit) =>
               dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
+                affected,
                 before,
                 contract,
                 end,
@@ -242,6 +246,7 @@ const txnCount = responseHandler(
     const count = await rollingWindowCount(
       (start, end, limit) =>
         dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
+          affected,
           before,
           contract,
           end,

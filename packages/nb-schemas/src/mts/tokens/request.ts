@@ -32,6 +32,7 @@ const token = v.object({
 });
 
 const txns = v.object({
+  affected: v.optional(v.string()),
   before_ts: tsSchema,
   contract: v.string(),
   limit: limitSchema,
@@ -41,6 +42,7 @@ const txns = v.object({
 });
 
 const txnCount = v.object({
+  affected: v.optional(v.string()),
   before_ts: tsSchema,
   contract: v.string(),
   token: v.string(),

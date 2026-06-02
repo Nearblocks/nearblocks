@@ -37,7 +37,7 @@ const routes = (route: Router) => {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *           maximum: 100
+   *           maximum: 250
    *           default: 25
    *     responses:
    *       200:
@@ -101,8 +101,8 @@ const routes = (route: Router) => {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *           maximum: 100
-   *           default: 25
+   *           maximum: 24
+   *           default: 24
    *     responses:
    *       200:
    *         description: Success response
@@ -137,9 +137,9 @@ const routes = (route: Router) => {
 
   /**
    * @openapi
-   * /v3/accounts/{account}/assets/mts:
+   * /v3/accounts/{account}/assets/mts/fts:
    *   get:
-   *     summary: List account MT balances
+   *     summary: List account MT (fungible) balances
    *     tags:
    *       - Accounts
    *     parameters:
@@ -165,19 +165,19 @@ const routes = (route: Router) => {
    *         schema:
    *           type: integer
    *           minimum: 1
-   *           maximum: 100
+   *           maximum: 250
    *           default: 25
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/:account/assets/mts', validate(request.mts), service.mts);
+  route.get('/:account/assets/mts/fts', validate(request.mtFts), service.mtFts);
 
   /**
    * @openapi
-   * /v3/accounts/{account}/assets/mts/count:
+   * /v3/accounts/{account}/assets/mts/fts/count:
    *   get:
-   *     summary: Get account MT balances count
+   *     summary: Get account MT (fungible) balances count
    *     x-internal: true
    *     tags:
    *       - Accounts
@@ -193,10 +193,78 @@ const routes = (route: Router) => {
    *         description: Success response
    */
   route.get(
-    '/:account/assets/mts/count',
+    '/:account/assets/mts/fts/count',
     internalOnly,
-    validate(request.mtCount),
-    service.mtCount,
+    validate(request.mtFtCount),
+    service.mtFtCount,
+  );
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/assets/mts/nfts:
+   *   get:
+   *     summary: List account MT (non-fungible) balances
+   *     tags:
+   *       - Accounts
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: next
+   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: prev
+   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 24
+   *           default: 24
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:account/assets/mts/nfts',
+    validate(request.mtNfts),
+    service.mtNfts,
+  );
+
+  /**
+   * @openapi
+   * /v3/accounts/{account}/assets/mts/nfts/count:
+   *   get:
+   *     summary: Get account MT (non-fungible) balances count
+   *     x-internal: true
+   *     tags:
+   *       - Accounts
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:account/assets/mts/nfts/count',
+    internalOnly,
+    validate(request.mtNftCount),
+    service.mtNftCount,
   );
 };
 

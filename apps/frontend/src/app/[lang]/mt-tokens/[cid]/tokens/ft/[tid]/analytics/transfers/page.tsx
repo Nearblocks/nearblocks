@@ -1,12 +1,29 @@
 import { ErrorSuspense } from '@/components/error-suspense';
 import { TransfersChart } from '@/components/mt-tokens/analytics/charts';
-import { fetchMTTokenStatsTransfers } from '@/data/mt-tokens/analytics';
+import {
+  fetchMTTokenStatsAccountTransfers,
+  fetchMTTokenStatsTransfers,
+} from '@/data/mt-tokens/analytics';
 
 type Props =
   PageProps<'/[lang]/mt-tokens/[cid]/tokens/ft/[tid]/analytics/transfers'>;
 
-const AnalyticsTransfersPage = async ({ params }: Props) => {
-  const { cid, tid } = await params;
+const AnalyticsTransfersPage = async ({ params, searchParams }: Props) => {
+  const [{ cid, tid }, { account }] = await Promise.all([params, searchParams]);
+
+  if (account && typeof account === 'string') {
+    const accountTransfersPromise = fetchMTTokenStatsAccountTransfers(
+      cid,
+      tid,
+      account,
+      { limit: '365' },
+    );
+    return (
+      <ErrorSuspense fallback={<TransfersChart loading />}>
+        <TransfersChart accountTransfersPromise={accountTransfersPromise} />
+      </ErrorSuspense>
+    );
+  }
 
   const transfersPromise = fetchMTTokenStatsTransfers(cid, tid, {
     limit: '365',

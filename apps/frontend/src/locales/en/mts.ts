@@ -97,6 +97,11 @@ export const mts = {
   token: {
     analyticsTab: 'Analytics',
     contract: 'Contract Address:',
+    holderFilter: {
+      balance: 'Balance',
+      filteredBy: 'Token holder',
+      value: 'Value',
+    },
     decimals: 'Decimals:',
     description: 'Description:',
     ftHolders: 'Holders',

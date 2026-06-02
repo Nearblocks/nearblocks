@@ -4,6 +4,8 @@ import {
   Account,
   AccountAssetFT,
   AccountAssetFTsRes,
+  AccountAssetMTFT,
+  AccountAssetMTFTsRes,
   AccountBalance,
   AccountBalanceRes,
   AccountRes,
@@ -33,6 +35,15 @@ export const fetchTokens = cache(
   async (account: string): Promise<AccountAssetFT[] | null> => {
     const resp = await fetcher<AccountAssetFTsRes>(
       `/v3/accounts/${account}/assets/fts?limit=250`,
+    );
+    return resp.data;
+  },
+);
+
+export const fetchMTTokens = cache(
+  async (account: string): Promise<AccountAssetMTFT[] | null> => {
+    const resp = await fetcher<AccountAssetMTFTsRes>(
+      `/v3/accounts/${account}/assets/mts/fts?limit=250`,
     );
     return resp.data;
   },

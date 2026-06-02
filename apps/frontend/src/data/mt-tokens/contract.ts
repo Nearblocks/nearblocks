@@ -105,6 +105,7 @@ export const fetchMTTokenTxns = cache(
     params: SearchParams,
   ): Promise<MTTokenTxnsRes> => {
     const keys: (keyof MTTokenTxnsReq)[] = [
+      'affected',
       'before_ts',
       'limit',
       'next',
@@ -127,7 +128,7 @@ export const fetchMTTokenTxnCount = cache(
     token: string,
     params: SearchParams,
   ): Promise<MTTokenTxnCountRes> => {
-    const keys: (keyof MTTokenTxnCountReq)[] = ['before_ts'];
+    const keys: (keyof MTTokenTxnCountReq)[] = ['affected', 'before_ts'];
     const queryParams = safeParams(params, keys);
 
     const resp = await fetcher<MTTokenTxnCountRes>(

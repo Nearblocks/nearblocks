@@ -3,10 +3,14 @@ import type {
   AccountAssetFTCount,
   AccountAssetFTCountReq,
   AccountAssetFTsReq,
-  AccountAssetMT,
-  AccountAssetMTCount,
-  AccountAssetMTCountReq,
-  AccountAssetMTsReq,
+  AccountAssetMTFT,
+  AccountAssetMTFTCount,
+  AccountAssetMTFTCountReq,
+  AccountAssetMTFTsReq,
+  AccountAssetMTNFT,
+  AccountAssetMTNFTCount,
+  AccountAssetMTNFTCountReq,
+  AccountAssetMTNFTsReq,
   AccountAssetNFT,
   AccountAssetNFTCount,
   AccountAssetNFTCountReq,
@@ -130,29 +134,99 @@ const nftCount = responseHandler(
   },
 );
 
-const mts = responseHandler(
-  response.mts,
-  async (req: RequestValidator<AccountAssetMTsReq>) => {
+const mtFts = responseHandler(
+  response.mtFts,
+  async (req: RequestValidator<AccountAssetMTFTsReq>) => {
     const account = req.validator.account;
+    const contract = req.validator.contract ?? null;
+    const token = req.validator.token ?? null;
     const limit = req.validator.limit;
     const next = req.validator.next
-      ? cursors.decode(request.mtsCursor, req.validator.next)
+      ? cursors.decode(request.mtFtsCursor, req.validator.next)
       : null;
     const prev = req.validator.prev
-      ? cursors.decode(request.mtsCursor, req.validator.prev)
+      ? cursors.decode(request.mtFtsCursor, req.validator.prev)
       : null;
     const direction = prev ? 'asc' : 'desc';
+    const contractDirection = prev ? 'desc' : 'asc';
+    const tokenDirection = prev ? 'desc' : 'asc';
     const cursor = prev || next;
 
-    const data = await dbEvents.manyOrNone<AccountAssetMT>(sql.assets.mts, {
+    const data = await dbEvents.manyOrNone<
+      AccountAssetMTFT & { value: string }
+    >(sql.assets.mtFts, {
       account,
+      contract,
+      contractDirection,
       cursor: {
         contract: cursor?.contract,
         token: cursor?.token,
+        value: cursor?.value,
       },
       direction,
       limit: limit + 1,
+      token,
+      tokenDirection,
     });
+
+    return paginateData(
+      data,
+      limit,
+      direction,
+      (mt) => ({
+        contract: mt.contract,
+        token: mt.token,
+        value: mt.value,
+      }),
+      !!cursor,
+    );
+  },
+);
+
+const mtFtCount = responseHandler(
+  response.mtFtCount,
+  async (req: RequestValidator<AccountAssetMTFTCountReq>) => {
+    const account = req.validator.account;
+
+    const count = await dbEvents.one<AccountAssetMTFTCount>(
+      sql.assets.mtFtCount,
+      {
+        account,
+      },
+    );
+
+    return { data: count };
+  },
+);
+
+const mtNfts = responseHandler(
+  response.mtNfts,
+  async (req: RequestValidator<AccountAssetMTNFTsReq>) => {
+    const account = req.validator.account;
+    const limit = req.validator.limit;
+    const next = req.validator.next
+      ? cursors.decode(request.mtNftsCursor, req.validator.next)
+      : null;
+    const prev = req.validator.prev
+      ? cursors.decode(request.mtNftsCursor, req.validator.prev)
+      : null;
+    const direction = prev ? 'asc' : 'desc';
+    const contractDirection = prev ? 'desc' : 'asc';
+    const cursor = prev || next;
+
+    const data = await dbEvents.manyOrNone<AccountAssetMTNFT>(
+      sql.assets.mtNfts,
+      {
+        account,
+        contractDirection,
+        cursor: {
+          contract: cursor?.contract,
+          token: cursor?.token,
+        },
+        direction,
+        limit: limit + 1,
+      },
+    );
 
     return paginateData(
       data,
@@ -167,17 +241,29 @@ const mts = responseHandler(
   },
 );
 
-const mtCount = responseHandler(
-  response.mtCount,
-  async (req: RequestValidator<AccountAssetMTCountReq>) => {
+const mtNftCount = responseHandler(
+  response.mtNftCount,
+  async (req: RequestValidator<AccountAssetMTNFTCountReq>) => {
     const account = req.validator.account;
 
-    const count = await dbEvents.one<AccountAssetMTCount>(sql.assets.mtCount, {
-      account,
-    });
+    const count = await dbEvents.one<AccountAssetMTNFTCount>(
+      sql.assets.mtNftCount,
+      {
+        account,
+      },
+    );
 
     return { data: count };
   },
 );
 
-export default { ftCount, fts, mtCount, mts, nftCount, nfts };
+export default {
+  ftCount,
+  fts,
+  mtFtCount,
+  mtFts,
+  mtNftCount,
+  mtNfts,
+  nftCount,
+  nfts,
+};

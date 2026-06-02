@@ -1,10 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
-import { ActiveLink } from '@/components/link';
+import { ActiveLink, Link } from '@/components/link';
 import { TabLink, TabLinks } from '@/components/tab-links';
 import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent } from '@/ui/card';

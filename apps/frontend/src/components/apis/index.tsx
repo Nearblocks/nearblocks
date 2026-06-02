@@ -2,9 +2,9 @@
 
 import { ArrowRight, ArrowUpRight, Building2 } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { use, useState } from 'react';
 
+import { Link } from '@/components/link';
 import type { ApiPlan } from '@/data/plans';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';

@@ -7,7 +7,10 @@ import 'highcharts/esm/modules/stock.src.js';
 import { ChartLine } from 'lucide-react';
 import { use, useMemo } from 'react';
 
-import type { MTContractStatsTransfersRes } from 'nb-schemas';
+import type {
+  MTContractStatsAccountTransfersRes,
+  MTContractStatsTransfersRes,
+} from 'nb-schemas';
 
 import { AnalyticsChart } from '@/components/address/analytics/chart';
 import { EmptyBox } from '@/components/empty';
@@ -17,6 +20,7 @@ import { dateFormat, numberFormat } from '@/lib/format';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  accountTransfersPromise?: Promise<MTContractStatsAccountTransfersRes>;
   loading?: boolean;
   transfersPromise?: Promise<MTContractStatsTransfersRes>;
 };
@@ -41,11 +45,19 @@ const tooltipFormatter = function (this: Highcharts.Point) {
   return header + (rows?.join('') ?? '');
 };
 
-export const TransfersChart = ({ loading, transfersPromise }: Props) => {
+export const TransfersChart = ({
+  accountTransfersPromise,
+  loading,
+  transfersPromise,
+}: Props) => {
   const { t } = useLocale('mts');
 
   const contractStats =
     !loading && transfersPromise ? use(transfersPromise) : undefined;
+  const accountStats =
+    !loading && accountTransfersPromise
+      ? use(accountTransfersPromise)
+      : undefined;
 
   const contractData = useMemo(() => {
     const stats = contractStats?.data ?? null;
@@ -64,8 +76,26 @@ export const TransfersChart = ({ loading, transfersPromise }: Props) => {
     return { isEmpty: stats?.length === 0, receivers, senders, transfers };
   }, [contractStats]);
 
-  const isLoading = loading || !contractStats;
-  const isEmpty = contractData.isEmpty;
+  const accountData = useMemo(() => {
+    const stats = accountStats?.data ?? null;
+    const transfers = [];
+    const uniqueIn = [];
+    const uniqueOut = [];
+    const reversed = (stats ?? []).toReversed();
+
+    for (const item of reversed) {
+      const timestamp = new Date(item.date).getTime();
+      transfers.push([timestamp, +item.transfers]);
+      uniqueIn.push([timestamp, +item.unique_address_in]);
+      uniqueOut.push([timestamp, +item.unique_address_out]);
+    }
+
+    return { isEmpty: stats?.length === 0, transfers, uniqueIn, uniqueOut };
+  }, [accountStats]);
+
+  const isLoading = loading || (!contractStats && !accountStats);
+  const isAccount = !!accountTransfersPromise;
+  const isEmpty = isAccount ? accountData.isEmpty : contractData.isEmpty;
 
   return (
     <div className="h-105">
@@ -81,6 +111,46 @@ export const TransfersChart = ({ loading, transfersPromise }: Props) => {
                 icon={<ChartLine />}
               />
             </div>
+          ) : isAccount ? (
+            <AnalyticsChart>
+              <XAxis className="stroke-0" type="datetime" />
+              <YAxis
+                className="stroke-0"
+                labels={countLabel}
+                opposite={false}
+                title={{ text: t('analytics.transfers.transfersCount') }}
+              />
+              <Column.Series
+                data={accountData.transfers}
+                options={{
+                  id: 'transfers',
+                  name: t('analytics.transfers.transfers'),
+                  yAxis: 0,
+                }}
+              />
+              <YAxis
+                className="stroke-0"
+                labels={countLabel}
+                title={{ text: t('analytics.transfers.count') }}
+              />
+              <Line.Series
+                data={accountData.uniqueIn}
+                options={{
+                  id: 'uniqueIn',
+                  name: t('analytics.transfers.senders'),
+                  yAxis: 1,
+                }}
+              />
+              <Line.Series
+                data={accountData.uniqueOut}
+                options={{
+                  id: 'uniqueOut',
+                  name: t('analytics.transfers.receivers'),
+                  yAxis: 1,
+                }}
+              />
+              <Tooltip formatter={tooltipFormatter} shared />
+            </AnalyticsChart>
           ) : (
             <AnalyticsChart>
               <XAxis className="stroke-0" type="datetime" />
