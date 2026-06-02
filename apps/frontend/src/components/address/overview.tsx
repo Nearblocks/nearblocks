@@ -2,7 +2,12 @@
 
 import { use } from 'react';
 
-import { AccountAssetFT, AccountBalance, Stats } from 'nb-schemas';
+import {
+  AccountAssetFT,
+  AccountAssetMTFT,
+  AccountBalance,
+  Stats,
+} from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
@@ -20,6 +25,7 @@ import { Tokens } from './tokens';
 type Props = {
   balancePromise?: Promise<AccountBalance | null>;
   loading?: boolean;
+  mtTokensPromise?: Promise<AccountAssetMTFT[] | null>;
   spamPatterns?: string[];
   statsPromise?: Promise<null | Stats>;
   tokenCachePromise?: Promise<null | TokenCache[]>;
@@ -29,6 +35,7 @@ type Props = {
 export const Overview = ({
   balancePromise,
   loading,
+  mtTokensPromise,
   spamPatterns,
   statsPromise,
   tokenCachePromise,
@@ -102,6 +109,7 @@ export const Overview = ({
             <ListRight className="xl:py-2">
               <ErrorSuspense fallback={<Tokens loading />}>
                 <Tokens
+                  mtTokensPromise={mtTokensPromise}
                   spamPatterns={spamPatterns}
                   tokenCachePromise={tokenCachePromise}
                   tokensPromise={tokensPromise}

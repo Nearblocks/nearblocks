@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
-import { ActiveLink } from '@/components/link';
 import { MtFtHeader } from '@/components/mt-tokens/token/ft-header';
 import { MtFtOverview } from '@/components/mt-tokens/token/ft-overview';
 import { MtFtProfile } from '@/components/mt-tokens/token/ft-profile';
-import { TabBadge, TabLink, TabLinks } from '@/components/tab-links';
+import { MtFtTabLinks } from '@/components/mt-tokens/token/ft-tab-links';
+import { MtFtHolderFilter } from '@/components/mt-tokens/token/holder-filter';
 import {
   fetchMTToken,
   fetchMTTokenHolderCount,
@@ -58,6 +58,8 @@ const FtTokenLayout = async ({ children, params }: Props) => {
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, {});
   const holderCountPromise = fetchMTTokenHolderCount(cid, tid);
 
+  console.log({ cid, tid });
+
   return (
     <>
       <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
@@ -76,28 +78,17 @@ const FtTokenLayout = async ({ children, params }: Props) => {
         </ErrorSuspense>
         <MtFtProfile cid={cid} tid={tid} />
       </div>
+      <ErrorSuspense fallback={null}>
+        <MtFtHolderFilter cid={cid} tid={tid} tokenPromise={tokenPromise} />
+      </ErrorSuspense>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">
-        <TabLinks>
-          <TabLink asChild>
-            <ActiveLink exact href={`/mt-tokens/${cid}/tokens/ft/${tid}`}>
-              {t('token.ftTransfersTab')}
-            </ActiveLink>
-          </TabLink>
-          <TabLink asChild>
-            <ActiveLink href={`/mt-tokens/${cid}/tokens/ft/${tid}/holders`}>
-              {t('token.ftHoldersTab')}
-            </ActiveLink>
-          </TabLink>
-          <TabLink asChild>
-            <ActiveLink
-              exact={false}
-              href={`/mt-tokens/${cid}/tokens/ft/${tid}/analytics`}
-            >
-              {t('token.analyticsTab')}
-              <TabBadge variant="teal">NEW</TabBadge>
-            </ActiveLink>
-          </TabLink>
-        </TabLinks>
+        <MtFtTabLinks
+          analytics={t('token.analyticsTab')}
+          cid={cid}
+          holders={t('token.ftHoldersTab')}
+          tid={tid}
+          transfers={t('token.ftTransfersTab')}
+        />
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       {children}

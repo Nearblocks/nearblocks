@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { use } from 'react';
 
 import { Account, AccountBalance, ContractDeployment } from 'nb-schemas';
 
+import { Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimeAgo } from '@/components/time-ago';

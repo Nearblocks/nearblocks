@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+
 import { ErrorSuspense } from '@/components/error-suspense';
 import { OverviewChart } from '@/components/mt-tokens/analytics/charts';
 import {
@@ -7,8 +9,14 @@ import {
 
 type Props = PageProps<'/[lang]/mt-tokens/[cid]/tokens/ft/[tid]/analytics'>;
 
-const AnalyticsOverviewPage = async ({ params }: Props) => {
-  const { cid, tid } = await params;
+const AnalyticsOverviewPage = async ({ params, searchParams }: Props) => {
+  const [{ cid, tid }, { account }] = await Promise.all([params, searchParams]);
+
+  if (account && typeof account === 'string') {
+    redirect(
+      `/mt-tokens/${cid}/tokens/ft/${tid}/analytics/transfers?account=${account}`,
+    );
+  }
 
   const overviewPromise = fetchMTTokenStatsOverview(cid, tid);
   const heatmapPromise = fetchMTTokenStatsHeatmap(cid, tid);

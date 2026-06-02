@@ -11,7 +11,4 @@ FROM
 WHERE
   mh.account = ${account}
   AND mh.amount > 0
-  AND (
-    mbm.token IS NOT NULL
-    OR mtm.token IS NOT NULL
-  )
+  AND mbm.decimals IS NOT NULL

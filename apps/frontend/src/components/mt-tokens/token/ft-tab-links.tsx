@@ -4,32 +4,31 @@ import { usePathname, useSearchParams } from 'next/navigation';
 
 import { ActiveLink, Link } from '@/components/link';
 import { TabBadge, TabLink, TabLinks } from '@/components/tab-links';
+import { encodeToken } from '@/lib/utils';
 
 type Props = {
   analytics: string;
   cid: string;
-  faq: string;
   holders: string;
-  info: string;
+  tid: string;
   transfers: string;
 };
 
-export const TokenTabLinks = ({
+export const MtFtTabLinks = ({
   analytics,
   cid,
-  faq,
   holders,
-  info,
+  tid,
   transfers,
 }: Props) => {
   const account = useSearchParams().get('account');
   const pathname = usePathname();
 
-  const analyticsBase = `/tokens/${cid}/analytics`;
-  const analyticsActive = pathname.includes(analyticsBase);
+  const base = `/mt-tokens/${cid}/tokens/ft/${encodeToken(tid)}`;
+  const analyticsActive = pathname.includes(`${base}/analytics`);
   const analyticsHref = account
-    ? `${analyticsBase}/transfers?account=${account}`
-    : analyticsBase;
+    ? `${base}/analytics/transfers?account=${account}`
+    : `${base}/analytics`;
 
   const analyticsLink = (
     <TabLink asChild>
@@ -41,16 +40,15 @@ export const TokenTabLinks = ({
   );
 
   if (account) {
-    const transfersBase = `/tokens/${cid}`;
     const transfersActive =
-      pathname === transfersBase || pathname.endsWith(`/${cid}`);
+      pathname === base || pathname.endsWith(`/ft/${encodeToken(tid)}`);
 
     return (
       <TabLinks>
         <TabLink asChild>
           <Link
             data-active={transfersActive}
-            href={`${transfersBase}?account=${account}`}
+            href={`${base}?account=${account}`}
           >
             {transfers}
           </Link>
@@ -63,18 +61,12 @@ export const TokenTabLinks = ({
   return (
     <TabLinks>
       <TabLink asChild>
-        <ActiveLink exact href={`/tokens/${cid}`}>
+        <ActiveLink exact href={base}>
           {transfers}
         </ActiveLink>
       </TabLink>
       <TabLink asChild>
-        <ActiveLink href={`/tokens/${cid}/holders`}>{holders}</ActiveLink>
-      </TabLink>
-      <TabLink asChild>
-        <ActiveLink href={`/tokens/${cid}/info`}>{info}</ActiveLink>
-      </TabLink>
-      <TabLink asChild>
-        <ActiveLink href={`/tokens/${cid}/faq`}>{faq}</ActiveLink>
+        <ActiveLink href={`${base}/holders`}>{holders}</ActiveLink>
       </TabLink>
       {analyticsLink}
     </TabLinks>

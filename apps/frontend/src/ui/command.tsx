@@ -117,7 +117,7 @@ const CommandGroup = ({
   return (
     <CommandPrimitive.Group
       className={cn(
-        'text-foreground **:[[cmdk-group-heading]]:text-muted-foreground **:[[cmdk-group-heading]]:text-body-xs overflow-hidden p-2 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:font-medium',
+        'text-foreground **:[[cmdk-group-heading]]:text-muted-foreground **:[[cmdk-group-heading]]:text-body-xs overflow-hidden p-2 **:[[cmdk-group-heading]]:border-b **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:font-medium',
         className,
       )}
       data-slot="command-group"

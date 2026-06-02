@@ -1,6 +1,8 @@
 import { cache } from 'react';
 
 import {
+  MTContractStatsAccountTransfersReq,
+  MTContractStatsAccountTransfersRes,
   MTContractStatsHeatmapRes,
   MTContractStatsOverviewRes,
   MTContractStatsTransfersReq,
@@ -30,6 +32,25 @@ export const fetchMTTokenStatsHeatmap = cache(
   ): Promise<MTContractStatsHeatmapRes> => {
     const resp = await fetcher<MTContractStatsHeatmapRes>(
       `/v3/mts/${contract}/tokens/${encodeToken(token)}/stats/heatmap`,
+    );
+    return resp;
+  },
+);
+
+export const fetchMTTokenStatsAccountTransfers = cache(
+  async (
+    contract: string,
+    token: string,
+    account: string,
+    params: SearchParams,
+  ): Promise<MTContractStatsAccountTransfersRes> => {
+    const keys: (keyof MTContractStatsAccountTransfersReq)[] = ['limit'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<MTContractStatsAccountTransfersRes>(
+      `/v3/mts/${contract}/tokens/${encodeToken(
+        token,
+      )}/stats/${account}/transfers?${queryParams.toString()}`,
     );
     return resp;
   },

@@ -17,6 +17,7 @@ import { TabLinks } from '@/components/tab-links';
 import {
   fetchAccount,
   fetchBalance,
+  fetchMTTokens,
   fetchTokenCache,
   fetchTokens,
 } from '@/data/address';
@@ -52,6 +53,7 @@ const AddressLayout = async ({ children, params }: Props) => {
   const contractPromise = fetchContract(address);
   const deploymentsPromise = fetchDeployments(address);
   const tokensPromise = fetchTokens(address);
+  const mtTokensPromise = fetchMTTokens(address);
   const tokenCachePromise = fetchTokenCache(address);
   const spamPatterns = await fetchSpamTokens();
 
@@ -90,6 +92,7 @@ const AddressLayout = async ({ children, params }: Props) => {
             <ErrorSuspense fallback={<Overview loading />}>
               <Overview
                 balancePromise={balancePromise}
+                mtTokensPromise={mtTokensPromise}
                 spamPatterns={spamPatterns}
                 statsPromise={statsPromise}
                 tokenCachePromise={tokenCachePromise}

@@ -11,7 +11,8 @@ type Props = {
 };
 
 const FtTokenTransfersPage = async ({ params, searchParams }: Props) => {
-  const [{ cid, tid }, filters] = await Promise.all([params, searchParams]);
+  const [{ cid, tid }, raw] = await Promise.all([params, searchParams]);
+  const filters = { ...raw, affected: raw.account ?? raw.affected };
   const txnsPromise = fetchMTTokenTxns(cid, tid, filters);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, filters);
 
