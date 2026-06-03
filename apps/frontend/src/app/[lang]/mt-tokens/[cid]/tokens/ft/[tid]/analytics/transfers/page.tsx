@@ -4,12 +4,17 @@ import {
   fetchMTTokenStatsAccountTransfers,
   fetchMTTokenStatsTransfers,
 } from '@/data/mt-tokens/analytics';
+import { decodeToken } from '@/lib/utils';
 
 type Props =
   PageProps<'/[lang]/mt-tokens/[cid]/tokens/ft/[tid]/analytics/transfers'>;
 
 const AnalyticsTransfersPage = async ({ params, searchParams }: Props) => {
-  const [{ cid, tid }, { account }] = await Promise.all([params, searchParams]);
+  const [{ cid, tid: rawTid }, { account }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const tid = decodeToken(rawTid);
 
   if (account && typeof account === 'string') {
     const accountTransfersPromise = fetchMTTokenStatsAccountTransfers(

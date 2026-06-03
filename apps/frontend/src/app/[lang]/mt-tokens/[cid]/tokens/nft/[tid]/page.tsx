@@ -8,6 +8,7 @@ import {
   fetchMTTokenTxnCount,
   fetchMTTokenTxns,
 } from '@/data/mt-tokens/contract';
+import { decodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { Card, CardContent } from '@/ui/card';
 
@@ -21,7 +22,8 @@ export const generateMetadata = async ({
 }: {
   params: Promise<{ cid: string; lang: string; tid: string }>;
 }): Promise<Metadata> => {
-  const { cid, lang, tid } = await params;
+  const { cid, lang, tid: rawTid } = await params;
+  const tid = decodeToken(rawTid);
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'mts');
 
@@ -48,7 +50,11 @@ export const generateMetadata = async ({
 };
 
 const NftTokenDetailPage = async ({ params, searchParams }: Props) => {
-  const [{ cid, tid }, filters] = await Promise.all([params, searchParams]);
+  const [{ cid, tid: rawTid }, filters] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const tid = decodeToken(rawTid);
   const tokenPromise = fetchMTToken(cid, tid);
   const txnsPromise = fetchMTTokenTxns(cid, tid, filters);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, filters);

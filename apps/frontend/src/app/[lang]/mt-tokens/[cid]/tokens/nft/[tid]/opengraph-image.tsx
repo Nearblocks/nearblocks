@@ -3,6 +3,7 @@ import { ImageResponse } from 'next/og';
 import { SubTitle, Title, TitleWrapper, Wrapper } from '@/components/thumbnail';
 import { TokenBG } from '@/icons/og';
 import { getRuntimeConfig } from '@/lib/config';
+import { decodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 export const contentType = 'image/png';
@@ -16,10 +17,11 @@ type Props = {
 };
 
 const Image = async ({ params }: Props) => {
-  const [{ lang, tid }, config] = await Promise.all([
+  const [{ lang, tid: rawTid }, config] = await Promise.all([
     params,
     getRuntimeConfig(),
   ]);
+  const tid = decodeToken(rawTid);
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'mts');
   const title =

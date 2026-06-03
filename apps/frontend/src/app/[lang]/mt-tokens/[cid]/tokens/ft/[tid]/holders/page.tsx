@@ -5,6 +5,7 @@ import {
   fetchMTTokenHolderCount,
   fetchMTTokenHolders,
 } from '@/data/mt-tokens/contract';
+import { decodeToken } from '@/lib/utils';
 
 type Props = {
   params: Promise<{ cid: string; lang: string; tid: string }>;
@@ -12,7 +13,11 @@ type Props = {
 };
 
 const FtTokenHoldersPage = async ({ params, searchParams }: Props) => {
-  const [{ cid, tid }, filters] = await Promise.all([params, searchParams]);
+  const [{ cid, tid: rawTid }, filters] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const tid = decodeToken(rawTid);
   const holdersPromise = fetchMTTokenHolders(cid, tid, filters);
   const holderCountPromise = fetchMTTokenHolderCount(cid, tid);
   const tokenPromise = fetchMTToken(cid, tid);

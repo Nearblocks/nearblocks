@@ -91,6 +91,14 @@ export const getCommitHash = (url: string) => {
 
 export const encodeToken = (token: string) => encodeURIComponent(token);
 
+export const decodeToken = (token: string) => {
+  try {
+    return decodeURIComponent(token);
+  } catch {
+    return token;
+  }
+};
+
 export const isSpamToken = (contract: string, patterns: string[]): boolean => {
   return patterns.some((pattern) => {
     if (pattern.startsWith('*.')) {
