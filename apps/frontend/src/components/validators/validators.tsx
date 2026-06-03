@@ -29,7 +29,8 @@ import {
   TableRow,
 } from '@/ui/table';
 
-import { AccountLink } from '../link';
+import { Copy } from '../copy';
+import { Link } from '../link';
 import { Truncate, TruncateCopy, TruncateText } from '../truncate';
 
 const statusVariant = (
@@ -335,10 +336,21 @@ const ValidatorRows = ({
         </TableCell>
         <TableCell>
           <div className="flex flex-col gap-0.5">
-            <AccountLink
-              account={row.account_id}
-              textClassName="text-body-sm max-w-40"
-            />
+            <span className="flex items-center gap-1">
+              <Link
+                className="text-body-sm text-link"
+                href={`/validators/${row.account_id}`}
+              >
+                <Truncate>
+                  <TruncateText className="max-w-50" text={row.account_id} />
+                </Truncate>
+              </Link>
+              <Copy
+                className="text-muted-foreground"
+                size="icon-xs"
+                text={row.account_id}
+              />
+            </span>
             {row.public_key && (
               <Truncate>
                 <TruncateText

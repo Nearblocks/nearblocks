@@ -10,7 +10,7 @@ import {
   fetchNFTTokenTxnCount,
   fetchNFTTokenTxns,
 } from '@/data/nft-tokens/contract';
-import { encodeToken } from '@/lib/utils';
+import { decodeToken, encodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/nft-tokens/[cid]/tokens/[tid]'>;
@@ -18,7 +18,8 @@ type Props = PageProps<'/[lang]/nft-tokens/[cid]/tokens/[tid]'>;
 export const generateMetadata = async ({
   params,
 }: Props): Promise<Metadata> => {
-  const { cid, lang, tid } = await params;
+  const { cid, lang, tid: rawTid } = await params;
+  const tid = decodeToken(rawTid);
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'nfts');
 
@@ -53,7 +54,11 @@ export const generateMetadata = async ({
 };
 
 const TokenDetailPage = async ({ params, searchParams }: Props) => {
-  const [{ cid, tid }, filters] = await Promise.all([params, searchParams]);
+  const [{ cid, tid: rawTid }, filters] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const tid = decodeToken(rawTid);
   const tokenPromise = fetchNFTToken(cid, tid);
   const contractPromise = fetchNFTContract(cid);
   const txnsPromise = fetchNFTTokenTxns(cid, tid, filters);

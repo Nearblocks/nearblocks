@@ -11,6 +11,7 @@ import {
   fetchMTTokenHolderCount,
   fetchMTTokenTxnCount,
 } from '@/data/mt-tokens/contract';
+import { decodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
@@ -24,7 +25,8 @@ export const generateMetadata = async ({
 }: {
   params: Promise<{ cid: string; lang: string; tid: string }>;
 }): Promise<Metadata> => {
-  const { cid, lang, tid } = await params;
+  const { cid, lang, tid: rawTid } = await params;
+  const tid = decodeToken(rawTid);
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'mts');
 
@@ -51,14 +53,13 @@ export const generateMetadata = async ({
 };
 
 const FtTokenLayout = async ({ children, params }: Props) => {
-  const { cid, lang, tid } = await params;
+  const { cid, lang, tid: rawTid } = await params;
+  const tid = decodeToken(rawTid);
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'mts');
   const tokenPromise = fetchMTToken(cid, tid);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, {});
   const holderCountPromise = fetchMTTokenHolderCount(cid, tid);
-
-  console.log({ cid, tid });
 
   return (
     <>

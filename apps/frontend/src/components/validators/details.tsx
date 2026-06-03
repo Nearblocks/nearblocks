@@ -18,8 +18,6 @@ import { Badge } from '@/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
-import { Copy } from '../copy';
-
 const PAGE_SIZE = 25;
 
 type DelegatorAccount = {
@@ -90,7 +88,12 @@ export const NodeDetails = ({ node }: Props) => {
 
   const columns: DataTableColumnDef<DelegatorAccount>[] = [
     {
-      cell: (row) => <AccountLink account={row.account_id} />,
+      cell: (row) => (
+        <AccountLink
+          account={row.account_id}
+          textClassName="sm:max-w-60 md:max-w-100"
+        />
+      ),
       className: 'w-[50%]',
       header: t('nodeDetails.columns.account'),
       id: 'account',
@@ -198,11 +201,6 @@ export const NodeDetails = ({ node }: Props) => {
 
   return (
     <div>
-      <div className="mb-6 flex items-center gap-2">
-        <span className="text-muted-foreground text-body-sm">@{node}</span>
-        <Copy text={node} />
-      </div>
-
       <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="border-b py-3">

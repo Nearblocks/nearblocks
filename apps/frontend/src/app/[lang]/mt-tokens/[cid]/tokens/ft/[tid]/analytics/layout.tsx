@@ -6,14 +6,15 @@ import { use } from 'react';
 import { ActiveLink, Link } from '@/components/link';
 import { TabLink, TabLinks } from '@/components/tab-links';
 import { useLocale } from '@/hooks/use-locale';
-import { encodeToken } from '@/lib/utils';
+import { decodeToken, encodeToken } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
 type Props = LayoutProps<'/[lang]/mt-tokens/[cid]/tokens/ft/[tid]/analytics'>;
 
 const AnalyticsLayout = ({ children, params }: Props) => {
-  const { cid, tid } = use(params);
+  const { cid, tid: rawTid } = use(params);
+  const tid = decodeToken(rawTid);
   const { t } = useLocale('mts');
   const searchParams = useSearchParams();
   const pathname = usePathname();

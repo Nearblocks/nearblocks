@@ -4,6 +4,7 @@ import {
   fetchMTTokenTxnCount,
   fetchMTTokenTxns,
 } from '@/data/mt-tokens/contract';
+import { decodeToken } from '@/lib/utils';
 
 type Props = {
   params: Promise<{ cid: string; lang: string; tid: string }>;
@@ -11,7 +12,8 @@ type Props = {
 };
 
 const FtTokenTransfersPage = async ({ params, searchParams }: Props) => {
-  const [{ cid, tid }, raw] = await Promise.all([params, searchParams]);
+  const [{ cid, tid: rawTid }, raw] = await Promise.all([params, searchParams]);
+  const tid = decodeToken(rawTid);
   const filters = { ...raw, affected: raw.account ?? raw.affected };
   const txnsPromise = fetchMTTokenTxns(cid, tid, filters);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, filters);
