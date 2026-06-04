@@ -43,4 +43,62 @@ export const syncMTPrice = async () => {
     `,
     bindings,
   );
+
+  const tokens = data.filter(
+    (t) => t.assetId && t.contractAddress && t.blockchain,
+  );
+
+  if (tokens.length) {
+    const tokenValues = tokens.map(() => `(?, ?, ?)`).join(',');
+    const tokenBindings = tokens.flatMap((t) => [
+      t.assetId,
+      t.contractAddress,
+      t.blockchain,
+    ]);
+
+    await dbEvents.raw(
+      `
+        INSERT INTO
+          mt_intents_tokens (token, contract, blockchain)
+        VALUES
+          ${tokenValues}
+        ON CONFLICT (token) DO UPDATE
+        SET
+          contract = EXCLUDED.contract,
+          blockchain = EXCLUDED.blockchain
+      `,
+      tokenBindings,
+    );
+  }
+
+  const history = data
+    .filter((t) => t.assetId && t.price != null && t.priceUpdatedAt)
+    .map((t) => ({
+      price: t.price,
+      token: t.assetId,
+      updatedAt: new Date(t.priceUpdatedAt).getTime(),
+    }))
+    .filter((t) => !Number.isNaN(t.updatedAt));
+
+  if (!history.length) {
+    return;
+  }
+
+  const historyValues = history.map(() => `(?, ?, ?)`).join(',');
+  const historyBindings = history.flatMap((t) => [
+    t.updatedAt,
+    t.price,
+    t.token,
+  ]);
+
+  await dbEvents.raw(
+    `
+      INSERT INTO
+        mt_intents_prices (updated_at, price, token)
+      VALUES
+        ${historyValues}
+      ON CONFLICT (token, updated_at) DO NOTHING
+    `,
+    historyBindings,
+  );
 };
