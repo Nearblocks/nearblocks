@@ -49,3 +49,6 @@ index.node
 # bos
 data.json
 .planning/
+
+# claude code
+.claude/
