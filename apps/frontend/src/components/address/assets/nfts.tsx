@@ -16,7 +16,7 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { NFTMedia, TokenImage } from '@/components/token';
 import { Truncate, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
-import { numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
 import {
   Pagination,
@@ -103,13 +103,19 @@ export const NFTAssets = ({ countPromise, loading, nftsPromise }: Props) => {
           fallback={<Skeleton className="h-7 w-40" />}
           loading={loading || !count}
         >
-          {() => (
-            <span className="leading-7">
-              {t('assets.nfts.total', {
-                count: numberFormat(count?.count ?? 0),
-              })}
-            </span>
-          )}
+          {() => {
+            const value = count?.count ?? '0';
+            return (
+              <span className="leading-7">
+                {t(
+                  isApproxCount(value)
+                    ? 'assets.nfts.total'
+                    : 'assets.nfts.totalExact',
+                  { count: countFormat(value) },
+                )}
+              </span>
+            );
+          }}
         </SkeletonSlot>
       </div>
       <div className="mt-4 grid grid-cols-1 gap-4 px-3 min-[440px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
