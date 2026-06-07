@@ -12,8 +12,8 @@ import { usageStreamRedisClient } from '#libs/usageStreamRedis';
 const STREAM_KEY = 'api:usage:events';
 
 // Path prefixes excluded from usage capture (high-volume noise we don't track,
-// e.g. legacy supply/fees/ping/nodes polling and sync-status health checks).
-const SKIP_PREFIXES = ['/v1/legacy', '/v1/sync', '/v3/sync'];
+// e.g. legacy supply/fees/ping/nodes polling, sync-status and health checks).
+const SKIP_PREFIXES = ['/v1/legacy', '/v1/sync', '/v3/sync', '/v1/health'];
 
 type UsageUser = { id?: number; key_id?: number };
 
