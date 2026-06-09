@@ -49,23 +49,25 @@ export const syncMTPrice = async () => {
   );
 
   if (tokens.length) {
-    const tokenValues = tokens.map(() => `(?, ?, ?)`).join(',');
+    const tokenValues = tokens.map(() => `(?, ?, ?, ?)`).join(',');
     const tokenBindings = tokens.flatMap((t) => [
       t.assetId,
       t.contractAddress,
       t.blockchain,
+      t.decimals,
     ]);
 
     await dbEvents.raw(
       `
         INSERT INTO
-          mt_intents_tokens (token, contract, blockchain)
+          mt_intents_tokens (token, contract, blockchain, decimals)
         VALUES
           ${tokenValues}
         ON CONFLICT (token) DO UPDATE
         SET
           contract = EXCLUDED.contract,
-          blockchain = EXCLUDED.blockchain
+          blockchain = EXCLUDED.blockchain,
+          decimals = EXCLUDED.decimals
       `,
       tokenBindings,
     );

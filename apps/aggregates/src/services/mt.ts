@@ -1,6 +1,8 @@
 import { logger } from 'nb-logger';
+import { Network } from 'nb-types';
 import { sleep } from 'nb-utils';
 
+import config from '#config';
 import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { big, getLimit } from '#libs/utils';
@@ -9,6 +11,10 @@ const OFFSET = 3_000_000_000n; // 3s in ns
 const TABLE = 'mt_holders';
 
 export const syncMTHolders = async () => {
+  if (config.network === Network.TESTNET) {
+    return;
+  }
+
   // eslint-disable-next-line no-constant-condition
   while (true) {
     await holders();

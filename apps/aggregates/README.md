@@ -2,11 +2,14 @@
 
 - ft token holders
 - nft token holders
+- mt token holders
+- mt intents values
 
 ### Config
 
 ```
 DATABASE_URL=
+NETWORK=
 
 # Optional
 DATABASE_CA=
