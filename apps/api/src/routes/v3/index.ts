@@ -3,6 +3,7 @@ import { Router } from 'express';
 import accounts from '#routes/v3/accounts/index';
 import blocks from '#routes/v3/blocks';
 import fts from '#routes/v3/fts/index';
+import intents from '#routes/v3/intents/index';
 import keys from '#routes/v3/keys';
 import mtsContract from '#routes/v3/mts/contract';
 import mts from '#routes/v3/mts/index';
@@ -22,6 +23,7 @@ const routes = () => {
   accounts(app);
   blocks(app);
   fts(app);
+  intents(app);
   keys(app);
   mts(app);
   mtsContract(app);

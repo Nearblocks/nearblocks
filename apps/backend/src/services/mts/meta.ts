@@ -101,7 +101,7 @@ export const syncMTTokenMeta = async () => {
           AND ec.attempts >= 5
       )
     LIMIT
-      10
+      25
   `);
 
   await Promise.all(mts.map((mt) => updateMTTokenMeta(mt.contract, mt.token)));

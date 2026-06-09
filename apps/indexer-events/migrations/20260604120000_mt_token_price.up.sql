@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS mt_intents_tokens (
   token TEXT NOT NULL,
   contract TEXT NOT NULL,
   blockchain TEXT NOT NULL,
+  decimals SMALLINT NOT NULL,
   PRIMARY KEY (token)
 );
 

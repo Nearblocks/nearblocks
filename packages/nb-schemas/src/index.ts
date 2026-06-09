@@ -4,6 +4,7 @@ export type * from './mts/index.js';
 export type * from './staking/index.js';
 export type * from './blocks/index.js';
 export type * from './fts/index.js';
+export type * from './intents/index.js';
 export type * from './keys/index.js';
 export type * from './multichain/index.js';
 export type * from './nfts/index.js';
