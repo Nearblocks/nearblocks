@@ -96,17 +96,17 @@ export const mts = {
   title: 'MT Token Tracker (NEP-245)',
   token: {
     analyticsTab: 'Analytics',
-    holderFilter: {
-      balance: 'Balance',
-      filteredBy: 'Token holder',
-      value: 'Value',
-    },
     contract: 'Contract Address:',
     decimals: 'Decimals:',
     description: 'Description:',
     ftHolders: 'Holders',
     ftHoldersTab: 'Holders',
     ftTransfersTab: 'Transfers',
+    holderFilter: {
+      balance: 'Balance',
+      filteredBy: 'Token holder',
+      value: 'Value',
+    },
     label: 'MT Token:',
     nep245: 'NEP-245',
     overview: 'Overview',
