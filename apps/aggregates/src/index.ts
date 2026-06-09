@@ -3,8 +3,8 @@ import { logger } from 'nb-logger';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncFTHolders } from '#services/ft';
+import { syncMTIntents } from '#services/intents';
 import { syncMTHolders } from '#services/mt';
-import { syncMTIntents } from '#services/mt_intents';
 import { syncNFTHolders } from '#services/nft';
 
 (async () => {
