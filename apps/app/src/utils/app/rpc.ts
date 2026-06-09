@@ -4,17 +4,20 @@ import { baseDecode } from 'borsh';
 import { providers } from 'near-api-js';
 
 import { SearchResult } from '../types';
-import { networkId, fastNearRpcKey } from './config';
+import { networkId, apiUrl } from './config';
 import { isValidAccount } from './libs';
 
 export const getRpcProviders = async () => {
+  // Keyless proxy at apps/api: the URL handed to the client no longer carries
+  // the FastNear apiKey. apiUrl is server-only here ('use server'); derive its
+  // origin and append the proxy path so the key stays server-side in apps/api.
+  const proxyBase = new URL(apiUrl).origin;
+
   return networkId === 'mainnet'
     ? [
         {
           name: 'FastNEAR (Archival)',
-          url: `https://archival-rpc.mainnet.fastnear.com${
-            fastNearRpcKey ? `?apiKey=${fastNearRpcKey}` : ''
-          }`,
+          url: `${proxyBase}/v1/rpc/archival`,
         },
         {
           name: 'NEAR (Archival)',
@@ -40,9 +43,7 @@ export const getRpcProviders = async () => {
     : [
         {
           name: 'FastNEAR (Archival)',
-          url: `https://archival-rpc.testnet.fastnear.com${
-            fastNearRpcKey ? `?apiKey=${fastNearRpcKey}` : ''
-          }`,
+          url: `${proxyBase}/v1/rpc/archival`,
         },
         {
           name: 'NEAR (Archival)',
