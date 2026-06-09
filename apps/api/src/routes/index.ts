@@ -15,6 +15,7 @@ import keys from '#routes/keys';
 import kitwallet from '#routes/kitwallet';
 import legacy from '#routes/legacy';
 import nfts from '#routes/nfts';
+import rpc from '#routes/rpc';
 import search from '#routes/search';
 import stats from '#routes/stats';
 import sync from '#routes/sync';
@@ -37,6 +38,7 @@ const routes = () => {
   kitwallet(app);
   legacy(app);
   nfts(app);
+  rpc(app);
   search(app);
   stats(app);
   sync(app);

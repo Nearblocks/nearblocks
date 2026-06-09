@@ -53,7 +53,7 @@ export const fetchTokenCache = cache(
   async (account: string): Promise<null | TokenCache[]> => {
     try {
       const config = getServerConfig();
-      const apiKey = config.NEXT_PUBLIC_FASTNEAR_RPC_KEY;
+      const apiKey = config.FASTNEAR_RPC_KEY;
 
       const res = await fetch(
         `https://api.fastnear.com/v1/account/${account}/ft?apiKey=${apiKey}`,

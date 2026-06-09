@@ -13,7 +13,16 @@ const STREAM_KEY = 'api:usage:events';
 
 // Path prefixes excluded from usage capture (high-volume noise we don't track,
 // e.g. legacy supply/fees/ping/nodes polling, sync-status and health checks).
-const SKIP_PREFIXES = ['/v1/legacy', '/v1/sync', '/v3/sync', '/v1/health'];
+// '/v1/rpc' is the anonymous keyless RPC proxy: high-volume, no api key, and not
+// a third-party consumer. Capturing it would inflate the anonymous bucket and
+// evict real consumer events from the capped stream (cf. /v1/health exclusion).
+const SKIP_PREFIXES = [
+  '/v1/legacy',
+  '/v1/sync',
+  '/v3/sync',
+  '/v1/health',
+  '/v1/rpc',
+];
 
 type UsageUser = { id?: number; key_id?: number };
 

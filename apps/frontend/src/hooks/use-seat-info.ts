@@ -7,7 +7,10 @@ import {
 } from '@near-js/jsonrpc-client';
 import useSWR from 'swr';
 
+import { sessionRequired } from '@/lib/session';
+
 import { useConfig } from './use-config';
+import { useSession } from './use-session';
 import { useSettings } from './use-settings';
 
 type SeatInfo = {
@@ -30,8 +33,14 @@ const findSeatPrice = (
   return (stakesSum * BigInt(ratioNum)) / BigInt(ratioDen);
 };
 
-const fetchSeatInfo = async (rpcUrl: string): Promise<SeatInfo> => {
-  const client = new NearRpcClient({ endpoint: rpcUrl });
+const fetchSeatInfo = async (
+  rpcUrl: string,
+  sessionToken?: null | string,
+): Promise<SeatInfo> => {
+  const client = new NearRpcClient({
+    endpoint: rpcUrl,
+    headers: sessionToken ? { 'x-rpc-session': sessionToken } : undefined,
+  });
 
   const [validatorsResp, protocolConfigResp] = await Promise.all([
     validators(client, 'latest'),
@@ -61,14 +70,18 @@ const fetchSeatInfo = async (rpcUrl: string): Promise<SeatInfo> => {
 export const useSeatInfo = (): SeatInfo => {
   const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const config = useConfig((s) => s.config);
+  const token = useSession((s) => s.token);
+  const ready = useSession((s) => s.ready);
 
-  const rpcUrl = (provider || defaultProvider).url;
-  const shouldFetch = hydrated && rpcUrl;
+  const rpcUrl = (provider || config.provider).url;
+  const required = sessionRequired(rpcUrl, config);
+  const gated = required && !ready;
+  const shouldFetch = hydrated && rpcUrl && !gated;
 
   const { data, isLoading } = useSWR<SeatInfo>(
-    shouldFetch ? ['seat-info', rpcUrl] : null,
-    () => fetchSeatInfo(rpcUrl),
+    shouldFetch ? ['seat-info', rpcUrl, required ? token : null] : null,
+    () => fetchSeatInfo(rpcUrl, required ? token : undefined),
     {
       keepPreviousData: true,
       revalidateOnFocus: false,

@@ -3,6 +3,7 @@ import { Geist_Mono, Roboto } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import { Layout } from '@/components/layout';
+import { SessionGate } from '@/components/session/session-gate';
 import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import type { Locale } from '@/locales/config';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
@@ -77,6 +78,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
           <LocaleProvider dictionary={dictionary} locale={locale}>
             <Layout>{children}</Layout>
           </LocaleProvider>
+          <SessionGate />
           <Toaster />
         </ConfigProvider>
       </body>

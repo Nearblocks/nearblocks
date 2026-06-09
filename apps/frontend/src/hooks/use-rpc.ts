@@ -7,8 +7,10 @@ import useSWR, { SWRConfiguration } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { txnStatus, viewFunction } from '@/lib/rpc';
+import { sessionRequired } from '@/lib/session';
 
 import { useConfig } from './use-config';
+import { useSession } from './use-session';
 import { useSettings } from './use-settings';
 
 type ViewParams = {
@@ -37,9 +39,15 @@ const options: SWRConfiguration = {
 export const useView = <T = unknown>(params: null | ViewParams) => {
   const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const config = useConfig((s) => s.config);
+  const token = useSession((s) => s.token);
+  const ready = useSession((s) => s.ready);
 
-  const shouldFetch = hydrated && params;
+  const resolvedProvider = provider || config.provider;
+  const required = sessionRequired(resolvedProvider.url, config);
+  const gated = required && !ready;
+
+  const shouldFetch = hydrated && params && !gated;
   const key = shouldFetch
     ? [
         'rpc-view',
@@ -48,6 +56,7 @@ export const useView = <T = unknown>(params: null | ViewParams) => {
         params.args,
         params.finality,
         params.blockId,
+        required ? token : null,
       ]
     : null;
 
@@ -57,12 +66,13 @@ export const useView = <T = unknown>(params: null | ViewParams) => {
       if (!params) throw new Error('Missing required params');
 
       return viewFunction<T>(
-        provider || defaultProvider,
+        resolvedProvider,
         params.contract,
         params.method,
         params.args ?? {},
         params.finality,
         params.blockId,
+        required ? token : undefined,
       );
     },
     options,
@@ -72,12 +82,19 @@ export const useView = <T = unknown>(params: null | ViewParams) => {
 export const useBatchView = <T = unknown>(params: BatchViewParams | null) => {
   const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const config = useConfig((s) => s.config);
+  const token = useSession((s) => s.token);
+  const ready = useSession((s) => s.ready);
 
-  const shouldFetch = hydrated && params;
+  const resolvedProvider = provider || config.provider;
+  const required = sessionRequired(resolvedProvider.url, config);
+  const gated = required && !ready;
+
+  const shouldFetch = hydrated && params && !gated;
   const key = shouldFetch
     ? [
         'rpc-batch-view',
+        required ? token : null,
         ...params.map((param) => [
           param.contract,
           param.method,
@@ -96,12 +113,13 @@ export const useBatchView = <T = unknown>(params: BatchViewParams | null) => {
       return Promise.all(
         params.map((call) =>
           viewFunction<T>(
-            provider || defaultProvider,
+            resolvedProvider,
             call.contract,
             call.method,
             call.args ?? {},
             call.finality,
             call.blockId,
+            required ? token : undefined,
           ),
         ),
       );
@@ -112,18 +130,28 @@ export const useBatchView = <T = unknown>(params: BatchViewParams | null) => {
 
 export const useViewMutation = <T = unknown>() => {
   const provider = useSettings((s) => s.provider);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const config = useConfig((s) => s.config);
+  const token = useSession((s) => s.token);
+  const ready = useSession((s) => s.ready);
+
+  const resolvedProvider = provider || config.provider;
+  const required = sessionRequired(resolvedProvider.url, config);
 
   return useSWRMutation<T, Error, string, ViewParams>(
     'rpc-mutation',
     async (_key, { arg }) => {
+      if (required && !ready) {
+        throw new Error('RPC session not ready');
+      }
+
       return viewFunction<T>(
-        provider || defaultProvider,
+        resolvedProvider,
         arg.contract,
         arg.method,
         arg.args ?? {},
         arg.finality,
         arg.blockId,
+        required ? token : undefined,
       );
     },
   );
@@ -137,11 +165,22 @@ type TxnStatusParams = {
 export const useTxnStatus = (params: TxnStatusParams) => {
   const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const config = useConfig((s) => s.config);
+  const token = useSession((s) => s.token);
+  const ready = useSession((s) => s.ready);
 
-  const shouldFetch = hydrated && params;
+  const resolvedProvider = provider || config.provider;
+  const required = sessionRequired(resolvedProvider.url, config);
+  const gated = required && !ready;
+
+  const shouldFetch = hydrated && params && !gated;
   const key = shouldFetch
-    ? ['rpc-txn-status', params.txHash, params.senderAccountId]
+    ? [
+        'rpc-txn-status',
+        params.txHash,
+        params.senderAccountId,
+        required ? token : null,
+      ]
     : null;
 
   return useSWR<RpcTransactionResponse>(
@@ -150,9 +189,10 @@ export const useTxnStatus = (params: TxnStatusParams) => {
       if (!params) throw new Error('Missing required params');
 
       return txnStatus(
-        provider || defaultProvider,
+        resolvedProvider,
         params.txHash,
         params.senderAccountId,
+        required ? token : undefined,
       );
     },
     options,

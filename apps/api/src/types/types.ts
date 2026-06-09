@@ -29,6 +29,9 @@ export type Config = {
   dbUrlStaking: string;
   dbWriteUrlBase: string;
   eventsStart: bigint;
+  fastnearArchivalRpcUrl: string;
+  fastnearRpcKey: string;
+  fastnearRpcUrl: string;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryCount: number;
@@ -48,10 +51,16 @@ export type Config = {
   redisSentinelPassword: string;
   redisSentinelUrls: string;
   redisUrl: string;
+  rpcAllowedOrigins: string;
+  rpcRateLimitDuration: number;
+  rpcRateLimitPoints: number;
+  rpcSessionEnforced: boolean;
+  rpcSessionSecret: string;
   rpcUrl: string;
   sentryDsn?: string;
   stakingStart: bigint;
   testnetUrl: string;
+  turnstileSecretKey: string;
   usageStreamMaxLen: number;
   usageStreamRedisPassword: string;
   usageStreamRedisUrl: string;

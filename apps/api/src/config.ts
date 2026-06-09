@@ -1,4 +1,4 @@
-import { cleanEnv, num, str, url } from 'envalid';
+import { bool, cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -27,6 +27,23 @@ const env = cleanEnv(process.env, {
   DB_URL_STAKING: str(dbFallback),
   DB_URL_USER: str(dbFallback),
   DB_WRITE_URL_BASE: str(dbFallback),
+  // FastNear archival RPC endpoint the keyless proxy forwards POST /v1/rpc/archival to.
+  FASTNEAR_ARCHIVAL_RPC_URL: str({
+    default:
+      process.env.NETWORK === Network.MAINNET
+        ? 'https://archival-rpc.mainnet.fastnear.com'
+        : 'https://archival-rpc.testnet.fastnear.com',
+  }),
+  // FastNear API key, server-only. Appended as ?apiKey=... when the proxy
+  // forwards JSON-RPC to FastNear. Never logged, never stored in a URL field.
+  FASTNEAR_RPC_KEY: str({ default: '' }),
+  // FastNear default (non-archival) RPC endpoint the keyless proxy forwards to.
+  FASTNEAR_RPC_URL: str({
+    default:
+      process.env.NETWORK === Network.MAINNET
+        ? 'https://rpc.mainnet.fastnear.com'
+        : 'https://rpc.testnet.fastnear.com',
+  }),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -44,9 +61,26 @@ const env = cleanEnv(process.env, {
   REDIS_SENTINEL_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_URLS: str({ default: '' }),
   REDIS_URL: url({ default: '' }),
+  // Comma-separated Origin/Referer allowlist enforced by the rpcOrigin
+  // middleware on the proxy routes. Empty allows same-origin/server callers.
+  RPC_ALLOWED_ORIGINS: str({ default: '' }),
+  // Window (seconds) for the dedicated per-IP proxy rate limiter.
+  RPC_RATELIMIT_DURATION: num({ default: 60 }),
+  // Per-IP request budget for the anonymous proxy within RPC_RATELIMIT_DURATION.
+  // Intentionally generous: a single explorer pageview fans out into many view
+  // calls, and shared NAT/CGNAT IPs carry many users. Real abuse is gated by
+  // Turnstile (Phase 2), so this is only a coarse anti-scraper backstop.
+  RPC_RATELIMIT_POINTS: num({ default: 1000 }),
+  // Phase-2 feature flag. When true the rpcSession middleware requires a valid
+  // session credential; when false it is a no-op (Phase-1 behaviour).
+  RPC_SESSION_ENFORCED: bool({ default: false }),
+  // HMAC secret used to sign/verify the short-lived (~30 min) RPC session.
+  RPC_SESSION_SECRET: str({ default: '' }),
   RPC_URL: str(),
   SENTRY_DSN: str({ default: '' }),
   TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
+  // Cloudflare Turnstile secret used by POST /v1/rpc/session to verify tokens.
+  TURNSTILE_SECRET_KEY: str({ default: '' }),
   // Hard ceiling on the buffered usage events; bounds memory if the
   // consumer stalls. ~500k events ≈ tens of MB. Set 0 to disable capture.
   USAGE_STREAM_MAXLEN: num({ default: 500_000 }),
@@ -82,6 +116,9 @@ const config: Config = {
   dbUrlStaking: env.DB_URL_STAKING,
   dbWriteUrlBase: env.DB_WRITE_URL_BASE,
   eventsStart,
+  fastnearArchivalRpcUrl: env.FASTNEAR_ARCHIVAL_RPC_URL,
+  fastnearRpcKey: env.FASTNEAR_RPC_KEY,
+  fastnearRpcUrl: env.FASTNEAR_RPC_URL,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryCount: 10000,
@@ -101,10 +138,16 @@ const config: Config = {
   redisSentinelPassword: env.REDIS_SENTINEL_PASSWORD,
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
+  rpcAllowedOrigins: env.RPC_ALLOWED_ORIGINS,
+  rpcRateLimitDuration: env.RPC_RATELIMIT_DURATION,
+  rpcRateLimitPoints: env.RPC_RATELIMIT_POINTS,
+  rpcSessionEnforced: env.RPC_SESSION_ENFORCED,
+  rpcSessionSecret: env.RPC_SESSION_SECRET,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
   stakingStart,
   testnetUrl: env.TESTNET_URL,
+  turnstileSecretKey: env.TURNSTILE_SECRET_KEY,
   usageStreamMaxLen: env.USAGE_STREAM_MAXLEN,
   usageStreamRedisPassword: env.USAGE_STREAM_REDIS_PASSWORD,
   usageStreamRedisUrl: env.USAGE_STREAM_REDIS_URL,

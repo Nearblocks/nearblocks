@@ -72,6 +72,19 @@ export const createSettingsStore = (
           if (error) {
             console.error('rehydration error', error);
           }
+          if (state) {
+            // Drop any stale keyed FastNear provider persisted before the proxy
+            // migration (its url carries `apiKey=`). deleteProvider nulls the
+            // selected provider so it falls back to the keyless proxy default.
+            const staleUrls = new Set<string>();
+            if (state.provider?.url.includes('apiKey=')) {
+              staleUrls.add(state.provider.url);
+            }
+            state.providers.forEach((p) => {
+              if (p.url.includes('apiKey=')) staleUrls.add(p.url);
+            });
+            staleUrls.forEach((url) => state.deleteProvider(url));
+          }
           state?.setHydrated(true);
         },
         partialize: (state) => ({

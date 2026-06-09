@@ -15,6 +15,17 @@ export const encodeArgs = (args: unknown) => {
   return Buffer.from(JSON.stringify(args)).toString('base64');
 };
 
+/**
+ * Build a NearRpcClient, attaching the proxy session credential as the
+ * `x-rpc-session` header when present. Immutable: a fresh client per call,
+ * no mutation of any shared instance.
+ */
+const createClient = (endpoint: string, sessionToken?: null | string) =>
+  new NearRpcClient({
+    endpoint,
+    headers: sessionToken ? { 'x-rpc-session': sessionToken } : undefined,
+  });
+
 export const viewFunction = async <T>(
   provider: Config['provider'],
   contract: string,
@@ -22,10 +33,9 @@ export const viewFunction = async <T>(
   args: unknown,
   finality?: Finality,
   blockId?: BlockId,
+  sessionToken?: null | string,
 ) => {
-  const client = new NearRpcClient({
-    endpoint: provider.url,
-  });
+  const client = createClient(provider.url, sessionToken);
 
   const data = await viewFunctionAsJson<T>(client, {
     accountId: contract,
@@ -42,8 +52,9 @@ export const txnStatus = async (
   provider: Config['provider'],
   txHash: string,
   senderAccountId: string,
+  sessionToken?: null | string,
 ): Promise<RpcTransactionResponse> => {
-  const client = new NearRpcClient({ endpoint: provider.url });
+  const client = createClient(provider.url, sessionToken);
 
   return experimentalTxStatus(client, {
     senderAccountId,

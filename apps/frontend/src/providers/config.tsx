@@ -5,6 +5,7 @@ import type { PropsWithChildren } from 'react';
 
 import { Config } from '@/lib/config';
 import { ConfigStore, createConfigStore } from '@/stores/config';
+import { createSessionStore, SessionStore } from '@/stores/session';
 import { createSettingsStore, SettingsStore } from '@/stores/settings';
 import { createWalletStore, WalletStore } from '@/stores/wallet';
 
@@ -13,6 +14,7 @@ type Props = PropsWithChildren<{
 }>;
 
 export const ConfigContext = createContext<ConfigStore | null>(null);
+export const SessionContext = createContext<null | SessionStore>(null);
 export const SettingsContext = createContext<null | SettingsStore>(null);
 export const WalletContext = createContext<null | WalletStore>(null);
 
@@ -20,6 +22,7 @@ import { useState } from 'react';
 
 export const ConfigProvider = ({ children, config }: Props) => {
   const [configStore] = useState(() => createConfigStore(config));
+  const [sessionStore] = useState(() => createSessionStore());
   const [settingsStore] = useState(() =>
     createSettingsStore(config.network, config.provider),
   );
@@ -35,11 +38,13 @@ export const ConfigProvider = ({ children, config }: Props) => {
 
   return (
     <ConfigContext.Provider value={configStore}>
-      <SettingsContext.Provider value={settingsStore}>
-        <WalletContext.Provider value={walletStore}>
-          {children}
-        </WalletContext.Provider>
-      </SettingsContext.Provider>
+      <SessionContext.Provider value={sessionStore}>
+        <SettingsContext.Provider value={settingsStore}>
+          <WalletContext.Provider value={walletStore}>
+            {children}
+          </WalletContext.Provider>
+        </SettingsContext.Provider>
+      </SessionContext.Provider>
     </ConfigContext.Provider>
   );
 };
