@@ -1,4 +1,4 @@
-CREATE MATERIALIZED VIEW mt_list AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS mt_list AS
 SELECT
   b.contract,
   b.token,
@@ -37,4 +37,4 @@ WHERE
   b.modified_at IS NOT NULL
   AND b.decimals IS NOT NULL;
 
-CREATE UNIQUE INDEX ON mt_list (contract, token);
+CREATE UNIQUE INDEX IF NOT EXISTS mt_list_contract_token_idx ON mt_list (contract, token);
