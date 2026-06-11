@@ -143,11 +143,6 @@ const rateLimiter = catchAsync(
           return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
         }
 
-        const now = dayjs.utc().toISOString();
-        const usageKey = `usage:${keyId}:${now.split('T')[0]}`;
-        await ratelimiterRedisClient.hincrby(usageKey, now, consumeCount);
-        await ratelimiterRedisClient.expire(usageKey, 60 * 60 * 24 * 31);
-
         await rateLimit.consume(tokenKey, consumeCount);
       }
     } catch (error) {
@@ -213,13 +208,6 @@ const useFreePlan = async (
       if (await isLimitReached(limiters, tokenKey, consumeCount)) {
         return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
       }
-
-      const [, keyId] = tokenKey.split('_');
-      const tokenKeyValue = parseInt(keyId, 10);
-      const now = dayjs.utc().toISOString();
-      const usageKey = `usage:${tokenKeyValue}:${now.split('T')[0]}`;
-      await ratelimiterRedisClient.hincrby(usageKey, now, consumeCount);
-      await ratelimiterRedisClient.expire(usageKey, 60 * 60 * 24 * 31);
 
       await rateLimit.consume(tokenKey, consumeCount);
     }
