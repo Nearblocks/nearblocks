@@ -160,9 +160,9 @@ export const ValidatorsTable = ({
             <TableBody>
               {loading
                 ? Array.from({ length: 25 }).map((_, i) => (
-                    <TableRow key={i}>
+                    <TableRow className="h-15" key={i}>
                       {Array.from({ length: 11 }).map((__, j) => (
-                        <TableCell className="h-22.5" key={j}>
+                        <TableCell key={j}>
                           <Skeleton className="h-5 w-full" />
                         </TableCell>
                       ))}
@@ -300,7 +300,7 @@ const ValidatorRows = ({
 
   return (
     <>
-      <TableRow>
+      <TableRow className="h-15">
         <TableCell>
           <button
             className="flex items-center justify-center p-1"
@@ -346,7 +346,7 @@ const ValidatorRows = ({
                 </Truncate>
               </Link>
               <Copy
-                className="text-muted-foreground"
+                className="h-5 text-muted-foreground"
                 size="icon-xs"
                 text={row.account_id}
               />
@@ -357,7 +357,7 @@ const ValidatorRows = ({
                   className="text-body-xs max-w-40 px-2"
                   text={row.public_key}
                 />
-                <TruncateCopy text={row.public_key} />
+                <TruncateCopy className="h-5" text={row.public_key} />
               </Truncate>
             )}
           </div>
@@ -376,14 +376,16 @@ const ValidatorRows = ({
           {row.own_stake_percent ? `${row.own_stake_percent}%` : ''}
         </TableCell>
         <TableCell>
-          <div className="bg-muted relative h-7 w-36 overflow-hidden rounded-xl">
-            <div
-              className="bg-link absolute inset-0 h-full"
-              style={{
-                width: `${row.cumulative_stake_percent ?? 0}%`,
-              }}
-            />
-            <span className="text-body-xs absolute inset-0 flex items-center justify-center font-medium text-white">
+          <div className="flex items-center gap-2">
+            <div className="bg-muted relative h-4 w-24 overflow-hidden rounded-full">
+              <div
+                className="bg-link absolute inset-y-0 left-0 rounded-full"
+                style={{
+                  width: `${row.cumulative_stake_percent ?? 0}%`,
+                }}
+              />
+            </div>
+            <span className="text-body-xs font-medium">
               {row.cumulative_stake_percent
                 ? `${row.cumulative_stake_percent}%`
                 : 'N/A'}
