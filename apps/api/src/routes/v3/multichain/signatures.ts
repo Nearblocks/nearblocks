@@ -15,6 +15,19 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/multichain/mpcs:
+   *   get:
+   *     summary: List MPC operators
+   *     tags:
+   *       - Multichain
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/mpcs', service.mpcs);
+
+  /**
+   * @openapi
    * /v3/multichain/signatures:
    *   get:
    *     summary: List multichain signature transactions

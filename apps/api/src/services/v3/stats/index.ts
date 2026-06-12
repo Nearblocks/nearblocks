@@ -1,6 +1,8 @@
 import type {
   DailyStats,
   DailyStatsReq,
+  SignerStats,
+  SignerStatsReq,
   Stats,
   TpsStats,
   TpsStatsReq,
@@ -36,6 +38,23 @@ const daily = responseHandler(
   },
 );
 
+const signer = responseHandler(
+  response.signer,
+  async (req: RequestValidator<SignerStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = req.validator.date
+      ? msToNsTime(new Date(`${req.validator.date}T00:00:00Z`).getTime())
+      : null;
+
+    const data = await dbBase.manyOrNone<SignerStats>(sql.signer, {
+      date,
+      limit,
+    });
+
+    return { data };
+  },
+);
+
 const tps = responseHandler(
   response.tps,
   async (req: RequestValidator<TpsStatsReq>) => {
@@ -46,4 +65,4 @@ const tps = responseHandler(
   },
 );
 
-export default { daily, stats, tps };
+export default { daily, signer, stats, tps };

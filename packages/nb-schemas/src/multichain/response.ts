@@ -4,6 +4,23 @@ import { DestinationChain } from 'nb-types';
 
 import { responseSchema } from '../common.js';
 
+const mpcParticipant = v.object({
+  account: v.string(),
+  public_key: v.string(),
+  url: v.string(),
+});
+
+const mpcParameters = v.object({
+  participants: v.array(mpcParticipant),
+  threshold: v.number(),
+});
+
+const mpcParametersResponse = responseSchema(mpcParameters);
+
+export type MCMpcParticipant = v.InferOutput<typeof mpcParticipant>;
+export type MCMpcParameters = v.InferOutput<typeof mpcParameters>;
+export type MCMpcParametersRes = v.InferOutput<typeof mpcParametersResponse>;
+
 const block = v.object({
   block_hash: v.optional(v.string()),
   block_height: v.optional(v.string()),
@@ -48,6 +65,7 @@ export type MCStatsRes = v.InferOutput<typeof statsResponse>;
 
 export default {
   count: txnCountResponse,
+  mpcState: mpcParametersResponse,
   stats: statsResponse,
   txns: txnsResponse,
 };

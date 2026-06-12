@@ -44,6 +44,13 @@ const dailyStats = v.object({
   txns: v.nullable(v.number()),
 });
 
+const signerStats = v.object({
+  date: v.string(),
+  gas_burnt: v.nullable(v.string()),
+  signers: v.nullable(v.number()),
+  txns: v.nullable(v.number()),
+});
+
 const shard = v.object({
   shard: v.number(),
   txns: v.number(),
@@ -57,18 +64,22 @@ const tpsStats = v.object({
 
 const statsResponse = responseSchema(stats);
 const dailyStatsResponse = responseSchema(v.array(dailyStats));
+const signerStatsResponse = responseSchema(v.array(signerStats));
 const tpsStatsResponse = responseSchema(v.array(tpsStats));
 
 export type Stats = v.InferOutput<typeof stats>;
 export type DailyStats = v.InferOutput<typeof dailyStats>;
+export type SignerStats = v.InferOutput<typeof signerStats>;
 export type TpsStats = v.InferOutput<typeof tpsStats>;
 
 export type StatsRes = v.InferOutput<typeof statsResponse>;
 export type DailyStatsRes = v.InferOutput<typeof dailyStatsResponse>;
+export type SignerStatsRes = v.InferOutput<typeof signerStatsResponse>;
 export type TpsStatsRes = v.InferOutput<typeof tpsStatsResponse>;
 
 export default {
   daily: dailyStatsResponse,
+  signer: signerStatsResponse,
   stats: statsResponse,
   tps: tpsStatsResponse,
 };

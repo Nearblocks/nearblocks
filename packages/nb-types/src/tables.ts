@@ -32,6 +32,8 @@ export interface TTables {
   execution_outcomes: ExecutionOutcome;
   ft_events: FTEvent;
   ft_meta: FTMeta;
+  ft_prices: FTPrice;
+  mt_prices: MTPrice;
   multichain_signatures: MultichainSignature;
   multichain_transactions: MultichainTransaction;
   nft_events: NFTEvent;
@@ -277,10 +279,24 @@ export type FTMeta = {
   website?: null | string;
 };
 
+export type FTPrice = {
+  contract: string;
+  date: string;
+  price: string;
+  source: string;
+};
+
 export type IntentsMeta = {
   contract: string;
   token: null | string;
   type: string;
+};
+
+export type MTPrice = {
+  date: string;
+  price: string;
+  source: string;
+  token: string;
 };
 
 export type MTEvent = {

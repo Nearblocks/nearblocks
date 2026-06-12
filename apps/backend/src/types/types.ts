@@ -134,6 +134,15 @@ export type CGPriceData = {
   volume_24h: null | string;
 };
 
+export type CGCoinItem = {
+  id: string;
+  name: string;
+  platforms?: Record<string, string>;
+  symbol: string;
+};
+
+export type CGTokenPrices = Record<string, { usd?: number }>;
+
 export type CMCMarketData = FTMarketData & {
   coinmarketcap_id: string;
 };
