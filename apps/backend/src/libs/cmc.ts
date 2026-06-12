@@ -31,6 +31,30 @@ const search = async (contract: string) => {
   }
 };
 
+const quotes = async (
+  ids: string[],
+): Promise<null | Record<string, null | string>> => {
+  try {
+    const resp = await axios.get<CMCQuote>(
+      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids.join(
+        ',',
+      )}`,
+      { headers: { 'X-CMC_PRO_API_KEY': config.cmcApiKey }, timeout: 60000 },
+    );
+
+    const data = resp?.data?.data ?? {};
+    const prices: Record<string, null | string> = {};
+
+    for (const id of Object.keys(data)) {
+      prices[id] = data[id]?.quote?.USD?.price ?? null;
+    }
+
+    return prices;
+  } catch (error) {
+    return null;
+  }
+};
+
 const getData = (id: string, info: CMCInfo, quote: CMCQuote): CMCMarketData => {
   return {
     change_24h: quote?.data?.[id]?.quote?.USD?.percent_change_24h ?? null,
@@ -49,4 +73,4 @@ const getData = (id: string, info: CMCInfo, quote: CMCQuote): CMCMarketData => {
   };
 };
 
-export default { search };
+export default { quotes, search };

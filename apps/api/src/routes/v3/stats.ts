@@ -53,6 +53,36 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/signer-stats:
+   *   get:
+   *     summary: Get daily signer statistics
+   *     tags:
+   *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  app.get(
+    '/signer-stats',
+    bearerAuth,
+    rateLimiter,
+    validate(request.signer),
+    service.signer,
+  );
+
+  /**
+   * @openapi
    * /v3/tps-stats:
    *   get:
    *     summary: Get transactions-per-second statistics

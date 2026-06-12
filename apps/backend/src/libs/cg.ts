@@ -3,7 +3,17 @@ import axios from 'axios';
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { CGInfo, CGMarketData, CGPriceData } from '#types/types';
+import { createCache } from '#libs/cache';
+import {
+  CGCoinItem,
+  CGInfo,
+  CGMarketData,
+  CGPriceData,
+  CGTokenPrices,
+} from '#types/types';
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const coinsCache = createCache<string[]>(ONE_DAY_MS);
 
 const search = async (contract: string) => {
   let address = contract;
@@ -77,6 +87,89 @@ const history = async (date: string) => {
   }
 };
 
+const coins = async (): Promise<null | string[]> => {
+  try {
+    const cached = coinsCache.get();
+    if (cached) return cached;
+
+    // Demo api
+    // const resp = await axios.get<CGCoinItem[]>(
+    //   `https://api.coingecko.com/api/v3/coins/list?include_platform=true`,
+    //   { headers: { 'x-cg-demo-api-key': config.cgApiKey }, timeout: 60000 },
+    // );
+    const resp = await axios.get<CGCoinItem[]>(
+      `https://pro-api.coingecko.com/api/v3/coins/list?include_platform=true`,
+      { headers: { 'x-cg-pro-api-key': config.cgApiKey }, timeout: 60000 },
+    );
+
+    const contracts = (resp.data ?? [])
+      .map((coin) => coin.platforms?.['near-protocol'])
+      .filter((contract): contract is string => !!contract);
+
+    if (contracts.length) {
+      coinsCache.set(contracts);
+      return contracts;
+    }
+
+    return null;
+  } catch (error) {
+    logger.error('tokenPrices: cg.coins');
+    logger.error(error);
+    return null;
+  }
+};
+
+const prices = async (
+  contracts: string[],
+  platform = 'near-protocol',
+): Promise<CGTokenPrices | null> => {
+  try {
+    // Demo api
+    // const resp = await axios.get<CGTokenPrices>(
+    //   `https://api.coingecko.com/api/v3/simple/token_price/${platform}?contract_addresses=${contracts.join(
+    //     ',',
+    //   )}&vs_currencies=usd`,
+    //   { headers: { 'x-cg-demo-api-key': config.cgApiKey }, timeout: 60000 },
+    // );
+    const resp = await axios.get<CGTokenPrices>(
+      `https://pro-api.coingecko.com/api/v3/simple/token_price/${platform}?contract_addresses=${contracts.join(
+        ',',
+      )}&vs_currencies=usd`,
+      { headers: { 'x-cg-pro-api-key': config.cgApiKey }, timeout: 60000 },
+    );
+
+    return resp.data ?? null;
+  } catch (error) {
+    logger.error('tokenPrices: cg.prices');
+    logger.error(error);
+    return null;
+  }
+};
+
+const ids = async (ids: string[]): Promise<CGTokenPrices | null> => {
+  try {
+    // Demo api
+    // const resp = await axios.get<CGTokenPrices>(
+    //   `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(
+    //     ',',
+    //   )}&vs_currencies=usd`,
+    //   { headers: { 'x-cg-demo-api-key': config.cgApiKey }, timeout: 60000 },
+    // );
+    const resp = await axios.get<CGTokenPrices>(
+      `https://pro-api.coingecko.com/api/v3/simple/price?ids=${ids.join(
+        ',',
+      )}&vs_currencies=usd`,
+      { headers: { 'x-cg-pro-api-key': config.cgApiKey }, timeout: 60000 },
+    );
+
+    return resp.data ?? null;
+  } catch (error) {
+    logger.error('tokenPrices: cg.ids');
+    logger.error(error);
+    return null;
+  }
+};
+
 const getData = (id: string, data: CGInfo): CGMarketData => {
   return {
     change_24h: data?.market_data?.price_change_percentage_24h ?? null,
@@ -105,4 +198,4 @@ const getPriceData = (data: CGInfo): CGPriceData => {
   };
 };
 
-export default { history, price, search };
+export default { coins, history, ids, price, prices, search };

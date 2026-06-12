@@ -44,15 +44,13 @@ export const syncMTPrice = async () => {
     bindings,
   );
 
-  const tokens = data.filter(
-    (t) => t.assetId && t.contractAddress && t.blockchain,
-  );
+  const tokens = data.filter((t) => t.assetId && t.blockchain);
 
   if (tokens.length) {
     const tokenValues = tokens.map(() => `(?, ?, ?, ?)`).join(',');
     const tokenBindings = tokens.flatMap((t) => [
       t.assetId,
-      t.contractAddress,
+      t.contractAddress ?? null,
       t.blockchain,
       t.decimals,
     ]);
