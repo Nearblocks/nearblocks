@@ -19,8 +19,9 @@ export class Redis {
     callback: () => Promise<T>,
     ttl: number,
   ): Promise<T> {
-    const prefixedKeys = this.prefixedKeys(key);
-    const value = await this.get(prefixedKeys);
+    // get/set prefix the key themselves — passing a pre-prefixed key here
+    // used to double-prefix every cache entry (prefix:prefix:key).
+    const value = await this.get(key);
 
     if (value) {
       return JSON.parse(value);
@@ -29,7 +30,7 @@ export class Redis {
     const data = await callback();
 
     if (data) {
-      await this.set(prefixedKeys, JSON.stringify(data), ttl);
+      await this.set(key, JSON.stringify(data), ttl);
     }
 
     return data;
