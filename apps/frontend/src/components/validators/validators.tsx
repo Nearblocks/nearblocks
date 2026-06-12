@@ -298,6 +298,12 @@ const ValidatorRows = ({
 
   const socialMedia = row.twitter || row.discord || row.github || row.telegram;
 
+  const cumulativeLabel = row.cumulative_stake_percent
+    ? `${row.cumulative_stake_percent}%`
+    : 'N/A';
+
+  const location = [row.city, row.country].filter(Boolean).join(', ');
+
   return (
     <>
       <TableRow className="h-15">
@@ -346,7 +352,7 @@ const ValidatorRows = ({
                 </Truncate>
               </Link>
               <Copy
-                className="h-5 text-muted-foreground"
+                className="text-muted-foreground h-5"
                 size="icon-xs"
                 text={row.account_id}
               />
@@ -354,7 +360,7 @@ const ValidatorRows = ({
             {row.public_key && (
               <Truncate>
                 <TruncateText
-                  className="text-body-xs max-w-40 px-2"
+                  className="text-body-xs max-w-40"
                   text={row.public_key}
                 />
                 <TruncateCopy className="h-5" text={row.public_key} />
@@ -376,20 +382,20 @@ const ValidatorRows = ({
           {row.own_stake_percent ? `${row.own_stake_percent}%` : ''}
         </TableCell>
         <TableCell>
-          <div className="flex items-center gap-2">
-            <div className="bg-muted relative h-4 w-24 overflow-hidden rounded-full">
-              <div
-                className="bg-link absolute inset-y-0 left-0 rounded-full"
-                style={{
-                  width: `${row.cumulative_stake_percent ?? 0}%`,
-                }}
-              />
-            </div>
-            <span className="text-body-xs font-medium">
-              {row.cumulative_stake_percent
-                ? `${row.cumulative_stake_percent}%`
-                : 'N/A'}
+          <div className="bg-muted relative h-7 w-40 overflow-hidden rounded-full">
+            <span className="text-body-xs text-foreground absolute inset-0 flex items-center justify-center font-medium">
+              {cumulativeLabel}
             </span>
+            <div
+              className="absolute inset-y-0 left-0 overflow-hidden rounded-full"
+              style={{
+                width: `${row.cumulative_stake_percent ?? 0}%`,
+              }}
+            >
+              <div className="bg-link text-body-xs text-background absolute inset-y-0 left-0 flex w-40 items-center justify-center font-medium">
+                {cumulativeLabel}
+              </div>
+            </div>
           </div>
         </TableCell>
         <TableCell>
@@ -414,17 +420,25 @@ const ValidatorRows = ({
 
       {isExpanded && (
         <>
-          {productivityRatio !== null && (
+          {(productivityRatio !== null || location) && (
             <TableRow className="bg-muted/40 hover:bg-muted/40">
-              <TableCell className="py-2 pl-8 align-top" colSpan={11}>
+              <TableCell className="py-2 pl-8 align-top" colSpan={3}>
                 <div className="text-muted-foreground text-headline-xs uppercase">
                   {t('table.expanded.uptime')}
                 </div>
                 <div className="text-body-xs mt-1">
-                  {productivityRatio * 100 === 100
-                    ? '100%'
-                    : `${(productivityRatio * 100).toFixed(3)}%`}
+                  {productivityRatio !== null
+                    ? productivityRatio * 100 === 100
+                      ? '100%'
+                      : `${(productivityRatio * 100).toFixed(3)}%`
+                    : '-'}
                 </div>
+              </TableCell>
+              <TableCell className="px-3 py-2 align-top" colSpan={8}>
+                <div className="text-muted-foreground text-headline-xs uppercase">
+                  {t('table.columns.location')}
+                </div>
+                <div className="text-body-xs mt-1">{location || '-'}</div>
               </TableCell>
             </TableRow>
           )}
@@ -442,7 +456,19 @@ const ValidatorRows = ({
                 <div className="text-muted-foreground text-headline-xs uppercase">
                   {t('table.expanded.name')}
                 </div>
-                <div className="text-body-sm mt-2">{row.name ?? '-'}</div>
+                <div className="text-body-sm mt-2 flex items-center gap-1.5">
+                  {row.logo && row.logo.startsWith('http') && (
+                    <Image
+                      alt={row.name ?? 'logo'}
+                      className="rounded-sm"
+                      height={20}
+                      src={row.logo}
+                      unoptimized
+                      width={20}
+                    />
+                  )}
+                  <span>{row.name ?? '-'}</span>
+                </div>
               </TableCell>
               <TableCell
                 className="p-3 align-top whitespace-normal"
