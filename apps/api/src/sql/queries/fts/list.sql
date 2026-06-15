@@ -10,7 +10,9 @@ SELECT
   onchain_market_cap,
   change_24h,
   market_cap,
-  volume_24h
+  volume_24h,
+  holders,
+  transfers
 FROM
   ft_list
 WHERE

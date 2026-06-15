@@ -8,7 +8,15 @@ const list = z.object({
   per_page: z.number().int().positive().max(50).optional().default(50),
   search: z.string().optional(),
   sort: z
-    .enum(['price', 'change', 'volume', 'market_cap', 'onchain_market_cap'])
+    .enum([
+      'price',
+      'change',
+      'volume',
+      'market_cap',
+      'onchain_market_cap',
+      'holders',
+      'transfers',
+    ])
     .optional()
     .default('onchain_market_cap'),
 });

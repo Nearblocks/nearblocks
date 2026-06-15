@@ -6,7 +6,6 @@ import config from '#config';
 import cg from '#libs/cg';
 import dayjs from '#libs/dayjs';
 import { dbEvents } from '#libs/knex';
-import ref from '#libs/ref';
 import { MetaContract, Raw } from '#types/types';
 
 const BATCH_SIZE = 125;
@@ -61,30 +60,6 @@ export const syncFTPrices = async () => {
           date,
           price: String(usd),
           source: 'coingecko',
-        });
-      }
-    }
-  }
-
-  const [whitelist, refData] = await Promise.all([
-    ref.whitelist(),
-    ref.price(),
-  ]);
-
-  if (whitelist?.length && refData) {
-    const whitelistSet = new Set(whitelist);
-
-    for (const contract of Object.keys(refData)) {
-      if (
-        contracts.has(contract) &&
-        whitelistSet.has(contract) &&
-        !prices.has(contract)
-      ) {
-        prices.set(contract, {
-          contract,
-          date,
-          price: refData[contract].price,
-          source: 'ref',
         });
       }
     }

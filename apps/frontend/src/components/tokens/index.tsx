@@ -15,7 +15,6 @@ import {
   currencyFormat,
   isApproxCount,
   numberFormat,
-  toTokenAmount,
 } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
@@ -111,11 +110,10 @@ export const Tokens = ({
     },
     {
       cell: (token) => {
-        if (!token.total_supply || token.decimals == null)
-          return <span>N/A</span>;
+        if (!token.total_supply) return <span>N/A</span>;
         return (
           <span>
-            {numberFormat(toTokenAmount(token.total_supply, token.decimals), {
+            {numberFormat(token.total_supply, {
               maximumFractionDigits: 0,
             })}
           </span>
