@@ -17,6 +17,10 @@ const orderBy = (sort: string) => {
       return 'volume_24h';
     case 'market_cap':
       return 'market_cap';
+    case 'holders':
+      return 'holders';
+    case 'transfers':
+      return 'transfers';
     default:
       return 'onchain_market_cap';
   }
@@ -72,7 +76,7 @@ const count = catchAsync(
       SELECT
         COUNT(contract)
       FROM
-        ft_meta
+        ft_list
       WHERE
         ${search
         ? sql`

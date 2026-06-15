@@ -9,7 +9,6 @@ import cg from '#libs/cg';
 import cmc from '#libs/cmc';
 import dayjs from '#libs/dayjs';
 import { dbEvents } from '#libs/knex';
-import ref from '#libs/ref';
 import { MetaContract, Raw } from '#types/types';
 
 const BATCH_SIZE = 25;
@@ -117,25 +116,6 @@ export const syncFTPrice = async () => {
         for (const contract of cmcIds.get(id) ?? []) {
           prices.set(contract, String(price));
         }
-      }
-    }
-  }
-
-  const [whitelist, refData] = await Promise.all([
-    ref.whitelist(),
-    ref.price(),
-  ]);
-
-  if (whitelist?.length && refData) {
-    const whitelistSet = new Set(whitelist);
-
-    for (const contract of Object.keys(refData)) {
-      if (
-        contracts.has(contract) &&
-        whitelistSet.has(contract) &&
-        !prices.has(contract)
-      ) {
-        prices.set(contract, refData[contract].price);
       }
     }
   }
