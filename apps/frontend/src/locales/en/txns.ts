@@ -135,6 +135,7 @@ export const txns = {
     overview: 'Overview',
     receipts: 'Receipts Summary',
     title: 'Transaction Details',
+    tree: 'Tree Plan',
   },
   tidMeta: {
     description: 'NEAR Blockchain detailed info for transaction {{tid}}.',

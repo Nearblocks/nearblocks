@@ -61,10 +61,7 @@ SELECT
   COUNT(*) FILTER (
     WHERE
       delta_amount > 0
-      OR (
-        delta_amount < 0
-        AND cause = 'BURN'
-      )
+      AND cause = 'TRANSFER'
   ) AS transfers,
   COUNT(DISTINCT token_id) AS tokens,
   COUNT(DISTINCT blockchain) AS chains,

@@ -31,7 +31,7 @@ type SectionProps = {
   receipt: TxnReceipt;
 };
 
-const actionVariant = (action: ActionKind) => {
+export const actionVariant = (action: ActionKind) => {
   switch (action) {
     case ActionKind.ADD_KEY:
     case ActionKind.CREATE_ACCOUNT:

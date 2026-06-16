@@ -19,9 +19,10 @@ const key = v.object({
   account_id: v.string(),
 });
 
-// const mt = v.object({
-//   contract: v.string(),
-// });
+const mt = v.object({
+  contract: v.string(),
+  token: v.string(),
+});
 
 const nft = v.object({
   contract: v.string(),
@@ -41,7 +42,7 @@ const search = v.object({
   blocks: v.array(block),
   fts: v.array(ft),
   keys: v.array(key),
-  // mts: v.array(mt),
+  mts: v.array(mt),
   nfts: v.array(nft),
   receipts: v.array(receipt),
   txns: v.array(txn),
@@ -51,7 +52,7 @@ const accountResponse = responseSchema(v.array(account));
 const blockResponse = responseSchema(v.array(block));
 const ftResponse = responseSchema(v.array(ft));
 const keyResponse = responseSchema(v.array(key));
-// const mtResponse = responseSchema(v.array(mt));
+const mtResponse = responseSchema(v.array(mt));
 const nftResponse = responseSchema(v.array(nft));
 const receiptResponse = responseSchema(v.array(receipt));
 const txnResponse = responseSchema(v.array(txn));
@@ -61,7 +62,7 @@ export type SearchAccount = v.InferOutput<typeof account>;
 export type SearchBlock = v.InferOutput<typeof block>;
 export type SearchFT = v.InferOutput<typeof ft>;
 export type SearchKey = v.InferOutput<typeof key>;
-// export type SearchMT = v.InferOutput<typeof mt>;
+export type SearchMT = v.InferOutput<typeof mt>;
 export type SearchNFT = v.InferOutput<typeof nft>;
 export type SearchReceipt = v.InferOutput<typeof receipt>;
 export type SearchTxn = v.InferOutput<typeof txn>;
@@ -71,7 +72,7 @@ export type SearchAccountRes = v.InferOutput<typeof accountResponse>;
 export type SearchBlockRes = v.InferOutput<typeof blockResponse>;
 export type SearchFTRes = v.InferOutput<typeof ftResponse>;
 export type SearchKeyRes = v.InferOutput<typeof keyResponse>;
-// export type SearchMTRes = v.InferOutput<typeof mtResponse>;
+export type SearchMTRes = v.InferOutput<typeof mtResponse>;
 export type SearchNFTRes = v.InferOutput<typeof nftResponse>;
 export type SearchReceiptRes = v.InferOutput<typeof receiptResponse>;
 export type SearchTxnRes = v.InferOutput<typeof txnResponse>;
@@ -82,7 +83,7 @@ export default {
   blocks: blockResponse,
   fts: ftResponse,
   keys: keyResponse,
-  // mts: mtResponse,
+  mts: mtResponse,
   nfts: nftResponse,
   receipts: receiptResponse,
   search: searchResponse,

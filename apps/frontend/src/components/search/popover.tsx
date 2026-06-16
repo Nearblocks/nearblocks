@@ -8,7 +8,7 @@ import { Search } from 'nb-schemas';
 import { useLocale } from '@/hooks/use-locale';
 import type { HistoryEntry } from '@/hooks/use-search-history';
 import { initialResults, searchKeyword } from '@/lib/search';
-import { cn } from '@/lib/utils';
+import { cn, encodeToken } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
 import { Popover, PopoverAnchor, PopoverContent } from '@/ui/popover';
@@ -85,6 +85,7 @@ export const SearchPopover = ({
               (resp.accounts.length > 0 ||
                 resp.blocks.length > 0 ||
                 resp.fts.length > 0 ||
+                resp.mts.length > 0 ||
                 resp.txns.length > 0),
           );
         } catch (error) {
@@ -110,6 +111,7 @@ export const SearchPopover = ({
         (results.accounts.length > 0 ||
           results.blocks.length > 0 ||
           results.fts.length > 0 ||
+          results.mts.length > 0 ||
           results.txns.length > 0),
     );
   };
@@ -119,6 +121,7 @@ export const SearchPopover = ({
     (results.accounts.length > 0 ||
       results.blocks.length > 0 ||
       results.fts.length > 0 ||
+      results.mts.length > 0 ||
       results.txns.length > 0);
 
   return (
@@ -239,6 +242,30 @@ export const SearchPopover = ({
                 {ft.contract}
               </SearchLink>
             ))}
+          </SearchItem>
+        )}
+        {results && results.mts.length > 0 && (
+          <SearchItem title={t('search.mtTokens')}>
+            {results.mts.map((mt) => {
+              const href = `/mt-tokens/${mt.contract}/tokens/ft/${encodeToken(
+                mt.token,
+              )}`;
+              return (
+                <SearchLink
+                  href={href}
+                  key={`${mt.contract}:${mt.token}`}
+                  onClick={() =>
+                    addToHistory({
+                      href,
+                      label: mt.token,
+                      type: 'token',
+                    })
+                  }
+                >
+                  {mt.token} ({mt.contract})
+                </SearchLink>
+              );
+            })}
           </SearchItem>
         )}
         {results && results.txns.length > 0 && (
