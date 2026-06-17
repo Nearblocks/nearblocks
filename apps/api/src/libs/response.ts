@@ -1,3 +1,5 @@
+import pgPromise from 'pg-promise';
+
 import cursors, { CursorObject } from '#libs/cursors';
 
 export type WindowListQuery<T> = (
@@ -57,6 +59,48 @@ export const countFromCagg = async (
 
   if (!Number.isFinite(value) || value >= limit) {
     return approximateCount(count);
+  }
+
+  return cappedCount(await exactCount(), limit);
+};
+
+/**
+ * Approximate count for tables that have no count continuous-aggregate.
+ *
+ * Runs a cheap query-planner estimate (`count_cost_estimate` → EXPLAIN) over
+ * the full filtered range. When the query is both expensive and large
+ * (cost > maxCost and rows > maxRows) it returns the rounded estimate as an
+ * approximate count, avoiding a flat "limit+"; otherwise it falls back to the
+ * exact count, capped at `limit`. `count_cost_estimate` must exist in the same
+ * database as `db`, and `query` must be a bare `SELECT 1 FROM ... WHERE ...`
+ * (no LIMIT) so the planner's top-node row estimate reflects the match count.
+ */
+export const countFromEstimate = async (options: {
+  db: { one: <T>(query: string, values?: unknown) => Promise<T> };
+  exactCount: () => Promise<number | string>;
+  limit: number;
+  maxCost: number;
+  maxRows: number;
+  query: pgPromise.QueryFile;
+  values: object;
+}): Promise<string> => {
+  const { db, exactCount, limit, maxCost, maxRows, query, values } = options;
+
+  const estimateQuery = pgPromise.as.format(query, values);
+  const { cost, count } = await db.one<{ cost: string; count: string }>(
+    'SELECT count, cost FROM count_cost_estimate($1)',
+    [estimateQuery],
+  );
+  const estCount = Number(count);
+  const estCost = Number(cost);
+
+  if (
+    Number.isFinite(estCount) &&
+    Number.isFinite(estCost) &&
+    estCost > maxCost &&
+    estCount > maxRows
+  ) {
+    return approximateCount(Math.round(estCount));
   }
 
   return cappedCount(await exactCount(), limit);
