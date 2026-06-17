@@ -76,13 +76,12 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                           <Skeleton className="w-20" />
                         </p>
                       </div>
-                      <Badge
-                        className="text-body-xs hidden h-6 @lg:ml-auto @lg:inline-flex"
-                        variant="teal"
-                      >
-                        <Fuel />
-                        <Skeleton className="w-15" />
-                      </Badge>
+                      <div className="hidden @lg:flex @lg:w-32 @lg:shrink-0 @lg:justify-end">
+                        <Badge className="text-body-xs h-6" variant="teal">
+                          <Fuel />
+                          <Skeleton className="w-15" />
+                        </Badge>
+                      </div>
                     </div>
                     {i != 9 && <Separator className="my-2.5" />}
                   </Fragment>
@@ -138,13 +137,12 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                             {block.transactions_agg.count} {t('blocks.txns')}
                           </p>
                         </div>
-                        <Badge
-                          className="text-body-xs hidden h-6 @lg:ml-auto @lg:inline-flex"
-                          variant="teal"
-                        >
-                          <Fuel />
-                          {tgas}
-                        </Badge>
+                        <div className="hidden @lg:flex @lg:w-32 @lg:shrink-0 @lg:justify-end">
+                          <Badge className="text-body-xs h-6" variant="teal">
+                            <Fuel />
+                            {tgas}
+                          </Badge>
+                        </div>
                       </div>
                       {blocks.length != i + 1 && (
                         <Separator className="my-2.5" />
