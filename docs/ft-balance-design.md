@@ -63,18 +63,26 @@ bytes `ft_balance_of` reads. So it is authoritative and strictly better than the
 sum: storage is ground truth and self-heals (each write overwrites the slot), where an
 event sum drifts forever.
 
-> **Prefix-pinning is mandatory — not optional (the C1 finding).** A standard FT contract
-> has _several_ `AccountId`-keyed maps besides balances: `storage_deposit` balances,
-> staking/locked/vesting amounts, ERC-20-style allowances. A sibling
-> `LookupMap<AccountId, u128>` (e.g. `locked[alice] = 500`) is byte-indistinguishable from
-> the balance map if we scan-and-discard the prefix — it would decode to
-> `(contract, alice, 500)` and **silently overwrite alice's real balance**. The 32-byte
-> `StorageBalance` struct is filtered by the 16-byte value guard, but a sibling u128 map is
-> not. Therefore the **exploratory** scanner (used only by the proof script to _discover_
-> the balance prefix) MUST NOT be the production decoder. Calibration (§5) records the
-> **exact verified balance-map key prefix per contract**, and the production indexer
-> decodes **only** `data_update`s whose key begins with that pinned prefix. Every other
-> AccountId-keyed slot is ignored. Without this, the design ships silently-wrong balances.
+> **Prefix-pinning is mandatory — and `startsWith` is NOT enough (C1 + round-2 NEW-C2).**
+> A standard FT contract has _several_ `AccountId`-keyed maps besides balances:
+> `storage_deposit` balances, staking/locked/vesting amounts, ERC-20-style allowances. A
+> sibling `LookupMap<AccountId, u128>` (e.g. `locked[alice] = 500`) is byte-indistinguishable
+> from the balance map if we scan-and-discard the prefix — it would decode to
+> `(contract, alice, 500)` and **silently overwrite alice's real balance**. Two traps:
+>
+> 1. The **exploratory forward-scan** (used only by the proof/measurement scripts to
+>    _discover_ a prefix) MUST NOT be the production decoder — it tries every offset and will
+>    happily skip extra bytes to find an account tail.
+> 2. **`key.startsWith(prefix)` is insufficient.** If balances pin at `[0x02]` and a sibling
+>    map sits at `[0x02, 0x07]` (nested enum / longer manual prefix), its keys _start with_ > `0x02` and a loose scan decodes them as balances.
+>
+> **Production rule — exact-offset parse.** Calibration records the exact prefix **length L**
+> (computed from a known account: `L = keyLen − (4 + len(account))`). The production decoder
+> accepts a slot **only if**, rooted exactly at byte L, the remaining bytes are _exactly_ > `borsh(account)` = `<u32-LE len><utf8>` with **no leftover** (`L + 4 + len == keyLen`) and
+> value is 16 bytes. No scan, no skip. A `[0x02,0x07]` sibling fails this (offset L=1 doesn't
+> yield a valid account), so it's rejected. The 32-byte `StorageBalance` struct is already
+> filtered by the 16-byte value guard. Without exact-offset pinning, the design ships
+> silently-wrong balances.
 
 **Last-write-wins per (contract, account) within a block is mandatory.** An account can be
 written by several receipts in one block; only the _final_ write equals `ft_balance_of` at
@@ -209,34 +217,62 @@ separate resolver does the read):
 
 ```
 # hot path — in the indexer, per block, NO network:
-on data_update for (contract, account, key):
-    verdict = calibration.get(codeIdentity(contract))
-    if verdict == standard and key.startsWith(verdict.prefix):
-        upsert balance = decode(change)              # inline, fast, 0 RPC
-    elif verdict in (non_standard, uncalibrated):
-        enqueue Task{contract, account, block_height}  # a row in ft_balance_tasks; keep moving
+on data_update for (contract, account, key) at block_height, shard, idx:
+    verdict = calibration.get(codeIdentity(contract, at=block_height))   # height-aware (NEW-H3)
+    if verdict == standard
+       and verdict.verifiedThroughHeight >= block_height                 # cross-stream guard
+       and exactPrefixParse(key, verdict.prefix) == account:             # exact, not startsWith (NEW-C2)
+        monotonicUpsert(contract, account, decode(change), block_height, shard, idx)  # 0 RPC
+    elif verdict in (non_standard, uncalibrated) or unknownDeployStatus(contract, block_height):
+        enqueue Task{contract, account, block_height}   # ft_balance_tasks; keep moving
     elif verdict == not_ft:
         skip
-    # (standard but non-pinned-prefix slot) -> ignore: it's a sibling map, not a balance
+    # standard but key fails exact parse -> ignore: sibling map, not a balance
+
+on data_deletion for a pinned-prefix balance slot:
+    monotonicUpsert(contract, account, 0, block_height, shard, idx)      # same path, not a side path (NEW-M4)
+
+# monotonic upsert — the ONLY writer primitive, used by BOTH the hot path and the resolver:
+#   ON CONFLICT (contract,account) DO UPDATE
+#     SET amount=excluded.amount, block_height=excluded.block_height, shard=…, idx=…
+#     WHERE (excluded.block_height, excluded.shard, excluded.idx)
+#         >= (ft_holders_v2.block_height, ft_holders_v2.shard, ft_holders_v2.idx)
+#   -> a stale resolver write can NEVER clobber a newer inline write (NEW-C1); the
+#      (height,shard,idx) tuple also resolves intra-block last-write (C2).
 
 # resolver — separate worker, out of band, batched & rate-limited:
-drain ft_balance_tasks -> group by block -> batched ft_balance_of (archival RPC)
-    -> write balances (eventually consistent) -> on uncalibrated, run calibration & set verdict
+drain ft_balance_tasks (NEWEST block first) -> group by block -> batched ft_balance_of (archival)
+    -> monotonicUpsert(...) -> on uncalibrated, run calibration & set verdict
+    -> dead-letter tasks whose block_height is older than archival retention (NEW-H4)
 ```
 
-The tip never waits on RPC: standard tokens (the majority) resolve inline at chain speed;
-non-standard/new tokens get **eventually-consistent** balances from the resolver, which is
-acceptable because they're the minority and a few seconds of lag on them is fine.
+The tip never waits on RPC: standard tokens resolve inline at chain speed; non-standard/new
+tokens get **eventually-consistent** balances from the resolver.
 
-Safety properties:
+Safety properties (with round-2 fixes):
 
-- **Default is the safe path, never a guessed decode.** Unknown ⇒ `uncalibrated` ⇒ queued
-  for RPC, never written from an unverified decode. A delayed fallback costs latency; a
-  wrong decode corrupts forever — the asymmetry is deliberate.
-- **The flag is earned, and pinned.** `standard` is set only after byte-exact matches
-  against the contract's own `ft_balance_of`, and authorizes **only** the verified prefix.
-- **Re-calibration guard.** Periodically re-verify a `standard` code's pinned decode vs
-  RPC; on mismatch, demote and alert. A redeploy changes `code_hash` ⇒ forced re-calibrate.
+- **Monotonic writes (NEW-C1).** Both writers go through `monotonicUpsert`; a later
+  `(block_height, shard, idx)` always wins, so the async resolver can't overwrite a newer
+  inline value with a stale historical read. This also subsumes C2 (intra-block ordering)
+  and M2 (re-orgs reconcile forward).
+- **Exact-prefix parse (NEW-C2).** `standard` authorizes only slots that parse _exactly_ at
+  the pinned offset — `startsWith` is not used. Sibling maps that merely share a prefix are
+  rejected.
+- **Cross-stream height guard (NEW-H3).** `indexer-ft-balance` and `indexer-contract` have
+  independent cursors. A `standard` verdict is trusted only up to the height its code
+  identity is confirmed through; if ft-balance runs ahead of the contract indexer (or a
+  deploy sits unprocessed in the window), the contract is treated as `uncalibrated` (RPC
+  path), never decoded under a possibly-stale prefix. Closes the redeploy race.
+- **Default is the safe path, never a guessed decode.** Unknown ⇒ `uncalibrated` ⇒ queued.
+- **Re-calibration guard.** Re-verify a `standard` code's pinned decode vs RPC on a sampled
+  cadence; on mismatch, demote (and §10's re-resolve). A redeploy changes `code_hash` ⇒
+  forced re-calibrate; the height guard covers the window before we notice.
+
+**Calibration picks the prefix rigorously (NEW-C2).** From a known account in a verified
+slot, compute the exact prefix length `L = keyLen − (4 + len(account))` — we don't guess it
+by scanning. Then require **all** of several sampled accounts to match `ft_balance_of`,
+preferring accounts with **non-zero, distinct** balances (zero-balance or balance==sibling
+accounts can spuriously match the wrong map). Zero DIFFs required, not a majority.
 
 ---
 
@@ -406,44 +442,56 @@ Three validation layers, cheap to strong:
 1. **Per-touch (free).** For `standard` tokens nothing is needed — the decoded value _is_
    `ft_balance_of`'s source. The risk isn't the value, it's decoding the _wrong slot_
    (C1) — handled structurally by prefix-pinning.
-2. **Total-supply invariant (strong, ~1 RPC per contract).** For a well-behaved NEP-141,
-   `SUM(all holder balances) == ft_total_supply`. We hold all holders in `ft_holders_v2`, so
-   periodically `SELECT SUM(amount) FROM ft_holders_v2 WHERE contract = X` vs RPC
-   `ft_total_supply(X)`. A match validates the **entire** contract's balance set at once;
-   a mismatch means either a sibling map leaked in (sum **>** supply → C1) or we missed
-   slots (sum **<** supply → gap). This is the single most powerful check and it costs one
-   RPC + one aggregate per contract. (Caveat: a few contracts intentionally keep
-   `total_supply` decoupled from the holder sum — burns, locked reserves — so treat a
-   mismatch as _investigate/alert_, and allow a per-contract "supply invariant N/A" flag.)
-3. **Random-sample audit (cheap, continuous).** Periodically pick random decoded
-   `(contract, account)` pairs and diff vs `ft_balance_of` at a recent block. Drift alarm +
-   auto-demote the code identity to `non_standard` on mismatch.
+2. **Total-supply invariant — an ALERT, not a gate (downgraded per round-2 NEW-H2).**
+   `SUM(ft_holders_v2 where contract=X) == ft_total_supply(X)` is a cheap whole-contract
+   smoke test (1 RPC + 1 aggregate), but it is **not** trustworthy enough to auto-quarantine
+   on its own:
 
-Plus the structural triggers: a **redeploy** changes `code_hash` ⇒ forced re-calibration;
-a `view_state` reconcile on backfill cross-checks the whole map.
+   - **False positives are common, on exactly the high-value contracts:** rebasing tokens
+     (stNEAR/LiNEAR-style), fee-on-transfer, locked treasury/reserves excluded from
+     `ft_balance_of`, and contracts where `total_supply` is a stored counter that drifts. So
+     "N/A this contract" would disable the check where C1 is most likely.
+   - **It can miss the corruption it's sold to catch:** an exact-prefix-pinned design (§2)
+     shouldn't admit sibling writes at all, but if one slipped through, an _overwrite_ of an
+     existing holder can land on either side of supply or within tolerance — the
+     `sum>supply ⇒ C1, sum<supply ⇒ gap` dichotomy is false.
+   - **Mid-backfill the sum is incomplete** → spurious `sum<supply`; only run once the
+     contract's `coverage_complete` flag is set (backfill seed + forward-decode caught up).
+
+   So: use it as an **alert-only signal**; never demote on it alone — require the
+   random-sample audit (layer 3) to **corroborate** before any action.
+
+3. **Random-sample audit (cheap, continuous) — the real gate.** Periodically diff random
+   decoded `(contract, account)` pairs vs `ft_balance_of` at a recent (non-GC'd) block.
+   This is the trustworthy automated demotion trigger; the supply invariant only escalates
+   _which_ contracts to sample harder.
+
+Plus the structural triggers: a **redeploy** changes `code_hash` ⇒ forced re-calibration
+(and the §5 height guard covers the window before we notice); on backfill, a per-prefix
+`view_state` reconcile where the node permits it.
 
 **Cadence (tie work to risk, not a fixed clock):**
 
-- _Supply invariant_ — **event-driven + swept.** Re-run for a contract when its holder set
-  has changed since the last check, debounced to at most once per ~N minutes per contract;
-  plus a **daily full sweep** of all `standard` contracts (one RPC + one aggregate each —
-  cheap even at thousands of contracts). New/high-volume contracts get checked sooner.
-- _Random-sample_ — a continuous low background rate (e.g. a few hundred pairs/min across
-  the whole corpus); weight sampling toward high-balance accounts and recently-calibrated
-  code (highest blast radius).
+- _Supply invariant_ — **event-driven, plus a sampled rotation.** Re-run for a contract when
+  its holder set changed, debounced per contract. **No unconditional daily full sweep**
+  (NEW-M6): NEAR mainnet has on the order of _tens of thousands_ of FT contracts, and a
+  daily archival RPC + full `SUM` over million-row holder tables is real, poorly-spent cost
+  for a weak signal. Sweep changed contracts + a rotating sample of the quiet tail.
+- _Random-sample_ — continuous low background rate; weight toward high-balance accounts and
+  recently-calibrated code (highest blast radius).
 - _Re-calibration_ — immediate on `code_hash` change; otherwise lazy.
 
 **Action on a failed audit — fail safe, never serve a suspect decode:**
 
-1. **Quarantine** the affected code identity (or single contract): set `non_standard` so the
-   indexer stops trusting its decode immediately.
-2. **Fall back to RPC** for that contract's balances (the §5 resolver path), so reads stay
-   correct (eventually-consistent) while we investigate.
-3. **Alert** a human with the evidence (decoded sum vs supply, or the mismatched pair).
-4. **Re-derive / re-calibrate**: sum **>** supply ⇒ likely a sibling-map prefix leak →
-   re-find the correct prefix; sum **<** supply ⇒ coverage gap → `view_state` reconcile.
-5. Only return the code identity to `standard` after a clean re-calibration. The bias is
-   deliberate: a false demotion costs RPC; a missed corruption costs wrong balances.
+1. **Quarantine** the code identity (or single contract): set `non_standard`; the indexer
+   stops trusting its decode immediately.
+2. **Re-resolve, don't just stop (NEW-M1).** Balances written while `standard` are now
+   suspect. Enqueue resolver tasks for **all current holders** of the contract (mark them
+   stale), not only future touches — otherwise dormant accounts serve wrong balances forever.
+3. **Fall back to RPC** for that contract going forward (the §5 resolver path).
+4. **Alert** a human with the evidence (sample mismatch; supply delta as context).
+5. **Re-derive / re-calibrate** the exact prefix; **only** return to `standard` after a clean
+   re-calibration. A false demotion costs RPC; a missed corruption costs wrong balances.
 
 **Plan for non-standard tokens' balances — yes, RPC into our own cache (this is exactly
 what fastNEAR does, applied only to the minority).** For a `non_standard` contract we can't
@@ -540,47 +588,75 @@ MT contract as lower-priority per-contract fingerprinting, and accept that a tru
 `sha256(token_id)` layout is RPC-only for `token_id`. NEP-171 NFTs are ownership, not
 balances (`nft_holders`) — separate model, out of scope.
 
+- **Same exact-parse + multi-sample discipline as FT (NEW-M5).** The two-string parse has
+  the identical loose-scan exposure, so pin the exact offsets and require multiple non-trivial
+  samples to match `mt_balance_of`. **Do not trust the `0x02` discriminant across
+  contract-tools versions** — it's an enum ordinal that a version bump can shift; pin the
+  discriminant region's bytes per code identity, and a `0x01` Token-record slot that happens
+  to be 16 bytes must be rejected by the exact parse, not admitted.
+
 > Open empirical check before building: dump `intents.near` `view_state` to byte-confirm its
-> root prefix is bare `~$245` and not namespaced by a wrapper.
+> root prefix is bare `~$245` and not namespaced by a wrapper (hard gate, not a nicety).
 
 ---
 
 ## 13. Risks & open questions
 
-Resolved in-design (by adversarial review), each with a test that must pass before ship:
+Addressed in-design across two adversarial review rounds, each with a test that must pass:
 
-- **C1 — sibling AccountId→u128 maps** (CRITICAL): addressed by prefix-pinning (§2/§5).
-  _Gate:_ Phase-1 must decode **every** 16-byte slot for the top-N contracts over a long
-  window and diff each vs `ft_balance_of`; zero non-balance-prefix matches required.
-- **C2 — intra-block / cross-shard ordering**: no payload ordering key; multi-write accounts
-  resolve via the resolver, not array position (§7). _Gate:_ measure multi-write frequency;
-  prove single-shard order or route those accounts to RPC.
-- **H4 — RPC stalls the indexer off the tip**: indexer never blocks on RPC; async batched
-  resolver (§5/§6). _Gate:_ load-test that block processing stays < block interval.
-- **H1/H2 — code identity**: handle `code_hash = NULL` global contracts and the
-  event-log-vs-current-state resolution (§4).
+- **C1 / NEW-C2 — sibling AccountId→u128 maps** (CRITICAL): exact-offset prefix parse, not
+  `startsWith` (§2/§5). _Gate:_ `scripts/ft-coverage-phase1.mjs` groups every 16-byte
+  account-keyed slot by prefix and flags any contract with >1 such prefix.
+- **NEW-C1 — resolver clobbers newer inline write** (CRITICAL): single `monotonicUpsert`
+  primitive guarded on `(block_height, shard, idx)` for both writers (§5). _Gate:_ enqueue a
+  task at H, land an inline write at H+k, drain the task, assert the H+k value survives.
+- **C2 — intra-block / cross-shard ordering**: subsumed by the monotonic tuple (§5/§7).
+  _Gate:_ multi-write frequency (Phase-1 already measures it).
+- **NEW-H3 — calibration races the contract-indexer cursor**: height-aware verdict lookup;
+  ft-balance ahead of the contract indexer ⇒ `uncalibrated` (§5). _Gate:_ redeploy with a
+  changed prefix; assert no inline decode between deploy block and re-calibration.
+- **H4 — RPC stalls the indexer**: indexer never blocks on RPC; async batched resolver
+  (§5/§6). _Gate:_ block processing stays < block interval under load.
+- **NEW-H2 — supply invariant overtrusted**: downgraded to alert-only, corroborate before
+  demote, `coverage_complete`-gated (§10).
+- **H1/H2 — code identity**: `code_hash = NULL` global contracts + current-state resolution (§4).
 
 Still open:
 
-1. **Non-standard layout share of _volume_** — how much RPC the fallback really needs.
-   Measure over busy blocks grouped by code identity (Phase 1).
-2. **Archival RPC cost & availability** for historical fallback/calibration (H3) and
-   **`view_state` feasibility** on million-holder contracts (M1) — pick a provider, price it.
-3. **Finality** — decode only finalized blocks vs reconcile-on-finality (M2).
-4. **`data_deletion` semantics** — unregister vs zero, storage-deposit edge cases (pinned
-   prefix only).
-5. **near-sdk version / collection drift** — `UnorderedMap`/`TreeMap` accounts maps add an
-   index vector (another sibling-map source); characterize per code identity in Phase 1 (M4).
+1. **Non-standard layout share of _volume_** — how much RPC the fallback really needs
+   (Phase 1, `scripts/ft-coverage-phase1.mjs`).
+2. **Proving sibling-map _absence_, not just non-observation (NEW-H1).** A touched-slot
+   window finds corruption where it occurs but can't prove a rarely-written sibling map
+   doesn't exist; public `view_state` is refused (`TOO_LARGE_CONTRACT_STATE`, confirmed). The
+   absence-proof paths are **static analysis of `code_base64`** (enumerate the wasm's
+   `BorshStorageKey` prefixes — `indexer-contract` already stores the code) and/or archival
+   per-prefix `view_state` paging. Until then, exact-offset pinning bounds the blast radius
+   and audits catch drift.
+3. **Resolver backpressure (NEW-H4).** No unbounded queue: newest-block-first ordering,
+   queue-depth/lag SLO + alerting, and a dead-letter path for tasks older than archival
+   retention (else they fail permanently on GC'd state, H3).
+4. **Archival RPC cost & `view_state` feasibility** (H3/M1) — pick + price a provider.
+5. **Finality** — decode only finalized blocks vs reconcile-on-finality (M2).
+6. **`near_sdk::store` vs `collections` (NEW-M2)** — `store::LookupMap` uses a different key
+   encoding and caches writes; different `code_hash` so it calibrates separately, but the
+   exact-parse must be validated against `store`'s layout, not assumed identical. Add to
+   Phase-1 enumeration.
+7. **near-sdk collection drift (M4)** — `UnorderedMap`/`TreeMap` accounts maps add an index
+   vector (another sibling-map source); characterize per code identity in Phase 1.
 
 ---
 
 ## 14. Phased plan
 
-1. **Measure (no write path).** Decode **every** 16-byte slot for the top-N contracts over a
-   long window, diff each vs `ft_balance_of`, grouped by code identity. Outputs: decodable
-   coverage _by volume_, the non-standard tail, the verified balance prefix per code, and —
-   critically — whether any sibling map decodes (the C1 gate). Also measure multi-write
-   frequency (C2) and `UnorderedMap`/`TreeMap` spread (M4).
+1. **Measure (no write path).** `scripts/ft-coverage-phase1.mjs` — over a long block window,
+   group **every** 16-byte account-keyed `data_update` by key prefix per contract and diff
+   each prefix vs `ft_balance_of`. Outputs: decodable coverage _by volume_, the non-standard
+   tail, the verified balance prefix per contract, multi-write frequency (C2), and — the C1
+   gate — any contract with >1 account-keyed u128 prefix. **Known limit (NEW-H1):** a window
+   only sees _written_ prefixes, so a clean result is "no sibling seen", not proof of absence;
+   the absence-proof is wasm static analysis of `code_base64` and/or archival per-prefix
+   `view_state` (open #2). Early run (40 blocks) already shows real FTs decode to a single
+   balance prefix, false-positives classify as `not-an-FT`, and 0 sibling prefixes.
 2. **Calibration store + harness.** `ft_calibration(code_identity, prefix, status, …)`, the
    decode-then-verify-prefix routine, and `contract_current_code` (handling DELETE and
    `code_hash = NULL` global contracts).
