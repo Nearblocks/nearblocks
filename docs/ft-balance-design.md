@@ -655,8 +655,15 @@ Still open:
    gate — any contract with >1 account-keyed u128 prefix. **Known limit (NEW-H1):** a window
    only sees _written_ prefixes, so a clean result is "no sibling seen", not proof of absence;
    the absence-proof is wasm static analysis of `code_base64` and/or archival per-prefix
-   `view_state` (open #2). Early run (40 blocks) already shows real FTs decode to a single
-   balance prefix, false-positives classify as `not-an-FT`, and 0 sibling prefixes.
+   `view_state` (open #2). **Result (200-block run, 161 scanned):** every real FT decoded to
+   exactly **one** balance prefix with all samples matching `ft_balance_of` (`usdt.tether-token.near`
+   7 accts, `aa-harvest-moon` 22 accts, the omft bridge suite, `factory.bridge.near` tokens,
+   …); **0 FTs had a second account-keyed u128 prefix (C1 gate PASS for the sample)**. The
+   only contracts with multiple such prefixes were **not FTs** — `v2.ref-finance.near` (3)
+   and `aggregatedex.near` (2, whose prefix bytes literally read `global_balance` /
+   `protocol_fee`) — and the `ft_balance_of` interface check excluded them wholesale, exactly
+   as designed. C2 is real: **45 multi-write events** across 161 blocks (~28% of blocks).
+   Coverage: 434/895 (48.5%) of u128 slots are account-keyed.
 2. **Calibration store + harness.** `ft_calibration(code_identity, prefix, status, …)`, the
    decode-then-verify-prefix routine, and `contract_current_code` (handling DELETE and
    `code_hash = NULL` global contracts).
