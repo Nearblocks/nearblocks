@@ -119,14 +119,14 @@ export const fts = {
   tokenLabel: 'Token:',
   tokens: {
     change: 'Change (%)',
-    circulatingMC: 'Circulating MC',
     empty: 'No tokens found',
+    holders: 'Holders',
     onchainMC: 'On-Chain MC',
     price: 'Price',
     title: 'TOKEN',
     total: 'More than {{count}} Token Contracts found',
     totalExact: 'A total of {{count}} Token Contracts found',
-    totalSupply: 'Total Supply',
+    transfers: 'Transfers',
     volume: 'Volume (24H)',
   },
   transfers: {

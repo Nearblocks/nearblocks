@@ -109,6 +109,25 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/search/mts:
+   *   get:
+   *     summary: Search multi-token (MT) FT tokens
+   *     tags:
+   *       - Search
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         description: MT token ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/mts', validate(request.search), service.mts);
+
+  /**
+   * @openapi
    * /v3/search/nfts:
    *   get:
    *     summary: Search NFTs

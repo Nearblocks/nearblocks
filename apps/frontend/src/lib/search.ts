@@ -6,6 +6,7 @@ import {
   searchBlocks,
   searchFTs,
   searchKeys,
+  searchMTs,
   searchNFTs,
   searchReceipts,
   searchTxns,
@@ -16,6 +17,7 @@ export const initialResults: Search = {
   blocks: [],
   fts: [],
   keys: [],
+  mts: [],
   nfts: [],
   receipts: [],
   txns: [],
@@ -34,6 +36,10 @@ export const searchKeyword = async (keyword: string, filter: string) => {
 
   if (filter === 'keys') {
     results.keys = await searchKeys(keyword);
+  }
+
+  if (filter === 'mts') {
+    results.mts = await searchMTs(keyword);
   }
 
   if (filter === 'nfts') {

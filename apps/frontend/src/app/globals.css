@@ -1833,3 +1833,105 @@ g.highcharts-series,
   fill: hsla(0, 0%, 0%, 0.3);
   stroke: hsla(0, 0%, 0%, 0.3);
 }
+
+/* Top-down receipt tree (connectors only; node boxes styled via Tailwind) */
+.receipt-tree {
+  margin-inline: auto;
+  text-align: center;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.receipt-tree ul {
+  display: flex;
+  justify-content: center;
+  padding-top: 1.25rem;
+  position: relative;
+}
+
+.receipt-tree li {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 1.25rem 0.5rem 0;
+  position: relative;
+}
+
+/* horizontal + vertical connectors above each node */
+.receipt-tree li::before,
+.receipt-tree li::after {
+  border-top: 1px solid var(--border);
+  content: '';
+  height: 1.25rem;
+  position: absolute;
+  right: 50%;
+  top: 0;
+  width: 50%;
+}
+
+.receipt-tree li::after {
+  border-left: 1px solid var(--border);
+  left: 50%;
+  right: auto;
+}
+
+/* single child: straight vertical line only */
+.receipt-tree li:only-child::before,
+.receipt-tree li:only-child::after {
+  display: none;
+}
+
+.receipt-tree li:only-child {
+  padding-top: 1.25rem;
+}
+
+/* trim outer connectors at the row edges */
+.receipt-tree li:first-child::before,
+.receipt-tree li:last-child::after {
+  border: 0 none;
+}
+
+.receipt-tree li:last-child::before {
+  border-right: 1px solid var(--border);
+}
+
+/* drop line from a parent node down to its children's connector bar */
+.receipt-tree ul::before {
+  border-left: 1px solid var(--border);
+  content: '';
+  height: 1.25rem;
+  left: 50%;
+  position: absolute;
+  top: 0;
+  width: 0;
+}
+
+/* root node has no incoming connector */
+.receipt-tree > li {
+  padding-top: 0;
+}
+
+/* Stacked detail rows (actions/result/logs): label row, content below */
+[data-stacked='true'] [data-slot='list-content'] {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-stacked='true'] [data-slot='list-item'] {
+  border-bottom-width: 1px;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-stacked='true'] [data-slot='list-item'][data-last-item='true'] {
+  border-bottom-width: 0;
+}
+
+[data-stacked='true'] [data-slot='list-left'] {
+  padding: 0.5rem 0.75rem 0;
+}
+
+[data-stacked='true'] [data-slot='list-right'] {
+  padding: 0.125rem 0.75rem 0.5rem;
+}

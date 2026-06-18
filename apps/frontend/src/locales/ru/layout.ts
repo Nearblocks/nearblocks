@@ -120,6 +120,7 @@ export const layout = {
     blocks: 'Blocks',
     filters: 'All Filters',
     history: 'Recent Searches',
+    mtTokens: 'MT Tokens',
     placeholder: 'Search by Account ID / Txn Hash / Block',
     tokens: 'Tokens',
     txns: 'Txns',

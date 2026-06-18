@@ -7,9 +7,11 @@ import type { ActionReceipt, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
+import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { gasFormat, nearFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -27,11 +29,12 @@ type Props = {
 };
 
 type SectionProps = {
-  actions: ActionReceipt[];
-  receipt: TxnReceipt;
+  actions?: ActionReceipt[];
+  loading?: boolean;
+  receipt?: TxnReceipt;
 };
 
-const actionVariant = (action: ActionKind) => {
+export const actionVariant = (action: ActionKind) => {
   switch (action) {
     case ActionKind.ADD_KEY:
     case ActionKind.CREATE_ACCOUNT:
@@ -156,23 +159,34 @@ export const ActionCard = ({ action, expanded, receipt, toggle }: Props) => {
   );
 };
 
-export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
+export const ReceiptExpandedSection = ({
+  actions = [],
+  loading = false,
+  receipt,
+}: SectionProps) => {
   const { t } = useLocale('txns');
-  const gasLimit = getGasAttached(receipt.actions);
-  const refund = getRefund(receipt.receipts);
-  const preCharged = getPreCharged(receipt);
+  const gasLimit = loading ? '0' : getGasAttached(receipt!.actions);
+  const refund = loading ? '0' : getRefund(receipt!.receipts);
+  const preCharged = loading ? '0' : getPreCharged(receipt!);
 
   return (
     <div className="border-border bg-card mt-1 space-y-3 rounded-lg border p-3">
-      {actions.map((action, i) => (
-        <ReceiptAction
-          action={action}
-          index={i}
-          key={i}
-          onlyArgs
-          receipt={receipt}
-        />
-      ))}
+      <SkeletonSlot
+        fallback={<Skeleton className="h-7 w-36 rounded-md" />}
+        loading={loading}
+      >
+        {() =>
+          actions.map((action, i) => (
+            <ReceiptAction
+              action={action}
+              index={i}
+              key={i}
+              onlyArgs
+              receipt={receipt!}
+            />
+          ))
+        }
+      </SkeletonSlot>
 
       <Tabs defaultValue="output">
         <TabsList>
@@ -181,11 +195,11 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
         </TabsList>
 
         <TabsContent value="output">
-          <ReceiptOutputRows receipt={receipt} />
+          <ReceiptOutputRows loading={loading} receipt={receipt} />
         </TabsContent>
 
         <TabsContent value="inspect">
-          <ReceiptInspectRows receipt={receipt} />
+          <ReceiptInspectRows loading={loading} receipt={receipt} />
           <hr className="border-border" />
           <List pairsPerRow={1}>
             <ListItem>
@@ -195,7 +209,14 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
                   tip={t('enhanced.gasLimitTip')}
                 />
               </ListLeft>
-              <ListRight>{`${gasFormat(gasLimit)} Tgas`}</ListRight>
+              <ListRight>
+                <SkeletonSlot
+                  fallback={<Skeleton className="w-20" />}
+                  loading={loading}
+                >
+                  {() => `${gasFormat(gasLimit)} Tgas`}
+                </SkeletonSlot>
+              </ListRight>
             </ListItem>
             <ListItem>
               <ListLeft>
@@ -204,7 +225,14 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
                   tip={t('enhanced.preChargedTip')}
                 />
               </ListLeft>
-              <ListRight>{`${nearFormat(preCharged)} Ⓝ`}</ListRight>
+              <ListRight>
+                <SkeletonSlot
+                  fallback={<Skeleton className="w-20" />}
+                  loading={loading}
+                >
+                  {() => `${nearFormat(preCharged)} Ⓝ`}
+                </SkeletonSlot>
+              </ListRight>
             </ListItem>
             <ListItem>
               <ListLeft>
@@ -213,7 +241,14 @@ export const ReceiptExpandedSection = ({ actions, receipt }: SectionProps) => {
                   tip={t('enhanced.refundTip')}
                 />
               </ListLeft>
-              <ListRight>{`${nearFormat(refund)} Ⓝ`}</ListRight>
+              <ListRight>
+                <SkeletonSlot
+                  fallback={<Skeleton className="w-20" />}
+                  loading={loading}
+                >
+                  {() => `${nearFormat(refund)} Ⓝ`}
+                </SkeletonSlot>
+              </ListRight>
             </ListItem>
           </List>
         </TabsContent>

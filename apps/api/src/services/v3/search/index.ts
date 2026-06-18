@@ -3,6 +3,7 @@ import type {
   SearchBlock,
   SearchFT,
   SearchKey,
+  SearchMT,
   SearchNFT,
   SearchReceipt,
   SearchReq,
@@ -109,6 +110,14 @@ const getFts = async (keyword: string) => {
   return dbEvents.manyOrNone<SearchFT>(sql.fts, {
     contract,
     hex,
+  });
+};
+
+const getMts = async (keyword: string) => {
+  if (keyword.length < 2) return [];
+
+  return dbEvents.manyOrNone<SearchMT>(sql.mts, {
+    keyword,
   });
 };
 
@@ -222,6 +231,17 @@ const fts = responseHandler(
   },
 );
 
+const mts = responseHandler(
+  response.mts,
+  async (req: RequestValidator<SearchReq>) => {
+    const keyword = normalizeKeyword(req.validator.keyword);
+
+    const mts = await getMts(keyword);
+
+    return { data: mts };
+  },
+);
+
 const nfts = responseHandler(
   response.nfts,
   async (req: RequestValidator<SearchReq>) => {
@@ -260,12 +280,13 @@ const search = responseHandler(
   async (req: RequestValidator<SearchReq>) => {
     const keyword = normalizeKeyword(req.validator.keyword);
 
-    const [accounts, blocks, keys, fts, nfts, receipts, txns] =
+    const [accounts, blocks, keys, fts, mts, nfts, receipts, txns] =
       await Promise.all([
         getAccounts(keyword),
         getBlocks(keyword),
         getKeys(keyword),
         getFts(keyword),
+        getMts(keyword),
         getNfts(keyword),
         getReceipts(keyword),
         getTxns(keyword),
@@ -277,6 +298,7 @@ const search = responseHandler(
         blocks,
         fts,
         keys,
+        mts,
         nfts,
         receipts,
         txns,
@@ -285,4 +307,14 @@ const search = responseHandler(
   },
 );
 
-export default { accounts, blocks, fts, keys, nfts, receipts, search, txns };
+export default {
+  accounts,
+  blocks,
+  fts,
+  keys,
+  mts,
+  nfts,
+  receipts,
+  search,
+  txns,
+};

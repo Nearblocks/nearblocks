@@ -8,7 +8,7 @@ const list = v.object({
   change_24h: v.nullable(v.string()),
   contract: v.string(),
   decimals: v.nullable(v.number()),
-  holders: v.nullable(v.number()),
+  holders: v.nullable(v.string()),
   icon: v.nullable(v.string()),
   market_cap: v.nullable(v.string()),
   name: v.string(),
@@ -17,7 +17,7 @@ const list = v.object({
   reference: v.nullable(v.string()),
   symbol: v.string(),
   total_supply: v.nullable(v.string()),
-  transfers: v.nullable(v.number()),
+  transfers: v.nullable(v.string()),
   volume_24h: v.nullable(v.string()),
 });
 

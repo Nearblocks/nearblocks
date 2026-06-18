@@ -10,12 +10,7 @@ import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage, TokenLink } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import {
-  countFormat,
-  currencyFormat,
-  isApproxCount,
-  numberFormat,
-} from '@/lib/format';
+import { countFormat, currencyFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -81,20 +76,10 @@ export const Tokens = ({
     {
       cell: (token) =>
         token.volume_24h ? currencyFormat(token.volume_24h) : <span>$0</span>,
+      enableSort: true,
       header: t('tokens.volume'),
       id: 'volume',
-    },
-    {
-      cell: (token) =>
-        token.market_cap && parseFloat(token.market_cap) > 0 ? (
-          currencyFormat(token.market_cap)
-        ) : (
-          <span>N/A</span>
-        ),
-      enableSort: true,
-      header: t('tokens.circulatingMC'),
-      id: 'market_cap',
-      sortName: 'market_cap',
+      sortName: 'volume_24h',
     },
     {
       cell: (token) =>
@@ -109,18 +94,20 @@ export const Tokens = ({
       sortName: 'onchain_market_cap',
     },
     {
-      cell: (token) => {
-        if (!token.total_supply) return <span>N/A</span>;
-        return (
-          <span>
-            {numberFormat(token.total_supply, {
-              maximumFractionDigits: 0,
-            })}
-          </span>
-        );
-      },
-      header: t('tokens.totalSupply'),
-      id: 'total_supply',
+      cell: (token) =>
+        token.transfers ? countFormat(token.transfers) : <span>0</span>,
+      enableSort: true,
+      header: t('tokens.transfers'),
+      id: 'transfers',
+      sortName: 'transfers',
+    },
+    {
+      cell: (token) =>
+        token.holders ? countFormat(token.holders) : <span>0</span>,
+      enableSort: true,
+      header: t('tokens.holders'),
+      id: 'holders',
+      sortName: 'holders',
     },
   ];
 

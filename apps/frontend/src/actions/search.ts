@@ -5,6 +5,7 @@ import {
   SearchBlockRes,
   SearchFTRes,
   SearchKeyRes,
+  SearchMTRes,
   SearchNFTRes,
   SearchReceiptRes,
   SearchRes,
@@ -55,6 +56,14 @@ export const searchFTs = async (keyword: string) => {
   if (!keyword || keyword.trim().length < 2) return [];
 
   const resp = await fetcher<SearchFTRes>(`/v3/search/fts?keyword=${keyword}`);
+
+  return resp.data || [];
+};
+
+export const searchMTs = async (keyword: string) => {
+  if (!keyword || keyword.trim().length < 2) return [];
+
+  const resp = await fetcher<SearchMTRes>(`/v3/search/mts?keyword=${keyword}`);
 
   return resp.data || [];
 };

@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react';
 
 import { useSearchHistory } from '@/hooks/use-search-history';
 import { searchKeyword } from '@/lib/search';
-import { cn } from '@/lib/utils';
+import { cn, encodeToken } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { ButtonGroup, ButtonGroupSeparator } from '@/ui/button-group';
 import { Spinner } from '@/ui/spinner';
@@ -39,6 +39,7 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
         (resp.accounts.length > 0 ||
           resp.blocks.length > 0 ||
           resp.fts.length > 0 ||
+          resp.mts.length > 0 ||
           resp.txns.length > 0);
 
       if (!hasResults) return;
@@ -58,6 +59,13 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
       } else if (resp.fts.length) {
         const href = `/tokens/${resp.fts[0].contract}`;
         addToHistory({ href, label: resp.fts[0].contract, type: 'token' });
+        router.push(href);
+      } else if (resp.mts.length) {
+        const mt = resp.mts[0];
+        const href = `/mt-tokens/${mt.contract}/tokens/ft/${encodeToken(
+          mt.token,
+        )}`;
+        addToHistory({ href, label: mt.token, type: 'token' });
         router.push(href);
       } else if (resp.txns.length) {
         const href = `/txns/${resp.txns[0].transaction_hash}`;
