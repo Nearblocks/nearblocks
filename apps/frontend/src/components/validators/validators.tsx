@@ -265,16 +265,6 @@ const ValidatorRows = ({
   const apyDisplay =
     apyNum !== null ? (apyNum === 0 ? '0%' : `${apyNum.toFixed(2)}%`) : 'N/A';
 
-  const blocksProduced = row.current_epoch_blocks_produced ?? 0;
-  const chunksProduced = row.current_epoch_chunks_produced ?? 0;
-  const blocksExpected = row.current_epoch_blocks_expected ?? 0;
-  const chunksExpected = row.current_epoch_chunks_expected ?? 0;
-  const totalExpected = blocksExpected + chunksExpected;
-  const productivityRatio =
-    totalExpected > 0
-      ? (blocksProduced + chunksProduced) / totalExpected
-      : null;
-
   const statusLabel = (status: string) => {
     switch (status) {
       case 'active':
@@ -301,8 +291,6 @@ const ValidatorRows = ({
   const cumulativeLabel = row.cumulative_stake_percent
     ? `${row.cumulative_stake_percent}%`
     : 'N/A';
-
-  const location = [row.city, row.country].filter(Boolean).join(', ');
 
   return (
     <>
@@ -336,7 +324,10 @@ const ValidatorRows = ({
           )}
         </TableCell>
         <TableCell>
-          <Badge variant={statusVariant(row.staking_status ?? '')}>
+          <Badge
+            className="text-body-xs px-1.5 py-0.5"
+            variant={statusVariant(row.staking_status ?? '')}
+          >
             {statusLabel(row.staking_status ?? '')}
           </Badge>
         </TableCell>
@@ -383,19 +374,15 @@ const ValidatorRows = ({
         </TableCell>
         <TableCell>
           <div className="bg-muted relative h-7 w-40 overflow-hidden rounded-full">
-            <span className="text-body-xs text-foreground absolute inset-0 flex items-center justify-center font-medium">
-              {cumulativeLabel}
-            </span>
             <div
-              className="absolute inset-y-0 left-0 overflow-hidden rounded-full"
+              className="bg-link absolute inset-y-0 left-0"
               style={{
                 width: `${row.cumulative_stake_percent ?? 0}%`,
               }}
-            >
-              <div className="bg-link text-body-xs text-background absolute inset-y-0 left-0 flex w-40 items-center justify-center font-medium">
-                {cumulativeLabel}
-              </div>
-            </div>
+            />
+            <span className="text-body-xs absolute inset-0 flex items-center justify-center font-medium text-white">
+              {cumulativeLabel}
+            </span>
           </div>
         </TableCell>
         <TableCell>
@@ -420,29 +407,6 @@ const ValidatorRows = ({
 
       {isExpanded && (
         <>
-          {(productivityRatio !== null || location) && (
-            <TableRow className="bg-muted/40 hover:bg-muted/40">
-              <TableCell className="py-2 pl-8 align-top" colSpan={3}>
-                <div className="text-muted-foreground text-headline-xs uppercase">
-                  {t('table.expanded.uptime')}
-                </div>
-                <div className="text-body-xs mt-1">
-                  {productivityRatio !== null
-                    ? productivityRatio * 100 === 100
-                      ? '100%'
-                      : `${(productivityRatio * 100).toFixed(3)}%`
-                    : '-'}
-                </div>
-              </TableCell>
-              <TableCell className="px-3 py-2 align-top" colSpan={8}>
-                <div className="text-muted-foreground text-headline-xs uppercase">
-                  {t('table.columns.location')}
-                </div>
-                <div className="text-body-xs mt-1">{location || '-'}</div>
-              </TableCell>
-            </TableRow>
-          )}
-
           {row.name ||
           row.description ||
           row.url ||
@@ -450,7 +414,7 @@ const ValidatorRows = ({
           socialMedia ? (
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableCell
-                className="p-3 align-top whitespace-normal"
+                className="pt-2 pb-4 pl-8 align-top whitespace-normal"
                 colSpan={3}
               >
                 <div className="text-muted-foreground text-headline-xs uppercase">
