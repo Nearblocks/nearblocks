@@ -1,24 +1,23 @@
-import { NFTAssets } from '@/components/address/assets/nfts';
+import { FTAssets } from '@/components/address/assets/fts';
 import { ErrorSuspense } from '@/components/error-suspense';
-import { fetchNFTAssetCount, fetchNFTAssets } from '@/data/address/assets';
-import { Card, CardContent } from '@/ui/card';
+import { fetchFTAssetCount, fetchFTAssets } from '@/data/address/assets';
 
 type Props = PageProps<'/[lang]/address/[address]/assets'>;
 
-const AssetsPage = async ({ params, searchParams }: Props) => {
+const TokenAssetsPage = async ({ params, searchParams }: Props) => {
   const [{ address }, filters] = await Promise.all([params, searchParams]);
-  const nftsPromise = fetchNFTAssets(address, { ...filters, limit: '24' });
-  const countPromise = fetchNFTAssetCount(address);
+  const ftsPromise = fetchFTAssets(address, { ...filters, limit: '25' });
+  const countPromise = fetchFTAssetCount(address);
 
   return (
-    <Card>
-      <CardContent className="text-body-sm px-0 py-3">
-        <ErrorSuspense fallback={<NFTAssets loading />}>
-          <NFTAssets countPromise={countPromise} nftsPromise={nftsPromise} />
-        </ErrorSuspense>
-      </CardContent>
-    </Card>
+    <ErrorSuspense fallback={<FTAssets account={address} loading />}>
+      <FTAssets
+        account={address}
+        countPromise={countPromise}
+        ftsPromise={ftsPromise}
+      />
+    </ErrorSuspense>
   );
 };
 
-export default AssetsPage;
+export default TokenAssetsPage;

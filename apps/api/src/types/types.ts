@@ -29,6 +29,8 @@ export type Config = {
   dbUrlStaking: string;
   dbWriteUrlBase: string;
   eventsStart: bigint;
+  fastnearApiKey: string;
+  fastnearUrl: string;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryCount: number;

@@ -63,7 +63,7 @@ const TokenCard = ({
       </div>
     </Link>
     <div className="text-body-xs space-y-0.5">
-      <div>
+      <div className="truncate">
         <span className="text-muted-foreground">{titleLabel}</span>
         <Link
           className="text-link"
@@ -160,31 +160,31 @@ export const NftTokens = ({
             </div>
           )}
         </div>
-        {!loading && (tokens?.meta?.next_page || tokens?.meta?.prev_page) && (
-          <div className="mt-4 flex items-center border-t pt-3">
-            <Pagination className="justify-end">
-              <PaginationContent>
-                {tokens.meta?.prev_page && (
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href={onPaginate('prev', tokens.meta.prev_page)}
-                      size="sm"
-                    />
-                  </PaginationItem>
-                )}
-                {tokens.meta?.next_page && (
-                  <PaginationItem>
-                    <PaginationNext
-                      href={onPaginate('next', tokens.meta.next_page)}
-                      size="sm"
-                    />
-                  </PaginationItem>
-                )}
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
       </CardContent>
+      {!loading && (tokens?.meta?.next_page || tokens?.meta?.prev_page) && (
+        <div className="flex items-center border-t p-3">
+          <Pagination className="justify-end">
+            <PaginationContent>
+              {tokens.meta?.prev_page && (
+                <PaginationItem>
+                  <PaginationPrevious
+                    href={onPaginate('prev', tokens.meta.prev_page)}
+                    size="sm"
+                  />
+                </PaginationItem>
+              )}
+              {tokens.meta?.next_page && (
+                <PaginationItem>
+                  <PaginationNext
+                    href={onPaginate('next', tokens.meta.next_page)}
+                    size="sm"
+                  />
+                </PaginationItem>
+              )}
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </Card>
   );
 };

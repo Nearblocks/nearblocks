@@ -18,6 +18,11 @@ const ftsCursor = v.object({
   value: v.string(),
 });
 
+const ftBalance = v.object({
+  account: v.string(),
+  contract: v.string(),
+});
+
 const nfts = v.object({
   account: v.string(),
   limit: limitSchemaMax(24),
@@ -71,6 +76,7 @@ const mtNftsCursor = v.object({
 
 export type AccountAssetFTsReq = v.InferOutput<typeof fts>;
 export type AccountAssetFTCountReq = v.InferOutput<typeof ftCount>;
+export type AccountAssetFTBalanceReq = v.InferOutput<typeof ftBalance>;
 export type AccountAssetFTsCursor = v.InferOutput<typeof ftsCursor>;
 export type AccountAssetNFTsReq = v.InferOutput<typeof nfts>;
 export type AccountAssetNFTCountReq = v.InferOutput<typeof nftCount>;
@@ -83,6 +89,7 @@ export type AccountAssetMTNFTCountReq = v.InferOutput<typeof mtNftCount>;
 export type AccountAssetMTNFTsCursor = v.InferOutput<typeof mtNftsCursor>;
 
 export default {
+  ftBalance,
   ftCount,
   fts,
   ftsCursor,

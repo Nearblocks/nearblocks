@@ -5,8 +5,11 @@ export const blockRange = sql('queries/accounts/blockRange.sql');
 export default {
   account: sql('queries/accounts/account.sql'),
   assets: {
+    ftBalance: sql('queries/accounts/assets/ftBalance.sql'),
     ftCount: sql('queries/accounts/assets/ftCount.sql'),
+    ftCountBalances: sql('queries/accounts/assets/ftCountBalances.sql'),
     fts: sql('queries/accounts/assets/fts.sql'),
+    ftsBalances: sql('queries/accounts/assets/ftsBalances.sql'),
     mtFtCount: sql('queries/accounts/assets/mtFtCount.sql'),
     mtFts: sql('queries/accounts/assets/mtFts.sql'),
     mtNftCount: sql('queries/accounts/assets/mtNftCount.sql'),
