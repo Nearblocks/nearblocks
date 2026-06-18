@@ -7,7 +7,8 @@ import type { Stats, TxnReceipt } from 'nb-schemas';
 import { SkeletonSlot } from '@/components/skeleton';
 import { Card, CardContent } from '@/ui/card';
 
-import { ReceiptBlock } from '../execution/receipt';
+import { ReceiptExpandedSection } from '../enhanced/action';
+import { TreeNode } from './node';
 import { TreePlan } from './tree-plan';
 
 type Props = {
@@ -31,8 +32,13 @@ export const Tree = ({
       <CardContent className="px-0 py-2">
         <SkeletonSlot
           fallback={
-            <div className="border-border ml-0 border-l-4">
-              <ReceiptBlock loading />
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="px-3 pt-2 pb-6 md:w-1/2 lg:w-7/12">
+                <TreeNode loading />
+              </div>
+              <div className="px-3 md:w-1/2 md:px-0 lg:w-5/12">
+                <ReceiptExpandedSection loading />
+              </div>
             </div>
           }
           loading={loading || !receipts}

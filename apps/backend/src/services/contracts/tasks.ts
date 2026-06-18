@@ -27,7 +27,7 @@ type ExpGenesisConfig = {
 };
 
 type ExpProtocolConfig = {
-  avg_hidden_validator_seats_per_shard: number[];
+  avg_hidden_validator_seats_per_shard?: number[];
   epoch_length: number;
   max_inflation_rate: number[];
   num_block_producer_seats: number;
@@ -85,10 +85,10 @@ export const protocolConfigCheck = async () => {
           : null,
         protocol_max_seats:
           protocolConfig.num_block_producer_seats +
-          protocolConfig.avg_hidden_validator_seats_per_shard.reduce(
+          (protocolConfig.avg_hidden_validator_seats_per_shard?.reduce(
             (seats, seat) => seats + seat,
             0,
-          ),
+          ) ?? 0),
         protocol_treasury_fraction: protocolConfig.protocol_reward_rate
           ? (JSON.stringify(
               protocolConfig.protocol_reward_rate,

@@ -4,16 +4,24 @@ import type { TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/ui/skeleton';
 
 import { argsRecord } from '../actions/action';
 import { ReceiptIcon } from '../actions/icon';
 import { actionVariant } from '../enhanced/action';
 
-type Props = {
-  isRoot?: boolean;
+type ItemProps = {
   receipt: TxnReceipt;
   selectedId: string;
   toggle: (id: string) => void;
+};
+
+type Props = {
+  isRoot?: boolean;
+  loading?: boolean;
+  receipt?: TxnReceipt;
+  selectedId?: string;
+  toggle?: (id: string) => void;
 };
 
 const actionLabel = (receipt: TxnReceipt): string => {
@@ -26,7 +34,7 @@ const actionLabel = (receipt: TxnReceipt): string => {
   return action.action;
 };
 
-const TreeItem = ({ receipt, selectedId, toggle }: Omit<Props, 'isRoot'>) => {
+const TreeItem = ({ receipt, selectedId, toggle }: ItemProps) => {
   const action = receipt.actions[0]?.action ?? ActionKind.UNKNOWN;
   const isSelected = receipt.receipt_id === selectedId;
   const isFail = receipt.outcome.status === false;
@@ -72,8 +80,48 @@ const TreeItem = ({ receipt, selectedId, toggle }: Omit<Props, 'isRoot'>) => {
   );
 };
 
-export const TreeNode = ({ receipt, selectedId, toggle }: Props) => (
-  <ul className="receipt-tree">
-    <TreeItem receipt={receipt} selectedId={selectedId} toggle={toggle} />
-  </ul>
+const skeletonNode = (
+  bg: string,
+  labelWidth: string,
+  children?: React.ReactNode,
+) => (
+  <li>
+    <div
+      className={cn(
+        'inline-flex max-w-60 items-center gap-2 rounded-md border-2 border-transparent px-2 py-1',
+        bg,
+      )}
+    >
+      <Skeleton className="size-3.5 shrink-0 rounded-full" />
+      <Skeleton className={cn('h-4', labelWidth)} />
+    </div>
+    {children && <ul>{children}</ul>}
+  </li>
 );
+
+export const TreeNode = ({ loading, receipt, selectedId, toggle }: Props) => {
+  if (loading) {
+    return (
+      <ul className="receipt-tree">
+        {skeletonNode(
+          'bg-blue-background',
+          'w-28',
+          <>
+            {skeletonNode(
+              'bg-amber-background',
+              'w-20',
+              skeletonNode('bg-lime-background', 'w-16'),
+            )}
+            {skeletonNode('bg-gray-background', 'w-24')}
+          </>,
+        )}
+      </ul>
+    );
+  }
+
+  return (
+    <ul className="receipt-tree">
+      <TreeItem receipt={receipt!} selectedId={selectedId!} toggle={toggle!} />
+    </ul>
+  );
+};
