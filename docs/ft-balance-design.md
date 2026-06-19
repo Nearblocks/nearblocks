@@ -528,9 +528,23 @@ trailing variable-length fields don't matter). The open-source `Account` definit
 (`linear-protocol/LiNEAR`, `Narwallets/meta-pool`) are useful to _confirm_ the field semantics,
 but we **don't hardcode a per-contract parser** — the offset is calibrated and verified against
 `ft_balance_of`, so new struct tokens onboard automatically and the same anti-fabrication
-discipline applies. (Live capture of these two specific contracts was inconclusive — they're
-touched too rarely to grab in a short window — so the actual offset is a Phase-1 calibration
-output, not asserted here.)
+discipline applies.
+
+**Worked example — `meta-pool.near` (stNEAR), offset 16.** Source-verified
+(`Narwallets/meta-pool`): the `Account` struct borsh-serialises as `available: u128` (bytes
+0–15) then `stake_shares: u128` (bytes **16–31**) then `unstaked: u128`…, and
+`fungible_token_standard.rs::ft_balance_of` returns `acc.stake_shares.into()` — the **raw
+stored field**, not a computed value. So **decode a `u128` at value-offset 16 == `ft_balance_of`**:
+stNEAR is **struct-decodable (0 per-touch RPC)**, and **value-accruing, not rebasing** (the
+stored `stake_shares` only changes on a write; the NEAR _value_ grows via the computed
+`amount_from_stake_shares`, which is not the FT balance). This is also exactly why calibration
+needs **multiple distinct accounts**: `available` (offset 0) is usually 0 for pure stakers, so a
+single zero sample could spuriously match offset 0 — but only offset 16 matches across several
+non-zero, distinct balances. (Offset confirmed from source; production calibration re-confirms it
+against live `ft_balance_of`. A live byte capture of meta-pool/LiNEAR was inconclusive — they're
+touched too rarely (epoch-bursty) to grab in a short window, and FastNEAR's
+`archival-rpc.mainnet.fastnear.com` is limited-retention `earliest ≈ 203144445`, ~2–3 days, not
+genesis — so genesis backfill needs the `.tgz` archives, not this endpoint.)
 
 **When struct-decode is impossible → it self-detects.** If `ft_balance_of` is _computed_
 (`shares × price`) rather than a stored field, **no offset matches** → the contract stays
