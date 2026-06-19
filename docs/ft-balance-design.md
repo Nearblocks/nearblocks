@@ -261,10 +261,13 @@ tokens get **eventually-consistent** balances from the resolver.
 
 Safety properties (with round-2 fixes):
 
-- **Monotonic writes (NEW-C1).** Both writers go through `monotonicUpsert`; a later
-  `(block_height, shard, idx)` always wins, so the async resolver can't overwrite a newer
-  inline value with a stale historical read. This also subsumes C2 (intra-block ordering)
-  and M2 (re-orgs reconcile forward).
+- **Append-only log + derived projection (NEW-C1, and §7).** Writes land in the append-only
+  `ft_balance_events`; `ft_holders_v2` is the projection of the latest row per
+  `(contract, account)` ordered by `(block_timestamp, shard_id, index_in_chunk) DESC`. So a
+  stale resolver read can't clobber a newer inline value — the projection just keeps the
+  highest-ordered row. The unique log key makes replays idempotent (no duplicates). This is
+  native balance's exact pattern; re-org correctness comes from finalized-only ingestion (M2),
+  not from the upsert.
 - **Exact-prefix parse (NEW-C2).** `standard` authorizes only slots that parse _exactly_ at
   the pinned offset — `startsWith` is not used. Sibling maps that merely share a prefix are
   rejected.
@@ -331,30 +334,46 @@ exactly on the native-balance path:
    `Message.shards[].stateChanges[]` — **no extra fetch, no full reindex**.
 2. **Per block:** collect `data_update` changes, look up the calibration verdict (§5), and
    either decode-inline (standard, pinned prefix) or enqueue a resolver task. No RPC here.
-3. **Write:** authoritative current-state `ft_holders_v2(contract, account, amount,
-block_height)` (upsert) **and** an append-only time-series `ft_balance_events` (§8a).
-   Stand both up as **shadow tables first**, diffed against today's event-sum `ft_holders`
-   to quantify drift before any cutover.
-4. **`data_deletion`** on a _pinned-prefix_ balance slot → account unregistered → balance 0
-   (or row delete). A `data_deletion` on any non-pinned slot is ignored (it's a sibling map).
+3. **Write — mirror native balance's two-table pattern exactly (not an independent upsert).**
+   `indexer-balance` already does the right thing and we clone it:
 
-Two correctness items the native-balance path doesn't have to worry about but this does:
+   - **`ft_balance_events` — the append-only authority.** One immutable row per decoded slot,
+     unique key **`(contract, block_timestamp, shard_id, index_in_chunk)`** with
+     `onConflict(...).ignore()`. `index_in_chunk` is the state change's array position in the
+     shard (native sets `changes[index].index_in_chunk = index`, `balance.ts:81`). Since
+     neardata returns the same payload in the same order on every refetch, replays collide on
+     the unique key and are dropped → **idempotent, no duplicates** (exactly `be_shard_index_uidx`
+     - `onConflict([...]).ignore()` in native, `balance.ts:89-91`).
+   - **`ft_holders_v2` — a derived current-state projection**, `PRIMARY KEY (contract, account)`,
+     maintained to the latest row `ORDER BY block_timestamp DESC, shard_id DESC,
+index_in_chunk DESC` — the same trigger pattern as native `account_balances`
+     (`migrations/20250924161921_update_trigger.up.sql`). This is the read cache for portfolio
+     queries; the **authority is the log**, so the earlier "independent monotonicUpsert" is
+     just this projection's `ORDER BY`.
 
-- **Intra-block ordering / multi-write (C2).** The neardata payload's `stateChanges` array
-  carries **no ordering key** (`StateChange = {cause, change:{accountId,keyBase64,
-valueBase64}, type}`), and shards are processed in parallel. "Last array element wins" is
-  therefore a _guess_ for an account written twice in one block (or across shards during
-  resharding). Do **not** rely on array position: when a `(contract, account)` has multiple
-  `data_update`s in one block, the safe resolution is to treat it as `uncalibrated`-style
-  and let the resolver read `ft_balance_of` at that block for the final value — or first
-  prove empirically (over many multi-write cases) that payload order == execution order for
-  a single shard and that cross-shard same-key collisions never occur.
-- **Finality / re-orgs (M2).** `ft_holders_v2` is a _current-state_ upsert, so a write
-  decoded from a block that later orphans is **not** self-correcting (unlike the append-only
-  native `balance_events`). Decode only finalized blocks, or reconcile on finality.
+   Stand both up as **shadow tables first**, diffed against today's event-sum `ft_holders`.
+
+4. **`data_deletion`** on a _pinned-prefix_ balance slot → balance-0 row in the log (account
+   unregistered); the projection reflects it as latest. A `data_deletion` on any non-pinned
+   slot is ignored (sibling map).
+
+Two correctness items, now resolved by cloning native:
+
+- **Intra-block ordering / multi-write (C2).** `index_in_chunk` (array position) is a perfect
+  **idempotency** key, and the projection orders by it to pick "latest write" — which is the
+  assumption native balance **already runs on in production**. It's an _assumed_ execution
+  order, not a guaranteed one; for FT (≈45 multi-writes / 161 blocks measured) we should
+  empirically confirm payload order == execution order, or route multi-write accounts to the
+  resolver. We inherit native's behavior, not a new risk.
+- **Finality / re-orgs (M2) — handled by the source, no machinery needed.** `nb-neardata`'s
+  `streamBlock` paces against `/v0/last_block/final` and caps fetching at `final - block`
+  (`packages/nb-neardata/src/index.ts:130-133`); neardata serves finalized blocks. So we
+  ingest **finalized blocks only** and never decode a block that can orphan. The append-only
+  log makes it _recoverable_ even if we ever did; finalized ingestion makes it _correct_.
+  Same protection native balance has.
 
 Otherwise this is the `indexer-balance` shape with `account_update` swapped for
-`data_update` (cursor, sequential commit, batched insert, conflict resolution unchanged).
+`data_update` (cursor, sequential commit, batched idempotent insert, derived projection).
 
 ---
 
@@ -364,19 +383,23 @@ Native NEAR balances have **two** shapes, and FT should mirror both — but they
 very differently. This is the crux of the "can we have an FT balance time-series like NEAR"
 question, and the answer is _yes, going forward, cheaply; historically, expensively._
 
-**8a. The two tables.**
+**8a. The two tables (same split native balance uses; the log is authoritative).**
 
-- **Current-state** `ft_holders_v2(contract, account, amount)` — upsert, "balance now."
-  Each decoded `data_update` is an _absolute_ snapshot, so this is a direct upsert.
-- **Time-series** `ft_balance_events(block_timestamp, block_height, contract, account,
-amount, …)` — append-only TimescaleDB hypertable, "balance over time / charts." Exactly
-  the `balance_events` pattern (`indexer-balance`), and state-decode is _ideal_ for it
-  because each `data_update` already carries the **absolute** post-write balance — no
-  cumulative-sum reconstruction, no drift. Overhead is the same order as the existing
-  `ft_events` hypertable (~38.5M rows/mo, Timescale compression handles it). **So the
-  time-series is possible and the overhead is acceptable — comparable to `ft_events`, which
-  already exists.** Going forward it's _free_ (one row per decoded touch, no RPC for
-  standard tokens).
+- **Authority — `ft_balance_events`** `(contract, account, amount, block_timestamp,
+block_height, shard_id, index_in_chunk, …)` — append-only TimescaleDB hypertable, unique
+  `(contract, block_timestamp, shard_id, index_in_chunk)` + `onConflict().ignore()`. This is
+  the `balance_events` pattern, and state-decode is _ideal_ for it because each `data_update`
+  already carries the **absolute** post-write balance — no cumulative-sum, no drift. Idempotent
+  on replay (no duplicates). Overhead ≈ the existing `ft_events` hypertable (~38.5M rows/mo,
+  Timescale compression handles it).
+- **Derived current-state — `ft_holders_v2(contract, account, amount)`**, `PRIMARY KEY
+(contract, account)`, projected to the latest log row `ORDER BY block_timestamp DESC,
+shard_id DESC, index_in_chunk DESC` (native `account_balances` trigger pattern). The fast
+  "balance now" / portfolio read cache — **not** an independent source of truth.
+
+So the time-series is the foundation, not an add-on, and the overhead is acceptable —
+comparable to `ft_events`, which already exists. Going forward it's _free_ (one row per
+decoded touch, no RPC for standard tokens).
 
 **8b. Backfill — current-state is cheap, history is the hard part.**
 
@@ -617,11 +640,17 @@ Addressed in-design across two adversarial review rounds, each with a test that 
 - **C1 / NEW-C2 — sibling AccountId→u128 maps** (CRITICAL): exact-offset prefix parse, not
   `startsWith` (§2/§5). _Gate:_ `scripts/ft-coverage-phase1.mjs` groups every 16-byte
   account-keyed slot by prefix and flags any contract with >1 such prefix.
-- **NEW-C1 — resolver clobbers newer inline write** (CRITICAL): single `monotonicUpsert`
-  primitive guarded on `(block_height, shard, idx)` for both writers (§5). _Gate:_ enqueue a
-  task at H, land an inline write at H+k, drain the task, assert the H+k value survives.
-- **C2 — intra-block / cross-shard ordering**: subsumed by the monotonic tuple (§5/§7).
-  _Gate:_ multi-write frequency (Phase-1 already measures it).
+- **NEW-C1 — resolver clobbers newer inline write** (CRITICAL): append-only
+  `ft_balance_events` + `ft_holders_v2` projected to the latest row by
+  `(block_timestamp, shard_id, index_in_chunk) DESC` (native balance's two-table pattern,
+  §7/§8a) — a stale read can't win. _Gate:_ enqueue a task at H, land an inline write at H+k,
+  drain the task, assert the H+k value survives.
+- **Duplicates / replay** (at-least-once stream): unique log key
+  `(contract, block_timestamp, shard_id, index_in_chunk)` + `onConflict().ignore()`, exactly
+  like native `be_shard_index_uidx` — replays are idempotent (§7/§8a).
+- **C2 — intra-block multi-write ordering**: the projection orders by `index_in_chunk` (array
+  position) — the assumption native balance already runs on. _Gate:_ confirm payload order ==
+  execution order for FT's multi-writes (≈45/161 blocks measured), else route to the resolver.
 - **NEW-H3 — calibration races the contract-indexer cursor**: height-aware verdict lookup;
   ft-balance ahead of the contract indexer ⇒ `uncalibrated` (§5). _Gate:_ redeploy with a
   changed prefix; assert no inline decode between deploy block and re-calibration.
@@ -630,6 +659,10 @@ Addressed in-design across two adversarial review rounds, each with a test that 
 - **NEW-H2 — supply invariant overtrusted**: downgraded to alert-only, corroborate before
   demote, `coverage_complete`-gated (§10).
 - **H1/H2 — code identity**: `code_hash = NULL` global contracts + current-state resolution (§4).
+- **M2 — finality / re-orgs**: handled by the source — `nb-neardata` paces against
+  `/v0/last_block/final` and neardata serves finalized blocks, so we ingest finalized blocks
+  only and never decode a block that can orphan (NEAR's finalized chain doesn't re-org). The
+  append-only log adds recoverability on top. No reconciliation machinery (§7).
 
 Still open:
 
@@ -646,12 +679,11 @@ Still open:
    queue-depth/lag SLO + alerting, and a dead-letter path for tasks older than archival
    retention (else they fail permanently on GC'd state, H3).
 4. **Archival RPC cost & `view_state` feasibility** (H3/M1) — pick + price a provider.
-5. **Finality** — decode only finalized blocks vs reconcile-on-finality (M2).
-6. **`near_sdk::store` vs `collections` (NEW-M2)** — `store::LookupMap` uses a different key
+5. **`near_sdk::store` vs `collections` (NEW-M2)** — `store::LookupMap` uses a different key
    encoding and caches writes; different `code_hash` so it calibrates separately, but the
    exact-parse must be validated against `store`'s layout, not assumed identical. Add to
    Phase-1 enumeration.
-7. **near-sdk collection drift (M4)** — `UnorderedMap`/`TreeMap` accounts maps add an index
+6. **near-sdk collection drift (M4)** — `UnorderedMap`/`TreeMap` accounts maps add an index
    vector (another sibling-map source); characterize per code identity in Phase 1.
 
 ---
