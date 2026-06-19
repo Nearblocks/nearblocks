@@ -131,13 +131,21 @@ records `ContractCodeUpdate`/`Deletion` into `contract_code_events`
 (`contract_account_id`, `code_hash`, `code_base64`, global-contract refs). No standards
 detection today — but it gives us **`code_hash`**.
 
-Most FTs are deployed from a few templates (`near-contract-standards` FT, the omft
-factory, bridge factory…), so thousands of contracts share **identical `code_hash`**.
-Therefore: **use `code_hash` to carry the verified _prefix_, re-checked per contract.**
-Same wasm ⇒ same prefix-selection _logic_, but a contract can place its accounts map under
-a different runtime/constructor-chosen prefix (H1), so inheritance is "try the code's known
-prefix first and confirm with one `ft_balance_of`," not blind trust. Still a big win: one
-cheap verify per new contract instead of a blind search.
+**`code_hash` clustering is partial — and that's fine.** Measured (18 sampled FTs → 12 distinct
+hashes): the **majors are each unique** (`usdt`, `wrap`, `aurora`, `meta-pool`, `linear`,
+`token.v2.ref-finance`, `sweat`), while **families cluster** (the 6 `*.omft.near` bridge tokens
+share one hash; `tkn.near` meme-factory tokens share one). So most top tokens do **not** share a
+factory hash. Validate the real distribution with one psql on `contract_code_events`
+(`DISTINCT ON (contract_account_id)` latest → `GROUP BY code_hash`, join `ft_meta`), not RPC.
+
+This doesn't hurt the design, because **what's shared is the _layout_, not the hash.** Two levers:
+
+- **Standard-layout fast-path:** nearly all FTs use `LookupMap<AccountId,u128>` at prefix
+  `0x61`/`0x00`, offset 0 — so even a _unique_-hash token calibrates in **~1 `ft_balance_of`**
+  (try the common `(prefix, offset)`, confirm). Calibration is cheap per token regardless of hash.
+- **`code_hash` carries the verified `(prefix, offset)`** for true clusters (omft, factories,
+  the long meme tail — where most _contracts_ live), re-checked per contract because a contract
+  can place its map under a different runtime/constructor-chosen prefix (H1).
 
 Two caveats on the join (H1/H2): `contract_code_events` is an **append-only event log**,
 not a current-state table — resolving a contract's code identity at block H needs
@@ -401,10 +409,18 @@ Two correctness items that are NOT free and must be settled:
   accounts with 3–4 writes/block found **last == `ft_balance_of` in 5/5**, intermediates in
   **0/5**, with both _increasing_ (`v2.ref-finance.near`) and _decreasing_ (`aurora`) sequences
   (so it's order, not max/min), and **0 cross-shard** cases (each account's writes stayed in one
-  shard, contiguous positions). So: **production routes multi-write accounts to RPC by default**;
-  only after Phase-1 confirms array==execution order at scale do we trust `last-array` and drop
-  the RPC. (The measurement script `ft-neardata-proof.mjs` was deduping by _first_ occurrence —
-  fixed to last-write-wins → 9/9 byte-exact incl. `aurora`.)
+  shard, contiguous positions). **Cost of the conservative path:** multi-write is common —
+  measured ~29% of writes, and as RPC calls (one `ft_balance_of` per multi-write account-block)
+  ≈ **10% of balance resolutions**, concentrated in the _hottest_ accounts (aurora, DEXes). So
+  routing all multi-write to RPC meaningfully erodes the near-zero-RPC goal on exactly the
+  high-traffic accounts. **Decision: trust `last-array` within a shard** (strongly evidenced as
+  execution order) and rely on the safety net — the risk is bounded (a wrong pick is an
+  _intermediate_ value off by recent deltas, **self-heals** on the account's next write — and hot
+  accounts re-write constantly — and is caught by the supply invariant + sampling audit). Route
+  to RPC only the **cross-shard** multi-write residue (array order undefined across shards; 0
+  observed) and until Phase-1 confirms array==execution order at scale. (The measurement script
+  `ft-neardata-proof.mjs` was deduping by _first_ occurrence — fixed to last-write-wins → 9/9
+  byte-exact incl. `aurora`.)
 
 - **Finality / re-orgs (M2 — NOT free, round-3 H-R3-1).** Verified empirically: neardata
   **does** serve pre-final blocks — `/v0/block/{H+1..H+12}` past the final height return real
