@@ -3,8 +3,10 @@ SELECT
 FROM
   accounts
 WHERE
-  search @@ TO_TSQUERY(${account} || ':*')
+  account_id = ${account}
+  OR search @@ TO_TSQUERY(${account} || ':*')
 ORDER BY
+  (account_id = ${account}) DESC,
   (account_id LIKE ${account} || '%') DESC,
   (account_id LIKE ${account} || '.%') DESC,
   LENGTH(account_id) ASC,
