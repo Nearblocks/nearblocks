@@ -61,35 +61,12 @@ const isValidPublicKey = (key: string) => {
   );
 };
 
-const raceNonEmpty = <T>(promises: Promise<T[]>[]): Promise<T[]> => {
-  return new Promise((resolve, reject) => {
-    let pending = promises.length;
-
-    promises.forEach((p) => {
-      p.then((result) => {
-        if (result.length > 0) {
-          resolve(result);
-          return;
-        }
-        pending -= 1;
-        if (pending === 0) resolve([]);
-      }).catch((err) => {
-        pending -= 1;
-        if (pending === 0) reject(err);
-      });
-    });
-  });
-};
-
 const getAccounts = async (keyword: string) => {
   const query = keyword.toLowerCase();
 
   if (!isValidAccountId(query)) return [];
 
-  return raceNonEmpty([
-    dbBase.manyOrNone<SearchAccount>(sql.account, { account: query }),
-    dbBase.manyOrNone<SearchAccount>(sql.accounts, { account: query }),
-  ]);
+  return dbBase.manyOrNone<SearchAccount>(sql.accounts, { account: query });
 };
 
 const getKeys = async (keyword: string) => {

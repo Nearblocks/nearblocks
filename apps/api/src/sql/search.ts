@@ -1,7 +1,6 @@
 import { sql } from '#sql/index';
 
 export default {
-  account: sql('queries/search/account.sql'),
   accounts: sql('queries/search/accounts.sql'),
   blocks: sql('queries/search/blocks.sql'),
   fts: sql('queries/search/fts.sql'),
