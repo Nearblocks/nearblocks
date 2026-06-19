@@ -85,32 +85,36 @@ async function main() {
   let height = blk.block.header.height;
   console.log(`NEARDATA ${NEARDATA}  final block ${height}`);
 
-  const decoded = [];
-  for (let tries = 0; tries < 80 && decoded.length < 6; tries++) {
+  // LAST-WRITE-WINS per (contract, account, block): an account can be written several times
+  // in one block (e.g. aurora / a DEX on wrap.near); only the FINAL write equals
+  // ft_balance_of at that block. Keying a Map and overwriting in array order keeps the last.
+  const lastWrite = new Map();
+  for (let tries = 0; tries < 80 && lastWrite.size < 6; tries++) {
     for (const sh of blk.shards || []) {
       for (const c of sh.state_changes || []) {
         if (c.type !== 'data_update') continue;
         const d = decode(c.change);
-        if (d) decoded.push({ ...d, h: height });
+        if (d)
+          lastWrite.set(`${d.contract}\0${d.account}\0${height}`, {
+            ...d,
+            h: height,
+          });
       }
     }
-    if (decoded.length >= 6) break;
+    if (lastWrite.size >= 6) break;
     do {
       height--;
       blk = await getBlock(`/v0/block/${height}`);
     } while (blk === null);
   }
+  const decoded = [...lastWrite.values()];
   console.log(
-    `found ${decoded.length} FT-shaped data_update slots in neardata blocks\n`,
+    `found ${decoded.length} FT-shaped data_update slots in neardata blocks (last-write-wins)\n`,
   );
 
   let ok = 0,
     checked = 0;
-  const seen = new Set();
   for (const d of decoded) {
-    const key = `${d.contract}\0${d.account}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
     const onchain = await ftBalanceOf(d.contract, d.account, d.h);
     if (onchain === null) {
       console.log(`NOFT  ${d.contract} ${d.account} (no ft_balance_of)`);

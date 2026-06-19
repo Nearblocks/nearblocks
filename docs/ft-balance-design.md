@@ -390,7 +390,12 @@ Two correctness items that are NOT free and must be settled:
   block for the final value) rather than trusting array order. Phase-1 measures whether array
   order == execution order; only then drop the fallback. Do **not** assert this as "inherited
   from native" — native derives its index from receipt-execution order, FT from trie-write
-  order; they are not the same assumption.
+  order; they are not the same assumption. **Observed in the wild:** a reported DIFF on
+  `wrap.near` / `aurora` (decoded = `ft_balance_of + 1`) was exactly this — an intermediate
+  write captured instead of the block's final one. Reproduced on `wrap.near` /
+  `closemeat6237.near` (2 writes in a block: write[0] ≠, write[1] == `ft_balance_of`), and
+  taking the **last** write makes it byte-exact (9/9, including `aurora`). The measurement
+  script `ft-neardata-proof.mjs` was deduping by _first_ occurrence — fixed to last-write-wins.
 - **Finality / re-orgs (M2 — NOT free, round-3 H-R3-1).** Verified empirically: neardata
   **does** serve pre-final blocks — `/v0/block/{H+1..H+12}` past the final height return real
   blocks. And `streamBlock`'s trailing `fetchBlock(url, block)` (`nb-neardata/src/index.ts:163`)
