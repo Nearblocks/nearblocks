@@ -10,6 +10,10 @@ Companion evidence and scripts:
 - `scripts/ft-decode-selftest.mjs` — offline proof of the decoder byte-layout (no network).
 - `scripts/ft-state-decode-proof.mjs` — live proof: decode balances from on-chain state
   changes and diff against `ft_balance_of` (7/7 byte-exact every run).
+- `scripts/ft-neardata-proof.mjs` — same, but reading the **neardata block stream** the
+  indexer actually consumes (not RPC `EXPERIMENTAL_changes`); confirms the production source
+  carries the `data_update` bytes. Byte-exact vs `ft_balance_of` every run.
+- `scripts/ft-coverage-phase1.mjs` — the C1 gate / coverage measurement (§11).
 
 ---
 
@@ -103,6 +107,12 @@ that block. The decoder dedupes to the last write per account per block.
   `ft_balance_of` returns nothing parseable. That's the calibration signal (§5), confirmed.
 - `rpc.mainnet.near.org` is **dead** (HTTP 200 + a `-429` "DEPRECATED" body that silently
   zeroed verification); the script now defaults to `free.rpc.fastnear.com`.
+- **Verified against the production source, not just RPC.** `scripts/ft-neardata-proof.mjs`
+  pulls a real **neardata** block (`/v0/last_block/final`), decodes its `data_update` slots
+  straight from the payload, and matches `ft_balance_of` byte-exact — confirming neardata's
+  `shards[].state_changes[]` actually carries `key_base64`/`value_base64` for `data_update`
+  (the raw JSON is snake_case; `nb-neardata` camelCases it). The earlier proofs used RPC
+  `EXPERIMENTAL_changes`; this closes the gap to the stream the indexer really consumes.
 
 > **What 7/7 proves and what it doesn't.** It proves the byte layout and that the _balance_
 > slot equals `ft_balance_of` — that the mechanism is real. It does **not** certify a whole
