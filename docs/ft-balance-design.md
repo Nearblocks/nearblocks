@@ -493,6 +493,41 @@ exactly as fastNEAR does. So:
 
 ---
 
+## 9b. Share-based / liquid-staking tokens (LiNEAR, stNEAR) — and the rebasing edge
+
+Liquid-staking tokens have a **different storage structure** and must be called out explicitly
+(flagged by the team). Measured facts: `linear-protocol.near` and `meta-pool.near` both have
+account maps **too large for `view_state`** (`TOO_LARGE_CONTRACT_STATE`; meta-pool has 20,669
+accounts), and they store a per-account **`Account` struct** (`stake_shares` + unstaked amounts
+
+- unlock epochs, …), **not** a bare `u128`. `meta-pool.near` is already one of today's 13
+  hand-parsed legacy contracts.
+
+**The design handles them safely with no special-casing — this is what calibration is for.**
+A struct value is **not 16 bytes**, so §2's value guard rejects it → `non_standard`; or, if a
+contract stored a bare-u128 _shares_ value, it would `≠ ft_balance_of` → calibration mismatch →
+`non_standard`. Either way they route to the **RPC fallback** (§5) — correct balances, **never a
+silently-wrong decode**. So no correctness hole. Two real consequences:
+
+1. **Liquid-staking is a _notable_ `non_standard` class, not a negligible tail.** These are
+   high-volume tokens, so they enlarge the RPC-fallback set and undercut "the standard majority
+   is free." **Phase-1 must size the struct/share-based volume** so the RPC budget is realistic.
+2. **Rebasing is the genuinely hard case — but LiNEAR/stNEAR are _not_ it.** stNEAR/LiNEAR are
+   **value-accruing**: the FT balance (`st_near` / LiNEAR amount) **equals the stored shares and
+   is stable** between transactions — only the NEAR _value_ grows (via the share price). So
+   `ft_balance_of` changes **only on a per-account storage write**, which means the normal
+   `non_standard` **RPC-on-touch** refresh tracks them correctly. They need no extra machinery.
+
+   The true-rebasing class is where `ft_balance_of` **changes with no per-account write** — i.e.
+   computed as `shares × global_index`, and the index moves on a single _global_ write when
+   rewards land. For such a token, the per-account slot never changes, so **neither state-decode
+   nor RPC-on-touch ever re-reads** and the cached balance drifts. Handling that needs a
+   **contract-global trigger** (re-read all holders when the share price / `ft_total_supply`
+   changes) or a periodic refresh — a distinct mechanism we'd add only for confirmed rebasing
+   contracts. Note this gap **already exists in the current event-sum pipeline** (no transfer
+   event fires on a rebase), so it's a pre-existing limitation, not a regression. _Open:_ confirm
+   whether any high-volume NEAR FT is truly rebasing (vs value-accruing) before building it.
+
 ## 10. Validation — when and how we check the decoded state is right
 
 Which indexer changes, and when RPC is used, stated plainly:
@@ -722,23 +757,28 @@ Round 3 turned up correctness items that are NOT yet settled — must be closed 
 Still open:
 
 1. **Non-standard layout share of _volume_** — how much RPC the fallback really needs
-   (Phase 1, `scripts/ft-coverage-phase1.mjs`).
-2. **Proving sibling-map _absence_, not just non-observation (NEW-H1).** A touched-slot
+   (Phase 1, `scripts/ft-coverage-phase1.mjs`). **Include the liquid-staking / struct-account
+   class (LiNEAR, stNEAR — §9b)** explicitly; it's a high-volume `non_standard` set, not a tail.
+2. **Truly-rebasing tokens (§9b).** Confirm whether any high-volume NEAR FT has an
+   `ft_balance_of` that moves with no per-account write (computed `shares × global_index`); if so
+   it needs a contract-global re-read trigger that neither state-decode nor RPC-on-touch provides
+   (and which the current event pipeline also lacks). LiNEAR/stNEAR are value-accruing, not this.
+3. **Proving sibling-map _absence_, not just non-observation (NEW-H1).** A touched-slot
    window finds corruption where it occurs but can't prove a rarely-written sibling map
    doesn't exist; public `view_state` is refused (`TOO_LARGE_CONTRACT_STATE`, confirmed). The
    absence-proof paths are **static analysis of `code_base64`** (enumerate the wasm's
    `BorshStorageKey` prefixes — `indexer-contract` already stores the code) and/or archival
    per-prefix `view_state` paging. Until then, exact-offset pinning bounds the blast radius
    and audits catch drift.
-3. **Resolver backpressure (NEW-H4).** No unbounded queue: newest-block-first ordering,
+4. **Resolver backpressure (NEW-H4).** No unbounded queue: newest-block-first ordering,
    queue-depth/lag SLO + alerting, and a dead-letter path for tasks older than archival
    retention (else they fail permanently on GC'd state, H3).
-4. **Archival RPC cost & `view_state` feasibility** (H3/M1) — pick + price a provider.
-5. **`near_sdk::store` vs `collections` (NEW-M2)** — `store::LookupMap` uses a different key
+5. **Archival RPC cost & `view_state` feasibility** (H3/M1) — pick + price a provider.
+6. **`near_sdk::store` vs `collections` (NEW-M2)** — `store::LookupMap` uses a different key
    encoding and caches writes; different `code_hash` so it calibrates separately, but the
    exact-parse must be validated against `store`'s layout, not assumed identical. Add to
    Phase-1 enumeration.
-6. **near-sdk collection drift (M4)** — `UnorderedMap`/`TreeMap` accounts maps add an index
+7. **near-sdk collection drift (M4)** — `UnorderedMap`/`TreeMap` accounts maps add an index
    vector (another sibling-map source); characterize per code identity in Phase 1.
 
 ---
