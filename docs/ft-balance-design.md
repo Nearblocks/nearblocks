@@ -326,9 +326,10 @@ The reframe that matters: **RPC is at index time, not query time.**
   per block** (group a block's tasks into one round-trip, fastNEAR-style), never inline in
   the indexer. For the proven-standard majority it's **zero**.
 
-Cost ceiling (worst case, every touch hits RPC): `count(*)` of `ft_events` over 1h ×24 ≈
-**1.28M touches/day** ≈ 38.5M/mo. With calibration the standard majority decodes for free,
-so real RPC is a small fraction. **But this must be sized against an _archival_ provider,
+Cost ceiling (worst case, every touch hits RPC): full-mainnet psql measured
+**1,331,256 `ft_events`/24h** (~1.33M/day ≈ 40M/mo) over ~135.9k blocks — confirming the
+estimate. With calibration the standard majority decodes for free, so real RPC is a small
+fraction (and the multi-write subset that needs it is **9.01%** of resolutions, §7). **But this must be sized against an _archival_ provider,
 not a free tier (H3):** non-archival nodes GC state after ~5 epochs (~2.5 days), so any
 fallback/calibration at a historical `block_id` (the indexer runs behind head, and backfill
 is fully historical) needs archival RPC, which is paid. The free-tier framing was wrong;
@@ -409,16 +410,18 @@ Two correctness items that are NOT free and must be settled:
   accounts with 3–4 writes/block found **last == `ft_balance_of` in 5/5**, intermediates in
   **0/5**, with both _increasing_ (`v2.ref-finance.near`) and _decreasing_ (`aurora`) sequences
   (so it's order, not max/min), and **0 cross-shard** cases (each account's writes stayed in one
-  shard, contiguous positions). **Cost of the conservative path:** multi-write is common —
-  measured ~29% of writes, and as RPC calls (one `ft_balance_of` per multi-write account-block)
-  ≈ **10% of balance resolutions**, concentrated in the _hottest_ accounts (aurora, DEXes). So
-  routing all multi-write to RPC meaningfully erodes the near-zero-RPC goal on exactly the
-  high-traffic accounts. **Decision: trust `last-array` within a shard** (strongly evidenced as
-  execution order) and rely on the safety net — the risk is bounded (a wrong pick is an
-  _intermediate_ value off by recent deltas, **self-heals** on the account's next write — and hot
-  accounts re-write constantly — and is caught by the supply invariant + sampling audit). Route
-  to RPC only the **cross-shard** multi-write residue (array order undefined across shards; 0
-  observed) and until Phase-1 confirms array==execution order at scale. (The measurement script
+  shard, contiguous positions). **Cost of the conservative path (full-mainnet psql, 24h):**
+  multi-write = **9.01%** of resolutions (100,879 of 1,120,220), max **44** writes to one account
+  in one block. Routing all of that to RPC would erode the near-zero-RPC goal on the
+  high-traffic accounts. **And the multi-write accounts are exactly the ones that self-heal:** the
+  top offenders are all hyper-active protocol/DEX/system accounts — `token.sweat` system accounts
+  (`spin/claim/oracle/jars`, SWEAT batch rewards), DEX pools (`dclv2.ref-labs.near`,
+  `v2.ref-finance.near`), `game.hot.tg`, bridge connectors — which are rewritten almost every
+  block, so the "multi-write then dormant → stale" failure mode can't materialize for them.
+  **Decision: trust `last-array` within a shard** (strongly evidenced as execution order) + the
+  safety net (a wrong pick is an _intermediate_ value off by recent deltas, self-heals on the
+  next write, caught by supply invariant + sampling audit). Route to RPC only the **cross-shard**
+  residue (0 observed) and until Phase-1 confirms array==execution order at scale. (The measurement script
   `ft-neardata-proof.mjs` was deduping by _first_ occurrence — fixed to last-write-wins → 9/9
   byte-exact incl. `aurora`.)
 
