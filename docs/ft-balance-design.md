@@ -131,12 +131,13 @@ records `ContractCodeUpdate`/`Deletion` into `contract_code_events`
 (`contract_account_id`, `code_hash`, `code_base64`, global-contract refs). No standards
 detection today — but it gives us **`code_hash`**.
 
-**`code_hash` clustering is partial — and that's fine.** Measured (18 sampled FTs → 12 distinct
-hashes): the **majors are each unique** (`usdt`, `wrap`, `aurora`, `meta-pool`, `linear`,
-`token.v2.ref-finance`, `sweat`), while **families cluster** (the 6 `*.omft.near` bridge tokens
-share one hash; `tkn.near` meme-factory tokens share one). So most top tokens do **not** share a
-factory hash. Validate the real distribution with one psql on `contract_code_events`
-(`DISTINCT ON (contract_account_id)` latest → `GROUP BY code_hash`, join `ft_meta`), not RPC.
+**`code_hash` clustering: majors unique, the bulk heavily shared.** The top tokens are each a
+unique hash (sampled: `usdt`, `wrap`, `aurora`, `meta-pool`, `linear`, `token.v2.ref-finance`,
+`sweat`; families like the 6 `*.omft.near` and the `tkn.near` meme factory share one). But at the
+**population** level the clustering is heavy — full-mainnet psql: **65,938 live contracts → 3,749
+distinct code hashes, 95% (62,752) share a hash** (factories: token templates, lockups,
+multisigs, meme factories). So per-`code_hash` calibration amortizes hardest exactly on the long
+tail where most _contracts_ live; the majors are few and calibrate cheaply anyway (below).
 
 This doesn't hurt the design, because **what's shared is the _layout_, not the hash.** Two levers:
 
@@ -456,11 +457,13 @@ block_height, shard_id, index_in_chunk, …)` — append-only TimescaleDB hypert
   cumulative-sum, no drift. Idempotent on replay. Overhead ≈ the existing `ft_events` hypertable
   (~38.5M rows/mo; full-history backfill is order ~2–3B rows — fine for a compressed Timescale
   hypertable, the shape native `balance_events` already runs).
-- **Derived current-state — `ft_holders_v2(contract, account, amount)`**, `PRIMARY KEY
-(contract, account)`, projected to the latest log row `ORDER BY block_timestamp DESC,
-shard_id DESC, index_in_chunk DESC` (native `account_balances` trigger pattern; **benchmark at
-  FT cardinality**, fall back to a continuous aggregate if the statement trigger is the
-  bottleneck — §7 H-R3-3). The fast portfolio read cache — **not** a source of truth.
+- **Derived current-state — `ft_holders_v2(contract, account, amount)`** = the latest log row
+  per `(contract, account)` by `(block_timestamp, shard_id, index_in_chunk) DESC`, maintained as a
+  **real-time TimescaleDB continuous aggregate** over `ft_balance_events` (`last(amount, …)` per
+  pair), with **compression** on the log — the **cagg + compress pattern native balance already
+  runs**, where the latest block refreshes the aggregate in real time. (This is the answer to the
+  H-R3-3 trigger-scaling worry: use the proven cagg, not a per-statement trigger.) The fast
+  portfolio read cache — **not** a source of truth.
 
 So the time-series is the foundation, not an add-on, and the overhead is acceptable —
 comparable to `ft_events`, which already exists. Going forward it's _free_ (one row per
