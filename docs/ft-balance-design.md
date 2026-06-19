@@ -197,18 +197,19 @@ slot for a contract, decode it and call `ft_balance_of(account)` once at that bl
   begins with that prefix (kills the C1 sibling-map corruption). Zero further RPC.
 - decoded **≠** RPC, or RPC panics / method missing → mark `non_standard` / `not_ft`.
 
-Persisted verdict — table `ft_calibration` keyed by **resolved code identity** plus the
-pinned prefix. Code identity is `code_hash` _or_, for global contracts, `global_code_hash`
-/ the current hash behind `global_account_id` (in `contract_code_events`, global-contract
-rows carry `code_hash = NULL`, so a naive `code_hash` join misses an entire class — H1). A
-`contract`-level override row handles the rare instance that deviates from its code peers.
+Persisted verdict — table `ft_calibration` keyed by **resolved code identity**, storing the
+pinned **`(key-prefix, value-offset)`** (offset 0 = bare-u128 standard; offset > 0 = struct,
+§9b). Code identity is `code_hash` _or_, for global contracts, `global_code_hash` / the current
+hash behind `global_account_id` (in `contract_code_events`, global-contract rows carry
+`code_hash = NULL`, so a naive `code_hash` join misses an entire class — H1). A `contract`-level
+override row handles the rare instance that deviates from its code peers.
 
-| status         | meaning                                                        | balance source going forward                 |
-| -------------- | -------------------------------------------------------------- | -------------------------------------------- |
-| `standard`     | decoded == `ft_balance_of`; **prefix pinned**                  | **decode pinned-prefix slots** (0 RPC)       |
-| `non_standard` | decodes, but decoded ≠ RPC (hashed / packed / other map)       | **async RPC `ft_balance_of`** (queued)       |
-| `not_ft`       | no `ft_balance_of` / it panics (ref-finance/aggregatedex case) | **ignore** — not token balances              |
-| `uncalibrated` | first sighting, not yet verified                               | **async RPC** (queued) + trigger calibration |
+| status         | meaning                                                         | balance source going forward                 |
+| -------------- | --------------------------------------------------------------- | -------------------------------------------- |
+| `standard`     | decoded == `ft_balance_of`; `(prefix, offset)` pinned           | **decode pinned slots** (0 RPC; struct too)  |
+| `non_standard` | no `(prefix, offset)` matches (hashed key / _computed_ balance) | **async RPC `ft_balance_of`** (queued)       |
+| `not_ft`       | no `ft_balance_of` / it panics (ref-finance/aggregatedex case)  | **ignore** — not token balances              |
+| `uncalibrated` | first sighting, not yet verified                                | **async RPC** (queued) + trigger calibration |
 
 > **Calibration must verify the prefix, not just one account.** `standard` certifies a
 > _prefix_, not a contract. To set it safely, sample several accounts under the candidate
@@ -503,15 +504,42 @@ accounts), and they store a per-account **`Account` struct** (`stake_shares` + u
 - unlock epochs, …), **not** a bare `u128`. `meta-pool.near` is already one of today's 13
   hand-parsed legacy contracts.
 
-**The design handles them safely with no special-casing — this is what calibration is for.**
-A struct value is **not 16 bytes**, so §2's value guard rejects it → `non_standard`; or, if a
-contract stored a bare-u128 _shares_ value, it would `≠ ft_balance_of` → calibration mismatch →
-`non_standard`. Either way they route to the **RPC fallback** (§5) — correct balances, **never a
-silently-wrong decode**. So no correctness hole. Two real consequences:
+**First, the safety floor: no special-casing is _required_.** A struct value is **not 16
+bytes**, so §2's value guard rejects it → `non_standard` → RPC fallback (§5). Correct balances,
+**never a silently-wrong decode**. So even if we do nothing extra, these are served correctly.
 
-1. **Liquid-staking is a _notable_ `non_standard` class, not a negligible tail.** These are
-   high-volume tokens, so they enlarge the RPC-fallback set and undercut "the standard majority
-   is free." **Phase-1 must size the struct/share-based volume** so the RPC budget is realistic.
+**But we don't have to leave them on RPC — add a third decode tier (struct-decode).** The
+struct is borsh-serialized with a **fixed layout**, so the balance is a `u128` at a **fixed byte
+offset** inside the value. Decoding that offset is still **state-only, zero per-touch RPC**.
+
+| Tier             | Storage                           | Decode rule                           |
+| ---------------- | --------------------------------- | ------------------------------------- |
+| **standard**     | `LookupMap<AccountId, u128>`      | u128 at offset 0 (whole value)        |
+| **struct**       | `LookupMap<AccountId, Account{}>` | u128 at a **calibrated value-offset** |
+| **non_standard** | hashed key / _computed_ balance   | RPC fallback                          |
+
+So **generalise calibration from a key-prefix to `(key-prefix, value-offset)`** — standard is
+just `offset = 0`. The offset is found the same empirical way as the prefix (§5/NEW-C2): for
+each 16-byte-aligned offset, decode a `u128` and require it to equal `ft_balance_of` for several
+**non-zero, distinct-balance** accounts; the offset that matches every sample is the balance
+field. **No source code or `view_state` needed** — the struct bytes are already in the
+`data_update` we ingest, and we only need the _one_ balance field, not the whole struct (so
+trailing variable-length fields don't matter). The open-source `Account` definitions
+(`linear-protocol/LiNEAR`, `Narwallets/meta-pool`) are useful to _confirm_ the field semantics,
+but we **don't hardcode a per-contract parser** — the offset is calibrated and verified against
+`ft_balance_of`, so new struct tokens onboard automatically and the same anti-fabrication
+discipline applies. (Live capture of these two specific contracts was inconclusive — they're
+touched too rarely to grab in a short window — so the actual offset is a Phase-1 calibration
+output, not asserted here.)
+
+**When struct-decode is impossible → it self-detects.** If `ft_balance_of` is _computed_
+(`shares × price`) rather than a stored field, **no offset matches** → the contract stays
+`non_standard`/RPC. The brute-force returning "no matching offset" _is_ the rebasing signal.
+
+Two remaining consequences:
+
+1. **Size the struct/share-based volume in Phase-1.** Whatever doesn't promote to struct-decode
+   stays in the RPC-fallback set, so the RPC budget depends on this measurement.
 2. **Rebasing is the genuinely hard case — but LiNEAR/stNEAR are _not_ it.** stNEAR/LiNEAR are
    **value-accruing**: the FT balance (`st_near` / LiNEAR amount) **equals the stored shares and
    is stable** between transactions — only the NEAR _value_ grows (via the share price). So
@@ -801,9 +829,11 @@ Still open:
    `protocol_fee`) — and the `ft_balance_of` interface check excluded them wholesale, exactly
    as designed. C2 is real: **45 multi-write events** across 161 blocks (~28% of blocks).
    Coverage: 434/895 (48.5%) of u128 slots are account-keyed.
-2. **Calibration store + harness.** `ft_calibration(code_identity, prefix, status, …)`, the
-   decode-then-verify-prefix routine, and `contract_current_code` (handling DELETE and
-   `code_hash = NULL` global contracts).
+2. **Calibration store + harness.** `ft_calibration(code_identity, prefix, value_offset, status,
+…)`, the decode-then-verify routine (pin **both** the key-prefix and the value-offset — offset
+   0 for bare-u128 standard, offset > 0 for struct/liquid-staking tokens, §9b), and
+   `contract_current_code` (handling DELETE and `code_hash = NULL` global contracts). Measure how
+   many `non_standard` contracts promote to struct-decode vs stay RPC-only.
 3. **Shadow indexer (dedicated process).** `indexer-ft-balance` — its own cursor, structural
    clone of `indexer-balance` pointed at `data_update`; decode-inline (pinned prefix) + async
    resolver; append-only `ft_balance_events` (raw-index key) + derived `ft_holders_v2`; **cursor
