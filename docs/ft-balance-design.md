@@ -265,9 +265,9 @@ Safety properties (with round-2 fixes):
   `ft_balance_events`; `ft_holders_v2` is the projection of the latest row per
   `(contract, account)` ordered by `(block_timestamp, shard_id, index_in_chunk) DESC`. So a
   stale resolver read can't clobber a newer inline value — the projection just keeps the
-  highest-ordered row. The unique log key makes replays idempotent (no duplicates). This is
-  native balance's exact pattern; re-org correctness comes from finalized-only ingestion (M2),
-  not from the upsert.
+  highest-ordered row. The unique log key (raw-stateChanges index, §7) makes replays idempotent.
+  Re-org correctness comes from **gating the cursor to the final height** (§7 M2), not the
+  upsert — neardata does serve pre-final blocks, so this gate is required, not free.
 - **Exact-prefix parse (NEW-C2).** `standard` authorizes only slots that parse _exactly_ at
   the pinned offset — `startsWith` is not used. Sibling maps that merely share a prefix are
   rejected.
@@ -280,6 +280,19 @@ Safety properties (with round-2 fixes):
 - **Re-calibration guard.** Re-verify a `standard` code's pinned decode vs RPC on a sampled
   cadence; on mismatch, demote (and §10's re-resolve). A redeploy changes `code_hash` ⇒
   forced re-calibrate; the height guard covers the window before we notice.
+- **Negative verdicts are retryable, not permanent (round-3 M-R3-2).** A real FT that is
+  paused/migrating/rate-limited during its one calibration attempt must **not** be stamped
+  `not_ft`/`non_standard` forever. Distinguish a **durable** signal (method genuinely missing →
+  `not_ft`) from a **transient** one (RPC error/timeout/panic → retry with backoff). Negative
+  verdicts carry an attempt count and are re-calibrated on a low-rate sweep; during backfill,
+  **cap the calibration enqueue rate** so a flood of `uncalibrated` contracts doesn't swamp the
+  resolver (NEW-H4) and cause a calibration storm precisely when RPC is most likely to fail.
+- **Pre-classifier is calibration-time, never trusted raw (round-3 M-R3-3).** A raw
+  `data_update` is just `(contract, keyBase64, valueBase64)`; before any verdict the indexer
+  must route it as an FT-candidate (one-string tail) vs MT-candidate (`~$245`+two strings) vs
+  neither. Resolve by **trying both parses and confirming against `ft_balance_of` /
+  `mt_balance_of`** — the one that matches wins, neither ⇒ `not_ft`. The pre-classification is
+  a hint, never trusted without the RPC confirm (same discipline as prefix-pinning).
 
 **Calibration picks the prefix rigorously (NEW-C2).** From a known account in a verified
 slot, compute the exact prefix length `L = keyLen − (4 + len(account))` — we don't guess it
@@ -338,39 +351,55 @@ exactly on the native-balance path:
    `indexer-balance` already does the right thing and we clone it:
 
    - **`ft_balance_events` — the append-only authority.** One immutable row per decoded slot,
-     unique key **`(contract, block_timestamp, shard_id, index_in_chunk)`** with
-     `onConflict(...).ignore()`. `index_in_chunk` is the state change's array position in the
-     shard (native sets `changes[index].index_in_chunk = index`, `balance.ts:81`). Since
-     neardata returns the same payload in the same order on every refetch, replays collide on
-     the unique key and are dropped → **idempotent, no duplicates** (exactly `be_shard_index_uidx`
-     - `onConflict([...]).ignore()` in native, `balance.ts:89-91`).
+     unique key **`(block_timestamp, shard_id, index_in_chunk)`** with `onConflict(...).ignore()`.
+     **`index_in_chunk` must be the RAW `shard.stateChanges[]` array index (round-3 C-R3-1)** —
+     assigned _before_ any calibration/prefix filtering. Native's `index_in_chunk` is the
+     position in a _derived, filtered_ array (`[...validatorChanges, ...txnChanges,
+...receiptRewardChanges]`, `balance.ts:75-81`); copying that naively would make the index
+     shift whenever a calibration verdict changes which slots survive the filter, so replays
+     would stop colliding and write duplicates. Rooting it at the raw array position makes the
+     key a stable, deterministic identity of that exact state-change (neardata returns the same
+     payload order on every refetch) → **idempotent replays**. `contract` is then redundant in
+     the key (one raw position = one change = one contract), so we drop it.
    - **`ft_holders_v2` — a derived current-state projection**, `PRIMARY KEY (contract, account)`,
      maintained to the latest row `ORDER BY block_timestamp DESC, shard_id DESC,
-index_in_chunk DESC` — the same trigger pattern as native `account_balances`
-     (`migrations/20250924161921_update_trigger.up.sql`). This is the read cache for portfolio
-     queries; the **authority is the log**, so the earlier "independent monotonicUpsert" is
-     just this projection's `ORDER BY`.
+index_in_chunk DESC` — the `account_balances` trigger pattern
+     (`migrations/20250924161921_update_trigger.up.sql`). **Scaling caveat (round-3 H-R3-3):**
+     native's statement trigger sorts the per-block NEW TABLE; at FT cardinality (all standard
+     contracts' slots per block, and large backfill batches) on a millions-of-row
+     `(contract, account)` table this is **unproven** — benchmark it, and fall back to a
+     Timescale continuous-aggregate projection if the trigger is the bottleneck. The authority
+     is the log either way.
 
    Stand both up as **shadow tables first**, diffed against today's event-sum `ft_holders`.
 
 4. **`data_deletion`** on a _pinned-prefix_ balance slot → balance-0 row in the log (account
-   unregistered); the projection reflects it as latest. A `data_deletion` on any non-pinned
-   slot is ignored (sibling map).
+   unregistered). **Separate decode rule (round-3 M-R3-4):** a `data_deletion` change carries
+   `keyBase64` but **no `valueBase64`**, so §2's "value must be 16 bytes" guard does NOT apply —
+   match by pinned key prefix and emit 0. A deletion on any non-pinned slot is ignored.
 
-Two correctness items, now resolved by cloning native:
+Two correctness items that are NOT free and must be settled:
 
-- **Intra-block ordering / multi-write (C2).** `index_in_chunk` (array position) is a perfect
-  **idempotency** key, and the projection orders by it to pick "latest write" — which is the
-  assumption native balance **already runs on in production**. It's an _assumed_ execution
-  order, not a guaranteed one; for FT (≈45 multi-writes / 161 blocks measured) we should
-  empirically confirm payload order == execution order, or route multi-write accounts to the
-  resolver. We inherit native's behavior, not a new risk.
-- **Finality / re-orgs (M2) — handled by the source, no machinery needed.** `nb-neardata`'s
-  `streamBlock` paces against `/v0/last_block/final` and caps fetching at `final - block`
-  (`packages/nb-neardata/src/index.ts:130-133`); neardata serves finalized blocks. So we
-  ingest **finalized blocks only** and never decode a block that can orphan. The append-only
-  log makes it _recoverable_ even if we ever did; finalized ingestion makes it _correct_.
-  Same protection native balance has.
+- **Intra-block multi-write ordering (C2 — still open, round-3 C-R3-2).** With the raw-index
+  key, two writes to one `(contract, account)` in a block get distinct `index_in_chunk`, and the
+  projection picks the highest. But "highest array position == execution-final" is the
+  storage-write _emission_ order, **not proven** to equal execution order — and it matters for
+  the ≈28% of blocks with a multi-write (45/161 measured). **Safe default:** route any
+  `(contract, account)` written >1× in a block to the resolver (read `ft_balance_of` at that
+  block for the final value) rather than trusting array order. Phase-1 measures whether array
+  order == execution order; only then drop the fallback. Do **not** assert this as "inherited
+  from native" — native derives its index from receipt-execution order, FT from trie-write
+  order; they are not the same assumption.
+- **Finality / re-orgs (M2 — NOT free, round-3 H-R3-1).** Verified empirically: neardata
+  **does** serve pre-final blocks — `/v0/block/{H+1..H+12}` past the final height return real
+  blocks. And `streamBlock`'s trailing `fetchBlock(url, block)` (`nb-neardata/src/index.ts:163`)
+  has no finality cap and `finalFetch` is stale up to 10 blocks, so the stream **can emit
+  non-final blocks**. So we are exposed to shallow tip re-orgs (rare on NEAR, but real). The
+  fix is cheap because the stream already knows the final height: **gate the FT indexer's
+  authoritative cursor to `≤ final` height** (process tip blocks as provisional, finalize on
+  advance), or simply lag the write cursor behind the final head. The append-only log makes a
+  re-org _recoverable_ (delete superseded-block rows; projection recomputes); the cursor gate
+  makes it _not happen_. Native balance shares this exposure today — don't claim it's handled.
 
 Otherwise this is the `indexer-balance` shape with `account_update` swapped for
 `data_update` (cursor, sequential commit, batched idempotent insert, derived projection).
@@ -387,15 +416,16 @@ question, and the answer is _yes, going forward, cheaply; historically, expensiv
 
 - **Authority — `ft_balance_events`** `(contract, account, amount, block_timestamp,
 block_height, shard_id, index_in_chunk, …)` — append-only TimescaleDB hypertable, unique
-  `(contract, block_timestamp, shard_id, index_in_chunk)` + `onConflict().ignore()`. This is
-  the `balance_events` pattern, and state-decode is _ideal_ for it because each `data_update`
-  already carries the **absolute** post-write balance — no cumulative-sum, no drift. Idempotent
-  on replay (no duplicates). Overhead ≈ the existing `ft_events` hypertable (~38.5M rows/mo,
-  Timescale compression handles it).
+  **`(block_timestamp, shard_id, index_in_chunk)`** (raw-stateChanges index, §7 C-R3-1) +
+  `onConflict().ignore()`. Each `data_update` carries the **absolute** post-write balance — no
+  cumulative-sum, no drift. Idempotent on replay. Overhead ≈ the existing `ft_events` hypertable
+  (~38.5M rows/mo; full-history backfill is order ~2–3B rows — fine for a compressed Timescale
+  hypertable, the shape native `balance_events` already runs).
 - **Derived current-state — `ft_holders_v2(contract, account, amount)`**, `PRIMARY KEY
 (contract, account)`, projected to the latest log row `ORDER BY block_timestamp DESC,
-shard_id DESC, index_in_chunk DESC` (native `account_balances` trigger pattern). The fast
-  "balance now" / portfolio read cache — **not** an independent source of truth.
+shard_id DESC, index_in_chunk DESC` (native `account_balances` trigger pattern; **benchmark at
+  FT cardinality**, fall back to a continuous aggregate if the statement trigger is the
+  bottleneck — §7 H-R3-3). The fast portfolio read cache — **not** a source of truth.
 
 So the time-series is the foundation, not an add-on, and the overhead is acceptable —
 comparable to `ft_events`, which already exists. Going forward it's _free_ (one row per
@@ -404,16 +434,22 @@ decoded touch, no RPC for standard tokens).
 **8b. Backfill from genesis — feasible via archive download, not RPC.** This is the big
 payoff and the earlier "history is prohibitive" framing was wrong for the standard majority.
 
-- **For STANDARD contracts, full history decodes from the block archives with ZERO RPC.**
-  Each historical `data_update` already carries the absolute post-write u128, so re-decoding
-  the archived blocks reconstructs the complete absolute balance series back to each
-  contract's first write. The cost is **download + CPU, not RPC.** And we already have the
-  bulk-archive fetcher: **`nb-neardata-raw`** streams compressed `.tgz` block bundles over
-  plain HTTP from `mainnet.neardata.xyz/raw/{…}/{block}.tgz` (`streamFiles`), camelCased to
-  the same `Message` shape — i.e. fastNEAR's "download the archives" path (~archive-count
-  GETs, not hundreds of millions of RPC calls). Plan: run the FT decoder over the
-  `nb-neardata-raw` archive stream from genesis → switch to the finalized `nb-neardata`
-  stream at the tip.
+- **For STANDARD contracts, history DECODES with zero RPC — but each code identity still needs
+  ≥1 archival calibration call (round-3 H-R3-2a).** Each historical `data_update` carries the
+  absolute post-write u128, so re-decoding archived blocks reconstructs the full series with no
+  per-touch RPC. The honest qualifier: a contract is only `standard` _after_ a decode-vs-`ft_balance_of`
+  match, and calibrating at a historical block needs **archival** `ft_balance_of` (state GC'd
+  after ~2.5d, H3). A contract that redeployed N times needs one calibration per code identity
+  per era. So it's "**zero decode-RPC after a small, archival-priced calibration per code
+  identity**," not literally zero. Still orders of magnitude below per-touch RPC.
+- **Bulk fetcher: `nb-neardata-raw`** streams compressed `.tgz` block archives over plain HTTP
+  from `mainnet.neardata.xyz/raw/…` (`streamFiles`) — fastNEAR's "download the archives" path.
+  **Verify before relying on it (round-3 H-R3-2c):** its `streamBlock` steps by 10
+  (`blocks.push(i); i += 10`, `index.ts:115-119`), so it's only correct if each `.tgz` bundles
+  10 blocks; if each archive is a single block it would skip 9/10. A recent-height probe at the
+  derived path returned empty, so **archive granularity, path scheme, and history availability
+  must be confirmed with fastNEAR** before scheduling the backfill. Plan once confirmed: decode
+  the raw archive stream from genesis → switch to the live `nb-neardata` stream at the tip.
 - **Only the NON-STANDARD tail's history is expensive.** Those don't decode, so historical
   balances would need archival `ft_balance_of` at many blocks (prohibitive). For the tail,
   seed current-state and accept shallow/no deep history — it's a small share of volume.
@@ -642,22 +678,25 @@ balances (`nft_holders`) — separate model, out of scope.
 
 ## 13. Risks & open questions
 
-Addressed in-design across two adversarial review rounds, each with a test that must pass:
+Addressed in-design across three adversarial review rounds, each with a test that must pass:
 
 - **C1 / NEW-C2 — sibling AccountId→u128 maps** (CRITICAL): exact-offset prefix parse, not
-  `startsWith` (§2/§5). _Gate:_ `scripts/ft-coverage-phase1.mjs` groups every 16-byte
-  account-keyed slot by prefix and flags any contract with >1 such prefix.
-- **NEW-C1 — resolver clobbers newer inline write** (CRITICAL): append-only
-  `ft_balance_events` + `ft_holders_v2` projected to the latest row by
-  `(block_timestamp, shard_id, index_in_chunk) DESC` (native balance's two-table pattern,
-  §7/§8a) — a stale read can't win. _Gate:_ enqueue a task at H, land an inline write at H+k,
-  drain the task, assert the H+k value survives.
+  `startsWith` (§2/§5). _Gate:_ `scripts/ft-coverage-phase1.mjs` flags any contract with >1
+  account-keyed u128 prefix (200-block run: 0 among real FTs).
+- **NEW-C1 — resolver clobbers newer inline write** (CRITICAL): append-only `ft_balance_events`
+  - `ft_holders_v2` projected to the latest row by `(block_timestamp, shard_id, index_in_chunk)
+DESC` (§7/§8a). _Gate:_ enqueue a task at H, land an inline write at H+k, assert H+k survives.
+- **C-R3-1 — `index_in_chunk` definition** (CRITICAL, round 3): must be the **raw
+  `shard.stateChanges[]` index**, not native's filtered-array position (`balance.ts:75-81`),
+  else verdict changes shift indices and replays write duplicates (§7/§8a). _Gate:_ replay a
+  block with a verdict change between runs; assert zero duplicate projection rows.
 - **Duplicates / replay** (at-least-once stream): unique log key
-  `(contract, block_timestamp, shard_id, index_in_chunk)` + `onConflict().ignore()`, exactly
-  like native `be_shard_index_uidx` — replays are idempotent (§7/§8a).
-- **C2 — intra-block multi-write ordering**: the projection orders by `index_in_chunk` (array
-  position) — the assumption native balance already runs on. _Gate:_ confirm payload order ==
-  execution order for FT's multi-writes (≈45/161 blocks measured), else route to the resolver.
+  `(block_timestamp, shard_id, index_in_chunk)` + `onConflict().ignore()`, like native
+  `be_shard_index_uidx` — idempotent (§7/§8a).
+- **C2 / C-R3-2 — intra-block multi-write ordering** (round 3): array order is the trie-write
+  emission order, **not proven** == execution order (and ≠ native's receipt-execution index).
+  Safe default: **route any `(contract, account)` written >1×/block to the resolver**; Phase-1
+  measures whether array order == execution order before dropping the fallback.
 - **NEW-H3 — calibration races the contract-indexer cursor**: height-aware verdict lookup;
   ft-balance ahead of the contract indexer ⇒ `uncalibrated` (§5). _Gate:_ redeploy with a
   changed prefix; assert no inline decode between deploy block and re-calibration.
@@ -666,10 +705,19 @@ Addressed in-design across two adversarial review rounds, each with a test that 
 - **NEW-H2 — supply invariant overtrusted**: downgraded to alert-only, corroborate before
   demote, `coverage_complete`-gated (§10).
 - **H1/H2 — code identity**: `code_hash = NULL` global contracts + current-state resolution (§4).
-- **M2 — finality / re-orgs**: handled by the source — `nb-neardata` paces against
-  `/v0/last_block/final` and neardata serves finalized blocks, so we ingest finalized blocks
-  only and never decode a block that can orphan (NEAR's finalized chain doesn't re-org). The
-  append-only log adds recoverability on top. No reconciliation machinery (§7).
+- **NEW-H2 → M-R3-2 — negative-verdict retry**: `not_ft`/`non_standard` are retryable with
+  backoff (durable vs transient); calibration enqueue rate-capped during backfill (§5).
+- **M-R3-3 — pre-classifier**: FT/MT routing decided at calibration time by try-both-confirm
+  against RPC, never trusted raw (§5).
+
+Round 3 turned up correctness items that are NOT yet settled — must be closed before build:
+
+- **C-R3-1 / C-R3-2** (CRITICAL): raw-index key + multi-write→resolver (above; §7).
+- **M2 — finality (round-3 H-R3-1, CORRECTED):** earlier "neardata serves finalized blocks" was
+  **wrong** — verified that `/v0/block/{H+1..H+12}` past the final height return real blocks, and
+  `streamBlock`'s trailing fetch has no finality cap. Fix: **gate the FT indexer's cursor to the
+  final height** (the stream already knows it). Append-only log makes re-orgs recoverable; the
+  gate makes them not happen. _Gate:_ assert no authoritative write above the latest final head.
 
 Still open:
 
@@ -718,13 +766,14 @@ Still open:
    `code_hash = NULL` global contracts).
 3. **Shadow indexer (dedicated process).** `indexer-ft-balance` — its own cursor, structural
    clone of `indexer-balance` pointed at `data_update`; decode-inline (pinned prefix) + async
-   resolver; append-only `ft_balance_events` (authority) + derived `ft_holders_v2`; finalized
-   `nb-neardata` stream at the tip; diff vs event-sum `ft_holders`, no user-facing change.
-4. **Genesis backfill via archive download (§8b).** Run the decoder over the
-   **`nb-neardata-raw`** archive stream (`.tgz` block bundles) from genesis forward — bulk
-   HTTP GETs, **zero RPC for standard contracts**, reconstructing full absolute history into
-   `ft_balance_events`. Non-standard tail: seed current-state, accept shallow history. **No
-   event-based history** (§8b — events are untrusted). This one-time job is the high-value
+   resolver; append-only `ft_balance_events` (raw-index key) + derived `ft_holders_v2`; **cursor
+   gated to the final head** (M2); multi-write accounts routed to the resolver (C-R3-2); diff vs
+   event-sum `ft_holders`, no user-facing change.
+4. **Genesis backfill via archive download (§8b).** Once the `nb-neardata-raw` archive
+   granularity is confirmed with fastNEAR, decode the `.tgz` archive stream from genesis forward
+   — bulk HTTP GETs, **zero per-touch RPC** (one archival calibration per code identity),
+   reconstructing full absolute history into `ft_balance_events`. Non-standard tail: seed
+   current-state, accept shallow history. **No event-based history** (§8b). The high-value
    deliverable: authoritative balances + full time-series for every standard FT.
 5. **Cutover.** Point `feat/assets` fallback at `ft_holders_v2`; retire fastNEAR primary;
    delete drift-prone paths once green.
