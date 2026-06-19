@@ -401,29 +401,33 @@ So the time-series is the foundation, not an add-on, and the overhead is accepta
 comparable to `ft_events`, which already exists. Going forward it's _free_ (one row per
 decoded touch, no RPC for standard tokens).
 
-**8b. Backfill — current-state is cheap, history is the hard part.**
+**8b. Backfill from genesis — feasible via archive download, not RPC.** This is the big
+payoff and the earlier "history is prohibitive" framing was wrong for the standard majority.
 
-- **Current-state backfill is bounded, not a history replay.** `view_state` returns a
-  contract's balance map _as of one block_ in paginated RPC calls — seed `ft_holders_v2`
-  per contract without streaming history. **Caveat (M1):** `view_state` has a hard
-  result-size cap and is often disabled/limited on public RPC; on USDT / `wrap.near`
-  (millions of keys) this is **not** "a few calls" — it needs archival, recent-block,
-  heavy pagination, and may not complete. For those top contracts the practical seed is the
-  current event-sum `ft_holders` baseline, then let forward decoding self-heal each account
-  on its next touch.
-- **Historical _time-series_ backfill is fundamentally expensive — this is the real
-  overhead concern.** `view_state` gives one point in time, not history. To reconstruct
-  absolute FT balances at _every past block_ you'd need either (i) a full historical
-  **re-stream** of neardata through the decoder (heavy one-time job, but feasible since the
-  state changes are in the archive), or (ii) `ft_balance_of` at many historical blocks
-  (archival, prohibitive). **The `ft_events` cumulative sum is NOT an acceptable fallback
-  for history** — fabricatable/missable events are the exact thing this design exists to
-  escape, so trusting them for a historical chart re-imports the bug. The honest options
-  are: **(a)** start the authoritative absolute series at indexer go-live and have no
-  trustworthy absolute history before it, or **(b)** if exact history is required, do the
-  one-time neardata **state re-stream** (the only fabrication-proof source of past
-  balances). Pick per product need; do not silently backfill from events and call it
-  authoritative.
+- **For STANDARD contracts, full history decodes from the block archives with ZERO RPC.**
+  Each historical `data_update` already carries the absolute post-write u128, so re-decoding
+  the archived blocks reconstructs the complete absolute balance series back to each
+  contract's first write. The cost is **download + CPU, not RPC.** And we already have the
+  bulk-archive fetcher: **`nb-neardata-raw`** streams compressed `.tgz` block bundles over
+  plain HTTP from `mainnet.neardata.xyz/raw/{…}/{block}.tgz` (`streamFiles`), camelCased to
+  the same `Message` shape — i.e. fastNEAR's "download the archives" path (~archive-count
+  GETs, not hundreds of millions of RPC calls). Plan: run the FT decoder over the
+  `nb-neardata-raw` archive stream from genesis → switch to the finalized `nb-neardata`
+  stream at the tip.
+- **Only the NON-STANDARD tail's history is expensive.** Those don't decode, so historical
+  balances would need archival `ft_balance_of` at many blocks (prohibitive). For the tail,
+  seed current-state and accept shallow/no deep history — it's a small share of volume.
+- **`view_state` is only for spot current-state seeding**, and is capped on public RPC
+  (`TOO_LARGE_CONTRACT_STATE` on USDT/`wrap.near`, M1). With genesis archive-decode it's
+  largely unnecessary for standard contracts — forward decode + archive backfill already
+  give exact current state.
+- **The `ft_events` cumulative sum is still NOT an acceptable history source** — fabricatable
+  events are the exact thing we're escaping; the archive re-decode is the fabrication-proof
+  path, and now a cheap one.
+
+So: a one-time **genesis archive backfill** yields authoritative current balances **and** the
+full absolute time-series for every standard FT (including no-event legacy tokens) — a
+dataset neither the event-sum table nor fastNEAR's current-only cache provides.
 
 **8c. Dropping fastNEAR.** `feat/assets` currently calls fastNEAR for `/v3/.../assets/fts`
 and falls back to the drift-prone `ft_holders`. Once `ft_holders_v2` is authoritative the
@@ -627,6 +631,9 @@ balances (`nft_holders`) — separate model, out of scope.
   contract-tools versions** — it's an enum ordinal that a version bump can shift; pin the
   discriminant region's bytes per code identity, and a `0x01` Token-record slot that happens
   to be 16 bytes must be rejected by the exact parse, not admitted.
+- **Genesis backfill is even cheaper for MT.** "Genesis" here is `intents.near`'s deploy block
+  (a 2024 contract), not chain genesis — so the same `nb-neardata-raw` archive backfill (§8b)
+  spans far fewer blocks. MT genesis indexing is a small, recent, decode-only job.
 
 > Open empirical check before building: dump `intents.near` `view_state` to byte-confirm its
 > root prefix is bare `~$245` and not namespaced by a wrapper (hard gate, not a nicety).
@@ -709,14 +716,16 @@ Still open:
 2. **Calibration store + harness.** `ft_calibration(code_identity, prefix, status, …)`, the
    decode-then-verify-prefix routine, and `contract_current_code` (handling DELETE and
    `code_hash = NULL` global contracts).
-3. **Shadow indexer.** `indexer-ft-balance` decode-inline (pinned prefix) + async resolver,
-   writing `ft_holders_v2` and `ft_balance_events`; finalized blocks only; diff vs event-sum
-   `ft_holders`, quantify drift, no user-facing change.
-4. **Backfill (current-state).** `view_state` snapshots to seed `ft_holders_v2` for top
-   contracts where feasible; event-sum baseline + forward self-heal where `view_state` can't
-   complete. **No event-based absolute-history backfill** (§8b — events are the untrusted
-   source); if exact history is needed, a one-time neardata state re-stream is the only
-   fabrication-proof source.
+3. **Shadow indexer (dedicated process).** `indexer-ft-balance` — its own cursor, structural
+   clone of `indexer-balance` pointed at `data_update`; decode-inline (pinned prefix) + async
+   resolver; append-only `ft_balance_events` (authority) + derived `ft_holders_v2`; finalized
+   `nb-neardata` stream at the tip; diff vs event-sum `ft_holders`, no user-facing change.
+4. **Genesis backfill via archive download (§8b).** Run the decoder over the
+   **`nb-neardata-raw`** archive stream (`.tgz` block bundles) from genesis forward — bulk
+   HTTP GETs, **zero RPC for standard contracts**, reconstructing full absolute history into
+   `ft_balance_events`. Non-standard tail: seed current-state, accept shallow history. **No
+   event-based history** (§8b — events are untrusted). This one-time job is the high-value
+   deliverable: authoritative balances + full time-series for every standard FT.
 5. **Cutover.** Point `feat/assets` fallback at `ft_holders_v2`; retire fastNEAR primary;
    delete drift-prone paths once green.
 6. **Phase 2 — MT (NEP-245).** Extend the same machinery to `(contract, token_id, account)`,
