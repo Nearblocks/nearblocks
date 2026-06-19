@@ -390,12 +390,22 @@ Two correctness items that are NOT free and must be settled:
   block for the final value) rather than trusting array order. Phase-1 measures whether array
   order == execution order; only then drop the fallback. Do **not** assert this as "inherited
   from native" — native derives its index from receipt-execution order, FT from trie-write
-  order; they are not the same assumption. **Observed in the wild:** a reported DIFF on
-  `wrap.near` / `aurora` (decoded = `ft_balance_of + 1`) was exactly this — an intermediate
-  write captured instead of the block's final one. Reproduced on `wrap.near` /
-  `closemeat6237.near` (2 writes in a block: write[0] ≠, write[1] == `ft_balance_of`), and
-  taking the **last** write makes it byte-exact (9/9, including `aurora`). The measurement
-  script `ft-neardata-proof.mjs` was deduping by _first_ occurrence — fixed to last-write-wins.
+  order; they are not the same assumption.
+
+  **The ground truth is RPC, not array order.** `ft_balance_of(block_id=H)` is _by definition_
+  the end-of-block-H value, so for a multi-write account the guaranteed-correct move is to read
+  it. `last-array-element` is an _optimization_ to avoid that RPC, valid only if array order ==
+  execution order. **Evidence (strong, not a proof):** a reported `wrap.near`/`aurora` DIFF
+  (decoded = `ft_balance_of + small`) was this — `aurora` gets bursts of ±1-yocto writes
+  (`…050→…049→…048→…047`, 4 in one block); the **last** equals `ft_balance_of`. A stress test of
+  accounts with 3–4 writes/block found **last == `ft_balance_of` in 5/5**, intermediates in
+  **0/5**, with both _increasing_ (`v2.ref-finance.near`) and _decreasing_ (`aurora`) sequences
+  (so it's order, not max/min), and **0 cross-shard** cases (each account's writes stayed in one
+  shard, contiguous positions). So: **production routes multi-write accounts to RPC by default**;
+  only after Phase-1 confirms array==execution order at scale do we trust `last-array` and drop
+  the RPC. (The measurement script `ft-neardata-proof.mjs` was deduping by _first_ occurrence —
+  fixed to last-write-wins → 9/9 byte-exact incl. `aurora`.)
+
 - **Finality / re-orgs (M2 — NOT free, round-3 H-R3-1).** Verified empirically: neardata
   **does** serve pre-final blocks — `/v0/block/{H+1..H+12}` past the final height return real
   blocks. And `streamBlock`'s trailing `fetchBlock(url, block)` (`nb-neardata/src/index.ts:163`)
