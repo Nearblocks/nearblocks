@@ -183,26 +183,27 @@ export const ReceiptInspectRows = ({
                   account={receipt!.predecessor_account_id}
                   textClassName="max-w-60"
                 />
-                {showPublicKey && (
-                  <span className="text-muted-foreground flex items-center">
-                    (
-                    <Key className="mx-1 size-3.5" />
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Link
-                          className="text-link inline max-w-40 truncate"
-                          href={`/address/${
-                            receipt!.predecessor_account_id
-                          }/keys`}
-                        >
-                          {receipt!.public_key}
-                        </Link>
-                      </TooltipTrigger>
-                      <TooltipContent>{receipt!.public_key}</TooltipContent>
-                    </Tooltip>
-                    <Copy text={receipt!.public_key} />)
-                  </span>
-                )}
+                {showPublicKey &&
+                  receipt?.predecessor_account_id !== 'system' && (
+                    <span className="text-muted-foreground flex items-center">
+                      (
+                      <Key className="mx-1 size-3.5" />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link
+                            className="text-link inline max-w-40 truncate"
+                            href={`/address/${
+                              receipt!.predecessor_account_id
+                            }/keys`}
+                          >
+                            {receipt!.public_key}
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>{receipt!.public_key}</TooltipContent>
+                      </Tooltip>
+                      <Copy text={receipt!.public_key} />)
+                    </span>
+                  )}
               </p>
             )}
           </SkeletonSlot>

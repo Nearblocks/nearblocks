@@ -44,11 +44,11 @@ const TreeItem = ({ receipt, selectedId, toggle }: ItemProps) => {
     <li>
       <div
         className={cn(
-          'inline-flex max-w-60 cursor-pointer items-center gap-2 rounded-md border-2 px-2 py-1 transition-colors',
+          'inline-flex max-w-60 cursor-pointer items-center gap-2 rounded-md px-2 py-1 transition-colors',
           variant.bg,
           isSelected
-            ? 'border-link'
-            : 'hover:border-link/50 border-transparent',
+            ? 'outline-link outline-2'
+            : 'hover:outline-link/50 hover:outline-2',
         )}
         onClick={() => toggle(receipt.receipt_id)}
         role="button"
@@ -88,12 +88,12 @@ const skeletonNode = (
   <li>
     <div
       className={cn(
-        'inline-flex max-w-60 items-center gap-2 rounded-md border-2 border-transparent px-2 py-1',
+        'inline-flex max-w-60 items-center gap-2 rounded-md px-2 py-1',
         bg,
       )}
     >
       <Skeleton className="size-3.5 shrink-0 rounded-full" />
-      <Skeleton className={cn('h-4', labelWidth)} />
+      <Skeleton className={cn('h-[1.375rem]', labelWidth)} />
     </div>
     {children && <ul>{children}</ul>}
   </li>
