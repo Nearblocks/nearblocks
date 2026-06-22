@@ -3,9 +3,7 @@
 import { baseDecode } from 'borsh';
 import { providers } from 'near-api-js';
 
-import { SearchResult } from '../types';
 import { networkId, fastNearRpcKey } from './config';
-import { isValidAccount } from './libs';
 
 export const getRpcProviders = async () => {
   return networkId === 'mainnet'
@@ -17,24 +15,12 @@ export const getRpcProviders = async () => {
           }`,
         },
         {
-          name: 'NEAR (Archival)',
-          url: 'https://archival-rpc.mainnet.near.org',
-        },
-        {
-          name: 'NEAR',
-          url: 'https://rpc.mainnet.near.org',
-        },
-        {
           name: 'FASTNEAR Free',
           url: 'https://free.rpc.fastnear.com',
         },
         {
           name: 'Lava Network',
           url: 'https://near.lava.build',
-        },
-        {
-          name: 'dRPC',
-          url: 'https://near.drpc.org',
         },
       ]
     : [
@@ -44,103 +30,9 @@ export const getRpcProviders = async () => {
             fastNearRpcKey ? `?apiKey=${fastNearRpcKey}` : ''
           }`,
         },
-        {
-          name: 'NEAR (Archival)',
-          url: 'https://archival-rpc.testnet.near.org',
-        },
-        {
-          name: 'NEAR',
-          url: 'https://rpc.testnet.near.org',
-        },
       ];
 };
 
-type response = {
-  final_execution_status: string;
-  receipt_id: string;
-  parent_transaction_hash: string;
-  transaction: {
-    hash: string;
-  };
-  header: {
-    height: number;
-    hash: string;
-  };
-};
-
-const receiptRpc =
-  networkId === 'mainnet'
-    ? `https://beta.rpc.mainnet.near.org`
-    : `https://beta.rpc.testnet.near.org')`;
-
-type SearchResponse =
-  | { data: SearchResult; keyword: string; loading: boolean }
-  | { data: null; loading: boolean };
-
-export const rpcSearch = async (keyword: string): Promise<SearchResponse> => {
-  const data: SearchResult = {
-    accounts: [],
-    blocks: [],
-    receipts: [],
-    tokens: [],
-    txns: [],
-    mtTokens: [],
-  };
-
-  const isQueryLong = keyword.length >= 43;
-
-  const [account, block, txn, receipt]: response[] = await Promise.all([
-    isValidAccount(keyword.toLocaleLowerCase())
-      ? getAccount(keyword.toLocaleLowerCase())
-      : undefined,
-    isQueryLong
-      ? getBlock(keyword)
-      : !isNaN(+keyword)
-      ? getBlock(+keyword)
-      : undefined,
-    isQueryLong ? getTxn(keyword) : undefined,
-    isQueryLong ? getReceipt(receiptRpc, keyword) : undefined,
-  ]);
-
-  if (account) {
-    data.accounts = [
-      {
-        account_id: keyword.toLocaleLowerCase(),
-      },
-    ];
-  }
-
-  if (block) {
-    data.blocks = [
-      {
-        block_hash: block?.header?.hash,
-        block_height: block?.header?.height,
-      },
-    ];
-  }
-
-  if (txn) {
-    if (txn?.final_execution_status !== 'NONE') {
-      data.txns = [{ transaction_hash: txn?.transaction?.hash }];
-    }
-  }
-
-  if (receipt) {
-    data.receipts = [
-      {
-        originated_from_transaction_hash: receipt?.parent_transaction_hash,
-        receipt_id: receipt?.receipt_id,
-      },
-    ];
-  }
-  const hasValidData = Object.values(data).some(
-    (value) => Array.isArray(value) && value.length > 0,
-  );
-
-  return hasValidData
-    ? { data, keyword, loading: false }
-    : { data: null, loading: false };
-};
 const RpcProviders = await getRpcProviders();
 const jsonProviders = RpcProviders.map(
   (p) => new providers.JsonRpcProvider({ url: p.url }, { retries: 0 }),
