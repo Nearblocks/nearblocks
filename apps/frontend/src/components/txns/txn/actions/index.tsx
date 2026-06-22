@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import { Txn } from 'nb-schemas';
+import { Txn, TxnFT, TxnMT, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { ScrollableList } from '@/components/scrollable-list';
@@ -12,16 +12,29 @@ import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 import { Action } from './action';
+import { ContractEvents } from './events';
 import { TxnIcon } from './icon';
 
 type Props = {
+  ftsPromise?: Promise<null | TxnFT[]>;
   loading?: boolean;
+  mtsPromise?: Promise<null | TxnMT[]>;
+  receiptsPromise?: Promise<null | TxnReceipt>;
   txnPromise?: Promise<null | Txn>;
 };
 
-export const Actions = ({ loading, txnPromise }: Props) => {
+export const Actions = ({
+  ftsPromise,
+  loading,
+  mtsPromise,
+  receiptsPromise,
+  txnPromise,
+}: Props) => {
   const { t } = useLocale('txns');
   const txn = !loading && txnPromise ? use(txnPromise) : null;
+  const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
+  const fts = !loading && ftsPromise ? use(ftsPromise) : null;
+  const mts = !loading && mtsPromise ? use(mtsPromise) : null;
 
   return (
     <Card>
@@ -79,6 +92,9 @@ export const Actions = ({ loading, txnPromise }: Props) => {
                       </ScrollableList>
                     ) : (
                       content
+                    )}
+                    {receipts && (
+                      <ContractEvents fts={fts} mts={mts} receipts={receipts} />
                     )}
                   </div>
                 );

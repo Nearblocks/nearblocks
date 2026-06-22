@@ -26,7 +26,12 @@ const TxnPage = async ({ params }: Props) => {
   return (
     <div className="flex flex-col gap-4">
       <ErrorSuspense fallback={<Actions loading />}>
-        <Actions txnPromise={txnPromise} />
+        <Actions
+          ftsPromise={txnFTsPromise}
+          mtsPromise={txnMTsPromise}
+          receiptsPromise={txnReceiptsPromise}
+          txnPromise={txnPromise}
+        />
       </ErrorSuspense>
       <ErrorSuspense fallback={<Overview loading />}>
         <Overview
