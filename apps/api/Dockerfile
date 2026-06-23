@@ -1,5 +1,5 @@
-# https://turbo.build/repo/docs/handbook/deploying-with-docker#the-solution
-FROM node:22-alpine AS base
+# fix for nodejs/node/issues/63989
+FROM node:22.22.3-alpine AS base 
 
 FROM --platform=$BUILDPLATFORM base AS builder
 WORKDIR /app
