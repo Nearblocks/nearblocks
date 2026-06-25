@@ -16,6 +16,7 @@ export default {
     tokens: sql('queries/nfts/tokens/tokens.sql'),
     tokenTxn: sql('queries/nfts/tokens/tokenTxn.sql'),
     tokenTxnCount: sql('queries/nfts/tokens/tokenTxnCount.sql'),
+    tokenTxnCountEstimate: sql('queries/nfts/tokens/tokenTxnCountEstimate.sql'),
     tokenTxns: sql('queries/nfts/tokens/tokenTxns.sql'),
   },
   txn: sql('queries/nfts/txn.sql'),
