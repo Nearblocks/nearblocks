@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const list = z.object({
-  cursor: z.string().regex(/^\d+$/, 'Invalid cursor').optional(),
+  cursor: z.string().regex(/^\d*$/, 'Invalid cursor').optional(),
   page: z.number().int().positive().max(200).optional().default(1),
   per_page: z.number().int().positive().max(250).optional().default(25),
 });
