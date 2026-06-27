@@ -26,7 +26,8 @@
     "prettier-plugin-sql": "0.18.0",
     "prettier-plugin-tailwindcss": "0.7.2",
     "turbo": "^2.8.3",
-    "wrangler": "^3.86.0"
+    "wrangler": "^3.86.0",
+    "ethers-multicall-utils": "^2.1.4"
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
