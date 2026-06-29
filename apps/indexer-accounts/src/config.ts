@@ -23,7 +23,10 @@ const genesisTimestamp =
   env.NETWORK === Network.MAINNET
     ? '1595350551591948000'
     : '1596166782911378000';
-const genesisFile = `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/${env.NETWORK}/genesis.json`;
+const genesisFile =
+  env.NETWORK === Network.MAINNET
+    ? `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/mainnet/genesis.json`
+    : `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/testnet/genesis.json.xz`;
 
 const config: Config = {
   dbCa: env.DATABASE_CA,
