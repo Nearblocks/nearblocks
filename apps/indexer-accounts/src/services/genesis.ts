@@ -1,4 +1,6 @@
+import { spawn } from 'child_process';
 import { createReadStream, createWriteStream } from 'fs';
+import { Readable } from 'stream';
 
 import { default as axios } from 'axios';
 import chain from 'stream-chain';
@@ -46,7 +48,9 @@ export const downloadGenesisData = async (): Promise<string> => {
   const { data } = await axios.get(config.genesisFile, {
     responseType: 'stream',
   });
-  const path = 'genesis.json';
+  const path = config.genesisFile.endsWith('.xz')
+    ? 'genesis.json.xz'
+    : 'genesis.json';
   const writer = createWriteStream(path);
 
   data.pipe(writer);
@@ -58,8 +62,24 @@ export const downloadGenesisData = async (): Promise<string> => {
 };
 
 export const insertGenesisData = async (path: string) => {
+  let source: Readable = createReadStream(path);
+
+  if (path.endsWith('.xz')) {
+    const xz = spawn('xz', ['-dc', path]);
+
+    xz.on('error', (err) => {
+      logger.error('failed to spawn xz for genesis decompression');
+      logger.error(err);
+    });
+    xz.stderr.on('data', (data) => {
+      logger.error(`xz: ${data}`);
+    });
+
+    source = xz.stdout;
+  }
+
   const readable = new chain([
-    createReadStream(path),
+    source,
     pick.withParser({ filter: /^records\.\w+/ }),
     new streamObject(),
   ]);
