@@ -17,20 +17,11 @@ COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 RUN yarn turbo run build --filter=backend...
 
-FROM --platform=$BUILDPLATFORM base AS neon-builder
-RUN apt update && apt install -y git curl build-essential pkg-config libssl-dev dumb-init
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
-WORKDIR /app
-COPY --from=builder /app/out/full/packages/nb-lockup .
-RUN yarn --immutable && yarn build-release
-
 FROM base AS runner
 RUN apt update && apt install -y libssl-dev ca-certificates
 ENV NODE_ENV production
 USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
-COPY --from=neon-builder /app/index.node ./node_modules/nb-lockup/index.node
 
 CMD ["node", "apps/backend/dist/index.js"]
