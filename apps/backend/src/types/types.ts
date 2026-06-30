@@ -143,6 +143,10 @@ export type CGCoinItem = {
 
 export type CGTokenPrices = Record<string, { usd?: number }>;
 
+export type CGMarketChart = {
+  prices?: [number, number][];
+};
+
 export type CMCMarketData = FTMarketData & {
   coinmarketcap_id: string;
 };
@@ -219,6 +223,7 @@ export type RefData = Record<string, RefPrice>;
 export type IntentsToken = {
   assetId: string;
   blockchain: string;
+  coingeckoId?: null | string;
   contractAddress?: string;
   decimals: number;
   price: number;
