@@ -1,4 +1,4 @@
-import { Account, Block, FTMeta, Network } from 'nb-types';
+import { FTMeta, Network } from 'nb-types';
 
 export interface Config {
   cgApiKey: string;
@@ -225,10 +225,3 @@ export type IntentsToken = {
   priceUpdatedAt: string;
   symbol: string;
 };
-
-export type AccountId = Pick<Account, 'account_id'>;
-
-export type BlockSupply = Pick<
-  Block,
-  'block_height' | 'block_timestamp' | 'total_supply'
->;

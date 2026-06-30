@@ -12,7 +12,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/stats:
    *   get:
-   *     summary: Get network statistics
+   *     summary: Get network stats
    *     tags:
    *       - Stats
    *     responses:
@@ -23,9 +23,9 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/daily-stats:
+   * /v3/block-stats:
    *   get:
-   *     summary: Get daily network statistics
+   *     summary: Get daily block stats
    *     tags:
    *       - Stats
    *     parameters:
@@ -44,18 +44,108 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   app.get(
-    '/daily-stats',
+    '/block-stats',
     bearerAuth,
     rateLimiter,
-    validate(request.daily),
-    service.daily,
+    validate(request.block),
+    service.block,
+  );
+
+  /**
+   * @openapi
+   * /v3/txn-stats:
+   *   get:
+   *     summary: Get daily transaction stats
+   *     tags:
+   *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  app.get(
+    '/txn-stats',
+    bearerAuth,
+    rateLimiter,
+    validate(request.txn),
+    service.txn,
+  );
+
+  /**
+   * @openapi
+   * /v3/address-stats:
+   *   get:
+   *     summary: Get daily address stats
+   *     tags:
+   *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  app.get(
+    '/address-stats',
+    bearerAuth,
+    rateLimiter,
+    validate(request.address),
+    service.address,
+  );
+
+  /**
+   * @openapi
+   * /v3/price-stats:
+   *   get:
+   *     summary: Get daily NEAR price and market-cap stats
+   *     tags:
+   *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  app.get(
+    '/price-stats',
+    bearerAuth,
+    rateLimiter,
+    validate(request.price),
+    service.price,
   );
 
   /**
    * @openapi
    * /v3/signer-stats:
    *   get:
-   *     summary: Get daily signer statistics
+   *     summary: Get daily signer stats
    *     tags:
    *       - Stats
    *     parameters:
@@ -85,7 +175,7 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/tps-stats:
    *   get:
-   *     summary: Get transactions-per-second statistics
+   *     summary: Get transactions-per-second stats
    *     tags:
    *       - Stats
    *     parameters:

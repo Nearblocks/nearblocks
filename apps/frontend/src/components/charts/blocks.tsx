@@ -6,7 +6,7 @@ import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
 import { use, useMemo, useState } from 'react';
 
-import { DailyStats } from 'nb-schemas';
+import { DailyBlockStats } from 'nb-schemas';
 
 import { AnalyticsChart } from '@/components/address/analytics/chart';
 import { SkeletonSlot } from '@/components/skeleton';
@@ -20,10 +20,10 @@ import { MiniChart } from './mini-chart';
 
 type Props = {
   loading?: boolean;
-  statsPromise?: Promise<DailyStats[] | null>;
+  statsPromise?: Promise<DailyBlockStats[] | null>;
 };
 
-const getData = (stats: DailyStats[] | null) =>
+const getData = (stats: DailyBlockStats[] | null) =>
   (stats ?? [])
     .toReversed()
     .filter((item) => item.blocks !== null)

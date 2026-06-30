@@ -4,7 +4,7 @@ import { ArrowRightLeft, Globe, Pickaxe } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { use } from 'react';
 
-import { DailyStats, Stats } from 'nb-schemas';
+import { DailyTxnStats, PriceStats, Stats } from 'nb-schemas';
 
 import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
@@ -27,21 +27,32 @@ const TxnsChart = dynamic(
 );
 
 type Props = {
-  dailyStatsPromise?: Promise<DailyStats[] | null>;
   loading?: boolean;
+  priceStatsPromise?: Promise<null | PriceStats[]>;
   statsPromise?: Promise<null | Stats>;
+  txnStatsPromise?: Promise<DailyTxnStats[] | null>;
 };
 
 export const Overview = ({
-  dailyStatsPromise,
   loading,
+  priceStatsPromise,
   statsPromise,
+  txnStatsPromise,
 }: Props) => {
   const { t } = useLocale('home');
   const network = useConfig((s) => s.config.network);
   const stats = !loading && statsPromise ? use(statsPromise) : null;
-  const dailyStats =
-    !loading && dailyStatsPromise ? use(dailyStatsPromise) : null;
+  const txnStats = !loading && txnStatsPromise ? use(txnStatsPromise) : null;
+  const priceStats =
+    !loading && priceStatsPromise ? use(priceStatsPromise) : null;
+  const priceMap = new Map(
+    (priceStats ?? []).map((item) => [item.date, item.near_price]),
+  );
+  const chartData = (txnStats ?? []).map((item) => ({
+    date: item.date,
+    near_price: priceMap.get(item.date) ?? null,
+    txns: item.txns,
+  }));
   const gridClass =
     network === 'mainnet'
       ? 'lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-stretch'
@@ -222,7 +233,7 @@ export const Overview = ({
               fallback={<Skeleton className="h-28 w-full" />}
               loading={!!loading}
             >
-              {() => <TxnsChart data={dailyStats ?? []} />}
+              {() => <TxnsChart data={chartData} />}
             </SkeletonSlot>
           </div>
         </div>

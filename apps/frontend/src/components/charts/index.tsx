@@ -4,7 +4,13 @@ import { RiQuestionLine } from '@remixicon/react';
 import { ChevronRight } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
-import { DailyStats, TpsStats } from 'nb-schemas';
+import {
+  AddressStats,
+  DailyBlockStats,
+  DailyTxnStats,
+  PriceStats,
+  TpsStats,
+} from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
 import { Link } from '@/components/link';
@@ -29,8 +35,11 @@ import {
 } from './charts';
 
 type Props = {
-  statsPromise: Promise<DailyStats[] | null>;
+  addressStatsPromise: Promise<AddressStats[] | null>;
+  blockStatsPromise: Promise<DailyBlockStats[] | null>;
+  priceStatsPromise: Promise<null | PriceStats[]>;
   tpsStatsPromise: Promise<null | TpsStats[]>;
+  txnStatsPromise: Promise<DailyTxnStats[] | null>;
 };
 
 type CardProps = {
@@ -45,7 +54,13 @@ type HeaderProps = {
   setLogView: Dispatch<SetStateAction<boolean>>;
 };
 
-export const Charts = ({ statsPromise, tpsStatsPromise }: Props) => {
+export const Charts = ({
+  addressStatsPromise,
+  blockStatsPromise,
+  priceStatsPromise,
+  tpsStatsPromise,
+  txnStatsPromise,
+}: Props) => {
   const { t } = useLocale('charts');
   const network = useConfig((s) => s.config.network);
 
@@ -55,34 +70,34 @@ export const Charts = ({ statsPromise, tpsStatsPromise }: Props) => {
         <>
           <ChartCard href="/charts/near-price" title={t('nearPrice.miniTitle')}>
             <ErrorSuspense fallback={<PriceChartMini loading />}>
-              <PriceChartMini statsPromise={statsPromise} />
+              <PriceChartMini statsPromise={priceStatsPromise} />
             </ErrorSuspense>
           </ChartCard>
           <ChartCard href="/charts/market-cap" title={t('marketCap.miniTitle')}>
             <ErrorSuspense fallback={<MarketCapChartMini loading />}>
-              <MarketCapChartMini statsPromise={statsPromise} />
+              <MarketCapChartMini statsPromise={priceStatsPromise} />
             </ErrorSuspense>
           </ChartCard>
         </>
       )}
       <ChartCard href="/charts/near-supply" title={t('nearSupply.miniTitle')}>
         <ErrorSuspense fallback={<SupplyChartMini loading />}>
-          <SupplyChartMini statsPromise={statsPromise} />
+          <SupplyChartMini statsPromise={blockStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       <ChartCard href="/charts/txns" title={t('txns.miniTitle')}>
         <ErrorSuspense fallback={<TxnsChartMini loading />}>
-          <TxnsChartMini statsPromise={statsPromise} />
+          <TxnsChartMini statsPromise={txnStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       <ChartCard href="/charts/blocks" title={t('blocks.miniTitle')}>
         <ErrorSuspense fallback={<BlocksChartMini loading />}>
-          <BlocksChartMini statsPromise={statsPromise} />
+          <BlocksChartMini statsPromise={blockStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       <ChartCard href="/charts/addresses" title={t('addresses.miniTitle')}>
         <ErrorSuspense fallback={<AddressesChartMini loading />}>
-          <AddressesChartMini statsPromise={statsPromise} />
+          <AddressesChartMini statsPromise={addressStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       <ChartCard href="/charts/tps" title={t('tps.miniTitle')}>
@@ -94,12 +109,18 @@ export const Charts = ({ statsPromise, tpsStatsPromise }: Props) => {
         <>
           <ChartCard href="/charts/txn-fee" title={t('txnFee.miniTitle')}>
             <ErrorSuspense fallback={<TxnFeeChartMini loading />}>
-              <TxnFeeChartMini statsPromise={statsPromise} />
+              <TxnFeeChartMini
+                priceStatsPromise={priceStatsPromise}
+                txnStatsPromise={txnStatsPromise}
+              />
             </ErrorSuspense>
           </ChartCard>
           <ChartCard href="/charts/txn-volume" title={t('txnVolume.miniTitle')}>
             <ErrorSuspense fallback={<TxnVolumeChartMini loading />}>
-              <TxnVolumeChartMini statsPromise={statsPromise} />
+              <TxnVolumeChartMini
+                priceStatsPromise={priceStatsPromise}
+                txnStatsPromise={txnStatsPromise}
+              />
             </ErrorSuspense>
           </ChartCard>
         </>

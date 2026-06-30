@@ -5,7 +5,8 @@ import { Blocks } from '@/components/home/blocks';
 import { Hero } from '@/components/home/hero';
 import { Overview } from '@/components/home/overview';
 import { Txns } from '@/components/home/txns';
-import { fetchBlocks, fetchDailyStats, fetchTxns } from '@/data/home';
+import { fetchPriceStats, fetchTxnStats } from '@/data/charts';
+import { fetchBlocks, fetchTxns } from '@/data/home';
 import { fetchStats } from '@/data/layout';
 import { getDictionary, hasLocale } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
@@ -15,7 +16,8 @@ const HomePage = async ({ params }: PageProps<'/[lang]'>) => {
   const statsPromise = fetchStats();
   const blocksPromise = fetchBlocks();
   const txnsPromise = fetchTxns();
-  const dailyStatsPromise = fetchDailyStats();
+  const txnStatsPromise = fetchTxnStats(14);
+  const priceStatsPromise = fetchPriceStats(14);
 
   if (!hasLocale(lang)) notFound();
 
@@ -28,8 +30,9 @@ const HomePage = async ({ params }: PageProps<'/[lang]'>) => {
         <div className="container mx-auto -mt-12.5 px-4">
           <ErrorSuspense fallback={<Overview />}>
             <Overview
-              dailyStatsPromise={dailyStatsPromise}
+              priceStatsPromise={priceStatsPromise}
               statsPromise={statsPromise}
+              txnStatsPromise={txnStatsPromise}
             />
           </ErrorSuspense>
           <div className="mt-4 grid gap-4 lg:grid-cols-2">

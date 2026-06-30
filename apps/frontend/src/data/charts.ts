@@ -1,13 +1,50 @@
 import { cache } from 'react';
 
-import { DailyStats, DailyStatsRes, TpsStats, TpsStatsRes } from 'nb-schemas';
+import {
+  AddressStats,
+  AddressStatsRes,
+  DailyBlockStats,
+  DailyBlockStatsRes,
+  DailyTxnStats,
+  DailyTxnStatsRes,
+  PriceStats,
+  PriceStatsRes,
+  TpsStats,
+  TpsStatsRes,
+} from 'nb-schemas';
 
 import { fetcher } from '@/lib/fetcher';
 
-export const fetchDailyStats = cache(
-  async (limit?: number): Promise<DailyStats[] | null> => {
-    const url = limit ? `/v3/daily-stats?limit=${limit}` : '/v3/daily-stats';
-    const resp = await fetcher<DailyStatsRes>(url);
+export const fetchBlockStats = cache(
+  async (limit?: number): Promise<DailyBlockStats[] | null> => {
+    const url = limit ? `/v3/block-stats?limit=${limit}` : '/v3/block-stats';
+    const resp = await fetcher<DailyBlockStatsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchTxnStats = cache(
+  async (limit?: number): Promise<DailyTxnStats[] | null> => {
+    const url = limit ? `/v3/txn-stats?limit=${limit}` : '/v3/txn-stats';
+    const resp = await fetcher<DailyTxnStatsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchAddressStats = cache(
+  async (limit?: number): Promise<AddressStats[] | null> => {
+    const url = limit
+      ? `/v3/address-stats?limit=${limit}`
+      : '/v3/address-stats';
+    const resp = await fetcher<AddressStatsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchPriceStats = cache(
+  async (limit?: number): Promise<null | PriceStats[]> => {
+    const url = limit ? `/v3/price-stats?limit=${limit}` : '/v3/price-stats';
+    const resp = await fetcher<PriceStatsRes>(url);
     return resp.data;
   },
 );
