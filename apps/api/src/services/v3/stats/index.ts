@@ -1,15 +1,21 @@
 import type {
-  DailyStats,
-  DailyStatsReq,
+  AddressStats,
+  AddressStatsReq,
+  BlockStatsReq,
+  DailyBlockStats,
+  DailyTxnStats,
+  PriceStats,
+  PriceStatsReq,
   SignerStats,
   SignerStatsReq,
   Stats,
   TpsStats,
   TpsStatsReq,
+  TxnStatsReq,
 } from 'nb-schemas';
 import response from 'nb-schemas/dist/stats/response.js';
 
-import { dbBase } from '#libs/pgp';
+import { dbBase, dbContract } from '#libs/pgp';
 import { msToNsTime } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import { RequestValidator } from '#middlewares/validate';
@@ -21,15 +27,81 @@ const stats = responseHandler(response.stats, async () => {
   return { data };
 });
 
-const daily = responseHandler(
-  response.daily,
-  async (req: RequestValidator<DailyStatsReq>) => {
+const block = responseHandler(
+  response.block,
+  async (req: RequestValidator<BlockStatsReq>) => {
     const limit = req.validator.limit;
     const date = req.validator.date
       ? msToNsTime(new Date(`${req.validator.date}T00:00:00Z`).getTime())
       : null;
 
-    const data = await dbBase.manyOrNone<DailyStats>(sql.daily, {
+    const data = await dbBase.manyOrNone<DailyBlockStats>(sql.block, {
+      date,
+      limit,
+    });
+
+    return { data };
+  },
+);
+
+const txn = responseHandler(
+  response.txn,
+  async (req: RequestValidator<TxnStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = req.validator.date
+      ? msToNsTime(new Date(`${req.validator.date}T00:00:00Z`).getTime())
+      : null;
+
+    const data = await dbBase.manyOrNone<DailyTxnStats>(sql.txn, {
+      date,
+      limit,
+    });
+
+    return { data };
+  },
+);
+
+const address = responseHandler(
+  response.address,
+  async (req: RequestValidator<AddressStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = req.validator.date
+      ? msToNsTime(new Date(`${req.validator.date}T00:00:00Z`).getTime())
+      : null;
+
+    const [actions, contracts] = await Promise.all([
+      dbBase.manyOrNone<Omit<AddressStats, 'new_contracts'>>(sql.address, {
+        date,
+        limit,
+      }),
+      dbContract.manyOrNone<{ date: string; new_contracts: number }>(
+        sql.contract,
+        { date, limit },
+      ),
+    ]);
+
+    const contractsByDate = new Map(
+      contracts.map((row) => [row.date, row.new_contracts]),
+    );
+
+    const data: AddressStats[] = actions.map((row) => ({
+      ...row,
+      new_contracts: contractsByDate.get(row.date) ?? null,
+    }));
+
+    return { data };
+  },
+);
+
+const price = responseHandler(
+  response.price,
+  async (req: RequestValidator<PriceStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = req.validator.date
+      ? msToNsTime(new Date(`${req.validator.date}T00:00:00Z`).getTime())
+      : null;
+
+    const data = await dbBase.manyOrNone<PriceStats>(sql.price, {
       date,
       limit,
     });
@@ -65,4 +137,4 @@ const tps = responseHandler(
   },
 );
 
-export default { daily, signer, stats, tps };
+export default { address, block, price, signer, stats, tps, txn };

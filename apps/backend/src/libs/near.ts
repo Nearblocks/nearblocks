@@ -1,5 +1,5 @@
 import { viewFunctionAsJson } from '@near-js/jsonrpc-client';
-import { validators, viewAccount } from '@near-js/jsonrpc-client/no-validation';
+import { validators } from '@near-js/jsonrpc-client/no-validation';
 
 import { logger } from 'nb-logger';
 
@@ -12,22 +12,6 @@ import {
   NFTMetadata,
   NFTTokenInfo,
 } from '#types/types';
-
-export const fetchAccount = async (
-  accountId: string,
-  blockId: number | string,
-) => {
-  try {
-    const account = await viewAccount(rpc, { accountId, blockId });
-
-    return account;
-  } catch (error) {
-    logger.error(`near: fetchAccount: ${accountId}: ${blockId}`);
-    logger.error(error);
-  }
-
-  return null;
-};
 
 export const fetchFTSupply = async (contract: string) => {
   try {

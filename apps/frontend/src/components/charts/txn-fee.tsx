@@ -6,7 +6,7 @@ import 'highcharts/esm/modules/exporting.src.js';
 import 'highcharts/esm/modules/stock.src.js';
 import { use, useMemo, useState } from 'react';
 
-import { DailyStats } from 'nb-schemas';
+import { DailyTxnStats, PriceStats } from 'nb-schemas';
 
 import { AnalyticsChart } from '@/components/address/analytics/chart';
 import { SkeletonSlot } from '@/components/skeleton';
@@ -20,17 +20,26 @@ import { MiniChart } from './mini-chart';
 
 type Props = {
   loading?: boolean;
-  statsPromise?: Promise<DailyStats[] | null>;
+  priceStatsPromise?: Promise<null | PriceStats[]>;
+  txnStatsPromise?: Promise<DailyTxnStats[] | null>;
 };
 
-const getData = (stats: DailyStats[] | null) =>
-  (stats ?? [])
+const getData = (txns: DailyTxnStats[] | null, prices: null | PriceStats[]) => {
+  const priceMap = new Map(
+    (prices ?? []).map((item) => [item.date, item.near_price]),
+  );
+
+  return (txns ?? [])
     .toReversed()
-    .filter((item) => item.txn_fee_usd !== null)
+    .filter((item) => item.txn_fee !== null && priceMap.get(item.date) != null)
     .map(
       (item) =>
-        [new Date(item.date).getTime(), +item.txn_fee_usd!] as [number, number],
+        [
+          new Date(item.date).getTime(),
+          +item.txn_fee! * +priceMap.get(item.date)!,
+        ] as [number, number],
     );
+};
 
 const yAxisLabel = {
   formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
@@ -45,17 +54,22 @@ const tooltipFormatter = function (this: Highcharts.Point) {
       maximumFractionDigits: 2,
       notation: 'compact',
     });
-    return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">\u25CF</span> ${point.series.name}: <span class="font-bold">${val}</span></span>`;
+    return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">●</span> ${point.series.name}: <span class="font-bold">${val}</span></span>`;
   });
   return header + (rows?.join('') ?? '');
 };
 
-export const TxnFeeChart = ({ loading, statsPromise }: Props) => {
+export const TxnFeeChart = ({
+  loading,
+  priceStatsPromise,
+  txnStatsPromise,
+}: Props) => {
   const { t } = useLocale('charts');
   const [logView, setLogView] = useState(false);
-  const stats = !loading && statsPromise ? use(statsPromise) : null;
+  const txns = !loading && txnStatsPromise ? use(txnStatsPromise) : null;
+  const prices = !loading && priceStatsPromise ? use(priceStatsPromise) : null;
 
-  const data = useMemo(() => getData(stats), [stats]);
+  const data = useMemo(() => getData(txns, prices), [txns, prices]);
 
   return (
     <Card>
@@ -67,7 +81,7 @@ export const TxnFeeChart = ({ loading, statsPromise }: Props) => {
       <CardContent className="p-3">
         <SkeletonSlot
           fallback={<Skeleton className="h-140 w-full" />}
-          loading={loading || !stats}
+          loading={loading || !txns}
         >
           {() => (
             <AnalyticsChart height={560}>
@@ -89,17 +103,22 @@ export const TxnFeeChart = ({ loading, statsPromise }: Props) => {
   );
 };
 
-export const TxnFeeChartMini = ({ loading, statsPromise }: Props) => {
+export const TxnFeeChartMini = ({
+  loading,
+  priceStatsPromise,
+  txnStatsPromise,
+}: Props) => {
   const { t } = useLocale('charts');
-  const stats = !loading && statsPromise ? use(statsPromise) : null;
+  const txns = !loading && txnStatsPromise ? use(txnStatsPromise) : null;
+  const prices = !loading && priceStatsPromise ? use(priceStatsPromise) : null;
 
-  const data = useMemo(() => getData(stats), [stats]);
+  const data = useMemo(() => getData(txns, prices), [txns, prices]);
 
   return (
     <div className="h-55">
       <SkeletonSlot
         fallback={<Skeleton className="my-3 h-49 w-full" />}
-        loading={loading || !stats}
+        loading={loading || !txns}
       >
         {() => (
           <MiniChart height={220}>

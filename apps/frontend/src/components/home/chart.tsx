@@ -4,14 +4,12 @@ import { Chart } from '@highcharts/react';
 import { Spline } from '@highcharts/react/series';
 import { useMemo } from 'react';
 
-import { DailyStats } from 'nb-schemas';
-
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { currencyFormat, dateFormat, numberFormat } from '@/lib/format';
 
 type Props = {
-  data: DailyStats[];
+  data: { date: string; near_price: null | string; txns: null | number }[];
 };
 
 export const TxnsChart = ({ data }: Props) => {
