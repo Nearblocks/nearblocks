@@ -10,16 +10,13 @@ import { Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TokenImage } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
-import { useTokenBalances } from '@/hooks/use-token-balances';
 import {
   currencyFormat,
   numberFormat,
   toTokenAmount,
   toTokenPrice,
 } from '@/lib/format';
-import { mergeTokens, sortTokens } from '@/lib/token';
 import { encodeToken, isSpamToken } from '@/lib/utils';
-import { TokenCache } from '@/types/types';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Command, CommandGroup, CommandItem, CommandList } from '@/ui/command';
@@ -32,7 +29,6 @@ type Props = {
   loading?: boolean;
   mtTokensPromise?: Promise<AccountAssetMTFT[] | null>;
   spamPatterns?: string[];
-  tokenCachePromise?: Promise<null | TokenCache[]>;
   tokensPromise?: Promise<AccountAssetFT[] | null>;
 };
 
@@ -49,8 +45,13 @@ type RowProps = {
   value: string;
 };
 
+const ftValue = (token: AccountAssetFT) =>
+  token.meta?.price && token.meta?.decimals != null
+    ? toTokenPrice(token.amount, token.meta.decimals, token.meta.price)
+    : '0';
+
 const mtValue = (token: AccountAssetMTFT) =>
-  token.token_meta?.price && token.meta?.decimals
+  token.token_meta?.price && token.meta?.decimals != null
     ? toTokenPrice(token.amount, token.meta.decimals, token.token_meta.price)
     : '0';
 
@@ -127,40 +128,34 @@ export const Tokens = ({
   loading,
   mtTokensPromise,
   spamPatterns,
-  tokenCachePromise,
   tokensPromise,
 }: Props) => {
   const { t } = useLocale('address');
   const tokens = !loading && tokensPromise ? use(tokensPromise) : null;
   const mts = !loading && mtTokensPromise ? use(mtTokensPromise) : null;
-  const tokenCache =
-    !loading && tokenCachePromise ? use(tokenCachePromise) : null;
 
   const { address } = useParams<{ address: string }>();
-  const { data: balances, isLoading } = useTokenBalances(
-    !loading && tokens && !tokenCache ? { account: address, tokens } : null,
-  );
   const [open, setOpen] = useState(false);
 
-  const inventory = useMemo(() => {
-    const merged = tokenCache ? mergeTokens(tokens, tokenCache) : balances;
+  const totalFtValue = useMemo(
+    () =>
+      (tokens ?? []).reduce((sum, token) => sum + Number(ftValue(token)), 0),
+    [tokens],
+  );
 
-    return sortTokens(merged);
-  }, [tokens, tokenCache, balances]);
-
-  const mtTotal = useMemo(
+  const totalMtValue = useMemo(
     () => (mts ?? []).reduce((sum, token) => sum + Number(mtValue(token)), 0),
     [mts],
   );
 
-  const totalCount = inventory.tokens.length + (mts?.length ?? 0);
-  const totalValue = inventory.amount + mtTotal;
+  const totalCount = (tokens?.length ?? 0) + (mts?.length ?? 0);
+  const totalValue = totalFtValue + totalMtValue;
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <SkeletonSlot
         fallback={<Skeleton className="h-9 w-full" />}
-        loading={loading || !tokens || isLoading}
+        loading={loading || !tokens}
       >
         {() => (
           <PopoverTrigger asChild>
@@ -192,15 +187,15 @@ export const Tokens = ({
         <Command>
           <CommandList className="max-h-none overflow-y-visible">
             <ScrollArea className="max-h-75">
-              {inventory.tokens.length > 0 && (
+              {tokens && tokens.length > 0 && (
                 <CommandGroup heading={t('tokensLabel')}>
-                  {inventory.tokens.map((token, index) => (
+                  {tokens.map((token, index) => (
                     <TokenRow
                       amount={token.amount}
                       decimals={token.meta?.decimals}
                       href={`/tokens/${token.contract}?account=${address}`}
                       icon={token.meta?.icon}
-                      isLast={index === inventory.tokens.length - 1}
+                      isLast={index === tokens.length - 1}
                       isSpam={
                         !!spamPatterns &&
                         isSpamToken(token.contract, spamPatterns)
@@ -209,7 +204,7 @@ export const Tokens = ({
                       name={token.meta?.name}
                       symbol={token.meta?.symbol}
                       unitPrice={token.meta?.price}
-                      value={token.price}
+                      value={ftValue(token)}
                     />
                   ))}
                 </CommandGroup>

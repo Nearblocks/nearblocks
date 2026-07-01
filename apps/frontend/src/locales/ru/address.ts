@@ -84,12 +84,38 @@ export const address = {
     },
   },
   assets: {
+    fts: {
+      amount: 'Quantity',
+      empty: 'No token assets found',
+      price: 'Price',
+      token: 'Token',
+      total: 'More than {{count}} token assets found',
+      totalExact: 'A total of {{count}} token assets found',
+      value: 'Value',
+    },
+    mtNfts: {
+      empty: 'No MT NFT assets found',
+      quantity: 'Quantity: ',
+      token: 'Token ID: ',
+      total: 'More than {{count}} MT NFT assets found',
+      totalExact: 'A total of {{count}} MT NFT assets found',
+    },
+    mts: {
+      amount: 'Quantity',
+      empty: 'No MT token assets found',
+      price: 'Price',
+      token: 'Token',
+      total: 'More than {{count}} MT token assets found',
+      totalExact: 'A total of {{count}} MT token assets found',
+      value: 'Value',
+    },
     nfts: {
       empty: 'No NFT assets found',
       token: 'Token ID: ',
       total: 'More than {{count}} NFT assets found',
       totalExact: 'A total of {{count}} NFT assets found',
     },
+    tabs: { mts: 'MTs', nfts: 'NFTs', tokens: 'Tokens' },
   },
   contract: {
     code: {
@@ -279,6 +305,7 @@ export const address = {
     title: 'Overview',
     tokens: 'Tokens:',
     value: 'Value:',
+    viewAssets: 'Click to see assets',
   },
   qr: 'View QR Code',
   receipts: {
@@ -318,7 +345,7 @@ export const address = {
   tabs: {
     accessKeys: 'Access Keys',
     analytics: 'Analytics',
-    assets: 'NFT Assets',
+    assets: 'Assets',
     multiTokenTxns: 'MT Token Txns',
     nftTxns: 'NFT Txns',
     receipts: 'Receipts',

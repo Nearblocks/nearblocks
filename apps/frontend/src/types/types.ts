@@ -1,5 +1,3 @@
-import { AccountAssetFT } from 'nb-schemas';
-
 import type { dictionary } from '@/locales/en';
 
 export type Dictionary = typeof dictionary;
@@ -82,25 +80,6 @@ export type NavMenu<K extends string = string> = NavMenuItem<K>[];
 
 export const isNavMenuDivider = (item: unknown): item is NavMenuDivider =>
   typeof item === 'object' && item !== null && 'divider' in item;
-
-export type TokensCacheRes = {
-  account_id: string;
-  tokens: null | TokenCache[];
-};
-
-export type TokenCache = {
-  balance: string;
-  contract_id: string;
-};
-
-export type AssetToken = AccountAssetFT & {
-  price: string;
-};
-
-export type TokenInventory = {
-  amount: number;
-  tokens: AssetToken[];
-};
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 

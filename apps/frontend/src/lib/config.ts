@@ -8,12 +8,10 @@ export const serverEnvSchema = z.object({
   AWS_REGION: z.string(),
   AWS_SES_FROM_EMAIL: z.email(),
   AWS_SES_TO_EMAIL: z.email(),
-  NEXT_PUBLIC_FASTNEAR_RPC_KEY: z.string(),
   TURNSTILE_SECRET_KEY: z.string(),
 });
 
 export const publicEnvSchema = z.object({
-  NEXT_PUBLIC_FASTNEAR_RPC_KEY: z.string(),
   NEXT_PUBLIC_FORMBRICKS_API_HOST: z._default(
     z.url(),
     'https://app.formbricks.com',
@@ -29,15 +27,15 @@ export const publicEnvSchema = z.object({
 
 export const defaultTheme = 'dark';
 
-export const rpcProviders = (key: string) => ({
+export const rpcProviders = () => ({
   mainnet: [
     {
       name: 'FastNear',
-      url: `https://rpc.mainnet.fastnear.com?apiKey=${key}`,
+      url: 'https://rpc.mainnet.fastnear.com',
     },
     {
       name: 'FastNear (Archival)',
-      url: `https://archival-rpc.mainnet.fastnear.com?apiKey=${key}`,
+      url: 'https://archival-rpc.mainnet.fastnear.com',
     },
     {
       name: 'NEAR (Archival)',
@@ -63,11 +61,11 @@ export const rpcProviders = (key: string) => ({
   testnet: [
     {
       name: 'FastNear',
-      url: `https://rpc.testnet.fastnear.com?apiKey=${key}`,
+      url: 'https://rpc.testnet.fastnear.com',
     },
     {
       name: 'FastNear (Archival)',
-      url: `https://archival-rpc.testnet.fastnear.com?apiKey=${key}`,
+      url: 'https://archival-rpc.testnet.fastnear.com',
     },
     {
       name: 'NEAR (Archival)',
@@ -131,7 +129,6 @@ const verifierSchema = z.object({
 });
 
 const configSchema = z.object({
-  fastNearRpcKey: publicEnvSchema.shape.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
   formbricksApiHost: publicEnvSchema.shape.NEXT_PUBLIC_FORMBRICKS_API_HOST,
   formbricksEnvId: publicEnvSchema.shape.NEXT_PUBLIC_FORMBRICKS_ENV_ID,
   legacyUiUrl: publicEnvSchema.shape.NEXT_PUBLIC_LEGACY_UI_URL,
@@ -167,7 +164,6 @@ let cachedPublicConfig: null | PublicEnv = null;
 export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
-      NEXT_PUBLIC_FASTNEAR_RPC_KEY: process.env.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
       NEXT_PUBLIC_FORMBRICKS_API_HOST:
         process.env.NEXT_PUBLIC_FORMBRICKS_API_HOST,
       NEXT_PUBLIC_FORMBRICKS_ENV_ID: process.env.NEXT_PUBLIC_FORMBRICKS_ENV_ID,
@@ -184,15 +180,12 @@ export const getRuntimeConfig = (): Config => {
   const network = cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID;
   const mainnetUrl = cachedPublicConfig.NEXT_PUBLIC_MAINNET_URL;
   const testnetUrl = cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL;
-  const providers = rpcProviders(
-    cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
-  )[network];
+  const providers = rpcProviders()[network];
   const siteUrl = network === 'mainnet' ? mainnetUrl : testnetUrl;
   const metaTemplate =
     network === 'mainnet' ? '%s | NearBlocks' : 'TESTNET | %s | NearBlocks';
 
   return {
-    fastNearRpcKey: cachedPublicConfig.NEXT_PUBLIC_FASTNEAR_RPC_KEY,
     formbricksApiHost: cachedPublicConfig.NEXT_PUBLIC_FORMBRICKS_API_HOST,
     formbricksEnvId: cachedPublicConfig.NEXT_PUBLIC_FORMBRICKS_ENV_ID,
     legacyUiUrl: cachedPublicConfig.NEXT_PUBLIC_LEGACY_UI_URL,

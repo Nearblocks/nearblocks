@@ -73,6 +73,38 @@ const routes = (route: Router) => {
 
   /**
    * @openapi
+   * /v3/accounts/{account}/assets/fts/{contract}:
+   *   get:
+   *     summary: Get account FT balance for a specific contract
+   *     x-internal: true
+   *     tags:
+   *       - Accounts
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Account ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: FT contract account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:account/assets/fts/:contract',
+    internalOnly,
+    validate(request.ftBalance),
+    service.ftBalance,
+  );
+
+  /**
+   * @openapi
    * /v3/accounts/{account}/assets/nfts:
    *   get:
    *     summary: List account NFT balances

@@ -1,5 +1,7 @@
 'use client';
 
+import { RiCoinsLine } from '@remixicon/react';
+import { useParams } from 'next/navigation';
 import { use } from 'react';
 
 import {
@@ -10,15 +12,17 @@ import {
 } from 'nb-schemas';
 
 import { ErrorSuspense } from '@/components/error-suspense';
+import { Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { currencyFormat, nearFiatFormat, nearFormat } from '@/lib/format';
-import { TokenCache } from '@/types/types';
+import { Button } from '@/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 import { Tokens } from './tokens';
 
@@ -28,7 +32,6 @@ type Props = {
   mtTokensPromise?: Promise<AccountAssetMTFT[] | null>;
   spamPatterns?: string[];
   statsPromise?: Promise<null | Stats>;
-  tokenCachePromise?: Promise<null | TokenCache[]>;
   tokensPromise?: Promise<AccountAssetFT[] | null>;
 };
 
@@ -38,13 +41,13 @@ export const Overview = ({
   mtTokensPromise,
   spamPatterns,
   statsPromise,
-  tokenCachePromise,
   tokensPromise,
 }: Props) => {
   const { t } = useLocale('address');
   const network = useConfig((s) => s.config.network);
   const stats = !loading && statsPromise ? use(statsPromise) : null;
   const balance = !loading && balancePromise ? use(balancePromise) : null;
+  const { address } = useParams<{ address: string }>();
 
   return (
     <Card>
@@ -107,14 +110,27 @@ export const Overview = ({
           <ListItem>
             <ListLeft className="min-w-20">{t('overview.tokens')}</ListLeft>
             <ListRight className="xl:py-2">
-              <ErrorSuspense fallback={<Tokens loading />}>
-                <Tokens
-                  mtTokensPromise={mtTokensPromise}
-                  spamPatterns={spamPatterns}
-                  tokenCachePromise={tokenCachePromise}
-                  tokensPromise={tokensPromise}
-                />
-              </ErrorSuspense>
+              <div className="flex w-full items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <ErrorSuspense fallback={<Tokens loading />}>
+                    <Tokens
+                      mtTokensPromise={mtTokensPromise}
+                      spamPatterns={spamPatterns}
+                      tokensPromise={tokensPromise}
+                    />
+                  </ErrorSuspense>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button asChild size="icon" variant="outline">
+                      <Link href={`/address/${address}/assets`}>
+                        <RiCoinsLine />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('overview.viewAssets')}</TooltipContent>
+                </Tooltip>
+              </div>
             </ListRight>
           </ListItem>
         </List>

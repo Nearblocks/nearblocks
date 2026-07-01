@@ -1,5 +1,7 @@
 import type {
   AccountAssetFT,
+  AccountAssetFTBalance,
+  AccountAssetFTBalanceReq,
   AccountAssetFTCount,
   AccountAssetFTCountReq,
   AccountAssetFTsReq,
@@ -20,6 +22,7 @@ import request from 'nb-schemas/dist/accounts/assets/request.js';
 import response from 'nb-schemas/dist/accounts/assets/response.js';
 
 import cursors from '#libs/cursors';
+import { getAccountFtBalances } from '#libs/fastnear';
 import { dbEvents } from '#libs/pgp';
 import { paginateData } from '#libs/response';
 import { responseHandler } from '#middlewares/response';
@@ -38,21 +41,42 @@ const fts = responseHandler(
       ? cursors.decode(request.ftsCursor, req.validator.prev)
       : null;
     const direction = prev ? 'asc' : 'desc';
+    const contractDirection = prev ? 'desc' : 'asc';
     const cursor = prev || next;
 
-    const fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
-      sql.assets.fts,
-      {
-        account,
-        cursor: {
-          contract: cursor?.contract,
-          value: cursor?.value,
+    const balances = await getAccountFtBalances(account);
+
+    let fts: (AccountAssetFT & { value: string })[];
+
+    if (balances !== null) {
+      fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
+        sql.assets.ftsBalances,
+        {
+          balances: JSON.stringify(balances),
+          contractDirection,
+          cursor: {
+            contract: cursor?.contract,
+            value: cursor?.value,
+          },
+          direction,
+          limit: limit + 1,
         },
-        direction,
-        // Fetch one extra to check if there is a next page
-        limit: limit + 1,
-      },
-    );
+      );
+    } else {
+      fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
+        sql.assets.fts,
+        {
+          account,
+          contractDirection,
+          cursor: {
+            contract: cursor?.contract,
+            value: cursor?.value,
+          },
+          direction,
+          limit: limit + 1,
+        },
+      );
+    }
 
     return paginateData(
       fts,
@@ -72,11 +96,48 @@ const ftCount = responseHandler(
   async (req: RequestValidator<AccountAssetFTCountReq>) => {
     const account = req.validator.account;
 
+    const balances = await getAccountFtBalances(account);
+
+    if (balances !== null) {
+      const count = await dbEvents.one<AccountAssetFTCount>(
+        sql.assets.ftCountBalances,
+        {
+          balances: JSON.stringify(balances),
+        },
+      );
+      return { data: count };
+    }
+
     const count = await dbEvents.one<AccountAssetFTCount>(sql.assets.ftCount, {
       account,
     });
 
     return { data: count };
+  },
+);
+
+const ftBalance = responseHandler(
+  response.ftBalance,
+  async (req: RequestValidator<AccountAssetFTBalanceReq>) => {
+    const { account, contract } = req.validator;
+
+    const balances = await getAccountFtBalances(account);
+
+    if (balances !== null) {
+      const match = balances.find((b) => b.contract === contract);
+      return {
+        data: { amount: match?.amount ?? '0' } satisfies AccountAssetFTBalance,
+      };
+    }
+
+    const row = await dbEvents.oneOrNone<{ amount: string }>(
+      sql.assets.ftBalance,
+      { account, contract },
+    );
+
+    return {
+      data: { amount: row?.amount ?? '0' } satisfies AccountAssetFTBalance,
+    };
   },
 );
 
@@ -258,6 +319,7 @@ const mtNftCount = responseHandler(
 );
 
 export default {
+  ftBalance,
   ftCount,
   fts,
   mtFtCount,

@@ -5,9 +5,9 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
 import {
-  AccountAssetNFT,
-  AccountAssetNFTCount,
-  AccountAssetNFTsRes,
+  AccountAssetMTNFT,
+  AccountAssetMTNFTCount,
+  AccountAssetMTNFTsRes,
 } from 'nb-schemas';
 
 import { EmptyBox } from '@/components/empty';
@@ -28,16 +28,31 @@ import {
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
-  countPromise?: Promise<AccountAssetNFTCount | null>;
+  account?: string;
+  countPromise?: Promise<AccountAssetMTNFTCount | null>;
   loading?: boolean;
-  nftsPromise?: Promise<AccountAssetNFTsRes>;
+  nftsPromise?: Promise<AccountAssetMTNFTsRes>;
 };
 
 const SKELETON_COUNT = 24;
 
-const NFTCard = ({ label, nft }: { label: string; nft: AccountAssetNFT }) => (
+const MTNFTCard = ({
+  account,
+  label,
+  nft,
+  quantityLabel,
+}: {
+  account?: string;
+  label: string;
+  nft: AccountAssetMTNFT;
+  quantityLabel: string;
+}) => (
   <div className="flex flex-col gap-2">
-    <Link href={`/nft-tokens/${nft.contract}/tokens/${nft.token}`}>
+    <Link
+      href={`/mt-tokens/${nft.contract}/tokens/nft/${encodeToken(nft.token)}${
+        account ? `?account=${account}` : ''
+      }`}
+    >
       <div className="aspect-square w-full overflow-hidden rounded-lg border">
         <NFTMedia
           alt={nft.token_meta?.title ?? nft.token}
@@ -53,18 +68,26 @@ const NFTCard = ({ label, nft }: { label: string; nft: AccountAssetNFT }) => (
         <span className="text-muted-foreground">{label}</span>
         <Link
           className="text-link"
-          href={`/nft-tokens/${nft.contract}/tokens/${encodeToken(nft.token)}`}
+          href={`/mt-tokens/${nft.contract}/tokens/nft/${encodeToken(
+            nft.token,
+          )}${account ? `?account=${account}` : ''}`}
         >
           {nft.token}
         </Link>
       </div>
+      {nft.amount && nft.amount !== '1' && (
+        <div className="text-muted-foreground truncate">
+          <span>{quantityLabel}</span>
+          {nft.amount}
+        </div>
+      )}
       <div className="flex items-center gap-1">
         <TokenImage
           alt={nft.meta?.name ?? ''}
           className="m-px size-4 rounded-full border"
           src={nft.meta?.icon ?? ''}
         />
-        <Link className="text-link" href={`/nft-tokens/${nft.contract}`}>
+        <Link className="text-link" href={`/mt-tokens/${nft.contract}`}>
           <Truncate>
             <TruncateText
               className="max-w-30"
@@ -77,7 +100,12 @@ const NFTCard = ({ label, nft }: { label: string; nft: AccountAssetNFT }) => (
   </div>
 );
 
-export const NFTAssets = ({ countPromise, loading, nftsPromise }: Props) => {
+export const MTNFTAssets = ({
+  account,
+  countPromise,
+  loading,
+  nftsPromise,
+}: Props) => {
   const { t } = useLocale('address');
   const nfts = !loading && nftsPromise ? use(nftsPromise) : null;
   const count = !loading && countPromise ? use(countPromise) : null;
@@ -109,8 +137,8 @@ export const NFTAssets = ({ countPromise, loading, nftsPromise }: Props) => {
               <span className="leading-7">
                 {t(
                   isApproxCount(value)
-                    ? 'assets.nfts.total'
-                    : 'assets.nfts.totalExact',
+                    ? 'assets.mtNfts.total'
+                    : 'assets.mtNfts.totalExact',
                   { count: countFormat(value) },
                 )}
               </span>
@@ -132,21 +160,26 @@ export const NFTAssets = ({ countPromise, loading, nftsPromise }: Props) => {
             ))
           ) : nfts.data?.length ? (
             nfts.data.map((nft) => (
-              <NFTCard
+              <MTNFTCard
+                account={account}
                 key={`${nft.contract}-${nft.token}`}
-                label={t('assets.nfts.token')}
+                label={t('assets.mtNfts.token')}
                 nft={nft}
+                quantityLabel={t('assets.mtNfts.quantity')}
               />
             ))
           ) : (
             <div className="col-span-full">
-              <EmptyBox description={t('assets.nfts.empty')} icon={<Inbox />} />
+              <EmptyBox
+                description={t('assets.mtNfts.empty')}
+                icon={<Inbox />}
+              />
             </div>
           )}
         </div>
       </div>
       {!loading && (nfts?.meta?.next_page || nfts?.meta?.prev_page) && (
-        <div className="-mx-3 flex items-center border-t px-3 pt-3">
+        <div className="mt-4 flex items-center border-t px-3 pt-3">
           <Pagination className="justify-end">
             <PaginationContent>
               {nfts.meta?.prev_page && (
