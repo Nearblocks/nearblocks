@@ -19,7 +19,7 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       decimals,
       icon,
       reference,
-      price,
+      p.price,
       change_24,
       market_cap,
       fully_diluted_market_cap,
@@ -34,10 +34,29 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
       coingecko_id,
       coinmarketcap_id,
       livecoinwatch_id,
-      (ft_meta.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap,
+      (p.price)::NUMERIC * (ft_meta.total_supply)::NUMERIC AS onchain_market_cap,
       nep518_hex_address
     FROM
       ft_meta
+      LEFT JOIN LATERAL (
+        SELECT
+          price
+        FROM
+          ft_prices
+        WHERE
+          coingecko_id = ft_meta.coingecko_id
+          AND date >= (
+            EXTRACT(
+              EPOCH
+              FROM
+                NOW()
+            ) * 1000
+          )::BIGINT - 600000
+        ORDER BY
+          date DESC
+        LIMIT
+          1
+      ) p ON TRUE
     WHERE
       contract = ${contract}
   `;

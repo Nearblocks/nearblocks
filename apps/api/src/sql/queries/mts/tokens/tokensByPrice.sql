@@ -10,11 +10,31 @@ SELECT
   mbm.reference,
   mtm.title,
   mtm.media,
-  mtm.price::TEXT,
+  p.price::TEXT,
   holder.account AS owner
 FROM
   mt_base_meta mbm
   LEFT JOIN mt_token_meta mtm USING (contract, token)
+  LEFT JOIN mt_intents_tokens it ON it.token = mbm.token
+  LEFT JOIN LATERAL (
+    SELECT
+      price
+    FROM
+      ft_prices
+    WHERE
+      coingecko_id = it.coingecko_id
+      AND date >= (
+        EXTRACT(
+          EPOCH
+          FROM
+            NOW()
+        ) * 1000
+      )::BIGINT - 600000
+    ORDER BY
+      date DESC
+    LIMIT
+      1
+  ) p ON TRUE
   LEFT JOIN LATERAL (
     SELECT
       account
@@ -39,17 +59,17 @@ WHERE
         (
           ${cursor.price}::TEXT IS NOT NULL
           AND (
-            (mtm.price < ${cursor.price}::NUMERIC)
+            (p.price < ${cursor.price}::NUMERIC)
             OR (
-              mtm.price = ${cursor.price}::NUMERIC
+              p.price = ${cursor.price}::NUMERIC
               AND mbm.token > ${cursor.token}
             )
-            OR mtm.price IS NULL
+            OR p.price IS NULL
           )
         )
         OR (
           ${cursor.price}::TEXT IS NULL
-          AND mtm.price IS NULL
+          AND p.price IS NULL
           AND mbm.token > ${cursor.token}
         )
       )
@@ -60,9 +80,9 @@ WHERE
         (
           ${cursor.price}::TEXT IS NOT NULL
           AND (
-            (mtm.price > ${cursor.price}::NUMERIC)
+            (p.price > ${cursor.price}::NUMERIC)
             OR (
-              mtm.price = ${cursor.price}::NUMERIC
+              p.price = ${cursor.price}::NUMERIC
               AND mbm.token < ${cursor.token}
             )
           )
@@ -70,9 +90,9 @@ WHERE
         OR (
           ${cursor.price}::TEXT IS NULL
           AND (
-            mtm.price IS NOT NULL
+            p.price IS NOT NULL
             OR (
-              mtm.price IS NULL
+              p.price IS NULL
               AND mbm.token < ${cursor.token}
             )
           )
@@ -81,7 +101,7 @@ WHERE
     )
   )
 ORDER BY
-  mtm.price ${direction:raw} NULLS ${nullsOrder:raw},
+  p.price ${direction:raw} NULLS ${nullsOrder:raw},
   mbm.token ${tokenDirection:raw}
 LIMIT
   ${limit}
