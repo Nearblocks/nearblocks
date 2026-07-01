@@ -81,15 +81,15 @@ FROM
   ) tm ON TRUE
   LEFT JOIN LATERAL (
     SELECT
-      mip.price::TEXT AS price
+      fpd.price::TEXT AS price
     FROM
-      mt_intents_prices mip
+      mt_intents_tokens it
+      JOIN ft_prices_daily fpd ON fpd.coingecko_id = it.coingecko_id
     WHERE
-      mip.token = mt.token_id
-      AND mip.updated_at <= mt.block_timestamp / 1000000
-      AND mip.updated_at >= mt.block_timestamp / 1000000 - 300000 -- max 5m stale (ms)
+      it.token = mt.token_id
+      AND fpd.date <= mt.block_timestamp / 1000000
     ORDER BY
-      mip.updated_at DESC
+      fpd.date DESC
     LIMIT
       1
   ) pr ON TRUE

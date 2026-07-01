@@ -86,14 +86,14 @@ const values = async () => {
             JOIN mt_intents_tokens it ON it.token = mt.token_id
             LEFT JOIN LATERAL (
               SELECT
-                mip.price
+                fpd.price
               FROM
-                mt_intents_prices mip
+                ft_prices_daily fpd
               WHERE
-                mip.token = mt.token_id
-                AND mip.updated_at <= mt.block_timestamp / 1000000
+                fpd.coingecko_id = it.coingecko_id
+                AND fpd.date <= mt.block_timestamp / 1000000
               ORDER BY
-                mip.updated_at DESC
+                fpd.date DESC
               LIMIT
                 1
             ) pr ON TRUE
