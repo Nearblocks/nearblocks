@@ -10,11 +10,31 @@ SELECT
   mbm.reference,
   mtm.title,
   mtm.media,
-  mtm.price::TEXT,
+  p.price::TEXT,
   holder.account AS owner
 FROM
   mt_base_meta mbm
   LEFT JOIN mt_token_meta mtm USING (contract, token)
+  LEFT JOIN mt_intents_tokens it ON it.token = mbm.token
+  LEFT JOIN LATERAL (
+    SELECT
+      price
+    FROM
+      ft_prices
+    WHERE
+      coingecko_id = it.coingecko_id
+      AND date >= (
+        EXTRACT(
+          EPOCH
+          FROM
+            NOW()
+        ) * 1000
+      )::BIGINT - 600000
+    ORDER BY
+      date DESC
+    LIMIT
+      1
+  ) p ON TRUE
   LEFT JOIN LATERAL (
     SELECT
       account

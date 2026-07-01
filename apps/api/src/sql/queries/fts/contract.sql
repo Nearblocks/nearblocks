@@ -1,6 +1,6 @@
 SELECT
   fm.decimals,
-  fm.price,
+  p.price,
   fm.market_cap,
   fm.fully_diluted_market_cap,
   fm.total_supply,
@@ -27,6 +27,25 @@ SELECT
 FROM
   ft_meta fm
   LEFT JOIN ft_list fl ON fl.contract = fm.contract
+  LEFT JOIN LATERAL (
+    SELECT
+      price
+    FROM
+      ft_prices
+    WHERE
+      coingecko_id = fm.coingecko_id
+      AND date >= (
+        EXTRACT(
+          EPOCH
+          FROM
+            NOW()
+        ) * 1000
+      )::BIGINT - 600000
+    ORDER BY
+      date DESC
+    LIMIT
+      1
+  ) p ON TRUE
 WHERE
   fm.contract = ${contract}
   AND fm.modified_at IS NOT NULL

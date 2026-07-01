@@ -13,9 +13,9 @@ WITH
       mtm.title,
       mtm.media,
       mtm.reference AS token_reference,
-      mtm.price,
+      p.price,
       COALESCE(
-        mh.amount * mtm.price / NULLIF(POWER(10, mbm.decimals)::NUMERIC, 0),
+        mh.amount * p.price / NULLIF(POWER(10, mbm.decimals)::NUMERIC, 0),
         0
       ) AS value
     FROM
@@ -27,6 +27,26 @@ WITH
       JOIN mt_token_meta mtm ON mtm.contract = mh.contract
       AND mtm.token = mh.token
       AND mtm.modified_at IS NOT NULL
+      LEFT JOIN mt_intents_tokens it ON it.token = mh.token
+      LEFT JOIN LATERAL (
+        SELECT
+          price
+        FROM
+          ft_prices
+        WHERE
+          coingecko_id = it.coingecko_id
+          AND date >= (
+            EXTRACT(
+              EPOCH
+              FROM
+                NOW()
+            ) * 1000
+          )::BIGINT - 600000
+        ORDER BY
+          date DESC
+        LIMIT
+          1
+      ) p ON TRUE
     WHERE
       mh.account = ${account}
       AND mh.amount > 0

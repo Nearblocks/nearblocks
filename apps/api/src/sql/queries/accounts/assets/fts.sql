@@ -8,14 +8,33 @@ WITH
       fm.decimals,
       fm.icon,
       fm.reference,
-      fm.price,
+      p.price,
       COALESCE(
-        fh.amount * fm.price / NULLIF(POWER(10, fm.decimals)::NUMERIC, 0),
+        fh.amount * p.price / NULLIF(POWER(10, fm.decimals)::NUMERIC, 0),
         0
       ) AS value
     FROM
       ft_holders fh
       JOIN ft_meta fm ON fm.contract = fh.contract
+      LEFT JOIN LATERAL (
+        SELECT
+          price
+        FROM
+          ft_prices
+        WHERE
+          coingecko_id = fm.coingecko_id
+          AND date >= (
+            EXTRACT(
+              EPOCH
+              FROM
+                NOW()
+            ) * 1000
+          )::BIGINT - 600000
+        ORDER BY
+          date DESC
+        LIMIT
+          1
+      ) p ON TRUE
     WHERE
       fh.account = ${account}
       AND fh.amount > 0
