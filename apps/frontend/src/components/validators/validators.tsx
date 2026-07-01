@@ -373,14 +373,14 @@ const ValidatorRows = ({
           {row.own_stake_percent ? `${row.own_stake_percent}%` : ''}
         </TableCell>
         <TableCell>
-          <div className="bg-muted relative h-7 w-40 overflow-hidden rounded-full">
+          <div className="dark:bg-muted relative h-7 w-40 overflow-hidden rounded-full bg-[#d1d5db]">
             <div
               className="bg-link absolute inset-y-0 left-0"
               style={{
                 width: `${row.cumulative_stake_percent ?? 0}%`,
               }}
             />
-            <span className="text-body-xs absolute inset-0 flex items-center justify-center font-medium text-white">
+            <span className="text-body-xs text-white-950 absolute inset-0 flex items-center justify-center font-medium">
               {cumulativeLabel}
             </span>
           </div>
