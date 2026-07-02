@@ -229,12 +229,16 @@ export const MTTokenLink = ({
   textClassName,
   token,
 }: MTTokenLinkProps) => {
-  const type = decimals === null ? 'nft' : 'ft';
+  const isNft = decimals === null;
 
   return (
     <Link
       className="text-link flex items-center gap-1"
-      href={`/mt-tokens/${contract}/tokens/${type}/${encodeToken(token)}`}
+      href={
+        isNft
+          ? `/mt-tokens/${contract}/nft-tokens/${encodeToken(token)}`
+          : `/mt-tokens/${contract}/tokens/${encodeToken(token)}`
+      }
     >
       <Truncate>
         <TruncateText

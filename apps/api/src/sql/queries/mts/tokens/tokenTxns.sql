@@ -110,6 +110,11 @@ WHERE
     ${before}::BIGINT IS NULL
     OR mt.block_timestamp < ${before}
   )
+  AND (
+    ${affected}::TEXT IS NOT NULL
+    OR mt.cause = 'BURN'
+    OR mt.delta_amount >= 0
+  )
 ORDER BY
   block_timestamp ${direction:raw},
   shard_id ${direction:raw},

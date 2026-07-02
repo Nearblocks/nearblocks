@@ -64,6 +64,7 @@ export const layout = {
   menu: {
     blockchain: {
       blocks: 'Blocks',
+      chainSignatures: 'Chain Signatures',
       charts: 'Charts',
       multichain: 'Multichain Txns',
       nodes: 'Validators',

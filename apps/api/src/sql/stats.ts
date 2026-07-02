@@ -6,6 +6,7 @@ export default {
   contract: sql('queries/stats/contract.sql'),
   price: sql('queries/stats/price.sql'),
   signer: sql('queries/stats/signer.sql'),
+  signerTotal: sql('queries/stats/signerTotal.sql'),
   stats: sql('queries/stats/stats.sql'),
   tps: sql('queries/stats/tps.sql'),
   txn: sql('queries/stats/txn.sql'),

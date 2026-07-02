@@ -8,6 +8,7 @@ import type {
   PriceStatsReq,
   SignerStats,
   SignerStatsReq,
+  SignerTotalStats,
   Stats,
   TpsStats,
   TpsStatsReq,
@@ -127,6 +128,12 @@ const signer = responseHandler(
   },
 );
 
+const signerTotal = responseHandler(response.signerTotal, async () => {
+  const data = await dbBase.one<SignerTotalStats>(sql.signerTotal);
+
+  return { data };
+});
+
 const tps = responseHandler(
   response.tps,
   async (req: RequestValidator<TpsStatsReq>) => {
@@ -137,4 +144,13 @@ const tps = responseHandler(
   },
 );
 
-export default { address, block, price, signer, stats, tps, txn };
+export default {
+  address,
+  block,
+  price,
+  signer,
+  signerTotal,
+  stats,
+  tps,
+  txn,
+};

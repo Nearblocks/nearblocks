@@ -1,0 +1,78 @@
+'use client';
+
+import { Tooltip, XAxis, YAxis } from '@highcharts/react';
+import { Area } from '@highcharts/react/series';
+import 'highcharts/esm/modules/exporting.src.js';
+import 'highcharts/esm/modules/stock.src.js';
+import { use, useMemo } from 'react';
+
+import { SignerStats } from 'nb-schemas';
+
+import { AnalyticsChart } from '@/components/address/analytics/chart';
+import { SkeletonSlot } from '@/components/skeleton';
+import { useLocale } from '@/hooks/use-locale';
+import { dateFormat, numberFormat, toTgas } from '@/lib/format';
+import { Skeleton } from '@/ui/skeleton';
+
+type Props = {
+  loading?: boolean;
+  statsPromise?: Promise<null | SignerStats[]>;
+};
+
+const yAxisLabel = {
+  formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
+    return numberFormat(+this.value, { notation: 'compact' });
+  },
+};
+
+const tooltipFormatter = function (this: Highcharts.Point) {
+  const header = `<span>${dateFormat(this.x, 'MMM D, YYYY')}</span><br/>`;
+  const rows = (this.points as Array<Highcharts.Point>)?.map((point, index) => {
+    const val = numberFormat(point.y, { notation: 'compact' });
+    return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">●</span> ${point.series.name}: <span class="font-bold">${val}</span></span>`;
+  });
+  return header + (rows?.join('') ?? '');
+};
+
+const getData = (stats: null | SignerStats[]) =>
+  (stats ?? [])
+    .toReversed()
+    .filter((item) => item.gas_burnt !== null)
+    .map(
+      (item) =>
+        [new Date(item.date).getTime(), +toTgas(item.gas_burnt!)] as [
+          number,
+          number,
+        ],
+    );
+
+export const ChainSignaturesGasChart = ({ loading, statsPromise }: Props) => {
+  const { t } = useLocale('chainSignatures');
+  const stats = !loading && statsPromise ? use(statsPromise) : null;
+
+  const data = useMemo(() => getData(stats), [stats]);
+
+  return (
+    <SkeletonSlot
+      fallback={<Skeleton className="h-140 w-full" />}
+      loading={loading || !stats}
+    >
+      {() => (
+        <AnalyticsChart height={560}>
+          <XAxis className="stroke-0" type="datetime" />
+          <YAxis
+            className="stroke-0"
+            labels={yAxisLabel}
+            opposite={false}
+            title={{ text: t('analytics.gasBurnt.yAxis') }}
+          />
+          <Area.Series
+            data={data}
+            options={{ name: t('analytics.gasBurnt.yAxis') }}
+          />
+          <Tooltip formatter={tooltipFormatter} shared />
+        </AnalyticsChart>
+      )}
+    </SkeletonSlot>
+  );
+};

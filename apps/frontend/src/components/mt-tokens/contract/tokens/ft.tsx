@@ -40,7 +40,7 @@ const FTCard = ({ token }: { token: MTTokenList }) => (
         src={token?.media ?? token?.icon ?? ''}
       />
       <TokenLink
-        contract={`${token.contract}/tokens/ft/${encodeToken(token.token)}`}
+        contract={`${token.contract}/tokens/${encodeToken(token.token)}`}
         name={token.title ?? token.name}
         symbol={token.symbol}
         type="mt-tokens"

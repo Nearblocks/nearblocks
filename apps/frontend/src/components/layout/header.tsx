@@ -47,6 +47,10 @@ const staticMenu = (isMainnet: boolean): NavMenu<RouteKey<'layout'>> => [
     menu: [
       { href: '/blocks', key: 'menu.blockchain.blocks' },
       { href: '/txns', key: 'menu.blockchain.txns' },
+      {
+        href: '/chain-signatures',
+        key: 'menu.blockchain.chainSignatures' as const,
+      },
       ...(isMainnet
         ? [
             {

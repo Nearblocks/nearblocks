@@ -6,11 +6,13 @@ import { responseSchema } from '../common.js';
 
 const mpcParticipant = v.object({
   account: v.string(),
+  is_validator: v.boolean(),
   public_key: v.string(),
   url: v.string(),
 });
 
 const mpcParameters = v.object({
+  contract: v.string(),
   participants: v.array(mpcParticipant),
   threshold: v.number(),
 });

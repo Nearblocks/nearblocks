@@ -5,4 +5,5 @@ export default {
   signatures: sql('queries/multichain/signatures.sql'),
   signatureTxn: sql('queries/multichain/signatureTxn.sql'),
   stats: sql('queries/multichain/stats.sql'),
+  validators: sql('queries/multichain/validators.sql'),
 };

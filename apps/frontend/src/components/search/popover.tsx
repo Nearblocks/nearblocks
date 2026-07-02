@@ -247,7 +247,7 @@ export const SearchPopover = ({
         {results && results.mts.length > 0 && (
           <SearchItem title={t('search.mtTokens')}>
             {results.mts.map((mt) => {
-              const href = `/mt-tokens/${mt.contract}/tokens/ft/${encodeToken(
+              const href = `/mt-tokens/${mt.contract}/tokens/${encodeToken(
                 mt.token,
               )}`;
               return (

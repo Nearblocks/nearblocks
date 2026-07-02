@@ -173,6 +173,19 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/signer-stats/total:
+   *   get:
+   *     summary: Get all-time signer contract transaction and gas totals
+   *     tags:
+   *       - Stats
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  app.get('/signer-stats/total', bearerAuth, rateLimiter, service.signerTotal);
+
+  /**
+   * @openapi
    * /v3/tps-stats:
    *   get:
    *     summary: Get transactions-per-second stats

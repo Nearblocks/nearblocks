@@ -3,6 +3,7 @@ import { address } from './address';
 import { advertise } from './advertise';
 import { apis } from './apis';
 import { blocks } from './blocks';
+import { chainSignatures } from './chain-signatures';
 import { charts } from './charts';
 import { contact } from './contact';
 import { fts } from './fts';
@@ -23,6 +24,7 @@ export const dictionary = {
   advertise,
   apis,
   blocks,
+  chainSignatures,
   charts,
   contact,
   fts,

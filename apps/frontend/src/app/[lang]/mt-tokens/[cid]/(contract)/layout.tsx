@@ -58,7 +58,7 @@ const MtTokenLayout = async ({ children, params }: Props) => {
             </ActiveLink>
           </TabLink>
           <TabLink asChild>
-            <ActiveLink exact={false} href={`/mt-tokens/${cid}/tokens`}>
+            <ActiveLink exact={false} href={`/mt-tokens/${cid}/inventory`}>
               {t('contract.inventory')}
             </ActiveLink>
           </TabLink>
