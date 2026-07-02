@@ -62,7 +62,7 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
         router.push(href);
       } else if (resp.mts.length) {
         const mt = resp.mts[0];
-        const href = `/mt-tokens/${mt.contract}/tokens/ft/${encodeToken(
+        const href = `/mt-tokens/${mt.contract}/tokens/${encodeToken(
           mt.token,
         )}`;
         addToHistory({ href, label: mt.token, type: 'token' });

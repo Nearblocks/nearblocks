@@ -43,7 +43,7 @@ const NftCard = ({
   token: MTTokenList;
 }) => (
   <div className="flex flex-col gap-2">
-    <Link href={`/mt-tokens/${cid}/tokens/nft/${encodeToken(token.token)}`}>
+    <Link href={`/mt-tokens/${cid}/nft-tokens/${encodeToken(token.token)}`}>
       <div className="aspect-square w-full overflow-hidden rounded-lg border">
         <NFTMedia
           alt={token.title ?? token.token}
@@ -59,7 +59,7 @@ const NftCard = ({
         <span className="text-muted-foreground">{titleLabel}</span>
         <Link
           className="text-link"
-          href={`/mt-tokens/${cid}/tokens/nft/${encodeToken(token.token)}`}
+          href={`/mt-tokens/${cid}/nft-tokens/${encodeToken(token.token)}`}
         >
           {token.token}
         </Link>

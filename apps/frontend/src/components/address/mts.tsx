@@ -79,12 +79,16 @@ export const MTTxns = ({
     {
       cell: (mt) => (
         <AccountLink
-          account={mt.affected_account_id}
+          account={
+            Number(mt.delta_amount) < 0
+              ? mt.affected_account_id
+              : mt.involved_account_id
+          }
           textClassName="max-w-25"
         />
       ),
-      header: t('mts.columns.affected'),
-      id: 'affected',
+      header: t('mts.columns.from'),
+      id: 'from',
     },
     {
       cell: (mt) => <TxnDirection amount={mt.delta_amount} />,
@@ -95,15 +99,16 @@ export const MTTxns = ({
     {
       cell: (mt) => (
         <AccountLink
-          account={mt.involved_account_id}
+          account={
+            Number(mt.delta_amount) < 0
+              ? mt.involved_account_id
+              : mt.affected_account_id
+          }
           textClassName="max-w-25"
         />
       ),
-      enableFilter: true,
-      filterName: 'involved',
-      filterPlaceholder: t('mts.filterInvolved'),
-      header: t('mts.columns.involved'),
-      id: 'involved',
+      header: t('mts.columns.to'),
+      id: 'to',
     },
     {
       cell: (mt) => (

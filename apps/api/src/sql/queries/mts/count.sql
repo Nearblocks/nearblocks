@@ -13,6 +13,10 @@ FROM
         ${before}::BIGINT IS NULL
         OR block_timestamp < ${before}
       )
+      AND (
+        cause = 'BURN'
+        OR delta_amount >= 0
+      )
       AND EXISTS (
         SELECT
           1

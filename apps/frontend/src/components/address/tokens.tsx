@@ -220,9 +220,7 @@ export const Tokens = ({
                     <TokenRow
                       amount={token.amount}
                       decimals={token.meta?.decimals}
-                      href={`/mt-tokens/${
-                        token.contract
-                      }/tokens/ft/${encodeToken(
+                      href={`/mt-tokens/${token.contract}/tokens/${encodeToken(
                         token.token,
                       )}?account=${address}`}
                       icon={token.meta?.icon}

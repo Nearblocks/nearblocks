@@ -79,9 +79,17 @@ export const FTTxns = ({
       id: 'cause',
     },
     {
-      cell: (ft) => <AccountLink account={ft.affected_account_id} />,
-      header: t('fts.columns.affected'),
-      id: 'affected',
+      cell: (ft) => (
+        <AccountLink
+          account={
+            Number(ft.delta_amount) < 0
+              ? ft.affected_account_id
+              : ft.involved_account_id
+          }
+        />
+      ),
+      header: t('fts.columns.from'),
+      id: 'from',
     },
     {
       cell: (ft) => <TxnDirection amount={ft.delta_amount} />,
@@ -90,12 +98,17 @@ export const FTTxns = ({
       id: 'direction',
     },
     {
-      cell: (ft) => <AccountLink account={ft.involved_account_id} />,
-      enableFilter: true,
-      filterName: 'involved',
-      filterPlaceholder: t('fts.filterInvolved'),
-      header: t('fts.columns.involved'),
-      id: 'involved',
+      cell: (ft) => (
+        <AccountLink
+          account={
+            Number(ft.delta_amount) < 0
+              ? ft.involved_account_id
+              : ft.affected_account_id
+          }
+        />
+      ),
+      header: t('fts.columns.to'),
+      id: 'to',
     },
     {
       cell: (ft) => (

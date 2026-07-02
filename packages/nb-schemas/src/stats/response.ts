@@ -60,6 +60,11 @@ const signerStats = v.object({
   txns: v.nullable(v.number()),
 });
 
+const signerTotalStats = v.object({
+  gas_burnt: v.nullable(v.string()),
+  txns: v.nullable(v.string()),
+});
+
 const shard = v.object({
   shard: v.number(),
   txns: v.number(),
@@ -77,6 +82,7 @@ const txnStatsResponse = responseSchema(v.array(txnStats));
 const addressStatsResponse = responseSchema(v.array(addressStats));
 const priceStatsResponse = responseSchema(v.array(priceStats));
 const signerStatsResponse = responseSchema(v.array(signerStats));
+const signerTotalStatsResponse = responseSchema(signerTotalStats);
 const tpsStatsResponse = responseSchema(v.array(tpsStats));
 
 export type Stats = v.InferOutput<typeof stats>;
@@ -85,6 +91,7 @@ export type DailyTxnStats = v.InferOutput<typeof txnStats>;
 export type AddressStats = v.InferOutput<typeof addressStats>;
 export type PriceStats = v.InferOutput<typeof priceStats>;
 export type SignerStats = v.InferOutput<typeof signerStats>;
+export type SignerTotalStats = v.InferOutput<typeof signerTotalStats>;
 export type TpsStats = v.InferOutput<typeof tpsStats>;
 
 export type StatsRes = v.InferOutput<typeof statsResponse>;
@@ -93,6 +100,9 @@ export type DailyTxnStatsRes = v.InferOutput<typeof txnStatsResponse>;
 export type AddressStatsRes = v.InferOutput<typeof addressStatsResponse>;
 export type PriceStatsRes = v.InferOutput<typeof priceStatsResponse>;
 export type SignerStatsRes = v.InferOutput<typeof signerStatsResponse>;
+export type SignerTotalStatsRes = v.InferOutput<
+  typeof signerTotalStatsResponse
+>;
 export type TpsStatsRes = v.InferOutput<typeof tpsStatsResponse>;
 
 export default {
@@ -100,6 +110,7 @@ export default {
   block: blockStatsResponse,
   price: priceStatsResponse,
   signer: signerStatsResponse,
+  signerTotal: signerTotalStatsResponse,
   stats: statsResponse,
   tps: tpsStatsResponse,
   txn: txnStatsResponse,

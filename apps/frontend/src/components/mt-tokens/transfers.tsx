@@ -74,12 +74,16 @@ export const MtTokenTransfers = ({
     {
       cell: (mt) => (
         <AccountLink
-          account={mt.affected_account_id}
+          account={
+            mt.cause === 'BURN'
+              ? mt.affected_account_id
+              : mt.involved_account_id
+          }
           textClassName="max-w-25"
         />
       ),
-      header: t('transfers.affected'),
-      id: 'affected',
+      header: t('transfers.from'),
+      id: 'from',
     },
     {
       cell: (mt) => <TxnDirection amount={mt.delta_amount} />,
@@ -90,12 +94,12 @@ export const MtTokenTransfers = ({
     {
       cell: (mt) => (
         <AccountLink
-          account={mt.involved_account_id}
+          account={mt.cause === 'BURN' ? null : mt.affected_account_id}
           textClassName="max-w-25"
         />
       ),
-      header: t('transfers.involved'),
-      id: 'involved',
+      header: t('transfers.to'),
+      id: 'to',
     },
     {
       cell: (mt) => (

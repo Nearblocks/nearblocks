@@ -200,14 +200,26 @@ const mpcs = responseHandler(response.mpcState, async () => {
   }
 
   const { parameters } = state['Running'] as RawRunning;
+  const participants = parameters.participants.participants.map(
+    ([account, , { tls_public_key, url }]) => ({
+      account,
+      public_key: tls_public_key,
+      url,
+    }),
+  );
+
+  const validators = await dbBase.manyOrNone<{ account_id: string }>(
+    sql.validators,
+    { account_ids: participants.map((p) => p.account) },
+  );
+  const validatorIds = new Set(validators.map((v) => v.account_id));
+
   const result: MCMpcParameters = {
-    participants: parameters.participants.participants.map(
-      ([account, , { tls_public_key, url }]) => ({
-        account,
-        public_key: tls_public_key,
-        url,
-      }),
-    ),
+    contract,
+    participants: participants.map((p) => ({
+      ...p,
+      is_validator: validatorIds.has(p.account),
+    })),
     threshold: parameters.threshold,
   };
 

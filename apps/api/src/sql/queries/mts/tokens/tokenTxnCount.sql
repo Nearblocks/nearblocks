@@ -19,6 +19,11 @@ FROM
         ${before}::BIGINT IS NULL
         OR mt.block_timestamp < ${before}
       )
+      AND (
+        ${affected}::TEXT IS NOT NULL
+        OR mt.cause = 'BURN'
+        OR mt.delta_amount >= 0
+      )
       AND EXISTS (
         SELECT
           1

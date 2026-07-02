@@ -83,9 +83,17 @@ export const NFTTxns = ({
       id: 'cause',
     },
     {
-      cell: (nft) => <AccountLink account={nft.affected_account_id} />,
-      header: t('nfts.columns.affected'),
-      id: 'affected',
+      cell: (nft) => (
+        <AccountLink
+          account={
+            Number(nft.delta_amount) < 0
+              ? nft.affected_account_id
+              : nft.involved_account_id
+          }
+        />
+      ),
+      header: t('nfts.columns.from'),
+      id: 'from',
     },
     {
       cell: (nft) => <TxnDirection amount={nft.delta_amount} />,
@@ -94,12 +102,17 @@ export const NFTTxns = ({
       id: 'direction',
     },
     {
-      cell: (nft) => <AccountLink account={nft.involved_account_id} />,
-      enableFilter: true,
-      filterName: 'involved',
-      filterPlaceholder: t('nfts.filterInvolved'),
-      header: t('nfts.columns.involved'),
-      id: 'involved',
+      cell: (nft) => (
+        <AccountLink
+          account={
+            Number(nft.delta_amount) < 0
+              ? nft.involved_account_id
+              : nft.affected_account_id
+          }
+        />
+      ),
+      header: t('nfts.columns.to'),
+      id: 'to',
     },
     {
       cell: (nft) => (

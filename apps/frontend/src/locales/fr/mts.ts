@@ -36,7 +36,7 @@ export const mts = {
     title: '{{name}} MT Stats, Holders & Transactions',
   },
   contract: {
-    inventory: 'Tokens',
+    inventory: 'Inventory',
     label: 'MT Contract:',
     overview: {
       holders: 'Holders:',
@@ -137,12 +137,12 @@ export const mts = {
     transfers: 'Transfers',
   },
   transfers: {
-    affected: 'Affected',
     empty: 'No mt token txns found',
+    from: 'From',
     heading: 'Token Transfers (NEP-245)',
-    involved: 'Involved',
     method: 'Method',
     quantity: 'Quantity',
+    to: 'To',
     token: 'Token',
     total: 'More than {{count}} mt token txns found',
     totalExact: 'A total of {{count}} mt token txns found',
