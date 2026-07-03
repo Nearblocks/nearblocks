@@ -13,6 +13,7 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { db } from '#libs/knex';
+import { normalizeAccessKey } from '#libs/utils';
 import { getAccessKeyData, storeGenesisAccessKeys } from '#services/accessKey';
 import { getAccountData, storeGenesisAccounts } from '#services/account';
 
@@ -113,7 +114,7 @@ export const insertGenesisData = async (path: string) => {
     if (chunk.key === 'AccessKey') {
       const accessKeyData = getAccessKeyData(
         chunk.value.account_id,
-        chunk.value.public_key,
+        normalizeAccessKey(chunk.value.public_key),
         chunk.value.access_key.permission,
         config.genesisTimestamp,
       );
