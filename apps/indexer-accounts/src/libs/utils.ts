@@ -1,4 +1,5 @@
 import { createRequire } from 'module';
+import { createHash } from 'node:crypto';
 
 import { base58 } from '@scure/base';
 
@@ -6,7 +7,24 @@ import { ExecutionStatus } from 'nb-neardata';
 
 const json = createRequire(import.meta.url)('nb-json');
 
+const ML_DSA_65_PREFIX = 'ml-dsa-65:';
+const ML_DSA_65_HASH_DOMAIN_TAG = 'near:ml-dsa-65-pubkey-hash:v1';
+
 export const jsonStringify = (args: unknown): string => json.stringify(args);
+
+export const normalizePublicKey = (publicKey: string): string => {
+  if (!publicKey.startsWith(ML_DSA_65_PREFIX)) {
+    return publicKey;
+  }
+
+  const raw = base58.decode(publicKey.slice(ML_DSA_65_PREFIX.length));
+  const hash = createHash('sha3-256')
+    .update(Buffer.from(ML_DSA_65_HASH_DOMAIN_TAG))
+    .update(raw)
+    .digest();
+
+  return `ml-dsa-65-hash:${base58.encode(hash)}`;
+};
 
 export const publicKeyFromImplicitAccount = (account: string) => {
   try {

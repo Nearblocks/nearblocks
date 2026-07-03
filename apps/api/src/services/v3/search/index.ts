@@ -54,7 +54,9 @@ const isValidPublicKey = (key: string) => {
   const [curve, value] = key.split(':');
 
   return (
-    (curve === 'ed25519' || curve === 'secp256k1') &&
+    (curve === 'ed25519' ||
+      curve === 'secp256k1' ||
+      curve === 'ml-dsa-65-hash') &&
     value.length >= 43 &&
     value.length <= 88 &&
     BASE58_REGEX.test(value)

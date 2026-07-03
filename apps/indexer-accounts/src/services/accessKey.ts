@@ -17,6 +17,7 @@ import {
 import {
   isExecutionSuccess,
   jsonStringify,
+  normalizePublicKey,
   publicKeyFromImplicitAccount,
 } from '#libs/utils';
 
@@ -143,7 +144,8 @@ const getChunkAccessKeys = (
       }
 
       if (isAddKeyAction(action)) {
-        const { accessKey, publicKey } = action.AddKey;
+        const { accessKey } = action.AddKey;
+        const publicKey = normalizePublicKey(action.AddKey.publicKey);
         const mapKey = `${accountId}:${publicKey}`;
         const keyToUpdate = accessKeysToUpdate.get(mapKey);
 
@@ -166,7 +168,7 @@ const getChunkAccessKeys = (
       }
 
       if (isDeleteKeyAction(action)) {
-        const { publicKey } = action.DeleteKey;
+        const publicKey = normalizePublicKey(action.DeleteKey.publicKey);
         const mapKey = `${accountId}:${publicKey}`;
         const existingKey = accessKeys.get(mapKey);
 
