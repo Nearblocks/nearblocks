@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { base58 } from '@scure/base';
 import { snakeCase, toUpper } from 'lodash-es';
 
@@ -8,6 +10,23 @@ import { sleep } from 'nb-utils';
 
 import config from '#config';
 import knex from '#libs/knex';
+
+const ML_DSA_65_PREFIX = 'ml-dsa-65:';
+const ML_DSA_65_HASH_DOMAIN_TAG = 'near:ml-dsa-65-pubkey-hash:v1';
+
+export const normalizePublicKey = (publicKey: string): string => {
+  if (!publicKey.startsWith(ML_DSA_65_PREFIX)) {
+    return publicKey;
+  }
+
+  const raw = base58.decode(publicKey.slice(ML_DSA_65_PREFIX.length));
+  const hash = createHash('sha3-256')
+    .update(Buffer.from(ML_DSA_65_HASH_DOMAIN_TAG))
+    .update(raw)
+    .digest();
+
+  return `ml-dsa-65-hash:${base58.encode(hash)}`;
+};
 
 export const mapExecutionStatus = (
   status: ExecutionStatus,

@@ -16,7 +16,7 @@ import {
   isTransferAction,
 } from '#libs/guards';
 import { keyHistogram } from '#libs/prom';
-import { publicKeyFromImplicitAccount } from '#libs/utils';
+import { normalizePublicKey, publicKeyFromImplicitAccount } from '#libs/utils';
 
 type AccessKeyMap = Map<string, AccessKey>;
 type DeletedAccountMap = Map<string, { accountId: string; receiptId: string }>;
@@ -114,7 +114,8 @@ export const storeChunkAccessKeys = async (
         }
 
         if (isAddKeyAction(action)) {
-          const { accessKey, publicKey } = action.AddKey;
+          const { accessKey } = action.AddKey;
+          const publicKey = normalizePublicKey(action.AddKey.publicKey);
 
           accessKeys.set(
             `${accountId}:${publicKey}`,
@@ -130,7 +131,7 @@ export const storeChunkAccessKeys = async (
         }
 
         if (isDeleteKeyAction(action)) {
-          const { publicKey } = action.DeleteKey;
+          const publicKey = normalizePublicKey(action.DeleteKey.publicKey);
           const accessKey = accessKeys.get(`${accountId}:${publicKey}`);
 
           if (accessKey) {
