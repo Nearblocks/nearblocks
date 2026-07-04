@@ -2,7 +2,6 @@ import type { BlockStatus, DateStatus, SyncStatus } from 'nb-schemas';
 import response from 'nb-schemas/dist/sync/response.js';
 
 import dayjs from '#libs/dayjs';
-import logger from '#libs/logger';
 import {
   dbBalance,
   dbBase,
@@ -40,45 +39,37 @@ const getBaseStatus = async (): Promise<BlockStatus> => {
   };
 };
 
+// Downstream indexers consume the same stream as base (which writes `blocks`)
+// but independently, so they can lead or trail it. Judge them purely by how far
+// their checkpoint trails base's tip — ahead or within range is in sync. Base's
+// own wall-clock freshness is checked in getBaseStatus.
 const getIndexerStatus =
   (db: typeof dbBase, key: string) => async (): Promise<BlockStatus> => {
-    const setting = await db.oneOrNone<{ value: { sync: string } }>(
-      'SELECT value FROM settings WHERE key = $1',
-      [key],
-    );
-    const indexerHeight = setting?.value?.sync;
-
-    if (!indexerHeight) return { height: null, sync: false, timestamp: null };
-
-    const syncedBlock = await dbBase.oneOrNone<{
-      block_height: string;
-      block_timestamp: string;
-    }>(
-      'SELECT block_height, block_timestamp FROM blocks WHERE block_height IN ($1:csv) LIMIT 1',
-      [[+indexerHeight, +indexerHeight - 1, +indexerHeight - 2]],
-    );
-
-    if (!syncedBlock) {
-      // Not in `blocks` yet → indexer is at/ahead of base's tip, not behind.
-      const latestBlock = await dbBase.oneOrNone<{ block_height: string }>(
+    const [setting, latestBlock] = await Promise.all([
+      db.oneOrNone<{ value: { sync: string } }>(
+        'SELECT value FROM settings WHERE key = $1',
+        [key],
+      ),
+      dbBase.oneOrNone<{ block_height: string }>(
         'SELECT block_height FROM blocks ORDER BY block_height DESC LIMIT 1',
-      );
-      const latestHeight = latestBlock?.block_height;
-      const sync =
-        latestHeight != null &&
-        +latestHeight - +indexerHeight <= BLOCK_HEIGHT_RANGE;
+      ),
+    ]);
 
-      if (!sync) {
-        logger.warn({ indexerHeight, key, latestHeight });
-      }
+    const indexerHeight = setting?.value?.sync;
+    const latestHeight = latestBlock?.block_height;
 
-      return { height: String(indexerHeight), sync, timestamp: null };
+    if (indexerHeight == null || latestHeight == null) {
+      return {
+        height: indexerHeight != null ? String(indexerHeight) : null,
+        sync: false,
+        timestamp: null,
+      };
     }
 
     return {
-      height: String(syncedBlock.block_height),
-      sync: isInSync(String(syncedBlock.block_timestamp)),
-      timestamp: String(syncedBlock.block_timestamp),
+      height: String(indexerHeight),
+      sync: +latestHeight - +indexerHeight <= BLOCK_HEIGHT_RANGE,
+      timestamp: null,
     };
   };
 
