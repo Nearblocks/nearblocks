@@ -14,7 +14,7 @@ import { responseHandler } from '#middlewares/response';
 
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m
-const BLOCK_HEIGHT_RANGE = 60; // ~1m of blocks
+const BLOCK_HEIGHT_RANGE = 300; // ~5m of blocks — max an indexer may trail base
 
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;

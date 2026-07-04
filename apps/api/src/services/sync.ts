@@ -9,7 +9,7 @@ import { getLatestBlock, getLatestStats, getSettings } from '#libs/sync';
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m — base wall-clock freshness
 const EVENT_RANGE = 600; // 10m of blocks — max an aggregate may trail
-const BLOCK_HEIGHT_RANGE = 60; // ~1m of blocks — max an indexer may trail base
+const BLOCK_HEIGHT_RANGE = 300; // ~5m of blocks — max an indexer may trail base
 
 // base freshness: is the latest indexed block recent in wall-clock time?
 const isInSync = (timestamp: string) =>
