@@ -15,6 +15,7 @@ import { responseHandler } from '#middlewares/response';
 
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m
+const BLOCK_HEIGHT_RANGE = 60; // ~1m of blocks
 
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
@@ -58,8 +59,20 @@ const getIndexerStatus =
     );
 
     if (!syncedBlock) {
-      logger.warn({ indexerHeight, key });
-      return { height: String(indexerHeight), sync: false, timestamp: null };
+      // Not in `blocks` yet → indexer is at/ahead of base's tip, not behind.
+      const latestBlock = await dbBase.oneOrNone<{ block_height: string }>(
+        'SELECT block_height FROM blocks ORDER BY block_height DESC LIMIT 1',
+      );
+      const latestHeight = latestBlock?.block_height;
+      const sync =
+        latestHeight != null &&
+        +latestHeight - +indexerHeight <= BLOCK_HEIGHT_RANGE;
+
+      if (!sync) {
+        logger.warn({ indexerHeight, key, latestHeight });
+      }
+
+      return { height: String(indexerHeight), sync, timestamp: null };
     }
 
     return {

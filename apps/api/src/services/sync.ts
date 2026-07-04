@@ -15,6 +15,7 @@ import {
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m
 const EVENT_RANGE = 600; // 10m
+const BLOCK_HEIGHT_RANGE = 60; // ~1m of blocks
 
 const isInSync = (timestamp: string) =>
   dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
@@ -22,6 +23,12 @@ const isEventInSync = (latest: number, current: number) =>
   +latest - +current <= EVENT_RANGE;
 const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
+// A synced block missing from `blocks` (written by the base indexer) means this
+// indexer is at or ahead of base's tip, i.e. it is not behind. Treat it as in
+// sync as long as it isn't far behind the latest block, so a genuinely stalled
+// indexer still surfaces as out of sync.
+const isAheadOfBase = (indexerHeight: number, latestHeight?: number) =>
+  latestHeight != null && latestHeight - indexerHeight <= BLOCK_HEIGHT_RANGE;
 
 const getBaseStatus = async () => {
   const latestBlock = await getLatestBlock();
@@ -32,21 +39,29 @@ const getBaseStatus = async () => {
   return { height, sync: isInSync(timestamp), timestamp };
 };
 
-const getBalanceStatus = async () => {
+const getIndexerStatus = async (key: string) => {
   const settings = await getSettings();
 
-  const balanceHeight = settings.find((item: Setting) => item.key === 'balance')
+  const indexerHeight = settings.find((item: Setting) => item.key === key)
     ?.value?.sync;
 
-  if (!balanceHeight) {
+  if (!indexerHeight) {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const syncedBlock = await getBlock(+balanceHeight);
+  const syncedBlock = await getBlock(+indexerHeight);
 
   if (!syncedBlock?.[0]) {
-    logger.warn({ syncedBlock });
-    return { height: balanceHeight, sync: false, timestamp: null };
+    // Not in `blocks` yet → indexer is at/ahead of base's tip, not behind.
+    const latestBlock = await getLatestBlock();
+    const latestHeight = latestBlock?.[0]?.block_height;
+    const sync = isAheadOfBase(+indexerHeight, latestHeight);
+
+    if (!sync) {
+      logger.warn({ indexerHeight, key, latestHeight });
+    }
+
+    return { height: indexerHeight, sync, timestamp: null };
   }
 
   const height = syncedBlock[0].block_height;
@@ -55,28 +70,8 @@ const getBalanceStatus = async () => {
   return { height, sync: isInSync(timestamp), timestamp };
 };
 
-const getEventStatus = async () => {
-  const settings = await getSettings();
-
-  const eventHeight = settings.find((item: Setting) => item.key === 'events')
-    ?.value?.sync;
-
-  if (!eventHeight) {
-    return { height: null, sync: false, timestamp: null };
-  }
-
-  const syncedBlock = await getBlock(+eventHeight);
-
-  if (!syncedBlock?.[0]) {
-    logger.warn({ syncedBlock });
-    return { height: eventHeight, sync: false, timestamp: null };
-  }
-
-  const height = syncedBlock[0].block_height;
-  const timestamp = syncedBlock[0].block_timestamp;
-
-  return { height, sync: isInSync(timestamp), timestamp };
-};
+const getBalanceStatus = () => getIndexerStatus('balance');
+const getEventStatus = () => getIndexerStatus('events');
 
 const getFTHoldersStatus = async () => {
   const settings = await getSettings();
@@ -91,23 +86,22 @@ const getFTHoldersStatus = async () => {
     return { height: null, sync: false, timestamp: null };
   }
 
-  const [syncedBlock, latestEvent] = await Promise.all([
-    getBlock(+ftHoldersHeight),
-    getBlock(+eventsHeight),
-  ]);
+  // ft_holders trails the events indexer; in sync when within EVENT_RANGE
+  // blocks of it. Both heights come from settings, so this holds even when the
+  // exact block row isn't in `blocks` yet.
+  const eventInSync = isEventInSync(+eventsHeight, +ftHoldersHeight);
+  const syncedBlock = await getBlock(+ftHoldersHeight);
 
-  if (!syncedBlock?.[0] || !latestEvent?.[0]) {
-    logger.warn({ latestEvent, syncedBlock });
-    return { height: ftHoldersHeight, sync: false, timestamp: null };
+  if (!syncedBlock?.[0]) {
+    return { height: ftHoldersHeight, sync: eventInSync, timestamp: null };
   }
 
   const height = syncedBlock[0].block_height;
   const timestamp = syncedBlock[0].block_timestamp;
-  const latestHeight = latestEvent[0].block_height;
 
   return {
     height,
-    sync: isInSync(timestamp) || isEventInSync(latestHeight, +ftHoldersHeight),
+    sync: isInSync(timestamp) || eventInSync,
     timestamp,
   };
 };
@@ -128,18 +122,22 @@ const getNFTHoldersStatus = async () => {
     getLatestBlock(),
   ]);
 
-  if (!syncedBlock?.[0] || !latestBlock?.[0]) {
-    logger.warn({ latestBlock, syncedBlock });
-    return { height: nftHoldersHeight, sync: false, timestamp: null };
+  // nft_holders trails the chain tip; in sync when within EVENT_RANGE blocks of
+  // the latest block, even if its exact block row isn't in `blocks` yet.
+  const latestHeight = latestBlock?.[0]?.block_height;
+  const heightInSync =
+    !!latestHeight && isEventInSync(+latestHeight, +nftHoldersHeight);
+
+  if (!syncedBlock?.[0]) {
+    return { height: nftHoldersHeight, sync: heightInSync, timestamp: null };
   }
 
   const height = syncedBlock[0].block_height;
   const timestamp = syncedBlock[0].block_timestamp;
-  const latestHeight = latestBlock[0].block_height;
 
   return {
     height,
-    sync: isInSync(timestamp) || isEventInSync(latestHeight, +nftHoldersHeight),
+    sync: isInSync(timestamp) || heightInSync,
     timestamp,
   };
 };
