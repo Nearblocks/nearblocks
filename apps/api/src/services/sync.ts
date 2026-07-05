@@ -45,8 +45,12 @@ const getIndexerStatus = async (key: string) => {
     ?.value?.sync;
   const latestHeight = latestBlock?.[0]?.block_height;
 
-  if (!indexerHeight || latestHeight == null) {
-    return { height: indexerHeight ?? null, sync: false, timestamp: null };
+  // Reference data momentarily unavailable (empty settings read or no latest
+  // block — a transient DB/cache blip, which is what surfaces as `height: null`).
+  // "Couldn't read" is not evidence the indexer trails, so report in sync rather
+  // than emit a false out-of-sync alert; the next probe re-checks against real data.
+  if (indexerHeight == null || latestHeight == null) {
+    return { height: indexerHeight ?? null, sync: true, timestamp: null };
   }
 
   return {
@@ -68,8 +72,10 @@ const getFTHoldersStatus = async () => {
     (item: Setting) => item.key === 'ft_holders_new',
   )?.value?.sync;
 
-  if (!ftHoldersHeight || !eventsHeight) {
-    return { height: null, sync: false, timestamp: null };
+  // Settings read unavailable — can't compute a delta, so don't page (see
+  // getIndexerStatus). Only report out of sync once we can measure the trail.
+  if (ftHoldersHeight == null || eventsHeight == null) {
+    return { height: ftHoldersHeight ?? null, sync: true, timestamp: null };
   }
 
   // ft_holders trails the events indexer; in sync when within EVENT_RANGE
@@ -92,8 +98,10 @@ const getNFTHoldersStatus = async () => {
   )?.value?.sync;
   const latestHeight = latestBlock?.[0]?.block_height;
 
-  if (!nftHoldersHeight || latestHeight == null) {
-    return { height: nftHoldersHeight ?? null, sync: false, timestamp: null };
+  // Settings/latest-block read unavailable — don't page on a transient blip
+  // (see getIndexerStatus). Only report out of sync once we can measure the trail.
+  if (nftHoldersHeight == null || latestHeight == null) {
+    return { height: nftHoldersHeight ?? null, sync: true, timestamp: null };
   }
 
   // nft_holders trails the chain tip; in sync when within EVENT_RANGE blocks.
