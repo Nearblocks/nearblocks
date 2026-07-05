@@ -201,7 +201,11 @@ const useFreePlan = async (
 
   // Never cache this fallback under user_plan:${key}: for a real user id a
   // transient empty lookup would pin them to free for 24h (free_plan is cached separately).
-  const { limiters, rateLimit } = rateLimiterUnion(plan, baseUrl);
+  // Anonymous consumers are keyed by IP (string); skip the unbounded 30-day
+  // month window for them. Registered users falling back to free are keyed by
+  // numeric id (bounded cardinality) and keep the monthly window.
+  const includeMonth = typeof key === 'number';
+  const { limiters, rateLimit } = rateLimiterUnion(plan, baseUrl, includeMonth);
 
   try {
     if (tokenKey) {
@@ -336,7 +340,7 @@ const insurance = (key: string, points: number, duration: number) => {
   return limiter;
 };
 
-const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
+const rateLimiterUnion = (plan: Plan, baseUrl: string, includeMonth = true) => {
   const pointsMinute = plan.limit_per_minute;
   const pointsDay = plan.limit_per_day;
   const pointsMonth = plan.limit_per_month;
@@ -367,7 +371,13 @@ const rateLimiterUnion = (plan: Plan, baseUrl: string) => {
     storeClient: ratelimiterRedisClient,
   });
 
-  if (baseUrl === SEARCH_PATH) {
+  // Anonymous traffic is keyed by IP, whose cardinality over the 30-day month
+  // window is unbounded and — on the noeviction rate-limit store — never evicts,
+  // which is what fills dragonfly. The minute + day windows already bound abuse,
+  // and a monthly cap on a rotating IP is meaningless, so the month window is
+  // applied only to authenticated, low-cardinality consumers. Search has always
+  // been minute + day only.
+  if (baseUrl === SEARCH_PATH || !includeMonth) {
     return {
       limiters: [minuteRateLimiter, dayRateLimiter],
       rateLimit: new RateLimiterUnion(minuteRateLimiter, dayRateLimiter),

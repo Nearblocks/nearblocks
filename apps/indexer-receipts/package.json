@@ -34,7 +34,6 @@
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",
-    "nb-redis": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
