@@ -21,16 +21,28 @@ export class Redis {
   ): Promise<T> {
     // get/set prefix the key themselves — passing a pre-prefixed key here
     // used to double-prefix every cache entry (prefix:prefix:key).
-    const value = await this.get(key);
+    //
+    // The cache is best-effort: a store that is unreachable or full (e.g.
+    // dragonfly refusing writes with `ERR Out of memory` under a noeviction
+    // policy) must degrade to the source, never surface as a request error.
+    try {
+      const value = await this.get(key);
 
-    if (value) {
-      return JSON.parse(value);
+      if (value) {
+        return JSON.parse(value);
+      }
+    } catch {
+      // read unavailable — fall through to the source
     }
 
     const data = await callback();
 
     if (data) {
-      await this.set(key, JSON.stringify(data), ttl);
+      try {
+        await this.set(key, JSON.stringify(data), ttl);
+      } catch {
+        // write unavailable (cache full/down) — serve the uncached result
+      }
     }
 
     return data;
