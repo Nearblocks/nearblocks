@@ -1,43 +1,30 @@
 WITH
+  balances AS (
+    SELECT
+      b.contract,
+      b.amount::NUMERIC AS amount
+    FROM
+      JSONB_TO_RECORDSET(${balances}::JSONB) AS b (contract TEXT, amount TEXT)
+  ),
   holdings AS (
     SELECT
-      fh.contract,
-      fh.amount,
+      b.contract,
+      b.amount::TEXT AS amount,
       fm.name,
       fm.symbol,
       fm.decimals,
       fm.icon,
       fm.reference,
-      p.price,
+      fm.price,
       COALESCE(
-        fh.amount * p.price / NULLIF(POWER(10, fm.decimals)::NUMERIC, 0),
+        b.amount * fm.price / NULLIF(POWER(10, fm.decimals)::NUMERIC, 0),
         0
       ) AS value
     FROM
-      ft_holders fh
-      JOIN ft_meta fm ON fm.contract = fh.contract
-      LEFT JOIN LATERAL (
-        SELECT
-          price
-        FROM
-          ft_prices
-        WHERE
-          coingecko_id = fm.coingecko_id
-          AND date >= (
-            EXTRACT(
-              EPOCH
-              FROM
-                NOW()
-            ) * 1000
-          )::BIGINT - 600000
-        ORDER BY
-          date DESC
-        LIMIT
-          1
-      ) p ON TRUE
+      balances b
+      JOIN ft_meta fm ON fm.contract = b.contract
     WHERE
-      fh.account = ${account}
-      AND fh.amount > 0
+      b.amount > 0
       AND fm.modified_at IS NOT NULL
   )
 SELECT

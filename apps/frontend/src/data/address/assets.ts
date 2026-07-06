@@ -5,6 +5,14 @@ import {
   AccountAssetFTCountRes,
   AccountAssetFTsReq,
   AccountAssetFTsRes,
+  AccountAssetMTFTCount,
+  AccountAssetMTFTCountRes,
+  AccountAssetMTFTsReq,
+  AccountAssetMTFTsRes,
+  AccountAssetMTNFTCount,
+  AccountAssetMTNFTCountRes,
+  AccountAssetMTNFTsReq,
+  AccountAssetMTNFTsRes,
   AccountAssetNFTCount,
   AccountAssetNFTCountRes,
   AccountAssetNFTsReq,
@@ -57,6 +65,54 @@ export const fetchNFTAssetCount = cache(
   async (account: string): Promise<AccountAssetNFTCount | null> => {
     const resp = await fetcher<AccountAssetNFTCountRes>(
       `/v3/accounts/${account}/assets/nfts/count`,
+    );
+    return resp.data;
+  },
+);
+
+export const fetchMTFTAssets = cache(
+  async (
+    account: string,
+    params: SearchParams,
+  ): Promise<AccountAssetMTFTsRes> => {
+    const keys: (keyof AccountAssetMTFTsReq)[] = ['limit', 'next', 'prev'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<AccountAssetMTFTsRes>(
+      `/v3/accounts/${account}/assets/mts/fts?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchMTFTAssetCount = cache(
+  async (account: string): Promise<AccountAssetMTFTCount | null> => {
+    const resp = await fetcher<AccountAssetMTFTCountRes>(
+      `/v3/accounts/${account}/assets/mts/fts/count`,
+    );
+    return resp.data;
+  },
+);
+
+export const fetchMTNFTAssets = cache(
+  async (
+    account: string,
+    params: SearchParams,
+  ): Promise<AccountAssetMTNFTsRes> => {
+    const keys: (keyof AccountAssetMTNFTsReq)[] = ['limit', 'next', 'prev'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<AccountAssetMTNFTsRes>(
+      `/v3/accounts/${account}/assets/mts/nfts?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
+export const fetchMTNFTAssetCount = cache(
+  async (account: string): Promise<AccountAssetMTNFTCount | null> => {
+    const resp = await fetcher<AccountAssetMTNFTCountRes>(
+      `/v3/accounts/${account}/assets/mts/nfts/count`,
     );
     return resp.data;
   },

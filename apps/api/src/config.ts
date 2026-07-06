@@ -27,6 +27,8 @@ const env = cleanEnv(process.env, {
   DB_URL_STAKING: str(dbFallback),
   DB_URL_USER: str(dbFallback),
   DB_WRITE_URL_BASE: str(dbFallback),
+  FASTNEAR_API_KEY: str({ default: '' }),
+  FASTNEAR_URL: str({ default: 'https://api.fastnear.com' }),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -82,6 +84,8 @@ const config: Config = {
   dbUrlStaking: env.DB_URL_STAKING,
   dbWriteUrlBase: env.DB_WRITE_URL_BASE,
   eventsStart,
+  fastnearApiKey: env.FASTNEAR_API_KEY,
+  fastnearUrl: env.FASTNEAR_URL,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryCount: 10000,

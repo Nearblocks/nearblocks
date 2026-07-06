@@ -18,7 +18,6 @@ import {
   fetchAccount,
   fetchBalance,
   fetchMTTokens,
-  fetchTokenCache,
   fetchTokens,
 } from '@/data/address';
 import { fetchContract, fetchDeployments } from '@/data/address/contract';
@@ -54,7 +53,6 @@ const AddressLayout = async ({ children, params }: Props) => {
   const deploymentsPromise = fetchDeployments(address);
   const tokensPromise = fetchTokens(address);
   const mtTokensPromise = fetchMTTokens(address);
-  const tokenCachePromise = fetchTokenCache(address);
   const spamPatterns = await fetchSpamTokens();
 
   if (!hasLocale(lang)) notFound();
@@ -95,7 +93,6 @@ const AddressLayout = async ({ children, params }: Props) => {
                 mtTokensPromise={mtTokensPromise}
                 spamPatterns={spamPatterns}
                 statsPromise={statsPromise}
-                tokenCachePromise={tokenCachePromise}
                 tokensPromise={tokensPromise}
               />
             </ErrorSuspense>

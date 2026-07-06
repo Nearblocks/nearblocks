@@ -3,6 +3,7 @@ import { cache } from 'react';
 import {
   Account,
   AccountAssetFT,
+  AccountAssetFTBalanceRes,
   AccountAssetFTsRes,
   AccountAssetMTFT,
   AccountAssetMTFTsRes,
@@ -11,9 +12,7 @@ import {
   AccountRes,
 } from 'nb-schemas';
 
-import { getServerConfig } from '@/lib/config';
 import { fetcher } from '@/lib/fetcher';
-import { TokenCache, TokensCacheRes } from '@/types/types';
 
 export const fetchAccount = cache(
   async (account: string): Promise<Account | null> => {
@@ -49,20 +48,13 @@ export const fetchMTTokens = cache(
   },
 );
 
-export const fetchTokenCache = cache(
-  async (account: string): Promise<null | TokenCache[]> => {
+export const fetchFTBalance = cache(
+  async (account: string, contract: string): Promise<null | string> => {
     try {
-      const config = getServerConfig();
-      const apiKey = config.NEXT_PUBLIC_FASTNEAR_RPC_KEY;
-
-      const res = await fetch(
-        `https://api.fastnear.com/v1/account/${account}/ft?apiKey=${apiKey}`,
+      const resp = await fetcher<AccountAssetFTBalanceRes>(
+        `/v3/accounts/${account}/assets/fts/${contract}`,
       );
-
-      if (!res.ok) return null;
-
-      const resp = (await res.json()) as TokensCacheRes;
-      return resp.tokens;
+      return resp.data?.amount ?? null;
     } catch {
       return null;
     }
