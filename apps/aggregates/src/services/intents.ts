@@ -3,87 +3,110 @@ import { sleep } from 'nb-utils';
 
 import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
-import { big, getLimit } from '#libs/utils';
+import { big } from '#libs/utils';
 
-const OFFSET = 3_000_000_000n; // 3s in ns
-const TABLE = 'mt_intents_values';
-const CONTRACT = 'intents.near';
+const DAY_NS = 86_400_000_000_000n;
+const DAY_MS = 86_400_000n;
+const SWAPS_TABLE = 'mt_intents_swaps';
+const STATS_TABLE = 'mt_intents_stats';
+const STATS_REBUILD_DAYS = 2n;
+const STATS_INTERVAL_MS = 60_000;
 
-export const syncMTIntents = async () => {
+export const syncIntentsStats = async () => {
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    await values();
+    await stats();
+    await sleep(STATS_INTERVAL_MS);
   }
 };
 
-const values = async () => {
+const stats = async () => {
   try {
-    const [settings, event] = await Promise.all([
-      knex('settings').where('key', TABLE).first(),
-      knex('settings').where('key', 'events').first(),
+    const [settings, swapsSettings] = await Promise.all([
+      knex('settings').where('key', STATS_TABLE).first(),
+      knex('settings').where('key', SWAPS_TABLE).first(),
     ]);
 
+    const swapsSynced = big(swapsSettings?.value?.sync as string);
+
+    if (!swapsSynced) return;
+
     const synced = big(settings?.value?.sync as string);
-    const last = big(event?.value?.timestamp as string);
+    const lastDay = (swapsSynced / DAY_NS) * DAY_MS;
+    let fromDay = synced ? synced - STATS_REBUILD_DAYS * DAY_MS : null;
 
-    if (!last) {
-      logger.warn(`${TABLE}: retrying... ${last}`);
-      await sleep(600);
+    if (!fromDay) {
+      const first = await knex
+        .select('block_timestamp')
+        .from(SWAPS_TABLE)
+        .orderBy('block_timestamp', 'asc')
+        .limit(1)
+        .first();
+      const oldest = big(first?.block_timestamp);
 
-      return;
+      if (!oldest) return;
+
+      fromDay = (oldest / DAY_NS) * DAY_MS;
     }
 
-    let end = last - OFFSET;
-    // first run: start from the current tip
-    const start = synced ? synced + 1n : end;
-    const limit = BigInt(getLimit(start));
+    const startDay = fromDay > lastDay ? lastDay : fromDay;
 
-    if (end < start) {
-      logger.warn(`${TABLE}: retrying... ${start} - ${end}`);
-      await sleep(1000);
-
-      return;
-    }
-
-    if (end - start > limit) end = start + limit;
-
-    logger.info(`${TABLE}: blocks: ${start} - ${end}`);
+    logger.info(`${STATS_TABLE}: days: ${startDay} - ${lastDay}`);
 
     await knex.transaction(async (trx) => {
       await trx.raw(
         `
           INSERT INTO
-            ${TABLE} (
-              block_timestamp,
-              shard_id,
-              event_index,
-              token_id,
-              blockchain,
-              affected_account_id,
-              involved_account_id,
-              cause,
-              delta_amount,
-              price,
-              value
-            )
+            ${STATS_TABLE} (date, token_id, blockchain, swaps, volume, fee, price, volume_usd, fee_usd)
           SELECT
-            mt.block_timestamp,
-            mt.shard_id,
-            mt.event_index,
-            mt.token_id,
+            s.date,
+            s.token_id,
             it.blockchain,
-            mt.affected_account_id,
-            mt.involved_account_id,
-            mt.cause,
-            mt.delta_amount,
+            s.swaps,
+            CASE
+              WHEN it.decimals IS NOT NULL THEN s.volume / (10::NUMERIC ^ it.decimals)
+            END AS volume,
+            CASE
+              WHEN it.decimals IS NOT NULL THEN s.fee / (10::NUMERIC ^ it.decimals)
+            END AS fee,
             pr.price,
             CASE
               WHEN pr.price IS NOT NULL
-              AND it.decimals IS NOT NULL THEN ABS(mt.delta_amount) / POWER(10, it.decimals) * pr.price
-            END AS value
+              AND it.decimals IS NOT NULL THEN s.volume / (10::NUMERIC ^ it.decimals) * pr.price
+            END AS volume_usd,
+            CASE
+              WHEN pr.price IS NOT NULL
+              AND it.decimals IS NOT NULL THEN s.fee / (10::NUMERIC ^ it.decimals) * pr.price
+            END AS fee_usd
           FROM
-            mt_events mt
-            JOIN mt_intents_tokens it ON it.token = mt.token_id
+            (
+              SELECT
+                (block_timestamp / 86400000000000) * 86400000 AS date,
+                token_id,
+                COUNT(*) FILTER (
+                  WHERE
+                    delta_amount > 0
+                ) AS swaps,
+                SUM(delta_amount) FILTER (
+                  WHERE
+                    delta_amount > 0
+                ) AS volume,
+                SUM(fee_amount) AS fee
+              FROM
+                ${SWAPS_TABLE}
+              WHERE
+                block_timestamp >= ?
+                AND block_timestamp < ?
+              GROUP BY
+                1,
+                2
+              HAVING
+                COUNT(*) FILTER (
+                  WHERE
+                    delta_amount > 0
+                ) > 0
+            ) s
+            LEFT JOIN mt_intents_tokens it ON it.token = s.token_id
             LEFT JOIN LATERAL (
               SELECT
                 fpd.price
@@ -91,30 +114,38 @@ const values = async () => {
                 ft_prices_daily fpd
               WHERE
                 fpd.coingecko_id = it.coingecko_id
-                AND fpd.date <= mt.block_timestamp / 1000000
+                AND fpd.date <= s.date
               ORDER BY
                 fpd.date DESC
               LIMIT
                 1
             ) pr ON TRUE
-          WHERE
-            mt.contract_account_id = ?
-            AND mt.block_timestamp BETWEEN ? AND ?
-          ON CONFLICT (block_timestamp, shard_id, event_index) DO NOTHING
+          ON CONFLICT (date, token_id) DO UPDATE
+          SET
+            blockchain = EXCLUDED.blockchain,
+            swaps = EXCLUDED.swaps,
+            volume = EXCLUDED.volume,
+            fee = EXCLUDED.fee,
+            price = EXCLUDED.price,
+            volume_usd = EXCLUDED.volume_usd,
+            fee_usd = EXCLUDED.fee_usd
         `,
-        [CONTRACT, start.toString(), end.toString()],
+        [
+          (startDay * 1_000_000n).toString(),
+          ((lastDay + DAY_MS) * 1_000_000n).toString(),
+        ],
       );
 
       await trx('settings')
         .insert({
-          key: TABLE,
-          value: { sync: end.toString() },
+          key: STATS_TABLE,
+          value: { sync: lastDay.toString() },
         })
         .onConflict('key')
         .merge();
     });
   } catch (error) {
-    logger.error(error, 'syncMTIntentsValues');
+    logger.error(error, 'syncIntentsStats');
     Sentry.captureException(error);
     await sleep(5000);
   }

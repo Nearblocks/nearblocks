@@ -3,7 +3,7 @@ import { logger } from 'nb-logger';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncFTHolders } from '#services/ft';
-import { syncMTIntents } from '#services/intents';
+import { syncIntentsStats } from '#services/intents';
 import { syncMTHolders } from '#services/mt';
 import { syncNFTHolders } from '#services/nft';
 
@@ -13,7 +13,7 @@ import { syncNFTHolders } from '#services/nft';
       syncFTHolders(),
       syncNFTHolders(),
       syncMTHolders(),
-      syncMTIntents(),
+      syncIntentsStats(),
     ]);
   } catch (error) {
     logger.error('aborting...');
