@@ -28,6 +28,7 @@ jobs:
             explorer-selector,
             aggregates,
             block-proxy,
+            indexer-intents,
           ]
       fail-fast: false
     steps:
