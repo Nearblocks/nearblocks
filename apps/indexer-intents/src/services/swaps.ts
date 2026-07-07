@@ -166,6 +166,14 @@ export const parse = (outcomes: OutcomeRow[]): IntentsSwap[] => {
       if (!Array.isArray(event.data)) continue;
 
       for (const item of event.data) {
+        const deltas = Object.values(item.diff).map(BigInt);
+
+        // a swap exchanges tokens: diff must have both a negative (sent) and a
+        // positive (received) side
+        if (!deltas.some((d) => d < 0n) || !deltas.some((d) => d > 0n)) {
+          continue;
+        }
+
         for (const token of Object.keys(item.diff).sort()) {
           const delta = BigInt(item.diff[token]);
 
