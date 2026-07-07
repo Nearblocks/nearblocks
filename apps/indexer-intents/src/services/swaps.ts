@@ -9,8 +9,6 @@ import { IntentsSwap } from '#types/types';
 
 const LIMIT = 60_000_000_000n; // 60s in ns
 const OFFSET = 3_000_000_000n; // 3s in ns
-// TEMP: index until (2025-01-01 00:00 UTC)
-const END_TIMESTAMP = 1_735_689_600_000_000_000n;
 const TABLE = 'mt_intents_swaps';
 const CONTRACT = 'intents.near';
 const INSERT_CHUNK_SIZE = 1000;
@@ -67,16 +65,6 @@ const swaps = async () => {
 
     let end = last - OFFSET;
     const start = synced ? synced + 1n : BigInt(config.intentsStartTimestamp);
-
-    // TEMP: index cap check
-    if (start > END_TIMESTAMP) {
-      logger.info(`${TABLE}: index cap reached, idling...`);
-      await sleep(60_000);
-
-      return;
-    }
-    if (end > END_TIMESTAMP) end = END_TIMESTAMP;
-    // TEMP: index cap check
 
     if (end < start) {
       logger.warn(`${TABLE}: retrying... ${start} - ${end}`);
