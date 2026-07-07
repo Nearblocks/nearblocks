@@ -96,7 +96,7 @@ const stats = async () => {
                     delta_amount > 0
                 ) > 0
             ) s
-            JOIN mt_intents_tokens it ON it.token = s.token_id
+            LEFT JOIN mt_intents_tokens it ON it.token = s.token_id
             LEFT JOIN LATERAL (
               SELECT
                 fpd.price
@@ -104,7 +104,7 @@ const stats = async () => {
                 ft_prices_daily fpd
               WHERE
                 fpd.coingecko_id = it.coingecko_id
-                AND fpd.date <= s.date
+                AND fpd.date <= s.date + 86400000 -- day close = next day's 00:00 snapshot
               ORDER BY
                 fpd.date DESC
               LIMIT
