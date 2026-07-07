@@ -63,21 +63,11 @@ const stats = async () => {
             s.token_id,
             it.blockchain,
             s.swaps,
-            CASE
-              WHEN it.decimals IS NOT NULL THEN s.volume / (10::NUMERIC ^ it.decimals)
-            END AS volume,
-            CASE
-              WHEN it.decimals IS NOT NULL THEN s.fee / (10::NUMERIC ^ it.decimals)
-            END AS fee,
+            s.volume / (10::NUMERIC ^ it.decimals) AS volume,
+            s.fee / (10::NUMERIC ^ it.decimals) AS fee,
             pr.price,
-            CASE
-              WHEN pr.price IS NOT NULL
-              AND it.decimals IS NOT NULL THEN s.volume / (10::NUMERIC ^ it.decimals) * pr.price
-            END AS volume_usd,
-            CASE
-              WHEN pr.price IS NOT NULL
-              AND it.decimals IS NOT NULL THEN s.fee / (10::NUMERIC ^ it.decimals) * pr.price
-            END AS fee_usd
+            s.volume / (10::NUMERIC ^ it.decimals) * pr.price AS volume_usd,
+            s.fee / (10::NUMERIC ^ it.decimals) * pr.price AS fee_usd
           FROM
             (
               SELECT
@@ -106,7 +96,7 @@ const stats = async () => {
                     delta_amount > 0
                 ) > 0
             ) s
-            LEFT JOIN mt_intents_tokens it ON it.token = s.token_id
+            JOIN mt_intents_tokens it ON it.token = s.token_id
             LEFT JOIN LATERAL (
               SELECT
                 fpd.price
