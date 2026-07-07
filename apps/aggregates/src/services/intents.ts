@@ -104,7 +104,7 @@ const stats = async () => {
                 ft_prices_daily fpd
               WHERE
                 fpd.coingecko_id = it.coingecko_id
-                AND fpd.date <= s.date + 86400000 -- day close = next day's 00:00 snapshot
+                AND fpd.date = s.date - 86400000 -- previous day's 00:00 snapshot
               ORDER BY
                 fpd.date DESC
               LIMIT
