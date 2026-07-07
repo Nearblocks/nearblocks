@@ -1,10 +1,21 @@
 import { Request, Response } from 'express';
 
-import { Setting } from 'nb-types';
+import { Network, Setting } from 'nb-types';
 
+import config from '#config';
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
 import { getLatestBlock, getLatestStats, getSettings } from '#libs/sync';
+import {
+  getBalanceStatus as v3BalanceStatus,
+  getBaseStatus as v3BaseStatus,
+  getEventStatus as v3EventStatus,
+  getFTHoldersStatus as v3FTHoldersStatus,
+  getNFTHoldersStatus as v3NFTHoldersStatus,
+  getStatStatus as v3StatStatus,
+} from '#services/v3/sync/index';
+
+const useV3 = config.network === Network.TESTNET;
 
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m — base wall-clock freshness
@@ -23,6 +34,8 @@ const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
 
 const getBaseStatus = async () => {
+  if (useV3) return v3BaseStatus();
+
   const latestBlock = await getLatestBlock();
 
   const height = latestBlock?.[0]?.block_height;
@@ -56,10 +69,14 @@ const getIndexerStatus = async (key: string) => {
   };
 };
 
-const getBalanceStatus = () => getIndexerStatus('balance');
-const getEventStatus = () => getIndexerStatus('events');
+const getBalanceStatus = () =>
+  useV3 ? v3BalanceStatus() : getIndexerStatus('balance');
+const getEventStatus = () =>
+  useV3 ? v3EventStatus() : getIndexerStatus('events');
 
 const getFTHoldersStatus = async () => {
+  if (useV3) return v3FTHoldersStatus();
+
   const settings = await getSettings();
 
   const eventsHeight = settings.find((item: Setting) => item.key === 'events')
@@ -82,6 +99,8 @@ const getFTHoldersStatus = async () => {
 };
 
 const getNFTHoldersStatus = async () => {
+  if (useV3) return v3NFTHoldersStatus();
+
   const [settings, latestBlock] = await Promise.all([
     getSettings(),
     getLatestBlock(),
@@ -105,6 +124,8 @@ const getNFTHoldersStatus = async () => {
 };
 
 const getStatStatus = async () => {
+  if (useV3) return v3StatStatus();
+
   const stats = await getLatestStats();
 
   const date = stats?.[0]?.date;

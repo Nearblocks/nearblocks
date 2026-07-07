@@ -245,6 +245,17 @@ const status = responseHandler(response.status, async () => {
   return { data };
 });
 
+// reused by the v1 sync/health services when config.syncV3 is on
+export {
+  getBalanceStatus,
+  getBaseStatus,
+  getEventStatus,
+  getFTHoldersStatus,
+  getNFTHoldersStatus,
+  getReceiptsStatus,
+  getStatStatus,
+};
+
 export default {
   accounts,
   balance,
