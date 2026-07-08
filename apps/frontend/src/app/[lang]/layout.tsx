@@ -8,6 +8,7 @@ import type { Locale } from '@/locales/config';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { ConfigProvider } from '@/providers/config';
 import { LocaleProvider } from '@/providers/locale';
+import { RpcSessionProvider } from '@/providers/rpc-session';
 import { Toaster } from '@/ui/sonner';
 
 import '../globals.css';
@@ -77,6 +78,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
           <LocaleProvider dictionary={dictionary} locale={locale}>
             <Layout>{children}</Layout>
           </LocaleProvider>
+          <RpcSessionProvider />
           <Toaster />
         </ConfigProvider>
       </body>

@@ -8,6 +8,9 @@ export const serverEnvSchema = z.object({
   AWS_REGION: z.string(),
   AWS_SES_FROM_EMAIL: z.email(),
   AWS_SES_TO_EMAIL: z.email(),
+  RPC_UPSTREAM_ARCHIVAL_URL: z.optional(z.url()),
+  RPC_UPSTREAM_KEY: z.optional(z.string()),
+  RPC_UPSTREAM_URL: z.url(),
   TURNSTILE_SECRET_KEY: z.string(),
 });
 
@@ -180,7 +183,10 @@ export const getRuntimeConfig = (): Config => {
   const network = cachedPublicConfig.NEXT_PUBLIC_NETWORK_ID;
   const mainnetUrl = cachedPublicConfig.NEXT_PUBLIC_MAINNET_URL;
   const testnetUrl = cachedPublicConfig.NEXT_PUBLIC_TESTNET_URL;
-  const providers = rpcProviders()[network];
+  const providers = [
+    { name: 'NearBlocks', url: '/api/rpc' },
+    ...rpcProviders()[network],
+  ];
   const siteUrl = network === 'mainnet' ? mainnetUrl : testnetUrl;
   const metaTemplate =
     network === 'mainnet' ? '%s | NearBlocks' : 'TESTNET | %s | NearBlocks';

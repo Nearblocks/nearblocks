@@ -28,7 +28,8 @@ export const ConfigProvider = ({ children, config }: Props) => {
       mainnetUrl: config.mainnetUrl,
       network: config.network,
       projectId: config.reownProjectId,
-      providers: config.providers,
+      // Wallets need absolute RPC URLs; skip the same-origin proxy entry
+      providers: config.providers.filter((p) => !p.url.startsWith('/')),
       testnetUrl: config.testnetUrl,
     }),
   );
