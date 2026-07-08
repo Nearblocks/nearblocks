@@ -4,12 +4,28 @@ type Props = {
   logs: unknown[];
 };
 
+const unicodeUnescape = (raw: string): string =>
+  raw
+    .replace(/\\u\{([0-9a-fA-F]{1,6})\}/g, (_, hex: string) =>
+      String.fromCodePoint(parseInt(hex, 16)),
+    )
+    .replace(/\\'/g, "'");
+
 const beautify = (raw: string): string => {
-  const unescaped = raw
+  const trimmed = unicodeUnescape(raw).trim();
+
+  try {
+    return JSON.stringify(JSON.parse(trimmed), null, 2);
+  } catch {}
+
+  try {
+    return JSON.stringify(JSON.parse(JSON.parse(`"${trimmed}"`)), null, 2);
+  } catch {}
+
+  const unescaped = trimmed
     .replace(/\\n/g, '\n')
     .replace(/\\t/g, '\t')
-    .replace(/\\"/g, '"')
-    .trim();
+    .replace(/\\"/g, '"');
 
   try {
     return JSON.stringify(JSON.parse(unescaped), null, 2);

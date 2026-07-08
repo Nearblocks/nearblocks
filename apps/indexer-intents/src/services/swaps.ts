@@ -123,6 +123,13 @@ const swaps = async () => {
   }
 };
 
+const sanitize = (payload: string) =>
+  payload
+    .replace(/\\u\{([0-9a-fA-F]{1,6})\}/g, (_, hex: string) =>
+      JSON.stringify(String.fromCodePoint(parseInt(hex, 16))).slice(1, -1),
+    )
+    .replace(/\\'/g, "'");
+
 export const parse = (outcomes: OutcomeRow[]): IntentsSwap[] => {
   const events: IntentsSwap[] = [];
   const indexes = new Map<string, number>();
@@ -138,7 +145,7 @@ export const parse = (outcomes: OutcomeRow[]): IntentsSwap[] => {
 
       if (!trimmed.startsWith('EVENT_JSON:')) continue;
 
-      const payload = trimmed.replace('EVENT_JSON:', '');
+      const payload = sanitize(trimmed.replace('EVENT_JSON:', ''));
       let event: TokenDiffEvent;
 
       try {

@@ -35,6 +35,17 @@ const HISTORY_ICONS = {
   txn: ArrowLeftRight,
 } as const;
 
+const hasResults = (results: null | Search) =>
+  !!results &&
+  (results.accounts.length > 0 ||
+    results.blocks.length > 0 ||
+    results.fts.length > 0 ||
+    results.keys.length > 0 ||
+    results.mts.length > 0 ||
+    results.nfts.length > 0 ||
+    results.receipts.length > 0 ||
+    results.txns.length > 0);
+
 export const SearchPopover = ({
   addToHistory,
   className,
@@ -80,14 +91,7 @@ export const SearchPopover = ({
           const resp = await searchKeyword(value, filter);
 
           setResults(resp);
-          setOpen(
-            !!resp &&
-              (resp.accounts.length > 0 ||
-                resp.blocks.length > 0 ||
-                resp.fts.length > 0 ||
-                resp.mts.length > 0 ||
-                resp.txns.length > 0),
-          );
+          setOpen(hasResults(resp));
         } catch (error) {
           console.error(error);
         }
@@ -106,23 +110,10 @@ export const SearchPopover = ({
       setOpen(true);
       return;
     }
-    setOpen(
-      !!results &&
-        (results.accounts.length > 0 ||
-          results.blocks.length > 0 ||
-          results.fts.length > 0 ||
-          results.mts.length > 0 ||
-          results.txns.length > 0),
-    );
+    setOpen(hasResults(results));
   };
 
-  const hasLiveResults =
-    !!results &&
-    (results.accounts.length > 0 ||
-      results.blocks.length > 0 ||
-      results.fts.length > 0 ||
-      results.mts.length > 0 ||
-      results.txns.length > 0);
+  const hasLiveResults = hasResults(results);
 
   return (
     <Popover onOpenChange={(open) => setOpen(open)} open={open}>
@@ -244,6 +235,25 @@ export const SearchPopover = ({
             ))}
           </SearchItem>
         )}
+        {results && results.nfts.length > 0 && (
+          <SearchItem title={t('search.nftTokens')}>
+            {results.nfts.map((nft) => (
+              <SearchLink
+                href={`/nft-tokens/${nft.contract}`}
+                key={nft.contract}
+                onClick={() =>
+                  addToHistory({
+                    href: `/nft-tokens/${nft.contract}`,
+                    label: nft.contract,
+                    type: 'token',
+                  })
+                }
+              >
+                {nft.contract}
+              </SearchLink>
+            ))}
+          </SearchItem>
+        )}
         {results && results.mts.length > 0 && (
           <SearchItem title={t('search.mtTokens')}>
             {results.mts.map((mt) => {
@@ -283,6 +293,47 @@ export const SearchPopover = ({
                 }
               >
                 {txn.transaction_hash}
+              </SearchLink>
+            ))}
+          </SearchItem>
+        )}
+        {results && results.receipts.length > 0 && (
+          <SearchItem title={t('search.receipts')}>
+            {results.receipts.map((receipt) => {
+              const href = `/txns/${receipt.transaction_hash}/execution#${receipt.receipt_id}`;
+              return (
+                <SearchLink
+                  href={href}
+                  key={receipt.receipt_id}
+                  onClick={() =>
+                    addToHistory({
+                      href,
+                      label: receipt.receipt_id,
+                      type: 'txn',
+                    })
+                  }
+                >
+                  {receipt.receipt_id}
+                </SearchLink>
+              );
+            })}
+          </SearchItem>
+        )}
+        {results && results.keys.length > 0 && (
+          <SearchItem title={t('search.keys')}>
+            {results.keys.map((key) => (
+              <SearchLink
+                href={`/address/${key.account_id}/keys`}
+                key={key.account_id}
+                onClick={() =>
+                  addToHistory({
+                    href: `/address/${key.account_id}/keys`,
+                    label: key.account_id,
+                    type: 'account',
+                  })
+                }
+              >
+                {key.account_id}
               </SearchLink>
             ))}
           </SearchItem>
