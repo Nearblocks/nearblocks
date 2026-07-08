@@ -40,6 +40,9 @@ export const RpcSessionProvider = () => {
         onSuccess={(token) => {
           pending.current?.resolve(token);
           pending.current = null;
+          // interaction-only widgets stay visible showing the solved state;
+          // reset returns it to its dormant (hidden) state once we have the token.
+          widget.current?.reset();
         }}
         options={{
           appearance: 'interaction-only',
