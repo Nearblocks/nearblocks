@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import path from 'path';
 
 import { apiReference } from '@scalar/express-api-reference';
@@ -42,7 +43,7 @@ const servers = [
 
 const apiDocumentation = async (app: Application, dir: string) => {
   const legacyDescription = `<p><strong>These are deprecated endpoints. They will be removed in a future release.</strong></p>
-        <p>For new integrations, use the <a href="/api-docs">current API</a>.</p>
+        <p>For new integrations, use the <a href="/api-docs">current API</a>. See the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> to move existing integrations.</p>
         `;
 
   // ── Main API docs (v3 only) ───────────────────────────────────────
@@ -58,7 +59,8 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
       },
       info: {
-        description: `<p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
+        description: `<blockquote><p><strong>Migrating from v1 or v2?</strong> v3 changes pagination, response envelopes, and several endpoints — it is not a drop-in base-path swap. Read the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> (also available as raw markdown at <a href="/api-docs/migration"><code>/api-docs/migration</code></a> for tooling and AI agents).</p></blockquote>
+        <p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
         <p><h2>Attribution Requirements:</h2></p>
         <p>The APIs are offered as a community service and are provided without any warranty. Please use them responsibly and only for what you need.</p>
         <p>For any usage other than personal or private, attribution is required. This can be done by either:</p>
@@ -87,7 +89,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
             : config.testnetUrl
         }/v3/accounts/wrap.near"</pre></code></p>
         <h2>Legacy API</h2>
-        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. These endpoints will be removed in a future release.</p>
+        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. These endpoints will be removed in a future release. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
         `,
         title: ' ',
         version: '1.0.0',
@@ -224,6 +226,26 @@ const apiDocumentation = async (app: Application, dir: string) => {
 
   app.get('/openapi-legacy.json', (_, res) => {
     res.json(legacySpec);
+  });
+
+  // Raw v1/v2 -> v3 migration guide, served as markdown for both humans and
+  // agents to fetch directly. Read once at startup from the shipped asset
+  // (dist/docs) or the source docs/ dir in dev; falls back if absent.
+  let migrationGuide = '# Migration guide unavailable\n';
+  for (const candidate of [
+    path.join(dir, '..', 'docs', 'v3-migration.md'), // built: dist/docs
+    path.join(dir, '..', '..', 'docs', 'v3-migration.md'), // dev: apps/api/docs
+  ]) {
+    try {
+      migrationGuide = readFileSync(candidate, 'utf8');
+      break;
+    } catch {
+      // try the next candidate
+    }
+  }
+
+  app.get('/api-docs/migration', (_, res) => {
+    res.type('text/markdown; charset=utf-8').send(migrationGuide);
   });
 
   app.use(

@@ -11,7 +11,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc && cpx \"src/**/*.sql\" dist",
+    "build": "yarn clean && tsc && cpx \"src/**/*.sql\" dist && cpx \"docs/**/*.md\" dist/docs",
     "start": "node dist/index.js",
     "dev": "tsx watch --env-file=.env --include src/sql src/index.ts",
     "lint": "tsc --noEmit && eslint ./ --fix",
