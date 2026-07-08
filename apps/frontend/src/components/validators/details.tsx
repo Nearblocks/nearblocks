@@ -1,6 +1,6 @@
 'use client';
 
-import { NearRpcClient, validators } from '@near-js/jsonrpc-client';
+import { validators } from '@near-js/jsonrpc-client';
 import { useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 
@@ -14,6 +14,7 @@ import { useView } from '@/hooks/use-rpc';
 import { useSettings } from '@/hooks/use-settings';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
+import { rpcCall } from '@/lib/rpc';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -125,8 +126,7 @@ export const NodeDetails = ({ node }: Props) => {
   const { data: validatorsData, isLoading: validatorsLoading } = useSWR(
     hydrated && rpcUrl ? ['node-validator-details', node, rpcUrl] : null,
     async () => {
-      const client = new NearRpcClient({ endpoint: rpcUrl });
-      return validators(client, 'latest');
+      return rpcCall(rpcUrl, (client) => validators(client, 'latest'));
     },
     {
       keepPreviousData: true,

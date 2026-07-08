@@ -2,10 +2,11 @@
 
 import {
   experimentalProtocolConfig,
-  NearRpcClient,
   validators,
 } from '@near-js/jsonrpc-client';
 import useSWR from 'swr';
+
+import { rpcCall } from '@/lib/rpc';
 
 import { useConfig } from './use-config';
 import { useSettings } from './use-settings';
@@ -31,11 +32,11 @@ const findSeatPrice = (
 };
 
 const fetchSeatInfo = async (rpcUrl: string): Promise<SeatInfo> => {
-  const client = new NearRpcClient({ endpoint: rpcUrl });
-
   const [validatorsResp, protocolConfigResp] = await Promise.all([
-    validators(client, 'latest'),
-    experimentalProtocolConfig(client, { finality: 'final' }),
+    rpcCall(rpcUrl, (client) => validators(client, 'latest')),
+    rpcCall(rpcUrl, (client) =>
+      experimentalProtocolConfig(client, { finality: 'final' }),
+    ),
   ]);
 
   const minStakeRatio = protocolConfigResp.minimumStakeRatio ?? [1, 6250];

@@ -67,6 +67,16 @@ export const createSettingsStore = (
       }),
       /* eslint-enable perfectionist/sort-objects */
       {
+        // v1: reset the active provider so existing users pick up the proxied default
+        migrate: (persisted, version) => {
+          const state = persisted as Partial<SettingsState>;
+
+          if (version < 1) {
+            return { ...state, provider: null };
+          }
+
+          return state;
+        },
         name: `nearblocks:${network}`,
         onRehydrateStorage: () => (state, error) => {
           if (error) {
@@ -89,6 +99,7 @@ export const createSettingsStore = (
                 setItem: () => void 0,
               },
         ),
+        version: 1,
       },
     ),
   );

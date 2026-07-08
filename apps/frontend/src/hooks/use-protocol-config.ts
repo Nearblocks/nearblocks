@@ -1,10 +1,9 @@
 'use client';
 
-import {
-  experimentalProtocolConfig,
-  NearRpcClient,
-} from '@near-js/jsonrpc-client';
+import { experimentalProtocolConfig } from '@near-js/jsonrpc-client';
 import useSWR from 'swr';
+
+import { rpcCall } from '@/lib/rpc';
 
 import { useConfig } from './use-config';
 import { useSettings } from './use-settings';
@@ -20,8 +19,9 @@ export const useProtocolConfig = () => {
   return useSWR(
     shouldFetch ? ['protocol-config', rpcUrl] : null,
     async () => {
-      const client = new NearRpcClient({ endpoint: rpcUrl });
-      return experimentalProtocolConfig(client, { finality: 'final' });
+      return rpcCall(rpcUrl, (client) =>
+        experimentalProtocolConfig(client, { finality: 'final' }),
+      );
     },
     {
       revalidateOnFocus: false,
