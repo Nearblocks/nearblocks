@@ -227,7 +227,7 @@ export type DeployGlobalContractByAccountIdAction = {
 
 export type DeterministicStateInitAction = {
   DeterministicStateInit: {
-    code: string;
+    code: string | { accountId: string } | { hash: string };
     data: Record<string, string>;
     deposit: string;
   };

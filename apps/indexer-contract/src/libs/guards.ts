@@ -1,5 +1,6 @@
 import {
   Action,
+  DeterministicStateInitAction,
   UseGlobalContractAction,
   UseGlobalContractByAccountIdAction,
 } from 'nb-neardata';
@@ -29,3 +30,8 @@ export const isUseGlobalContractByAccountIdAction = (
 ): action is UseGlobalContractByAccountIdAction =>
   (action as UseGlobalContractByAccountIdAction)
     .UseGlobalContractByAccountId !== undefined;
+
+export const isDeterministicStateInitAction = (
+  action: Action,
+): action is DeterministicStateInitAction =>
+  (action as DeterministicStateInitAction).DeterministicStateInit !== undefined;
