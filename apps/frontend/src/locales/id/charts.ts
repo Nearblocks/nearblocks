@@ -72,6 +72,27 @@ export const charts = {
     series: 'NEAR Supply',
     yAxis: 'NEAR Supply',
   },
+  shards: {
+    activeCount: '{{count}} active shards',
+    description:
+      'NEAR Shard Topology chart shows the live shard layout and transaction load for each shard on the NEAR protocol.',
+    empty: 'No shard activity found',
+    footnote: 'Live view — last 60 minutes of transactions per shard.',
+    heading: 'NEAR Shard Topology',
+    heatmapTitle: 'Per-shard activity',
+    layoutTitle: 'Current shard layout',
+    less: 'Less',
+    meta: {
+      description:
+        'NEAR Shard Topology chart visualizes the live shard layout, per-shard transaction load and dynamic resharding. Data is real-time and pulled directly from the NEAR blockchain.',
+      title: 'NEAR Shard Topology Chart',
+    },
+    miniTitle: 'NEAR Shard Layout',
+    more: 'More',
+    rollingTxns: '{{count}} txns',
+    shardLabel: 'Shard {{id}}',
+    shareLabel: 'Share of transactions in the last few minutes',
+  },
   title: 'NEAR Charts & Statistics',
   tps: {
     description:

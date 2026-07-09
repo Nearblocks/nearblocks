@@ -93,3 +93,13 @@ export const TpsChartMini = dynamic(
   () => import('./tps').then((m) => m.TpsChartMini),
   { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
 );
+
+export const ShardsChart = dynamic(
+  () => import('./shards').then((m) => m.ShardsChart),
+  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+);
+
+export const ShardsChartMini = dynamic(
+  () => import('./shards').then((m) => m.ShardsChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);

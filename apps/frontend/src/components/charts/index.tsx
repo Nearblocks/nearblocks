@@ -27,6 +27,7 @@ import {
   BlocksChartMini,
   MarketCapChartMini,
   PriceChartMini,
+  ShardsChartMini,
   SupplyChartMini,
   TpsChartMini,
   TxnFeeChartMini,
@@ -103,6 +104,11 @@ export const Charts = ({
       <ChartCard href="/charts/tps" title={t('tps.miniTitle')}>
         <ErrorSuspense fallback={<TpsChartMini loading />}>
           <TpsChartMini statsPromise={tpsStatsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
+      <ChartCard href="/charts/shards" title={t('shards.miniTitle')}>
+        <ErrorSuspense fallback={<ShardsChartMini loading />}>
+          <ShardsChartMini statsPromise={tpsStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       {network === 'mainnet' && (
