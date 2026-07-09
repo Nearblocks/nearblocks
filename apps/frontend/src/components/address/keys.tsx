@@ -8,6 +8,7 @@ import { AccountKey, AccountKeyCount, AccountKeysRes } from 'nb-schemas';
 import { ExportType } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
+import { KeyTypeBadge } from '@/components/key-type-badge';
 import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
@@ -60,10 +61,13 @@ export const AccessKeys = ({
     },
     {
       cell: (key) => (
-        <Truncate>
-          <TruncateText text={key.public_key} />
-          <TruncateCopy text={key.public_key} />
-        </Truncate>
+        <span className="flex items-center gap-2">
+          <Truncate>
+            <TruncateText text={key.public_key} />
+            <TruncateCopy text={key.public_key} />
+          </Truncate>
+          <KeyTypeBadge publicKey={key.public_key} />
+        </span>
       ),
       header: t('keys.columns.publicKey'),
       id: 'public_key',

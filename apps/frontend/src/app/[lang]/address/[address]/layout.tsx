@@ -6,6 +6,7 @@ import { ContractTab } from '@/components/address/contract/tab';
 import { Info } from '@/components/address/info';
 import { Overview } from '@/components/address/overview';
 import { AccountQr } from '@/components/address/qr';
+import { QuantumSafeBadge } from '@/components/address/quantum-safe-badge';
 import { Validate } from '@/components/address/validate';
 import { Copy } from '@/components/copy';
 import { ErrorSuspense } from '@/components/error-suspense';
@@ -21,6 +22,7 @@ import {
   fetchTokens,
 } from '@/data/address';
 import { fetchContract, fetchDeployments } from '@/data/address/contract';
+import { fetchQuantumSafe } from '@/data/address/keys';
 import { fetchStats } from '@/data/layout';
 import { fetchSpamTokens } from '@/data/spam-tokens';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
@@ -53,6 +55,7 @@ const AddressLayout = async ({ children, params }: Props) => {
   const deploymentsPromise = fetchDeployments(address);
   const tokensPromise = fetchTokens(address);
   const mtTokensPromise = fetchMTTokens(address);
+  const quantumSafePromise = fetchQuantumSafe(address);
   const spamPatterns = await fetchSpamTokens();
 
   if (!hasLocale(lang)) notFound();
@@ -72,6 +75,9 @@ const AddressLayout = async ({ children, params }: Props) => {
                 <span className="break-all">{address}</span>
                 <Copy text={address} />
                 <AccountQr address={address} />
+                <ErrorSuspense fallback={null}>
+                  <QuantumSafeBadge quantumSafePromise={quantumSafePromise} />
+                </ErrorSuspense>
               </span>
             }
           >

@@ -305,6 +305,11 @@ export const address = {
     viewAssets: 'Click to see assets',
   },
   qr: 'View QR Code',
+  quantumSafe: {
+    label: 'Quantum-safe',
+    tooltip:
+      'This account secures a full-access key with post-quantum cryptography (ML-DSA-65), resisting attacks from quantum computers.',
+  },
   receipts: {
     columns: {
       block: 'Block',

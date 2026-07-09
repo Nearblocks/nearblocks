@@ -6,10 +6,12 @@ import type { ActionReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
+import { KeyTypeBadge } from '@/components/key-type-badge';
 import { AccountLink, Link } from '@/components/link';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat } from '@/lib/format';
+import { normalizePublicKey } from '@/lib/keys';
 import { Badge } from '@/ui/badge';
 
 type Props = {
@@ -266,6 +268,9 @@ export const Action = ({
   }
 
   if (action.action === ActionKind.ADD_KEY) {
+    const rawKey = String(args.public_key ?? '');
+    const displayKey = normalizePublicKey(rawKey);
+
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.addKey')}{' '}
@@ -273,12 +278,10 @@ export const Action = ({
           className="text-link max-w-32 truncate sm:max-w-40"
           href={`/address/${receiver}/keys`}
         >
-          {String(args.public_key ?? '')}
+          {displayKey}
         </Link>
-        <Copy
-          className="text-muted-foreground"
-          text={String(args.public_key ?? '')}
-        />
+        <Copy className="text-muted-foreground" text={displayKey} />
+        <KeyTypeBadge publicKey={rawKey} />
         {full && (
           <>
             {' '}
@@ -295,6 +298,9 @@ export const Action = ({
   }
 
   if (action.action === ActionKind.DELETE_KEY) {
+    const rawKey = String(args.public_key ?? '');
+    const displayKey = normalizePublicKey(rawKey);
+
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.deleteKey')}{' '}
@@ -302,12 +308,10 @@ export const Action = ({
           className="text-link max-w-32 truncate sm:max-w-40"
           href={`/address/${receiver}/keys`}
         >
-          {String(args.public_key ?? '')}
+          {displayKey}
         </Link>
-        <Copy
-          className="text-muted-foreground"
-          text={String(args.public_key ?? '')}
-        />
+        <Copy className="text-muted-foreground" text={displayKey} />
+        <KeyTypeBadge publicKey={rawKey} />
         {full && (
           <>
             {' '}
