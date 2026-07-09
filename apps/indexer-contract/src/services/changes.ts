@@ -21,6 +21,7 @@ import { retry } from 'nb-utils';
 import {
   isContractDeletion,
   isContractUpdate,
+  isDeterministicStateInitAction,
   isUseGlobalContractAction,
   isUseGlobalContractByAccountIdAction,
 } from '#libs/guards';
@@ -185,6 +186,26 @@ const getReceiptChanges = (
             receipt_id: receiptId,
             shard_id: 0, // placeholder; actual value will be set later
           });
+        } else if (isDeterministicStateInitAction(action)) {
+          const identifier = getGlobalContractIdentifier(
+            action.DeterministicStateInit.code,
+          );
+
+          if (!identifier) continue;
+
+          result.code.push({
+            block_height: block.height,
+            block_timestamp: block.timestampNanosec,
+            code_base64: null,
+            code_hash: null,
+            contract_account_id: outcome.receipt.receiverId,
+            event_type: ContractEventType.UPDATE,
+            global_account_id: identifier.accountId,
+            global_code_hash: identifier.codeHash,
+            index_in_chunk: 0, // placeholder; actual value will be set later
+            receipt_id: receiptId,
+            shard_id: 0, // placeholder; actual value will be set later
+          });
         }
       }
     }
@@ -203,6 +224,33 @@ const getReceiptChanges = (
   }
 
   return result;
+};
+
+// Global contract identifier from DeterministicStateInit action
+const getGlobalContractIdentifier = (
+  code: { accountId: string } | { hash: string } | string,
+): { accountId: null | string; codeHash: null | string } | null => {
+  if (typeof code === 'string') {
+    try {
+      if (base58.decode(code).length === 32) {
+        return { accountId: null, codeHash: code };
+      }
+    } catch {
+      // not base58, treat as account id
+    }
+
+    return { accountId: code, codeHash: null };
+  }
+
+  if ('hash' in code) {
+    return { accountId: null, codeHash: code.hash };
+  }
+
+  if ('accountId' in code) {
+    return { accountId: code.accountId, codeHash: null };
+  }
+
+  return null;
 };
 
 const getCodeHash = (code: string) => {
