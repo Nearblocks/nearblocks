@@ -109,6 +109,8 @@ const getGlobalContractIdentifier = (
   return null;
 };
 
+const INDEX_IN_CHUNK_OFFSET = 100;
+
 const insertCodeChanges = async (
   knex: Knex,
   shardId: number,
@@ -120,7 +122,7 @@ const insertCodeChanges = async (
 
   for (let index = 0; index < legnth; index++) {
     changes[index].shard_id = shardId;
-    changes[index].index_in_chunk = index;
+    changes[index].index_in_chunk = index + INDEX_IN_CHUNK_OFFSET;
   }
 
   await retry(async () => {
