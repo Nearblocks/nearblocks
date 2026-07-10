@@ -9,6 +9,7 @@ const env = cleanEnv(process.env, {
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
+  FASTNEAR_API_KEY: str({ default: undefined }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
@@ -24,6 +25,7 @@ const config: Config = {
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
   endBlockHeight: stopHeight,
+  fastnearApiKey: env.FASTNEAR_API_KEY,
   indexerKey: 'contracts_deterministic',
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,

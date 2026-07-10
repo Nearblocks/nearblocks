@@ -11,6 +11,7 @@ import { retry } from 'nb-utils';
 import { camelCaseKeys } from './utils.js';
 
 export type BlockStreamConfig = {
+  apiKey?: string;
   end: number;
   network: string;
   start: number;
@@ -41,10 +42,11 @@ const endpoint = (network: string, blockHeight: number) => {
   return 'https://testnet.neardata.xyz/raw';
 };
 
-const fetch = async (url: string) => {
+const fetch = async (url: string, apiKey?: string) => {
   return await retry(
     async () => {
       const response = await axios.get(url, {
+        headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
         responseType: 'stream',
       });
 
@@ -54,10 +56,10 @@ const fetch = async (url: string) => {
   );
 };
 
-export const streamFiles = async (file: string) => {
+export const streamFiles = async (file: string, apiKey?: string) => {
   return await retry(
     async () => {
-      const response = await fetch(file);
+      const response = await fetch(file, apiKey);
 
       return new Promise<Readable>((resolve, reject) => {
         const readable = new Readable({
@@ -154,7 +156,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
           const subFolder = base.slice(6, 9);
           const file = `${url}/${folder}/${subFolder}/${base}.tgz`;
 
-          promises.push(streamFiles(file));
+          promises.push(streamFiles(file, config.apiKey));
         }
 
         const streams = await Promise.all(promises);

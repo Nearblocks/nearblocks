@@ -24,6 +24,7 @@ export const syncData = async () => {
   );
 
   const stream = streamBlock({
+    apiKey: config.fastnearApiKey,
     end: config.endBlockHeight,
     network: config.network,
     start: startBlock,

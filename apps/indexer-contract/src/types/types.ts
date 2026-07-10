@@ -11,6 +11,7 @@ export type Config = {
   dbKey: string;
   dbUrl: string;
   endBlockHeight: number;
+  fastnearApiKey?: string;
   indexerKey: string;
   network: Network;
   sentryDsn?: string;
