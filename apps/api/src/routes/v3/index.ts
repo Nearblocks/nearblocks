@@ -5,6 +5,7 @@ import blocks from '#routes/v3/blocks';
 import fts from '#routes/v3/fts/index';
 import intents from '#routes/v3/intents/index';
 import keys from '#routes/v3/keys';
+import kitwallet from '#routes/v3/kitwallet';
 import mtsContract from '#routes/v3/mts/contract';
 import mts from '#routes/v3/mts/index';
 import multichain from '#routes/v3/multichain/index';
@@ -25,6 +26,7 @@ const routes = () => {
   fts(app);
   intents(app);
   keys(app);
+  kitwallet(app);
   mts(app);
   mtsContract(app);
   multichain(app);
