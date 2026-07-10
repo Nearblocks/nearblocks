@@ -1,5 +1,6 @@
 import { logger } from 'nb-logger';
-import { Message, streamBlock } from 'nb-neardata';
+import { Message } from 'nb-neardata';
+import { streamBlock } from 'nb-neardata-raw';
 
 import config from '#config';
 import { db } from '#libs/knex';
@@ -14,22 +15,25 @@ export const syncData = async () => {
   const latestBlock = settings?.value?.sync;
   let startBlock = config.startBlockHeight;
 
-  if (!startBlock && latestBlock) {
+  if (latestBlock && +latestBlock > startBlock) {
     startBlock = +latestBlock;
   }
 
-  logger.info(`syncing from block: ${startBlock}`);
+  logger.info(
+    `backfilling from block: ${startBlock} to block: ${config.endBlockHeight}`,
+  );
 
   const stream = streamBlock({
-    concurrency: config.neardataConcurrency,
+    end: config.endBlockHeight,
     network: config.network,
-    start: startBlock || config.genesisHeight,
-    url: config.neardataUrl,
+    start: startBlock,
   });
 
   for await (const message of stream) {
-    await onMessage(message);
+    await onMessage(message as Message);
   }
+
+  logger.info(`backfill completed at block: ${config.endBlockHeight}`);
 };
 
 export const onMessage = async (message: Message) => {

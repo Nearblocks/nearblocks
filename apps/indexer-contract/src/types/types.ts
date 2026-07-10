@@ -10,10 +10,8 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  genesisHeight: number;
+  endBlockHeight: number;
   indexerKey: string;
-  neardataConcurrency: 'auto' | number;
-  neardataUrl: string;
   network: Network;
   sentryDsn?: string;
   startBlockHeight: number;

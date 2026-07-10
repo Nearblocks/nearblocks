@@ -25,10 +25,20 @@ const retryLogger = (attempt: number, error: unknown) => {
   logger.error({ attempt });
 };
 
-const endpoint = (network: string) => {
-  return network === Network.MAINNET
-    ? 'https://mainnet.neardata.xyz/raw'
-    : 'https://testnet.neardata.xyz/raw';
+const MAINNET_ARCHIVE_BOUNDARIES = [122_000_000, 142_000_000, 177_000_000];
+
+const endpoint = (network: string, blockHeight: number) => {
+  if (network === Network.MAINNET) {
+    const position = MAINNET_ARCHIVE_BOUNDARIES.findIndex(
+      (boundary) => blockHeight < boundary,
+    );
+    const shard =
+      position === -1 ? MAINNET_ARCHIVE_BOUNDARIES.length : position;
+
+    return `https://a${shard}.mainnet.neardata.xyz/raw`;
+  }
+
+  return 'https://testnet.neardata.xyz/raw';
 };
 
 const fetch = async (url: string) => {
@@ -103,7 +113,6 @@ export const streamFiles = async (file: string) => {
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const url = config.url ?? endpoint(config.network);
   const startBlock = config.start;
   const endBlock = config.end;
 
@@ -139,6 +148,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
 
         for (let i = next; i < next + concurrency; i++) {
           const block = blocks[i];
+          const url = config.url ?? endpoint(config.network, block);
           const base = String(block).padStart(12, '0');
           const folder = base.slice(0, 6);
           const subFolder = base.slice(6, 9);

@@ -1,41 +1,33 @@
-import { cleanEnv, num, str, url } from 'envalid';
+import { cleanEnv, str } from 'envalid';
 
 import { Network } from 'nb-types';
 
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
-  CONTRACT_INDEXER_KEY: str(),
-  CONTRACT_START_BLOCK: num({ default: 0 }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
-  NEARDATA_CONCURRENCY: str({ default: 'auto' }),
-  NEARDATA_URL: url(),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
   SENTRY_DSN: str({ default: '' }),
 });
 
-const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
+const startHeight = env.NETWORK === Network.MAINNET ? 185_429_400 : 225_030_600;
+const stopHeight = env.NETWORK === Network.MAINNET ? 206_240_000 : 258_460_000;
 
 const config: Config = {
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
-  genesisHeight,
-  indexerKey: env.CONTRACT_INDEXER_KEY,
-  neardataConcurrency:
-    env.NEARDATA_CONCURRENCY === 'auto'
-      ? 'auto'
-      : Number(env.NEARDATA_CONCURRENCY),
-  neardataUrl: env.NEARDATA_URL,
+  endBlockHeight: stopHeight,
+  indexerKey: 'contracts_deterministic',
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,
-  startBlockHeight: env.CONTRACT_START_BLOCK,
+  startBlockHeight: startHeight,
 };
 
 export default config;

@@ -28,6 +28,7 @@
     "eslint-config-custom-node": "*",
     "knex-migrate-sql-file": "~2.0",
     "nb-neardata": "*",
+    "nb-neardata-raw": "*",
     "nb-knex": "*",
     "nb-logger": "*",
     "nb-tsconfig": "*",
