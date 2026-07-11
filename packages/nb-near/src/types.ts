@@ -72,7 +72,6 @@ export interface RpcResultTxnReceipt extends RpcResultTxn {
 }
 export interface RpcResultAccessKey extends AccessKeyList {}
 export interface RpcResultReceipt {
-  parent_transaction_hash: string;
-  receipt_id: string;
-  shard_id: number;
+  sender_account_id: string;
+  transaction_hash: string;
 }

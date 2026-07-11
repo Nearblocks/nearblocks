@@ -21,7 +21,6 @@ export const useSearch = () => {
   const [results, setResults] = useState<SearchResult>(initial);
   const rpcUrl = useRpcStore((state) => state.rpc);
   const providers = useNetworkStore((state) => state.providers);
-  const network = useNetworkStore((state) => state.network);
 
   const search = useCallback(
     async (query?: string) => {
@@ -31,10 +30,6 @@ export const useSearch = () => {
       setResults((res) => ({ ...res, query }));
 
       const rpc = new RPC(rpcUrl || providers?.[0]?.url);
-      const receiptRpc =
-        network === 'mainnet'
-          ? new RPC('https://beta.rpc.mainnet.near.org')
-          : new RPC('https://beta.rpc.testnet.near.org');
 
       const isQueryLong = query.length >= 43;
 
@@ -48,7 +43,7 @@ export const useSearch = () => {
           ? getBlock(rpc, +query)
           : undefined,
         isQueryLong ? getTxn(rpc, query) : undefined,
-        isQueryLong ? getReceipt(receiptRpc, query) : undefined,
+        isQueryLong ? getReceipt(rpc, query) : undefined,
       ]);
 
       const data = {
@@ -63,7 +58,7 @@ export const useSearch = () => {
 
       return data;
     },
-    [rpcUrl, providers, network],
+    [rpcUrl, providers],
   );
 
   useEffect(() => {

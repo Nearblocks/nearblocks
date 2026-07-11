@@ -96,7 +96,7 @@ export const getReceipt = async (rpc: RPC, receiptId: string) => {
   try {
     const { data } = await rpc.query(
       { receipt_id: receiptId },
-      'view_receipt_record',
+      'EXPERIMENTAL_receipt_to_tx',
     );
 
     return data as RpcResponse<RpcResultReceipt>;

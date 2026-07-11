@@ -59,7 +59,7 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
     if (resp?.block) return router.push(`/blocks/${resp.query}`);
     if (resp?.txn) return router.push(`/txns/${resp.query}`);
     if (resp?.receipt)
-      return router.push(`/txns/${resp.receipt.parent_transaction_hash}`);
+      return router.push(`/txns/${resp.receipt.transaction_hash}`);
 
     return;
   };
@@ -173,13 +173,13 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
               <li>
                 <Link
                   className="flex items-center justify-between text-base hover:text-primary h-7 pl-6 pr-6 md:pl-5 md:pr-6"
-                  href={`/txns/${results.receipt.parent_transaction_hash}`}
+                  href={`/txns/${results.receipt.transaction_hash}`}
                 >
                   <span className="flex items-center">
                     <span className="w-7 flex-shrink-0">
                       <Txn className="text-primary w-4" />
                     </span>
-                    {shortenHash(results.receipt.parent_transaction_hash)}
+                    {shortenHash(results.receipt.transaction_hash)}
                   </span>
                 </Link>
               </li>
