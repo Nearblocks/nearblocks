@@ -2,12 +2,13 @@
 
 import { Menu as LuMenu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { Logo } from '@/icons/logo';
+import { LogoIcon } from '@/icons/logo-icon';
 import { hrefForLocale } from '@/lib/locale';
 import type { Locale } from '@/locales/config';
 import { NavMenu, RouteKey } from '@/types/types';
@@ -119,14 +120,21 @@ const useHeaderMenu = (): NavMenu<RouteKey<'layout'>> => {
 export const Header = () => {
   const { t } = useLocale('layout');
   const menu = useHeaderMenu();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   return (
     <header className="bg-card border-b">
-      <Popover>
+      <Popover onOpenChange={setOpen} open={open}>
         <PopoverAnchor>
           <div className="container mx-auto flex h-14 items-center px-4">
             <Link className="flex items-center gap-2" href="/">
-              <Logo className="text-primary h-10" />
+              <Logo className="text-primary hidden h-10 sm:block" />
+              <LogoIcon className="text-primary h-10 sm:hidden" />
               <Badge
                 className="text-body-xs px-1.5 py-0 tracking-wide uppercase"
                 variant="teal"
