@@ -11,7 +11,10 @@ type Props = {
 export const SearchItem = ({ button, children, title }: Props) => {
   return (
     <>
-      <div className="align-center flex justify-between p-2">
+      <div
+        className="align-center flex justify-between p-2"
+        role="presentation"
+      >
         <div className="text-headline-xs text-muted-foreground px-2 py-1">
           {title}
         </div>
