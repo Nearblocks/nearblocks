@@ -161,11 +161,12 @@ export const parse = (outcomes: OutcomeRow[]): IntentsSwap[] => {
       if (!Array.isArray(event.data)) continue;
 
       for (const item of event.data) {
-        const deltas = Object.values(item.diff).map(BigInt);
+        const deltas = Object.values(item.diff)
+          .map(BigInt)
+          .filter((d) => d !== 0n);
 
-        // a swap exchanges tokens: diff must have both a negative (sent) and a
-        // positive (received) side
-        if (!deltas.some((d) => d < 0n) || !deltas.some((d) => d > 0n)) {
+        // skip single-token diffs
+        if (deltas.length < 2) {
           continue;
         }
 
