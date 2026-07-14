@@ -10,6 +10,7 @@ const DAY_MS = 86_400_000n;
 const SWAPS_TABLE = 'mt_intents_swaps';
 const STATS_TABLE = 'mt_intents_stats';
 const STATS_REBUILD_DAYS = 2n;
+const STATS_CATCHUP_DAYS = 3n;
 const STATS_INTERVAL_MS = 60_000;
 
 export const syncIntentsStats = async () => {
@@ -50,8 +51,12 @@ const stats = async () => {
     }
 
     const startDay = fromDay > lastDay ? lastDay : fromDay;
+    const endDay =
+      lastDay - startDay > STATS_CATCHUP_DAYS * DAY_MS
+        ? startDay + STATS_CATCHUP_DAYS * DAY_MS
+        : lastDay;
 
-    logger.info(`${STATS_TABLE}: days: ${startDay} - ${lastDay}`);
+    logger.info(`${STATS_TABLE}: days: ${startDay} - ${endDay}`);
 
     await knex.transaction(async (trx) => {
       await trx.raw(
@@ -96,7 +101,7 @@ const stats = async () => {
                     delta_amount > 0
                 ) > 0
             ) s
-            LEFT JOIN mt_intents_tokens it ON it.token = s.token_id
+            JOIN mt_intents_tokens it ON it.token = s.token_id
             LEFT JOIN LATERAL (
               SELECT
                 fpd.price
@@ -122,14 +127,14 @@ const stats = async () => {
         `,
         [
           (startDay * 1_000_000n).toString(),
-          ((lastDay + DAY_MS) * 1_000_000n).toString(),
+          ((endDay + DAY_MS) * 1_000_000n).toString(),
         ],
       );
 
       await trx('settings')
         .insert({
           key: STATS_TABLE,
-          value: { sync: lastDay.toString() },
+          value: { sync: endDay.toString() },
         })
         .onConflict('key')
         .merge();
