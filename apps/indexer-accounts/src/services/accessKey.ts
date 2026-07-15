@@ -39,6 +39,7 @@ export const storeGenesisAccessKeys = async (
 
 export const storeAccessKeys = async (knex: Knex, message: Message) => {
   const accessKeys: AccessKeyMap = new Map();
+  const implicitKeys: AccessKeyMap = new Map();
   const accessKeysToUpdate: AccessKeyMap = new Map();
   const deletedAccounts: DeletedAccountMap = new Map();
 
@@ -52,6 +53,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
           message.block.header,
           outcome.receipt,
           accessKeys,
+          implicitKeys,
           accessKeysToUpdate,
           deletedAccounts,
         );
@@ -66,9 +68,51 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
         .onConflict(['public_key', 'account_id'])
         .merge()
         .whereRaw(
-          'access_keys.created_by_block_timestamp < EXCLUDED.created_by_block_timestamp',
+          'access_keys.deleted_by_block_timestamp IS NOT NULL AND access_keys.deleted_by_block_timestamp <= EXCLUDED.created_by_block_timestamp',
         );
     });
+  }
+
+  if (implicitKeys.size) {
+    await retry(async () => {
+      return knex('access_keys')
+        .insert([...implicitKeys.values()])
+        .onConflict(['public_key', 'account_id'])
+        .ignore();
+    });
+
+    await Promise.all(
+      [...implicitKeys.values()].map(async (accessKey) => {
+        return retry(async () => {
+          return knex('access_keys')
+            .update({
+              created_by_block_timestamp: accessKey.created_by_block_timestamp,
+              created_by_receipt_id: accessKey.created_by_receipt_id,
+              deleted_by_block_timestamp: null,
+              deleted_by_receipt_id: null,
+              permission: accessKey.permission,
+              permission_kind: accessKey.permission_kind,
+            })
+            .where('public_key', accessKey.public_key)
+            .where('account_id', accessKey.account_id)
+            .whereNotNull('deleted_by_block_timestamp')
+            .where(
+              'deleted_by_block_timestamp',
+              '<=',
+              accessKey.created_by_block_timestamp,
+            )
+            .whereExists(function () {
+              this.select('account_id')
+                .from('accounts')
+                .where('accounts.account_id', accessKey.account_id)
+                .where(
+                  'accounts.created_by_receipt_id',
+                  accessKey.created_by_receipt_id,
+                );
+            });
+        });
+      }),
+    );
   }
 
   if (accessKeysToUpdate.size) {
@@ -126,6 +170,7 @@ const getChunkAccessKeys = (
   block: BlockHeader,
   receipt: Receipt,
   accessKeys: AccessKeyMap,
+  implicitKeys: AccessKeyMap,
   accessKeysToUpdate: AccessKeyMap,
   deletedAccounts: DeletedAccountMap,
 ) => {
@@ -153,6 +198,8 @@ const getChunkAccessKeys = (
           accessKeysToUpdate.delete(mapKey);
         }
 
+        implicitKeys.delete(mapKey);
+
         accessKeys.set(
           mapKey,
           getAccessKeyData(
@@ -170,9 +217,10 @@ const getChunkAccessKeys = (
       if (isDeleteKeyAction(action)) {
         const publicKey = normalizePublicKey(action.DeleteKey.publicKey);
         const mapKey = `${accountId}:${publicKey}`;
-        const existingKey = accessKeys.get(mapKey);
+        const existingKey = accessKeys.get(mapKey) ?? implicitKeys.get(mapKey);
 
         if (existingKey) {
+          implicitKeys.delete(mapKey);
           accessKeys.set(mapKey, {
             ...existingKey,
             deleted_by_block_timestamp: block.timestampNanosec,
@@ -202,8 +250,8 @@ const getChunkAccessKeys = (
         const publicKey = publicKeyFromImplicitAccount(accountId);
         const mapKey = `${accountId}:${publicKey}`;
 
-        if (publicKey) {
-          accessKeys.set(
+        if (publicKey && !accessKeys.has(mapKey)) {
+          implicitKeys.set(
             mapKey,
             getAccessKeyData(
               accountId,
