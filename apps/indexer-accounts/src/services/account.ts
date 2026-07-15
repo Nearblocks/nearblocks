@@ -46,7 +46,7 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
         .onConflict(['account_id'])
         .merge()
         .whereRaw(
-          'accounts.created_by_block_timestamp < EXCLUDED.created_by_block_timestamp',
+          'accounts.deleted_by_block_timestamp IS NOT NULL AND accounts.deleted_by_block_timestamp <= EXCLUDED.created_by_block_timestamp',
         );
     });
   }

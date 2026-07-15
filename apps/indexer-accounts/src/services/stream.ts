@@ -40,10 +40,8 @@ export const onMessage = async (message: Message) => {
 
     logger.info(`syncing block: ${blockHeight}`);
 
-    await Promise.all([
-      storeAccounts(db, message),
-      storeAccessKeys(db, message),
-    ]);
+    await storeAccounts(db, message);
+    await storeAccessKeys(db, message);
 
     await db('settings')
       .insert({
