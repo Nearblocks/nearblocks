@@ -1,9 +1,11 @@
 import { Network } from 'nb-types';
 
 export type Config = {
+  backfillWindowSize: bigint;
   dbCa: string;
   dbCert: string;
   dbKey: string;
+  dbSchema: string;
   dbUrl: string;
   genesisFile: string;
   genesisHeight: number;

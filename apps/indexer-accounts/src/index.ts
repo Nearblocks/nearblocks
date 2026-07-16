@@ -4,16 +4,16 @@ import config from '#config';
 import { db } from '#libs/knex';
 import { server } from '#libs/prom';
 import sentry from '#libs/sentry';
+import { backfillData } from '#services/backfill';
 import { syncGenesis } from '#services/genesis';
-import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
     logger.info('syncing genesis data...');
     await syncGenesis();
-    logger.info('syncing blockchain data...');
-    await syncData();
+    logger.info('backfilling blockchain data from db...');
+    await backfillData();
   } catch (error) {
     logger.error('aborting...');
     logger.error(error);

@@ -6,6 +6,7 @@ import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
   ACCOUNTS_START_BLOCK: num({ default: 0 }),
+  BACKFILL_WINDOW_SIZE: str({ default: '60000000000000' }), // 1m in ns
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),
@@ -29,9 +30,11 @@ const genesisFile =
     : `https://s3-us-west-1.amazonaws.com/build.nearprotocol.com/nearcore-deploy/testnet/genesis.json.xz`;
 
 const config: Config = {
+  backfillWindowSize: BigInt(env.BACKFILL_WINDOW_SIZE),
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
+  dbSchema: 'rebuild',
   dbUrl: env.DATABASE_URL,
   genesisFile,
   genesisHeight,
