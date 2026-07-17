@@ -14,6 +14,7 @@ const ENDPOINTS: Record<ExportType, string> = {
   [ExportType.NFT_TRANSFERS]: 'nft-txns/export',
   [ExportType.RECEIPTS]: 'receipts/export',
   [ExportType.STAKING]: 'staking-txns/export',
+  [ExportType.SUBACCOUNTS]: 'subaccounts/export',
   [ExportType.TRANSACTIONS]: 'txns/export',
 };
 
@@ -24,6 +25,7 @@ const FILENAMES: Record<ExportType, string> = {
   [ExportType.NFT_TRANSFERS]: 'nft-txns.csv',
   [ExportType.RECEIPTS]: 'receipts.csv',
   [ExportType.STAKING]: 'staking-txns.csv',
+  [ExportType.SUBACCOUNTS]: 'subaccounts.csv',
   [ExportType.TRANSACTIONS]: 'txns.csv',
 };
 

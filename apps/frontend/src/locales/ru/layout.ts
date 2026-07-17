@@ -101,6 +101,7 @@ export const layout = {
     },
     wallet: {
       signIn: 'Sign In',
+      signOut: 'Sign Out',
     },
   },
   meta: {

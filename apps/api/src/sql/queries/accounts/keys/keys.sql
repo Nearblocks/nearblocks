@@ -16,15 +16,18 @@ WITH
       account_id = ${account}
       AND (
         ${cursor.timestamp}::BIGINT IS NULL
-        OR action_timestamp < ${cursor.timestamp}
         OR (
-          action_timestamp = ${cursor.timestamp}
-          AND public_key < ${cursor.key}
+          ${direction} = 'desc'
+          AND (action_timestamp, public_key) < (${cursor.timestamp}, ${cursor.key})
+        )
+        OR (
+          ${direction} = 'asc'
+          AND (action_timestamp, public_key) > (${cursor.timestamp}, ${cursor.key})
         )
       )
     ORDER BY
-      action_timestamp DESC,
-      public_key DESC
+      action_timestamp ${direction:raw},
+      public_key ${direction:raw}
     LIMIT
       ${limit}
   )
@@ -92,5 +95,5 @@ FROM
       AND r.receipt_id = ks.deleted_by_receipt_id
   ) d ON TRUE
 ORDER BY
-  ks.action_timestamp DESC,
-  ks.public_key DESC
+  ks.action_timestamp ${direction:raw},
+  ks.public_key ${direction:raw}

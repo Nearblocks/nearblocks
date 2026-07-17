@@ -7,5 +7,6 @@ export type * from './receipts/index.js';
 export type * from './request.js';
 export type * from './response.js';
 export type * from './staking/index.js';
+export type * from './subaccounts/index.js';
 export type * from './stats/index.js';
 export type * from './txns/index.js';

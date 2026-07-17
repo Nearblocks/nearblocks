@@ -81,6 +81,11 @@ export default {
     overview: sql('queries/accounts/stats/overview.sql'),
     txns: sql('queries/accounts/stats/txns.sql'),
   },
+  subaccounts: {
+    count: sql('queries/accounts/subaccounts/count.sql'),
+    export: sql('queries/accounts/subaccounts/export.sql'),
+    subaccounts: sql('queries/accounts/subaccounts/subaccounts.sql'),
+  },
   txns: {
     count: sql('queries/accounts/txns/count.sql'),
     countCagg: sql('queries/accounts/txns/countCagg.sql'),

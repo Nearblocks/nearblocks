@@ -169,5 +169,6 @@ export enum ExportType {
   NFT_TRANSFERS = 'nft_transfers',
   RECEIPTS = 'receipts',
   STAKING = 'staking',
+  SUBACCOUNTS = 'subaccounts',
   TRANSACTIONS = 'transactions',
 }

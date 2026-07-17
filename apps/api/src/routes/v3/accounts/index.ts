@@ -12,6 +12,7 @@ import nfts from '#routes/v3/accounts/nfts';
 import receipts from '#routes/v3/accounts/receipts';
 import staking from '#routes/v3/accounts/staking';
 import stats from '#routes/v3/accounts/stats';
+import subaccounts from '#routes/v3/accounts/subaccounts';
 import txns from '#routes/v3/accounts/txns';
 
 const route = Router();
@@ -29,6 +30,7 @@ const routes = (app: Router) => {
   receipts(route);
   staking(route);
   stats(route);
+  subaccounts(route);
   txns(route);
 
   return app;
