@@ -12,6 +12,7 @@ import { storeAccounts } from '#services/account';
 const indexerKey = 'accounts';
 const CATCH_UP_DELAY_MS = 60_000;
 const TIP_SAFETY_MARGIN_NS = 60_000_000_000n;
+const RECEIPT_EXECUTION_CAP_NS = 300_000_000_000n; // 5m in ns
 
 const ACTION_KINDS = [
   ActionKind.ADD_KEY,
@@ -155,6 +156,10 @@ const fetchWindow = async (from: bigint, to: bigint) => {
       WHERE eo.executed_in_block_timestamp >= :from
         AND eo.executed_in_block_timestamp < :to
         AND eo.status IN ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID')
+        AND ara.receipt_included_in_block_timestamp >= :araFrom
+        AND ara.receipt_included_in_block_timestamp < :to
+        AND b.block_timestamp >= :from
+        AND b.block_timestamp < :to
         AND ara.action_kind = ANY(:kinds)
         AND (
           ara.action_kind <> 'TRANSFER'
@@ -167,7 +172,12 @@ const fetchWindow = async (from: bigint, to: bigint) => {
         eo.index_in_chunk ASC,
         ara.index_in_action_receipt ASC
     `,
-    { from: from.toString(), kinds: ACTION_KINDS, to: to.toString() },
+    {
+      araFrom: (from - RECEIPT_EXECUTION_CAP_NS).toString(),
+      from: from.toString(),
+      kinds: ACTION_KINDS,
+      to: to.toString(),
+    },
   );
 
   return result.rows as BackfillRow[];
