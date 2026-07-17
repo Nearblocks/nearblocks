@@ -11,11 +11,13 @@ import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { useView } from '@/hooks/use-rpc';
-import { downloadWasm, getCommitHash } from '@/lib/utils';
+import { bytesFormat } from '@/lib/format';
+import { detectWasmLanguage, downloadWasm, getCommitHash } from '@/lib/utils';
 import {
   ContractSourceMetadata,
   ContractVerifierResponse,
 } from '@/types/types';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/skeleton';
 import { Textarea } from '@/ui/textarea';
@@ -51,6 +53,17 @@ export const ContractCode = ({ contract }: Props) => {
   const verifierData = useMemo(() => {
     return verifierResponse?.[0]?.[1] || null;
   }, [verifierResponse]);
+
+  const wasm = useMemo(() => {
+    if (!contract.code_base64) return null;
+
+    const bytes = Buffer.from(contract.code_base64, 'base64');
+
+    return { language: detectWasmLanguage(bytes), size: bytes.length };
+  }, [contract.code_base64]);
+
+  const lang = verifierData?.lang || wasm?.language;
+  const language = lang ? lang.charAt(0).toUpperCase() + lang.slice(1) : null;
 
   const info = useMemo(() => {
     const isNep330 =
@@ -264,6 +277,18 @@ export const ContractCode = ({ contract }: Props) => {
           <span className="flex items-center gap-1">
             <RiCodeSSlashLine className="size-4" /> {t('contract.code.base64')}
           </span>
+          {wasm && (
+            <span className="ml-auto">
+              {language && (
+                <Badge className="text-body-xs mr-1 truncate" variant="purple">
+                  {language}
+                </Badge>
+              )}
+              <Badge className="text-body-xs truncate" variant="blue">
+                {bytesFormat(wasm.size)}
+              </Badge>
+            </span>
+          )}
           <Button
             onClick={() =>
               downloadWasm(contract.account_id, contract.code_base64 || '')

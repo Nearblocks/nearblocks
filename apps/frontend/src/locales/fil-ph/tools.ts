@@ -54,6 +54,7 @@ export const tools = {
       nft_transfers: 'NFT Transfers',
       receipts: 'Receipts',
       staking: 'Staking Txns',
+      subaccounts: 'Sub Accounts',
       transactions: 'Transactions',
     },
   },

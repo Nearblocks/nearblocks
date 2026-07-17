@@ -26,7 +26,7 @@ type ErrorsProps = {
 const iconClass = 'size-4';
 const statusClass = 'size-5 rounded-full p-1';
 const directionClass =
-  'inline-block max-w-20 min-w-12.5 truncate text-center align-middle';
+  'inline-block max-w-20 min-w-12.5 truncate text-center align-middle text-body-xs';
 
 export const TxnStatus = ({ status }: StatusProps) => {
   if (status == null)

@@ -14,6 +14,7 @@ const EXPORT_FILENAMES: Record<ExportType, string> = {
   [ExportType.NFT_TRANSFERS]: 'nft-txns.csv',
   [ExportType.RECEIPTS]: 'receipts.csv',
   [ExportType.STAKING]: 'staking-txns.csv',
+  [ExportType.SUBACCOUNTS]: 'subaccounts.csv',
   [ExportType.TRANSACTIONS]: 'txns.csv',
 };
 
@@ -161,6 +162,9 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
                     </NativeSelectOption>
                     <NativeSelectOption value="keys">
                       {t('export.types.keys')}
+                    </NativeSelectOption>
+                    <NativeSelectOption value="subaccounts">
+                      {t('export.types.subaccounts')}
                     </NativeSelectOption>
                   </NativeSelect>
                 )}

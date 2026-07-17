@@ -158,6 +158,14 @@ const AddressLayout = async ({ children, params }: Props) => {
                   {t('tabs.accessKeys')}
                 </ActiveLink>
               </TabLink>
+              {address.includes('.') && (
+                <TabLink asChild>
+                  <ActiveLink href={`/address/${address}/subaccounts`}>
+                    {t('tabs.subAccounts')}
+                    <TabBadge variant="teal">NEW</TabBadge>
+                  </ActiveLink>
+                </TabLink>
+              )}
               <ErrorSuspense fallback={<Skeleton className="w-20" />}>
                 <ContractTab
                   address={address}

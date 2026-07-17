@@ -339,6 +339,18 @@ export const address = {
     totalExact: 'A total of {{count}} staking txns found',
     viewAll: 'View all staking txns',
   },
+  subaccounts: {
+    columns: {
+      action: 'Action',
+      subaccount: 'Sub Account',
+      txnHash: 'Transaction Hash',
+    },
+    created: 'Created',
+    deleted: 'Deleted',
+    empty: 'No sub accounts found',
+    total: 'More than {{count}} sub accounts found',
+    totalExact: 'A total of {{count}} sub accounts found',
+  },
   tabs: {
     accessKeys: 'Access Keys',
     analytics: 'Analytics',
@@ -347,6 +359,7 @@ export const address = {
     nftTxns: 'NFT Txns',
     receipts: 'Receipts',
     stakingTxns: 'Staking Txns',
+    subAccounts: 'Sub Accounts',
     tokenTxns: 'Token Txns',
     transactions: 'Transactions',
   },

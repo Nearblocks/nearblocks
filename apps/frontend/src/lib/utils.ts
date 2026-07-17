@@ -82,6 +82,122 @@ export const downloadWasm = (contract: string, base64String: string) => {
   }
 };
 
+const readVarU32 = (bytes: Uint8Array, offset: number): [number, number] => {
+  let result = 0;
+  let shift = 0;
+
+  while (offset < bytes.length) {
+    const byte = bytes[offset++];
+    result |= (byte & 0x7f) << shift;
+
+    if ((byte & 0x80) === 0) break;
+
+    shift += 7;
+  }
+
+  return [result >>> 0, offset];
+};
+
+const readWasmProducersLanguage = (bytes: Uint8Array): null | string => {
+  // magic '\0asm' + version
+  if (
+    bytes.length < 8 ||
+    bytes[0] !== 0x00 ||
+    bytes[1] !== 0x61 ||
+    bytes[2] !== 0x73 ||
+    bytes[3] !== 0x6d
+  ) {
+    return null;
+  }
+
+  const decoder = new TextDecoder();
+  let offset = 8;
+
+  while (offset < bytes.length) {
+    const sectionId = bytes[offset++];
+    let sectionSize: number;
+    [sectionSize, offset] = readVarU32(bytes, offset);
+    const sectionEnd = offset + sectionSize;
+
+    if (sectionId === 0) {
+      let nameLength: number;
+      [nameLength, offset] = readVarU32(bytes, offset);
+      const name = decoder.decode(bytes.subarray(offset, offset + nameLength));
+      offset += nameLength;
+
+      if (name === 'producers') {
+        let fieldCount: number;
+        [fieldCount, offset] = readVarU32(bytes, offset);
+
+        for (let i = 0; i < fieldCount && offset < sectionEnd; i++) {
+          let fieldNameLength: number;
+          [fieldNameLength, offset] = readVarU32(bytes, offset);
+          const fieldName = decoder.decode(
+            bytes.subarray(offset, offset + fieldNameLength),
+          );
+          offset += fieldNameLength;
+
+          let valueCount: number;
+          [valueCount, offset] = readVarU32(bytes, offset);
+
+          for (let j = 0; j < valueCount && offset < sectionEnd; j++) {
+            let valueLength: number;
+            [valueLength, offset] = readVarU32(bytes, offset);
+            const value = decoder.decode(
+              bytes.subarray(offset, offset + valueLength),
+            );
+            offset += valueLength;
+
+            let versionLength: number;
+            [versionLength, offset] = readVarU32(bytes, offset);
+            offset += versionLength;
+
+            if (fieldName === 'language' && value) return value;
+          }
+        }
+
+        return null;
+      }
+    }
+
+    offset = sectionEnd;
+  }
+
+  return null;
+};
+
+// SDKs embedding an interpreter (MicroPython, QuickJS, .NET) are themselves
+// compiled from C/Rust, so those markers must be checked first
+const wasmLanguageMarkers: [language: string, markers: string[]][] = [
+  ['Python', ['micropython']],
+  // QuickJS embeds its builtin atom table; AssemblyScript stores strings as UTF-16LE
+  ['JavaScript', ['quickjs', 'near_sdk_js', 'getownpropertydescriptor']],
+  ['C#', ['system.private.corelib', 'dotnetjs']],
+  ['AssemblyScript', ['~lib/', 'assemblyscript', '~\0l\0i\0b\0/\0']],
+  ['Rust', ['rustc', 'cargo/registry', 'near-sdk', 'near_sdk', 'lib.rs']],
+  ['Go', ['tinygo', 'go.runtime']],
+  ['C/C++', ['emscripten']],
+  ['Zig', ['ziglang']],
+];
+
+export const detectWasmLanguage = (bytes: Uint8Array): null | string => {
+  try {
+    const producersLanguage = readWasmProducersLanguage(bytes);
+
+    if (producersLanguage) return producersLanguage;
+
+    const text = Buffer.from(bytes).toString('latin1').toLowerCase();
+
+    for (const [language, markers] of wasmLanguageMarkers) {
+      if (markers.some((marker) => text.includes(marker))) return language;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 export const getCommitHash = (url: string) => {
   const match = url.match(/[0-9a-f]{40}$/i) || url.match(/rev=([0-9a-f]{40})/i);
   const hash = match?.[1] || match?.[0] || null;
