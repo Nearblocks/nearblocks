@@ -7,7 +7,8 @@ FROM
     FROM
       staking_events
     WHERE
-      block_timestamp >= ${start}::BIGINT
+      account IS NOT NULL
+      AND block_timestamp >= ${start}::BIGINT
       AND block_timestamp <= ${end}::BIGINT
       AND (
         ${before}::BIGINT IS NULL
