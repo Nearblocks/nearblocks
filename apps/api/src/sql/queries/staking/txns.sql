@@ -18,7 +18,8 @@ FROM
   staking_events se
   JOIN params p ON TRUE
 WHERE
-  (
+  se.account IS NOT NULL
+  AND (
     p.block_timestamp IS NULL
     OR (
       (
