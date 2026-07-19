@@ -29,6 +29,9 @@ export const Validators = ({
   const info =
     !loading && validatorInfoPromise ? use(validatorInfoPromise) : null;
   const stats = !loading && statsPromise ? use(statsPromise) : null;
+  if (list?.errors?.length || info?.errors?.length) {
+    throw new Error('Failed to load validators');
+  }
 
   const totalSupply = stats?.total_supply
     ? nearFormat(stats.total_supply, { maximumFractionDigits: 0 })
@@ -42,7 +45,7 @@ export const Validators = ({
           loading={loading}
           totalSupply={totalSupply}
         />
-        <ValidatorInfoCard loading={loading} />
+        <ValidatorInfoCard info={info?.data ?? null} loading={loading} />
         <EpochInfo info={info?.data ?? null} loading={loading} />
       </div>
       <ValidatorsTable

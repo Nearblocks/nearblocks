@@ -403,10 +403,23 @@ export const validatorsCheck = async () => {
         configData.genesis_min_stake_ratio,
         configData.protocol_version!,
       );
-      await dbBase('validator_config').where('id', 1).update({
-        epoch_seat_price: seatPrice.toString(),
-        updated_at: new Date(),
-      });
+      const nextSeatPrice = validators.next_validators.length
+        ? validatorApi.findSeatPrice(
+            validators.next_validators,
+            configData.protocol_max_seats,
+            configData.genesis_min_stake_ratio,
+            configData.protocol_version!,
+          )
+        : null;
+      await dbBase('validator_config')
+        .where('id', 1)
+        .update({
+          epoch_seat_price: seatPrice.toString(),
+          next_epoch_seat_price: nextSeatPrice
+            ? nextSeatPrice.toString()
+            : null,
+          updated_at: new Date(),
+        });
     }
 
     const { data } = await RPC.query(
