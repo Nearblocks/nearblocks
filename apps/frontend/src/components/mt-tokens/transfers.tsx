@@ -11,12 +11,11 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { MTTokenLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, isApproxCount } from '@/lib/format';
 import { pathnameWithoutLocale } from '@/lib/locale';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -33,6 +32,7 @@ export const MtTokenTransfers = ({
 }: Props) => {
   const { t } = useLocale('mts');
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  if (txns?.errors?.length) throw new Error('Failed to load transfers');
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const searchParams = useSearchParams();
@@ -41,9 +41,10 @@ export const MtTokenTransfers = ({
   const columns: DataTableColumnDef<MTTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (mt) =>
@@ -57,19 +58,15 @@ export const MtTokenTransfers = ({
         ) : (
           <Skeleton className="w-25" />
         ),
+      className: 'w-44',
       header: t('transfers.txnHash'),
       id: 'txn_hash',
     },
     {
-      cell: (mt) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={mt.cause} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (mt) => <MethodBadge text={mt.cause} />,
       header: t('transfers.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-[71px] rounded-md" />,
     },
     {
       cell: (mt) => (
@@ -90,6 +87,7 @@ export const MtTokenTransfers = ({
       className: 'w-20',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
       cell: (mt) => (
@@ -128,6 +126,7 @@ export const MtTokenTransfers = ({
           />
         </span>
       ),
+      className: 'w-48',
       header: t('transfers.token'),
       id: 'token',
     },
@@ -168,7 +167,7 @@ export const MtTokenTransfers = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !txnCount}
+              loading={!!loading}
             >
               {() => {
                 const count = txnCount?.count;
@@ -182,7 +181,7 @@ export const MtTokenTransfers = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!txns?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           pagination={txns?.meta}
         />

@@ -2,10 +2,10 @@
 
 import { RiCloseLine } from '@remixicon/react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { use } from 'react';
+import { Suspense, use } from 'react';
 import useSWR from 'swr';
 
-import { MTTokenRes } from 'nb-schemas';
+import { AccountAssetMTFT, MTTokenRes } from 'nb-schemas';
 
 import { getMTTokenHolderBalance } from '@/actions/mt-token';
 import { AccountLink, Link } from '@/components/link';
@@ -26,14 +26,69 @@ type Props = {
   tokenPromise: Promise<MTTokenRes>;
 };
 
+type CellProps = {
+  balanceData: AccountAssetMTFT | null | undefined;
+  loading: boolean;
+  tokenPromise: Promise<MTTokenRes>;
+};
+
+// The token-dependent cells suspend on the token promise behind their own
+// Suspense boundaries so the card shell renders synchronously — the card's
+// presence is determined by the `account` search param alone.
+const BalanceCell = ({ balanceData, loading, tokenPromise }: CellProps) => {
+  const result = use(tokenPromise);
+  const token = result?.data ?? null;
+  const balance = balanceData?.amount ?? null;
+  const decimals = balanceData?.meta?.decimals ?? token?.decimals ?? 0;
+
+  return (
+    <SkeletonSlot fallback={<Skeleton className="w-32" />} loading={loading}>
+      {() =>
+        balance !== null ? (
+          <span className="text-body-sm">
+            {numberFormat(toTokenAmount(balance, decimals), {
+              maximumFractionDigits: 6,
+            })}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">N/A</span>
+        )
+      }
+    </SkeletonSlot>
+  );
+};
+
+const ValueCell = ({ balanceData, loading, tokenPromise }: CellProps) => {
+  const result = use(tokenPromise);
+  const token = result?.data ?? null;
+  const balance = balanceData?.amount ?? null;
+  const decimals = balanceData?.meta?.decimals ?? token?.decimals ?? 0;
+  const price = balanceData?.token_meta?.price ?? token?.price ?? '0';
+  const hasPrice = parseFloat(price) > 0;
+
+  return (
+    <SkeletonSlot fallback={<Skeleton className="w-32" />} loading={loading}>
+      {() =>
+        balance !== null && hasPrice ? (
+          <span className="text-body-sm">
+            {currencyFormat(toTokenPrice(balance, decimals, price))}
+            <span className="text-muted-foreground ml-2">
+              @{numberFormat(price, { maximumFractionDigits: 6 })}
+            </span>
+          </span>
+        ) : (
+          <span className="text-muted-foreground">N/A</span>
+        )
+      }
+    </SkeletonSlot>
+  );
+};
+
 export const MtFtHolderFilter = ({ cid, tid, tokenPromise }: Props) => {
   const { t } = useLocale('mts');
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const account = searchParams.get('account');
-
-  const result = use(tokenPromise);
-  const token = result?.data ?? null;
 
   const { data: balanceData, isLoading } = useSWR(
     account ? ['mt-holder-balance', cid, tid, account] : null,
@@ -44,9 +99,6 @@ export const MtFtHolderFilter = ({ cid, tid, tokenPromise }: Props) => {
   if (!account) return null;
 
   const balance = balanceData?.amount ?? null;
-  const decimals = balanceData?.meta?.decimals ?? token?.decimals ?? 0;
-  const price = balanceData?.token_meta?.price ?? token?.price ?? '0';
-  const hasPrice = parseFloat(price) > 0;
   const loading = balance === null && isLoading;
 
   const params = new URLSearchParams(searchParams.toString());
@@ -75,44 +127,25 @@ export const MtFtHolderFilter = ({ cid, tid, tokenPromise }: Props) => {
           <div className="text-muted-foreground text-body-xs mb-2 uppercase">
             {t('token.holderFilter.balance')}
           </div>
-          <SkeletonSlot
-            fallback={<Skeleton className="h-5 w-32" />}
-            loading={loading}
-          >
-            {() =>
-              balance !== null ? (
-                <span className="text-body-sm">
-                  {numberFormat(toTokenAmount(balance, decimals), {
-                    maximumFractionDigits: 6,
-                  })}
-                </span>
-              ) : (
-                <span className="text-muted-foreground">N/A</span>
-              )
-            }
-          </SkeletonSlot>
+          <Suspense fallback={<Skeleton className="w-32" />}>
+            <BalanceCell
+              balanceData={balanceData}
+              loading={loading}
+              tokenPromise={tokenPromise}
+            />
+          </Suspense>
         </div>
         <div className="flex-1 px-4 py-3">
           <div className="text-muted-foreground text-body-xs mb-2 uppercase">
             {t('token.holderFilter.value')}
           </div>
-          <SkeletonSlot
-            fallback={<Skeleton className="h-5 w-32" />}
-            loading={loading}
-          >
-            {() =>
-              balance !== null && hasPrice ? (
-                <span className="text-body-sm">
-                  {currencyFormat(toTokenPrice(balance, decimals, price))}
-                  <span className="text-muted-foreground ml-2">
-                    @{numberFormat(price, { maximumFractionDigits: 6 })}
-                  </span>
-                </span>
-              ) : (
-                <span className="text-muted-foreground">N/A</span>
-              )
-            }
-          </SkeletonSlot>
+          <Suspense fallback={<Skeleton className="w-32" />}>
+            <ValueCell
+              balanceData={balanceData}
+              loading={loading}
+              tokenPromise={tokenPromise}
+            />
+          </Suspense>
         </div>
       </CardContent>
     </Card>

@@ -128,8 +128,12 @@ export const MTNFTAssets = ({
     <>
       <div className="text-body-sm -mx-3 flex flex-wrap items-center justify-between gap-1 border-t border-b px-3 py-3">
         <SkeletonSlot
-          fallback={<Skeleton className="h-7 w-40" />}
-          loading={loading || !count}
+          fallback={
+            <span className="leading-7">
+              <Skeleton className="w-40" />
+            </span>
+          }
+          loading={!!loading}
         >
           {() => {
             const value = count?.count ?? '0';
@@ -148,17 +152,21 @@ export const MTNFTAssets = ({
       </div>
       <div className="text-body-sm px-1 py-4">
         <div className="grid grid-cols-1 gap-4 min-[440px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {loading || !nfts ? (
+          {loading ? (
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <div className="flex flex-col gap-2" key={i}>
-                <Skeleton className="aspect-square w-full rounded-lg" />
-                <div className="h-12.5">
-                  <Skeleton className="h-5 w-1/2" />
-                  <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="aspect-square h-auto w-full rounded-lg" />
+                <div className="text-body-xs space-y-0.5">
+                  <span className="block">
+                    <Skeleton className="w-1/2" />
+                  </span>
+                  <span className="block">
+                    <Skeleton className="w-3/4" />
+                  </span>
                 </div>
               </div>
             ))
-          ) : nfts.data?.length ? (
+          ) : nfts?.data?.length ? (
             nfts.data.map((nft) => (
               <MTNFTCard
                 account={account}

@@ -295,7 +295,7 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
             </div>
           )}
 
-          <div>
+          <div className="min-h-[65px]">
             {turnstileSiteKey && (
               <Turnstile
                 onSuccess={(token) => {

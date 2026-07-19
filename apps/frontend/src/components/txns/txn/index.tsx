@@ -98,19 +98,27 @@ export const Overview = ({
             <ListRight>
               <p className="min-w-30 break-all">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-60" />}
-                  loading={loading || !txn}
+                  fallback={
+                    <span className="flex h-12 items-center md:h-7">
+                      <Skeleton className="w-60 max-w-full" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <>
-                      {txn!.transaction_hash}{' '}
-                      <Copy
-                        className="text-muted-foreground inline-flex align-middle"
-                        size="icon-xs"
-                        text={txn!.transaction_hash || ''}
-                      />
-                    </>
-                  )}
+                  {() =>
+                    txn ? (
+                      <>
+                        {txn.transaction_hash}{' '}
+                        <Copy
+                          className="text-muted-foreground inline-flex align-middle"
+                          size="icon-xs"
+                          text={txn.transaction_hash || ''}
+                        />
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -127,15 +135,19 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="h-6 w-20" />}
-                loading={loading || !txn}
+                fallback={<Skeleton className="h-5 w-20 rounded-md" />}
+                loading={!!loading}
               >
-                {() => (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <TxnStatus status={txn!.outcomes.status} />
-                    <TxnReceiptErrors receipts={receipts} />
-                  </div>
-                )}
+                {() =>
+                  txn ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <TxnStatus status={txn.outcomes.status} />
+                      <TxnReceiptErrors receipts={receipts} />
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">N/A</span>
+                  )
+                }
               </SkeletonSlot>
             </ListRight>
           </ListItem>
@@ -152,24 +164,32 @@ export const Overview = ({
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-25" />}
-                  loading={loading || !txn || !txn.block?.block_height}
+                  fallback={
+                    <span className="flex h-7 items-center">
+                      <Skeleton className="w-25" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <>
-                      <Link
-                        className="text-link"
-                        href={`/blocks/${txn!.block.block_hash}`}
-                      >
-                        {numberFormat(txn!.block.block_height)}
-                      </Link>
-                      <Copy
-                        className="text-muted-foreground"
-                        size="icon-xs"
-                        text={txn!.block.block_height || ''}
-                      />
-                    </>
-                  )}
+                  {() =>
+                    txn?.block?.block_height ? (
+                      <>
+                        <Link
+                          className="text-link"
+                          href={`/blocks/${txn.block.block_hash}`}
+                        >
+                          {numberFormat(txn.block.block_height)}
+                        </Link>
+                        <Copy
+                          className="text-muted-foreground"
+                          size="icon-xs"
+                          text={txn.block.block_height || ''}
+                        />
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -187,10 +207,20 @@ export const Overview = ({
             <ListRight>
               <p className="flex items-center">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-60" />}
-                  loading={loading || !txn}
+                  fallback={
+                    <span className="flex h-7 items-center">
+                      <Skeleton className="w-60" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => <LongDate ns={txn!.block_timestamp} />}
+                  {() =>
+                    txn ? (
+                      <LongDate ns={txn.block_timestamp} />
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -209,9 +239,15 @@ export const Overview = ({
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-10" />}
-                  loading={loading || !txn}
+                  loading={!!loading}
                 >
-                  {() => <>{txn!.shard_id}</>}
+                  {() =>
+                    txn ? (
+                      <>{txn.shard_id}</>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -234,13 +270,20 @@ export const Overview = ({
             <ListRight>
               <p className="flex flex-wrap items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-30" />}
-                  loading={loading || !txn}
+                  fallback={
+                    <span className="flex h-7 items-center">
+                      <Skeleton className="w-30" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() => {
+                    if (!txn) {
+                      return <span className="text-muted-foreground">N/A</span>;
+                    }
                     // Meta-transaction: the on-chain signer is the relayer.
                     // The real sender lives inside the DelegateAction's args.
-                    const delegate = txn!.actions?.find(
+                    const delegate = txn.actions?.find(
                       (a) => a.action === ActionKind.DELEGATE_ACTION,
                     );
                     const delegateArgs = delegate
@@ -254,23 +297,23 @@ export const Overview = ({
                     return (
                       <>
                         <AccountLink
-                          account={realSender ?? txn!.signer_account_id}
+                          account={realSender ?? txn.signer_account_id}
                           textClassName="max-w-60"
                         />
                         {realSender && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Badge
-                                className="inline-flex cursor-help items-center gap-1"
+                                className="text-body-xs inline-flex cursor-help items-center gap-1 px-1.5 py-0.5"
                                 variant="gray"
                               >
                                 <Radio className="size-3" />
                                 via
                                 <Link
                                   className="text-link max-w-32 truncate sm:max-w-40"
-                                  href={`/address/${txn!.signer_account_id}`}
+                                  href={`/address/${txn.signer_account_id}`}
                                 >
-                                  {txn!.signer_account_id}
+                                  {txn.signer_account_id}
                                 </Link>
                               </Badge>
                             </TooltipTrigger>
@@ -299,15 +342,23 @@ export const Overview = ({
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-30" />}
-                  loading={loading || !txn}
+                  fallback={
+                    <span className="flex h-7 items-center">
+                      <Skeleton className="w-30" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <AccountLink
-                      account={txn!.receiver_account_id}
-                      textClassName="max-w-60"
-                    />
-                  )}
+                  {() =>
+                    txn ? (
+                      <AccountLink
+                        account={txn.receiver_account_id}
+                        textClassName="max-w-60"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -338,24 +389,28 @@ export const Overview = ({
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={loading || !txn}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex items-center gap-1">
-                      <NearCircle className="size-4" />
-                      {nearFormat(txn!.actions_agg.deposit)}{' '}
-                      {stats?.near_price && (
-                        <span className="text-muted-foreground">
-                          (
-                          {nearFiatFormat(
-                            txn!.actions_agg.deposit,
-                            stats.near_price,
-                          )}
-                          )
-                        </span>
-                      )}
-                    </span>
-                  )}
+                  {() =>
+                    txn ? (
+                      <span className="flex items-center gap-1">
+                        <NearCircle className="size-4" />
+                        {nearFormat(txn.actions_agg.deposit)}{' '}
+                        {stats?.near_price && (
+                          <span className="text-muted-foreground">
+                            (
+                            {nearFiatFormat(
+                              txn.actions_agg.deposit,
+                              stats.near_price,
+                            )}
+                            )
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -374,24 +429,28 @@ export const Overview = ({
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-25" />}
-                  loading={loading || !txn}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex items-center gap-1">
-                      <NearCircle className="size-4" />
-                      {nearFormat(txn!.outcomes_agg.transaction_fee)}{' '}
-                      {stats?.near_price && (
-                        <span className="text-muted-foreground">
-                          (
-                          {nearFiatFormat(
-                            txn!.outcomes_agg.transaction_fee,
-                            stats.near_price,
-                          )}
-                          )
-                        </span>
-                      )}
-                    </span>
-                  )}
+                  {() =>
+                    txn ? (
+                      <span className="flex items-center gap-1">
+                        <NearCircle className="size-4" />
+                        {nearFormat(txn.outcomes_agg.transaction_fee)}{' '}
+                        {stats?.near_price && (
+                          <span className="text-muted-foreground">
+                            (
+                            {nearFiatFormat(
+                              txn.outcomes_agg.transaction_fee,
+                              stats.near_price,
+                            )}
+                            )
+                          </span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -410,15 +469,19 @@ export const Overview = ({
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-30" />}
-                  loading={loading || !txn}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex items-center gap-1">
-                      {gasFormat(txn!.actions_agg.gas_attached)} Tgas
-                      <span className="text-muted-foreground">|</span>
-                      {gasFormat(txn!.outcomes_agg.gas_used)} Tgas
-                    </span>
-                  )}
+                  {() =>
+                    txn ? (
+                      <span className="flex items-center gap-1">
+                        {gasFormat(txn.actions_agg.gas_attached)} Tgas
+                        <span className="text-muted-foreground">|</span>
+                        {gasFormat(txn.outcomes_agg.gas_used)} Tgas
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -437,16 +500,20 @@ export const Overview = ({
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-30" />}
-                  loading={loading || !txn}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex items-center gap-1">
-                      {gasFormat(txn!.receipt_conversion_gas_burnt)} Tgas
-                      <span className="text-muted-foreground">|</span>
-                      <NearCircle className="size-4" />
-                      {nearFormat(txn!.receipt_conversion_tokens_burnt)}
-                    </span>
-                  )}
+                  {() =>
+                    txn ? (
+                      <span className="flex items-center gap-1">
+                        {gasFormat(txn.receipt_conversion_gas_burnt)} Tgas
+                        <span className="text-muted-foreground">|</span>
+                        <NearCircle className="size-4" />
+                        {nearFormat(txn.receipt_conversion_tokens_burnt)}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>

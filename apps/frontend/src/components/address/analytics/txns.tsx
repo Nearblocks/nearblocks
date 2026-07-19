@@ -63,14 +63,14 @@ export const TxnsChart = ({ loading, txnsPromise }: Props) => {
       uniqueOut.push([timestamp, +item.unique_address_out]);
     }
 
-    return { isEmpty: stats?.length === 0, txns, uniqueIn, uniqueOut };
+    return { isEmpty: !stats?.length, txns, uniqueIn, uniqueOut };
   }, [stats]);
 
   return (
     <div className="h-105">
       <SkeletonSlot
         fallback={<Skeleton className="h-105 w-full" />}
-        loading={loading || !stats}
+        loading={!!loading}
       >
         {() =>
           data.isEmpty ? (

@@ -50,8 +50,12 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-28" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-28" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -75,8 +79,12 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !holderCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -98,8 +106,12 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !txCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>

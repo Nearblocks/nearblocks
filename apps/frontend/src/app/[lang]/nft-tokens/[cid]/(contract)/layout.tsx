@@ -12,6 +12,7 @@ import {
   fetchNFTContractHolderCount,
   fetchNFTContractTxnCount,
 } from '@/data/nft-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
@@ -53,6 +54,7 @@ const NftTokenLayout = async ({ children, params }: Props) => {
   const contractPromise = fetchNFTContract(cid);
   const holderCountPromise = fetchNFTContractHolderCount(cid);
   const txCountPromise = fetchNFTContractTxnCount(cid, {});
+  await holdNav();
 
   return (
     <>

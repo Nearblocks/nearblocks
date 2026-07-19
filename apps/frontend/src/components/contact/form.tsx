@@ -126,12 +126,16 @@ export const ContactForm = ({ subject }: Props) => {
         </Field>
       </FieldSet>
 
-      <Turnstile
-        onSuccess={(token) => {
-          tokenRef.current = token;
-        }}
-        siteKey={turnstileSiteKey}
-      />
+      {/* Reserve the widget's height so the async iframe doesn't push the
+          submit button down when it mounts. */}
+      <div className="min-h-[65px]">
+        <Turnstile
+          onSuccess={(token) => {
+            tokenRef.current = token;
+          }}
+          siteKey={turnstileSiteKey}
+        />
+      </div>
 
       <div>
         <Button disabled={isSubmitting} type="submit" variant="secondary">

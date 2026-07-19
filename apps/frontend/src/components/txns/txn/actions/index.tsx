@@ -43,9 +43,9 @@ export const Actions = ({
           <div className="hidden shrink-0 sm:block">
             <SkeletonSlot
               fallback={<Skeleton className="size-10 rounded-full" />}
-              loading={loading || !txn}
+              loading={!!loading}
             >
-              {() => <TxnIcon actions={txn!.actions} />}
+              {() => (txn ? <TxnIcon actions={txn.actions} /> : null)}
             </SkeletonSlot>
           </div>
           <div className="min-w-0 flex-1">
@@ -53,9 +53,11 @@ export const Actions = ({
               <div className="shrink-0 sm:hidden">
                 <SkeletonSlot
                   fallback={<Skeleton className="size-6 rounded-full" />}
-                  loading={loading || !txn}
+                  loading={!!loading}
                 >
-                  {() => <TxnIcon actions={txn!.actions} size="sm" />}
+                  {() =>
+                    txn ? <TxnIcon actions={txn.actions} size="sm" /> : null
+                  }
                 </SkeletonSlot>
               </div>
               <h2 className="text-headline-xs leading-normal font-medium uppercase">
@@ -63,14 +65,21 @@ export const Actions = ({
               </h2>
             </div>
             <SkeletonSlot
-              fallback={<Skeleton className="mt-1.5 h-5 w-1/2" />}
-              loading={loading || !txn || txn.actions?.length === 0}
+              fallback={
+                <p className="text-body-sm mt-1">
+                  <Skeleton className="w-1/2" />
+                </p>
+              }
+              loading={!!loading}
             >
               {() => {
+                if (!txn?.actions?.length) {
+                  return <span className="text-muted-foreground">N/A</span>;
+                }
                 const actions =
-                  txn!.actions[0]?.action === ActionKind.DELEGATE_ACTION
-                    ? [txn!.actions[0]]
-                    : txn!.actions;
+                  txn.actions[0]?.action === ActionKind.DELEGATE_ACTION
+                    ? [txn.actions[0]]
+                    : txn.actions;
                 const content = (
                   <div className="text-body-sm space-y-1">
                     {actions.map((action, index) => (
@@ -78,8 +87,8 @@ export const Actions = ({
                         action={action}
                         hideCopy
                         key={index}
-                        receiver={txn!.receiver_account_id}
-                        signer={txn!.signer_account_id}
+                        receiver={txn.receiver_account_id}
+                        signer={txn.signer_account_id}
                       />
                     ))}
                   </div>

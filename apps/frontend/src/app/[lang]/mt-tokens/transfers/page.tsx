@@ -9,6 +9,7 @@ import {
   fetchMTTxns as fetchAddressMTTxns,
 } from '@/data/address/mts';
 import { fetchMTTxnCount, fetchMTTxns } from '@/data/mt-tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/mt-tokens/transfers'>;
@@ -38,6 +39,7 @@ const MtTransfersPage = async ({ params, searchParams }: Props) => {
   if (account) {
     const mtsPromise = fetchAddressMTTxns(account, filters);
     const mtCountPromise = fetchAddressMTTxnCount(account, filters);
+    await holdNav();
 
     return (
       <>
@@ -56,6 +58,7 @@ const MtTransfersPage = async ({ params, searchParams }: Props) => {
 
   const txnsPromise = fetchMTTxns(filters);
   const txnCountPromise = fetchMTTxnCount(filters);
+  await holdNav();
 
   return (
     <>

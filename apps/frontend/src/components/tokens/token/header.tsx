@@ -24,10 +24,12 @@ export const TokenHeader = ({ cid, contractPromise, loading }: Props) => {
       fallback={
         <span className="flex items-center gap-2">
           <Skeleton className="size-6 rounded-full" />
-          <Skeleton className="w-32" />
+          <span className="block">
+            <Skeleton className="w-32" />
+          </span>
         </span>
       }
-      loading={loading || !contract}
+      loading={!!loading}
     >
       {() => (
         <span className="flex items-center gap-2">

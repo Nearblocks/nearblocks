@@ -8,6 +8,7 @@ import {
   fetchMTTokenTxnCount,
   fetchMTTokenTxns,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { Card, CardContent } from '@/ui/card';
@@ -58,6 +59,7 @@ const NftTokenDetailPage = async ({ params, searchParams }: Props) => {
   const tokenPromise = fetchMTToken(cid, tid);
   const txnsPromise = fetchMTTokenTxns(cid, tid, filters);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, filters);
+  await holdNav();
 
   return (
     <>

@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import { MCMpcParameters, SignerTotalStats } from 'nb-schemas';
+import { MCMpcParametersRes, SignerTotalStats } from 'nb-schemas';
 
 import { AccountLink } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
@@ -13,7 +13,7 @@ import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
-  mpcsPromise?: Promise<MCMpcParameters | null>;
+  mpcsPromise?: Promise<MCMpcParametersRes>;
   totalStatsPromise?: Promise<null | SignerTotalStats>;
 };
 
@@ -23,12 +23,14 @@ export const Overview = ({
   totalStatsPromise,
 }: Props) => {
   const { t } = useLocale('chainSignatures');
-  const mpcs = !loading && mpcsPromise ? use(mpcsPromise) : null;
+  const mpcsRes = !loading && mpcsPromise ? use(mpcsPromise) : null;
+  if (mpcsRes?.errors?.length) throw new Error('Failed to load MPC network');
+  const mpcs = mpcsRes?.data ?? null;
   const totalStats =
     !loading && totalStatsPromise ? use(totalStatsPromise) : null;
 
-  const isMpcsLoading = loading || !mpcs;
-  const isStatsLoading = loading || !totalStats;
+  const isMpcsLoading = !!loading;
+  const isStatsLoading = !!loading;
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -44,9 +46,11 @@ export const Overview = ({
               <ListLeft>{t('overview.network.totalOperators')}</ListLeft>
               <ListRight>
                 {isMpcsLoading ? (
-                  <Skeleton className="h-4 w-10" />
+                  <Skeleton className="w-10" />
+                ) : mpcs ? (
+                  numberFormat(mpcs.participants.length)
                 ) : (
-                  numberFormat(mpcs!.participants.length)
+                  <span className="text-muted-foreground">N/A</span>
                 )}
               </ListRight>
             </ListItem>
@@ -54,9 +58,11 @@ export const Overview = ({
               <ListLeft>{t('overview.network.threshold')}</ListLeft>
               <ListRight>
                 {isMpcsLoading ? (
-                  <Skeleton className="h-4 w-14" />
+                  <Skeleton className="w-14" />
+                ) : mpcs ? (
+                  `${mpcs.threshold} / ${mpcs.participants.length}`
                 ) : (
-                  `${mpcs!.threshold} / ${mpcs!.participants.length}`
+                  <span className="text-muted-foreground">N/A</span>
                 )}
               </ListRight>
             </ListItem>
@@ -75,9 +81,13 @@ export const Overview = ({
               <ListLeft>{t('overview.activity.contract')}</ListLeft>
               <ListRight>
                 {isMpcsLoading ? (
-                  <Skeleton className="h-4 w-30" />
+                  <span className="flex h-7 items-center">
+                    <Skeleton className="w-30" />
+                  </span>
+                ) : mpcs ? (
+                  <AccountLink account={mpcs.contract} />
                 ) : (
-                  <AccountLink account={mpcs!.contract} />
+                  <span className="text-muted-foreground">N/A</span>
                 )}
               </ListRight>
             </ListItem>
@@ -85,9 +95,11 @@ export const Overview = ({
               <ListLeft>{t('overview.activity.totalTxns')}</ListLeft>
               <ListRight>
                 {isStatsLoading ? (
-                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="w-20" />
+                ) : totalStats ? (
+                  numberFormat(totalStats.txns)
                 ) : (
-                  numberFormat(totalStats!.txns)
+                  <span className="text-muted-foreground">N/A</span>
                 )}
               </ListRight>
             </ListItem>
@@ -95,9 +107,9 @@ export const Overview = ({
               <ListLeft>{t('overview.activity.totalGasBurnt')}</ListLeft>
               <ListRight>
                 {isStatsLoading ? (
-                  <Skeleton className="h-4 w-20" />
-                ) : totalStats!.gas_burnt ? (
-                  `${gasFormat(totalStats!.gas_burnt, {
+                  <Skeleton className="w-20" />
+                ) : totalStats?.gas_burnt ? (
+                  `${gasFormat(totalStats.gas_burnt, {
                     notation: 'compact',
                   })} Tgas`
                 ) : (

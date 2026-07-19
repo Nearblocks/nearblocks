@@ -1,28 +1,22 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
-import { useTransition } from 'react';
 
-import { setTheme } from '@/actions/theme';
 import { useLocale } from '@/hooks/use-locale';
 import { useTheme } from '@/hooks/use-theme';
+import { applyTheme } from '@/lib/theme';
 import { Button } from '@/ui/button';
 
 export const ThemeToggle = () => {
   const theme = useTheme();
   const { t } = useLocale('layout');
-  const [isPending, startTransition] = useTransition();
 
   const onToggle = () => {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
-    startTransition(() => {
-      setTheme(nextTheme);
-    });
+    applyTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
     <Button
-      disabled={isPending}
       onClick={onToggle}
       size="icon-md"
       title={t('header.toggleTheme')}

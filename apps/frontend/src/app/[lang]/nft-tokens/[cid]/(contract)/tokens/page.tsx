@@ -5,6 +5,7 @@ import {
   fetchNFTContractTokenCount,
   fetchNFTContractTokens,
 } from '@/data/nft-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/nft-tokens/[cid]/tokens'>;
 
@@ -16,6 +17,7 @@ const TokensPage = async ({ params, searchParams }: Props) => {
   });
   const tokenCountPromise = fetchNFTContractTokenCount(cid);
   const contractPromise = fetchNFTContract(cid);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<NftTokens loading />}>

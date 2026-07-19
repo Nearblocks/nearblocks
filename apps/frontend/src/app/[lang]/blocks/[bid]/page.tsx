@@ -4,6 +4,7 @@ import { Overview } from '@/components/blocks/overview';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { fetchBlock } from '@/data/blocks';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/blocks/[bid]'>;
@@ -27,6 +28,7 @@ const BlockPage = async ({ params }: Props) => {
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'blocks');
   const blockPromise = fetchBlock(bid);
+  await holdNav();
 
   return (
     <>

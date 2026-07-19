@@ -9,6 +9,7 @@ import { use, useMemo } from 'react';
 import { SignerStats } from 'nb-schemas';
 
 import { AnalyticsChart } from '@/components/address/analytics/chart';
+import { ChartEmpty } from '@/components/charts';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat, toTgas } from '@/lib/format';
@@ -51,28 +52,38 @@ export const ChainSignaturesGasChart = ({ loading, statsPromise }: Props) => {
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   const data = useMemo(() => getData(stats), [stats]);
+  const isEmpty = !data.length;
 
   return (
-    <SkeletonSlot
-      fallback={<Skeleton className="h-140 w-full" />}
-      loading={loading || !stats}
-    >
-      {() => (
-        <AnalyticsChart height={560}>
-          <XAxis className="stroke-0" type="datetime" />
-          <YAxis
-            className="stroke-0"
-            labels={yAxisLabel}
-            opposite={false}
-            title={{ text: t('analytics.gasBurnt.yAxis') }}
-          />
-          <Area.Series
-            data={data}
-            options={{ name: t('analytics.gasBurnt.yAxis') }}
-          />
-          <Tooltip formatter={tooltipFormatter} shared />
-        </AnalyticsChart>
-      )}
-    </SkeletonSlot>
+    // Fixed-height wrapper so the server-rendered markup reserves the chart
+    // height; the chart itself only renders client-side after Highcharts
+    // mounts.
+    <div className="h-140">
+      <SkeletonSlot
+        fallback={<Skeleton className="h-140 w-full" />}
+        loading={!!loading}
+      >
+        {() =>
+          isEmpty ? (
+            <ChartEmpty />
+          ) : (
+            <AnalyticsChart height={560}>
+              <XAxis className="stroke-0" type="datetime" />
+              <YAxis
+                className="stroke-0"
+                labels={yAxisLabel}
+                opposite={false}
+                title={{ text: t('analytics.gasBurnt.yAxis') }}
+              />
+              <Area.Series
+                data={data}
+                options={{ name: t('analytics.gasBurnt.yAxis') }}
+              />
+              <Tooltip formatter={tooltipFormatter} shared />
+            </AnalyticsChart>
+          )
+        }
+      </SkeletonSlot>
+    </div>
   );
 };

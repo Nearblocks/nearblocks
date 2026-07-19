@@ -23,12 +23,18 @@ type LongDateProps = {
   ns: null | string | undefined;
 };
 
+// Timestamp display modes are client preferences (persisted store), but
+// waiting for store hydration meant a skeleton flash and table column
+// reflow on every document load. Instead, render the store defaults
+// ('age' / 'utc') — identical on the server and the pre-hydration client
+// render, so hydration is clean — and only users who changed a preference
+// get a post-hydration swap.
 export const TimestampToggle = () => {
   const hasHydrated = useSettings((s) => s.hydrated);
   const timestampMode = useSettings((s) => s.timestampMode);
   const toggleTimestampMode = useSettings((s) => s.toggleTimestampMode);
 
-  if (!hasHydrated) return <Skeleton className="w-10" />;
+  const mode = hasHydrated ? timestampMode : 'age';
 
   return (
     <Tooltip>
@@ -38,7 +44,7 @@ export const TimestampToggle = () => {
           onClick={toggleTimestampMode}
           type="button"
         >
-          {timestampMode === 'age' ? (
+          {mode === 'age' ? (
             <>
               Age <Clock className="size-3.5" />
             </>
@@ -50,7 +56,7 @@ export const TimestampToggle = () => {
         </button>
       </TooltipTrigger>
       <TooltipContent>
-        Click to show {timestampMode === 'age' ? 'Date time' : 'Age'} format
+        Click to show {mode === 'age' ? 'Date time' : 'Age'} format
       </TooltipContent>
     </Tooltip>
   );
@@ -61,13 +67,17 @@ export const TimestampCell = ({ ns }: Props) => {
   const timestampMode = useSettings((s) => s.timestampMode);
 
   if (!ns) return null;
-  if (!hasHydrated) return <Skeleton className="w-30" />;
 
+  const mode = hasHydrated ? timestampMode : 'age';
   const ms = toMs(ns);
 
-  return timestampMode === 'age'
-    ? ageFormat(ms)
-    : dateFormat(ms, 'YYYY-MM-DD HH:mm:ss');
+  // suppressHydrationWarning: the age string can drift between the server
+  // render and hydration (e.g. "a few seconds ago" → "a minute ago").
+  return (
+    <span suppressHydrationWarning>
+      {mode === 'age' ? ageFormat(ms) : dateFormat(ms, 'YYYY-MM-DD HH:mm:ss')}
+    </span>
+  );
 };
 
 export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
@@ -75,14 +85,20 @@ export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
   const utcMode = useSettings((s) => s.utcMode);
   const toggleUTCMode = useSettings((s) => s.toggleUTCMode);
 
-  if (!ns || !hasHydrated) return <Skeleton className="w-60" />;
+  if (!ns)
+    return (
+      <span className="flex h-7 items-center">
+        <Skeleton className="w-60" />
+      </span>
+    );
 
+  const mode = hasHydrated ? utcMode : 'utc';
   const ms = toMs(ns);
-  const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss Z', utcMode === 'utc');
+  const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss Z', mode === 'utc');
 
   return (
     <span>
-      <span>
+      <span suppressHydrationWarning>
         {!hideAge && `${ageFormat(ms)} `}
         {hideAge ? date : `(${date})`}
       </span>
@@ -93,19 +109,15 @@ export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
             size="xs"
             variant="outline"
           >
-            {utcMode === 'local' ? 'Local' : 'UTC'}
+            {mode === 'local' ? 'Local' : 'UTC'}
             <ChevronDown className="ml-0.5 size-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem
-            onClick={() => utcMode !== 'utc' && toggleUTCMode()}
-          >
+          <DropdownMenuItem onClick={() => mode !== 'utc' && toggleUTCMode()}>
             UTC
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => utcMode !== 'local' && toggleUTCMode()}
-          >
+          <DropdownMenuItem onClick={() => mode !== 'local' && toggleUTCMode()}>
             Local
           </DropdownMenuItem>
         </DropdownMenuContent>

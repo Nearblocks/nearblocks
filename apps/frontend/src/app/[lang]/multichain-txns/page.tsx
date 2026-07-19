@@ -8,6 +8,7 @@ import {
   fetchMCTxnCount,
   fetchMCTxns,
 } from '@/data/multichain-txns';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/multichain-txns'>;
@@ -34,6 +35,7 @@ const MultichainTxnsPage = async ({ params, searchParams }: Props) => {
   const txnsPromise = fetchMCTxns(filters);
   const txnCountPromise = fetchMCTxnCount(filters);
   const mcStatsPromise = fetchMCStats();
+  await holdNav();
 
   return (
     <>

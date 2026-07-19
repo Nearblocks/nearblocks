@@ -155,7 +155,7 @@ export const Tokens = ({
     <Popover onOpenChange={setOpen} open={open}>
       <SkeletonSlot
         fallback={<Skeleton className="h-9 w-full" />}
-        loading={loading || !tokens}
+        loading={!!loading}
       >
         {() => (
           <PopoverTrigger asChild>

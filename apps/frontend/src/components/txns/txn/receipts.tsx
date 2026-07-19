@@ -9,12 +9,17 @@ import { ActionKind } from 'nb-types';
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import {
+  TxnDirectionIcon,
+  TxnDirectionSkeleton,
+  TxnStatusIcon,
+} from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { gasFormat, nearFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
+import { Skeleton } from '@/ui/skeleton';
 
 type ReceiptRow = {
   action: ActionReceipt;
@@ -88,9 +93,10 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
   const columns: DataTableColumnDef<ReceiptRow>[] = [
     {
       cell: (row) => <TxnStatusIcon status={row.outcome_status} />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (row) => (
@@ -121,6 +127,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
       ),
       header: t('receipts.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-16 rounded-md" />,
     },
     {
       cell: (row) => <AccountLink account={row.predecessor_account_id} />,
@@ -133,6 +140,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
       className: 'w-6',
       header: '',
       id: 'direction',
+      skeletonCell: <TxnDirectionSkeleton />,
     },
     {
       cell: (row) => <AccountLink account={row.receiver_account_id} />,
@@ -173,10 +181,10 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
       <CardContent className="text-body-sm p-0">
         <DataTable
           columns={columns}
-          data={loading || !receipts ? undefined : rows}
+          data={loading ? undefined : rows}
           emptyMessage={t('receipts.empty')}
           getRowKey={(row) => `${row.receipt_id}-${row.index}`}
-          loading={loading || !receipts}
+          loading={!!loading}
           skeletonRows={5}
         />
       </CardContent>

@@ -1,7 +1,6 @@
 import { cache } from 'react';
 
 import {
-  MCMpcParameters,
   MCMpcParametersRes,
   SignerStats,
   SignerStatsRes,
@@ -11,9 +10,11 @@ import {
 
 import { fetcher } from '@/lib/fetcher';
 
-export const fetchMpcs = cache(async (): Promise<MCMpcParameters | null> => {
+// Returns the full response so consumers can tell an error-shaped payload
+// (throw to the retry card) apart from genuinely-empty data.
+export const fetchMpcs = cache(async (): Promise<MCMpcParametersRes> => {
   const resp = await fetcher<MCMpcParametersRes>('/v3/multichain/mpcs');
-  return resp.data;
+  return resp;
 });
 
 export const fetchSignerStats = cache(

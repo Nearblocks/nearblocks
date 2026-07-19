@@ -33,6 +33,7 @@ export const MtTokens = ({
   const { t } = useLocale('mts');
   const searchParams = useSearchParams();
   const tokens = !loading && mtListPromise ? use(mtListPromise) : null;
+  if (tokens?.errors?.length) throw new Error('Failed to load tokens');
   const tokenCount =
     !loading && mtListCountPromise ? use(mtListCountPromise) : null;
 
@@ -120,7 +121,7 @@ export const MtTokens = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !tokenCount}
+              loading={!!loading}
             >
               {() => {
                 const count = tokenCount?.data?.count ?? 0;
@@ -137,7 +138,7 @@ export const MtTokens = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!tokens?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           onSortNavigate={onSort}
           pagination={tokens?.meta}

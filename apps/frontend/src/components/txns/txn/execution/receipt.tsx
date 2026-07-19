@@ -44,9 +44,16 @@ export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
             <div className="w-full">
               <SkeletonSlot
                 fallback={
-                  <div className="flex flex-col">
-                    <Skeleton className="mb-1 h-6 w-30" />
-                    <Skeleton className="h-17.5 w-full" />
+                  <div className="text-body-sm">
+                    <span className="block">
+                      <Skeleton className="w-30" />
+                    </span>
+                    <span className="block">
+                      <Skeleton className="w-full" />
+                    </span>
+                    <span className="block">
+                      <Skeleton className="w-2/3" />
+                    </span>
                   </div>
                 }
                 loading={!receipt || loading}

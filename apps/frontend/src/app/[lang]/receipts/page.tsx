@@ -9,6 +9,7 @@ import {
   fetchReceipts as fetchAddressReceipts,
 } from '@/data/address/receipts';
 import { fetchReceiptCount, fetchReceipts } from '@/data/receipts';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/receipts'>;
@@ -38,6 +39,7 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
   if (account) {
     const receiptsPromise = fetchAddressReceipts(account, filters);
     const receiptCountPromise = fetchAddressReceiptCount(account, filters);
+    await holdNav();
 
     return (
       <>
@@ -67,6 +69,7 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
   const block = typeof filters.block === 'string' ? filters.block : undefined;
   const receiptsPromise = fetchReceipts(filters);
   const receiptCountPromise = fetchReceiptCount(filters);
+  await holdNav();
 
   const title = block ? (
     <>

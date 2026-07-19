@@ -36,9 +36,11 @@ export const ValidatorInfo = ({ loading }: Props) => {
             <ListLeft>{t('validatorInfo.protocolVersion')}</ListLeft>
             <ListRight>
               {isLoading ? (
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="w-20" />
+              ) : protocolVersion != null ? (
+                numberFormat(protocolVersion)
               ) : (
-                numberFormat(protocolVersion ?? undefined)
+                <span className="text-muted-foreground">N/A</span>
               )}
             </ListRight>
           </ListItem>
@@ -46,7 +48,7 @@ export const ValidatorInfo = ({ loading }: Props) => {
             <ListLeft>{t('validatorInfo.nextSeatPrice')}</ListLeft>
             <ListRight>
               {isLoading ? (
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="w-20" />
               ) : nextSeatPrice !== null ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />
@@ -55,7 +57,7 @@ export const ValidatorInfo = ({ loading }: Props) => {
                   })}
                 </span>
               ) : (
-                ''
+                <span className="text-muted-foreground">N/A</span>
               )}
             </ListRight>
           </ListItem>
@@ -63,7 +65,7 @@ export const ValidatorInfo = ({ loading }: Props) => {
             <ListLeft>{t('validatorInfo.currentSeatPrice')}</ListLeft>
             <ListRight>
               {isLoading ? (
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="w-20" />
               ) : currentSeatPrice !== null ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />
@@ -72,7 +74,7 @@ export const ValidatorInfo = ({ loading }: Props) => {
                   })}
                 </span>
               ) : (
-                ''
+                <span className="text-muted-foreground">N/A</span>
               )}
             </ListRight>
           </ListItem>

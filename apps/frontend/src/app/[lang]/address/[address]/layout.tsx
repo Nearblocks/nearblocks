@@ -23,10 +23,10 @@ import {
 import { fetchContract, fetchDeployments } from '@/data/address/contract';
 import { fetchStats } from '@/data/layout';
 import { fetchSpamTokens } from '@/data/spam-tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
-import { Skeleton } from '@/ui/skeleton';
 
 type Props = LayoutProps<'/[lang]/address/[address]'>;
 
@@ -59,6 +59,7 @@ const AddressLayout = async ({ children, params }: Props) => {
 
   const dictionary = await getDictionary(lang, ['address']);
   const t = await translator(lang, 'address');
+  await holdNav();
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>
@@ -166,7 +167,10 @@ const AddressLayout = async ({ children, params }: Props) => {
                   </ActiveLink>
                 </TabLink>
               )}
-              <ErrorSuspense fallback={<Skeleton className="w-20" />}>
+              {/* Most accounts are not contracts, so the tab renders nothing
+                  while loading — reserving it would pop OUT more often than
+                  it pops in. */}
+              <ErrorSuspense fallback={null}>
                 <ContractTab
                   address={address}
                   contractPromise={contractPromise}

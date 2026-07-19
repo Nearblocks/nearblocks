@@ -42,8 +42,12 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !tokenCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -65,8 +69,12 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !txCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>

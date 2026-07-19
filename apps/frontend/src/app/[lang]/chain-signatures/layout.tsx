@@ -6,6 +6,7 @@ import { ActiveLink } from '@/components/link';
 import { PageHeading } from '@/components/page-heading';
 import { TabLink, TabLinks } from '@/components/tab-links';
 import { fetchMpcs, fetchSignerTotalStats } from '@/data/chain-signatures';
+import { holdNav } from '@/lib/hold-nav';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
 import { LocaleProvider } from '@/providers/locale';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
@@ -22,6 +23,7 @@ const ChainSignaturesLayout = async ({ children, params }: Props) => {
 
   const mpcsPromise = fetchMpcs();
   const totalStatsPromise = fetchSignerTotalStats();
+  await holdNav();
 
   return (
     <LocaleProvider dictionary={dictionary} locale={lang}>

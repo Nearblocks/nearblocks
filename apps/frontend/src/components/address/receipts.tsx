@@ -17,7 +17,7 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
@@ -28,7 +28,6 @@ import {
 } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -50,6 +49,7 @@ export const Receipts = ({
 }: Props) => {
   const { t } = useLocale('address');
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
+  if (receipts?.errors?.length) throw new Error('Failed to load receipts');
   const receiptCount =
     !loading && receiptCountPromise ? use(receiptCountPromise) : null;
 
@@ -94,9 +94,10 @@ export const Receipts = ({
   const columns: DataTableColumnDef<AccountReceipt>[] = [
     {
       cell: (receipt) => <TxnStatusIcon status={receipt.outcome?.status} />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (receipt) => (
@@ -114,19 +115,10 @@ export const Receipts = ({
       id: 'receipt_id',
     },
     {
-      cell: (receipt) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText
-              as="code"
-              className="max-w-20"
-              text={actionMethod(receipt.actions)}
-            />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (receipt) => <MethodBadge text={actionMethod(receipt.actions)} />,
       header: t('receipts.columns.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-[114px] rounded-md" />,
     },
     {
       cell: (receipt) => (
@@ -159,6 +151,7 @@ export const Receipts = ({
       className: 'w-20',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
       cell: (receipt) => <AccountLink account={receipt.receiver_account_id} />,
@@ -213,7 +206,7 @@ export const Receipts = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !receiptCount}
+              loading={!!loading}
             >
               {() => {
                 const count = receiptCount?.count;
@@ -227,12 +220,18 @@ export const Receipts = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!receipts?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
+          paginated={!!basePath}
           pagination={basePath ? receipts?.meta : undefined}
         />
+        {loading && !basePath && (
+          <div className="border-t px-4 py-3">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
         {!basePath && receipts?.meta?.next_page && (
           <div className="border-t px-4 py-3">
             <Button asChild className="h-8 w-full" variant="ghost">

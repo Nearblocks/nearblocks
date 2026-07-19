@@ -18,11 +18,10 @@ import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -44,14 +43,16 @@ export const NFTTxns = ({
 }: Props) => {
   const { t } = useLocale('address');
   const nfts = !loading && nftsPromise ? use(nftsPromise) : null;
+  if (nfts?.errors?.length) throw new Error('Failed to load NFT transfers');
   const nftCount = !loading && nftCountPromise ? use(nftCountPromise) : null;
 
   const columns: DataTableColumnDef<AccountNFTTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (nft) =>
@@ -69,18 +70,13 @@ export const NFTTxns = ({
       id: 'txn_hash',
     },
     {
-      cell: (nft) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={nft.cause} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (nft) => <MethodBadge text={nft.cause} />,
       enableFilter: true,
       filterName: 'cause',
       filterPlaceholder: t('nfts.filterMethod'),
       header: t('nfts.columns.method'),
       id: 'cause',
+      skeletonCell: <Skeleton className="h-4.5 w-[103px] rounded-md" />,
     },
     {
       cell: (nft) => (
@@ -100,6 +96,7 @@ export const NFTTxns = ({
       className: 'w-20',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
       cell: (nft) => (
@@ -231,7 +228,7 @@ export const NFTTxns = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !nftCount}
+              loading={!!loading}
             >
               {() => {
                 const count = nftCount?.count;
@@ -243,12 +240,18 @@ export const NFTTxns = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!nfts?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
+          paginated={!!basePath}
           pagination={basePath ? nfts?.meta : undefined}
         />
+        {loading && !basePath && (
+          <div className="border-t px-4 py-3">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
         {!basePath && nfts?.meta?.next_page && (
           <div className="border-t px-4 py-3">
             <Button asChild className="h-8 w-full" variant="ghost">

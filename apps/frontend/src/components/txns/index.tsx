@@ -12,7 +12,12 @@ import { StatCard } from '@/components/stat-card';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import {
+  MethodBadge,
+  TxnDirectionIcon,
+  TxnDirectionSkeleton,
+  TxnStatusIcon,
+} from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
@@ -23,7 +28,6 @@ import {
 } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -46,16 +50,17 @@ export const Txns = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  if (txns?.errors?.length) throw new Error('Failed to load transactions');
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
   const txnStats = !loading && txnStatsPromise ? use(txnStatsPromise) : null;
 
   const columns: DataTableColumnDef<TxnListItem>[] = [
     {
       cell: (txn) => <TxnStatusIcon status={txn.outcomes?.status} />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
-      skeletonCell: <Skeleton className="size-4 rounded-full" />,
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (txn) => (
@@ -66,35 +71,27 @@ export const Txns = ({
           </Truncate>
         </Link>
       ),
+      className: 'w-44',
       csvLabel: 'Transaction Hash',
       csvValue: (txn) => txn.transaction_hash,
       header: t('list.txnHash'),
       id: 'txn_hash',
-      skeletonWidth: 'w-36',
     },
     {
-      cell: (txn) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText
-              as="code"
-              className="max-w-20"
-              text={actionMethod(txn.actions)}
-            />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (txn) => <MethodBadge text={actionMethod(txn.actions)} />,
       csvLabel: 'Method',
       csvValue: (txn) => actionMethod(txn.actions),
       header: t('list.method'),
       id: 'method',
-      skeletonCell: <Skeleton className="h-4.5 w-16 rounded-md" />,
+      skeletonCell: <Skeleton className="h-4.5 w-[95px] rounded-md" />,
     },
     {
       cell: (txn) => (
-        <span className="flex items-center gap-1">
-          <NearCircle className="size-4" />
-          {nearFormat(txn.actions_agg?.deposit)}
+        <span className="flex min-w-0 items-center gap-1">
+          <NearCircle className="size-4 shrink-0" />
+          <span className="block truncate">
+            {nearFormat(txn.actions_agg?.deposit)}
+          </span>
         </span>
       ),
       csvLabel: 'Deposit Value (NEAR)',
@@ -104,15 +101,19 @@ export const Txns = ({
       skeletonCell: (
         <span className="flex items-center gap-1">
           <Skeleton className="size-4 rounded-full" />
-          <Skeleton className="w-16" />
+          <span className="block">
+            <Skeleton className="w-20" />
+          </span>
         </span>
       ),
     },
     {
       cell: (txn) => (
-        <span className="flex items-center gap-1">
-          <NearCircle className="size-4" />
-          {nearFormat(txn.outcomes_agg?.transaction_fee)}
+        <span className="flex min-w-0 items-center gap-1">
+          <NearCircle className="size-4 shrink-0" />
+          <span className="block truncate">
+            {nearFormat(txn.outcomes_agg?.transaction_fee)}
+          </span>
         </span>
       ),
       csvLabel: 'Txn Fee (NEAR)',
@@ -122,7 +123,9 @@ export const Txns = ({
       skeletonCell: (
         <span className="flex items-center gap-1">
           <Skeleton className="size-4 rounded-full" />
-          <Skeleton className="w-16" />
+          <span className="block">
+            <Skeleton className="w-16" />
+          </span>
         </span>
       ),
     },
@@ -132,14 +135,13 @@ export const Txns = ({
       csvValue: (txn) => txn.signer_account_id ?? '',
       header: t('list.from'),
       id: 'from',
-      skeletonWidth: 'w-32',
     },
     {
       cell: () => <TxnDirectionIcon />,
       className: 'w-12',
       header: '',
       id: 'direction',
-      skeletonCell: <Skeleton className="size-5 rounded-md" />,
+      skeletonCell: <TxnDirectionSkeleton />,
     },
     {
       cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
@@ -147,7 +149,6 @@ export const Txns = ({
       csvValue: (txn) => txn.receiver_account_id ?? '',
       header: t('list.to'),
       id: 'to',
-      skeletonWidth: 'w-32',
     },
     {
       cell: (txn) => (
@@ -162,7 +163,6 @@ export const Txns = ({
       filterPlaceholder: t('list.filterBlock'),
       header: t('list.block'),
       id: 'block',
-      skeletonWidth: 'w-20',
     },
     {
       cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
@@ -172,7 +172,6 @@ export const Txns = ({
       csvValue: (txn) => txn.block?.block_timestamp ?? '',
       header: <TimestampToggle />,
       id: 'age',
-      skeletonWidth: 'w-24',
     },
   ];
 
@@ -248,7 +247,7 @@ export const Txns = ({
                 href={href}
                 key={label}
                 label={label}
-                loading={loading || !txnStats}
+                loading={!!loading}
                 skeletonIcon={skeletonIcon}
                 skeletonWidth={skeletonWidth}
                 value={value}
@@ -268,7 +267,7 @@ export const Txns = ({
             header={
               <SkeletonSlot
                 fallback={<Skeleton className="w-40" />}
-                loading={loading || !txnCount}
+                loading={!!loading}
               >
                 {() => {
                   const count = txnCount?.count;
@@ -280,7 +279,7 @@ export const Txns = ({
                 }}
               </SkeletonSlot>
             }
-            loading={loading || !!txns?.errors}
+            loading={!!loading}
             onClear={onClear}
             onFilter={onFilter}
             onPaginationNavigate={onPaginate}

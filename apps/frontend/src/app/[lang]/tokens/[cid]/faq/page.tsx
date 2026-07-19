@@ -6,6 +6,7 @@ import {
   fetchFTContractHolderCount,
   fetchFTContractTxnCount,
 } from '@/data/tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/tokens/[cid]/faq'>;
 
@@ -15,6 +16,7 @@ const FaqPage = async ({ params }: Props) => {
   const deploymentsPromise = fetchDeployments(cid);
   const txnCountPromise = fetchFTContractTxnCount(cid, {});
   const holderCountPromise = fetchFTContractHolderCount(cid);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<TokenFaq loading />}>

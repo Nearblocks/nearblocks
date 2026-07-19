@@ -4,6 +4,7 @@ import {
   fetchMTContractTokenCount,
   fetchMTContractTokens,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/mt-tokens/[cid]/inventory/nfts'>;
 
@@ -15,6 +16,7 @@ const NftTokensPage = async ({ params, searchParams }: Props) => {
     type: 'nft',
   });
   const tokenCountPromise = fetchMTContractTokenCount(cid, { type: 'nft' });
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<MtNftTokenList cid={cid} loading />}>

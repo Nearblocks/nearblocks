@@ -9,6 +9,7 @@ import {
   fetchStakingCount as fetchAddressStakingCount,
 } from '@/data/address/staking';
 import { fetchStaking, fetchStakingCount } from '@/data/staking';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/staking-txns'>;
@@ -38,6 +39,7 @@ const StakingTxnsPage = async ({ params, searchParams }: Props) => {
   if (account) {
     const stakingPromise = fetchAddressStaking(account, filters);
     const stakingCountPromise = fetchAddressStakingCount(account, filters);
+    await holdNav();
 
     return (
       <>
@@ -56,6 +58,7 @@ const StakingTxnsPage = async ({ params, searchParams }: Props) => {
 
   const stakingPromise = fetchStaking(filters);
   const stakingCountPromise = fetchStakingCount(filters);
+  await holdNav();
 
   return (
     <>

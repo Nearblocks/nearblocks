@@ -90,7 +90,13 @@ const PendingMarker = () => {
   );
 };
 
-export const Link = ({ children, className, href, ...props }: Props) => {
+export const Link = ({
+  children,
+  className,
+  href,
+  prefetch,
+  ...props
+}: Props) => {
   const { locale } = useLocale();
 
   const localizedHref = useMemo(
@@ -106,6 +112,11 @@ export const Link = ({ children, className, href, ...props }: Props) => {
         '[&:has([data-link-pending=true])]:cursor-progress',
       )}
       href={localizedHref}
+      // Prefetching caches a per-route static shell whose Suspense fallbacks
+      // the router commits instantly on click — bypassing holdNav and
+      // flashing skeletons even when data resolves quickly. Opt out so
+      // navigations wait (on the current page) for the held response.
+      prefetch={prefetch ?? false}
     >
       <PendingMarker />
       {children}

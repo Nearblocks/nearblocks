@@ -28,6 +28,7 @@ export const NftTokens = ({
   const { t } = useLocale('nfts');
   const searchParams = useSearchParams();
   const tokens = !loading && nftTokensPromise ? use(nftTokensPromise) : null;
+  if (tokens?.errors?.length) throw new Error('Failed to load tokens');
   const tokenCount =
     !loading && nftTokenCountPromise ? use(nftTokenCountPromise) : null;
 
@@ -52,6 +53,12 @@ export const NftTokens = ({
       enableSort: true,
       header: t('tokens.token'),
       id: 'token',
+      skeletonCell: (
+        <span className="flex items-center gap-2">
+          <Skeleton className="size-5 shrink-0 rounded-full" />
+          <Skeleton className="w-24" />
+        </span>
+      ),
       sortName: 'name',
     },
     {
@@ -105,7 +112,7 @@ export const NftTokens = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !tokenCount}
+              loading={!!loading}
             >
               {() => {
                 const count = tokenCount?.data?.count ?? 0;
@@ -122,7 +129,7 @@ export const NftTokens = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!tokens?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           onSortNavigate={onSort}
           pagination={tokens?.meta}

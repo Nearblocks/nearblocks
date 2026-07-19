@@ -1,11 +1,14 @@
 'use client';
 
 import { CircleUserRound } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { useLocale } from '@/hooks/use-locale';
 import { useWallet } from '@/hooks/use-wallet';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
+
+const INIT_GRACE_MS = 4000;
 
 type Props = {
   className?: string;
@@ -17,6 +20,14 @@ export const Wallet = ({ className }: Props) => {
   const connect = useWallet((s) => s.connect);
   const disconnect = useWallet((s) => s.disconnect);
   const isInitialized = useWallet((s) => s.isInitialized);
+  // If the wallet SDK never initializes (blocked scripts, misconfig), stop
+  // pulsing and show the sign-in label instead of a permanent skeleton.
+  const [graceOver, setGraceOver] = useState(false);
+
+  useEffect(() => {
+    const id = setTimeout(() => setGraceOver(true), INIT_GRACE_MS);
+    return () => clearTimeout(id);
+  }, []);
 
   const handleClick = async () => {
     try {
@@ -30,6 +41,8 @@ export const Wallet = ({ className }: Props) => {
     }
   };
 
+  const showLabel = isInitialized || graceOver;
+
   return (
     <button
       className={cn(
@@ -42,10 +55,12 @@ export const Wallet = ({ className }: Props) => {
       type="button"
     >
       <CircleUserRound className="size-4 shrink-0" />
-      {isInitialized ? (
+      {showLabel ? (
         <span className="truncate">{account ?? t('menu.wallet.signIn')}</span>
       ) : (
-        <Skeleton className="h-4 w-14" />
+        <span className="block">
+          <Skeleton className="w-14" />
+        </span>
       )}
     </button>
   );

@@ -39,7 +39,11 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
               <p className="flex min-w-30 items-center gap-1">
                 <NearCircle className="size-4" />{' '}
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-20" />
+                    </span>
+                  }
                   loading={!!loading}
                 >
                   {() =>
@@ -58,7 +62,11 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-20" />
+                    </span>
+                  }
                   loading={!!loading}
                 >
                   {() =>
@@ -77,7 +85,7 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
             <ListRight>
               <p className="min-w-30">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={<Skeleton className="w-56 max-w-full" />}
                   loading={!!loading}
                 >
                   {() =>

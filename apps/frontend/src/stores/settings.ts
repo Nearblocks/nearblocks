@@ -68,10 +68,15 @@ export const createSettingsStore = (
       /* eslint-enable perfectionist/sort-objects */
       {
         // v1: reset the active provider so existing users pick up the proxied default
+        // v2: reset providers pinned to the deprecated near.org RPC aliases
         migrate: (persisted, version) => {
           const state = persisted as Partial<SettingsState>;
 
           if (version < 1) {
+            return { ...state, provider: null };
+          }
+
+          if (version < 2 && state.provider?.url.includes('.near.org')) {
             return { ...state, provider: null };
           }
 
@@ -99,7 +104,7 @@ export const createSettingsStore = (
                 setItem: () => void 0,
               },
         ),
-        version: 1,
+        version: 2,
       },
     ),
   );

@@ -11,11 +11,15 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenAmount } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import {
+  MethodBadge,
+  TxnDirectionIcon,
+  TxnDirectionSkeleton,
+  TxnStatusIcon,
+} from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -32,6 +36,7 @@ export const TokenTransfers = ({
 }: Props) => {
   const { t } = useLocale('fts');
   const txn = !loading && txnsPromise ? use(txnsPromise) : null;
+  if (txn?.errors?.length) throw new Error('Failed to load transfers');
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const pathname = usePathname();
@@ -42,9 +47,10 @@ export const TokenTransfers = ({
   const columns: DataTableColumnDef<FTTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (ft) =>
@@ -62,15 +68,10 @@ export const TokenTransfers = ({
       id: 'txn_hash',
     },
     {
-      cell: (ft) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={ft.cause} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (ft) => <MethodBadge text={ft.cause} />,
       header: t('transfers.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-[80px] rounded-md" />,
     },
     {
       cell: (ft) => (
@@ -90,6 +91,7 @@ export const TokenTransfers = ({
       className: 'w-12',
       header: '',
       id: 'direction',
+      skeletonCell: <TxnDirectionSkeleton />,
     },
     {
       cell: (ft) => (
@@ -171,7 +173,7 @@ export const TokenTransfers = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !txnCount}
+              loading={!!loading}
             >
               {() => {
                 const count = txnCount?.data?.count;
@@ -189,7 +191,7 @@ export const TokenTransfers = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!txn?.errors}
+          loading={!!loading}
           onClear={(data) => {
             const params = buildParams(searchParams, {
               ...data,

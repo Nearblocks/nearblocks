@@ -76,7 +76,7 @@ export const FTsChart = ({ ftsPromise, loading }: Props) => {
 
     return {
       contracts,
-      isEmpty: stats?.length === 0,
+      isEmpty: !stats?.length,
       transfers,
       uniqueIn,
       uniqueOut,
@@ -87,7 +87,7 @@ export const FTsChart = ({ ftsPromise, loading }: Props) => {
     <div className="h-105">
       <SkeletonSlot
         fallback={<Skeleton className="h-105 w-full" />}
-        loading={loading || !stats}
+        loading={!!loading}
       >
         {() =>
           data.isEmpty ? (

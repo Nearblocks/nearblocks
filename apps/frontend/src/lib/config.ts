@@ -15,11 +15,6 @@ export const serverEnvSchema = z.object({
 });
 
 export const publicEnvSchema = z.object({
-  NEXT_PUBLIC_FORMBRICKS_API_HOST: z._default(
-    z.url(),
-    'https://app.formbricks.com',
-  ),
-  NEXT_PUBLIC_FORMBRICKS_ENV_ID: z.optional(z.string()),
   NEXT_PUBLIC_LEGACY_UI_URL: z.optional(z.url()),
   NEXT_PUBLIC_MAINNET_URL: z._default(z.url(), 'https://nearblocks.io'),
   NEXT_PUBLIC_NETWORK_ID: z.enum(ONetwork),
@@ -30,27 +25,19 @@ export const publicEnvSchema = z.object({
 
 export const defaultTheme = 'dark';
 
+// Free, anonymous, CORS-open providers only. The near.org endpoints were
+// deprecated in 2025 and now just alias FastNear's infrastructure; FastNear's
+// keyed endpoint duplicates the free one for anonymous use. dRPC is not
+// archival — queries for garbage-collected blocks fall back to other providers.
 export const rpcProviders = () => ({
   mainnet: [
     {
       name: 'FastNear',
-      url: 'https://rpc.mainnet.fastnear.com',
+      url: 'https://free.rpc.fastnear.com',
     },
     {
       name: 'FastNear (Archival)',
       url: 'https://archival-rpc.mainnet.fastnear.com',
-    },
-    {
-      name: 'NEAR (Archival)',
-      url: 'https://archival-rpc.mainnet.near.org',
-    },
-    {
-      name: 'NEAR',
-      url: 'https://rpc.mainnet.near.org',
-    },
-    {
-      name: 'FastNear Free',
-      url: 'https://free.rpc.fastnear.com',
     },
     {
       name: 'Lava Network',
@@ -64,23 +51,11 @@ export const rpcProviders = () => ({
   testnet: [
     {
       name: 'FastNear',
-      url: 'https://rpc.testnet.fastnear.com',
+      url: 'https://test.rpc.fastnear.com',
     },
     {
       name: 'FastNear (Archival)',
       url: 'https://archival-rpc.testnet.fastnear.com',
-    },
-    {
-      name: 'NEAR (Archival)',
-      url: 'https://archival-rpc.testnet.near.org',
-    },
-    {
-      name: 'NEAR',
-      url: 'https://rpc.testnet.near.org',
-    },
-    {
-      name: 'FastNear Free',
-      url: 'https://test.rpc.fastnear.com',
     },
     {
       name: 'Lava Network',
@@ -132,8 +107,6 @@ const verifierSchema = z.object({
 });
 
 const configSchema = z.object({
-  formbricksApiHost: publicEnvSchema.shape.NEXT_PUBLIC_FORMBRICKS_API_HOST,
-  formbricksEnvId: publicEnvSchema.shape.NEXT_PUBLIC_FORMBRICKS_ENV_ID,
   legacyUiUrl: publicEnvSchema.shape.NEXT_PUBLIC_LEGACY_UI_URL,
   mainnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_MAINNET_URL,
   metaTemplate: z.string(),
@@ -167,9 +140,6 @@ let cachedPublicConfig: null | PublicEnv = null;
 export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
-      NEXT_PUBLIC_FORMBRICKS_API_HOST:
-        process.env.NEXT_PUBLIC_FORMBRICKS_API_HOST,
-      NEXT_PUBLIC_FORMBRICKS_ENV_ID: process.env.NEXT_PUBLIC_FORMBRICKS_ENV_ID,
       NEXT_PUBLIC_LEGACY_UI_URL: process.env.NEXT_PUBLIC_LEGACY_UI_URL,
       NEXT_PUBLIC_MAINNET_URL: process.env.NEXT_PUBLIC_MAINNET_URL,
       NEXT_PUBLIC_NETWORK_ID: process.env.NEXT_PUBLIC_NETWORK_ID,
@@ -192,8 +162,6 @@ export const getRuntimeConfig = (): Config => {
     network === 'mainnet' ? '%s | NearBlocks' : 'TESTNET | %s | NearBlocks';
 
   return {
-    formbricksApiHost: cachedPublicConfig.NEXT_PUBLIC_FORMBRICKS_API_HOST,
-    formbricksEnvId: cachedPublicConfig.NEXT_PUBLIC_FORMBRICKS_ENV_ID,
     legacyUiUrl: cachedPublicConfig.NEXT_PUBLIC_LEGACY_UI_URL,
     mainnetUrl,
     metaTemplate,

@@ -155,6 +155,7 @@ export const txns = {
     title: 'NEAR Transaction {{tid}}',
   },
   title: 'Latest NEAR Protocol Transactions',
+  titleByAccount: 'Transaksi untuk',
   titleByBlock: 'Transactions in Block',
   transfer: {
     allTransfers: 'All Transfers',

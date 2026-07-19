@@ -6129,11 +6129,6 @@
   dependencies:
     tslib "2"
 
-"@formbricks/js@^4.4.0":
-  version "4.4.0"
-  resolved "https://registry.yarnpkg.com/@formbricks/js/-/js-4.4.0.tgz#5dad48a5afd481fc521ac3746bf440933c762cae"
-  integrity sha512-97nu0lOhsDXmymE2bwg+PJqCXD7gIl5YbUaXWnvEGdRwyKmPZ3hFPEmw05G3y5xqjjd2XkmfuIYNP8x6WVYwMw==
-
 "@godaddy/terminus@4.12.1":
   version "4.12.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.12.1.tgz#c4fdc280a4ac9655d4734250e22299a4ad46c54c"

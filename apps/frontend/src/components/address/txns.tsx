@@ -13,7 +13,7 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
@@ -24,7 +24,6 @@ import {
 } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -50,6 +49,7 @@ export const Txns = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  if (txns?.errors?.length) throw new Error('Failed to load transactions');
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const base = basePath ?? `/address/${resolvedAddress}`;
@@ -89,9 +89,10 @@ export const Txns = ({
   const columns: DataTableColumnDef<AccountTxn>[] = [
     {
       cell: (txn) => <TxnStatusIcon status={txn.outcomes?.status} />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (txn) => (
@@ -102,36 +103,38 @@ export const Txns = ({
           </Truncate>
         </Link>
       ),
+      className: 'w-44',
+      csvLabel: 'Transaction Hash',
+      csvValue: (txn) => txn.transaction_hash,
       header: t('txns.columns.txnHash'),
       id: 'txn_hash',
     },
     {
-      cell: (txn) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText
-              as="code"
-              className="max-w-20"
-              text={actionMethod(txn.actions)}
-            />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (txn) => <MethodBadge text={actionMethod(txn.actions)} />,
+      csvLabel: 'Method',
+      csvValue: (txn) => actionMethod(txn.actions),
       header: t('txns.columns.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-[114px] rounded-md" />,
     },
     {
       cell: (txn) => (
-        <span className="flex items-center gap-1">
+        <span className="flex min-w-0 items-center gap-1">
           <NearCircle className="size-4" />
-          {nearFormat(txn.actions_agg?.deposit)}
+          <span className="truncate">
+            {nearFormat(txn.actions_agg?.deposit)}
+          </span>
         </span>
       ),
+      csvLabel: 'Deposit Value (NEAR)',
+      csvValue: (txn) => nearFormat(txn.actions_agg?.deposit),
       header: t('txns.columns.depositValue'),
       id: 'deposit',
     },
     {
       cell: (txn) => <AccountLink account={txn.signer_account_id} />,
+      csvLabel: 'From',
+      csvValue: (txn) => txn.signer_account_id ?? '',
       enableFilter: true,
       filterName: 'signer',
       filterPlaceholder: t('txns.filterFrom'),
@@ -149,9 +152,12 @@ export const Txns = ({
       className: 'w-20',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
       cell: (txn) => <AccountLink account={txn.receiver_account_id} />,
+      csvLabel: 'To',
+      csvValue: (txn) => txn.receiver_account_id ?? '',
       enableFilter: true,
       filterName: 'receiver',
       filterPlaceholder: t('txns.filterTo'),
@@ -194,13 +200,16 @@ export const Txns = ({
           }
           columns={columns}
           data={txns?.data}
+          downloadFilename={
+            resolvedAddress ? `nearblocks-txns-${resolvedAddress}` : undefined
+          }
           emptyMessage={t('txns.empty')}
           extraFilters={extraFilters}
           getRowKey={(txn) => txn.transaction_hash}
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !txnCount}
+              loading={!!loading}
             >
               {() => {
                 const count = txnCount?.count;
@@ -212,12 +221,19 @@ export const Txns = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!txns?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? txns?.meta : undefined}
         />
+        {/* Reserved while loading: the main-tab embed almost always has a
+            next page, so the footer vanishing would shift the layout. */}
+        {loading && !basePath && (
+          <div className="border-t px-4 py-3">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
         {!basePath && txns?.meta?.next_page && (
           <div className="border-t px-4 py-3">
             <Button asChild className="h-8 w-full" variant="ghost">

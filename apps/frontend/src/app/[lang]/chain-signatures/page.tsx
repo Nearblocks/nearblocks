@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Operators } from '@/components/chain-signatures/operators';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchMpcs } from '@/data/chain-signatures';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/chain-signatures'>;
@@ -23,6 +24,7 @@ export const generateMetadata = async ({
 
 const ChainSignaturesPage = async () => {
   const mpcsPromise = fetchMpcs();
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<Operators loading />}>

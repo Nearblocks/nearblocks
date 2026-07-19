@@ -6,7 +6,8 @@ import { use } from 'react';
 
 import { DailyTxnStats, PriceStats, Stats } from 'nb-schemas';
 
-import { PriceChange } from '@/components/price-change';
+import { Link } from '@/components/link';
+import { PriceChangeText } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
@@ -67,60 +68,74 @@ export const Overview = ({
         {network === 'mainnet' && (
           <>
             <div className="divide-border divide-y">
-              <div className="flex items-center gap-3 py-3">
+              <Link
+                className="group flex items-center gap-3 py-3"
+                href="/charts/near-price"
+              >
                 <div className="bg-muted rounded-lg p-3">
                   <Near className="size-6" />
                 </div>
                 <div>
-                  <h3 className="text-body-xs text-muted-foreground uppercase">
+                  <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                     {t('overview.price')}
                   </h3>
                   <p className="text-body-base text-foreground/80 mt-0.5 font-normal whitespace-nowrap">
                     <SkeletonSlot
-                      fallback={<Skeleton className="h-6 w-45" />}
-                      loading={loading || !stats}
+                      fallback={<Skeleton className="w-45" />}
+                      loading={!!loading}
                     >
-                      {() => (
-                        <>
-                          {currencyFormat(stats!.near_price)}{' '}
-                          <span className="text-muted-foreground">
-                            @{' '}
-                            {numberFormat(stats!.near_btc_price, {
-                              maximumFractionDigits: 6,
-                            })}{' '}
-                            BTC
-                          </span>{' '}
-                          <PriceChange change={stats!.change_24h} />
-                        </>
-                      )}
+                      {() =>
+                        stats ? (
+                          <>
+                            {currencyFormat(stats.near_price)}{' '}
+                            <span className="text-muted-foreground">
+                              @{' '}
+                              {numberFormat(stats.near_btc_price, {
+                                maximumFractionDigits: 6,
+                              })}{' '}
+                              BTC
+                            </span>{' '}
+                            <PriceChangeText change={stats.change_24h} />
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">N/A</span>
+                        )
+                      }
                     </SkeletonSlot>
                   </p>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 py-3">
+              </Link>
+              <Link
+                className="group flex items-center gap-3 py-3"
+                href="/charts/market-cap"
+              >
                 <div className="bg-muted rounded-lg p-3">
                   <Globe className="size-6" />
                 </div>
                 <div>
-                  <h3 className="text-body-xs text-muted-foreground uppercase">
+                  <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                     {t('overview.marketCap')}
                   </h3>
                   <p className="text-body-base text-foreground/80 mt-0.5 font-normal">
                     <SkeletonSlot
                       fallback={<Skeleton className="w-30" />}
-                      loading={loading || !stats}
+                      loading={!!loading}
                     >
-                      {() => (
-                        <>
-                          {currencyFormat(stats!.market_cap, {
-                            maximumFractionDigits: 0,
-                          })}
-                        </>
-                      )}
+                      {() =>
+                        stats ? (
+                          <>
+                            {currencyFormat(stats.market_cap, {
+                              maximumFractionDigits: 0,
+                            })}
+                          </>
+                        ) : (
+                          <span className="text-muted-foreground">N/A</span>
+                        )
+                      }
                     </SkeletonSlot>
                   </p>
                 </div>
-              </div>
+              </Link>
             </div>
             <Separator className="lg:hidden" />
             <Separator
@@ -135,50 +150,65 @@ export const Overview = ({
               <ArrowRightLeft className="size-6" />
             </div>
             <div className="flex grow flex-wrap justify-between gap-2">
-              <div>
-                <h3 className="text-body-xs text-muted-foreground uppercase">
+              <Link className="group block" href="/charts/txns">
+                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                   {t('overview.transactions')}
                 </h3>
                 <p className="text-body-base text-foreground/80 mt-0.5 font-normal">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-30" />}
-                    loading={loading || !stats}
+                    loading={!!loading}
                   >
-                    {() => (
-                      <>
-                        {numberFormat(stats!.total_txns, {
-                          maximumFractionDigits: 2,
-                          notation: 'compact',
-                        })}{' '}
-                        <span className="text-body-sm text-muted-foreground">
-                          ({numberFormat(stats!.tps)} TPS)
-                        </span>
-                      </>
-                    )}
+                    {() =>
+                      stats ? (
+                        <>
+                          {numberFormat(stats.total_txns, {
+                            maximumFractionDigits: 2,
+                            notation: 'compact',
+                          })}{' '}
+                          <span className="text-body-sm text-muted-foreground">
+                            ({numberFormat(stats.tps)} TPS)
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )
+                    }
                   </SkeletonSlot>
                 </p>
-              </div>
-              <div className="ml-auto text-right">
-                <h3 className="text-body-xs text-muted-foreground uppercase">
+              </Link>
+              <Link
+                className="group ml-auto block text-right"
+                href="/charts/txn-fee"
+              >
+                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                   {t('overview.gas')}
                 </h3>
                 <p className="text-body-base text-foreground/80 mt-0.5 flex items-center gap-1 font-normal">
                   <SkeletonSlot
-                    fallback={<Skeleton className="w-32" />}
-                    loading={loading || !stats}
+                    fallback={
+                      <span className="block">
+                        <Skeleton className="w-32" />
+                      </span>
+                    }
+                    loading={!!loading}
                   >
-                    {() => (
-                      <>
-                        <NearCircle className="size-4" />{' '}
-                        {gasFormat(stats!.gas_price, {
-                          maximumSignificantDigits: 4,
-                        })}{' '}
-                        / TGas
-                      </>
-                    )}
+                    {() =>
+                      stats ? (
+                        <>
+                          <NearCircle className="size-4" />{' '}
+                          {gasFormat(stats.gas_price, {
+                            maximumSignificantDigits: 4,
+                          })}{' '}
+                          / TGas
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )
+                    }
                   </SkeletonSlot>
                 </p>
-              </div>
+              </Link>
             </div>
           </div>
           <div className="flex items-center gap-3 py-3">
@@ -186,51 +216,66 @@ export const Overview = ({
               <Pickaxe className="size-6" />
             </div>
             <div className="flex grow flex-wrap items-center gap-2">
-              <div>
-                <h3 className="text-body-xs text-muted-foreground uppercase">
+              <Link className="group block" href="/validators">
+                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                   {t('overview.validators')}
                 </h3>
                 <p className="text-body-base text-foreground/80 mt-0.5">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-10" />}
-                    loading={loading || !stats}
+                    loading={!!loading}
                   >
-                    {() => <>{numberFormat(stats!.nodes_online)}</>}
+                    {() =>
+                      stats ? (
+                        <>{numberFormat(stats.nodes_online)}</>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )
+                    }
                   </SkeletonSlot>
                 </p>
-              </div>
-              <div className="ml-auto text-right">
-                <h3 className="text-body-xs text-muted-foreground uppercase">
+              </Link>
+              <Link
+                className="group ml-auto block text-right"
+                href="/charts/blocks"
+              >
+                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                   {t('overview.blockTime')}
                 </h3>
                 <p className="text-body-base text-foreground/80 mt-0.5">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-15" />}
-                    loading={loading || !stats}
+                    loading={!!loading}
                   >
-                    {() => (
-                      <>
-                        {numberFormat(stats!.avg_block_time, {
-                          maximumFractionDigits: 4,
-                        })}
-                        s
-                      </>
-                    )}
+                    {() =>
+                      stats ? (
+                        <>
+                          {numberFormat(stats.avg_block_time, {
+                            maximumFractionDigits: 4,
+                          })}
+                          s
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )
+                    }
                   </SkeletonSlot>
                 </p>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
         <Separator className={sep1Class} />
         <Separator className={sep2Class} orientation="vertical" />
         <div className={cn(chartClass, 'flex flex-col justify-center')}>
-          <h3 className="text-body-xs text-muted-foreground pb-1 uppercase">
-            {t('chart.title')}
-          </h3>
+          <Link href="/charts/txns">
+            <h3 className="text-body-xs text-muted-foreground hover:text-link pb-1 uppercase transition-colors">
+              {t('chart.title')}
+            </h3>
+          </Link>
           <div>
             <SkeletonSlot
-              fallback={<Skeleton className="h-28 w-full" />}
+              fallback={<Skeleton className="h-28.75 w-full" />}
               loading={!!loading}
             >
               {() => <TxnsChart data={chartData} />}

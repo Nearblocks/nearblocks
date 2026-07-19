@@ -41,7 +41,9 @@ const StatBody = ({
         fallback={
           <>
             {skeletonIcon && <Skeleton className="size-4 rounded-full" />}
-            <Skeleton className={`h-5 ${skeletonWidth}`} />
+            <span className="block">
+              <Skeleton className={skeletonWidth} />
+            </span>
           </>
         }
         loading={!!loading}

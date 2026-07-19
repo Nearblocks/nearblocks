@@ -4,6 +4,7 @@ import { Blocks } from '@/components/blocks';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { fetchBlockCount, fetchBlocks, fetchBlockStats } from '@/data/blocks';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/blocks'>;
@@ -30,6 +31,7 @@ const BlocksPage = async ({ params, searchParams }: Props) => {
   const blocksPromise = fetchBlocks(filters);
   const blockCountPromise = fetchBlockCount();
   const blockStatsPromise = fetchBlockStats();
+  await holdNav();
 
   return (
     <>

@@ -6,6 +6,7 @@ import {
   fetchSubAccountCount,
   fetchSubAccounts,
 } from '@/data/address/subaccounts';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/address/[address]/subaccounts'>;
 
@@ -16,6 +17,7 @@ const SubAccountsPage = async ({ params, searchParams }: Props) => {
 
   const subAccountsPromise = fetchSubAccounts(address, filters);
   const subAccountCountPromise = fetchSubAccountCount(address);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<SubAccounts loading />}>

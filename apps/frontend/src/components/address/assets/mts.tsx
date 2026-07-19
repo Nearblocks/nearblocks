@@ -80,6 +80,12 @@ export const MTAssets = ({
       className: 'w-60',
       header: t('assets.mts.token'),
       id: 'token',
+      skeletonCell: (
+        <span className="flex items-center gap-2">
+          <Skeleton className="size-5 shrink-0 rounded-full" />
+          <Skeleton className="w-24" />
+        </span>
+      ),
     },
     {
       cell: (mt) =>
@@ -123,7 +129,7 @@ export const MTAssets = ({
         header={
           <SkeletonSlot
             fallback={<Skeleton className="w-40" />}
-            loading={loading || !count}
+            loading={!!loading}
           >
             {() => {
               const value = count?.count ?? '0';
@@ -140,9 +146,11 @@ export const MTAssets = ({
             }}
           </SkeletonSlot>
         }
-        loading={loading || !mts}
+        loading={!!loading}
         onPaginationNavigate={onPaginate}
+        paginated={false}
         pagination={mts?.meta}
+        skeletonRows={10}
       />
     </div>
   );

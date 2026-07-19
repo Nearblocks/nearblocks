@@ -80,6 +80,12 @@ export const FTAssets = ({
       className: 'w-60',
       header: t('assets.fts.token'),
       id: 'token',
+      skeletonCell: (
+        <span className="flex items-center gap-2">
+          <Skeleton className="size-5 shrink-0 rounded-full" />
+          <Skeleton className="w-24" />
+        </span>
+      ),
     },
     {
       cell: (ft) =>
@@ -119,7 +125,7 @@ export const FTAssets = ({
         header={
           <SkeletonSlot
             fallback={<Skeleton className="w-40" />}
-            loading={loading || !count}
+            loading={!!loading}
           >
             {() => {
               const value = count?.count ?? '0';
@@ -136,9 +142,11 @@ export const FTAssets = ({
             }}
           </SkeletonSlot>
         }
-        loading={loading || !fts}
+        loading={!!loading}
         onPaginationNavigate={onPaginate}
+        paginated={false}
         pagination={fts?.meta}
+        skeletonRows={10}
       />
     </div>
   );

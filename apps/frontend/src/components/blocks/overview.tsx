@@ -54,19 +54,27 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-25" />}
-                  loading={loading || !block}
+                  fallback={
+                    <span className="flex h-7 items-center">
+                      <Skeleton className="w-25" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <>
-                      {numberFormat(block!.block_height)}{' '}
-                      <Copy
-                        className="text-muted-foreground"
-                        size="icon-xs"
-                        text={block!.block_height}
-                      />
-                    </>
-                  )}
+                  {() =>
+                    block ? (
+                      <>
+                        {numberFormat(block.block_height)}{' '}
+                        <Copy
+                          className="text-muted-foreground"
+                          size="icon-xs"
+                          text={block.block_height}
+                        />
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -84,19 +92,27 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="min-w-30 break-all">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-70" />}
-                  loading={loading || !block}
+                  fallback={
+                    <span className="flex h-12 items-center min-[500px]:h-7">
+                      <Skeleton className="w-70 max-w-full" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <>
-                      {block!.block_hash}{' '}
-                      <Copy
-                        className="text-muted-foreground inline-flex align-middle"
-                        size="icon-xs"
-                        text={block!.block_hash}
-                      />
-                    </>
-                  )}
+                  {() =>
+                    block ? (
+                      <>
+                        {block.block_hash}{' '}
+                        <Copy
+                          className="text-muted-foreground inline-flex align-middle"
+                          size="icon-xs"
+                          text={block.block_hash}
+                        />
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -114,10 +130,20 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="flex items-center">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-60" />}
-                  loading={loading || !block}
+                  fallback={
+                    <span className="flex h-12 items-center min-[480px]:h-7">
+                      <Skeleton className="w-60" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => <LongDate ns={block!.block_timestamp} />}
+                  {() =>
+                    block ? (
+                      <LongDate ns={block.block_timestamp} />
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -135,15 +161,23 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="flex items-center gap-1">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-30" />}
-                  loading={loading || !block}
+                  fallback={
+                    <span className="flex h-7 items-center">
+                      <Skeleton className="w-30" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <AccountLink
-                      account={block!.author_account_id}
-                      textClassName="max-w-60"
-                    />
-                  )}
+                  {() =>
+                    block ? (
+                      <AccountLink
+                        account={block.author_account_id}
+                        textClassName="max-w-60"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -161,34 +195,46 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-40" />}
-                  loading={loading || !block}
+                  fallback={<Skeleton className="h-4.5 w-40 rounded-md" />}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex flex-wrap items-center gap-1.5">
-                      <Badge asChild variant="teal">
-                        <Link
-                          className="text-link"
-                          href={`/txns?block=${block!.block_hash}`}
+                  {() =>
+                    block ? (
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <Badge
+                          asChild
+                          className="text-body-xs px-1.5 py-0.5"
+                          variant="teal"
                         >
-                          {t('overview.transactions', {
-                            count: numberFormat(block!.transactions_agg.count),
-                          })}
-                        </Link>
-                      </Badge>
-                      <span className="text-muted-foreground">and</span>
-                      <Badge asChild variant="teal">
-                        <Link
-                          className="text-link"
-                          href={`/receipts?block=${block!.block_hash}`}
+                          <Link
+                            className="text-link"
+                            href={`/txns?block=${block.block_hash}`}
+                          >
+                            {t('overview.transactions', {
+                              count: numberFormat(block.transactions_agg.count),
+                            })}
+                          </Link>
+                        </Badge>
+                        <span className="text-muted-foreground">and</span>
+                        <Badge
+                          asChild
+                          className="text-body-xs px-1.5 py-0.5"
+                          variant="teal"
                         >
-                          {t('overview.receipts', {
-                            count: numberFormat(block!.receipts_agg.count),
-                          })}
-                        </Link>
-                      </Badge>
-                    </span>
-                  )}
+                          <Link
+                            className="text-link"
+                            href={`/receipts?block=${block.block_hash}`}
+                          >
+                            {t('overview.receipts', {
+                              count: numberFormat(block.receipts_agg.count),
+                            })}
+                          </Link>
+                        </Badge>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -212,17 +258,18 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-25" />}
-                  loading={loading || !block}
+                  loading={!!loading}
                 >
                   {() => {
-                    const used = Number(block!.chunks_agg.gas_used);
-                    const limit = Number(block!.chunks_agg.gas_limit);
+                    if (!block) {
+                      return <span className="text-muted-foreground">N/A</span>;
+                    }
+                    const used = Number(block.chunks_agg.gas_used);
+                    const limit = Number(block.chunks_agg.gas_limit);
                     const utilization = limit > 0 ? (used / limit) * 100 : 0;
                     return (
                       <span className="flex flex-wrap items-center gap-2">
-                        <span>
-                          {gasFormat(block!.chunks_agg.gas_used)} Tgas
-                        </span>
+                        <span>{gasFormat(block.chunks_agg.gas_used)} Tgas</span>
                         <span className="text-muted-foreground text-body-sm">
                           ({utilization.toFixed(2)}%)
                         </span>
@@ -247,11 +294,15 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-20" />}
-                  loading={loading || !block}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span>{gasFormat(block!.chunks_agg.gas_limit)} Tgas</span>
-                  )}
+                  {() =>
+                    block ? (
+                      <span>{gasFormat(block.chunks_agg.gas_limit)} Tgas</span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -270,17 +321,21 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-30" />}
-                  loading={loading || !block}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex items-center gap-1">
-                      <NearCircle className="size-4" />
-                      {gasFormat(block!.gas_price, {
-                        maximumSignificantDigits: 4,
-                      })}{' '}
-                      / TGas
-                    </span>
-                  )}
+                  {() =>
+                    block ? (
+                      <span className="flex items-center gap-1">
+                        <NearCircle className="size-4" />
+                        {gasFormat(block.gas_price, {
+                          maximumSignificantDigits: 4,
+                        })}{' '}
+                        / TGas
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -299,14 +354,18 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-25" />}
-                  loading={loading || !block}
+                  loading={!!loading}
                 >
-                  {() => (
-                    <span className="flex items-center gap-1">
-                      <NearCircle className="size-4" />
-                      {gasFee(block!.chunks_agg.gas_used, block!.gas_price)}
-                    </span>
-                  )}
+                  {() =>
+                    block ? (
+                      <span className="flex items-center gap-1">
+                        <NearCircle className="size-4" />
+                        {gasFee(block.chunks_agg.gas_used, block.gas_price)}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -325,9 +384,15 @@ export const Overview = ({ blockPromise, loading }: Props) => {
               <p>
                 <SkeletonSlot
                   fallback={<Skeleton className="w-10" />}
-                  loading={loading || !block}
+                  loading={!!loading}
                 >
-                  {() => <>{numberFormat(block!.chunks_agg.count)}</>}
+                  {() =>
+                    block ? (
+                      <>{numberFormat(block.chunks_agg.count)}</>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>
@@ -345,24 +410,32 @@ export const Overview = ({ blockPromise, loading }: Props) => {
             <ListRight>
               <p className="min-w-30 break-all">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-7 w-70" />}
-                  loading={loading || !block}
+                  fallback={
+                    <span className="flex h-12 items-center min-[500px]:h-7">
+                      <Skeleton className="w-70 max-w-full" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
-                  {() => (
-                    <>
-                      <Link
-                        className="text-link"
-                        href={`/blocks/${block!.prev_block_hash}`}
-                      >
-                        {block!.prev_block_hash}
-                      </Link>{' '}
-                      <Copy
-                        className="text-muted-foreground inline-flex align-middle"
-                        size="icon-xs"
-                        text={block!.prev_block_hash}
-                      />
-                    </>
-                  )}
+                  {() =>
+                    block ? (
+                      <>
+                        <Link
+                          className="text-link"
+                          href={`/blocks/${block.prev_block_hash}`}
+                        >
+                          {block.prev_block_hash}
+                        </Link>{' '}
+                        <Copy
+                          className="text-muted-foreground inline-flex align-middle"
+                          size="icon-xs"
+                          text={block.prev_block_hash}
+                        />
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )
+                  }
                 </SkeletonSlot>
               </p>
             </ListRight>

@@ -11,6 +11,7 @@ import {
   fetchMTTokenHolderCount,
   fetchMTTokenTxnCount,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
@@ -60,6 +61,7 @@ const FtTokenLayout = async ({ children, params }: Props) => {
   const tokenPromise = fetchMTToken(cid, tid);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, {});
   const holderCountPromise = fetchMTTokenHolderCount(cid, tid);
+  await holdNav();
 
   return (
     <>

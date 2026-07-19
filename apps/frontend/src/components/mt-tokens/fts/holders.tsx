@@ -46,6 +46,7 @@ export const MtFtHolders = ({
 }: Props) => {
   const { t } = useLocale('mts');
   const holders = !loading && holdersPromise ? use(holdersPromise) : null;
+  if (holders?.errors?.length) throw new Error('Failed to load holders');
   const holderCount =
     !loading && holderCountPromise ? use(holderCountPromise) : null;
   const tokenRes = !loading && tokenPromise ? use(tokenPromise) : null;
@@ -115,7 +116,7 @@ export const MtFtHolders = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !holderCount}
+              loading={!!loading}
             >
               {() => {
                 const count = holderCount?.data?.count ?? 0;
@@ -132,7 +133,7 @@ export const MtFtHolders = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!holders?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           pagination={holders?.meta}
         />

@@ -63,7 +63,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-7 w-60" />}
+            fallback={
+              <span className="flex h-7 items-center">
+                <Skeleton className="w-60" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -93,7 +97,7 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-6 w-20" />}
+            fallback={<Skeleton className="h-5 w-20 rounded-md" />}
             loading={!receipt || loading}
           >
             {() => <TxnStatus status={receipt!.outcome.status} />}
@@ -114,7 +118,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-7 w-25" />}
+            fallback={
+              <span className="flex h-7 items-center">
+                <Skeleton className="w-25" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -149,7 +157,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-6 w-60" />}
+            fallback={
+              <span className="flex h-7 items-center">
+                <Skeleton className="w-60" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -174,7 +186,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-7 w-40" />}
+            fallback={
+              <span className="flex h-7 items-center">
+                <Skeleton className="w-40" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -223,7 +239,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="h-7 w-30" />}
+            fallback={
+              <span className="flex h-7 items-center">
+                <Skeleton className="w-30" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -249,7 +269,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="w-20" />}
+            fallback={
+              <span className="block">
+                <Skeleton className="w-20" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -279,7 +303,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="w-30" />}
+            fallback={
+              <span className="block">
+                <Skeleton className="w-30" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (
@@ -305,7 +333,11 @@ export const ReceiptInspectRows = ({
         </ListLeft>
         <ListRight>
           <SkeletonSlot
-            fallback={<Skeleton className="w-30" />}
+            fallback={
+              <span className="block">
+                <Skeleton className="w-30" />
+              </span>
+            }
             loading={!receipt || loading}
           >
             {() => (

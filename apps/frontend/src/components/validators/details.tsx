@@ -1,7 +1,7 @@
 'use client';
 
 import { validators } from '@near-js/jsonrpc-client';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import useSWR from 'swr';
 
 import type { DataTableColumnDef } from '@/components/data-table';
@@ -66,6 +66,7 @@ export const NodeDetails = ({ node }: Props) => {
   const defaultProvider = useConfig((s) => s.config.provider);
   const rpcUrl = (provider || defaultProvider).url;
 
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'));
   const fromIndex = (page - 1) * PAGE_SIZE;
@@ -108,7 +109,6 @@ export const NodeDetails = ({ node }: Props) => {
       ),
       header: t('nodeDetails.columns.stakedBalance'),
       id: 'staked_balance',
-      skeletonWidth: 'w-28',
     },
     {
       cell: (row) => (
@@ -119,7 +119,6 @@ export const NodeDetails = ({ node }: Props) => {
       ),
       header: t('nodeDetails.columns.unstakedBalance'),
       id: 'unstaked_balance',
-      skeletonWidth: 'w-28',
     },
   ];
 
@@ -198,6 +197,11 @@ export const NodeDetails = ({ node }: Props) => {
   const hasPrevPage = page > 1;
 
   const isTopLoading = validatorsLoading || feeLoading;
+  // useView's SWR key is null until the settings store hydrates, and SWR
+  // reports isLoading=false for a null key — treat pre-hydration as loading
+  // so SSR/first paint shows the skeleton instead of an empty table.
+  const isDelegatorsLoading = delegatorsLoading || !hydrated;
+  const isTotalLoading = totalLoading || !hydrated;
 
   return (
     <div>
@@ -218,7 +222,10 @@ export const NodeDetails = ({ node }: Props) => {
                   {isTopLoading ? (
                     <Skeleton className="h-5 w-16" />
                   ) : status ? (
-                    <Badge variant={statusVariant(status)}>
+                    <Badge
+                      className="text-body-xs px-1.5 py-0.5"
+                      variant={statusVariant(status)}
+                    >
                       {statusLabel(status)}
                     </Badge>
                   ) : (
@@ -229,7 +236,7 @@ export const NodeDetails = ({ node }: Props) => {
               <ListItem>
                 <ListLeft>{t('nodeDetails.fee')}</ListLeft>
                 <ListRight>
-                  {feeLoading ? <Skeleton className="h-4 w-16" /> : fee ?? '-'}
+                  {feeLoading ? <Skeleton className="w-16" /> : fee ?? '-'}
                 </ListRight>
               </ListItem>
             </List>
@@ -250,10 +257,18 @@ export const NodeDetails = ({ node }: Props) => {
                 </ListLeft>
                 <ListRight>
                   {validatorsLoading ? (
-                    <Skeleton className="h-4 w-48" />
+                    <span className="flex flex-wrap items-center gap-2">
+                      <Skeleton className="h-5 w-16" />
+                      <span className="block">
+                        <Skeleton className="w-40" />
+                      </span>
+                    </span>
                   ) : (
                     <span className="flex flex-wrap items-center gap-2">
-                      <Badge variant={uptimeVariant(blocksRatio)}>
+                      <Badge
+                        className="text-body-xs px-1.5 py-0.5"
+                        variant={uptimeVariant(blocksRatio)}
+                      >
                         {blocksRatio.toFixed(2)} %
                       </Badge>
                       <span className="text-muted-foreground">
@@ -270,10 +285,18 @@ export const NodeDetails = ({ node }: Props) => {
                 <ListLeft>{t('nodeDetails.chunks')}</ListLeft>
                 <ListRight>
                   {validatorsLoading ? (
-                    <Skeleton className="h-4 w-48" />
+                    <span className="flex flex-wrap items-center gap-2">
+                      <Skeleton className="h-5 w-16" />
+                      <span className="block">
+                        <Skeleton className="w-40" />
+                      </span>
+                    </span>
                   ) : (
                     <span className="flex flex-wrap items-center gap-2">
-                      <Badge variant={uptimeVariant(chunksRatio)}>
+                      <Badge
+                        className="text-body-xs px-1.5 py-0.5"
+                        variant={uptimeVariant(chunksRatio)}
+                      >
                         {chunksRatio.toFixed(2)} %
                       </Badge>
                       <span className="text-muted-foreground">
@@ -297,16 +320,23 @@ export const NodeDetails = ({ node }: Props) => {
           data={delegatorsData}
           getRowKey={(row) => row.account_id}
           header={
-            totalLoading ? (
-              <Skeleton className="h-4 w-32" />
+            isTotalLoading ? (
+              <Skeleton className="w-32" />
             ) : total != null ? (
               t('nodeDetails.delegatorsTotal', { count: numberFormat(total) })
             ) : undefined
           }
-          loading={delegatorsLoading}
-          onPaginationNavigate={(_type, cursor) => `?page=${cursor}`}
+          loading={isDelegatorsLoading}
+          onPaginationNavigate={(type, cursor) =>
+            type === 'first' ? pathname : `${pathname}?page=${cursor}`
+          }
+          pageParamKey="page"
+          // Only reserve pager controls when a second page is plausible: keep
+          // the reservation while the total is unknown, drop it once the pool
+          // is known to fit one page.
+          paginated={isTotalLoading || (total ?? 0) > PAGE_SIZE}
           pagination={
-            delegatorsLoading
+            isDelegatorsLoading
               ? null
               : {
                   next_page: hasNextPage ? String(page + 1) : null,

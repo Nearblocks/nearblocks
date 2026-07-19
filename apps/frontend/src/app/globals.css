@@ -346,6 +346,13 @@
 }
 
 @layer base {
+  html {
+    /* iOS Safari font boosting inflates text inside wide scrollable
+       tables while leaving SVG icons at CSS size, breaking proportions. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

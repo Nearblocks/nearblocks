@@ -4,6 +4,7 @@ import {
   fetchMTContractTokenCount,
   fetchMTContractTokens,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/mt-tokens/[cid]/inventory'>;
 
@@ -15,6 +16,7 @@ const FtTokensPage = async ({ params, searchParams }: Props) => {
     type: 'ft',
   });
   const tokenCountPromise = fetchMTContractTokenCount(cid, { type: 'ft' });
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<MtFtTokenList cid={cid} loading />}>

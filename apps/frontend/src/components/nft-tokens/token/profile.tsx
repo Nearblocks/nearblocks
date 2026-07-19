@@ -19,8 +19,8 @@ type Props = {
 
 export const Profile = ({ cid, contractPromise, loading }: Props) => {
   const { t } = useLocale('nfts');
-  const result = !loading && contractPromise ? use(contractPromise) : null;
-  const contract = result?.data ?? null;
+  // Suspend until the contract resolves so this card streams in with its data.
+  if (!loading && contractPromise) void use(contractPromise);
 
   return (
     <Card>
@@ -37,8 +37,12 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="h-7 w-40" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-40" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => <AccountLink account={cid} textClassName="max-w-60" />}
               </SkeletonSlot>

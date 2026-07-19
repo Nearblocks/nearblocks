@@ -5,6 +5,7 @@ import {
   fetchMTTokenHolderCount,
   fetchMTTokenHolders,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken } from '@/lib/utils';
 
 type Props = {
@@ -21,6 +22,7 @@ const FtTokenHoldersPage = async ({ params, searchParams }: Props) => {
   const holdersPromise = fetchMTTokenHolders(cid, tid, filters);
   const holderCountPromise = fetchMTTokenHolderCount(cid, tid);
   const tokenPromise = fetchMTToken(cid, tid);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<MtFtHolders loading />}>

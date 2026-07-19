@@ -57,8 +57,12 @@ export const TokenFaq = ({
       <CardContent className="flex flex-col divide-y px-4 py-0">
         <div className="py-4">
           <SkeletonSlot
-            fallback={<Skeleton className="mb-3 h-4 w-50" />}
-            loading={loading || !contract}
+            fallback={
+              <span className="text-headline-sm mb-3 block">
+                <Skeleton className="w-50" />
+              </span>
+            }
+            loading={!!loading}
           >
             {() => (
               <h3 className="text-headline-sm mb-3">
@@ -67,8 +71,20 @@ export const TokenFaq = ({
             )}
           </SkeletonSlot>
           <SkeletonSlot
-            fallback={<Skeleton className="h-12 w-full" />}
-            loading={loading || !contract}
+            fallback={
+              <span className="text-body-sm block">
+                <span className="block">
+                  <Skeleton className="w-full" />
+                </span>
+                <span className="block">
+                  <Skeleton className="w-full" />
+                </span>
+                <span className="block">
+                  <Skeleton className="w-2/3" />
+                </span>
+              </span>
+            }
+            loading={!!loading}
           >
             {() => (
               <p className="text-body-sm text-muted-foreground">
@@ -133,11 +149,11 @@ export const TokenFaq = ({
         <div className="py-4">
           <SkeletonSlot
             fallback={
-              <div>
-                <Skeleton className="mb-3 h-4 w-80" />
-              </div>
+              <span className="text-headline-sm mb-3 block">
+                <Skeleton className="w-80" />
+              </span>
             }
-            loading={loading || !contract}
+            loading={!!loading}
           >
             {() => (
               <h3 className="text-headline-sm mb-3">
@@ -146,8 +162,17 @@ export const TokenFaq = ({
             )}
           </SkeletonSlot>
           <SkeletonSlot
-            fallback={<Skeleton className="h-6 w-3/5" />}
-            loading={loading || !contract}
+            fallback={
+              <span className="text-body-sm block">
+                <span className="block">
+                  <Skeleton className="w-full" />
+                </span>
+                <span className="block">
+                  <Skeleton className="w-1/2" />
+                </span>
+              </span>
+            }
+            loading={!!loading}
           >
             {() => (
               <p className="text-body-sm text-muted-foreground">
@@ -205,11 +230,11 @@ export const TokenFaq = ({
         <div className="py-4">
           <SkeletonSlot
             fallback={
-              <div>
-                <Skeleton className="mb-3 h-4 w-65" />
-              </div>
+              <span className="text-headline-sm mb-3 block">
+                <Skeleton className="w-65" />
+              </span>
             }
-            loading={loading || !contract}
+            loading={!!loading}
           >
             {() => (
               <h3 className="text-headline-sm mb-3">
@@ -218,8 +243,17 @@ export const TokenFaq = ({
             )}
           </SkeletonSlot>
           <SkeletonSlot
-            fallback={<Skeleton className="h-6 w-3/4" />}
-            loading={loading || !contract}
+            fallback={
+              <span className="text-body-sm block">
+                <span className="block">
+                  <Skeleton className="w-full" />
+                </span>
+                <span className="block">
+                  <Skeleton className="w-1/3" />
+                </span>
+              </span>
+            }
+            loading={!!loading}
           >
             {() => (
               <p className="text-body-sm text-muted-foreground">

@@ -10,7 +10,6 @@ import { IpfsSourceViewer } from '@/components/ipfs';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
-import { useView } from '@/hooks/use-rpc';
 import { bytesFormat } from '@/lib/format';
 import { detectWasmLanguage, downloadWasm, getCommitHash } from '@/lib/utils';
 import {
@@ -19,7 +18,6 @@ import {
 } from '@/types/types';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
-import { Skeleton } from '@/ui/skeleton';
 import { Textarea } from '@/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -27,28 +25,20 @@ import { Info } from './info';
 
 type Props = {
   contract: Contract;
+  // Resolved server-side by the page (over the upstream RPC) so the verified
+  // source section renders in the initial HTML instead of inserting itself
+  // above the Base64 section once client RPC resolves.
+  sourceMetadata: ContractSourceMetadata | null;
+  verifierResponse: ContractVerifierResponse | null;
 };
 
-export const ContractCode = ({ contract }: Props) => {
+export const ContractCode = ({
+  contract,
+  sourceMetadata,
+  verifierResponse,
+}: Props) => {
   const { t } = useLocale('address');
   const verifier = useConfig((s) => s.config.verifier);
-
-  const { data: sourceMetadata, isLoading: isLoadingMetadata } =
-    useView<ContractSourceMetadata | null>({
-      args: {},
-      contract: contract.account_id,
-      method: 'contract_source_metadata',
-    });
-  const { data: verifierResponse, isLoading: isLoadingVerifier } =
-    useView<ContractVerifierResponse | null>(
-      contract.code_hash
-        ? {
-            args: { code_hash: contract.code_hash },
-            contract: verifier.contract,
-            method: 'get_contracts_by_code_hash',
-          }
-        : null,
-    );
 
   const verifierData = useMemo(() => {
     return verifierResponse?.[0]?.[1] || null;
@@ -82,25 +72,7 @@ export const ContractCode = ({ contract }: Props) => {
         account={contract.account_id}
         isNep330={info.isNep330}
         isVerified={info.isVerified}
-        loading={isLoadingMetadata || isLoadingVerifier}
       />
-      {isLoadingMetadata || isLoadingVerifier ? (
-        <>
-          <div className="mb-6.5">
-            <Skeleton className="h-118 w-full lg:h-36.5" />
-          </div>
-          <div className="mb-2.5">
-            <Skeleton className="h-4 w-40" />
-          </div>
-          <div className="border-border overflow-hidden rounded-lg border">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div className="border-b px-3 py-2 last:border-b-0" key={i}>
-                <Skeleton className="h-6 w-full" />
-              </div>
-            ))}
-          </div>
-        </>
-      ) : null}
       {sourceMetadata && verifierData && (
         <>
           <div className="mb-4 grid xl:grid-cols-2">

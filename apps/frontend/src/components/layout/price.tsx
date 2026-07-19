@@ -4,7 +4,7 @@ import { use } from 'react';
 
 import { Stats } from 'nb-schemas';
 
-import { PriceChange } from '@/components/price-change';
+import { PriceChangeText } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { currencyFormat } from '@/lib/format';
@@ -25,17 +25,25 @@ export const NearPrice = ({ loading = false, statsPromise }: Props) => {
         {t('header.nearPrice')}:
       </span>
       <SkeletonSlot
-        fallback={<Skeleton className="h-4 w-25" />}
-        loading={loading || !stats || !stats.near_price}
+        fallback={
+          <span className="block">
+            <Skeleton className="w-25" />
+          </span>
+        }
+        loading={!!loading}
       >
-        {() => (
-          <>
-            <span className="text-link">
-              {currencyFormat(stats!.near_price)}
-            </span>{' '}
-            <PriceChange change={stats!.change_24h} />
-          </>
-        )}
+        {() =>
+          stats?.near_price ? (
+            <>
+              <span className="text-link">
+                {currencyFormat(stats.near_price)}
+              </span>{' '}
+              <PriceChangeText change={stats.change_24h} />
+            </>
+          ) : (
+            <span className="text-muted-foreground">N/A</span>
+          )
+        }
       </SkeletonSlot>
     </div>
   );

@@ -64,7 +64,11 @@ export const Overview = ({
               <p className="flex items-center gap-1">
                 <NearCircle className="size-4" />{' '}
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-20" />
+                    </span>
+                  }
                   loading={!!loading}
                 >
                   {() =>
@@ -84,7 +88,11 @@ export const Overview = ({
               <ListRight>
                 <p className="flex flex-wrap items-center gap-1">
                   <SkeletonSlot
-                    fallback={<Skeleton className="w-20" />}
+                    fallback={
+                      <span className="block">
+                        <Skeleton className="w-20" />
+                      </span>
+                    }
                     loading={!!loading}
                   >
                     {() =>

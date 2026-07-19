@@ -52,7 +52,16 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
         <ListRight>
           <div className="w-full">
             <SkeletonSlot
-              fallback={<Skeleton className="h-17.5 w-full" />}
+              fallback={
+                <span className="text-body-sm block">
+                  <span className="block">
+                    <Skeleton className="w-full" />
+                  </span>
+                  <span className="block">
+                    <Skeleton className="w-2/3" />
+                  </span>
+                </span>
+              }
               loading={!receipt || loading}
             >
               {() => {
@@ -123,7 +132,16 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
         <ListRight>
           <div className="w-full space-y-3">
             <SkeletonSlot
-              fallback={<Skeleton className="h-17.5 w-full" />}
+              fallback={
+                <span className="text-body-sm block">
+                  <span className="block">
+                    <Skeleton className="w-full" />
+                  </span>
+                  <span className="block">
+                    <Skeleton className="w-2/3" />
+                  </span>
+                </span>
+              }
               loading={!receipt || loading}
             >
               {() => (

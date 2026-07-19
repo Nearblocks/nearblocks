@@ -10,6 +10,7 @@ import { bytesFormat, nearFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
 import { Field, FieldContent, FieldLabel, FieldSet } from '@/ui/field';
 import { Input } from '@/ui/input';
+import { Skeleton } from '@/ui/skeleton';
 
 export const StorageCostForm = () => {
   const { t } = useLocale('tools');
@@ -94,9 +95,15 @@ export const StorageCostForm = () => {
       {!storageAmountPerByte && !configError && (
         <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
           <div className="space-y-3">
-            <div className="bg-muted h-4 w-1/3 animate-pulse rounded" />
-            <div className="bg-muted h-4 w-1/2 animate-pulse rounded" />
-            <div className="bg-muted h-3 w-full animate-pulse rounded" />
+            <span className="block">
+              <Skeleton className="w-1/3" />
+            </span>
+            <span className="block">
+              <Skeleton className="w-1/2" />
+            </span>
+            <span className="block">
+              <Skeleton className="w-full" />
+            </span>
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { ContractMethods } from '@/components/address/contract/methods';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchContract, fetchSchema } from '@/data/address/contract';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/address/[address]/contract/methods'>;
 
@@ -12,6 +13,8 @@ const MethodsPage = async ({ params }: Props) => {
   const schemaPromise = fetchSchema(address);
 
   if (!contract) return redirect(`/address/${address}`);
+
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<ContractMethods loading />}>

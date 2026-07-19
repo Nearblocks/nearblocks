@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- data is fully awaited before render (no streaming boundary), so the segment holds implicitly */
 import type { Metadata } from 'next';
 
 import { VerifyContract } from '@/components/address/contract/verifier';

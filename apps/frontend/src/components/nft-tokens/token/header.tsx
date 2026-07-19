@@ -41,11 +41,13 @@ export const NftTokenHeader = ({
     <SkeletonSlot
       fallback={
         <span className="flex items-center gap-2">
-          <Skeleton className="size-6 rounded-full" />
-          <Skeleton className="w-32" />
+          <Skeleton className={cn('size-6 rounded-full', imageClassName)} />
+          <span className="block">
+            <Skeleton className="w-32" />
+          </span>
         </span>
       }
-      loading={loading || !contract}
+      loading={!!loading}
     >
       {() => (
         <span className="flex items-center gap-2">
@@ -89,11 +91,12 @@ export const NftHeader = ({
         <SkeletonSlot
           fallback={
             <span className="flex items-center gap-2">
-              <Skeleton className="size-6 rounded-full" />
-              <Skeleton className="w-32" />
+              <span className="block">
+                <Skeleton className="w-48" />
+              </span>
             </span>
           }
-          loading={loading || !token}
+          loading={!!loading}
         >
           {() => (
             <Truncate className="flex items-center gap-2">
@@ -110,7 +113,11 @@ export const NftHeader = ({
         className="text-body-base text-muted-foreground flex flex-wrap items-center gap-2"
         href={`/nft-tokens/${cid}`}
       >
-        <ErrorSuspense fallback={<NftTokenHeader cid={cid} loading />}>
+        <ErrorSuspense
+          fallback={
+            <NftTokenHeader cid={cid} imageClassName="size-4" loading />
+          }
+        >
           <NftTokenHeader
             cid={cid}
             contractPromise={contractPromise}

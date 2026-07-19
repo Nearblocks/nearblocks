@@ -50,8 +50,12 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             <ListLeft className="min-w-28">{t('profile.contract')}</ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="h-7 w-40" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-40" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => <AccountLink account={cid} textClassName="max-w-60" />}
               </SkeletonSlot>
@@ -61,8 +65,12 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             <ListLeft className="min-w-28">{t('profile.decimals')}</ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-8" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-8" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -82,8 +90,12 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-32" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-32" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -110,8 +122,12 @@ export const Profile = ({ cid, contractPromise, loading }: Props) => {
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-24" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="flex h-6 items-center">
+                    <Skeleton className="w-24" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() =>
                   hasSocials ? (
