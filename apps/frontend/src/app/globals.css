@@ -86,7 +86,11 @@
   --color-lime-background: #10b9811a;
   --color-lime-foreground: #10b981;
 
-  --background: color-mix(in oklch, var(--color-neutral-50) 92%, var(--color-teal-50));
+  --background: color-mix(
+    in oklch,
+    var(--color-neutral-50) 92%,
+    var(--color-teal-50)
+  );
   --foreground: var(--color-neutral-700);
   --card: var(--color-white-950);
   --card-foreground: var(--color-neutral-600);
@@ -141,7 +145,11 @@
   --color-lime-background: #b4f35a1a;
   --color-lime-foreground: rgb(180, 243, 90);
 
-  --background: color-mix(in oklch, var(--color-neutral-950) 85%, var(--color-teal-900));
+  --background: color-mix(
+    in oklch,
+    var(--color-neutral-950) 85%,
+    var(--color-teal-900)
+  );
   --foreground: var(--color-neutral-50);
   --card: var(--color-neutral-800);
   --card-foreground: var(--color-neutral-50);
@@ -1421,6 +1429,7 @@ circle.highcharts-legend-nav-inactive {
 .highcharts-range-selector-buttons .highcharts-button {
   stroke-width: 0;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 .highcharts-range-selector-buttons .highcharts-label {

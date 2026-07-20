@@ -46,7 +46,9 @@ export const ChartSkeleton = () => (
 
     {/* Plot region: y-axis tick labels + silhouette */}
     <div className="flex min-h-0 flex-1 gap-3">
-      <div className="flex flex-col justify-between py-1">
+      {/* text-headline-xs so the tick Skeletons (h-[1em]) match the real
+          Highcharts axis-label font size */}
+      <div className="text-headline-xs flex flex-col justify-between py-1">
         {[10, 8, 9, 7, 8, 6].map((w, i) => (
           <Skeleton
             className="rounded"
@@ -88,7 +90,7 @@ export const ChartSkeleton = () => (
     </div>
 
     {/* X-axis tick labels */}
-    <div className="flex justify-between pl-8">
+    <div className="text-headline-xs flex justify-between pl-8">
       {[9, 8, 9, 8, 9, 8].map((w, i) => (
         <Skeleton className="rounded" key={i} style={{ width: `${w * 4}px` }} />
       ))}
