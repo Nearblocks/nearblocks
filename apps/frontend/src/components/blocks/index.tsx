@@ -58,7 +58,6 @@ export const Blocks = ({
           {numberFormat(block.block_height)}
         </Link>
       ),
-      className: 'w-30',
       csvLabel: 'Block',
       csvValue: (block) => block.block_height,
       header: t('columns.block'),
@@ -66,6 +65,7 @@ export const Blocks = ({
     },
     {
       cell: (block) => <AccountLink account={block.author_account_id} />,
+      className: 'w-60',
       csvLabel: 'Author',
       csvValue: (block) => block.author_account_id ?? '',
       header: t('columns.author'),
@@ -73,7 +73,7 @@ export const Blocks = ({
     },
     {
       cell: (block) => numberFormat(block.transactions_agg.count),
-      className: 'w-16',
+      className: 'w-30',
       csvLabel: 'Txns',
       csvValue: (block) => block.transactions_agg.count,
       header: t('columns.txns'),
@@ -81,7 +81,6 @@ export const Blocks = ({
     },
     {
       cell: (block) => `${gasFormat(block.chunks_agg.gas_used)} Tgas`,
-      className: 'w-28',
       csvLabel: 'Gas Used (Tgas)',
       csvValue: (block) => gasFormat(block.chunks_agg.gas_used),
       header: t('columns.gasUsed'),
@@ -89,7 +88,6 @@ export const Blocks = ({
     },
     {
       cell: (block) => `${gasFormat(block.chunks_agg.gas_limit)} Tgas`,
-      className: 'w-28',
       csvLabel: 'Gas Limit (Tgas)',
       csvValue: (block) => gasFormat(block.chunks_agg.gas_limit),
       header: t('columns.gasLimit'),
@@ -102,7 +100,6 @@ export const Blocks = ({
           {gasFee(block.chunks_agg.gas_used, block.gas_price)}
         </span>
       ),
-      className: 'w-24',
       csvLabel: 'Gas Fee (NEAR)',
       csvValue: (block) => gasFee(block.chunks_agg.gas_used, block.gas_price),
       header: t('columns.gasFee'),
