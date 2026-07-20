@@ -178,12 +178,16 @@ export const ChartHeader = ({
           id="log-switch"
           onCheckedChange={setLogView}
         />
-        <Label htmlFor="log-switch">{t('logView')}</Label>
+        <Label className="text-body-xs" htmlFor="log-switch">
+          {t('logView')}
+        </Label>
         <Tooltip>
           <TooltipTrigger asChild>
             <RiQuestionLine className="size-4" />
           </TooltipTrigger>
-          <TooltipContent>{t('logViewTip')}</TooltipContent>
+          <TooltipContent className="px-2.5 py-1">
+            {t('logViewTip')}
+          </TooltipContent>
         </Tooltip>
       </span>
     </CardHeader>
