@@ -31,19 +31,22 @@ export const Execution = ({
       <CardContent className="px-0 py-2">
         <SkeletonSlot
           fallback={
-            <div className="border-border ml-0 border-l-4">
+            <div className="divide-border md:border-border ml-0 md:divide-y md:border-l-4">
               <ReceiptBlock loading />
             </div>
           }
-          loading={loading || !receipts}
+          loading={!!loading}
         >
-          {() => (
-            <ExecutionPlan
-              nearPrice={stats?.near_price}
-              receipts={receipts!}
-              tid={tid}
-            />
-          )}
+          {() => {
+            if (!receipts) throw new Error('Failed to load receipts');
+            return (
+              <ExecutionPlan
+                nearPrice={stats?.near_price}
+                receipts={receipts}
+                tid={tid}
+              />
+            );
+          }}
         </SkeletonSlot>
       </CardContent>
     </Card>

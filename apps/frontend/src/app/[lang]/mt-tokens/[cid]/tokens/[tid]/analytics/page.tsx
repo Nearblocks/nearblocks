@@ -6,6 +6,7 @@ import {
   fetchMTTokenStatsHeatmap,
   fetchMTTokenStatsOverview,
 } from '@/data/mt-tokens/analytics';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken } from '@/lib/utils';
 
 type Props = PageProps<'/[lang]/mt-tokens/[cid]/tokens/[tid]/analytics'>;
@@ -25,6 +26,7 @@ const AnalyticsOverviewPage = async ({ params, searchParams }: Props) => {
 
   const overviewPromise = fetchMTTokenStatsOverview(cid, tid);
   const heatmapPromise = fetchMTTokenStatsHeatmap(cid, tid);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<OverviewChart loading />}>

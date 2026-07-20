@@ -4,6 +4,7 @@ import { BlocksChart } from '@/components/charts/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { fetchBlockStats } from '@/data/charts';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/charts/blocks'>;
@@ -27,6 +28,7 @@ const BlocksChartPage = async ({ params }: Props) => {
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'charts');
   const statsPromise = fetchBlockStats();
+  await holdNav();
 
   return (
     <>

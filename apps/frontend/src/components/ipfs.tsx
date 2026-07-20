@@ -176,8 +176,8 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
     return (
       <div className="border-border overflow-hidden rounded-lg border">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div className="border-b px-3 py-2 last:border-b-0" key={i}>
-            <Skeleton className="h-6 w-full" />
+          <div className="border-b px-3 py-2 text-sm last:border-b-0" key={i}>
+            <Skeleton className="w-full" />
           </div>
         ))}
       </div>

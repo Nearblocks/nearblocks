@@ -131,7 +131,7 @@ export const ActionCard = ({ action, expanded, receipt, toggle }: Props) => {
     <div className="mb-1 inline-block">
       <div
         className={cn(
-          'inline-flex max-w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1 transition-colors',
+          'text-body-xs inline-flex max-w-full cursor-pointer items-center gap-2 rounded-md px-1.5 py-0.5 transition-colors',
           variant.bg,
           'hover:opacity-90',
         )}
@@ -143,7 +143,7 @@ export const ActionCard = ({ action, expanded, receipt, toggle }: Props) => {
           action={action.action}
           className={cn('size-3.5', variant.color)}
         />
-        <span className={cn('text-body-sm max-w-60 truncate', variant.color)}>
+        <span className={cn('max-w-60 truncate', variant.color)}>
           {actionLabel}
         </span>
         {receipt.outcome.status === false && (
@@ -172,7 +172,16 @@ export const ReceiptExpandedSection = ({
   return (
     <div className="border-border bg-card mt-1 space-y-3 rounded-lg border p-3">
       <SkeletonSlot
-        fallback={<Skeleton className="h-7 w-36 rounded-md" />}
+        fallback={
+          <span className="text-body-sm block">
+            <span className="block">
+              <Skeleton className="w-full" />
+            </span>
+            <span className="block">
+              <Skeleton className="w-2/3" />
+            </span>
+          </span>
+        }
         loading={loading}
       >
         {() =>
@@ -211,7 +220,11 @@ export const ReceiptExpandedSection = ({
               </ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-20" />
+                    </span>
+                  }
                   loading={loading}
                 >
                   {() => `${gasFormat(gasLimit)} Tgas`}
@@ -227,7 +240,11 @@ export const ReceiptExpandedSection = ({
               </ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-20" />
+                    </span>
+                  }
                   loading={loading}
                 >
                   {() => `${nearFormat(preCharged)} Ⓝ`}
@@ -243,7 +260,11 @@ export const ReceiptExpandedSection = ({
               </ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-20" />}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-20" />
+                    </span>
+                  }
                   loading={loading}
                 >
                   {() => `${nearFormat(refund)} Ⓝ`}

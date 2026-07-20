@@ -8,11 +8,9 @@ import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { Logo } from '@/icons/logo';
-import { LogoIcon } from '@/icons/logo-icon';
 import { hrefForLocale } from '@/lib/locale';
 import type { Locale } from '@/locales/config';
 import { NavMenu, RouteKey } from '@/types/types';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import {
   Popover,
@@ -133,14 +131,7 @@ export const Header = () => {
         <PopoverAnchor>
           <div className="container mx-auto flex h-14 items-center px-4">
             <Link className="flex items-center gap-2" href="/">
-              <Logo className="text-primary hidden h-10 sm:block" />
-              <LogoIcon className="text-primary h-10 sm:hidden" />
-              <Badge
-                className="text-body-xs px-1.5 py-0 tracking-wide uppercase"
-                variant="teal"
-              >
-                Beta
-              </Badge>
+              <Logo className="text-primary h-10" />
             </Link>
             <div className="text-headline-sm ml-auto flex gap-2">
               <Menu menu={menu} />

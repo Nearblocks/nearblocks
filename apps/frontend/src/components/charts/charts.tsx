@@ -2,11 +2,38 @@
 
 import dynamic from 'next/dynamic';
 
+import { Card, CardContent, CardHeader } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
+
+import { ChartSkeleton } from './chart-skeleton';
+
+// Mirrors the loaded chart markup (Card > ChartHeader > CardContent > chart
+// slot) so swapping the module-loading skeleton for the mounted chart doesn't
+// shift the page.
+const ChartCardSkeleton = () => (
+  <Card>
+    <CardHeader className="flex-wrap gap-2 border-b">
+      {/* Inline segments wrap like the ~90-char description text does, so the
+          header reserves the same 1-line desktop / 2-3-line mobile height. */}
+      <p className="text-body-sm">
+        <Skeleton className="w-64" /> <Skeleton className="w-56" />{' '}
+        <Skeleton className="w-44" />
+      </p>
+      <span className="flex items-center gap-2 leading-6 whitespace-nowrap">
+        <Skeleton className="w-28" />
+      </span>
+    </CardHeader>
+    <CardContent className="p-3">
+      <div className="h-140">
+        <ChartSkeleton />
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export const PriceChart = dynamic(
   () => import('./near-price').then((m) => m.PriceChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const PriceChartMini = dynamic(
@@ -16,7 +43,7 @@ export const PriceChartMini = dynamic(
 
 export const MarketCapChart = dynamic(
   () => import('./market-cap').then((m) => m.MarketCapChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const MarketCapChartMini = dynamic(
@@ -26,7 +53,7 @@ export const MarketCapChartMini = dynamic(
 
 export const SupplyChart = dynamic(
   () => import('./near-supply').then((m) => m.SupplyChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const SupplyChartMini = dynamic(
@@ -36,7 +63,7 @@ export const SupplyChartMini = dynamic(
 
 export const TxnsChart = dynamic(
   () => import('./txns').then((m) => m.TxnsChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const TxnsChartMini = dynamic(
@@ -46,7 +73,7 @@ export const TxnsChartMini = dynamic(
 
 export const BlocksChart = dynamic(
   () => import('./blocks').then((m) => m.BlocksChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const BlocksChartMini = dynamic(
@@ -56,7 +83,7 @@ export const BlocksChartMini = dynamic(
 
 export const AddressesChart = dynamic(
   () => import('./addresses').then((m) => m.AddressesChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const AddressesChartMini = dynamic(
@@ -66,7 +93,7 @@ export const AddressesChartMini = dynamic(
 
 export const TxnFeeChart = dynamic(
   () => import('./txn-fee').then((m) => m.TxnFeeChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const TxnFeeChartMini = dynamic(
@@ -76,7 +103,7 @@ export const TxnFeeChartMini = dynamic(
 
 export const TxnVolumeChart = dynamic(
   () => import('./txn-volume').then((m) => m.TxnVolumeChart),
-  { loading: () => <Skeleton className="h-161 w-full" />, ssr: false },
+  { loading: () => <ChartCardSkeleton />, ssr: false },
 );
 
 export const TxnVolumeChartMini = dynamic(
@@ -85,7 +112,7 @@ export const TxnVolumeChartMini = dynamic(
 );
 
 export const TpsChart = dynamic(() => import('./tps').then((m) => m.TpsChart), {
-  loading: () => <Skeleton className="h-161 w-full" />,
+  loading: () => <ChartCardSkeleton />,
   ssr: false,
 });
 

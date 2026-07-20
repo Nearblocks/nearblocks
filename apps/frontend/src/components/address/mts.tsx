@@ -12,11 +12,10 @@ import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { MTTokenLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -38,14 +37,16 @@ export const MTTxns = ({
 }: Props) => {
   const { t } = useLocale('address');
   const mts = !loading && mtsPromise ? use(mtsPromise) : null;
+  if (mts?.errors?.length) throw new Error('Failed to load token transfers');
   const mtCount = !loading && mtCountPromise ? use(mtCountPromise) : null;
 
   const columns: DataTableColumnDef<AccountMTTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (mt) =>
@@ -63,18 +64,13 @@ export const MTTxns = ({
       id: 'txn_hash',
     },
     {
-      cell: (mt) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={mt.cause} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (mt) => <MethodBadge text={mt.cause} />,
       enableFilter: true,
       filterName: 'cause',
       filterPlaceholder: t('mts.filterMethod'),
       header: t('mts.columns.method'),
       id: 'cause',
+      skeletonCell: <Skeleton className="h-4.5 w-[103px] rounded-md" />,
     },
     {
       cell: (mt) => (
@@ -95,6 +91,7 @@ export const MTTxns = ({
       className: 'w-20',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
       cell: (mt) => (
@@ -204,7 +201,7 @@ export const MTTxns = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !mtCount}
+              loading={!!loading}
             >
               {() => {
                 const count = mtCount?.count;
@@ -216,12 +213,18 @@ export const MTTxns = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!mts?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
+          paginated={!!basePath}
           pagination={basePath ? mts?.meta : undefined}
         />
+        {loading && !basePath && (
+          <div className="border-t px-4 py-3">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
         {!basePath && mts?.meta?.next_page && (
           <div className="border-t px-4 py-3">
             <Button asChild className="h-8 w-full" variant="ghost">

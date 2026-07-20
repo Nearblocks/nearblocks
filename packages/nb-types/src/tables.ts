@@ -537,6 +537,7 @@ export type ValidatorConfig = {
   latest_block_height: null | number;
   latest_block_timestamp: null | number;
   network_holder_index: null | number;
+  next_epoch_seat_price: null | string;
   protocol_epoch_length: null | number;
   protocol_max_inflation_rate: null | number[];
   protocol_max_seats: null | number;

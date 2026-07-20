@@ -29,7 +29,7 @@ export const StakingOverview = ({ info, loading, totalSupply }: Props) => {
             <ListLeft>{t('staking.currentValidators')}</ListLeft>
             <ListRight>
               {loading ? (
-                <Skeleton className="h-4 w-10" />
+                <Skeleton className="w-10" />
               ) : (
                 numberFormat(info?.current_validators_count)
               )}
@@ -39,7 +39,7 @@ export const StakingOverview = ({ info, loading, totalSupply }: Props) => {
             <ListLeft>{t('staking.totalStaked')}</ListLeft>
             <ListRight>
               {loading ? (
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="w-20" />
               ) : info?.total_stake ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />
@@ -56,7 +56,7 @@ export const StakingOverview = ({ info, loading, totalSupply }: Props) => {
             <ListLeft>{t('staking.totalSupply')}</ListLeft>
             <ListRight>
               {loading ? (
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="w-20" />
               ) : totalSupply ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />

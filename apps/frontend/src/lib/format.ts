@@ -14,10 +14,17 @@ export const currencyFormat = (
   const data =
     typeof value === 'string' ? (value as Intl.StringNumericLiteral) : value;
 
+  // Sub-cent values would render as $0.00; show significant digits instead
+  // (e.g. $0.000043), like other explorers.
+  const numeric = Number(data);
+  const subCent =
+    Number.isFinite(numeric) && numeric !== 0 && Math.abs(numeric) < 0.01;
+
   return new Intl.NumberFormat('en-US', {
     currency: 'USD',
     currencyDisplay: 'symbol',
     style: 'currency',
+    ...(subCent ? { maximumSignificantDigits: 2 } : {}),
     ...options,
   }).format(data);
 };

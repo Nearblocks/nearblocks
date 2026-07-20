@@ -10,6 +10,7 @@ import {
   fetchNFTTokenTxnCount,
   fetchNFTTokenTxns,
 } from '@/data/nft-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken, encodeToken } from '@/lib/utils';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
@@ -63,6 +64,7 @@ const TokenDetailPage = async ({ params, searchParams }: Props) => {
   const contractPromise = fetchNFTContract(cid);
   const txnsPromise = fetchNFTTokenTxns(cid, tid, filters);
   const txnCountPromise = fetchNFTTokenTxnCount(cid, tid, filters);
+  await holdNav();
 
   return (
     <>

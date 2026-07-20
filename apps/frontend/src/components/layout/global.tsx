@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
-import { NewUiBanner } from '@/components/layout/new-ui-banner';
 import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import { defaultLocale, type Locale, supportedLocales } from '@/locales/config';
 import { clientTranslator, getDictionary } from '@/locales/dictionaries';
@@ -89,7 +88,6 @@ export const GlobalLayout = ({ children, head }: Props) => {
         <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>
             <Header />
-            <NewUiBanner />
             {children({ t })}
             <Footer />
           </LocaleProvider>

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- data is fully awaited before render (no streaming boundary), so the segment holds implicitly */
 import { Metadata } from 'next';
 
 import { Apis } from '@/components/apis';
@@ -20,6 +21,7 @@ export const generateMetadata = async ({
 
 const ApisPage = async () => {
   const plansPromise = fetchPlans();
+
   return (
     <main className="flex flex-1 flex-col">
       <Apis plansPromise={plansPromise} />

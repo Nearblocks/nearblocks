@@ -10,6 +10,7 @@ import {
   fetchMTContractTokenCount,
   fetchMTContractTxnCount,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
@@ -35,6 +36,7 @@ const MtTokenLayout = async ({ children, params }: Props) => {
   const t = await translator(locale, 'mts');
   const tokenCountPromise = fetchMTContractTokenCount(cid);
   const txCountPromise = fetchMTContractTxnCount(cid, {});
+  await holdNav();
 
   return (
     <>

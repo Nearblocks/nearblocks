@@ -3,7 +3,10 @@ import type { Metadata } from 'next';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { SpamAlert } from '@/components/tokens/spam-alert';
 import { TokenHeader } from '@/components/tokens/token/header';
-import { HolderFilter } from '@/components/tokens/token/holder-filter';
+import {
+  HolderFilter,
+  HolderFilterFallback,
+} from '@/components/tokens/token/holder-filter';
 import { Overview } from '@/components/tokens/token/overview';
 import { Profile } from '@/components/tokens/token/profile';
 import { TokenTabLinks } from '@/components/tokens/token/tab-links';
@@ -12,6 +15,7 @@ import {
   fetchFTContractHolderCount,
   fetchFTContractTxnCount,
 } from '@/data/tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
@@ -53,6 +57,7 @@ const TokenLayout = async ({ children, params }: Props) => {
   const contractPromise = fetchFTContract(cid);
   const holderCountPromise = fetchFTContractHolderCount(cid);
   const txCountPromise = fetchFTContractTxnCount(cid, {});
+  await holdNav();
 
   return (
     <>
@@ -82,7 +87,7 @@ const TokenLayout = async ({ children, params }: Props) => {
           <Profile cid={cid} contractPromise={contractPromise} />
         </ErrorSuspense>
       </div>
-      <ErrorSuspense fallback={null}>
+      <ErrorSuspense errorFallback={null} fallback={<HolderFilterFallback />}>
         <HolderFilter cid={cid} contractPromise={contractPromise} />
       </ErrorSuspense>
       <ScrollArea className="mb-3 w-full whitespace-nowrap">

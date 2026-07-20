@@ -73,7 +73,7 @@ const TableHead = ({ className, ...props }: React.ComponentProps<'th'>) => {
   return (
     <th
       className={cn(
-        'text-muted-foreground text-headline-xs h-12 px-4 py-2 text-left align-middle whitespace-nowrap uppercase [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5',
+        'text-muted-foreground text-headline-xs h-12 truncate px-4 py-2 text-left align-middle uppercase [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5',
         className,
       )}
       data-slot="table-head"

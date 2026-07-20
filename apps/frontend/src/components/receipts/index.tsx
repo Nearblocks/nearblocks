@@ -11,7 +11,12 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import {
+  MethodBadge,
+  TxnDirectionIcon,
+  TxnDirectionSkeleton,
+  TxnStatusIcon,
+} from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
@@ -22,7 +27,6 @@ import {
 } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -41,15 +45,17 @@ export const Receipts = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
+  if (receipts?.errors?.length) throw new Error('Failed to load receipts');
   const receiptCount =
     !loading && receiptCountPromise ? use(receiptCountPromise) : null;
 
   const columns: DataTableColumnDef<Receipt>[] = [
     {
       cell: (receipt) => <TxnStatusIcon status={receipt.outcome?.status} />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (receipt) => (
@@ -67,19 +73,10 @@ export const Receipts = ({
       id: 'receipt_id',
     },
     {
-      cell: (receipt) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText
-              as="code"
-              className="max-w-20"
-              text={actionMethod(receipt.actions)}
-            />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (receipt) => <MethodBadge text={actionMethod(receipt.actions)} />,
       header: t('list.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-16 rounded-md" />,
     },
     {
       cell: (receipt) => (
@@ -103,6 +100,7 @@ export const Receipts = ({
       className: 'w-12',
       header: '',
       id: 'direction',
+      skeletonCell: <TxnDirectionSkeleton />,
     },
     {
       cell: (receipt) => <AccountLink account={receipt.receiver_account_id} />,
@@ -165,7 +163,7 @@ export const Receipts = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !receiptCount}
+              loading={!!loading}
             >
               {() => {
                 const count = receiptCount?.count;
@@ -177,7 +175,7 @@ export const Receipts = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!receipts?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}

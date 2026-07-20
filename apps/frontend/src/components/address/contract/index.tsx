@@ -54,7 +54,11 @@ export const Contract = ({
         <ListRight className="xl:py-2.5">
           <p className="flex items-center gap-1">
             <SkeletonSlot
-              fallback={<Skeleton className="h-7 w-70" />}
+              fallback={
+                <span className="block">
+                  <Skeleton className="w-70 max-w-full" />
+                </span>
+              }
               loading={loading || !contract}
             >
               {() => (
@@ -135,15 +139,19 @@ export const Contract = ({
           <p className="py-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-20" />}
-              loading={loading || !account}
+              loading={!!loading}
             >
-              {() => (
-                <>
-                  {account!.locked
-                    ? t('contract.overview.yes')
-                    : t('contract.overview.no')}
-                </>
-              )}
+              {() =>
+                account ? (
+                  <>
+                    {account.locked
+                      ? t('contract.overview.yes')
+                      : t('contract.overview.no')}
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </ListRight>
@@ -164,16 +172,20 @@ export const Contract = ({
           <p className="py-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-60" />}
-              loading={loading || !deployments || deployments.length === 0}
+              loading={!!loading}
             >
-              {() => (
-                <LongDate
-                  ns={
-                    deployments?.[1]?.block?.block_timestamp ??
-                    deployments![0].block.block_timestamp
-                  }
-                />
-              )}
+              {() =>
+                deployments?.length ? (
+                  <LongDate
+                    ns={
+                      deployments[1]?.block?.block_timestamp ??
+                      deployments[0].block.block_timestamp
+                    }
+                  />
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </ListRight>
@@ -192,20 +204,24 @@ export const Contract = ({
           <p className="py-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-50" />}
-              loading={loading || !deployments || deployments.length === 0}
+              loading={!!loading}
             >
-              {() => (
-                <Link
-                  className="text-link inline-block w-50 truncate align-middle"
-                  href={`/txns/${
-                    deployments?.[1]?.transaction_hash ??
-                    deployments![0].transaction_hash
-                  }`}
-                >
-                  {deployments?.[1]?.transaction_hash ??
-                    deployments![0].transaction_hash}
-                </Link>
-              )}
+              {() =>
+                deployments?.length ? (
+                  <Link
+                    className="text-link inline-block w-50 truncate align-middle"
+                    href={`/txns/${
+                      deployments[1]?.transaction_hash ??
+                      deployments[0].transaction_hash
+                    }`}
+                  >
+                    {deployments[1]?.transaction_hash ??
+                      deployments[0].transaction_hash}
+                  </Link>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </ListRight>
@@ -226,19 +242,25 @@ export const Contract = ({
           <p>
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
-              loading={loading || !deployments || deployments.length === 0}
+              loading={!!loading}
             >
-              {() => (
-                <AccountLink
-                  account={deployments![0].predecessor_account_id}
-                  textClassName="max-w-60"
-                />
-              )}
+              {() =>
+                deployments?.length ? (
+                  <AccountLink
+                    account={deployments[0].predecessor_account_id}
+                    textClassName="max-w-60"
+                  />
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </ListRight>
       </ListItem>
-      {deployments && deployments.length > 1 && (
+      {/* Reserved while loading: redeployed contracts (the common case) show
+          this first-deployment row, so it would pop in otherwise. */}
+      {(loading || (deployments && deployments.length > 1)) && (
         <ListItem>
           <ListLeft className="flex min-w-40 items-center gap-1">
             <Tooltip>
@@ -255,16 +277,20 @@ export const Contract = ({
             <p className="py-0.5">
               <SkeletonSlot
                 fallback={<Skeleton className="w-30" />}
-                loading={loading || !deployments || deployments.length === 0}
+                loading={!!loading}
               >
-                {() => (
-                  <Link
-                    className="text-link inline-block w-30 truncate align-middle"
-                    href={`/txns/${deployments![0].transaction_hash}`}
-                  >
-                    {deployments![0].transaction_hash}
-                  </Link>
-                )}
+                {() =>
+                  deployments && deployments.length > 1 ? (
+                    <Link
+                      className="text-link inline-block w-30 truncate align-middle"
+                      href={`/txns/${deployments[0].transaction_hash}`}
+                    >
+                      {deployments[0].transaction_hash}
+                    </Link>
+                  ) : (
+                    <span className="text-muted-foreground">N/A</span>
+                  )
+                }
               </SkeletonSlot>
             </p>
           </ListRight>

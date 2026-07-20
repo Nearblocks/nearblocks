@@ -9,6 +9,7 @@ import {
   fetchTpsStats,
   fetchTxnStats,
 } from '@/data/charts';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/charts'>;
@@ -36,6 +37,7 @@ const ChartsPage = async ({ params }: Props) => {
   const addressStatsPromise = fetchAddressStats(14);
   const priceStatsPromise = fetchPriceStats(14);
   const tpsStatsPromise = fetchTpsStats();
+  await holdNav();
 
   return (
     <>

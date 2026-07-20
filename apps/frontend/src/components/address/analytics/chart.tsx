@@ -47,7 +47,7 @@ export const AnalyticsChart = ({
         ? {
             allButtonsEnabled: true,
             buttonPosition: {
-              // align: 'right' as const,
+              align: 'right' as const,
               x: -20,
               y: -4,
             },

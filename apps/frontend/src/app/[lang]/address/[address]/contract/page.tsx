@@ -4,6 +4,7 @@ import { Contract } from '@/components/address/contract';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchAccount } from '@/data/address';
 import { fetchContract, fetchDeployments } from '@/data/address/contract';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/address/[address]/contract'>;
 
@@ -14,6 +15,8 @@ const ContractPage = async ({ params }: Props) => {
   const deploymentsPromise = fetchDeployments(address);
 
   if (!contract) return redirect(`/address/${address}`);
+
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<Contract loading />}>

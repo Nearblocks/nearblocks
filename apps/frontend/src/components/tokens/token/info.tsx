@@ -24,28 +24,6 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        {(loading || contract?.description) && (
-          <>
-            <CardHeader className="border-b py-3">
-              <CardTitle className="text-headline-sm">
-                {t('info.overview')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="py-3">
-              <SkeletonSlot
-                fallback={<Skeleton className="h-18 w-full" />}
-                loading={loading || !contract}
-              >
-                {() => (
-                  <p className="text-muted-foreground text-body-sm">
-                    {contract!.description}
-                  </p>
-                )}
-              </SkeletonSlot>
-            </CardContent>
-            <hr className="border-border" />
-          </>
-        )}
         <CardHeader className="border-b py-3">
           <CardTitle className="text-headline-sm">
             {t('info.marketTitle')}
@@ -57,8 +35,12 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               <ListLeft className="min-w-36">{t('info.marketCap')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-24" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-24" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() =>
                     contract?.market_cap && +contract.market_cap > 0 ? (
@@ -78,8 +60,12 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               </ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-24" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-24" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() =>
                     contract?.onchain_market_cap &&
@@ -100,8 +86,12 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               </ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-24" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-24" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() =>
                     contract?.fully_diluted_market_cap &&
@@ -120,8 +110,12 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               <ListLeft className="min-w-36">{t('info.volume24h')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-24" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-24" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() =>
                     contract?.volume_24h && +contract.volume_24h > 0 ? (
@@ -141,8 +135,12 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               </ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-28" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-28" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() =>
                     contract?.circulating_supply &&
@@ -161,8 +159,12 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               <ListLeft className="min-w-36">{t('info.totalSupply')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-28" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-28" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() =>
                     contract?.total_supply && +contract.total_supply > 0 ? (
@@ -178,6 +180,24 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
             </ListItem>
           </List>
         </CardContent>
+        {/* Descriptions are absent for the long tail of tokens, so nothing is
+            reserved while loading; rendered last so a late description appends
+            below instead of pushing the Market section down. */}
+        {contract?.description && (
+          <>
+            <hr className="border-border" />
+            <CardHeader className="border-b py-3">
+              <CardTitle className="text-headline-sm">
+                {t('info.overview')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="py-3">
+              <p className="text-muted-foreground text-body-sm">
+                {contract.description}
+              </p>
+            </CardContent>
+          </>
+        )}
       </Card>
     </div>
   );

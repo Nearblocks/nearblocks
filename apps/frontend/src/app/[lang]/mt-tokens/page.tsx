@@ -4,6 +4,7 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { MtTokens } from '@/components/mt-tokens';
 import { PageHeading } from '@/components/page-heading';
 import { fetchMTList, fetchMTListCount } from '@/data/mt-tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/mt-tokens'>;
@@ -29,6 +30,7 @@ const MtTokensPage = async ({ params, searchParams }: Props) => {
   const filters = await searchParams;
   const mtListPromise = fetchMTList(filters);
   const mtListCountPromise = fetchMTListCount(filters);
+  await holdNav();
 
   return (
     <>

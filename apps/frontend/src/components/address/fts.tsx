@@ -14,11 +14,10 @@ import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirection, TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, isApproxCount } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -40,14 +39,16 @@ export const FTTxns = ({
 }: Props) => {
   const { t } = useLocale('address');
   const fts = !loading && ftsPromise ? use(ftsPromise) : null;
+  if (fts?.errors?.length) throw new Error('Failed to load token transfers');
   const ftCount = !loading && ftCountPromise ? use(ftCountPromise) : null;
 
   const columns: DataTableColumnDef<AccountFTTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (ft) =>
@@ -61,22 +62,18 @@ export const FTTxns = ({
         ) : (
           <Skeleton className="w-30" />
         ),
+      className: 'w-44',
       header: t('fts.columns.txnHash'),
       id: 'txn_hash',
     },
     {
-      cell: (ft) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={ft.cause} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (ft) => <MethodBadge text={ft.cause} />,
       enableFilter: true,
       filterName: 'cause',
       filterPlaceholder: t('fts.filterMethod'),
       header: t('fts.columns.method'),
       id: 'cause',
+      skeletonCell: <Skeleton className="h-4.5 w-[103px] rounded-md" />,
     },
     {
       cell: (ft) => (
@@ -96,6 +93,7 @@ export const FTTxns = ({
       className: 'w-20',
       header: '',
       id: 'direction',
+      skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
       cell: (ft) => (
@@ -213,7 +211,7 @@ export const FTTxns = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !ftCount}
+              loading={!!loading}
             >
               {() => {
                 const count = ftCount?.count;
@@ -225,12 +223,18 @@ export const FTTxns = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!fts?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
+          paginated={!!basePath}
           pagination={basePath ? fts?.meta : undefined}
         />
+        {loading && !basePath && (
+          <div className="border-t px-4 py-3">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
         {!basePath && fts?.meta?.next_page && (
           <div className="border-t px-4 py-3">
             <Button asChild className="h-8 w-full" variant="ghost">

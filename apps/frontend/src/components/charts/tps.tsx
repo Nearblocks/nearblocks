@@ -15,7 +15,8 @@ import { dateFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
-import { ChartHeader } from '.';
+import { ChartEmpty, ChartHeader } from '.';
+import { ChartSkeleton } from './chart-skeleton';
 import { MiniChart } from './mini-chart';
 
 type Props = {
@@ -79,6 +80,7 @@ export const TpsChart = ({ loading, statsPromise }: Props) => {
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   const series = useMemo(() => getData(stats), [stats]);
+  const isEmpty = !stats?.length;
 
   return (
     <Card>
@@ -88,31 +90,34 @@ export const TpsChart = ({ loading, statsPromise }: Props) => {
         setLogView={setLogView}
       />
       <CardContent className="p-3">
-        <SkeletonSlot
-          fallback={<Skeleton className="h-140 w-full" />}
-          loading={loading || !stats}
-        >
-          {() => (
-            <AnalyticsChart height={560} showRangeSelector={false}>
-              <XAxis className="stroke-0" type="datetime" />
-              <YAxis
-                className="stroke-0"
-                labels={yAxisLabel}
-                opposite={false}
-                title={{ text: t('tps.yAxis') }}
-                type={logView ? 'logarithmic' : 'linear'}
-              />
-              {series.map((s) => (
-                <Line.Series
-                  data={s.data}
-                  key={s.id}
-                  options={{ id: s.id, name: s.name }}
-                />
-              ))}
-              <Tooltip formatter={tooltipFormatter} shared />
-            </AnalyticsChart>
-          )}
-        </SkeletonSlot>
+        <div className="h-140">
+          <SkeletonSlot fallback={<ChartSkeleton />} loading={!!loading}>
+            {() =>
+              isEmpty ? (
+                <ChartEmpty />
+              ) : (
+                <AnalyticsChart height={560} showRangeSelector={false}>
+                  <XAxis className="stroke-0" type="datetime" />
+                  <YAxis
+                    className="stroke-0"
+                    labels={yAxisLabel}
+                    opposite={false}
+                    title={{ text: t('tps.yAxis') }}
+                    type={logView ? 'logarithmic' : 'linear'}
+                  />
+                  {series.map((s) => (
+                    <Line.Series
+                      data={s.data}
+                      key={s.id}
+                      options={{ id: s.id, name: s.name }}
+                    />
+                  ))}
+                  <Tooltip formatter={tooltipFormatter} shared />
+                </AnalyticsChart>
+              )
+            }
+          </SkeletonSlot>
+        </div>
       </CardContent>
     </Card>
   );
@@ -123,19 +128,24 @@ export const TpsChartMini = ({ loading, statsPromise }: Props) => {
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   const data = useMemo(() => getMiniData(stats), [stats]);
+  const isEmpty = !data.length;
 
   return (
     <div className="h-55">
       <SkeletonSlot
         fallback={<Skeleton className="my-3 h-49 w-full" />}
-        loading={loading || !stats}
+        loading={!!loading}
       >
-        {() => (
-          <MiniChart height={220}>
-            <Line.Series data={data} options={{ name: t('tps.series') }} />
-            <Tooltip formatter={tooltipFormatter} shared />
-          </MiniChart>
-        )}
+        {() =>
+          isEmpty ? (
+            <ChartEmpty />
+          ) : (
+            <MiniChart height={220}>
+              <Line.Series data={data} options={{ name: t('tps.series') }} />
+              <Tooltip formatter={tooltipFormatter} shared />
+            </MiniChart>
+          )
+        }
       </SkeletonSlot>
     </div>
   );

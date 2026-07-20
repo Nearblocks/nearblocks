@@ -9,6 +9,7 @@ import {
   fetchNFTTxns as fetchAddressNFTTxns,
 } from '@/data/address/nfts';
 import { fetchNFTTxnCount, fetchNFTTxns } from '@/data/nft-tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/nft-tokens/transfers'>;
@@ -38,6 +39,7 @@ const NftTransfersPage = async ({ params, searchParams }: Props) => {
   if (account) {
     const nftsPromise = fetchAddressNFTTxns(account, filters);
     const nftCountPromise = fetchAddressNFTTxnCount(account, filters);
+    await holdNav();
 
     return (
       <>
@@ -56,6 +58,7 @@ const NftTransfersPage = async ({ params, searchParams }: Props) => {
 
   const txnsPromise = fetchNFTTxns(filters);
   const txnCountPromise = fetchNFTTxnCount(filters);
+  await holdNav();
 
   return (
     <>

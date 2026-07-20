@@ -2,7 +2,9 @@ import { CircleCheck, CircleX, Hourglass, MoveRight } from 'lucide-react';
 
 import type { TxnReceipt } from 'nb-schemas';
 
+import { Truncate, TruncateText } from '@/components/truncate';
 import { Badge } from '@/ui/badge';
+import { Skeleton } from '@/ui/skeleton';
 
 type StatusProps = {
   status: boolean | undefined;
@@ -26,22 +28,24 @@ type ErrorsProps = {
 const iconClass = 'size-4';
 const statusClass = 'size-5 rounded-full p-1';
 const directionClass =
-  'inline-block max-w-20 min-w-12.5 truncate text-center align-middle text-body-xs';
+  'text-body-xs inline-block max-w-20 min-w-12.5 truncate px-1.5 py-0.5 text-center align-middle';
+
+const pillClass = 'text-body-xs px-1.5 py-0.5';
 
 export const TxnStatus = ({ status }: StatusProps) => {
   if (status == null)
     return (
-      <Badge variant="amber">
+      <Badge className={pillClass} variant="amber">
         <Hourglass className={iconClass} /> Pending
       </Badge>
     );
 
   return status ? (
-    <Badge variant="lime">
+    <Badge className={pillClass} variant="lime">
       <CircleCheck className={iconClass} /> Success
     </Badge>
   ) : (
-    <Badge variant="red">
+    <Badge className={pillClass} variant="red">
       <CircleX className={iconClass} /> Failed
     </Badge>
   );
@@ -99,9 +103,31 @@ export const TxnDirection = ({ address, amount, from, to }: DirectionProps) => {
 };
 
 export const TxnDirectionIcon = () => (
-  <div className="bg-teal-background flex size-5 items-center justify-center rounded-full">
+  <div className="bg-teal-background mx-auto flex size-5 items-center justify-center rounded-full">
     <MoveRight className="text-teal-foreground size-3" />
   </div>
+);
+
+export const TxnDirectionSkeleton = () => (
+  <Skeleton className="mx-auto flex size-5 rounded-full" />
+);
+
+export const MethodBadge = ({
+  text,
+  textClassName,
+}: {
+  text: null | string | undefined;
+  textClassName?: string;
+}) => (
+  <Badge className="text-body-xs max-w-full px-1.5 py-0.5" variant="teal">
+    <Truncate>
+      <TruncateText
+        as="code"
+        className={textClassName ?? 'max-w-20'}
+        text={text ?? ''}
+      />
+    </Truncate>
+  </Badge>
 );
 
 const countFailedReceipts = (receipt: TxnReceipt): number => {
@@ -150,12 +176,12 @@ export const TxnReceiptErrors = ({ receipts }: ErrorsProps) => {
   return (
     <>
       {!isTxnFailed && (
-        <Badge className="text-body-xs" variant="red">
+        <Badge className={pillClass} variant="red">
           {failed} Failed Receipt{failed > 1 ? 's' : ''}
         </Badge>
       )}
       {error && (
-        <Badge className="text-body-xs" variant="amber">
+        <Badge className={pillClass} variant="amber">
           {error}
         </Badge>
       )}

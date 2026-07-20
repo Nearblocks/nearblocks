@@ -1,4 +1,12 @@
-import { ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
+'use client';
+
+import {
+  ChevronLeft,
+  ChevronRight,
+  Ellipsis,
+  LoaderCircle,
+} from 'lucide-react';
+import { useLinkStatus } from 'next/link';
 import * as React from 'react';
 
 import { Link } from '@/components/link';
@@ -62,6 +70,26 @@ const PaginationLink = ({
   );
 };
 
+// Swaps the chevron for a spinner when this link's navigation has been
+// pending for a noticeable time, so slow pagination gives feedback.
+const PendingIcon = ({ children }: { children: React.ReactNode }) => {
+  const { pending } = useLinkStatus();
+  const [slow, setSlow] = React.useState(false);
+
+  React.useEffect(() => {
+    if (pending) {
+      const t = setTimeout(() => setSlow(true), 250);
+      return () => clearTimeout(t);
+    }
+    setSlow(false);
+    return;
+  }, [pending]);
+
+  if (slow) return <LoaderCircle className="animate-spin" />;
+
+  return <>{children}</>;
+};
+
 const PaginationPrevious = ({
   className,
   ...props
@@ -73,7 +101,9 @@ const PaginationPrevious = ({
       size="default"
       {...props}
     >
-      <ChevronLeft />
+      <PendingIcon>
+        <ChevronLeft />
+      </PendingIcon>
       <span className="block">Prev</span>
     </PaginationLink>
   );
@@ -91,7 +121,9 @@ const PaginationNext = ({
       {...props}
     >
       <span className="block">Next</span>
-      <ChevronRight />
+      <PendingIcon>
+        <ChevronRight />
+      </PendingIcon>
     </PaginationLink>
   );
 };

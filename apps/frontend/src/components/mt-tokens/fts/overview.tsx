@@ -43,15 +43,19 @@ export const MtFtOverview = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="px-1">
-        {(token?.price || loading) && (
+        {(loading || token?.price) && (
           <>
             <List pairsPerRow={1}>
               <ListItem>
                 <ListLeft className="min-w-36">{t('token.price')}</ListLeft>
                 <ListRight>
                   <SkeletonSlot
-                    fallback={<Skeleton className="w-24" />}
-                    loading={loading || !token}
+                    fallback={
+                      <span className="block">
+                        <Skeleton className="w-24" />
+                      </span>
+                    }
+                    loading={!!loading}
                   >
                     {() => (
                       <span className="text-body-sm">
@@ -70,8 +74,12 @@ export const MtFtOverview = ({
             <ListLeft className="min-w-36">{t('token.decimals')}</ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-8" />}
-                loading={loading || !token}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-8" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <span className="text-body-sm">
@@ -87,8 +95,12 @@ export const MtFtOverview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !holderCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <span className="text-body-sm">
@@ -106,8 +118,12 @@ export const MtFtOverview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !txnCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <span className="text-body-sm">

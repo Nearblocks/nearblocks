@@ -82,8 +82,12 @@ export const MtFtTokenList = ({
     <>
       <div className="text-body-sm flex flex-wrap items-center justify-between gap-1 px-1 pb-3">
         <SkeletonSlot
-          fallback={<Skeleton className="h-7 w-40" />}
-          loading={loading || !tokenCount}
+          fallback={
+            <span className="leading-7">
+              <Skeleton className="w-40" />
+            </span>
+          }
+          loading={!!loading}
         >
           {() => {
             const count = tokenCount?.data?.count ?? 0;
@@ -102,16 +106,21 @@ export const MtFtTokenList = ({
       </div>
       <div className="text-body-sm p-1">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {loading || !tokens ? (
+          {loading ? (
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <Card className="p-3" key={i}>
-                <Skeleton className="h-6 w-50" />
-                <div className="h-7 p-1">
-                  <Skeleton className="h-5 w-10" />
-                </div>
+                <span className="flex items-center gap-1">
+                  <Skeleton className="m-px size-5 rounded-full" />
+                  <span className="block">
+                    <Skeleton className="w-40" />
+                  </span>
+                </span>
+                <span className="block p-1">
+                  <Skeleton className="w-10" />
+                </span>
               </Card>
             ))
-          ) : tokens.data?.length ? (
+          ) : tokens?.data?.length ? (
             tokens.data.map((token) => (
               <FTCard key={`${token.contract}-${token.token}`} token={token} />
             ))
@@ -121,28 +130,35 @@ export const MtFtTokenList = ({
             </div>
           )}
         </div>
-        {!loading && (tokens?.meta?.next_page || tokens?.meta?.prev_page) && (
+        {(loading || tokens?.meta?.next_page || tokens?.meta?.prev_page) && (
           <div className="mt-4 flex items-center border-t pt-3">
-            <Pagination className="justify-end">
-              <PaginationContent>
-                {tokens.meta?.prev_page && (
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href={onPaginate('prev', tokens.meta.prev_page)}
-                      size="sm"
-                    />
-                  </PaginationItem>
-                )}
-                {tokens.meta?.next_page && (
-                  <PaginationItem>
-                    <PaginationNext
-                      href={onPaginate('next', tokens.meta.next_page)}
-                      size="sm"
-                    />
-                  </PaginationItem>
-                )}
-              </PaginationContent>
-            </Pagination>
+            {loading ? (
+              <span className="flex w-full justify-end gap-1">
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-8 w-16" />
+              </span>
+            ) : (
+              <Pagination className="justify-end">
+                <PaginationContent>
+                  {tokens?.meta?.prev_page && (
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href={onPaginate('prev', tokens.meta.prev_page)}
+                        size="sm"
+                      />
+                    </PaginationItem>
+                  )}
+                  {tokens?.meta?.next_page && (
+                    <PaginationItem>
+                      <PaginationNext
+                        href={onPaginate('next', tokens.meta.next_page)}
+                        size="sm"
+                      />
+                    </PaginationItem>
+                  )}
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         )}
       </div>

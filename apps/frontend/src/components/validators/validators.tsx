@@ -10,15 +10,25 @@ import {
   Send,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import type { Validator, ValidatorsListRes } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
 import { nearFormat, numberFormat } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
+import { buttonVariants } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/ui/pagination';
 import { Skeleton } from '@/ui/skeleton';
 import {
   Table,
@@ -70,7 +80,7 @@ export const ValidatorsTable = ({
   validators,
 }: Props) => {
   const { t } = useLocale('validators');
-  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [expanded, setExpanded] = useState<string[]>([]);
 
@@ -87,45 +97,72 @@ export const ValidatorsTable = ({
     ? pageData.findIndex((v) => v.is_network_holder_warning === true)
     : -1;
 
-  const onNext = () => {
-    if (!meta?.next_page) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('next', meta.next_page);
-    params.delete('prev');
-    router.push(`?${params.toString()}`);
-  };
+  // Client-side page counter, mirroring the DataTable pager semantics: a
+  // cursor-less URL is the canonical first page even if a stale `p` survived
+  // a round-trip; a cursor without `p` (legacy or shared link) is an unknown
+  // depth, so don't claim a page number for it.
+  const hasCursorInUrl =
+    !!searchParams.get('next') || !!searchParams.get('prev');
+  const pageParam = searchParams.get('p');
+  const urlPage = Math.max(1, Number(pageParam ?? '1') || 1);
+  const currentPage = hasCursorInUrl ? urlPage : 1;
+  const pageUnknown = hasCursorInUrl && !pageParam;
 
-  const onPrev = () => {
-    if (!meta?.prev_page) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('prev', meta.prev_page);
-    params.delete('next');
-    router.push(`?${params.toString()}`);
-  };
-
-  const onFirst = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('next');
-    params.delete('prev');
-    router.push(`?${params.toString()}`);
-  };
-
-  const hasPrev = !!meta?.prev_page;
+  const isFirstPage = !hasCursorInUrl;
+  const hasPrev = !!meta?.prev_page && !isFirstPage;
   const hasNext = !!meta?.next_page;
-  const isFirstPage = !searchParams.get('next') && !searchParams.get('prev');
+
+  const buildHref = (mutate: (params: URLSearchParams) => void) => {
+    const params = new URLSearchParams(searchParams.toString());
+    mutate(params);
+    const qs = params.toString();
+    return qs ? `${pathname}?${qs}` : pathname;
+  };
+
+  const firstHref = buildHref((params) => {
+    params.delete('next');
+    params.delete('prev');
+    params.delete('p');
+  });
+
+  // Prev onto page 1 goes to the canonical cursor-less first page, so Prev
+  // correctly disables there — but only when the depth is actually known to
+  // be 2; from an unknown depth Prev must follow the prev cursor.
+  const prevHref =
+    currentPage === 2
+      ? firstHref
+      : buildHref((params) => {
+          if (meta?.prev_page) params.set('prev', meta.prev_page);
+          params.delete('next');
+          if (!pageUnknown && currentPage - 1 > 1) {
+            params.set('p', String(currentPage - 1));
+          } else {
+            params.delete('p');
+          }
+        });
+
+  const nextHref = buildHref((params) => {
+    if (meta?.next_page) params.set('next', meta.next_page);
+    params.delete('prev');
+    // From an unknown depth, stay unknown instead of claiming page 2.
+    if (pageUnknown) params.delete('p');
+    else params.set('p', String(currentPage + 1));
+  });
+
+  const disabledClass = 'pointer-events-none opacity-50';
 
   return (
     <Card>
       <CardContent className="p-0">
         <div className="text-body-sm border-b px-4 py-3 leading-7">
           {loading ? (
-            <Skeleton className="h-4 w-40 align-middle" />
+            <Skeleton className="w-40" />
           ) : total != null ? (
             t('table.total', { count: numberFormat(total) })
           ) : null}
         </div>
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="min-w-[1200px] table-fixed">
             <TableHeader className="uppercase">
               <TableRow>
                 <TableHead className="w-14" />
@@ -143,31 +180,74 @@ export const ValidatorsTable = ({
                 <TableHead className="w-28">
                   {t('table.columns.delegators')}
                 </TableHead>
-                <TableHead className="whitespace-nowrap">
+                <TableHead className="w-32">
                   {t('table.columns.totalStake')}
                 </TableHead>
-                <TableHead className="whitespace-nowrap">
+                <TableHead className="w-24">
                   {t('table.columns.stakePercent')}
                 </TableHead>
-                <TableHead className="w-44 whitespace-nowrap">
+                <TableHead className="w-48">
                   {t('table.columns.cumulativeStake')}
                 </TableHead>
-                <TableHead className="whitespace-nowrap">
+                <TableHead className="w-36">
                   {t('table.columns.stakeChange')}
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading
-                ? Array.from({ length: 25 }).map((_, i) => (
-                    <TableRow className="h-15" key={i}>
-                      {Array.from({ length: 11 }).map((__, j) => (
-                        <TableCell key={j}>
-                          <Skeleton className="h-5 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                ? Array.from({ length: 25 }).flatMap((_, i) => {
+                    const rows = [
+                      <TableRow className="h-15" key={i}>
+                        {[
+                          'w-[60%]',
+                          'w-[60%]',
+                          'h-4.5 w-12.5 rounded-md',
+                          // The validator column stacks the account link over
+                          // the pubkey line, so its skeleton mirrors that
+                          // two-line geometry to keep row heights equal.
+                          null,
+                          'w-[60%]',
+                          'w-[60%]',
+                          'w-[60%]',
+                          'w-[60%]',
+                          'w-[60%]',
+                          'w-[60%]',
+                          'w-[60%]',
+                        ].map((width, j) => (
+                          <TableCell key={j}>
+                            {width ? (
+                              <Skeleton className={width} />
+                            ) : (
+                              <div className="flex flex-col gap-0.5">
+                                {/* Line 1 is a text-body-sm line box (22px);
+                                    line 2 matches the h-5 Copy-button row —
+                                    22 + 2 + 20 + py-3 = the loaded 68px. */}
+                                <Skeleton className="w-40" />
+                                <span className="flex h-5 items-center">
+                                  <Skeleton className="w-32" />
+                                </span>
+                              </div>
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>,
+                    ];
+                    // The first page carries the decentralization warning row
+                    // after the cumulative-33% validator (usually within the
+                    // first handful of rows), so reserve one placeholder row
+                    // with identical geometry instead of popping it in.
+                    if (isFirstPage && i === 8) {
+                      rows.push(
+                        <TableRow key="decentralization-warning">
+                          <TableCell className="py-3 text-center" colSpan={11}>
+                            <Skeleton className="w-[60%]" />
+                          </TableCell>
+                        </TableRow>,
+                      );
+                    }
+                    return rows;
+                  })
                 : pageData.flatMap((row, localIdx) => {
                     const rows = [
                       <ValidatorRows
@@ -182,7 +262,7 @@ export const ValidatorsTable = ({
                       rows.push(
                         <TableRow key="decentralization-warning">
                           <TableCell
-                            className="text-body-sm py-3 text-center text-amber-500"
+                            className="text-body-sm py-3 text-center whitespace-normal text-amber-500"
                             colSpan={11}
                           >
                             {t('table.warning', {
@@ -199,30 +279,76 @@ export const ValidatorsTable = ({
             </TableBody>
           </Table>
         </div>
+        {/* Loading placeholders mirror the four controls the loaded pager
+            renders (First / Prev / page label / Next), matching the
+            DataTable convention so the bar keeps its geometry. */}
+        {loading && (
+          <div className="flex items-center border-t p-4 py-3">
+            <Pagination className="justify-end">
+              <PaginationContent>
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-12" />
+                </PaginationItem>
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-17" />
+                </PaginationItem>
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-16" />
+                </PaginationItem>
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-17" />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
         {!loading && (hasPrev || hasNext || !isFirstPage) && (
-          <div className="text-body-sm flex items-center justify-end gap-2 border-t px-4 py-3">
-            {!isFirstPage && (
-              <button
-                className="rounded border px-3 py-1 disabled:opacity-40"
-                onClick={onFirst}
-              >
-                {t('table.first')}
-              </button>
-            )}
-            <button
-              className="rounded border px-3 py-1 disabled:opacity-40"
-              disabled={!hasPrev}
-              onClick={onPrev}
-            >
-              {t('table.prev')}
-            </button>
-            <button
-              className="rounded border px-3 py-1 disabled:opacity-40"
-              disabled={!hasNext}
-              onClick={onNext}
-            >
-              {t('table.next')}
-            </button>
+          <div className="flex items-center justify-end border-t p-4 py-3">
+            <Pagination className="mx-0 w-auto">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationLink
+                    aria-disabled={!hasPrev || undefined}
+                    className={hasPrev ? undefined : disabledClass}
+                    href={hasPrev ? firstHref : '#'}
+                    size="sm"
+                    tabIndex={hasPrev ? undefined : -1}
+                  >
+                    {t('table.first')}
+                  </PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationPrevious
+                    aria-disabled={!hasPrev || undefined}
+                    className={hasPrev ? undefined : disabledClass}
+                    href={hasPrev ? prevHref : '#'}
+                    size="sm"
+                    tabIndex={hasPrev ? undefined : -1}
+                  />
+                </PaginationItem>
+                <PaginationItem>
+                  <span
+                    className={cn(
+                      buttonVariants({ size: 'sm', variant: 'outline' }),
+                      'pointer-events-none whitespace-nowrap opacity-50',
+                    )}
+                  >
+                    {t('table.page', {
+                      page: pageUnknown ? '–' : currentPage,
+                    })}
+                  </span>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext
+                    aria-disabled={!hasNext || undefined}
+                    className={hasNext ? undefined : disabledClass}
+                    href={hasNext ? nextHref : '#'}
+                    size="sm"
+                    tabIndex={hasNext ? undefined : -1}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </CardContent>
@@ -318,9 +444,7 @@ const ValidatorRows = ({
               width={20}
             />
           ) : (
-            <div className="bg-muted text-muted-foreground text-body-xs flex size-5 items-center justify-center rounded-sm">
-              ?
-            </div>
+            <span className="text-muted-foreground">—</span>
           )}
         </TableCell>
         <TableCell>

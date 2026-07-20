@@ -37,6 +37,7 @@ export const Blocks = ({
 }: Props) => {
   const { t } = useLocale('blocks');
   const blocks = !loading && blocksPromise ? use(blocksPromise) : null;
+  if (blocks?.errors?.length) throw new Error('Failed to load blocks');
   const blockCount =
     !loading && blockCountPromise ? use(blockCountPromise) : null;
   const blockStats =
@@ -64,6 +65,7 @@ export const Blocks = ({
     },
     {
       cell: (block) => <AccountLink account={block.author_account_id} />,
+      className: 'w-60',
       csvLabel: 'Author',
       csvValue: (block) => block.author_account_id ?? '',
       header: t('columns.author'),
@@ -71,6 +73,7 @@ export const Blocks = ({
     },
     {
       cell: (block) => numberFormat(block.transactions_agg.count),
+      className: 'w-30',
       csvLabel: 'Txns',
       csvValue: (block) => block.transactions_agg.count,
       header: t('columns.txns'),
@@ -127,6 +130,7 @@ export const Blocks = ({
     {
       href: '/charts/txn-fee',
       label: t('stats.gasPrice'),
+      skeletonIcon: true,
       value: blockStats ? (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
@@ -138,6 +142,7 @@ export const Blocks = ({
     {
       href: '/charts/txn-fee',
       label: t('stats.burntFees'),
+      skeletonIcon: true,
       value: blockStats ? (
         <span className="flex items-center gap-1">
           <NearCircle className="size-4" />
@@ -150,12 +155,13 @@ export const Blocks = ({
   return (
     <>
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {statItems.map(({ href, label, value }) => (
+        {statItems.map(({ href, label, skeletonIcon, value }) => (
           <StatCard
             href={href}
             key={label}
             label={label}
-            loading={loading || !blockStats}
+            loading={!!loading}
+            skeletonIcon={skeletonIcon}
             value={value}
           />
         ))}
@@ -170,8 +176,8 @@ export const Blocks = ({
             getRowKey={(block) => block.block_hash}
             header={
               <SkeletonSlot
-                fallback={<Skeleton className="w-40" />}
-                loading={loading || !blockCount}
+                fallback={<Skeleton className="w-64" />}
+                loading={!!loading}
               >
                 {() => {
                   const count = blockCount?.count;
@@ -180,7 +186,7 @@ export const Blocks = ({
                 }}
               </SkeletonSlot>
             }
-            loading={loading || !!blocks?.errors}
+            loading={!!loading}
             onPaginationNavigate={(type, cursor) =>
               type === 'first' ? '/blocks' : `/blocks?${type}=${cursor}`
             }

@@ -5,10 +5,8 @@ import { RiQuestionLine } from '@remixicon/react';
 import { TxnFT, TxnMT, TxnNFT } from 'nb-schemas';
 
 import { ListItem, ListLeft, ListRight } from '@/components/list';
-import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { Badge } from '@/ui/badge';
-import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 import { FTTransfers } from './ft';
@@ -42,7 +40,7 @@ export const Transfers = ({ fts, loading, mts, nfts, spamPatterns }: Props) => {
 
   return (
     <>
-      {(loading || (fts && fts.length > 0)) && (
+      {!loading && fts && fts.length > 0 && (
         <ListItem>
           <ListLeft>
             <p className="flex items-center gap-1">
@@ -53,30 +51,23 @@ export const Transfers = ({ fts, loading, mts, nfts, spamPatterns }: Props) => {
                 <TooltipContent>{t('transfers.ftTip')}</TooltipContent>
               </Tooltip>
               {t('transfers.ftTitle')}
-              {!loading && fts && (
-                <Badge className="ml-1 h-4 px-1 text-[10px]" variant="gray">
-                  {
-                    fts.filter(
-                      (ft) =>
-                        BigInt(ft.delta_amount) > 0n ||
-                        ft.involved_account_id === null,
-                    ).length
-                  }
-                </Badge>
-              )}
+              <Badge className="ml-1 h-4 px-1 text-[10px]" variant="gray">
+                {
+                  fts.filter(
+                    (ft) =>
+                      BigInt(ft.delta_amount) > 0n ||
+                      ft.involved_account_id === null,
+                  ).length
+                }
+              </Badge>
             </p>
           </ListLeft>
           <ListRight>
-            <SkeletonSlot
-              fallback={<Skeleton className="h-19 w-full" />}
-              loading={!!(loading || !fts)}
-            >
-              {() => <FTTransfers fts={fts!} spamPatterns={spamPatterns} />}
-            </SkeletonSlot>
+            <FTTransfers fts={fts} spamPatterns={spamPatterns} />
           </ListRight>
         </ListItem>
       )}
-      {(loading || (nfts && nfts.length > 0)) && (
+      {!loading && nfts && nfts.length > 0 && (
         <ListItem>
           <ListLeft>
             <p className="flex items-center gap-1">
@@ -87,30 +78,22 @@ export const Transfers = ({ fts, loading, mts, nfts, spamPatterns }: Props) => {
                 <TooltipContent>{t('transfers.nftTip')}</TooltipContent>
               </Tooltip>
               {t('transfers.nftTitle')}
-              {!loading && nfts && (
-                <Badge className="ml-1 h-4 px-1 text-[10px]" variant="gray">
-                  {
-                    nfts.filter(
-                      (nft) =>
-                        nft.delta_amount > 0 ||
-                        nft.involved_account_id === null,
-                    ).length
-                  }
-                </Badge>
-              )}
+              <Badge className="ml-1 h-4 px-1 text-[10px]" variant="gray">
+                {
+                  nfts.filter(
+                    (nft) =>
+                      nft.delta_amount > 0 || nft.involved_account_id === null,
+                  ).length
+                }
+              </Badge>
             </p>
           </ListLeft>
           <ListRight>
-            <SkeletonSlot
-              fallback={<Skeleton className="h-13 w-full" />}
-              loading={!!(loading || !nfts)}
-            >
-              {() => <NFTTransfers nfts={nfts!} spamPatterns={spamPatterns} />}
-            </SkeletonSlot>
+            <NFTTransfers nfts={nfts} spamPatterns={spamPatterns} />
           </ListRight>
         </ListItem>
       )}
-      {(loading || (mts && mts.length > 0)) && (
+      {!loading && mts && mts.length > 0 && (
         <ListItem>
           <ListLeft>
             <p className="flex items-center gap-1">
@@ -121,20 +104,13 @@ export const Transfers = ({ fts, loading, mts, nfts, spamPatterns }: Props) => {
                 <TooltipContent>{t('transfers.mtTip')}</TooltipContent>
               </Tooltip>
               {t('transfers.mtTitle')}
-              {!loading && mts && (
-                <Badge className="ml-1 h-4 px-1 text-[10px]" variant="gray">
-                  {mtFtCount + mtNftCount}
-                </Badge>
-              )}
+              <Badge className="ml-1 h-4 px-1 text-[10px]" variant="gray">
+                {mtFtCount + mtNftCount}
+              </Badge>
             </p>
           </ListLeft>
           <ListRight>
-            <SkeletonSlot
-              fallback={<Skeleton className="h-19 w-full" />}
-              loading={!!(loading || !mts)}
-            >
-              {() => <MTTransfers mts={mts!} spamPatterns={spamPatterns} />}
-            </SkeletonSlot>
+            <MTTransfers mts={mts} spamPatterns={spamPatterns} />
           </ListRight>
         </ListItem>
       )}

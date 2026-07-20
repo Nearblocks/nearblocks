@@ -9,6 +9,7 @@ import {
   fetchFTTxns as fetchAddressFTTxns,
 } from '@/data/address/fts';
 import { fetchFTTxnCount, fetchFTTxns } from '@/data/tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/tokens/transfers'>;
@@ -38,6 +39,7 @@ const TransfersPage = async ({ params, searchParams }: Props) => {
   if (account) {
     const ftsPromise = fetchAddressFTTxns(account, filters);
     const ftCountPromise = fetchAddressFTTxnCount(account, filters);
+    await holdNav();
 
     return (
       <>
@@ -56,6 +58,7 @@ const TransfersPage = async ({ params, searchParams }: Props) => {
 
   const txnsPromise = fetchFTTxns(filters);
   const txnCountPromise = fetchFTTxnCount(filters);
+  await holdNav();
 
   return (
     <>

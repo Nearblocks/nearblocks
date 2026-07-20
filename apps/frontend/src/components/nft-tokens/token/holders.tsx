@@ -39,6 +39,7 @@ export const NftTokenHolders = ({
 }: Props) => {
   const { t } = useLocale('nfts');
   const holders = !loading && holdersPromise ? use(holdersPromise) : null;
+  if (holders?.errors?.length) throw new Error('Failed to load holders');
   const holderCount =
     !loading && holderCountPromise ? use(holderCountPromise) : null;
   const contractRes = !loading && contractPromise ? use(contractPromise) : null;
@@ -117,7 +118,7 @@ export const NftTokenHolders = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !holderCount}
+              loading={!!loading}
             >
               {() => {
                 const count = holderCount?.data?.count ?? 0;
@@ -134,7 +135,7 @@ export const NftTokenHolders = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!holders?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           pagination={holders?.meta}
         />

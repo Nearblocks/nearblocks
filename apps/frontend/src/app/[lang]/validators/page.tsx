@@ -6,6 +6,7 @@ import { RpcSelector } from '@/components/rpc';
 import { Validators } from '@/components/validators';
 import { fetchStats } from '@/data/layout';
 import { fetchValidatorInfo, fetchValidatorList } from '@/data/validators';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/validators'>;
@@ -32,6 +33,7 @@ const ValidatorsPage = async ({ params, searchParams }: Props) => {
   const validatorListPromise = fetchValidatorList(filters);
   const validatorInfoPromise = fetchValidatorInfo();
   const statsPromise = fetchStats();
+  await holdNav();
 
   return (
     <>

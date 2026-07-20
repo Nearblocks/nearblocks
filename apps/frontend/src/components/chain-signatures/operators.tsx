@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import { MCMpcParameters } from 'nb-schemas';
+import { MCMpcParametersRes } from 'nb-schemas';
 
 import { AccountLink, Link } from '@/components/link';
 import { Truncate, TruncateText } from '@/components/truncate';
@@ -23,22 +23,25 @@ import { Copy } from '../copy';
 
 type Props = {
   loading?: boolean;
-  mpcsPromise?: Promise<MCMpcParameters | null>;
+  mpcsPromise?: Promise<MCMpcParametersRes>;
 };
 
 export const Operators = ({ loading, mpcsPromise }: Props) => {
   const { t } = useLocale('chainSignatures');
   const mpcs = !loading && mpcsPromise ? use(mpcsPromise) : null;
-  const isLoading = loading || !mpcs;
-  const participants = mpcs?.participants ?? [];
+  if (mpcs?.errors?.length) throw new Error('Failed to load MPC operators');
+  const isLoading = !!loading;
+  const participants = mpcs?.data?.participants ?? [];
 
   return (
     <Card>
-      {mpcs && (
-        <div className="text-body-sm border-b px-4 py-3">
-          {t('operators.found', { count: participants.length })}
-        </div>
-      )}
+      <div className="text-body-sm border-b px-4 py-3">
+        {isLoading ? (
+          <Skeleton className="w-40" />
+        ) : (
+          t('operators.found', { count: participants.length })
+        )}
+      </div>
       <CardContent className="p-0">
         <Table>
           <TableHeader>
@@ -50,21 +53,21 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
           </TableHeader>
           <TableBody>
             {isLoading &&
-              Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index}>
+              Array.from({ length: 10 }).map((_, index) => (
+                <TableRow className="h-15" key={index}>
                   <TableCell>
-                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="w-40" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="w-40" />
                   </TableCell>
                   <TableCell>
-                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="w-40" />
                   </TableCell>
                 </TableRow>
               ))}
             {!isLoading && !participants.length && (
-              <TableRow>
+              <TableRow className="h-15">
                 <TableCell
                   className="text-muted-foreground text-center"
                   colSpan={3}
@@ -75,7 +78,7 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
             )}
             {!isLoading &&
               participants.map((participant) => (
-                <TableRow key={participant.account}>
+                <TableRow className="h-15" key={participant.account}>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <AccountLink
@@ -84,7 +87,10 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
                       />
                       {participant.is_validator && (
                         <Link href={`/validators/${participant.account}`}>
-                          <Badge variant="lime">
+                          <Badge
+                            className="text-body-xs px-1.5 py-0.5"
+                            variant="lime"
+                          >
                             {t('operators.validator')}
                           </Badge>
                         </Link>

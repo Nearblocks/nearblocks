@@ -6,6 +6,7 @@ import {
   fetchFTContractStatsHeatmap,
   fetchFTContractStatsOverview,
 } from '@/data/tokens/analytics';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/tokens/[cid]/analytics'>;
 
@@ -18,6 +19,7 @@ const AnalyticsOverviewPage = async ({ params, searchParams }: Props) => {
 
   const overviewPromise = fetchFTContractStatsOverview(cid);
   const heatmapPromise = fetchFTContractStatsHeatmap(cid);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<OverviewChart loading />}>

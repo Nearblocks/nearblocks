@@ -26,6 +26,45 @@ type Props = {
   contractPromise: Promise<FTContractRes>;
 };
 
+// Suspense fallback for HolderFilter. The card's presence is determined by
+// the `account` search param alone, so this reserves the card shell on
+// filtered URLs while the contract fetch streams in (and renders nothing
+// otherwise), preventing the card from popping in above the tab bar.
+export const HolderFilterFallback = () => {
+  const { t } = useLocale('fts');
+  const searchParams = useSearchParams();
+  const account = searchParams.get('account');
+
+  if (!account) return null;
+
+  return (
+    <Card className="mb-4">
+      <CardContent className="flex flex-col divide-y px-0 md:flex-row md:divide-x md:divide-y-0">
+        <div className="flex-1 px-4 py-3">
+          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+            {t('overview.filteredBy')}
+          </div>
+          <div className="text-body-sm flex items-center gap-1">
+            <Skeleton className="w-40" />
+          </div>
+        </div>
+        <div className="flex-1 px-4 py-3">
+          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+            {t('overview.balance')}
+          </div>
+          <Skeleton className="w-32" />
+        </div>
+        <div className="flex-1 px-4 py-3">
+          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+            {t('overview.value')}
+          </div>
+          <Skeleton className="w-32" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 export const HolderFilter = ({ cid, contractPromise }: Props) => {
   const { t } = useLocale('fts');
   const pathname = usePathname();
@@ -88,7 +127,7 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
             {t('overview.balance')}
           </div>
           <SkeletonSlot
-            fallback={<Skeleton className="h-5 w-32" />}
+            fallback={<Skeleton className="w-32" />}
             loading={loading}
           >
             {() =>
@@ -109,7 +148,7 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
             {t('overview.value')}
           </div>
           <SkeletonSlot
-            fallback={<Skeleton className="h-5 w-32" />}
+            fallback={<Skeleton className="w-32" />}
             loading={loading}
           >
             {() =>

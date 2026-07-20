@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 
 import { Txns as AddressTxns } from '@/components/address/txns';
 import { ErrorSuspense } from '@/components/error-suspense';
+import { Link } from '@/components/link';
 import { PageHeading } from '@/components/page-heading';
 import { Txns } from '@/components/txns';
 import {
@@ -9,6 +10,7 @@ import {
   fetchTxns as fetchAddressTxns,
 } from '@/data/address/txns';
 import { fetchTxnCount, fetchTxns, fetchTxnStats } from '@/data/txns';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/txns'>;
@@ -38,11 +40,27 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
   if (account) {
     const txnsPromise = fetchAddressTxns(account, filters);
     const txnCountPromise = fetchAddressTxnCount(account, filters);
+    await holdNav();
 
     return (
       <>
-        <PageHeading apiTag="txns" title={t('title')} />
-        <ErrorSuspense fallback={<AddressTxns loading />}>
+        <PageHeading
+          apiTag="txns"
+          title={
+            <>
+              {t('titleByAccount')}{' '}
+              <Link
+                className="text-link text-body-base break-all"
+                href={`/address/${account}`}
+              >
+                {account}
+              </Link>
+            </>
+          }
+        />
+        <ErrorSuspense
+          fallback={<AddressTxns address={account} basePath="/txns" loading />}
+        >
           <AddressTxns
             address={account}
             basePath="/txns"
@@ -59,6 +77,7 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
   const txnsPromise = fetchTxns(filters);
   const txnCountPromise = fetchTxnCount(filters);
   const txnStatsPromise = isFiltered ? undefined : fetchTxnStats();
+  await holdNav();
 
   const title = block ? (
     <>

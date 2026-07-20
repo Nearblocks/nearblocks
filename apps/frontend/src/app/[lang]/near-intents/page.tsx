@@ -7,6 +7,7 @@ import {
   fetchNearIntentsTxnCount,
   fetchNearIntentsTxns,
 } from '@/data/near-intents';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/near-intents'>;
@@ -33,6 +34,7 @@ const NearIntentsPage = async ({ params, searchParams }: Props) => {
 
   const txnsPromise = fetchNearIntentsTxns(filters);
   const txnCountPromise = fetchNearIntentsTxnCount(filters);
+  await holdNav();
 
   return (
     <>

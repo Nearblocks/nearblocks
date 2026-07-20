@@ -1,12 +1,11 @@
 'use client';
 
 import { Check, ChevronRight, Moon, Sun } from 'lucide-react';
-import { useTransition } from 'react';
 
-import { setTheme } from '@/actions/theme';
 import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { useTheme } from '@/hooks/use-theme';
+import { applyTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { Theme } from '@/types/enums';
 import { isNavMenuDivider, NavMenu, RouteKey } from '@/types/types';
@@ -30,14 +29,10 @@ type Props = {
 export const MobileMenu = ({ menu }: Props) => {
   const { t } = useLocale('layout');
   const theme = useTheme();
-  const [, startTransition] = useTransition();
   const network = useConfig((c) => c.config.network);
   const mainnetUrl = useConfig((c) => c.config.mainnetUrl);
   const testnetUrl = useConfig((c) => c.config.testnetUrl);
-  const onTheme = (value: Theme) =>
-    startTransition(() => {
-      setTheme(value);
-    });
+  const onTheme = (value: Theme) => applyTheme(value);
 
   return (
     <MobileNavigationMenu>

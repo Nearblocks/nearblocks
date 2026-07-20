@@ -13,6 +13,7 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
+import { MethodBadge } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { countFormat, isApproxCount, nearFormat } from '@/lib/format';
@@ -36,6 +37,7 @@ export const AccessKeys = ({
 }: Props) => {
   const { t } = useLocale('address');
   const keys = !loading && keysPromise ? use(keysPromise) : null;
+  if (keys?.errors?.length) throw new Error('Failed to load access keys');
   const keyCount = !loading && keyCountPromise ? use(keyCountPromise) : null;
 
   const columns: DataTableColumnDef<AccountKey>[] = [
@@ -65,19 +67,17 @@ export const AccessKeys = ({
           <TruncateCopy text={key.public_key} />
         </Truncate>
       ),
+      className: 'w-44',
       header: t('keys.columns.publicKey'),
       id: 'public_key',
     },
     {
       cell: (key) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText className="max-w-30" text={key.permission_kind} />
-          </Truncate>
-        </Badge>
+        <MethodBadge text={key.permission_kind} textClassName="max-w-30" />
       ),
       header: t('keys.columns.access'),
       id: 'access',
+      skeletonCell: <Skeleton className="h-4.5 w-16 rounded-md" />,
     },
     {
       cell: (key) => {
@@ -134,9 +134,13 @@ export const AccessKeys = ({
     {
       cell: (key) =>
         key.deleted.transaction_hash ? (
-          <Badge variant="red">{t('keys.deleted')}</Badge>
+          <Badge className="text-body-xs px-1.5 py-0.5" variant="red">
+            {t('keys.deleted')}
+          </Badge>
         ) : (
-          <Badge variant="lime">{t('keys.created')}</Badge>
+          <Badge className="text-body-xs px-1.5 py-0.5" variant="lime">
+            {t('keys.created')}
+          </Badge>
         ),
       header: t('keys.columns.action'),
       id: 'action',
@@ -196,7 +200,7 @@ export const AccessKeys = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !keyCount}
+              loading={!!loading}
             >
               {() => {
                 const count = keyCount?.count ?? 0;
@@ -211,11 +215,13 @@ export const AccessKeys = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!keys?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
+          paginated={false}
           pagination={keys?.meta}
+          skeletonRows={5}
         />
       </CardContent>
     </Card>

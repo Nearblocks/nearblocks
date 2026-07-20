@@ -65,6 +65,7 @@ export const validators = {
     },
     first: 'First',
     next: 'Next',
+    page: 'Page {{page}}',
     prev: 'Prev',
     statuses: {
       active: 'Active',

@@ -4,6 +4,7 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { NftTokens } from '@/components/nft-tokens';
 import { PageHeading } from '@/components/page-heading';
 import { fetchNFTTokenCount, fetchNFTTokens } from '@/data/nft-tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/nft-tokens'>;
@@ -29,6 +30,7 @@ const NftTokensPage = async ({ params, searchParams }: Props) => {
   const filters = await searchParams;
   const nftTokensPromise = fetchNFTTokens(filters);
   const nftTokenCountPromise = fetchNFTTokenCount(filters);
+  await holdNav();
 
   return (
     <>

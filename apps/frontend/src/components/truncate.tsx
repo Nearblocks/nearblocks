@@ -28,7 +28,10 @@ export type TruncateCopyProps = {
 export const Truncate = ({ children, className }: TruncateProps) => {
   return (
     <span
-      className={cn('pointer-events-auto flex w-fit items-center', className)}
+      className={cn(
+        'pointer-events-auto flex w-fit max-w-full items-center',
+        className,
+      )}
     >
       {children}
     </span>
@@ -46,7 +49,7 @@ export const TruncateText = ({
     <Tooltip>
       <TooltipTrigger asChild>
         <Component
-          className={cn('inline-block max-w-30 truncate', className)}
+          className={cn('inline-block max-w-30 min-w-0 truncate', className)}
           {...props}
         >
           {text}
@@ -69,6 +72,9 @@ export const TruncateCopy = ({
   if (hidden) return null;
 
   return (
-    <Copy className={cn('text-muted-foreground', className)} text={text} />
+    <Copy
+      className={cn('text-muted-foreground shrink-0', className)}
+      text={text}
+    />
   );
 };

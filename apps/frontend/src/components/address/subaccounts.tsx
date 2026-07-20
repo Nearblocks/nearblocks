@@ -38,6 +38,8 @@ export const SubAccounts = ({
   const { t } = useLocale('address');
   const subAccounts =
     !loading && subAccountsPromise ? use(subAccountsPromise) : null;
+  if (subAccounts?.errors?.length)
+    throw new Error('Failed to load sub accounts');
   const subAccountCount =
     !loading && subAccountCountPromise ? use(subAccountCountPromise) : null;
 
@@ -70,9 +72,13 @@ export const SubAccounts = ({
     {
       cell: (subAccount) =>
         subAccount.deleted.transaction_hash ? (
-          <Badge variant="red">{t('subaccounts.deleted')}</Badge>
+          <Badge className="text-body-xs px-1.5 py-0.5" variant="red">
+            {t('subaccounts.deleted')}
+          </Badge>
         ) : (
-          <Badge variant="lime">{t('subaccounts.created')}</Badge>
+          <Badge className="text-body-xs px-1.5 py-0.5" variant="lime">
+            {t('subaccounts.created')}
+          </Badge>
         ),
       header: t('subaccounts.columns.action'),
       id: 'action',
@@ -121,7 +127,7 @@ export const SubAccounts = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !subAccountCount}
+              loading={!!loading}
             >
               {() => {
                 const count = subAccountCount?.count ?? 0;
@@ -138,9 +144,11 @@ export const SubAccounts = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!subAccounts?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
+          paginated={false}
           pagination={subAccounts?.meta}
+          skeletonRows={5}
         />
       </CardContent>
     </Card>

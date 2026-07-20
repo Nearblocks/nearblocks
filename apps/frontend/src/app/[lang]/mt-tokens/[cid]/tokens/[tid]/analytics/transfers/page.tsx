@@ -4,6 +4,7 @@ import {
   fetchMTTokenStatsAccountTransfers,
   fetchMTTokenStatsTransfers,
 } from '@/data/mt-tokens/analytics';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken } from '@/lib/utils';
 
 type Props =
@@ -23,6 +24,8 @@ const AnalyticsTransfersPage = async ({ params, searchParams }: Props) => {
       account,
       { limit: '365' },
     );
+    await holdNav();
+
     return (
       <ErrorSuspense fallback={<TransfersChart loading />}>
         <TransfersChart accountTransfersPromise={accountTransfersPromise} />
@@ -33,6 +36,7 @@ const AnalyticsTransfersPage = async ({ params, searchParams }: Props) => {
   const transfersPromise = fetchMTTokenStatsTransfers(cid, tid, {
     limit: '365',
   });
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<TransfersChart loading />}>

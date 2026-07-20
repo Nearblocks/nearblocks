@@ -4,6 +4,7 @@ import { TxnFeeChart } from '@/components/charts/charts';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { fetchPriceStats, fetchTxnStats } from '@/data/charts';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/charts/txn-fee'>;
@@ -28,6 +29,7 @@ const TxnFeePage = async ({ params }: Props) => {
   const t = await translator(locale, 'charts');
   const txnStatsPromise = fetchTxnStats();
   const priceStatsPromise = fetchPriceStats();
+  await holdNav();
 
   return (
     <>

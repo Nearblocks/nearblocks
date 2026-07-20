@@ -80,7 +80,7 @@ export const EpochInfo = ({ info, loading }: Props) => {
             <ListLeft>{t('epochInfo.epochElapsed')}</ListLeft>
             <ListRight className="font-mono">
               {loading ? (
-                <Skeleton className="h-4 w-24" />
+                <Skeleton className="w-24" />
               ) : (
                 secondsToTime(Math.floor(elapsedTime))
               )}
@@ -90,7 +90,7 @@ export const EpochInfo = ({ info, loading }: Props) => {
             <ListLeft>{t('epochInfo.nextEpochEta')}</ListLeft>
             <ListRight className="font-mono">
               {loading ? (
-                <Skeleton className="h-4 w-24" />
+                <Skeleton className="w-24" />
               ) : (
                 secondsToTime(Math.floor(timeRemaining))
               )}
@@ -100,7 +100,7 @@ export const EpochInfo = ({ info, loading }: Props) => {
             <ListLeft>{t('epochInfo.lastEpochApy')}</ListLeft>
             <ListRight>
               {loading ? (
-                <Skeleton className="h-4 w-12" />
+                <Skeleton className="w-12" />
               ) : info?.last_epoch_apy ? (
                 `${info.last_epoch_apy}%`
               ) : (
@@ -112,7 +112,12 @@ export const EpochInfo = ({ info, loading }: Props) => {
             <ListLeft>{t('epochInfo.progress')}</ListLeft>
             <ListRight>
               {loading ? (
-                <Skeleton className="h-4 w-24" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-2 w-28 rounded-full" />
+                  <span className="block">
+                    <Skeleton className="w-8" />
+                  </span>
+                </div>
               ) : info != null ? (
                 <div className="flex items-center gap-2">
                   <div className="bg-muted h-2 w-28 rounded-full">

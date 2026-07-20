@@ -29,6 +29,7 @@ export const Tokens = ({
   const { t } = useLocale('fts');
   const searchParams = useSearchParams();
   const tokens = !loading && tokensPromise ? use(tokensPromise) : null;
+  if (tokens?.errors?.length) throw new Error('Failed to load tokens');
   const tokenCount =
     !loading && tokenCountPromise ? use(tokenCountPromise) : null;
 
@@ -53,11 +54,21 @@ export const Tokens = ({
       enableSort: true,
       header: t('tokens.title'),
       id: 'token',
+      skeletonCell: (
+        <span className="flex items-center gap-2">
+          <Skeleton className="size-5 shrink-0 rounded-full" />
+          <Skeleton className="w-24" />
+        </span>
+      ),
       sortName: 'name',
     },
     {
       cell: (token) =>
-        token.price ? currencyFormat(token.price) : <span>N/A</span>,
+        token.price ? (
+          currencyFormat(token.price)
+        ) : (
+          <span className="text-muted-foreground">N/A</span>
+        ),
       enableSort: true,
       header: t('tokens.price'),
       id: 'price',
@@ -68,7 +79,7 @@ export const Tokens = ({
         token.change_24h ? (
           <PriceChange change={token.change_24h} />
         ) : (
-          <span>N/A</span>
+          <span className="text-muted-foreground">N/A</span>
         ),
       header: t('tokens.change'),
       id: 'change',
@@ -86,7 +97,7 @@ export const Tokens = ({
         token.onchain_market_cap && parseFloat(token.onchain_market_cap) > 0 ? (
           currencyFormat(token.onchain_market_cap)
         ) : (
-          <span>N/A</span>
+          <span className="text-muted-foreground">N/A</span>
         ),
       enableSort: true,
       header: t('tokens.onchainMC'),
@@ -144,7 +155,7 @@ export const Tokens = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !tokenCount}
+              loading={!!loading}
             >
               {() => {
                 const count = tokenCount?.data?.count ?? 0;
@@ -161,10 +172,11 @@ export const Tokens = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!tokens?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           onSortNavigate={onSort}
           pagination={tokens?.meta}
+          tableClassName="min-w-5xl"
         />
       </CardContent>
     </Card>

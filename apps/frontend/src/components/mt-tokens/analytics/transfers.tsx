@@ -73,7 +73,7 @@ export const TransfersChart = ({
       receivers.push([timestamp, +item.unique_receivers]);
     }
 
-    return { isEmpty: stats?.length === 0, receivers, senders, transfers };
+    return { isEmpty: !stats?.length, receivers, senders, transfers };
   }, [contractStats]);
 
   const accountData = useMemo(() => {
@@ -90,10 +90,10 @@ export const TransfersChart = ({
       uniqueOut.push([timestamp, +item.unique_address_out]);
     }
 
-    return { isEmpty: stats?.length === 0, transfers, uniqueIn, uniqueOut };
+    return { isEmpty: !stats?.length, transfers, uniqueIn, uniqueOut };
   }, [accountStats]);
 
-  const isLoading = loading || (!contractStats && !accountStats);
+  const isLoading = !!loading;
   const isAccount = !!accountTransfersPromise;
   const isEmpty = isAccount ? accountData.isEmpty : contractData.isEmpty;
 

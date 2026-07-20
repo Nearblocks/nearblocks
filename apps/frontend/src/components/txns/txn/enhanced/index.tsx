@@ -32,40 +32,49 @@ export const Enhanced = ({
         <SkeletonSlot
           fallback={
             <div className="px-4 md:px-8">
-              <div className="flex justify-end">
+              <div className="hidden justify-end md:flex">
                 <Skeleton className="absolute h-7 w-25" />
               </div>
               <div>
                 <div className="flex items-center gap-2 py-1">
                   <Skeleton className="size-4 rounded-full" />
-                  <Skeleton className="h-7 w-40" />
+                  <span className="flex h-7 items-center">
+                    <Skeleton className="w-40" />
+                  </span>
                 </div>
                 <div className="border-border ml-2 border-l-2 py-2.5 pl-6">
-                  <Skeleton className="h-8 w-40" />
+                  <Skeleton className="h-5.5 w-40 rounded-md" />
                 </div>
                 <div className="flex items-center gap-2 py-1">
                   <Skeleton className="size-4 rounded-full" />
-                  <Skeleton className="h-7 w-36" />
+                  <span className="flex h-7 items-center">
+                    <Skeleton className="w-36" />
+                  </span>
                 </div>
                 <div className="border-border ml-2 border-l-2 py-2.5 pl-6">
-                  <Skeleton className="h-8 w-30" />
+                  <Skeleton className="h-5.5 w-30 rounded-md" />
                 </div>
                 <div className="flex items-center gap-2 py-1">
                   <Skeleton className="size-4 rounded-full" />
-                  <Skeleton className="h-7 w-40" />
+                  <span className="flex h-7 items-center">
+                    <Skeleton className="w-40" />
+                  </span>
                 </div>
               </div>
             </div>
           }
-          loading={loading || !receipts}
+          loading={!!loading}
         >
-          {() => (
-            <EnhancedPlan
-              nearPrice={stats?.near_price}
-              receipts={receipts!}
-              tid={tid}
-            />
-          )}
+          {() => {
+            if (!receipts) throw new Error('Failed to load receipts');
+            return (
+              <EnhancedPlan
+                nearPrice={stats?.near_price}
+                receipts={receipts}
+                tid={tid}
+              />
+            );
+          }}
         </SkeletonSlot>
       </CardContent>
     </Card>

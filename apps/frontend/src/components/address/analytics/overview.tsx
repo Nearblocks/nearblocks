@@ -47,18 +47,30 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           <p className="text-headline-base mt-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-20" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => <>{numberFormat(overview!.txns)}</>}
+              {() =>
+                overview ? (
+                  <>{numberFormat(overview.txns)}</>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
           <p className="text-body-xs text-muted-foreground mt-2">
             {t('analytics.overview.since')}{' '}
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => <>{dateFormat(overview!.first_day, 'ddd DD, MMM YYYY')}</>}
+              {() =>
+                overview ? (
+                  <>{dateFormat(overview.first_day, 'ddd DD, MMM YYYY')}</>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </Card>
@@ -77,22 +89,32 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           <p className="text-headline-base mt-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => <YearsAndDays dayCount={+overview!.active_days} />}
+              {() =>
+                overview ? (
+                  <YearsAndDays dayCount={+overview.active_days} />
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
           <p className="text-body-xs text-muted-foreground mt-2">
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => (
-                <>
-                  {dateFormat(overview!.first_day, 'ddd DD, MMM YYYY')} -{' '}
-                  {dateFormat(overview!.last_day, 'ddd DD, MMM YYYY')}
-                </>
-              )}
+              {() =>
+                overview ? (
+                  <>
+                    {dateFormat(overview.first_day, 'ddd DD, MMM YYYY')} -{' '}
+                    {dateFormat(overview.last_day, 'ddd DD, MMM YYYY')}
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </Card>
@@ -111,18 +133,30 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           <p className="text-headline-base mt-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => <YearsAndDays dayCount={+overview!.unique_days} />}
+              {() =>
+                overview ? (
+                  <YearsAndDays dayCount={+overview.unique_days} />
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
           <p className="text-body-xs text-muted-foreground mt-2">
             {t('analytics.overview.since')}{' '}
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => <>{dateFormat(overview!.first_day, 'ddd DD, MMM YYYY')}</>}
+              {() =>
+                overview ? (
+                  <>{dateFormat(overview.first_day, 'ddd DD, MMM YYYY')}</>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </Card>
@@ -141,26 +175,39 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           <p className="text-headline-base mt-0.5">
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => <YearsAndDays dayCount={+overview!.longest_streak.days} />}
+              {() =>
+                overview ? (
+                  <YearsAndDays dayCount={+overview.longest_streak.days} />
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
           <p className="text-body-xs text-muted-foreground mt-2">
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !overview}
+              loading={!!loading}
             >
-              {() => (
-                <>
-                  {dateFormat(
-                    overview!.longest_streak.start,
-                    'ddd DD, MMM YYYY',
-                  )}{' '}
-                  -{' '}
-                  {dateFormat(overview!.longest_streak.end, 'ddd DD, MMM YYYY')}
-                </>
-              )}
+              {() =>
+                overview ? (
+                  <>
+                    {dateFormat(
+                      overview.longest_streak.start,
+                      'ddd DD, MMM YYYY',
+                    )}{' '}
+                    -{' '}
+                    {dateFormat(
+                      overview.longest_streak.end,
+                      'ddd DD, MMM YYYY',
+                    )}
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )
+              }
             </SkeletonSlot>
           </p>
         </Card>
@@ -174,8 +221,8 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
         </CardHeader>
         <CardContent className="h-64 px-3 py-5">
           <SkeletonSlot
-            fallback={<Skeleton className="h-54 w-full" />}
-            loading={loading || !heatmap}
+            fallback={<Skeleton className="h-46 w-full" />}
+            loading={!!loading}
           >
             {() => <Heatmap data={heatmap ?? []} />}
           </SkeletonSlot>

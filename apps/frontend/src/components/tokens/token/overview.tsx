@@ -52,8 +52,12 @@ export const Overview = ({
               </ListLeft>
               <ListRight className="pt-0!">
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-6 w-28" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="text-body-xs block">
+                      <Skeleton className="w-28" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() => (
                     <span className="text-body-xs flex items-center gap-1">
@@ -80,8 +84,12 @@ export const Overview = ({
               </ListLeft>
               <ListRight className="pt-0!">
                 <SkeletonSlot
-                  fallback={<Skeleton className="w-28" />}
-                  loading={loading || !contract}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-28" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() => (
                     <>
@@ -108,8 +116,12 @@ export const Overview = ({
             </ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-28" />}
-                loading={loading || !contract}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-28" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -129,8 +141,12 @@ export const Overview = ({
             <ListLeft className="min-w-36">{t('overview.holders')}</ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !holderCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>
@@ -148,8 +164,12 @@ export const Overview = ({
             <ListLeft className="min-w-36">{t('overview.transfers')}</ListLeft>
             <ListRight>
               <SkeletonSlot
-                fallback={<Skeleton className="w-20" />}
-                loading={loading || !txCount}
+                fallback={
+                  <span className="block">
+                    <Skeleton className="w-20" />
+                  </span>
+                }
+                loading={!!loading}
               >
                 {() => (
                   <>

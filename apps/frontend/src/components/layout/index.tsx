@@ -2,9 +2,7 @@ import { fetchStats, fetchSyncStatus } from '@/data/layout';
 
 import { ErrorSuspense } from '../error-suspense';
 import { Footer } from './footer';
-import { Formbricks } from './formbricks';
 import { Header } from './header';
-import { NewUiBanner } from './new-ui-banner';
 import { Notice } from './notice';
 import { TopBar } from './topbar';
 
@@ -21,12 +19,10 @@ export const Layout = ({ children }: Props) => {
       <ErrorSuspense fallback={null}>
         <Notice syncStatusPromise={syncStatusPromise} />
       </ErrorSuspense>
-      <NewUiBanner />
       <TopBar statsPromise={statsPromise} />
       <Header />
       {children}
       <Footer />
-      <Formbricks />
       <svg
         aria-hidden
         className="absolute size-0"

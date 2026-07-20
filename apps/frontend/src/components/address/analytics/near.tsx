@@ -62,14 +62,14 @@ export const NearChart = ({ loading, nearPromise }: Props) => {
       amountOut.push([timestamp, +toNear(item.amount_out)]);
     }
 
-    return { amountIn, amountOut, isEmpty: stats?.length === 0 };
+    return { amountIn, amountOut, isEmpty: !stats?.length };
   }, [stats]);
 
   return (
     <div className="h-105">
       <SkeletonSlot
         fallback={<Skeleton className="h-105 w-full" />}
-        loading={loading || !stats}
+        loading={!!loading}
       >
         {() =>
           data.isEmpty ? (

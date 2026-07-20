@@ -4,6 +4,7 @@ import {
   fetchMTTokenTxnCount,
   fetchMTTokenTxns,
 } from '@/data/mt-tokens/contract';
+import { holdNav } from '@/lib/hold-nav';
 import { decodeToken } from '@/lib/utils';
 
 type Props = {
@@ -17,6 +18,7 @@ const FtTokenTransfersPage = async ({ params, searchParams }: Props) => {
   const filters = { ...raw, affected: raw.account ?? raw.affected };
   const txnsPromise = fetchMTTokenTxns(cid, tid, filters);
   const txnCountPromise = fetchMTTokenTxnCount(cid, tid, filters);
+  await holdNav();
 
   return (
     <ErrorSuspense fallback={<MtFtTransfers loading />}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { RiQuestionLine } from '@remixicon/react';
-import { ChevronRight } from 'lucide-react';
+import { ChartLine, ChevronRight } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
 import {
@@ -12,6 +12,7 @@ import {
   TpsStats,
 } from 'nb-schemas';
 
+import { EmptyBox } from '@/components/empty';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { Link } from '@/components/link';
 import { useConfig } from '@/hooks/use-config';
@@ -150,6 +151,18 @@ export const ChartCard = ({ children, href, title }: CardProps) => {
   );
 };
 
+// Rendered inside a fixed-height chart slot when stats resolve null/empty so
+// an empty dataset shows a "no data" state instead of a bare Highcharts frame.
+// Copy matches the (untranslated) `fts.analytics.noData` string; the charts
+// dictionaries have no equivalent key.
+export const ChartEmpty = () => {
+  return (
+    <div className="flex h-full">
+      <EmptyBox description="No data available" icon={<ChartLine />} />
+    </div>
+  );
+};
+
 export const ChartHeader = ({
   description,
   logView,
@@ -165,12 +178,16 @@ export const ChartHeader = ({
           id="log-switch"
           onCheckedChange={setLogView}
         />
-        <Label htmlFor="log-switch">{t('logView')}</Label>
+        <Label className="text-body-xs" htmlFor="log-switch">
+          {t('logView')}
+        </Label>
         <Tooltip>
           <TooltipTrigger asChild>
             <RiQuestionLine className="size-4" />
           </TooltipTrigger>
-          <TooltipContent>{t('logViewTip')}</TooltipContent>
+          <TooltipContent className="px-2.5 py-1">
+            {t('logViewTip')}
+          </TooltipContent>
         </Tooltip>
       </span>
     </CardHeader>

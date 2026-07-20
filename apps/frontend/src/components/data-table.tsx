@@ -17,8 +17,9 @@ import {
   FilterData,
   TableFilter,
 } from '@/components/table-filter';
+import { numberFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { Button } from '@/ui/button';
+import { Button, buttonVariants } from '@/ui/button';
 import {
   Pagination,
   PaginationContent,
@@ -103,8 +104,23 @@ type DataTableProps<TData> = {
     cursor: string,
   ) => string;
   onSortNavigate?: (sort: string, order: 'asc' | 'desc') => string;
+  // Query param that tracks the page number. Cursor-paginated tables use the
+  // default client-side `p` counter; tables that paginate by a real server
+  // page number (validator delegators) pass their own param, which is then
+  // the source of truth for the label.
+  pageParamKey?: string;
+  // Whether a pager is plausible for this table's typical result set. When
+  // false, loading skeletons stop reserving pager controls that would vanish
+  // for single-page results. Defaults to reserving whenever the table is
+  // paginatable at all.
+  paginated?: boolean;
   pagination?: null | PaginationMeta;
+  // Rows per page for the "Showing X to Y" range; the API paginates by
+  // cursor so this mirrors the fetch limit (overridden by a `limit` param).
+  perPage?: number;
   skeletonRows?: number;
+  // Merged onto the table element, e.g. a wider min-width for dense tables.
+  tableClassName?: string;
 };
 
 export const DataTable = <TData,>({
@@ -123,10 +139,15 @@ export const DataTable = <TData,>({
   onFilter,
   onPaginationNavigate,
   onSortNavigate,
+  pageParamKey = 'p',
+  paginated,
   pagination,
+  perPage = 25,
   skeletonRows = 25,
+  tableClassName,
 }: DataTableProps<TData>) => {
   const searchParams = useSearchParams();
+  const reservePager = paginated ?? !!onPaginationNavigate;
 
   const csvColumns = columns.filter(
     (
@@ -153,41 +174,128 @@ export const DataTable = <TData,>({
   };
 
   const hasPagination = !!pagination?.next_page || !!pagination?.prev_page;
-  const renderPagination = () => (
-    <Pagination className="mx-0 w-auto">
-      <PaginationContent>
-        {pagination?.prev_page && onPaginationNavigate && (
+  // The API paginates by cursor (no server page numbers), so track the page
+  // client-side via a `p` query param: +1 on Next, -1 on Prev, cleared on
+  // First. This also lets us clamp Prev/First on page 1 even when the API
+  // still returns a prev cursor there.
+  const hasCursorInUrl =
+    !!searchParams.get('next') || !!searchParams.get('prev');
+  const pageParam = searchParams.get(pageParamKey);
+  const urlPage = Math.max(1, Number(pageParam ?? '1') || 1);
+  const cursorMode = pageParamKey === 'p';
+  // Cursor mode: a URL without a cursor is the canonical first page even if a
+  // stale `p` survived a sort/filter round-trip; a cursor without `p` (legacy
+  // or shared link) is an unknown depth, so don't claim a page number for it.
+  const currentPage = cursorMode && !hasCursorInUrl ? 1 : urlPage;
+  const pageUnknown = cursorMode && hasCursorInUrl && !pageParam;
+  // Fetchers forward a user-settable `limit` (1-100) to the API; the Showing
+  // range must count with the same page size the data was fetched with.
+  const limitParam = Number(searchParams.get('limit'));
+  const effPerPage =
+    Number.isInteger(limitParam) && limitParam >= 1 && limitParam <= 100
+      ? limitParam
+      : perPage;
+
+  const withPageParam = (href: string, page: null | number) => {
+    const [path, query = ''] = href.split('?');
+    const params = new URLSearchParams(query);
+    if (page && page > 1) params.set(pageParamKey, String(page));
+    else params.delete(pageParamKey);
+    const qs = params.toString();
+    return qs ? `${path}?${qs}` : path;
+  };
+
+  // All three controls always render (disabled when unavailable) so buttons
+  // keep stable positions across page changes instead of appearing/vanishing.
+  const renderPagination = () => {
+    const canPrev =
+      !!pagination?.prev_page &&
+      !!onPaginationNavigate &&
+      (currentPage > 1 || hasCursorInUrl);
+    const canNext = !!pagination?.next_page && !!onPaginationNavigate;
+    const disabledClass = 'pointer-events-none opacity-50';
+
+    return (
+      <Pagination className="mx-0 w-auto">
+        <PaginationContent>
           <PaginationItem>
-            <PaginationLink href={onPaginationNavigate('first', '')} size="sm">
+            <PaginationLink
+              aria-disabled={!canPrev || undefined}
+              className={canPrev ? undefined : disabledClass}
+              href={
+                canPrev
+                  ? withPageParam(onPaginationNavigate!('first', ''), null)
+                  : '#'
+              }
+              size="sm"
+              tabIndex={canPrev ? undefined : -1}
+            >
               First
             </PaginationLink>
           </PaginationItem>
-        )}
-        {pagination?.prev_page && onPaginationNavigate && (
           <PaginationItem>
             <PaginationPrevious
-              href={onPaginationNavigate('prev', pagination.prev_page)}
+              aria-disabled={!canPrev || undefined}
+              className={canPrev ? undefined : disabledClass}
+              href={
+                // Prev onto page 1 goes to the canonical cursor-less first
+                // page, so Prev correctly disables there.
+                canPrev
+                  ? currentPage === 2
+                    ? withPageParam(onPaginationNavigate!('first', ''), null)
+                    : withPageParam(
+                        onPaginationNavigate!('prev', pagination!.prev_page!),
+                        currentPage - 1,
+                      )
+                  : '#'
+              }
               size="sm"
+              tabIndex={canPrev ? undefined : -1}
             />
           </PaginationItem>
-        )}
-        {pagination?.next_page && onPaginationNavigate && (
+          <PaginationItem>
+            <span
+              className={cn(
+                buttonVariants({ size: 'sm', variant: 'outline' }),
+                'pointer-events-none whitespace-nowrap opacity-50',
+              )}
+            >
+              Page {pageUnknown ? '–' : currentPage}
+            </span>
+          </PaginationItem>
           <PaginationItem>
             <PaginationNext
-              href={onPaginationNavigate('next', pagination.next_page)}
+              aria-disabled={!canNext || undefined}
+              className={canNext ? undefined : disabledClass}
+              href={
+                canNext
+                  ? withPageParam(
+                      onPaginationNavigate!('next', pagination!.next_page!),
+                      // From an unknown depth, stay unknown instead of
+                      // claiming page 2.
+                      pageUnknown ? null : currentPage + 1,
+                    )
+                  : '#'
+              }
               size="sm"
+              tabIndex={canNext ? undefined : -1}
             />
           </PaginationItem>
-        )}
-      </PaginationContent>
-    </Pagination>
-  );
+        </PaginationContent>
+      </Pagination>
+    );
+  };
 
+  // Filters and sorts reset the data to the first page (cursors cleared), so
+  // the page counter must reset with them or the label desyncs from the data.
+  const pageReset = {
+    next: undefined,
+    [pageParamKey]: undefined,
+    prev: undefined,
+  };
   const filterHelpers: FilterHelpers = {
-    onClear: (data) =>
-      (onClear || (() => {}))({ next: undefined, prev: undefined, ...data }),
-    onFilter: (value) =>
-      (onFilter || (() => {}))({ next: undefined, prev: undefined, ...value }),
+    onClear: (data) => (onClear || (() => {}))({ ...pageReset, ...data }),
+    onFilter: (value) => (onFilter || (() => {}))({ ...pageReset, ...value }),
   };
 
   const activeFilters = [
@@ -227,7 +335,12 @@ export const DataTable = <TData,>({
         <span className="flex items-center gap-1">
           {column.header}
           <Button asChild size="icon-xs" variant="ghost">
-            <Link href={onSortNavigate(column.sortName, newOrder)}>
+            <Link
+              href={withPageParam(
+                onSortNavigate(column.sortName, newOrder),
+                null,
+              )}
+            >
               <SortIcon className="size-3" />
             </Link>
           </Button>
@@ -244,11 +357,34 @@ export const DataTable = <TData,>({
         activeFilters.length > 0 ||
         actions ||
         canDownload ||
-        hasPagination) && (
+        hasPagination ||
+        (loading && (!!downloadFilename || reservePager))) && (
         <div className="text-body-sm flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
-          <div className="leading-7">{header}</div>
+          <div className="leading-7">
+            {header}
+            {/* The Showing line renders on load for every paginatable table
+                (even single-page ones), so its reservation keys off
+                onPaginationNavigate, not the pager reservation. */}
+            {loading && !!onPaginationNavigate && (
+              <span className="text-body-xs block leading-5">
+                <Skeleton className="w-28" />
+              </span>
+            )}
+            {!loading &&
+              !!onPaginationNavigate &&
+              !!data?.length &&
+              !pageUnknown && (
+                <span className="text-body-xs text-muted-foreground/80 block leading-5">
+                  (Showing {numberFormat((currentPage - 1) * effPerPage + 1)} to{' '}
+                  {numberFormat((currentPage - 1) * effPerPage + data.length)})
+                </span>
+              )}
+          </div>
           <div className="flex flex-wrap items-center gap-2">
-            {activeFilters.length > 0 && !loading && (
+            {/* Filters are URL-derived, so the chips are fully known during
+                loading — rendering them in both states keeps the bar's wrap
+                geometry identical when data arrives. */}
+            {activeFilters.length > 0 && (
               <>
                 <span className="text-muted-foreground shrink-0">
                   Filtered By:
@@ -256,7 +392,11 @@ export const DataTable = <TData,>({
                 {activeFilters.map((filter) => (
                   <Button
                     key={filter.name}
-                    onClick={() => onClear?.({ [filter.name]: undefined })}
+                    // Route through filterHelpers so clearing a chip also
+                    // resets the cursors and page counter with the filter.
+                    onClick={() =>
+                      filterHelpers.onClear({ [filter.name]: undefined })
+                    }
                     size="xs"
                     variant="outline"
                   >
@@ -267,9 +407,33 @@ export const DataTable = <TData,>({
                 ))}
               </>
             )}
-            {loading ? <Skeleton className="h-7 w-40" /> : actions}
+            {/* Loading placeholders mirror what this table renders when
+                loaded: an xs action button, the sm download button, and the
+                four pagination controls — so the bar keeps its height AND its
+                wrap threshold; widths match the controls that replace them. */}
+            {loading
+              ? actions && (
+                  <span className="flex h-7 items-center">
+                    <Skeleton className="w-24" />
+                  </span>
+                )
+              : actions}
+            {loading && !!downloadFilename && (
+              <span className="hidden h-8 items-center sm:flex">
+                <Skeleton className="w-41" />
+              </span>
+            )}
+            {loading && reservePager && (
+              <span className="flex h-8 items-center gap-2">
+                <Skeleton className="w-12" />
+                <Skeleton className="w-17" />
+                <Skeleton className="w-16" />
+                <Skeleton className="w-17" />
+              </span>
+            )}
             {canDownload && (
               <Button
+                className="hidden sm:inline-flex"
                 onClick={onDownload}
                 size="sm"
                 title="Download visible rows as CSV"
@@ -283,7 +447,10 @@ export const DataTable = <TData,>({
           </div>
         </div>
       )}
-      <Table>
+      {/* Fixed layout sizes columns from the header row only, so skeleton
+          and loaded states get identical column widths — no reflow when
+          data arrives. Cells already truncate. */}
+      <Table className={cn('min-w-4xl table-fixed', tableClassName)}>
         <TableHeader className="uppercase">
           <TableRow>
             {columns.map((column, index) => (
@@ -357,17 +524,26 @@ export const DataTable = <TData,>({
           <div className="flex items-center border-t p-4 py-3">
             <Pagination className="justify-end">
               <PaginationContent>
-                <PaginationItem>
-                  <Skeleton className="h-8 w-17.5" />
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-12" />
                 </PaginationItem>
-                <PaginationItem>
-                  <Skeleton className="h-8 w-17.5" />
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-17" />
+                </PaginationItem>
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-16" />
+                </PaginationItem>
+                <PaginationItem className="flex h-8 items-center">
+                  <Skeleton className="w-17" />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
           </div>
         }
-        loading={loading}
+        // Only reserve a footer pager when one is plausible for this table's
+        // typical result set (see the `paginated` prop) — a reserved footer
+        // that vanishes for single-page results is itself a layout shift.
+        loading={loading && reservePager}
       >
         {() => (
           <>

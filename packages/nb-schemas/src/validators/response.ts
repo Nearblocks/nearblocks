@@ -47,7 +47,9 @@ const validatorInfo = v.object({
   latest_block_height: v.nullable(v.string()),
   latest_block_timestamp: v.nullable(v.string()),
   network_holder_index: v.nullable(v.number()),
+  next_epoch_seat_price: v.nullable(v.string()),
   protocol_epoch_length: v.nullable(v.number()),
+  protocol_version: v.nullable(v.number()),
   total_stake: v.nullable(v.string()),
   total_validators_count: v.nullable(v.number()),
 });

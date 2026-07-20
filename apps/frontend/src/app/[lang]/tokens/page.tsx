@@ -4,6 +4,7 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { Tokens } from '@/components/tokens';
 import { fetchTokenCount, fetchTokens } from '@/data/tokens';
+import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/tokens'>;
@@ -29,6 +30,7 @@ const TokensPage = async ({ params, searchParams }: Props) => {
   const filters = await searchParams;
   const tokensPromise = fetchTokens(filters);
   const tokenCountPromise = fetchTokenCount(filters);
+  await holdNav();
 
   return (
     <>

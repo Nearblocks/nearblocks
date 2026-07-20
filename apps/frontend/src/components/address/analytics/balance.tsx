@@ -71,14 +71,14 @@ export const BalanceChart = ({ balancePromise, loading }: Props) => {
       storage.push([timestamp, +item.storage_usage]);
     }
 
-    return { amount, isEmpty: stats?.length === 0, staked, storage };
+    return { amount, isEmpty: !stats?.length, staked, storage };
   }, [stats]);
 
   return (
     <div className="h-105">
       <SkeletonSlot
         fallback={<Skeleton className="h-105 w-full" />}
-        loading={loading || !stats}
+        loading={!!loading}
       >
         {() =>
           data.isEmpty ? (

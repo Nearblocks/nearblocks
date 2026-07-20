@@ -11,11 +11,15 @@ import { AccountLink } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnDirectionIcon, TxnStatusIcon } from '@/components/txn';
+import {
+  MethodBadge,
+  TxnDirectionIcon,
+  TxnDirectionSkeleton,
+  TxnStatusIcon,
+} from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -32,6 +36,7 @@ export const MtNftTransfers = ({
 }: Props) => {
   const { t } = useLocale('mts');
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  if (txns?.errors?.length) throw new Error('Failed to load transfers');
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
   const pathname = usePathname();
@@ -51,9 +56,10 @@ export const MtNftTransfers = ({
   const columns: DataTableColumnDef<MTTokenTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (mt) =>
@@ -71,15 +77,10 @@ export const MtNftTransfers = ({
       id: 'txn_hash',
     },
     {
-      cell: (mt) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={mt.cause} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (mt) => <MethodBadge text={mt.cause} />,
       header: t('token.tokenTransfers.method'),
       id: 'method',
+      skeletonCell: <Skeleton className="h-4.5 w-[71px] rounded-md" />,
     },
     {
       cell: (mt) => (
@@ -99,6 +100,7 @@ export const MtNftTransfers = ({
       className: 'w-12',
       header: '',
       id: 'direction',
+      skeletonCell: <TxnDirectionSkeleton />,
     },
     {
       cell: (mt) => (
@@ -146,7 +148,7 @@ export const MtNftTransfers = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !txnCount}
+              loading={!!loading}
             >
               {() => {
                 const count = txnCount?.data?.count;
@@ -164,7 +166,7 @@ export const MtNftTransfers = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!txns?.errors}
+          loading={!!loading}
           onPaginationNavigate={onPaginate}
           pagination={txns?.meta}
         />

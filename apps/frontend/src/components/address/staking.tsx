@@ -17,12 +17,11 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
-import { TxnStatusIcon } from '@/components/txn';
+import { MethodBadge, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { countFormat, isApproxCount, nearFormat } from '@/lib/format';
 import { buildParams } from '@/lib/utils';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -44,6 +43,8 @@ export const StakingTxns = ({
 }: Props) => {
   const { t } = useLocale('address');
   const staking = !loading && stakingPromise ? use(stakingPromise) : null;
+  if (staking?.errors?.length)
+    throw new Error('Failed to load staking transactions');
   const stakingCount =
     !loading && stakingCountPromise ? use(stakingCountPromise) : null;
 
@@ -88,9 +89,10 @@ export const StakingTxns = ({
   const columns: DataTableColumnDef<AccountStakingTxn>[] = [
     {
       cell: () => <TxnStatusIcon status />,
-      className: 'w-5',
+      className: 'w-12',
       header: '',
       id: 'status',
+      skeletonCell: <Skeleton className="size-5 rounded-full" />,
     },
     {
       cell: (staking) =>
@@ -111,18 +113,13 @@ export const StakingTxns = ({
       id: 'txn_hash',
     },
     {
-      cell: (staking) => (
-        <Badge variant="teal">
-          <Truncate>
-            <TruncateText as="code" className="max-w-20" text={staking.type} />
-          </Truncate>
-        </Badge>
-      ),
+      cell: (staking) => <MethodBadge text={staking.type} />,
       enableFilter: true,
       filterName: 'type',
       filterPlaceholder: t('staking.filterMethod'),
       header: t('staking.columns.method'),
       id: 'type',
+      skeletonCell: <Skeleton className="h-4.5 w-[114px] rounded-md" />,
     },
     {
       cell: (staking) => <AccountLink account={staking.contract} />,
@@ -180,7 +177,7 @@ export const StakingTxns = ({
           header={
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
-              loading={loading || !stakingCount}
+              loading={!!loading}
             >
               {() => {
                 const count = stakingCount?.count;
@@ -192,12 +189,18 @@ export const StakingTxns = ({
               }}
             </SkeletonSlot>
           }
-          loading={loading || !!staking?.errors}
+          loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
           onPaginationNavigate={onPaginate}
+          paginated={!!basePath}
           pagination={basePath ? staking?.meta : undefined}
         />
+        {loading && !basePath && (
+          <div className="border-t px-4 py-3">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        )}
         {!basePath && staking?.meta?.next_page && (
           <div className="border-t px-4 py-3">
             <Button asChild className="h-8 w-full" variant="ghost">

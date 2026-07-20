@@ -4,6 +4,7 @@ import {
   fetchFTContractStatsAccountTransfers,
   fetchFTContractStatsTransfers,
 } from '@/data/tokens/analytics';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/tokens/[cid]/analytics/transfers'>;
 
@@ -16,6 +17,8 @@ const AnalyticsTransfersPage = async ({ params, searchParams }: Props) => {
       account,
       { limit: '365' },
     );
+    await holdNav();
+
     return (
       <ErrorSuspense fallback={<TransfersChart loading />}>
         <TransfersChart accountTransfersPromise={accountTransfersPromise} />
@@ -24,6 +27,8 @@ const AnalyticsTransfersPage = async ({ params, searchParams }: Props) => {
   }
 
   const transfersPromise = fetchFTContractStatsTransfers(cid, { limit: '365' });
+  await holdNav();
+
   return (
     <ErrorSuspense fallback={<TransfersChart loading />}>
       <TransfersChart transfersPromise={transfersPromise} />

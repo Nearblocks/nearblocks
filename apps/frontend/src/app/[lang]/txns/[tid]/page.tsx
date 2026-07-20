@@ -10,6 +10,7 @@ import {
   fetchTxnNFTs,
   fetchTxnReceipts,
 } from '@/data/txns';
+import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/txns/[tid]'>;
 
@@ -22,6 +23,7 @@ const TxnPage = async ({ params }: Props) => {
   const txnReceiptsPromise = fetchTxnReceipts(tid);
   const statsPromise = fetchStats();
   const spamPatterns = await fetchSpamTokens();
+  await holdNav();
 
   return (
     <div className="flex flex-col gap-4">

@@ -70,7 +70,9 @@ export const TxnsChart = ({ data }: Props) => {
       xAxis: {
         className: 'stroke-0',
         labels: {
+          format: '{value:%b %e}',
           step: 3,
+          style: { textOverflow: 'none', whiteSpace: 'nowrap' },
         },
         type: 'datetime' as const,
       },

@@ -35,8 +35,10 @@ export const NftOverview = ({
     <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <div className="aspect-square w-full overflow-hidden rounded-lg">
         <SkeletonSlot
-          fallback={<Skeleton className="aspect-square w-full rounded-lg" />}
-          loading={loading || !token}
+          fallback={
+            <Skeleton className="aspect-square h-auto w-full rounded-lg" />
+          }
+          loading={!!loading}
         >
           {() => (
             <NFTMedia
@@ -61,8 +63,12 @@ export const NftOverview = ({
               <ListLeft className="min-w-40">{t('token.owner')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-5 w-40" />}
-                  loading={loading || !token}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-40" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() => (
                     <AccountLink
@@ -77,8 +83,12 @@ export const NftOverview = ({
               <ListLeft className="min-w-40">{t('token.contract')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-5 w-40" />}
-                  loading={loading || !token}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-40" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() => <AccountLink account={cid} textClassName="max-w-60" />}
                 </SkeletonSlot>
@@ -88,8 +98,12 @@ export const NftOverview = ({
               <ListLeft className="min-w-40">{t('token.tokenId')}</ListLeft>
               <ListRight>
                 <SkeletonSlot
-                  fallback={<Skeleton className="h-5 w-24" />}
-                  loading={loading || !token}
+                  fallback={
+                    <span className="block">
+                      <Skeleton className="w-24" />
+                    </span>
+                  }
+                  loading={!!loading}
                 >
                   {() => <span className="text-body-sm">{token?.token}</span>}
                 </SkeletonSlot>
@@ -108,8 +122,12 @@ export const NftOverview = ({
                 </ListLeft>
                 <ListRight>
                   <SkeletonSlot
-                    fallback={<Skeleton className="h-5 w-48" />}
-                    loading={loading || !token}
+                    fallback={
+                      <span className="block">
+                        <Skeleton className="w-48" />
+                      </span>
+                    }
+                    loading={!!loading}
                   >
                     {() => (
                       <span className="text-body-sm">{token?.description}</span>

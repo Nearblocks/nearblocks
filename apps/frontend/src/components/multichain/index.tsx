@@ -120,6 +120,7 @@ export const MultichainTxns = ({
   const { t } = useLocale('multichain');
   const searchParams = useSearchParams();
   const txns = !loading && txnsPromise ? use(txnsPromise) : null;
+  if (txns?.errors?.length) throw new Error('Failed to load transactions');
   const mcStats = !loading && mcStatsPromise ? use(mcStatsPromise) : null;
   const txnCount = !loading && txnCountPromise ? use(txnCountPromise) : null;
 
@@ -186,6 +187,7 @@ export const MultichainTxns = ({
           </span>
         );
       },
+      className: 'w-50',
       header: t('list.destTxn'),
       id: 'dest_txn',
     },
@@ -216,6 +218,7 @@ export const MultichainTxns = ({
           </span>
         );
       },
+      className: 'w-50',
       header: t('list.destAddress'),
       id: 'dest_address',
     },
@@ -262,7 +265,7 @@ export const MultichainTxns = ({
           <StatCard
             key={label}
             label={label}
-            loading={loading || !mcStats}
+            loading={!!loading}
             value={value}
           />
         ))}
@@ -277,7 +280,7 @@ export const MultichainTxns = ({
             header={
               <SkeletonSlot
                 fallback={<Skeleton className="w-40" />}
-                loading={loading || !txnCount}
+                loading={!!loading}
               >
                 {() => {
                   const count = txnCount?.count;
@@ -289,7 +292,7 @@ export const MultichainTxns = ({
                 }}
               </SkeletonSlot>
             }
-            loading={loading || !!txns?.errors}
+            loading={!!loading}
             onPaginationNavigate={onPaginate}
             pagination={txns?.meta}
           />

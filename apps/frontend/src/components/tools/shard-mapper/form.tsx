@@ -9,6 +9,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Field, FieldContent, FieldLabel, FieldSet } from '@/ui/field';
 import { Input } from '@/ui/input';
+import { Skeleton } from '@/ui/skeleton';
 
 type ShardLayout = {
   V1?: { boundaryAccounts: string[] };
@@ -78,7 +79,7 @@ export const ShardMapperForm = () => {
 
       {account.trim() && !protocolConfig && !configError && (
         <div className="mt-6 max-w-xl">
-          <div className="bg-muted h-8 w-40 animate-pulse rounded" />
+          <Skeleton className="h-8 w-40" />
         </div>
       )}
 
