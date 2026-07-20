@@ -7,7 +7,9 @@ SELECT
   vc.latest_block_height,
   vc.latest_block_timestamp,
   vc.network_holder_index,
+  vc.next_epoch_seat_price,
   vc.protocol_epoch_length,
+  vc.protocol_version,
   vc.total_stake,
   (
     SELECT

@@ -1,11 +1,6 @@
 import Big from 'big.js';
 
-import {
-  AccountView,
-  BlockResult,
-  EpochValidatorInfo,
-  validatorApi,
-} from 'nb-near';
+import { AccountView, BlockResult, EpochValidatorInfo } from 'nb-near';
 import { RPC as NearRPC } from 'nb-near';
 import {
   ValidatorConfig,
@@ -46,6 +41,17 @@ export const validator = {
 };
 
 const CHUNK_SIZE = 100;
+const DEFAULT_MIN_STAKE_RATIO = [1, 6250];
+
+const findSeatPrice = (
+  validatorList: { stake: string }[],
+  minimumStakeRatio: number[],
+): string => {
+  const [ratioNum, ratioDen] = minimumStakeRatio;
+  const stakesSum = validatorList.reduce((sum, v) => sum + BigInt(v.stake), 0n);
+
+  return ((stakesSum * BigInt(ratioNum)) / BigInt(ratioDen)).toString();
+};
 
 export const latestBlockCheck = async () => {
   const latestBlock = await dbBase('blocks')
@@ -396,18 +402,23 @@ export const validatorsCheck = async () => {
       .whereNotIn('account_id', currentAccountIds)
       .delete();
 
-    if (configData?.genesis_min_stake_ratio && configData.protocol_max_seats) {
-      const seatPrice = validatorApi.findSeatPrice(
-        validators.current_validators,
-        configData.protocol_max_seats,
-        configData.genesis_min_stake_ratio,
-        configData.protocol_version!,
-      );
-      await dbBase('validator_config').where('id', 1).update({
-        epoch_seat_price: seatPrice.toString(),
-        updated_at: new Date(),
-      });
-    }
+    const minStakeRatio =
+      configData?.genesis_min_stake_ratio ?? DEFAULT_MIN_STAKE_RATIO;
+
+    const seatPrice =
+      validators.current_validators.length > 0
+        ? findSeatPrice(validators.current_validators, minStakeRatio)
+        : null;
+    const nextSeatPrice =
+      validators.next_validators.length > 0
+        ? findSeatPrice(validators.next_validators, minStakeRatio)
+        : null;
+
+    await dbBase('validator_config').where('id', 1).update({
+      epoch_seat_price: seatPrice,
+      next_epoch_seat_price: nextSeatPrice,
+      updated_at: new Date(),
+    });
 
     const { data } = await RPC.query(
       { block_id: validators.epoch_start_height },
