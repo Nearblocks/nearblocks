@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/validators';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import validatorsProxy from '#services/proxy/validators';
 import validators from '#services/validators';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? validatorsProxy : validators;
 
 const routes = (app: Router) => {
   app.use('/validators', bearerAuth, rateLimiter, route);
@@ -39,7 +43,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validator(schema.list), validators.list);
+  route.get('/', validator(schema.list), service.list);
 };
 
 export default routes;

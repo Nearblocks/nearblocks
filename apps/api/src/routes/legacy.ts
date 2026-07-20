@@ -1,12 +1,17 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/legacy';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
 import legacy from '#services/legacy';
+import legacyProxy from '#services/proxy/legacy';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? legacyProxy : legacy;
+const fees = config.v1ProxyEnabled ? legacyProxy.fees : legacy.fees;
 
 const routes = (app: Router) => {
   app.use('/legacy', bearerAuth, rateLimiter, route);
@@ -37,7 +42,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/total-supply', validator(schema.supply), legacy.total);
+  route.get('/total-supply', validator(schema.supply), service.total);
 
   /**
    * @openapi
@@ -65,7 +70,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/circulating-supply', validator(schema.supply), legacy.supply);
+  route.get('/circulating-supply', validator(schema.supply), service.supply);
 
   /**
    * @openapi
@@ -86,7 +91,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/fees', validator(schema.fees), legacy.fees);
+  route.get('/fees', validator(schema.fees), fees);
 
   route.get('/ping', legacy.ping);
 

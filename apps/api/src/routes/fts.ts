@@ -1,13 +1,18 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/fts';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
 import contract from '#services/fts/contract';
 import ft from '#services/fts/index';
+import ftsProxy from '#services/proxy/fts';
 
 const route = Router();
+
+const ftService = config.v1ProxyEnabled ? ftsProxy.ft : ft;
+const contractService = config.v1ProxyEnabled ? ftsProxy.contract : contract;
 
 const routes = (app: Router) => {
   app.use('/fts', bearerAuth, rateLimiter, route);
@@ -59,7 +64,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validator(schema.list), ft.list);
+  route.get(
+    '/',
+    validator(config.v1ProxyEnabled ? ftsProxy.schemas.list : schema.list),
+    ftService.list,
+  );
 
   /**
    * @openapi
@@ -78,7 +87,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', validator(schema.count), ft.count);
+  route.get('/count', validator(schema.count), ftService.count);
 
   /**
    * @openapi
@@ -115,7 +124,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns', validator(schema.txns), ft.txns);
+  route.get(
+    '/txns',
+    validator(config.v1ProxyEnabled ? ftsProxy.schemas.txns : schema.txns),
+    ftService.txns,
+  );
 
   /**
    * @openapi
@@ -128,7 +141,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', ft.txnsCount);
+  route.get('/txns/count', ftService.txnsCount);
 
   /**
    * @openapi
@@ -151,7 +164,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract', validator(schema.item), contract.item);
+  route.get('/:contract', validator(schema.item), contractService.item);
 
   /**
    * @openapi
@@ -215,7 +228,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract/txns', validator(schema.ftTxns), contract.txns);
+  route.get(
+    '/:contract/txns',
+    validator(config.v1ProxyEnabled ? ftsProxy.schemas.ftTxns : schema.ftTxns),
+    contractService.txns,
+  );
 
   /**
    * @openapi
@@ -252,7 +269,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/txns/count',
     validator(schema.ftTxnsCount),
-    contract.txnsCount,
+    contractService.txnsCount,
   );
 
   /**
@@ -299,7 +316,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract/holders', validator(schema.holders), contract.holders);
+  route.get(
+    '/:contract/holders',
+    validator(config.v1ProxyEnabled ? ftsProxy.schemas.holders : schema.holders),
+    contractService.holders,
+  );
 
   /**
    * @openapi
@@ -325,7 +346,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/holders/count',
     validator(schema.holdersCount),
-    contract.holdersCount,
+    contractService.holdersCount,
   );
 };
 

@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/search';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import searchProxy from '#services/proxy/search';
 import search from '#services/search';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? searchProxy : search;
 
 const routes = (app: Router) => {
   app.use('/search', bearerAuth, rateLimiter, route);
@@ -29,7 +33,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validator(schema.item), search.search);
+  route.get('/', validator(schema.item), service.search);
 
   /**
    * @openapi
@@ -49,7 +53,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns', validator(schema.item), search.txns);
+  route.get('/txns', validator(schema.item), service.txns);
 
   /**
    * @openapi
@@ -72,7 +76,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/blocks', validator(schema.item), search.blocks);
+  route.get('/blocks', validator(schema.item), service.blocks);
 
   /**
    * @openapi
@@ -92,7 +96,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/accounts', validator(schema.item), search.accounts);
+  route.get('/accounts', validator(schema.item), service.accounts);
 
   /**
    * @openapi
@@ -112,7 +116,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/receipts', validator(schema.item), search.receipts);
+  route.get('/receipts', validator(schema.item), service.receipts);
 
   /**
    * @openapi
@@ -132,7 +136,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/tokens', validator(schema.item), search.tokens);
+  route.get('/tokens', validator(schema.item), service.tokens);
 };
 
 export default routes;

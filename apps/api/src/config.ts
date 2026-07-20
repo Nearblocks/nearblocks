@@ -1,4 +1,4 @@
-import { cleanEnv, num, str, url } from 'envalid';
+import { bool, cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -56,6 +56,9 @@ const env = cleanEnv(process.env, {
   // rate-limiter store when unset.
   USAGE_STREAM_REDIS_PASSWORD: str({ default: '' }),
   USAGE_STREAM_REDIS_URL: url({ default: '' }),
+  // When true, v1/v2 endpoints are served by the v3 back-compat proxy instead of
+  // the legacy path. Default off so behaviour is unchanged until a deployment opts in.
+  V1_PROXY_ENABLED: bool({ default: false }),
 });
 
 const baseStart =
@@ -113,6 +116,7 @@ const config: Config = {
   usageStreamRedisPassword: env.USAGE_STREAM_REDIS_PASSWORD,
   usageStreamRedisUrl: env.USAGE_STREAM_REDIS_URL,
   userDbUrl: env.DB_URL_USER,
+  v1ProxyEnabled: env.V1_PROXY_ENABLED,
 };
 
 export default config;

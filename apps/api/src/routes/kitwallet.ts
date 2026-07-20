@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import config from '#config';
 import accountSchema from '#libs/schema/account';
 import schema from '#libs/schema/kitwallet';
 import { bearerAuth } from '#middlewares/passport';
@@ -7,8 +8,18 @@ import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
 import account from '#services/account/txn';
 import kitwallet from '#services/kitwallet';
+import { deprecated } from '#services/proxy/deprecated';
+import kitwalletProxy from '#services/proxy/kitwallet';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? kitwalletProxy : kitwallet;
+const receipts = config.v1ProxyEnabled ? deprecated : account.receipts;
+const receiptsCount = config.v1ProxyEnabled
+  ? deprecated
+  : account.receiptsCount;
+const activities = config.v1ProxyEnabled ? deprecated : kitwallet.activities;
+const receivers = config.v1ProxyEnabled ? deprecated : kitwallet.receivers;
 
 const routes = (app: Router) => {
   app.use('/kitwallet', bearerAuth, rateLimiter, route);
@@ -24,7 +35,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/stakingPools', kitwallet.pools);
+  route.get('/stakingPools', service.pools);
 
   /**
    * @openapi
@@ -50,7 +61,7 @@ const routes = (app: Router) => {
   route.get(
     '/staking-deposits/:account',
     validator(schema.deposits),
-    kitwallet.deposits,
+    service.deposits,
   );
 
   /**
@@ -77,7 +88,7 @@ const routes = (app: Router) => {
   route.get(
     '/publicKey/:key/accounts',
     validator(schema.accounts),
-    kitwallet.accounts,
+    service.accounts,
   );
 
   /**
@@ -104,7 +115,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/activities',
     validator(schema.activities),
-    kitwallet.activities,
+    activities,
   );
 
   /**
@@ -131,7 +142,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/callReceivers',
     validator(schema.receivers),
-    kitwallet.receivers,
+    receivers,
   );
 
   /**
@@ -158,7 +169,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/likelyTokens',
     validator(schema.tokens),
-    kitwallet.tokens,
+    service.tokens,
   );
 
   /**
@@ -190,7 +201,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/likelyTokensFromBlock',
     validator(schema.tokensFromBlock),
-    kitwallet.tokensFromBlock,
+    service.tokensFromBlock,
   );
 
   /**
@@ -217,7 +228,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/likelyNFTs',
     validator(schema.nfts),
-    kitwallet.nfts,
+    service.nfts,
   );
 
   /**
@@ -249,7 +260,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/likelyNFTsFromBlock',
     validator(schema.nftsFromBlock),
-    kitwallet.nftsFromBlock,
+    service.nftsFromBlock,
   );
 
   /**
@@ -326,7 +337,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/receipts',
     validator(accountSchema.receipts),
-    account.receipts,
+    receipts,
   );
 
   /**
@@ -383,7 +394,7 @@ const routes = (app: Router) => {
   route.get(
     '/account/:account/receipts/count',
     validator(accountSchema.receiptsCount),
-    account.receiptsCount,
+    receiptsCount,
   );
 };
 

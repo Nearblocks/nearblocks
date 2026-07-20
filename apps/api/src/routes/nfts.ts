@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/nfts';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
@@ -7,8 +8,13 @@ import validator from '#middlewares/validator';
 import contract from '#services/nfts/contract';
 import nft from '#services/nfts/index';
 import tokens from '#services/nfts/tokens';
+import nftsProxy from '#services/proxy/nfts';
 
 const route = Router();
+
+const nftService = config.v1ProxyEnabled ? nftsProxy.nft : nft;
+const contractService = config.v1ProxyEnabled ? nftsProxy.contract : contract;
+const tokenService = config.v1ProxyEnabled ? nftsProxy.tokens : tokens;
 
 const routes = (app: Router) => {
   app.use('/nfts', bearerAuth, rateLimiter, route);
@@ -60,7 +66,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validator(schema.list), nft.list);
+  route.get(
+    '/',
+    validator(config.v1ProxyEnabled ? nftsProxy.schemas.list : schema.list),
+    nftService.list,
+  );
 
   /**
    * @openapi
@@ -79,7 +89,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', validator(schema.count), nft.count);
+  route.get('/count', validator(schema.count), nftService.count);
 
   /**
    * @openapi
@@ -116,7 +126,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns', validator(schema.txns), nft.txns);
+  route.get(
+    '/txns',
+    validator(config.v1ProxyEnabled ? nftsProxy.schemas.txns : schema.txns),
+    nftService.txns,
+  );
 
   /**
    * @openapi
@@ -129,7 +143,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', nft.txnsCount);
+  route.get('/txns/count', nftService.txnsCount);
 
   /**
    * @openapi
@@ -152,7 +166,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract', validator(schema.item), contract.item);
+  route.get('/:contract', validator(schema.item), contractService.item);
 
   /**
    * @openapi
@@ -216,7 +230,13 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract/txns', validator(schema.nftTxns), contract.txns);
+  route.get(
+    '/:contract/txns',
+    validator(
+      config.v1ProxyEnabled ? nftsProxy.schemas.nftTxns : schema.nftTxns,
+    ),
+    contractService.txns,
+  );
 
   /**
    * @openapi
@@ -253,7 +273,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/txns/count',
     validator(schema.nftTxnsCount),
-    contract.txnsCount,
+    contractService.txnsCount,
   );
 
   /**
@@ -300,7 +320,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract/holders', validator(schema.holders), contract.holders);
+  route.get(
+    '/:contract/holders',
+    validator(config.v1ProxyEnabled ? nftsProxy.schemas.holders : schema.holders),
+    contractService.holders,
+  );
 
   /**
    * @openapi
@@ -326,7 +350,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/holders/count',
     validator(schema.holdersCount),
-    contract.holdersCount,
+    contractService.holdersCount,
   );
 
   /**
@@ -366,7 +390,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:contract/tokens', validator(schema.tokens), tokens.list);
+  route.get(
+    '/:contract/tokens',
+    validator(config.v1ProxyEnabled ? nftsProxy.schemas.tokens : schema.tokens),
+    tokenService.list,
+  );
 
   /**
    * @openapi
@@ -392,7 +420,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/tokens/count',
     validator(schema.tokensCount),
-    tokens.count,
+    tokenService.count,
   );
 
   /**
@@ -428,7 +456,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/tokens/:token',
     validator(schema.tokenItem),
-    tokens.item,
+    tokenService.item,
   );
 
   /**
@@ -499,8 +527,10 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/tokens/:token/txns',
-    validator(schema.tokenTxns),
-    tokens.txns,
+    validator(
+      config.v1ProxyEnabled ? nftsProxy.schemas.tokenTxns : schema.tokenTxns,
+    ),
+    tokenService.txns,
   );
 
   /**
@@ -542,7 +572,7 @@ const routes = (app: Router) => {
   route.get(
     '/:contract/tokens/:token/txns/count',
     validator(schema.tokenTxnsCount),
-    tokens.txnsCount,
+    tokenService.txnsCount,
   );
 };
 

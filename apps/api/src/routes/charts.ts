@@ -1,10 +1,17 @@
 import { Router } from 'express';
 
+import config from '#config';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import charts from '#services/charts';
+import { deprecated } from '#services/proxy/deprecated';
 
 const route = Router();
+
+// Charts have no faithful v3 source, so they are deprecated when the proxy is on.
+const list = config.v1ProxyEnabled ? deprecated : charts.list;
+const latest = config.v1ProxyEnabled ? deprecated : charts.latest;
+const tps = config.v1ProxyEnabled ? deprecated : charts.tps;
 
 const routes = (app: Router) => {
   app.use('/charts', bearerAuth, rateLimiter, route);
@@ -20,7 +27,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', charts.list);
+  route.get('/', list);
 
   /**
    * @openapi
@@ -33,7 +40,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/latest', charts.latest);
+  route.get('/latest', latest);
 
   /**
    * @openapi
@@ -46,7 +53,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/tps', charts.tps);
+  route.get('/tps', tps);
 };
 
 export default routes;

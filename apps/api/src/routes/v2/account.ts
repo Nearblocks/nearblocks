@@ -1,13 +1,25 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/v2/account';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import txnProxy from '#services/proxy/account-txn';
+import { deprecated } from '#services/proxy/deprecated';
 import account from '#services/v2/account/index';
 import receipts from '#services/v2/account/receipts';
 
 const route = Router();
+
+const proxied = config.v1ProxyEnabled;
+
+const list = proxied ? txnProxy.v2Receipts : receipts.receipts;
+const count = proxied ? txnProxy.v2ReceiptsCount : receipts.receiptsCount;
+const inventory = proxied ? deprecated : account.inventory;
+
+// The proxy emits the v3 opaque cursor in place of the numeric `receipts.id`.
+const listSchema = proxied ? txnProxy.schemas.v2Receipts : schema.receipts;
 
 const routes = (app: Router) => {
   app.use('/account', bearerAuth, rateLimiter, route);
@@ -83,11 +95,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/receipts',
-    validator(schema.receipts),
-    receipts.receipts,
-  );
+  route.get('/:account/receipts', validator(listSchema), list);
 
   /**
    * @openapi
@@ -140,17 +148,9 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/receipts/count',
-    validator(schema.receiptsCount),
-    receipts.receiptsCount,
-  );
+  route.get('/:account/receipts/count', validator(schema.receiptsCount), count);
 
-  route.get(
-    '/:account/inventory/mts',
-    validator(schema.inventory),
-    account.inventory,
-  );
+  route.get('/:account/inventory/mts', validator(schema.inventory), inventory);
 };
 
 export default routes;

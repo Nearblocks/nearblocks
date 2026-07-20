@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/stats';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import statsProxy from '#services/proxy/stats';
 import stats from '#services/stats';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? statsProxy : stats;
 
 const routes = (app: Router) => {
   app.use('/stats', bearerAuth, rateLimiter, route);
@@ -22,7 +26,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', stats.latest);
+  route.get('/', service.latest);
 
   /**
    * @openapi
@@ -41,7 +45,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/price', validator(schema.price), stats.price);
+  route.get('/price', validator(schema.price), service.price);
 };
 
 export default routes;

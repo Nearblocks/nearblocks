@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/account';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
@@ -11,8 +12,44 @@ import key from '#services/account/key';
 import nft from '#services/account/nft';
 import stake from '#services/account/stake';
 import txn from '#services/account/txn';
+import accountProxy from '#services/proxy/account';
+import tokenProxy from '#services/proxy/account-token';
+import txnProxy from '#services/proxy/account-txn';
+import { deprecated } from '#services/proxy/deprecated';
 
 const route = Router();
+
+const proxied = config.v1ProxyEnabled;
+
+const item = proxied ? accountProxy.item : account.item;
+const contract = proxied ? accountProxy.contract : account.contract;
+const deployments = proxied ? accountProxy.deployments : account.deployments;
+const action = proxied ? accountProxy.action : account.action;
+const parse = proxied ? deprecated : account.parse;
+const inventory = proxied ? deprecated : account.inventory;
+const tokens = proxied ? deprecated : account.tokens;
+const keys = proxied ? accountProxy.keys : key.keys;
+const keysCount = proxied ? accountProxy.keysCount : key.keysCount;
+const txns = proxied ? deprecated : txn.txns;
+const txnsCount = proxied ? deprecated : txn.txnsCount;
+const txnsOnly = proxied ? txnProxy.txnsOnly : txn.txnsOnly;
+const txnsOnlyCount = proxied ? txnProxy.txnsOnlyCount : txn.txnsOnlyCount;
+const receipts = proxied ? txnProxy.receipts : txn.receipts;
+const receiptsCount = proxied ? txnProxy.receiptsCount : txn.receiptsCount;
+const ftTxns = proxied ? tokenProxy.ftTxns : ft.txns;
+const ftTxnsCount = proxied ? tokenProxy.ftTxnsCount : ft.txnsCount;
+const nftTxns = proxied ? tokenProxy.nftTxns : nft.txns;
+const nftTxnsCount = proxied ? tokenProxy.nftTxnsCount : nft.txnsCount;
+const stakeTxns = proxied ? deprecated : stake.txns;
+const stakeTxnsCount = proxied ? deprecated : stake.txnsCount;
+const activities = proxied ? deprecated : activity.changes;
+const activitiesCount = proxied ? deprecated : activity.changesCount;
+
+// The proxy emits the v3 opaque cursor, which the legacy zod rules reject.
+const txnsOnlySchema = proxied ? txnProxy.schemas.txnsOnly : schema.txnsOnly;
+const receiptsSchema = proxied ? txnProxy.schemas.receipts : schema.receipts;
+const ftTxnsSchema = proxied ? tokenProxy.schemas.ftTxns : schema.ftTxns;
+const nftTxnsSchema = proxied ? tokenProxy.schemas.nftTxns : schema.nftTxns;
 
 const routes = (app: Router) => {
   app.use('/account', bearerAuth, rateLimiter, route);
@@ -38,7 +75,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account', validator(schema.item), account.item);
+  route.get('/:account', validator(schema.item), item);
 
   /**
    * @openapi
@@ -61,7 +98,7 @@ const routes = (app: Router) => {
    *       '200':
    *         description: Success response
    */
-  route.get('/:account/contract', validator(schema.contract), account.contract);
+  route.get('/:account/contract', validator(schema.contract), contract);
 
   /**
    * @openapi
@@ -87,7 +124,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/contract/deployments',
     validator(schema.deployments),
-    account.deployments,
+    deployments,
   );
 
   /**
@@ -111,11 +148,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/contract/parse',
-    validator(schema.contract),
-    account.parse,
-  );
+  route.get('/:account/contract/parse', validator(schema.contract), parse);
 
   /**
    * @openapi
@@ -147,11 +180,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/contract/:method',
-    validator(schema.action),
-    account.action,
-  );
+  route.get('/:account/contract/:method', validator(schema.action), action);
 
   /**
    * @openapi
@@ -174,11 +203,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/inventory',
-    validator(schema.inventory),
-    account.inventory,
-  );
+  route.get('/:account/inventory', validator(schema.inventory), inventory);
 
   /**
    * @openapi
@@ -201,7 +226,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/tokens', validator(schema.tokens), account.tokens);
+  route.get('/:account/tokens', validator(schema.tokens), tokens);
 
   /**
    * @openapi
@@ -247,7 +272,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/keys', validator(schema.keys), key.keys);
+  route.get('/:account/keys', validator(schema.keys), keys);
 
   /**
    * @openapi
@@ -270,7 +295,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/keys/count', validator(schema.keysCount), key.keysCount);
+  route.get('/:account/keys/count', validator(schema.keysCount), keysCount);
 
   /**
    * @openapi
@@ -366,7 +391,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/txns', validator(schema.txns), txn.txns);
+  route.get('/:account/txns', validator(schema.txns), txns);
 
   /**
    * @openapi
@@ -429,7 +454,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/txns/count', validator(schema.txnsCount), txn.txnsCount);
+  route.get('/:account/txns/count', validator(schema.txnsCount), txnsCount);
 
   /**
    * @openapi
@@ -494,7 +519,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/txns-only', validator(schema.txnsOnly), txn.txnsOnly);
+  route.get('/:account/txns-only', validator(txnsOnlySchema), txnsOnly);
 
   /**
    * @openapi
@@ -540,7 +565,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/txns-only/count',
     validator(schema.txnsOnlyCount),
-    txn.txnsOnlyCount,
+    txnsOnlyCount,
   );
 
   /**
@@ -614,7 +639,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/receipts', validator(schema.receipts), txn.receipts);
+  route.get('/:account/receipts', validator(receiptsSchema), receipts);
 
   /**
    * @openapi
@@ -670,7 +695,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/receipts/count',
     validator(schema.receiptsCount),
-    txn.receiptsCount,
+    receiptsCount,
   );
 
   /**
@@ -749,7 +774,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/ft-txns', validator(schema.ftTxns), ft.txns);
+  route.get('/:account/ft-txns', validator(ftTxnsSchema), ftTxns);
 
   /**
    * @openapi
@@ -800,7 +825,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/ft-txns/count',
     validator(schema.ftTxnsCount),
-    ft.txnsCount,
+    ftTxnsCount,
   );
 
   /**
@@ -874,7 +899,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/nft-txns', validator(schema.nftTxns), nft.txns);
+  route.get('/:account/nft-txns', validator(nftTxnsSchema), nftTxns);
 
   /**
    * @openapi
@@ -920,7 +945,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/nft-txns/count',
     validator(schema.nftTxnsCount),
-    nft.txnsCount,
+    nftTxnsCount,
   );
 
   /**
@@ -992,7 +1017,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:account/stake-txns', validator(schema.stakeTxns), stake.txns);
+  route.get('/:account/stake-txns', validator(schema.stakeTxns), stakeTxns);
 
   /**
    * @openapi
@@ -1038,7 +1063,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/stake-txns/count',
     validator(schema.stakeTxnsCount),
-    stake.txnsCount,
+    stakeTxnsCount,
   );
 
   /**
@@ -1077,11 +1102,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get(
-    '/:account/activities',
-    validator(schema.activities),
-    activity.changes,
-  );
+  route.get('/:account/activities', validator(schema.activities), activities);
 
   /**
    * @openapi
@@ -1107,7 +1128,7 @@ const routes = (app: Router) => {
   route.get(
     '/:account/activities/count',
     validator(schema.activitiesCount),
-    activity.changesCount,
+    activitiesCount,
   );
 };
 

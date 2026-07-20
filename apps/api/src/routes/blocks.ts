@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/blocks';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
 import blocks from '#services/blocks';
+import blocksProxy from '#services/proxy/blocks';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? blocksProxy : blocks;
 
 const routes = (app: Router) => {
   app.use('/blocks', bearerAuth, rateLimiter, route);
@@ -44,7 +48,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validator(schema.list), blocks.list);
+  route.get(
+    '/',
+    validator(config.v1ProxyEnabled ? blocksProxy.schemas.list : schema.list),
+    service.list,
+  );
 
   /**
    * @openapi
@@ -57,7 +65,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', blocks.count);
+  route.get('/count', service.count);
 
   /**
    * @openapi
@@ -79,7 +87,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/latest', validator(schema.latest), blocks.latest);
+  route.get('/latest', validator(schema.latest), service.latest);
 
   /**
    * @openapi
@@ -102,7 +110,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:hash', validator(schema.item), blocks.item);
+  route.get('/:hash', validator(schema.item), service.item);
 };
 
 export default routes;

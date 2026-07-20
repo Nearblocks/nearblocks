@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/v2/mts';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import mtsProxy from '#services/proxy/mts';
 import mts from '#services/v2/mts/index';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? mtsProxy : mts;
 
 const routes = (app: Router) => {
   app.use('/mts', bearerAuth, rateLimiter, route);
@@ -14,7 +18,7 @@ const routes = (app: Router) => {
   route.get(
     '/contract/:contract/:token_id',
     validator(schema.meta),
-    mts.metadata,
+    service.metadata,
   );
 };
 

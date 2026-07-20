@@ -1,12 +1,16 @@
 import { Router } from 'express';
 
+import config from '#config';
 import schema from '#libs/schema/txns';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import validator from '#middlewares/validator';
+import txnsProxy from '#services/proxy/txns';
 import txns from '#services/txns';
 
 const route = Router();
+
+const service = config.v1ProxyEnabled ? txnsProxy : txns;
 
 const routes = (app: Router) => {
   app.use('/txns', bearerAuth, rateLimiter, route);
@@ -86,7 +90,11 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/', validator(schema.list), txns.list);
+  route.get(
+    '/',
+    validator(config.v1ProxyEnabled ? txnsProxy.schemas.list : schema.list),
+    service.list,
+  );
 
   /**
    * @openapi
@@ -135,7 +143,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/count', validator(schema.count), txns.count);
+  route.get('/count', validator(schema.count), service.count);
 
   /**
    * @openapi
@@ -157,7 +165,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/latest', validator(schema.latest), txns.latest);
+  route.get('/latest', validator(schema.latest), service.latest);
 
   /**
    * @openapi
@@ -180,7 +188,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:hash', validator(schema.item), txns.item);
+  route.get('/:hash', validator(schema.item), service.item);
 
   /**
    * @openapi
@@ -203,7 +211,7 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/:hash/full', validator(schema.full), txns.full);
+  route.get('/:hash/full', validator(schema.full), service.full);
 };
 
 export default routes;
