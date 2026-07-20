@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
+import { ChartSkeleton } from './chart-skeleton';
+
 // Mirrors the loaded chart markup (Card > ChartHeader > CardContent > chart
 // slot) so swapping the module-loading skeleton for the mounted chart doesn't
 // shift the page.
@@ -22,7 +24,9 @@ const ChartCardSkeleton = () => (
       </span>
     </CardHeader>
     <CardContent className="p-3">
-      <Skeleton className="h-140 w-full" />
+      <div className="h-140">
+        <ChartSkeleton />
+      </div>
     </CardContent>
   </Card>
 );

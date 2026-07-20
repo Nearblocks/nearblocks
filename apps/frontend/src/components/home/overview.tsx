@@ -184,19 +184,18 @@ export const Overview = ({
                 <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
                   {t('overview.gas')}
                 </h3>
-                <p className="text-body-base text-foreground/80 mt-0.5 flex items-center gap-1 font-normal">
+                {/* Fixed-width, right-aligned value box so the skeleton and the
+                    loaded `Ⓝ x / TGas` readout share the exact footprint — the
+                    number no longer jumps when the promise resolves. */}
+                <p className="text-body-base text-foreground/80 mt-0.5 flex w-32 items-center justify-end gap-1 font-normal">
                   <SkeletonSlot
-                    fallback={
-                      <span className="block">
-                        <Skeleton className="w-32" />
-                      </span>
-                    }
+                    fallback={<Skeleton className="w-full" />}
                     loading={!!loading}
                   >
                     {() =>
                       stats ? (
                         <>
-                          <NearCircle className="size-4" />{' '}
+                          <NearCircle className="size-4 shrink-0" />{' '}
                           {gasFormat(stats.gas_price, {
                             maximumSignificantDigits: 4,
                           })}{' '}

@@ -10,10 +10,10 @@ import { SignerStats } from 'nb-schemas';
 
 import { AnalyticsChart } from '@/components/address/analytics/chart';
 import { ChartEmpty } from '@/components/charts';
+import { ChartSkeleton } from '@/components/charts/chart-skeleton';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, numberFormat } from '@/lib/format';
-import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
   loading?: boolean;
@@ -56,10 +56,7 @@ export const ChainSignaturesTxnsChart = ({ loading, statsPromise }: Props) => {
     // height; the chart itself only renders client-side after Highcharts
     // mounts.
     <div className="h-140">
-      <SkeletonSlot
-        fallback={<Skeleton className="h-140 w-full" />}
-        loading={!!loading}
-      >
+      <SkeletonSlot fallback={<ChartSkeleton />} loading={!!loading}>
         {() =>
           isEmpty ? (
             <ChartEmpty />

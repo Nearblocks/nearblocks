@@ -16,6 +16,7 @@ import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 import { ChartEmpty, ChartHeader } from '.';
+import { ChartSkeleton } from './chart-skeleton';
 import { MiniChart } from './mini-chart';
 
 type Props = {
@@ -64,10 +65,7 @@ export const BlocksChart = ({ loading, statsPromise }: Props) => {
       />
       <CardContent className="p-3">
         <div className="h-140">
-          <SkeletonSlot
-            fallback={<Skeleton className="h-140 w-full" />}
-            loading={!!loading}
-          >
+          <SkeletonSlot fallback={<ChartSkeleton />} loading={!!loading}>
             {() =>
               isEmpty ? (
                 <ChartEmpty />
