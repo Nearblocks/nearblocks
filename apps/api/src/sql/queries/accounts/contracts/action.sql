@@ -3,7 +3,8 @@ SELECT
 FROM
   action_receipt_actions
 WHERE
-  method = ${method}
+  receipt_receiver_account_id = ${account}
+  AND method = ${method}
 ORDER BY
   receipt_included_in_block_timestamp DESC,
   shard_id DESC,
