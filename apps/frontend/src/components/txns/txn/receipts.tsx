@@ -83,7 +83,7 @@ type Props = {
 export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
   const { t } = useLocale('txns');
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
-  const { txn } = useParams<{ txn: string }>();
+  const { tid } = useParams<{ tid: string }>();
 
   const rows = useMemo(() => {
     if (!receipts) return [];
@@ -102,7 +102,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
       cell: (row) => (
         <Link
           className="text-link"
-          href={`/txns/${txn}/execution#${row.receipt_id}`}
+          href={`/txns/${tid}/execution#${row.receipt_id}`}
         >
           <Truncate>
             <TruncateText text={row.receipt_id} />
