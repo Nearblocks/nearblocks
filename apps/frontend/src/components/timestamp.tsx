@@ -94,7 +94,7 @@ export const LongDate = ({ hideAge = false, ns }: LongDateProps) => {
 
   const mode = hasHydrated ? utcMode : 'utc';
   const ms = toMs(ns);
-  const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss Z', mode === 'utc');
+  const date = dateFormat(ms, 'MMM D, YYYY HH:mm:ss.SSS Z', mode === 'utc');
 
   return (
     <span>

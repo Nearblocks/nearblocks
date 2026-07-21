@@ -1,6 +1,16 @@
 import { cache } from 'react';
 
-import { MTTxnCount, MTTxnCountRes, MTTxnsRes } from 'nb-schemas';
+import {
+  IntentsAssetPoint,
+  IntentsBlockchainPoint,
+  IntentsOverview,
+  IntentsStatsAssetsRes,
+  IntentsStatsBlockchainsRes,
+  IntentsStatsOverviewRes,
+  MTTxnCount,
+  MTTxnCountRes,
+  MTTxnsRes,
+} from 'nb-schemas';
 
 import { fetcher, safeParams } from '@/lib/fetcher';
 import { SearchParams } from '@/types/types';
@@ -26,6 +36,35 @@ export const fetchNearIntentsTxnCount = cache(
     const resp = await fetcher<MTTxnCountRes>(
       `/v3/mts/${CONTRACT}/txns/count?${queryParams.toString()}`,
     );
+    return resp.data;
+  },
+);
+
+export const fetchIntentsOverview = cache(
+  async (): Promise<IntentsOverview | null> => {
+    const resp = await fetcher<IntentsStatsOverviewRes>(
+      '/v3/intents/stats/overview',
+    );
+    return resp.data;
+  },
+);
+
+export const fetchIntentsAssetStats = cache(
+  async (limit?: number): Promise<IntentsAssetPoint[] | null> => {
+    const url = limit
+      ? `/v3/intents/stats/assets?limit=${limit}`
+      : '/v3/intents/stats/assets';
+    const resp = await fetcher<IntentsStatsAssetsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchIntentsBlockchainStats = cache(
+  async (limit?: number): Promise<IntentsBlockchainPoint[] | null> => {
+    const url = limit
+      ? `/v3/intents/stats/blockchains?limit=${limit}`
+      : '/v3/intents/stats/blockchains';
+    const resp = await fetcher<IntentsStatsBlockchainsRes>(url);
     return resp.data;
   },
 );

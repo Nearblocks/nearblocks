@@ -80,11 +80,53 @@ export const mts = {
     title: 'NEAR MT Token Tracker (NEP-245)',
   },
   nearIntents: {
-    heading: 'Near Intents Transfers',
-    meta: {
-      description:
-        'Browse NEAR Intents multi-token transfers on the NEAR Protocol blockchain.',
-      title: 'Near Intents Transfers',
+    dashboard: {
+      cards: {
+        allTimeSwaps: 'Swaps (All Time)',
+        allTimeVolume: 'Volume (All Time)',
+        lastDaySwaps: 'Swaps (24h)',
+        lastDayVolume: 'Volume (24h)',
+      },
+      charts: {
+        assets: {
+          othersLabel: 'Others',
+          title: 'Daily Volume by Assets (30D)',
+          yAxis: 'Daily Volume (USD)',
+        },
+        blockchain: {
+          othersLabel: 'Others',
+          title: 'Daily Volume by Blockchain (30D)',
+          yAxis: 'Daily Volume (USD)',
+        },
+        swaps: {
+          seriesCumulative: 'Cumulative Swaps',
+          seriesDaily: 'Daily Swaps',
+          title: 'Daily Swaps',
+          yAxis: 'Daily Swaps',
+          yAxisCumulative: 'Cumulative Swaps',
+        },
+        volume: {
+          seriesCumulative: 'Cumulative Volume (USD)',
+          seriesDaily: 'Daily Volume (USD)',
+          title: 'Daily Volume',
+          yAxis: 'Daily Volume (USD)',
+          yAxisCumulative: 'Cumulative Volume (USD)',
+        },
+      },
+      heading: 'NEAR Intents',
+      meta: {
+        description:
+          'NEAR Intents dashboard shows daily and all-time swap volume, swap counts, and breakdowns by asset and blockchain.',
+        title: 'NEAR Intents Dashboard',
+      },
+    },
+    transfers: {
+      heading: 'Near Intents Transfers',
+      meta: {
+        description:
+          'Browse NEAR Intents multi-token transfers on the NEAR Protocol blockchain.',
+        title: 'Near Intents Transfers',
+      },
     },
   },
   tidMeta: {

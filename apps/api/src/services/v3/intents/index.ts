@@ -1,9 +1,17 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
+  IntentsAssetPoint,
+  IntentsBlockchainPoint,
+  IntentsMetricPoint,
+  IntentsOverview,
+  IntentsStatsAssetsReq,
+  IntentsStatsBlockchainsReq,
+  IntentsSwapStatsReq,
   IntentsTxn,
   IntentsTxnCountReq,
   IntentsTxnsReq,
+  IntentsVolumeStatsReq,
 } from 'nb-schemas';
 import request from 'nb-schemas/dist/intents/request.js';
 import response from 'nb-schemas/dist/intents/response.js';
@@ -160,4 +168,81 @@ const txnCount = responseHandler(
   },
 );
 
-export default { txnCount, txns };
+const toDayMs = (date?: string): null | number =>
+  date ? new Date(`${date}T00:00:00Z`).getTime() : null;
+
+const volumeStats = responseHandler(
+  response.volumeStats,
+  async (req: RequestValidator<IntentsVolumeStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsMetricPoint>(
+      sql.volumeStats,
+      { date, limit },
+    );
+
+    return { data };
+  },
+);
+
+const swapStats = responseHandler(
+  response.swapStats,
+  async (req: RequestValidator<IntentsSwapStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsMetricPoint>(sql.swapStats, {
+      date,
+      limit,
+    });
+
+    return { data };
+  },
+);
+
+const statsAssets = responseHandler(
+  response.statsAssets,
+  async (req: RequestValidator<IntentsStatsAssetsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsAssetPoint>(sql.statsAssets, {
+      date,
+      limit,
+    });
+
+    return { data };
+  },
+);
+
+const statsBlockchains = responseHandler(
+  response.statsBlockchains,
+  async (req: RequestValidator<IntentsStatsBlockchainsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsBlockchainPoint>(
+      sql.statsBlockchains,
+      { date, limit },
+    );
+
+    return { data };
+  },
+);
+
+const statsOverview = responseHandler(response.statsOverview, async () => {
+  const data = await dbEvents.one<IntentsOverview>(sql.statsOverview);
+
+  return { data };
+});
+
+export default {
+  statsAssets,
+  statsBlockchains,
+  statsOverview,
+  swapStats,
+  txnCount,
+  txns,
+  volumeStats,
+};

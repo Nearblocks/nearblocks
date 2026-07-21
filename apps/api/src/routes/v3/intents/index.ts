@@ -71,6 +71,127 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/txns/count', validate(request.count), service.txnCount);
+
+  /**
+   * @openapi
+   * /v3/intents/volume-stats:
+   *   get:
+   *     summary: Get daily and cumulative NEAR Intents swap volume (USD)
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/volume-stats',
+    validate(request.volumeStats),
+    service.volumeStats,
+  );
+
+  /**
+   * @openapi
+   * /v3/intents/swap-stats:
+   *   get:
+   *     summary: Get daily and cumulative NEAR Intents swap counts
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/swap-stats', validate(request.swapStats), service.swapStats);
+
+  /**
+   * @openapi
+   * /v3/intents/stats/assets:
+   *   get:
+   *     summary: Get daily NEAR Intents swap volume/fees/swaps broken down by asset
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/stats/assets',
+    validate(request.statsAssets),
+    service.statsAssets,
+  );
+
+  /**
+   * @openapi
+   * /v3/intents/stats/blockchains:
+   *   get:
+   *     summary: Get daily NEAR Intents swap volume/fees/swaps broken down by blockchain
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/stats/blockchains',
+    validate(request.statsBlockchains),
+    service.statsBlockchains,
+  );
+
+  /**
+   * @openapi
+   * /v3/intents/stats/overview:
+   *   get:
+   *     summary: Get all-time NEAR Intents swap volume/fees/swaps totals
+   *     tags:
+   *       - Intents
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/stats/overview', service.statsOverview);
 };
 
 export default routes;

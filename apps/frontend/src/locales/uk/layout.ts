@@ -67,6 +67,7 @@ export const layout = {
       chainSignatures: 'Chain Signatures',
       charts: 'Charts',
       multichain: 'Multichain Txns',
+      nearIntents: 'Near Intents',
       nodes: 'Validators',
       title: 'Blockchain',
       txns: 'Transactions',
