@@ -7,6 +7,9 @@ import {
   DailyBlockStatsRes,
   DailyTxnStats,
   DailyTxnStatsRes,
+  IntentsMetricPoint,
+  IntentsSwapStatsRes,
+  IntentsVolumeStatsRes,
   PriceStats,
   PriceStatsRes,
   TpsStats,
@@ -53,6 +56,26 @@ export const fetchTpsStats = cache(
   async (limit?: number): Promise<null | TpsStats[]> => {
     const url = limit ? `/v3/tps-stats?limit=${limit}` : '/v3/tps-stats';
     const resp = await fetcher<TpsStatsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchIntentsVolumeStats = cache(
+  async (limit?: number): Promise<IntentsMetricPoint[] | null> => {
+    const url = limit
+      ? `/v3/intents/volume-stats?limit=${limit}`
+      : '/v3/intents/volume-stats';
+    const resp = await fetcher<IntentsVolumeStatsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchIntentsSwapStats = cache(
+  async (limit?: number): Promise<IntentsMetricPoint[] | null> => {
+    const url = limit
+      ? `/v3/intents/swap-stats?limit=${limit}`
+      : '/v3/intents/swap-stats';
+    const resp = await fetcher<IntentsSwapStatsRes>(url);
     return resp.data;
   },
 );

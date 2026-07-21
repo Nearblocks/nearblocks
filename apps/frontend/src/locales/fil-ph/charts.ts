@@ -25,6 +25,36 @@ export const charts = {
     series: 'Blocks',
     yAxis: 'Blocks',
   },
+  intentsSwaps: {
+    description:
+      'NEAR Intents Swaps chart shows the daily and cumulative number of swaps executed across NEAR Intents.',
+    heading: 'NEAR Intents Swaps Chart',
+    meta: {
+      description:
+        'NEAR Intents swaps chart shows the daily and all-time cumulative number of swaps executed across NEAR Intents.',
+      title: 'NEAR Intents Swaps Chart',
+    },
+    miniTitle: 'NEAR Intents Swaps (14D)',
+    seriesCumulative: 'Cumulative Swaps',
+    seriesDaily: 'Daily Swaps',
+    yAxis: 'Daily Swaps',
+    yAxisCumulative: 'Cumulative Swaps',
+  },
+  intentsVolume: {
+    description:
+      'NEAR Intents Volume chart shows the daily and cumulative swap volume (USD) across NEAR Intents.',
+    heading: 'NEAR Intents Volume Chart',
+    meta: {
+      description:
+        'NEAR Intents volume chart shows the daily and all-time cumulative swap volume in USD across NEAR Intents.',
+      title: 'NEAR Intents Volume Chart',
+    },
+    miniTitle: 'NEAR Intents Volume (14D)',
+    seriesCumulative: 'Cumulative Volume (USD)',
+    seriesDaily: 'Daily Volume (USD)',
+    yAxis: 'Daily Volume (USD)',
+    yAxisCumulative: 'Cumulative Volume (USD)',
+  },
   logView: 'Log View',
   logViewTip:
     'Toggle between Log View and Normal View. Log View uses logarithmic scale.',
@@ -89,13 +119,13 @@ export const charts = {
   txnFee: {
     description:
       'Transaction Fee chart shows the total transaction fees paid per day in USD.',
-    heading: 'Transaction Fee Chart',
+    heading: 'NEAR Transaction Fee Chart',
     meta: {
       description:
         'NEAR blockchain transaction fee chart shows the daily amount in USD spent per transaction on NEAR blockchain. All data is real-time, accurate and pulled directly from NEAR blockchain.',
       title: 'NEAR Transaction Fee Chart',
     },
-    miniTitle: 'Transaction Fee (14D)',
+    miniTitle: 'NEAR Transaction Fee (14D)',
     series: 'Transaction Fee (USD)',
     yAxis: 'Transaction Fee (USD)',
   },
@@ -115,13 +145,13 @@ export const charts = {
   txnVolume: {
     description:
       'Transaction Volume chart shows the total transaction volume in USD per day.',
-    heading: 'Transaction Volume Chart',
+    heading: 'NEAR Transaction Volume Chart',
     meta: {
       description:
         'NEAR blockchain transaction volume chart shows the daily amount in USD spent per transaction on NEAR blockchain.',
       title: 'NEAR Transaction Volume Chart',
     },
-    miniTitle: 'Transaction Volume (14D)',
+    miniTitle: 'NEAR Transaction Volume (14D)',
     series: 'Transaction Volume (USD)',
     yAxis: 'Transaction Volume (USD)',
   },

@@ -539,6 +539,17 @@
   --highcharts-color-5: var(--color-pink-foreground);
   --highcharts-color-6: var(--color-gray-foreground);
   --highcharts-color-7: var(--color-red-foreground);
+  /* Extra series colors for charts with more than 8 categories (e.g. the
+     NEAR Intents asset/blockchain breakdowns) — same tonal formula as the
+     8 named colors above (saturated, darker for light-mode contrast). */
+  --highcharts-color-8: hsl(60 70% 32%);
+  --highcharts-color-9: hsl(95 60% 32%);
+  --highcharts-color-10: hsl(130 55% 32%);
+  --highcharts-color-11: hsl(215 70% 40%);
+  --highcharts-color-12: hsl(245 65% 48%);
+  --highcharts-color-13: hsl(285 60% 42%);
+  --highcharts-color-14: hsl(310 65% 40%);
+  --highcharts-color-15: hsl(0 0% 45%);
 
   /* Chart background, point stroke for markers and columns etc */
   --highcharts-background-color: var(--card);
@@ -618,6 +629,16 @@
   --highcharts-color-5: var(--color-pink-foreground);
   --highcharts-color-6: var(--color-gray-foreground);
   --highcharts-color-7: var(--color-red-foreground);
+  /* Extra series colors for charts with more than 8 categories — brighter
+     than the light-mode values above for dark-surface contrast. */
+  --highcharts-color-8: hsl(60 85% 65%);
+  --highcharts-color-9: hsl(95 70% 60%);
+  --highcharts-color-10: hsl(130 60% 60%);
+  --highcharts-color-11: hsl(215 85% 68%);
+  --highcharts-color-12: hsl(245 80% 75%);
+  --highcharts-color-13: hsl(285 70% 72%);
+  --highcharts-color-14: hsl(310 80% 70%);
+  --highcharts-color-15: hsl(0 0% 60%);
 
   /* UI colors */
   --highcharts-background-color: var(--card);
@@ -945,6 +966,36 @@ g.highcharts-series,
 .highcharts-color-9 {
   fill: var(--highcharts-color-9);
   stroke: var(--highcharts-color-9);
+}
+
+.highcharts-color-10 {
+  fill: var(--highcharts-color-10);
+  stroke: var(--highcharts-color-10);
+}
+
+.highcharts-color-11 {
+  fill: var(--highcharts-color-11);
+  stroke: var(--highcharts-color-11);
+}
+
+.highcharts-color-12 {
+  fill: var(--highcharts-color-12);
+  stroke: var(--highcharts-color-12);
+}
+
+.highcharts-color-13 {
+  fill: var(--highcharts-color-13);
+  stroke: var(--highcharts-color-13);
+}
+
+.highcharts-color-14 {
+  fill: var(--highcharts-color-14);
+  stroke: var(--highcharts-color-14);
+}
+
+.highcharts-color-15 {
+  fill: var(--highcharts-color-15);
+  stroke: var(--highcharts-color-15);
 }
 
 /* Various series-specific */
