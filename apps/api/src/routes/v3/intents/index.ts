@@ -126,9 +126,9 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
-   * /v3/intents/stats/assets:
+   * /v3/intents/volume-stats/assets:
    *   get:
-   *     summary: Get daily NEAR Intents swap volume/fees/swaps broken down by asset
+   *     summary: Get daily NEAR Intents swap volume/swaps broken down by asset
    *     tags:
    *       - Intents
    *     parameters:
@@ -147,16 +147,16 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get(
-    '/stats/assets',
+    '/volume-stats/assets',
     validate(request.statsAssets),
     service.statsAssets,
   );
 
   /**
    * @openapi
-   * /v3/intents/stats/blockchains:
+   * /v3/intents/volume-stats/blockchains:
    *   get:
-   *     summary: Get daily NEAR Intents swap volume/fees/swaps broken down by blockchain
+   *     summary: Get daily NEAR Intents swap volume/swaps broken down by blockchain
    *     tags:
    *       - Intents
    *     parameters:
@@ -175,23 +175,23 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get(
-    '/stats/blockchains',
+    '/volume-stats/blockchains',
     validate(request.statsBlockchains),
     service.statsBlockchains,
   );
 
   /**
    * @openapi
-   * /v3/intents/stats/overview:
+   * /v3/intents/stats:
    *   get:
-   *     summary: Get all-time NEAR Intents swap volume/fees/swaps totals
+   *     summary: Get all-time NEAR Intents swap volume/swaps totals, plus previous day totals
    *     tags:
    *       - Intents
    *     responses:
    *       200:
    *         description: Success response
    */
-  route.get('/stats/overview', service.statsOverview);
+  route.get('/stats', service.statsOverview);
 };
 
 export default routes;

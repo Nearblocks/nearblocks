@@ -21,8 +21,7 @@ SELECT
   s.blockchain,
   s.volume,
   s.volume_usd,
-  s.swaps::TEXT AS swaps,
-  s.fee_usd AS fee
+  s.swaps::TEXT AS swaps
 FROM
   mt_intents_stats s
   JOIN days d USING (date)

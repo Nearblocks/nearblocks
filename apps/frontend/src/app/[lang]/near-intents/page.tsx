@@ -51,11 +51,7 @@ const NearIntentsPage = async ({ params }: Props) => {
         title={t('nearIntents.dashboard.heading')}
       />
       <ErrorSuspense fallback={<OverviewCards loading />}>
-        <OverviewCards
-          overviewPromise={overviewPromise}
-          swapStatsPromise={swapStatsPromise}
-          volumeStatsPromise={volumeStatsPromise}
-        />
+        <OverviewCards overviewPromise={overviewPromise} />
       </ErrorSuspense>
       <div className="grid grid-cols-1 gap-4">
         <ErrorSuspense fallback={<IntentsVolumeAssetsChart loading />}>

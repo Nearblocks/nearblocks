@@ -100,17 +100,25 @@ const yAxisLabel = {
   },
 };
 
-const tooltipFormatter = function (this: Highcharts.Point) {
-  const header = `<span>${dateFormat(this.x, 'MMM D, YYYY')}</span><br/>`;
-  const rows = (this.points as Array<Highcharts.Point>)?.map((point, index) => {
-    const val = currencyFormat(point.y, {
+const makeTooltipFormatter = (totalLabel: string) =>
+  function (this: Highcharts.Point) {
+    const points = (this.points as Array<Highcharts.Point>) ?? [];
+    const header = `<span>${dateFormat(this.x, 'MMM D, YYYY')}</span><br/>`;
+    const rows = points.map((point, index) => {
+      const val = currencyFormat(point.y, {
+        maximumFractionDigits: 2,
+        notation: 'compact',
+      });
+      return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">●</span> ${point.series.name}: <span class="font-bold">${val}</span></span>`;
+    });
+    const total = points.reduce((sum, point) => sum + (point.y ?? 0), 0);
+    const totalVal = currencyFormat(total, {
       maximumFractionDigits: 2,
       notation: 'compact',
     });
-    return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">●</span> ${point.series.name}: <span class="font-bold">${val}</span></span>`;
-  });
-  return header + (rows?.join('') ?? '');
-};
+    const totalRow = `<span class="mt-1 flex items-center gap-x-1 border-t pt-1 font-bold">${totalLabel}: ${totalVal}</span>`;
+    return header + rows.join('') + totalRow;
+  };
 
 export const IntentsVolumeAssetsChart = ({ loading, statsPromise }: Props) => {
   const { t } = useLocale('mts');
@@ -120,6 +128,10 @@ export const IntentsVolumeAssetsChart = ({ loading, statsPromise }: Props) => {
     () =>
       getSeries(stats, t('nearIntents.dashboard.charts.assets.othersLabel')),
     [stats, t],
+  );
+  const tooltipFormatter = useMemo(
+    () => makeTooltipFormatter(t('nearIntents.dashboard.charts.assets.total')),
+    [t],
   );
 
   return (

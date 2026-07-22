@@ -18,8 +18,7 @@ SELECT
   TO_CHAR(TO_TIMESTAMP(s.date / 1000), 'YYYY-MM-DD') AS date,
   s.blockchain,
   SUM(COALESCE(s.volume_usd, 0)) AS volume,
-  SUM(s.swaps) AS swaps,
-  SUM(COALESCE(s.fee_usd, 0)) AS fee
+  SUM(s.swaps) AS swaps
 FROM
   mt_intents_stats s
   JOIN days d USING (date)

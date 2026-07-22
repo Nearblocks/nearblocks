@@ -84,18 +84,20 @@ export const mts = {
       cards: {
         allTimeSwaps: 'Swaps (All Time)',
         allTimeVolume: 'Volume (All Time)',
-        lastDaySwaps: 'Swaps (24h)',
-        lastDayVolume: 'Volume (24h)',
+        lastDaySwaps: 'Swaps (Previous Day)',
+        lastDayVolume: 'Volume (Previous Day)',
       },
       charts: {
         assets: {
           othersLabel: 'Others',
           title: 'Daily Volume by Assets (30D)',
+          total: 'Total',
           yAxis: 'Daily Volume (USD)',
         },
         blockchain: {
           othersLabel: 'Others',
           title: 'Daily Volume by Blockchain (30D)',
+          total: 'Total',
           yAxis: 'Daily Volume (USD)',
         },
         swaps: {

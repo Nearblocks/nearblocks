@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import { IntentsMetricPoint, IntentsOverview } from 'nb-schemas';
+import { IntentsOverview } from 'nb-schemas';
 
 import { StatCard } from '@/components/stat-card';
 import { useLocale } from '@/hooks/use-locale';
@@ -11,26 +11,14 @@ import { currencyFormat, numberFormat } from '@/lib/format';
 type Props = {
   loading?: boolean;
   overviewPromise?: Promise<IntentsOverview | null>;
-  swapStatsPromise?: Promise<IntentsMetricPoint[] | null>;
-  volumeStatsPromise?: Promise<IntentsMetricPoint[] | null>;
 };
 
-export const OverviewCards = ({
-  loading,
-  overviewPromise,
-  swapStatsPromise,
-  volumeStatsPromise,
-}: Props) => {
+export const OverviewCards = ({ loading, overviewPromise }: Props) => {
   const { t } = useLocale('mts');
-  // Volume/swap-stats rows are ordered DESC by date, so index 0 is the most
-  // recent day — the same promise the daily/cumulative charts below use.
   const overview = !loading && overviewPromise ? use(overviewPromise) : null;
-  const volumeStats =
-    !loading && volumeStatsPromise ? use(volumeStatsPromise) : null;
-  const swapStats = !loading && swapStatsPromise ? use(swapStatsPromise) : null;
 
-  const lastDayVolume = volumeStats?.[0]?.daily ?? null;
-  const lastDaySwaps = swapStats?.[0]?.daily ?? null;
+  const lastDayVolume = overview?.prev_day_volume_usd ?? null;
+  const lastDaySwaps = overview?.prev_day_swaps ?? null;
   const allTimeVolume = overview?.volume_usd ?? null;
   const allTimeSwaps = overview?.swaps ?? null;
 

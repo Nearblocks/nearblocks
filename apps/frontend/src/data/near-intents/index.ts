@@ -42,9 +42,7 @@ export const fetchNearIntentsTxnCount = cache(
 
 export const fetchIntentsOverview = cache(
   async (): Promise<IntentsOverview | null> => {
-    const resp = await fetcher<IntentsStatsOverviewRes>(
-      '/v3/intents/stats/overview',
-    );
+    const resp = await fetcher<IntentsStatsOverviewRes>('/v3/intents/stats');
     return resp.data;
   },
 );
@@ -52,8 +50,8 @@ export const fetchIntentsOverview = cache(
 export const fetchIntentsAssetStats = cache(
   async (limit?: number): Promise<IntentsAssetPoint[] | null> => {
     const url = limit
-      ? `/v3/intents/stats/assets?limit=${limit}`
-      : '/v3/intents/stats/assets';
+      ? `/v3/intents/volume-stats/assets?limit=${limit}`
+      : '/v3/intents/volume-stats/assets';
     const resp = await fetcher<IntentsStatsAssetsRes>(url);
     return resp.data;
   },
@@ -62,8 +60,8 @@ export const fetchIntentsAssetStats = cache(
 export const fetchIntentsBlockchainStats = cache(
   async (limit?: number): Promise<IntentsBlockchainPoint[] | null> => {
     const url = limit
-      ? `/v3/intents/stats/blockchains?limit=${limit}`
-      : '/v3/intents/stats/blockchains';
+      ? `/v3/intents/volume-stats/blockchains?limit=${limit}`
+      : '/v3/intents/volume-stats/blockchains';
     const resp = await fetcher<IntentsStatsBlockchainsRes>(url);
     return resp.data;
   },
