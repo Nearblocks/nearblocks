@@ -42,7 +42,7 @@ export const Validators = ({
           loading={loading}
           totalSupply={totalSupply}
         />
-        <ValidatorInfoCard loading={loading} />
+        <ValidatorInfoCard info={info?.data ?? null} loading={loading} />
         <EpochInfo info={info?.data ?? null} loading={loading} />
       </div>
       <ValidatorsTable

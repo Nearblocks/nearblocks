@@ -541,6 +541,7 @@ export type ValidatorConfig = {
   protocol_epoch_length: null | number;
   protocol_max_inflation_rate: null | number[];
   protocol_max_seats: null | number;
+  protocol_min_stake_ratio: null | number[];
   protocol_treasury_fraction: null | number[];
   protocol_version: null | number;
   total_stake: null | string;
