@@ -25,6 +25,7 @@ type ExpProtocolConfig = {
   avg_hidden_validator_seats_per_shard?: number[];
   epoch_length: number;
   max_inflation_rate: number[];
+  minimum_stake_ratio: number[];
   num_block_producer_seats: number;
   protocol_reward_rate: number[];
   protocol_version: number;
@@ -41,7 +42,7 @@ export const validator = {
 };
 
 const CHUNK_SIZE = 100;
-const DEFAULT_MIN_STAKE_RATIO = [1, 6250];
+const DEFAULT_MIN_STAKE_RATIO = [1, 62500];
 
 const findSeatPrice = (
   validatorList: { stake: string }[],
@@ -95,6 +96,11 @@ export const protocolConfigCheck = async () => {
             (seats, seat) => seats + seat,
             0,
           ) ?? 0),
+        protocol_min_stake_ratio: protocolConfig.minimum_stake_ratio
+          ? (JSON.stringify(
+              protocolConfig.minimum_stake_ratio,
+            ) as unknown as number[])
+          : null,
         protocol_treasury_fraction: protocolConfig.protocol_reward_rate
           ? (JSON.stringify(
               protocolConfig.protocol_reward_rate,
@@ -108,6 +114,7 @@ export const protocolConfigCheck = async () => {
         'protocol_epoch_length',
         'protocol_max_inflation_rate',
         'protocol_max_seats',
+        'protocol_min_stake_ratio',
         'protocol_treasury_fraction',
         'protocol_version',
         'updated_at',
@@ -403,7 +410,7 @@ export const validatorsCheck = async () => {
       .delete();
 
     const minStakeRatio =
-      configData?.genesis_min_stake_ratio ?? DEFAULT_MIN_STAKE_RATIO;
+      configData?.protocol_min_stake_ratio ?? DEFAULT_MIN_STAKE_RATIO;
 
     const seatPrice =
       validators.current_validators.length > 0

@@ -27,8 +27,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 import {
   AddressesChartMini,
   BlocksChartMini,
+  ChunksChartMini,
+  ContractsChartMini,
+  GasChartMini,
   MarketCapChartMini,
+  MetaTxnsChartMini,
   PriceChartMini,
+  ReceiptsChartMini,
   SupplyChartMini,
   TpsChartMini,
   TxnFeeChartMini,
@@ -103,9 +108,34 @@ export const Charts = ({
           <BlocksChartMini statsPromise={blockStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
+      <ChartCard href="/charts/chunks" title={t('chunks.miniTitle')}>
+        <ErrorSuspense fallback={<ChunksChartMini loading />}>
+          <ChunksChartMini statsPromise={blockStatsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
       <ChartCard href="/charts/addresses" title={t('addresses.miniTitle')}>
         <ErrorSuspense fallback={<AddressesChartMini loading />}>
           <AddressesChartMini statsPromise={addressStatsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
+      <ChartCard href="/charts/receipts" title={t('receipts.miniTitle')}>
+        <ErrorSuspense fallback={<ReceiptsChartMini loading />}>
+          <ReceiptsChartMini statsPromise={txnStatsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
+      <ChartCard href="/charts/gas" title={t('gas.miniTitle')}>
+        <ErrorSuspense fallback={<GasChartMini loading />}>
+          <GasChartMini statsPromise={blockStatsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
+      <ChartCard href="/charts/contracts" title={t('contracts.miniTitle')}>
+        <ErrorSuspense fallback={<ContractsChartMini loading />}>
+          <ContractsChartMini statsPromise={addressStatsPromise} />
+        </ErrorSuspense>
+      </ChartCard>
+      <ChartCard href="/charts/meta-txns" title={t('metaTxns.miniTitle')}>
+        <ErrorSuspense fallback={<MetaTxnsChartMini loading />}>
+          <MetaTxnsChartMini txnStatsPromise={txnStatsPromise} />
         </ErrorSuspense>
       </ChartCard>
       <ChartCard href="/charts/tps" title={t('tps.miniTitle')}>

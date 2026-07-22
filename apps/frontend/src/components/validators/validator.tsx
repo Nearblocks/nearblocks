@@ -1,27 +1,26 @@
 'use client';
 
+import type { ValidatorInfo as ValidatorInfoData } from 'nb-schemas';
+
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { useLocale } from '@/hooks/use-locale';
-import { useSeatInfo } from '@/hooks/use-seat-info';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type Props = {
+  info?: null | ValidatorInfoData;
   loading?: boolean;
 };
 
-export const ValidatorInfo = ({ loading }: Props) => {
+export const ValidatorInfo = ({ info, loading }: Props) => {
   const { t } = useLocale('validators');
-  const {
-    currentSeatPrice,
-    isLoading: seatLoading,
-    nextSeatPrice,
-    protocolVersion,
-  } = useSeatInfo();
+  const currentSeatPrice = info?.epoch_seat_price ?? null;
+  const nextSeatPrice = info?.next_epoch_seat_price ?? null;
+  const protocolVersion = info?.protocol_version ?? null;
 
-  const isLoading = loading || seatLoading;
+  const isLoading = loading;
 
   return (
     <Card>
@@ -52,7 +51,7 @@ export const ValidatorInfo = ({ loading }: Props) => {
               ) : nextSeatPrice !== null ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />
-                  {nearFormat(nextSeatPrice.toString(), {
+                  {nearFormat(nextSeatPrice, {
                     maximumFractionDigits: 0,
                   })}
                 </span>
@@ -69,7 +68,7 @@ export const ValidatorInfo = ({ loading }: Props) => {
               ) : currentSeatPrice !== null ? (
                 <span className="flex items-center gap-1">
                   <NearCircle className="size-4" />
-                  {nearFormat(currentSeatPrice.toString(), {
+                  {nearFormat(currentSeatPrice, {
                     maximumFractionDigits: 0,
                   })}
                 </span>

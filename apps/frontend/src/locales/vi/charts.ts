@@ -25,6 +25,49 @@ export const charts = {
     series: 'Blocks',
     yAxis: 'Blocks',
   },
+  chunks: {
+    description:
+      'NEAR Daily Chunks & Shards chart shows the number of chunks produced and active shards per day on the NEAR protocol.',
+    heading: 'NEAR Chunks & Shards Chart',
+    meta: {
+      description:
+        'NEAR blockchain Chunks & Shards Chart shows the historical number of chunks produced and active shards per day on NEAR blockchain. All data is real-time, accurate and pulled directly from NEAR blockchain.',
+      title: 'NEAR Chunks & Shards Chart',
+    },
+    miniTitle: 'NEAR Chunks & Shards (14D)',
+    seriesChunks: 'Chunks',
+    seriesShards: 'Shards',
+    yAxis: 'Chunks',
+    yAxisShards: 'Shards',
+  },
+  contracts: {
+    description:
+      'NEAR Active Contracts chart shows the number of distinct smart contracts called per day on the NEAR protocol.',
+    heading: 'NEAR Active Contracts Chart',
+    meta: {
+      description:
+        'NEAR blockchain Active Contracts Chart shows the historical number of distinct smart contracts invoked daily on NEAR blockchain. All data is real-time, accurate and pulled directly from NEAR blockchain.',
+      title: 'NEAR Active Contracts Chart',
+    },
+    miniTitle: 'NEAR Active Contracts (14D)',
+    series: 'Active Contracts',
+    yAxis: 'Active Contracts',
+  },
+  gas: {
+    description:
+      'NEAR Gas chart shows the total gas used and average gas price per day on the NEAR protocol.',
+    heading: 'NEAR Gas Chart',
+    meta: {
+      description:
+        'NEAR blockchain Gas Chart shows the historical daily gas used and average gas price on NEAR blockchain. All data is real-time, accurate and pulled directly from NEAR blockchain.',
+      title: 'NEAR Gas Chart',
+    },
+    miniTitle: 'NEAR Gas Used (14D)',
+    seriesPrice: 'Gas Price (/TGas)',
+    seriesUsed: 'Gas Used',
+    yAxisPrice: 'Gas Price (/TGas)',
+    yAxisUsed: 'Gas Used',
+  },
   intentsSwaps: {
     description:
       'NEAR Intents Swaps chart shows the daily and cumulative number of swaps executed across NEAR Intents.',
@@ -76,6 +119,21 @@ export const charts = {
       'NearBlocks provides a suite of real-time NEAR data charts and statistics to track everything about NEAR: Price, Supply, Marketcap, Transaction Fee and others.',
     title: 'NEAR Charts & Statistics',
   },
+  metaTxns: {
+    description:
+      'NEAR Meta Transactions chart shows the daily number of meta transactions, meta accounts and relayers on the NEAR protocol.',
+    heading: 'NEAR Meta Transactions Chart',
+    meta: {
+      description:
+        'NEAR blockchain Meta Transactions Chart shows the historical daily number of meta transactions, meta accounts and relayers on NEAR blockchain. All data is real-time, accurate and pulled directly from NEAR blockchain.',
+      title: 'NEAR Meta Transactions Chart',
+    },
+    miniTitle: 'NEAR Meta Txns (14D)',
+    seriesAccounts: 'Meta Accounts',
+    seriesRelayers: 'Relayers',
+    seriesTxns: 'Meta Txns',
+    yAxis: 'Count',
+  },
   nearPrice: {
     description:
       'NEAR Daily Price chart shows the historical price of NEAR in USD.',
@@ -101,6 +159,19 @@ export const charts = {
     miniTitle: 'NEAR Supply Growth (14D)',
     series: 'NEAR Supply',
     yAxis: 'NEAR Supply',
+  },
+  receipts: {
+    description:
+      'NEAR Daily Receipts chart shows the number of receipts processed per day on the NEAR protocol.',
+    heading: 'NEAR Daily Receipts Chart',
+    meta: {
+      description:
+        'NEAR blockchain Daily Receipts Chart shows the historical number of receipts processed daily on NEAR blockchain. All data is real-time, accurate and pulled directly from NEAR blockchain.',
+      title: 'NEAR Daily Receipts Chart',
+    },
+    miniTitle: 'NEAR Daily Receipts (14D)',
+    series: 'Receipts',
+    yAxis: 'Receipts',
   },
   title: 'NEAR Charts & Statistics',
   tps: {

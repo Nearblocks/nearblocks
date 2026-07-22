@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
+import type { HistoryEntry } from '@/hooks/use-search-history';
 import { useSearchHistory } from '@/hooks/use-search-history';
 import { searchKeyword } from '@/lib/search';
 import { cn, encodeToken } from '@/lib/utils';
@@ -32,49 +33,63 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
 
   const navigateByKeyword = (kw: string) => {
     startTransition(async () => {
-      const resp = await searchKeyword(kw, filter);
+      try {
+        const resp = await searchKeyword(kw, filter);
+        if (!resp) return;
 
-      const hasResults =
-        resp &&
-        (resp.accounts.length > 0 ||
-          resp.blocks.length > 0 ||
-          resp.fts.length > 0 ||
-          resp.mts.length > 0 ||
-          resp.txns.length > 0);
+        const routes: Array<HistoryEntry | undefined> = [
+          resp.accounts?.[0] && {
+            href: `/address/${resp.accounts[0].account_id}`,
+            label: resp.accounts[0].account_id,
+            type: 'account',
+          },
+          resp.blocks?.[0] && {
+            href: `/blocks/${resp.blocks[0].block_hash}`,
+            label: resp.blocks[0].block_hash,
+            type: 'block',
+          },
+          resp.fts?.[0] && {
+            href: `/tokens/${resp.fts[0].contract}`,
+            label: resp.fts[0].contract,
+            type: 'token',
+          },
+          resp.mts?.[0] && {
+            href: `/mt-tokens/${resp.mts[0].contract}/tokens/${encodeToken(
+              resp.mts[0].token,
+            )}`,
+            label: resp.mts[0].token,
+            type: 'token',
+          },
+          resp.nfts?.[0] && {
+            href: `/nft-tokens/${resp.nfts[0].contract}`,
+            label: resp.nfts[0].contract,
+            type: 'token',
+          },
+          resp.txns?.[0] && {
+            href: `/txns/${resp.txns[0].transaction_hash}`,
+            label: resp.txns[0].transaction_hash,
+            type: 'txn',
+          },
+          resp.receipts?.[0] && {
+            href: `/txns/${resp.receipts[0].transaction_hash}/execution#${resp.receipts[0].receipt_id}`,
+            label: resp.receipts[0].receipt_id,
+            type: 'txn',
+          },
+          resp.keys?.[0] && {
+            href: `/address/${resp.keys[0].account_id}/keys`,
+            label: resp.keys[0].account_id,
+            type: 'account',
+          },
+        ];
 
-      if (!hasResults) return;
+        const match = routes.find(Boolean);
 
-      if (resp.accounts.length) {
-        const href = `/address/${resp.accounts[0].account_id}`;
-        addToHistory({
-          href,
-          label: resp.accounts[0].account_id,
-          type: 'account',
-        });
-        router.push(href);
-      } else if (resp.blocks.length) {
-        const href = `/blocks/${resp.blocks[0].block_hash}`;
-        addToHistory({ href, label: resp.blocks[0].block_hash, type: 'block' });
-        router.push(href);
-      } else if (resp.fts.length) {
-        const href = `/tokens/${resp.fts[0].contract}`;
-        addToHistory({ href, label: resp.fts[0].contract, type: 'token' });
-        router.push(href);
-      } else if (resp.mts.length) {
-        const mt = resp.mts[0];
-        const href = `/mt-tokens/${mt.contract}/tokens/${encodeToken(
-          mt.token,
-        )}`;
-        addToHistory({ href, label: mt.token, type: 'token' });
-        router.push(href);
-      } else if (resp.txns.length) {
-        const href = `/txns/${resp.txns[0].transaction_hash}`;
-        addToHistory({
-          href,
-          label: resp.txns[0].transaction_hash,
-          type: 'txn',
-        });
-        router.push(href);
+        if (!match) return;
+
+        addToHistory(match);
+        router.push(match.href);
+      } catch (error) {
+        console.error(error);
       }
     });
   };

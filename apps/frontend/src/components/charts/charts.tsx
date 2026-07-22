@@ -81,6 +81,56 @@ export const BlocksChartMini = dynamic(
   { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
 );
 
+export const ChunksChart = dynamic(
+  () => import('./chunks').then((m) => m.ChunksChart),
+  { loading: () => <ChartCardSkeleton />, ssr: false },
+);
+
+export const ChunksChartMini = dynamic(
+  () => import('./chunks').then((m) => m.ChunksChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);
+
+export const ReceiptsChart = dynamic(
+  () => import('./receipts').then((m) => m.ReceiptsChart),
+  { loading: () => <ChartCardSkeleton />, ssr: false },
+);
+
+export const ReceiptsChartMini = dynamic(
+  () => import('./receipts').then((m) => m.ReceiptsChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);
+
+export const GasChart = dynamic(() => import('./gas').then((m) => m.GasChart), {
+  loading: () => <ChartCardSkeleton />,
+  ssr: false,
+});
+
+export const GasChartMini = dynamic(
+  () => import('./gas').then((m) => m.GasChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);
+
+export const ContractsChart = dynamic(
+  () => import('./contracts').then((m) => m.ContractsChart),
+  { loading: () => <ChartCardSkeleton />, ssr: false },
+);
+
+export const ContractsChartMini = dynamic(
+  () => import('./contracts').then((m) => m.ContractsChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);
+
+export const MetaTxnsChart = dynamic(
+  () => import('./meta-txns').then((m) => m.MetaTxnsChart),
+  { loading: () => <ChartCardSkeleton />, ssr: false },
+);
+
+export const MetaTxnsChartMini = dynamic(
+  () => import('./meta-txns').then((m) => m.MetaTxnsChartMini),
+  { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
+);
+
 export const AddressesChart = dynamic(
   () => import('./addresses').then((m) => m.AddressesChart),
   { loading: () => <ChartCardSkeleton />, ssr: false },
