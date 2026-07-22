@@ -67,7 +67,6 @@ const metricPoint = v.object({
 const assetPoint = v.object({
   blockchain: v.string(),
   date: v.string(),
-  fee: v.nullable(v.string()),
   swaps: v.string(),
   symbol: v.nullable(v.string()),
   token_id: v.string(),
@@ -78,14 +77,14 @@ const assetPoint = v.object({
 const blockchainPoint = v.object({
   blockchain: v.string(),
   date: v.string(),
-  fee: v.nullable(v.string()),
   swaps: v.string(),
   volume: v.nullable(v.string()),
 });
 
 const overview = v.object({
   blockchains: v.string(),
-  fee_usd: v.nullable(v.string()),
+  prev_day_swaps: v.nullable(v.string()),
+  prev_day_volume_usd: v.nullable(v.string()),
   swaps: v.nullable(v.string()),
   tokens: v.string(),
   volume_usd: v.nullable(v.string()),
