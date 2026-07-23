@@ -9,6 +9,7 @@ import { ExportType } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
+import { QuantumSafeBadge } from '@/components/quantum-safe-badge';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
 import { TimestampCell, TimestampToggle } from '@/components/timestamp';
@@ -62,10 +63,13 @@ export const AccessKeys = ({
     },
     {
       cell: (key) => (
-        <Truncate>
-          <TruncateText text={key.public_key} />
-          <TruncateCopy text={key.public_key} />
-        </Truncate>
+        <div className="flex items-center gap-1">
+          <QuantumSafeBadge publicKey={key.public_key} />
+          <Truncate>
+            <TruncateText text={key.public_key} />
+            <TruncateCopy text={key.public_key} />
+          </Truncate>
+        </div>
       ),
       className: 'w-44',
       header: t('keys.columns.publicKey'),

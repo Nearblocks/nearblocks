@@ -52,8 +52,8 @@ const routes = (app: Router) => {
    *         description: Sort field
    *         schema:
    *           type: string
-   *           enum: [holders, name, price, transfers]
-   *           default: transfers
+   *           enum: [holders, name, onchain_market_cap, price, transfers, volume_24h]
+   *           default: volume_24h
    *       - in: query
    *         name: order
    *         description: Sort order

@@ -71,6 +71,26 @@ export const MtTokens = ({
       sortName: 'price',
     },
     {
+      cell: (token) =>
+        token.volume_24h ? currencyFormat(token.volume_24h) : <span>$0</span>,
+      enableSort: true,
+      header: t('tokens.volume'),
+      id: 'volume',
+      sortName: 'volume_24h',
+    },
+    {
+      cell: (token) =>
+        token.onchain_market_cap && parseFloat(token.onchain_market_cap) > 0 ? (
+          currencyFormat(token.onchain_market_cap)
+        ) : (
+          <span>N/A</span>
+        ),
+      enableSort: true,
+      header: t('tokens.onchainMC'),
+      id: 'onchain_mc',
+      sortName: 'onchain_market_cap',
+    },
+    {
       cell: (token) => numberFormat(token.holders),
       className: 'w-40',
       enableSort: true,
@@ -115,7 +135,7 @@ export const MtTokens = ({
         <DataTable
           columns={columns}
           data={tokens?.data}
-          defaultSort="transfers"
+          defaultSort="volume_24h"
           emptyMessage={t('tokens.empty')}
           getRowKey={(token) => `${token.contract}:${token.token}`}
           header={

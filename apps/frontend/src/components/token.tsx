@@ -1,7 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from 'react';
 
-import { numberFormat, toTokenAmount } from '@/lib/format';
+import {
+  currencyFormat,
+  numberFormat,
+  toTokenAmount,
+  toTokenPrice,
+} from '@/lib/format';
 import { parseMTToken } from '@/lib/token';
 import { cn, encodeToken } from '@/lib/utils';
 
@@ -23,6 +28,12 @@ type AmountProps = {
   className?: string;
   decimals: number;
   hideSign?: boolean;
+};
+type ValueProps = {
+  amount: string;
+  className?: string;
+  decimals: null | number | undefined;
+  price: null | string | undefined;
 };
 type LinkProps = {
   contract: string;
@@ -195,6 +206,22 @@ export const TokenAmount = ({
     </span>
   ) : (
     <span className={cn('text-red-foreground', className)}>{display}</span>
+  );
+};
+
+export const TokenValue = ({
+  amount,
+  className,
+  decimals,
+  price,
+}: ValueProps) => {
+  if (price == null || decimals == null) return null;
+
+  return (
+    <span className={cn('text-muted-foreground text-body-xs', className)}>
+      (~
+      {currencyFormat(toTokenPrice(amount.replace(/^-/, ''), decimals, price))})
+    </span>
   );
 };
 

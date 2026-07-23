@@ -1,16 +1,3 @@
-CREATE MATERIALIZED VIEW nft_token_list AS
-SELECT
-  contract,
-  COUNT(*) as tokens
-FROM
-  nft_token_meta
-WHERE
-  modified_at IS NOT NULL
-GROUP BY
-  contract;
-
-CREATE UNIQUE INDEX ON nft_token_list (contract);
-
 CREATE MATERIALIZED VIEW ft_list AS
 SELECT
   contract,
@@ -44,14 +31,17 @@ SELECT
   COALESCE(dt.transfers, 0) AS transfers_24h
 FROM
   nft_meta m
-  LEFT JOIN LATERAL (
+  LEFT JOIN (
     SELECT
-      tokens
+      contract,
+      COUNT(*) AS tokens
     FROM
-      nft_token_list
+      nft_token_meta
     WHERE
-      contract = m.contract
-  ) t ON true
+      modified_at IS NOT NULL
+    GROUP BY
+      contract
+  ) t ON t.contract = m.contract
   LEFT JOIN LATERAL (
     SELECT
       COUNT(*) AS transfers

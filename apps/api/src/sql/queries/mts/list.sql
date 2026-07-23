@@ -8,6 +8,8 @@ SELECT
   base_uri,
   reference,
   price,
+  onchain_market_cap,
+  volume_24h,
   holders,
   transfers
 FROM

@@ -9,6 +9,7 @@ import type { TxnReceipt } from 'nb-schemas';
 import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
+import { QuantumSafeBadge } from '@/components/quantum-safe-badge';
 import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
 import { TxnStatus } from '@/components/txn';
@@ -19,6 +20,7 @@ import {
   nearFormat,
   numberFormat,
 } from '@/lib/format';
+import { isQuantumSafeKey } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
@@ -203,7 +205,14 @@ export const ReceiptInspectRows = ({
                   receipt?.predecessor_account_id !== 'system' && (
                     <span className="text-muted-foreground flex items-center">
                       (
-                      <Key className="mx-1 size-3.5" />
+                      {isQuantumSafeKey(receipt!.public_key) ? (
+                        <QuantumSafeBadge
+                          className="mx-1"
+                          publicKey={receipt!.public_key}
+                        />
+                      ) : (
+                        <Key className="mx-1 size-3.5" />
+                      )}
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Link

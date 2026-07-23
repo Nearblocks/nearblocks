@@ -226,3 +226,11 @@ export const isSpamToken = (contract: string, patterns: string[]): boolean => {
     return contract === pattern;
   });
 };
+
+// A NEAR public key encodes its scheme as the prefix before `:`.
+// Post-quantum (ML-DSA-65) keys use `ml-dsa-65:` on-chain and are stored
+// hashed as `ml-dsa-65-hash:` by the indexer — match both forms.
+export const isQuantumSafeKey = (publicKey?: null | string): boolean => {
+  const curve = publicKey?.split(':')[0];
+  return curve === 'ml-dsa-65' || curve === 'ml-dsa-65-hash';
+};

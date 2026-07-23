@@ -94,6 +94,13 @@ SELECT
   b.base_uri,
   b.reference,
   p.price,
+  ROUND(
+    (p.price)::NUMERIC * (h.supply / POWER(10, b.decimals)::NUMERIC)
+  ) AS onchain_market_cap,
+  ROUND(
+    (vol.amount / POWER(10, b.decimals)::NUMERIC) * p.price,
+    8
+  ) AS volume_24h,
   COALESCE(h.holders, 0) AS holders,
   COALESCE(ts.transfers, 0) AS transfers
 FROM
@@ -120,7 +127,8 @@ FROM
   ) p ON true
   LEFT JOIN LATERAL (
     SELECT
-      COUNT(*) AS holders
+      COUNT(*) AS holders,
+      COALESCE(SUM(amount), 0) AS supply
     FROM
       mt_holders
     WHERE
@@ -136,6 +144,25 @@ FROM
       contract = b.contract
       AND token = b.token
   ) ts ON true
+  LEFT JOIN LATERAL (
+    SELECT
+      COALESCE(SUM(transfers_amount), 0) AS amount
+    FROM
+      mt_token_stats
+    WHERE
+      contract = b.contract
+      AND token = b.token
+      AND date = (
+        EXTRACT(
+          epoch
+          FROM
+            DATE_TRUNC(
+              'day',
+              (NOW() AT TIME ZONE 'UTC') - INTERVAL '1 day'
+            )
+        ) * 1000000000
+      )::BIGINT
+  ) vol ON true
 WHERE
   b.modified_at IS NOT NULL
   AND b.decimals IS NOT NULL;

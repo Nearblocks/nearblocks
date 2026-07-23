@@ -8,6 +8,7 @@ import {
   TokenAmount,
   TokenImage,
   TokenLink,
+  TokenValue,
 } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 
@@ -99,6 +100,11 @@ const renderTokenEntry = (
         decimals={tokenMeta.decimals ?? 0}
         hideSign
       />
+      <TokenValue
+        amount={entry.amount}
+        decimals={tokenMeta.decimals}
+        price={tokenMeta.price}
+      />
       <TokenImage
         alt={tokenMeta.name ?? ''}
         className="m-px size-5 rounded-full border"
@@ -169,6 +175,11 @@ export const IntentsSwapEvents = ({ logs, meta }: Props) => {
               amount={w.amount}
               decimals={tokenMeta.decimals ?? 0}
               hideSign
+            />
+            <TokenValue
+              amount={w.amount}
+              decimals={tokenMeta.decimals}
+              price={tokenMeta.price}
             />
             <TokenImage
               alt={tokenMeta.name ?? ''}

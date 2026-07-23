@@ -30,6 +30,7 @@ export type TokenMeta = {
   decimals: null | number;
   icon: null | string;
   name: null | string;
+  price: null | string;
   symbol: null | string;
 };
 
@@ -65,6 +66,7 @@ export const buildMetaMap = (
         decimals: ft.meta.decimals,
         icon: ft.meta.icon,
         name: ft.meta.name,
+        price: ft.meta.price,
         symbol: ft.meta.symbol,
       });
     }
@@ -75,6 +77,7 @@ export const buildMetaMap = (
       decimals: mt.base_meta.decimals,
       icon: mt.base_meta.icon,
       name: mt.base_meta.name,
+      price: mt.base_meta.price,
       symbol: mt.base_meta.symbol,
     };
     // Key by contract_account_id (general contract lookup)

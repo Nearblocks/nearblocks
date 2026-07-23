@@ -53,7 +53,7 @@ const routes = (app: Router) => {
    *         schema:
    *           type: string
    *           enum: [market_cap, name, onchain_market_cap, price, volume_24h]
-   *           default: onchain_market_cap
+   *           default: volume_24h
    *       - in: query
    *         name: order
    *         description: Sort order

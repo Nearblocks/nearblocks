@@ -5,8 +5,10 @@ import { cursorSchema, limitSchema, tsSchema } from '../common.js';
 export const MTListSort = {
   HOLDERS: 'holders',
   NAME: 'name',
+  ONCHAIN_MARKET_CAP: 'onchain_market_cap',
   PRICE: 'price',
   TRANSFERS: 'transfers',
+  VOLUME_24H: 'volume_24h',
 } as const;
 
 export const MTListOrder = {
@@ -20,7 +22,7 @@ const list = v.object({
   order: v.optional(v.enum(MTListOrder), 'desc'),
   prev: cursorSchema,
   search: v.optional(v.string()),
-  sort: v.optional(v.enum(MTListSort), 'transfers'),
+  sort: v.optional(v.enum(MTListSort), 'volume_24h'),
 });
 
 const listCursor = v.object({

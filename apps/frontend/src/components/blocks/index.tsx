@@ -58,13 +58,19 @@ export const Blocks = ({
           {numberFormat(block.block_height)}
         </Link>
       ),
+      className: 'w-40',
       csvLabel: 'Block',
       csvValue: (block) => block.block_height,
       header: t('columns.block'),
       id: 'block',
     },
     {
-      cell: (block) => <AccountLink account={block.author_account_id} />,
+      cell: (block) => (
+        <AccountLink
+          account={block.author_account_id}
+          textClassName="max-w-50"
+        />
+      ),
       className: 'w-60',
       csvLabel: 'Author',
       csvValue: (block) => block.author_account_id ?? '',

@@ -19,6 +19,7 @@ export const fetchFtsMeta = async (
             decimals: ft.decimals,
             icon: ft.icon,
             name: ft.name,
+            price: ft.price,
             symbol: ft.symbol,
           } satisfies TokenMeta,
         ] as const;

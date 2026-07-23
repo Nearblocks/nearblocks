@@ -40,7 +40,51 @@ FROM
         'icon',
         icon,
         'reference',
-        reference
+        reference,
+        'price',
+        (
+          SELECT
+            (
+              CASE
+                WHEN (${block_timestamp}::BIGINT / 1000000 / 86400000) = (
+                  EXTRACT(
+                    EPOCH
+                    FROM
+                      NOW()
+                  )::BIGINT * 1000 / 86400000
+                ) THEN (
+                  SELECT
+                    price
+                  FROM
+                    ft_prices fp
+                  WHERE
+                    fp.coingecko_id = it.coingecko_id
+                    AND fp.date <= ${block_timestamp}::BIGINT / 1000000
+                  ORDER BY
+                    fp.date DESC
+                  LIMIT
+                    1
+                )
+                ELSE (
+                  SELECT
+                    price
+                  FROM
+                    ft_prices_daily fpd
+                  WHERE
+                    fpd.coingecko_id = it.coingecko_id
+                    AND fpd.date <= ${block_timestamp}::BIGINT / 1000000
+                  ORDER BY
+                    fpd.date DESC
+                  LIMIT
+                    1
+                )
+              END
+            )::TEXT
+          FROM
+            mt_intents_tokens it
+          WHERE
+            it.token = mbm.token
+        )
       ) AS base_meta
     FROM
       mt_base_meta mbm

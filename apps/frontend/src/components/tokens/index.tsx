@@ -149,7 +149,7 @@ export const Tokens = ({
         <DataTable
           columns={columns}
           data={tokens?.data}
-          defaultSort="onchain_market_cap"
+          defaultSort="volume_24h"
           emptyMessage={t('tokens.empty')}
           getRowKey={(token) => token.contract}
           header={

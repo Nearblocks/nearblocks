@@ -11,7 +11,12 @@ import {
 } from 'lucide-react';
 
 import { AccountLink } from '@/components/link';
-import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
+import {
+  TokenAmount,
+  TokenImage,
+  TokenLink,
+  TokenValue,
+} from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 
 import type { TokenMeta } from './utils';
@@ -85,6 +90,11 @@ export const BurrowEvents = ({ logs, meta }: Props) => {
               amount={event.amount}
               decimals={burrowDecimals(tokenMeta.decimals)}
               hideSign
+            />
+            <TokenValue
+              amount={event.amount}
+              decimals={burrowDecimals(tokenMeta.decimals)}
+              price={tokenMeta.price}
             />
             <TokenImage
               alt={tokenMeta.name ?? ''}
