@@ -174,11 +174,13 @@ export const mts = {
   tokens: {
     empty: 'No MT tokens found',
     holders: 'Holders',
+    onchainMC: 'On-Chain MC',
     price: 'Price',
     title: 'TOKEN',
     total: 'More than {{count}} MT Token Contracts found',
     totalExact: 'A total of {{count}} MT Token Contracts found',
     transfers: 'Transfers',
+    volume: 'Volume (24H)',
   },
   transfers: {
     empty: 'No mt token txns found',

@@ -3,7 +3,12 @@
 import { ArrowLeftRight } from 'lucide-react';
 
 import { AccountLink } from '@/components/link';
-import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
+import {
+  TokenAmount,
+  TokenImage,
+  TokenLink,
+  TokenValue,
+} from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 
 import type { TokenMeta } from './utils';
@@ -39,6 +44,11 @@ export const RheaSwapEvents = ({ logs, meta }: Props) => {
               decimals={metaIn.decimals ?? 0}
               hideSign
             />
+            <TokenValue
+              amount={row.amountIn}
+              decimals={metaIn.decimals}
+              price={metaIn.price}
+            />
             <TokenImage
               alt={metaIn.name ?? ''}
               className="m-px size-5 rounded-full border"
@@ -54,6 +64,11 @@ export const RheaSwapEvents = ({ logs, meta }: Props) => {
               amount={row.amountOut}
               decimals={metaOut.decimals ?? 0}
               hideSign
+            />
+            <TokenValue
+              amount={row.amountOut}
+              decimals={metaOut.decimals}
+              price={metaOut.price}
             />
             <TokenImage
               alt={metaOut.name ?? ''}

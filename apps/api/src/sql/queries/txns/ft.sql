@@ -26,7 +26,44 @@ FROM
         'icon',
         icon,
         'reference',
-        reference
+        reference,
+        'price',
+        (
+          CASE
+            WHEN (${block_timestamp}::BIGINT / 1000000 / 86400000) = (
+              EXTRACT(
+                EPOCH
+                FROM
+                  NOW()
+              )::BIGINT * 1000 / 86400000
+            ) THEN (
+              SELECT
+                price
+              FROM
+                ft_prices
+              WHERE
+                coingecko_id = fm.coingecko_id
+                AND date <= ${block_timestamp}::BIGINT / 1000000
+              ORDER BY
+                date DESC
+              LIMIT
+                1
+            )
+            ELSE (
+              SELECT
+                price
+              FROM
+                ft_prices_daily
+              WHERE
+                coingecko_id = fm.coingecko_id
+                AND date <= ${block_timestamp}::BIGINT / 1000000
+              ORDER BY
+                date DESC
+              LIMIT
+                1
+            )
+          END
+        )::TEXT
       ) AS meta
     FROM
       ft_meta fm

@@ -11,6 +11,7 @@ import {
   NFTMedia,
   TokenAmount,
   TokenImage,
+  TokenValue,
 } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import { isSpamToken } from '@/lib/utils';
@@ -105,6 +106,11 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
                       decimals={mt.base_meta?.decimals ?? 0}
                       hideSign
                     />
+                    <TokenValue
+                      amount={mt.delta_amount}
+                      decimals={mt.base_meta?.decimals}
+                      price={mt.base_meta?.price}
+                    />
                     <TokenImage
                       alt={mt.base_meta?.name ?? ''}
                       className="m-px size-5 rounded-full border"
@@ -143,6 +149,11 @@ export const MTTransfers = ({ mts, spamPatterns }: Props) => {
                     amount={net.delta.toString()}
                     decimals={net.meta?.decimals ?? 0}
                     hideSign
+                  />
+                  <TokenValue
+                    amount={net.delta.toString()}
+                    decimals={net.meta?.decimals}
+                    price={net.meta?.price}
                   />
                   <TokenImage
                     alt={net.meta?.name ?? ''}

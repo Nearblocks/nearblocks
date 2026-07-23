@@ -23,7 +23,7 @@ const list = v.object({
   order: v.optional(v.enum(FTListOrder), 'desc'),
   prev: cursorSchema,
   search: v.optional(v.string()),
-  sort: v.optional(v.enum(FTListSort), 'onchain_market_cap'),
+  sort: v.optional(v.enum(FTListSort), 'volume_24h'),
 });
 
 const count = v.object({

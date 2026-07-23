@@ -11,11 +11,13 @@ const list = v.object({
   holders: v.string(),
   icon: v.nullable(v.string()),
   name: v.nullable(v.string()),
+  onchain_market_cap: v.nullable(v.string()),
   price: v.nullable(v.string()),
   reference: v.nullable(v.string()),
   symbol: v.nullable(v.string()),
   token: v.string(),
   transfers: v.string(),
+  volume_24h: v.nullable(v.string()),
 });
 
 const listCount = v.object({

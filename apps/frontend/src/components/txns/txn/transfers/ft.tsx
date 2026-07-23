@@ -6,7 +6,12 @@ import { TxnFT } from 'nb-schemas';
 
 import { AccountLink } from '@/components/link';
 import { ScrollableList } from '@/components/scrollable-list';
-import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
+import {
+  TokenAmount,
+  TokenImage,
+  TokenLink,
+  TokenValue,
+} from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import { isSpamToken } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -82,6 +87,11 @@ export const FTTransfers = ({ fts, spamPatterns }: Props) => {
                   decimals={ft.meta?.decimals ?? 0}
                   hideSign
                 />
+                <TokenValue
+                  amount={ft.delta_amount}
+                  decimals={ft.meta?.decimals}
+                  price={ft.meta?.price}
+                />
                 <TokenImage
                   alt={ft.meta?.name ?? ''}
                   className="m-px size-5 rounded-full border"
@@ -116,6 +126,11 @@ export const FTTransfers = ({ fts, spamPatterns }: Props) => {
                 amount={net.delta.toString()}
                 decimals={net.meta?.decimals ?? 0}
                 hideSign
+              />
+              <TokenValue
+                amount={net.delta.toString()}
+                decimals={net.meta?.decimals}
+                price={net.meta?.price}
               />
               <TokenImage
                 alt={net.meta?.name ?? ''}

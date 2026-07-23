@@ -114,6 +114,7 @@ export const layout = {
     outOfSync:
       'Due to unexpected maintenance NearBlocks is out of sync. Some blocks or transactions may be delayed.',
   },
+  quantumSafeKey: 'Quantum-safe access key (ML-DSA-65)',
   scrollable: {
     more: 'Scroll for more',
     top: 'Scroll to top',

@@ -7,6 +7,7 @@ import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
 import { AccountLink, Link } from '@/components/link';
+import { QuantumSafeBadge } from '@/components/quantum-safe-badge';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat } from '@/lib/format';
@@ -269,6 +270,7 @@ export const Action = ({
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.addKey')}{' '}
+        <QuantumSafeBadge publicKey={String(args.public_key ?? '')} />
         <Link
           className="text-link max-w-32 truncate sm:max-w-40"
           href={`/address/${receiver}/keys`}
@@ -298,6 +300,7 @@ export const Action = ({
     return (
       <span className="text-body-sm flex flex-wrap items-center gap-1">
         {t('actions.deleteKey')}{' '}
+        <QuantumSafeBadge publicKey={String(args.public_key ?? '')} />
         <Link
           className="text-link max-w-32 truncate sm:max-w-40"
           href={`/address/${receiver}/keys`}
