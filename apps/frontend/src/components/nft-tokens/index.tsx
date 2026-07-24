@@ -45,6 +45,7 @@ export const NftTokens = ({
             contract={token.contract}
             name={token.name}
             symbol={token.symbol}
+            textClassName="max-w-40"
             type="nft-tokens"
           />
         </span>

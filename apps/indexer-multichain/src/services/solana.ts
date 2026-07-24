@@ -86,10 +86,14 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     }
   };
 
+  const fetchStart = Date.now();
   const block = await retry(runBlock, { onError });
+  const fetchMs = Date.now() - fetchStart;
 
   if (!block) {
-    logger.info(`${chain}: block missing, skipping: ${height}`);
+    logger.info(
+      `${chain}: block missing, skipping: ${height} (fetchMs=${fetchMs})`,
+    );
     return;
   }
 
@@ -99,14 +103,19 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     chainLastBlockTimestamp.set({ chain }, block.blockTime);
   }
 
-  if (!block.transactions?.length) return;
+  if (!block.transactions?.length) {
+    logger.info(
+      `${chain}: block ${height} fetchMs=${fetchMs} insertMs=0 txns=0`,
+    );
+    return;
+  }
 
   const txns: MultichainTransaction[] = [];
 
   for (const txn of block.transactions) {
     const txnHash = txn.transaction.signatures[0];
     const signature = Buffer.from(base58.decode(txnHash));
-    const address = txn.transaction.message.accountKeys[0] ?? 'unknown';
+    const address = txn.transaction.accountKeys[0]?.pubkey ?? 'unknown';
 
     txns.push({
       address: address.toLowerCase(),
@@ -145,7 +154,13 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     }
   }
 
+  const insertStart = Date.now();
   await Promise.all(promises);
+  const insertMs = Date.now() - insertStart;
+
+  logger.info(
+    `${chain}: block ${height} fetchMs=${fetchMs} insertMs=${insertMs} txns=${txns.length}`,
+  );
 };
 
 export default { processBlocks };

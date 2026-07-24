@@ -39,6 +39,7 @@ type LinkProps = {
   contract: string;
   name?: null | string;
   symbol?: null | string;
+  textClassName?: string;
   type?: 'mt-tokens' | 'nft-tokens' | 'tokens';
 };
 type MTTokenLinkProps = {
@@ -229,6 +230,7 @@ export const TokenLink = ({
   contract,
   name,
   symbol,
+  textClassName,
   type = 'tokens',
 }: LinkProps) => {
   return (
@@ -237,7 +239,10 @@ export const TokenLink = ({
       href={`/${type}/${contract}`}
     >
       <Truncate>
-        <TruncateText className="max-w-20" text={name ?? contract} />
+        <TruncateText
+          className={cn('max-w-20', textClassName)}
+          text={name ?? contract}
+        />
       </Truncate>
       {symbol && (
         <Truncate className="text-muted-foreground">

@@ -69,6 +69,17 @@ export const getBlock = async (
   return rpcCall<BitcoinBlock>(url, 'getblock', [blockHash, 2]);
 };
 
+const to32Bytes = (buf: Buffer): Buffer => {
+  const src = buf.length > 32 ? buf.subarray(buf.length - 32) : buf;
+
+  if (src.length === 32) return Buffer.from(src);
+
+  const out = Buffer.alloc(32);
+  src.copy(out, 32 - src.length);
+
+  return out;
+};
+
 export const decodeDERsignature = (signatureHex: string) => {
   const signature = Buffer.from(signatureHex, 'hex');
 
@@ -83,7 +94,7 @@ export const decodeDERsignature = (signatureHex: string) => {
   if (der[offset++] !== 0x02) throw new Error('expected integer for r');
 
   const rLen = der[offset++];
-  const r = der.subarray(offset + 1, offset + rLen);
+  const r = der.subarray(offset, offset + rLen);
   offset += rLen;
 
   if (der[offset++] !== 0x02) throw new Error('expected integer for s');
@@ -91,7 +102,7 @@ export const decodeDERsignature = (signatureHex: string) => {
   const sLen = der[offset++];
   const s = der.subarray(offset, offset + sLen);
 
-  return { r, s };
+  return { r: to32Bytes(r), s: to32Bytes(s) };
 };
 
 export const pubKeyToP2PKH = (pubKeyHex: string): string => {

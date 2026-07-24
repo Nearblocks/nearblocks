@@ -51,12 +51,13 @@ export const MtTokens = ({
             decimals={token.decimals}
             name={token.name}
             symbol={token.symbol}
+            textClassName="max-w-28"
             token={token.token}
           />
         </span>
       ),
       cellClassName: 'px-4',
-      className: 'w-60',
+      className: 'w-80',
       enableSort: true,
       header: t('tokens.title'),
       id: 'token',

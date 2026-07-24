@@ -62,7 +62,15 @@ export const getBlock = async (
   return rpcCall<null | SolanaBlock>(
     url,
     'getBlock',
-    [slot, { encoding: 'json', maxSupportedTransactionVersion: 0 }],
+    [
+      slot,
+      {
+        encoding: 'json',
+        maxSupportedTransactionVersion: 0,
+        rewards: false,
+        transactionDetails: 'accounts',
+      },
+    ],
     { allowNull: true },
   );
 };

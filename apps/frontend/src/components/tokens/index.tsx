@@ -46,11 +46,12 @@ export const Tokens = ({
             contract={token.contract}
             name={token.name}
             symbol={token.symbol}
+            textClassName="max-w-28"
           />
         </span>
       ),
       cellClassName: 'px-4',
-      className: 'w-60',
+      className: 'w-80',
       enableSort: true,
       header: t('tokens.title'),
       id: 'token',
@@ -176,7 +177,6 @@ export const Tokens = ({
           onPaginationNavigate={onPaginate}
           onSortNavigate={onSort}
           pagination={tokens?.meta}
-          tableClassName="min-w-5xl"
         />
       </CardContent>
     </Card>

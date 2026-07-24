@@ -447,10 +447,7 @@ export const DataTable = <TData,>({
           </div>
         </div>
       )}
-      {/* Fixed layout sizes columns from the header row only, so skeleton
-          and loaded states get identical column widths — no reflow when
-          data arrives. Cells already truncate. */}
-      <Table className={cn('min-w-4xl table-fixed', tableClassName)}>
+      <Table className={tableClassName}>
         <TableHeader className="uppercase">
           <TableRow>
             {columns.map((column, index) => (
