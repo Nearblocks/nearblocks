@@ -76,7 +76,7 @@ export const MtTokenTransfers = ({
               ? mt.affected_account_id
               : mt.involved_account_id
           }
-          textClassName="max-w-25"
+          textClassName="max-w-30"
         />
       ),
       header: t('transfers.from'),
@@ -93,7 +93,7 @@ export const MtTokenTransfers = ({
       cell: (mt) => (
         <AccountLink
           account={mt.cause === 'BURN' ? null : mt.affected_account_id}
-          textClassName="max-w-25"
+          textClassName="max-w-30"
         />
       ),
       header: t('transfers.to'),
@@ -122,11 +122,11 @@ export const MtTokenTransfers = ({
             decimals={mt.base_meta?.decimals}
             name={mt.token_meta?.title ?? mt.base_meta?.name}
             symbol={mt.base_meta?.symbol}
+            textClassName="max-w-28"
             token={mt.token_id}
           />
         </span>
       ),
-      className: 'w-48',
       header: t('transfers.token'),
       id: 'token',
     },

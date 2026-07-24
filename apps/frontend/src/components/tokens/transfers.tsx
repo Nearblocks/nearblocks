@@ -61,9 +61,9 @@ export const TokenTransfers = ({
         ) : (
           <Skeleton className="w-30" />
         ),
+      className: 'w-44',
       header: t('transfers.txnHash'),
       id: 'txn_hash',
-      skeletonWidth: 'w-[85%]',
     },
     {
       cell: (ft) => <MethodBadge text={ft.cause} />,
@@ -120,7 +120,12 @@ export const TokenTransfers = ({
             className="m-px size-5 rounded-full border"
             src={ft.meta?.icon ?? ''}
           />
-          <TokenLink contract={ft.contract_account_id} name={ft.meta?.name} />
+          <TokenLink
+            contract={ft.contract_account_id}
+            name={ft.meta?.name}
+            symbol={ft.meta?.symbol}
+            textClassName="max-w-28"
+          />
         </span>
       ),
       header: t('transfers.token'),

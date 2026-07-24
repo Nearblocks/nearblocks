@@ -127,6 +127,7 @@ export const NftTokenTransfers = ({
           <TokenLink
             contract={nft.contract_account_id}
             name={nft.meta?.name}
+            textClassName="max-w-30"
             type="nft-tokens"
           />
         </span>

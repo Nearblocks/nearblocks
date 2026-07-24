@@ -93,11 +93,16 @@ export type SolanaRpcResponse<T> = {
   result?: T;
 };
 
+export type SolanaAccountKey = {
+  pubkey: string;
+  signer: boolean;
+  source: string;
+  writable: boolean;
+};
+
 export type SolanaTransaction = {
   transaction: {
-    message: {
-      accountKeys: string[];
-    };
+    accountKeys: SolanaAccountKey[];
     signatures: string[];
   };
 };
