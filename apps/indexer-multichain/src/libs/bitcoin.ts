@@ -29,7 +29,9 @@ export const rpcCall = async <T>(
 
   const { body, statusCode } = await request(url, {
     body: JSON.stringify(payload),
+    bodyTimeout: 60_000,
     headers: { 'Content-Type': 'application/json' },
+    headersTimeout: 60_000,
     method: 'POST',
   });
 
@@ -45,12 +47,12 @@ export const rpcCall = async <T>(
 
   const json = (await body.json()) as BitcoinRpcResponse<T>;
 
-  if (!json.result) {
-    throw new NotFoundError('block not found');
-  }
-
   if (json.error) {
     throw new Error(json.error.message);
+  }
+
+  if (!json.result) {
+    throw new NotFoundError('block not found');
   }
 
   return json.result as T;

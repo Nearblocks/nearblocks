@@ -2,92 +2,41 @@ import { base58 } from '@scure/base';
 
 import { logger } from 'nb-logger';
 import { MultichainTransaction } from 'nb-types';
-import { sleep } from 'nb-utils';
 
 import config from '#config';
-import { NotFoundError } from '#libs/errors';
 import { db } from '#libs/knex';
-import {
-  chainBlockHeight,
-  chainBlocksProcessed,
-  chainLastBlockTimestamp,
-} from '#libs/prom';
+import { chainLastBlockTimestamp } from '#libs/prom';
 import { getBlock, getLatestSlot } from '#libs/solana';
-import {
-  getStartBlock,
-  retry,
-  retryOnError,
-  secToNs,
-  updateProgress,
-} from '#libs/utils';
+import { syncBlocks } from '#libs/sync';
+import { retry, secToNs } from '#libs/utils';
 import { Chains } from '#types/enum';
-import { BlockProcess, RetryErrorContext } from '#types/types';
+import { BlockProcess } from '#types/types';
 
-const BATCH_SIZE = 10;
 const INSERT_LIMIT = config.insertLimit;
 
 const processBlocks = async (chain: Chains) => {
-  const { interval, start, url } = config.chains[chain];
+  const { concurrency, interval, start, url } = config.chains[chain];
 
   if (!url) return;
 
-  const latestSlot = await getLatestSlot(url);
-  const startSlot = await getStartBlock(chain, start);
-
-  for (let i = startSlot; i <= latestSlot; i += BATCH_SIZE) {
-    const promises = [];
-    logger.info(`${chain}: syncing block: ${i}`);
-
-    for (let j = 0; j < BATCH_SIZE; j++) {
-      promises.push(
-        processBlock({
-          chain,
-          height: i + j,
-          interval,
-          url,
-        }),
-      );
-    }
-
-    await Promise.all(promises);
-    await updateProgress(chain, Math.min(i + BATCH_SIZE, latestSlot));
-    chainBlocksProcessed.inc({ chain }, BATCH_SIZE);
-  }
-
-  let currentBlock = latestSlot;
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    currentBlock++;
-    logger.info(`${chain}: syncing block: ${currentBlock}`);
-
-    await processBlock({
-      chain,
-      height: currentBlock,
-      interval,
-      url,
-    });
-    await updateProgress(chain, currentBlock);
-    chainBlockHeight.set({ chain }, currentBlock);
-    chainBlocksProcessed.inc({ chain });
-  }
+  await syncBlocks({
+    chain,
+    concurrency,
+    getTip: getLatestSlot,
+    interval,
+    processBlock,
+    start,
+    url,
+  });
 };
 
-const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
+const processBlock = async ({ chain, height, url }: BlockProcess) => {
   const runBlock = async () => {
     return getBlock(url, height);
   };
-  const onError = async ({ attempts, error, retries }: RetryErrorContext) => {
-    logger.error({ attempts, chain, err: error, height });
-    if (error instanceof NotFoundError) {
-      await sleep(interval);
-    } else {
-      await retryOnError({ attempts, error, retries });
-    }
-  };
 
   const fetchStart = Date.now();
-  const block = await retry(runBlock, { onError });
+  const block = await retry(runBlock, { chain, label: `block ${height}` });
   const fetchMs = Date.now() - fetchStart;
 
   if (!block) {
@@ -97,11 +46,17 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
     return;
   }
 
-  // Solana RPC returns null blockTime for blocks without a confirmed timestamp;
-  // skip the gauge update rather than reporting a misleading value.
-  if (typeof block.blockTime === 'number' && Number.isFinite(block.blockTime)) {
-    chainLastBlockTimestamp.set({ chain }, block.blockTime);
+  if (
+    typeof block.blockTime !== 'number' ||
+    !Number.isFinite(block.blockTime)
+  ) {
+    logger.info(
+      `${chain}: block ${height} missing blockTime, skipping (fetchMs=${fetchMs})`,
+    );
+    return;
   }
+
+  chainLastBlockTimestamp.set({ chain }, block.blockTime);
 
   if (!block.transactions?.length) {
     logger.info(
@@ -141,26 +96,13 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
           .ignore();
       };
 
-      const onError = async ({
-        attempts,
-        error,
-        retries,
-      }: RetryErrorContext) => {
-        logger.error({ attempts, chain, dberr: error, height });
-        await retryOnError({ attempts, error, retries });
-      };
-
-      promises.push(retry(runBatch, { onError }));
+      promises.push(
+        retry(runBatch, { chain, label: `insert block ${height}` }),
+      );
     }
   }
 
-  const insertStart = Date.now();
   await Promise.all(promises);
-  const insertMs = Date.now() - insertStart;
-
-  logger.info(
-    `${chain}: block ${height} fetchMs=${fetchMs} insertMs=${insertMs} txns=${txns.length}`,
-  );
 };
 
 export default { processBlocks };

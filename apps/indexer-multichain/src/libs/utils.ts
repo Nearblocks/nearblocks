@@ -50,10 +50,26 @@ export const updateProgress = async (chain: Chains, block: number) => {
 
 export const retryOnError = async ({
   attempts,
+  chain,
+  error,
+  label,
   retries,
 }: RetryErrorContext) => {
+  const prefix = chain ? `${chain}: ` : '';
+  const suffix = label ? ` (${label})` : '';
+
   if (attempts < retries) {
-    await sleep(Math.pow(2, attempts) * 1000 + Math.random() * 250);
+    const wait = Math.pow(2, attempts) * 1000 + Math.random() * 250;
+    logger.error(
+      { attempts, chain, err: error, retries },
+      `${prefix}retrying in ${Math.round(wait)}ms${suffix}`,
+    );
+    await sleep(wait);
+  } else {
+    logger.error(
+      { attempts, chain, err: error, retries },
+      `${prefix}retries exhausted${suffix}`,
+    );
   }
 };
 
@@ -62,7 +78,7 @@ export const retry = async <A>(
   options?: RetryOptions,
 ): Promise<A> => {
   const config = options ?? { onError: retryOnError, retries: 10 };
-  const { onError = retryOnError, retries = 10 } = config;
+  const { chain, label, onError = retryOnError, retries = 10 } = config;
 
   for (let attempts = 1; attempts <= retries; attempts++) {
     try {
@@ -70,7 +86,9 @@ export const retry = async <A>(
     } catch (error) {
       await onError({
         attempts,
+        chain,
         error,
+        label,
         retries,
       });
     }

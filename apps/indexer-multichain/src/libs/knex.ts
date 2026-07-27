@@ -25,8 +25,8 @@ const dbConfig = {
   },
   pool: {
     idleTimeoutMillis: 30_000,
-    max: 10,
-    min: 0,
+    max: 30,
+    min: 2,
     propagateCreateError: false,
   },
 };

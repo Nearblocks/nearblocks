@@ -1,6 +1,4 @@
-import { logger } from 'nb-logger';
 import { MultichainTransaction } from 'nb-types';
-import { sleep } from 'nb-utils';
 
 import config from '#config';
 import {
@@ -12,85 +10,36 @@ import {
 } from '#libs/bitcoin';
 import { NotFoundError } from '#libs/errors';
 import { db } from '#libs/knex';
-import {
-  chainBlockHeight,
-  chainBlocksProcessed,
-  chainLastBlockTimestamp,
-} from '#libs/prom';
-import {
-  getStartBlock,
-  retry,
-  retryOnError,
-  secToNs,
-  updateProgress,
-} from '#libs/utils';
+import { chainLastBlockTimestamp } from '#libs/prom';
+import { syncBlocks } from '#libs/sync';
+import { retry, secToNs } from '#libs/utils';
 import { Chains } from '#types/enum';
-import { BlockProcess, RetryErrorContext } from '#types/types';
+import { BlockProcess } from '#types/types';
 
-const BATCH_SIZE = 10;
 const INSERT_LIMIT = config.insertLimit;
 
 const processBlocks = async (chain: Chains) => {
-  const { interval, start, url } = config.chains[chain];
+  const { concurrency, interval, start, url } = config.chains[chain];
 
   if (!url) return;
 
-  const latestBlock = await getLatestBlock(url);
-  const startBlock = await getStartBlock(chain, start);
-
-  for (let i = startBlock; i <= latestBlock; i += BATCH_SIZE) {
-    const promises = [];
-    logger.info(`${chain}: syncing block: ${i}`);
-
-    for (let j = 0; j < BATCH_SIZE; j++) {
-      promises.push(
-        processBlock({
-          chain,
-          height: i + j,
-          interval,
-          url,
-        }),
-      );
-    }
-
-    await Promise.all(promises);
-    await updateProgress(chain, Math.min(i + BATCH_SIZE, latestBlock));
-    chainBlocksProcessed.inc({ chain }, BATCH_SIZE);
-  }
-
-  let currentBlock = latestBlock;
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    currentBlock++;
-    logger.info(`${chain}: syncing block: ${currentBlock}`);
-
-    await processBlock({
-      chain,
-      height: currentBlock,
-      interval,
-      url,
-    });
-    await updateProgress(chain, currentBlock);
-    chainBlockHeight.set({ chain }, currentBlock);
-    chainBlocksProcessed.inc({ chain });
-  }
+  await syncBlocks({
+    chain,
+    concurrency,
+    getTip: getLatestBlock,
+    interval,
+    processBlock,
+    start,
+    url,
+  });
 };
 
-const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
+const processBlock = async ({ chain, height, url }: BlockProcess) => {
   const runBlock = async () => {
     return getBlock(url, height);
   };
-  const onError = async ({ attempts, error, retries }: RetryErrorContext) => {
-    logger.error({ attempts, chain, err: error, height });
-    if (error instanceof NotFoundError) {
-      await sleep(interval);
-    } else {
-      await retryOnError({ attempts, error, retries });
-    }
-  };
 
-  const block = await retry(runBlock, { onError });
+  const block = await retry(runBlock, { chain, label: `block ${height}` });
 
   if (!block) {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
@@ -145,16 +94,9 @@ const processBlock = async ({ chain, height, interval, url }: BlockProcess) => {
           .ignore();
       };
 
-      const onError = async ({
-        attempts,
-        error,
-        retries,
-      }: RetryErrorContext) => {
-        logger.error({ attempts, chain, dberr: error, height });
-        await retryOnError({ attempts, error, retries });
-      };
-
-      promises.push(retry(runBatch, { onError }));
+      promises.push(
+        retry(runBatch, { chain, label: `insert block ${height}` }),
+      );
     }
   }
 

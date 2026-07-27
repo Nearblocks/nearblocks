@@ -37,4 +37,11 @@ export const chainLastBlockTimestamp = new client.Gauge({
   registers: [register],
 });
 
+export const chainTipHeight = new client.Gauge({
+  help: 'Latest block height reported by the RPC per chain',
+  labelNames: ['chain'],
+  name: 'multichain_chain_tip_height',
+  registers: [register],
+});
+
 export default metrics;

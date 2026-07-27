@@ -38,52 +38,62 @@ const env = cleanEnv(process.env, {
 const config: Config = {
   chains: {
     ARBITRUM: {
-      interval: 1000, // 1s
+      concurrency: 25,
+      interval: 250, // 0.25s (measured block time ~0.25s)
       start: env.ARBITRUM_START_BLOCK,
       url: env.ARBITRUM_RPC_URL,
     },
     AURORA: {
-      interval: 1000, // 1s
+      concurrency: 15,
+      interval: 500, // 0.5s (measured block time ~0.6s)
       start: env.AURORA_START_BLOCK,
       url: env.AURORA_RPC_URL,
     },
     BASE: {
-      interval: 5000, // 5s
+      concurrency: 15,
+      interval: 1000, // 1s (measured block time ~2s)
       start: env.BASE_START_BLOCK,
       url: env.BASE_RPC_URL,
     },
     BITCOIN: {
-      interval: env.NETWORK === Network.MAINNET ? 600000 : 300000, // 10m/5m
+      concurrency: 5,
+      interval: env.NETWORK === Network.MAINNET ? 30000 : 15000, // 30s/15s (measured block time ~10m)
       start: env.BITCOIN_START_BLOCK,
       url: env.BITCOIN_RPC_URL,
     },
     BSC: {
-      interval: 10000, // 10s
+      concurrency: 25,
+      interval: 400, // 0.4s (measured block time ~0.45s)
       start: env.BSC_START_BLOCK,
       url: env.BSC_RPC_URL,
     },
     ETHEREUM: {
-      interval: 10000, // 10s
+      concurrency: 10,
+      interval: 3000, // 3s (measured block time ~12s)
       start: env.ETHEREUM_START_BLOCK,
       url: env.ETHEREUM_RPC_URL,
     },
     GNOSIS: {
-      interval: 10000, // 10s
+      concurrency: 10,
+      interval: 2000, // 2s (measured block time ~5s)
       start: env.GNOSIS_START_BLOCK,
       url: env.GNOSIS_RPC_URL,
     },
     OPTIMISM: {
-      interval: 5000, // 5s
+      concurrency: 15,
+      interval: 1000, // 1s (measured block time ~2s)
       start: env.OPTIMISM_START_BLOCK,
       url: env.OPTIMISM_RPC_URL,
     },
     POLYGON: {
-      interval: 5000, // 5s
+      concurrency: 15,
+      interval: 1000, // 1s (measured block time ~1.5s)
       start: env.POLYGON_START_BLOCK,
       url: env.POLYGON_RPC_URL,
     },
     SOLANA: {
-      interval: 2000, // 2s
+      concurrency: 30,
+      interval: 400, // 0.4s (measured slot time ~0.43s)
       start: env.SOLANA_START_BLOCK,
       url: env.SOLANA_RPC_URL,
     },

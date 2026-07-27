@@ -20,7 +20,9 @@ export const rpcCall = async <T>(
 
   const { body, statusCode } = await request(url, {
     body: JSON.stringify(payload),
+    bodyTimeout: 30_000,
     headers: { 'Content-Type': 'application/json' },
+    headersTimeout: 30_000,
     method: 'POST',
   });
 
