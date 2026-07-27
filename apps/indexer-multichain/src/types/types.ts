@@ -5,6 +5,7 @@ import { Chains } from '#types/enum';
 export interface Config {
   chains: {
     [key in Chains]: {
+      concurrency: number;
       interval: number;
       start: number;
       url: string;
@@ -116,11 +117,22 @@ export type SolanaBlock = {
 export type BlockProcess = {
   chain: Chains;
   height: number;
+  url: string;
+};
+
+export type SyncOptions = {
+  chain: Chains;
+  concurrency: number;
+  getTip: (url: string) => Promise<number>;
   interval: number;
+  processBlock: (params: BlockProcess) => Promise<void>;
+  start: number;
   url: string;
 };
 
 export type RetryOptions = {
+  chain?: Chains;
+  label?: string;
   onError?: (context: RetryErrorContext) => Promise<void>;
   retries?: number;
 };
@@ -131,6 +143,8 @@ export type RetryInputContext = {
 
 export type RetryErrorContext = {
   attempts: number;
+  chain?: Chains;
   error: unknown;
+  label?: string;
   retries: number;
 };

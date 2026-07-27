@@ -1,5 +1,6 @@
 import { logger } from 'nb-logger';
 
+import config from '#config';
 import { db } from '#libs/knex';
 import Sentry from '#libs/sentry';
 import bitcoin from '#services/bitcoin';
@@ -8,6 +9,14 @@ import solana from '#services/solana';
 import { Chains } from '#types/enum';
 
 export const syncData = async () => {
+  const enabled = Object.entries(config.chains)
+    .filter(([, chain]) => Boolean(chain.url))
+    .map(([name]) => name);
+
+  logger.info(
+    `enabled chains: ${enabled.length ? enabled.join(', ') : 'none'}`,
+  );
+
   try {
     await Promise.all([
       evm.processBlocks(Chains.ETHEREUM),
