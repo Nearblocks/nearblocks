@@ -182,6 +182,86 @@ const routes = (app: Router) => {
 
   /**
    * @openapi
+   * /v3/intents/token-stats:
+   *   get:
+   *     summary: Get daily count of unique NEAR Intents tokens swapped
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/token-stats', validate(request.tokenStats), service.tokenStats);
+
+  /**
+   * @openapi
+   * /v3/intents/blockchain-stats:
+   *   get:
+   *     summary: Get daily count of unique blockchains active on NEAR Intents
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/blockchain-stats',
+    validate(request.blockchainStats),
+    service.blockchainStats,
+  );
+
+  /**
+   * @openapi
+   * /v3/intents/account-stats:
+   *   get:
+   *     summary: Get daily count of unique accounts swapping on NEAR Intents
+   *     tags:
+   *       - Intents
+   *     parameters:
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of days to return
+   *         schema:
+   *           type: integer
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/account-stats',
+    validate(request.accountStats),
+    service.accountStats,
+  );
+
+  /**
+   * @openapi
    * /v3/intents/stats:
    *   get:
    *     summary: Get all-time NEAR Intents swap volume/swaps totals, plus previous day totals

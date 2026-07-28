@@ -1,13 +1,17 @@
 import { unionWith } from 'es-toolkit';
 
 import type {
+  IntentsAccountStatsReq,
   IntentsAssetPoint,
   IntentsBlockchainPoint,
+  IntentsBlockchainStatsReq,
+  IntentsDailyCountPoint,
   IntentsMetricPoint,
   IntentsOverview,
   IntentsStatsAssetsReq,
   IntentsStatsBlockchainsReq,
   IntentsSwapStatsReq,
+  IntentsTokenStatsReq,
   IntentsTxn,
   IntentsTxnCountReq,
   IntentsTxnsReq,
@@ -237,11 +241,59 @@ const statsOverview = responseHandler(response.statsOverview, async () => {
   return { data };
 });
 
+const tokenStats = responseHandler(
+  response.tokenStats,
+  async (req: RequestValidator<IntentsTokenStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsDailyCountPoint>(
+      sql.tokenStats,
+      { date, limit },
+    );
+
+    return { data };
+  },
+);
+
+const blockchainStats = responseHandler(
+  response.blockchainStats,
+  async (req: RequestValidator<IntentsBlockchainStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsDailyCountPoint>(
+      sql.blockchainStats,
+      { date, limit },
+    );
+
+    return { data };
+  },
+);
+
+const accountStats = responseHandler(
+  response.accountStats,
+  async (req: RequestValidator<IntentsAccountStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = toDayMs(req.validator.date);
+
+    const data = await dbEvents.manyOrNone<IntentsDailyCountPoint>(
+      sql.accountStats,
+      { date, limit },
+    );
+
+    return { data };
+  },
+);
+
 export default {
+  accountStats,
+  blockchainStats,
   statsAssets,
   statsBlockchains,
   statsOverview,
   swapStats,
+  tokenStats,
   txnCount,
   txns,
   volumeStats,

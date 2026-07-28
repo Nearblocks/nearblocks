@@ -39,6 +39,21 @@ const statsBlockchains = v.object({
   limit: v.optional(limit(365)),
 });
 
+const tokenStats = v.object({
+  date: v.optional(v.pipe(v.string(), v.isoDate())),
+  limit: v.optional(limit(365)),
+});
+
+const blockchainStats = v.object({
+  date: v.optional(v.pipe(v.string(), v.isoDate())),
+  limit: v.optional(limit(365)),
+});
+
+const accountStats = v.object({
+  date: v.optional(v.pipe(v.string(), v.isoDate())),
+  limit: v.optional(limit(365)),
+});
+
 export type IntentsTxnsReq = v.InferOutput<typeof txns>;
 export type IntentsTxnCountReq = v.InferOutput<typeof count>;
 export type IntentsTxnsCursor = v.InferOutput<typeof cursor>;
@@ -46,13 +61,19 @@ export type IntentsVolumeStatsReq = v.InferOutput<typeof volumeStats>;
 export type IntentsSwapStatsReq = v.InferOutput<typeof swapStats>;
 export type IntentsStatsAssetsReq = v.InferOutput<typeof statsAssets>;
 export type IntentsStatsBlockchainsReq = v.InferOutput<typeof statsBlockchains>;
+export type IntentsTokenStatsReq = v.InferOutput<typeof tokenStats>;
+export type IntentsBlockchainStatsReq = v.InferOutput<typeof blockchainStats>;
+export type IntentsAccountStatsReq = v.InferOutput<typeof accountStats>;
 
 export default {
+  accountStats,
+  blockchainStats,
   count,
   cursor,
   statsAssets,
   statsBlockchains,
   swapStats,
+  tokenStats,
   txns,
   volumeStats,
 };
