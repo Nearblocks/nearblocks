@@ -9,6 +9,8 @@ const DAY_NS = 86_400_000_000_000n;
 const DAY_MS = 86_400_000n;
 const SWAPS_TABLE = 'mt_intents_swaps';
 const STATS_TABLE = 'mt_intents_stats';
+const ACCOUNTS_TABLE = 'mt_intents_account_stats';
+const ROSTER_TABLE = 'mt_intents_accounts';
 const STATS_REBUILD_DAYS = 2n;
 const STATS_CATCHUP_DAYS = 3n;
 const STATS_INTERVAL_MS = 60_000;
@@ -21,40 +23,58 @@ export const syncIntentsStats = async () => {
   }
 };
 
+export const syncIntentsAccounts = async () => {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    await accounts();
+    await sleep(STATS_INTERVAL_MS);
+  }
+};
+
+const dayWindow = async (key: string) => {
+  const [settings, swapsSettings] = await Promise.all([
+    knex('settings').where('key', key).first(),
+    knex('settings').where('key', SWAPS_TABLE).first(),
+  ]);
+
+  const swapsSynced = big(swapsSettings?.value?.sync as string);
+
+  if (!swapsSynced) return null;
+
+  const synced = big(settings?.value?.sync as string);
+  const lastDay = (swapsSynced / DAY_NS) * DAY_MS;
+  let fromDay = synced ? synced - STATS_REBUILD_DAYS * DAY_MS : null;
+
+  if (!fromDay) {
+    const first = await knex
+      .select('block_timestamp')
+      .from(SWAPS_TABLE)
+      .orderBy('block_timestamp', 'asc')
+      .limit(1)
+      .first();
+    const oldest = big(first?.block_timestamp);
+
+    if (!oldest) return null;
+
+    fromDay = (oldest / DAY_NS) * DAY_MS;
+  }
+
+  const startDay = fromDay > lastDay ? lastDay : fromDay;
+  const endDay =
+    lastDay - startDay > STATS_CATCHUP_DAYS * DAY_MS
+      ? startDay + STATS_CATCHUP_DAYS * DAY_MS
+      : lastDay;
+
+  return { endDay, startDay };
+};
+
 const stats = async () => {
   try {
-    const [settings, swapsSettings] = await Promise.all([
-      knex('settings').where('key', STATS_TABLE).first(),
-      knex('settings').where('key', SWAPS_TABLE).first(),
-    ]);
+    const window = await dayWindow(STATS_TABLE);
 
-    const swapsSynced = big(swapsSettings?.value?.sync as string);
+    if (!window) return;
 
-    if (!swapsSynced) return;
-
-    const synced = big(settings?.value?.sync as string);
-    const lastDay = (swapsSynced / DAY_NS) * DAY_MS;
-    let fromDay = synced ? synced - STATS_REBUILD_DAYS * DAY_MS : null;
-
-    if (!fromDay) {
-      const first = await knex
-        .select('block_timestamp')
-        .from(SWAPS_TABLE)
-        .orderBy('block_timestamp', 'asc')
-        .limit(1)
-        .first();
-      const oldest = big(first?.block_timestamp);
-
-      if (!oldest) return;
-
-      fromDay = (oldest / DAY_NS) * DAY_MS;
-    }
-
-    const startDay = fromDay > lastDay ? lastDay : fromDay;
-    const endDay =
-      lastDay - startDay > STATS_CATCHUP_DAYS * DAY_MS
-        ? startDay + STATS_CATCHUP_DAYS * DAY_MS
-        : lastDay;
+    const { endDay, startDay } = window;
 
     logger.info(`${STATS_TABLE}: days: ${startDay} - ${endDay}`);
 
@@ -141,6 +161,73 @@ const stats = async () => {
     });
   } catch (error) {
     logger.error(error, 'syncIntentsStats');
+    Sentry.captureException(error);
+    await sleep(5000);
+  }
+};
+
+const accounts = async () => {
+  try {
+    const window = await dayWindow(ACCOUNTS_TABLE);
+
+    if (!window) return;
+
+    const { endDay, startDay } = window;
+
+    logger.info(`${ACCOUNTS_TABLE}: days: ${startDay} - ${endDay}`);
+
+    await knex.transaction(async (trx) => {
+      await trx.raw(
+        `
+          INSERT INTO
+            ${ROSTER_TABLE} (date, account_id)
+          SELECT DISTINCT
+            (block_timestamp / 86400000000000) * 86400000 AS date,
+            account_id
+          FROM
+            ${SWAPS_TABLE}
+          WHERE
+            block_timestamp >= ?
+            AND block_timestamp < ?
+          ON CONFLICT (date, account_id) DO NOTHING
+        `,
+        [
+          (startDay * 1_000_000n).toString(),
+          ((endDay + DAY_MS) * 1_000_000n).toString(),
+        ],
+      );
+
+      await trx.raw(
+        `
+          INSERT INTO
+            ${ACCOUNTS_TABLE} (date, accounts)
+          SELECT
+            date,
+            COUNT(*) AS accounts
+          FROM
+            ${ROSTER_TABLE}
+          WHERE
+            date >= ?
+            AND date <= ?
+          GROUP BY
+            1
+          ON CONFLICT (date) DO UPDATE
+          SET
+            accounts = EXCLUDED.accounts
+        `,
+        [startDay.toString(), endDay.toString()],
+      );
+
+      await trx('settings')
+        .insert({
+          key: ACCOUNTS_TABLE,
+          value: { sync: endDay.toString() },
+        })
+        .onConflict('key')
+        .merge();
+    });
+  } catch (error) {
+    logger.error(error, 'syncIntentsAccounts');
     Sentry.captureException(error);
     await sleep(5000);
   }
