@@ -1,17 +1,26 @@
 import type { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
+import { IntentsAccountsChart } from '@/components/near-intents/accounts-chart';
+import { IntentsBlockchainsChart } from '@/components/near-intents/blockchains-chart';
 import { OverviewCards } from '@/components/near-intents/overview-cards';
 import { IntentsSwapsChart } from '@/components/near-intents/swaps-chart';
+import { IntentsTokensChart } from '@/components/near-intents/tokens-chart';
 import { IntentsVolumeAssetsChart } from '@/components/near-intents/volume-assets-chart';
 import { IntentsVolumeBlockchainChart } from '@/components/near-intents/volume-blockchain-chart';
 import { IntentsVolumeChart } from '@/components/near-intents/volume-chart';
 import { PageHeading } from '@/components/page-heading';
-import { fetchIntentsSwapStats, fetchIntentsVolumeStats } from '@/data/charts';
+import {
+  fetchIntentsAccountStats,
+  fetchIntentsSwapStats,
+  fetchIntentsVolumeStats,
+} from '@/data/charts';
 import {
   fetchIntentsAssetStats,
+  fetchIntentsBlockchainCountStats,
   fetchIntentsBlockchainStats,
   fetchIntentsOverview,
+  fetchIntentsTokenStats,
 } from '@/data/near-intents';
 import { holdNav } from '@/lib/hold-nav';
 import { hasLocale, translator } from '@/locales/dictionaries';
@@ -42,6 +51,9 @@ const NearIntentsPage = async ({ params }: Props) => {
   const swapStatsPromise = fetchIntentsSwapStats(365);
   const assetStatsPromise = fetchIntentsAssetStats(30);
   const blockchainStatsPromise = fetchIntentsBlockchainStats(30);
+  const accountStatsPromise = fetchIntentsAccountStats(365);
+  const tokenStatsPromise = fetchIntentsTokenStats(365);
+  const blockchainCountStatsPromise = fetchIntentsBlockchainCountStats(365);
   await holdNav();
 
   return (
@@ -65,6 +77,17 @@ const NearIntentsPage = async ({ params }: Props) => {
         </ErrorSuspense>
         <ErrorSuspense fallback={<IntentsVolumeChart loading />}>
           <IntentsVolumeChart statsPromise={volumeStatsPromise} />
+        </ErrorSuspense>
+        <ErrorSuspense fallback={<IntentsAccountsChart loading />}>
+          <IntentsAccountsChart statsPromise={accountStatsPromise} />
+        </ErrorSuspense>
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <ErrorSuspense fallback={<IntentsBlockchainsChart loading />}>
+          <IntentsBlockchainsChart statsPromise={blockchainCountStatsPromise} />
+        </ErrorSuspense>
+        <ErrorSuspense fallback={<IntentsTokensChart loading />}>
+          <IntentsTokensChart statsPromise={tokenStatsPromise} />
         </ErrorSuspense>
       </div>
     </>

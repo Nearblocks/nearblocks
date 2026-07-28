@@ -52,7 +52,7 @@ export const layout = {
       },
     },
     trademark:
-      'NearBlocks is operated full and on its own. NearBlocks is not associated to The NEAR Foundation and every licensed trademark displayed on this website belongs to their respective owners.',
+      'NearBlocks is independently operated. NearBlocks is not affiliated with the NEAR Foundation, and all trademarks displayed on this website belong to their respective owners.',
   },
   header: {
     nearPrice: 'NEAR Price',

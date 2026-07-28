@@ -23,6 +23,7 @@ import response from 'nb-schemas/dist/intents/response.js';
 import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
+import redis from '#libs/redis';
 import {
   cappedCount,
   countFromCagg,
@@ -236,7 +237,11 @@ const statsBlockchains = responseHandler(
 );
 
 const statsOverview = responseHandler(response.statsOverview, async () => {
-  const data = await dbEvents.one<IntentsOverview>(sql.statsOverview);
+  const data = await redis.cache<IntentsOverview>(
+    'v3:intents:stats',
+    () => dbEvents.one<IntentsOverview>(sql.statsOverview),
+    60, // aggregates refresh at most once a minute
+  );
 
   return { data };
 });

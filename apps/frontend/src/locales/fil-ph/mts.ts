@@ -84,8 +84,12 @@ export const mts = {
       cards: {
         allTimeSwaps: 'Swaps (All Time)',
         allTimeVolume: 'Volume (All Time)',
+        lastDayBlockchains: 'Unique Blockchains (Previous Day)',
         lastDaySwaps: 'Swaps (Previous Day)',
+        lastDayTokens: 'Unique Tokens (Previous Day)',
+        lastDayUsers: 'Unique Users (Previous Day)',
         lastDayVolume: 'Volume (Previous Day)',
+        users30d: 'Unique Users (30D)',
       },
       charts: {
         assets: {
@@ -106,6 +110,21 @@ export const mts = {
           title: 'Daily Swaps',
           yAxis: 'Daily Swaps',
           yAxisCumulative: 'Cumulative Swaps',
+        },
+        uniqueAccounts: {
+          seriesDaily: 'Daily Unique Accounts',
+          title: 'Daily Unique Accounts',
+          yAxis: 'Daily Unique Accounts',
+        },
+        uniqueBlockchains: {
+          seriesDaily: 'Daily Unique Blockchains',
+          title: 'Daily Unique Blockchains',
+          yAxis: 'Daily Unique Blockchains',
+        },
+        uniqueTokens: {
+          seriesDaily: 'Daily Unique Tokens',
+          title: 'Daily Unique Tokens',
+          yAxis: 'Daily Unique Tokens',
         },
         volume: {
           seriesCumulative: 'Cumulative Volume (USD)',
@@ -190,8 +209,8 @@ export const mts = {
     quantity: 'Quantity',
     to: 'To',
     token: 'Token',
-    total: 'More than {{count}} mt token txns found',
-    totalExact: 'A total of {{count}} mt token txns found',
+    total: 'More than {{count}} transfers found',
+    totalExact: 'A total of {{count}} transfers found',
     txnHash: 'Transaction Hash',
   },
   transfersMeta: {

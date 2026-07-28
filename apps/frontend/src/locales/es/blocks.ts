@@ -31,7 +31,7 @@ export const blocks = {
     hash: 'Hash:',
     heading: 'Block',
     parentHash: 'Parent Hash:',
-    receipts: 'and {{count}} receipts',
+    receipts: '{{count}} receipts',
     testnetNotice: 'This is a Testnet block only',
     timestamp: 'Timestamp:',
     transactions: '{{count}} transactions',

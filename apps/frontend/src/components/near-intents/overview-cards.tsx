@@ -21,6 +21,10 @@ export const OverviewCards = ({ loading, overviewPromise }: Props) => {
   const lastDaySwaps = overview?.prev_day_swaps ?? null;
   const allTimeVolume = overview?.volume_usd ?? null;
   const allTimeSwaps = overview?.swaps ?? null;
+  const lastDayAccounts = overview?.prev_day_accounts ?? null;
+  const accounts30d = overview?.accounts_30d ?? null;
+  const lastDayBlockchains = overview?.prev_day_blockchains ?? null;
+  const lastDayTokens = overview?.prev_day_tokens ?? null;
 
   const statItems = [
     {
@@ -59,6 +63,36 @@ export const OverviewCards = ({ loading, overviewPromise }: Props) => {
       value:
         allTimeSwaps !== null
           ? numberFormat(allTimeSwaps, { notation: 'compact' })
+          : null,
+    },
+    {
+      href: '/charts/intents-accounts',
+      label: t('nearIntents.dashboard.cards.lastDayUsers'),
+      value:
+        lastDayAccounts !== null
+          ? numberFormat(lastDayAccounts, { notation: 'compact' })
+          : null,
+    },
+    {
+      href: '/charts/intents-accounts',
+      label: t('nearIntents.dashboard.cards.users30d'),
+      value:
+        accounts30d !== null
+          ? numberFormat(accounts30d, { notation: 'compact' })
+          : null,
+    },
+    {
+      label: t('nearIntents.dashboard.cards.lastDayBlockchains'),
+      value:
+        lastDayBlockchains !== null
+          ? numberFormat(lastDayBlockchains, { notation: 'compact' })
+          : null,
+    },
+    {
+      label: t('nearIntents.dashboard.cards.lastDayTokens'),
+      value:
+        lastDayTokens !== null
+          ? numberFormat(lastDayTokens, { notation: 'compact' })
           : null,
     },
   ];

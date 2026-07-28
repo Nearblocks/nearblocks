@@ -5,6 +5,7 @@ import { PageHeading } from '@/components/page-heading';
 import {
   fetchAddressStats,
   fetchBlockStats,
+  fetchIntentsAccountStats,
   fetchIntentsSwapStats,
   fetchIntentsVolumeStats,
   fetchPriceStats,
@@ -41,6 +42,7 @@ const ChartsPage = async ({ params }: Props) => {
   const tpsStatsPromise = fetchTpsStats();
   const intentsVolumeStatsPromise = fetchIntentsVolumeStats(14);
   const intentsSwapStatsPromise = fetchIntentsSwapStats(14);
+  const intentsAccountStatsPromise = fetchIntentsAccountStats(14);
   await holdNav();
 
   return (
@@ -49,6 +51,7 @@ const ChartsPage = async ({ params }: Props) => {
       <Charts
         addressStatsPromise={addressStatsPromise}
         blockStatsPromise={blockStatsPromise}
+        intentsAccountStatsPromise={intentsAccountStatsPromise}
         intentsSwapStatsPromise={intentsSwapStatsPromise}
         intentsVolumeStatsPromise={intentsVolumeStatsPromise}
         priceStatsPromise={priceStatsPromise}

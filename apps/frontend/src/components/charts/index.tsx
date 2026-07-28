@@ -8,6 +8,7 @@ import {
   AddressStats,
   DailyBlockStats,
   DailyTxnStats,
+  IntentsDailyCountPoint,
   IntentsMetricPoint,
   PriceStats,
   TpsStats,
@@ -40,12 +41,14 @@ import {
   TxnsChartMini,
   TxnVolumeChartMini,
 } from './charts';
+import { IntentsAccountsChartMini } from './intents-accounts';
 import { IntentsSwapsChartMini } from './intents-swaps';
 import { IntentsVolumeChartMini } from './intents-volume';
 
 type Props = {
   addressStatsPromise: Promise<AddressStats[] | null>;
   blockStatsPromise: Promise<DailyBlockStats[] | null>;
+  intentsAccountStatsPromise: Promise<IntentsDailyCountPoint[] | null>;
   intentsSwapStatsPromise: Promise<IntentsMetricPoint[] | null>;
   intentsVolumeStatsPromise: Promise<IntentsMetricPoint[] | null>;
   priceStatsPromise: Promise<null | PriceStats[]>;
@@ -68,6 +71,7 @@ type HeaderProps = {
 export const Charts = ({
   addressStatsPromise,
   blockStatsPromise,
+  intentsAccountStatsPromise,
   intentsSwapStatsPromise,
   intentsVolumeStatsPromise,
   priceStatsPromise,
@@ -177,6 +181,16 @@ export const Charts = ({
           >
             <ErrorSuspense fallback={<IntentsSwapsChartMini loading />}>
               <IntentsSwapsChartMini statsPromise={intentsSwapStatsPromise} />
+            </ErrorSuspense>
+          </ChartCard>
+          <ChartCard
+            href="/charts/intents-accounts"
+            title={t('intentsAccounts.miniTitle')}
+          >
+            <ErrorSuspense fallback={<IntentsAccountsChartMini loading />}>
+              <IntentsAccountsChartMini
+                statsPromise={intentsAccountStatsPromise}
+              />
             </ErrorSuspense>
           </ChartCard>
         </>
