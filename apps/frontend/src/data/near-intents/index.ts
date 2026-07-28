@@ -3,10 +3,13 @@ import { cache } from 'react';
 import {
   IntentsAssetPoint,
   IntentsBlockchainPoint,
+  IntentsBlockchainStatsRes,
+  IntentsDailyCountPoint,
   IntentsOverview,
   IntentsStatsAssetsRes,
   IntentsStatsBlockchainsRes,
   IntentsStatsOverviewRes,
+  IntentsTokenStatsRes,
   MTTxnCount,
   MTTxnCountRes,
   MTTxnsRes,
@@ -63,6 +66,26 @@ export const fetchIntentsBlockchainStats = cache(
       ? `/v3/intents/volume-stats/blockchains?limit=${limit}`
       : '/v3/intents/volume-stats/blockchains';
     const resp = await fetcher<IntentsStatsBlockchainsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchIntentsTokenStats = cache(
+  async (limit?: number): Promise<IntentsDailyCountPoint[] | null> => {
+    const url = limit
+      ? `/v3/intents/token-stats?limit=${limit}`
+      : '/v3/intents/token-stats';
+    const resp = await fetcher<IntentsTokenStatsRes>(url);
+    return resp.data;
+  },
+);
+
+export const fetchIntentsBlockchainCountStats = cache(
+  async (limit?: number): Promise<IntentsDailyCountPoint[] | null> => {
+    const url = limit
+      ? `/v3/intents/blockchain-stats?limit=${limit}`
+      : '/v3/intents/blockchain-stats';
+    const resp = await fetcher<IntentsBlockchainStatsRes>(url);
     return resp.data;
   },
 );

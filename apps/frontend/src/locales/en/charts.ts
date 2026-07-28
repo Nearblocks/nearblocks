@@ -68,6 +68,19 @@ export const charts = {
     yAxisPrice: 'Gas Price (/TGas)',
     yAxisUsed: 'Gas Used',
   },
+  intentsAccounts: {
+    description:
+      'NEAR Intents Unique Users chart shows the daily number of unique accounts swapping across NEAR Intents.',
+    heading: 'NEAR Intents Unique Users Chart',
+    meta: {
+      description:
+        'NEAR Intents unique users chart shows the daily number of unique accounts swapping across NEAR Intents.',
+      title: 'NEAR Intents Unique Users Chart',
+    },
+    miniTitle: 'NEAR Intents Unique Users (14D)',
+    seriesDaily: 'Daily Unique Users',
+    yAxis: 'Daily Unique Users',
+  },
   intentsSwaps: {
     description:
       'NEAR Intents Swaps chart shows the daily and cumulative number of swaps executed across NEAR Intents.',

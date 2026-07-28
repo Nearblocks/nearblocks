@@ -87,12 +87,16 @@ const dailyCountPoint = v.object({
 });
 
 const overview = v.object({
+  accounts_30d: v.string(),
   blockchains: v.string(),
-  prev_day_swaps: v.nullable(v.string()),
-  prev_day_volume_usd: v.nullable(v.string()),
-  swaps: v.nullable(v.string()),
+  prev_day_accounts: v.string(),
+  prev_day_blockchains: v.string(),
+  prev_day_swaps: v.string(),
+  prev_day_tokens: v.string(),
+  prev_day_volume_usd: v.string(),
+  swaps: v.string(),
   tokens: v.string(),
-  volume_usd: v.nullable(v.string()),
+  volume_usd: v.string(),
 });
 
 const txnsResponse = responseSchema(v.array(txn));
