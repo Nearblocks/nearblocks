@@ -81,6 +81,11 @@ const blockchainPoint = v.object({
   volume: v.nullable(v.string()),
 });
 
+const dailyCountPoint = v.object({
+  daily: v.string(),
+  date: v.string(),
+});
+
 const overview = v.object({
   blockchains: v.string(),
   prev_day_swaps: v.nullable(v.string()),
@@ -97,6 +102,9 @@ const swapStatsResponse = responseSchema(v.array(metricPoint));
 const statsAssetsResponse = responseSchema(v.array(assetPoint));
 const statsBlockchainsResponse = responseSchema(v.array(blockchainPoint));
 const statsOverviewResponse = responseSchema(overview);
+const tokenStatsResponse = responseSchema(v.array(dailyCountPoint));
+const blockchainStatsResponse = responseSchema(v.array(dailyCountPoint));
+const accountStatsResponse = responseSchema(v.array(dailyCountPoint));
 
 export type IntentsTxn = v.InferOutput<typeof txn>;
 export type IntentsTxnCount = v.InferOutput<typeof count>;
@@ -105,6 +113,7 @@ export type IntentsTxnCountRes = v.InferOutput<typeof txnCountResponse>;
 export type IntentsMetricPoint = v.InferOutput<typeof metricPoint>;
 export type IntentsAssetPoint = v.InferOutput<typeof assetPoint>;
 export type IntentsBlockchainPoint = v.InferOutput<typeof blockchainPoint>;
+export type IntentsDailyCountPoint = v.InferOutput<typeof dailyCountPoint>;
 export type IntentsOverview = v.InferOutput<typeof overview>;
 export type IntentsVolumeStatsRes = v.InferOutput<typeof volumeStatsResponse>;
 export type IntentsSwapStatsRes = v.InferOutput<typeof swapStatsResponse>;
@@ -115,13 +124,21 @@ export type IntentsStatsBlockchainsRes = v.InferOutput<
 export type IntentsStatsOverviewRes = v.InferOutput<
   typeof statsOverviewResponse
 >;
+export type IntentsTokenStatsRes = v.InferOutput<typeof tokenStatsResponse>;
+export type IntentsBlockchainStatsRes = v.InferOutput<
+  typeof blockchainStatsResponse
+>;
+export type IntentsAccountStatsRes = v.InferOutput<typeof accountStatsResponse>;
 
 export default {
+  accountStats: accountStatsResponse,
+  blockchainStats: blockchainStatsResponse,
   count: txnCountResponse,
   statsAssets: statsAssetsResponse,
   statsBlockchains: statsBlockchainsResponse,
   statsOverview: statsOverviewResponse,
   swapStats: swapStatsResponse,
+  tokenStats: tokenStatsResponse,
   txns: txnsResponse,
   volumeStats: volumeStatsResponse,
 };
