@@ -15,6 +15,7 @@ export const scheduleJobs = () => {
 
     // Token jobs
     cron.schedule('*/15 * * * * *', './jobs/tokenSupply.js', options); // 15s
+    cron.schedule('*/15 * * * * *', './jobs/nftTokenMeta.js', options); // 15s
     cron.schedule('0 * * * * *', './jobs/tokenMeta.js', options); // 1m
     cron.schedule('0 * * * * *', './jobs/tokenMarket.js', options); // 1m
     cron.schedule('0 * * * * *', './jobs/tokenPrice.js', options); // 1m

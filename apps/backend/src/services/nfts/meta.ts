@@ -157,7 +157,7 @@ export const updateNFTTokenMeta = async (contract: string, token: string) => {
       await upsertError(contract, 'nft', token);
     }
   } catch (error) {
-    logger.error(`tokenMeta: updateNFTTokenMeta: ${contract}: ${token}`);
+    logger.error(`nftTokenMeta: updateNFTTokenMeta: ${contract}: ${token}`);
     logger.error(error);
     await upsertError(contract, 'nft', token);
   }
