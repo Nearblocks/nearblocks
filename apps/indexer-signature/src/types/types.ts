@@ -5,12 +5,14 @@ export interface Config {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
+  dbUrlBase: string;
   genesisHeight: number;
   indexerKey: string;
   insertLimit: number;
   neardataConcurrency: 'auto' | number;
   neardataUrl: string;
   network: Network;
+  rpcUrl: string;
   sentryDsn?: string;
   startBlockHeight: number;
 }
@@ -20,8 +22,16 @@ export type Sign = {
 };
 
 export type SignRequest = {
-  domain_id?: string;
+  domain_id?: number | string;
+  key_version?: number;
   path?: string;
+};
+
+export type MSMpcKey = {
+  account_id: string;
+  block_timestamp: string;
+  domain_id: number;
+  path: string;
 };
 
 export type MSReceipt = Omit<

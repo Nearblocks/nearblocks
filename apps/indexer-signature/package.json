@@ -18,9 +18,11 @@
   "dependencies": {
     "@cosmjs/crypto": "0.32.4",
     "@cosmjs/encoding": "0.32.4",
+    "@noble/curves": "2.2.0",
     "@sentry/node": "7.74.1",
     "bech32": "2.0.0",
     "bitcoinjs-lib": "7.0.0-rc.0",
+    "bs58": "6.0.0",
     "elliptic": "6.6.0",
     "envalid": "8.0.0",
     "nb-prom": "*",

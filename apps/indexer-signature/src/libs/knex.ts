@@ -46,4 +46,14 @@ const migrationConfig = {
 
 export const db: Knex = createKnex(dbConfig);
 
+export const dbBase: Knex = createKnex({
+  client: 'pg',
+  connection: {
+    application_name: 'indexer-signature',
+    connectionString: config.dbUrlBase,
+    ssl: ssl?.ca ? ssl : false,
+  },
+  pool: { max: 5, min: 0 },
+});
+
 export const dbMigration: Knex = createKnex(migrationConfig);

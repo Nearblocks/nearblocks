@@ -15,6 +15,7 @@ const env = cleanEnv(process.env, {
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
   }),
+  RPC_URL: url(),
   SENTRY_DSN: str({ default: '' }),
   SIGNATURE_INDEXER_KEY: str(),
   SIGNATURE_START_BLOCK: num({ default: 0 }),
@@ -27,6 +28,7 @@ const config: Config = {
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
   dbUrl: env.DATABASE_URL,
+  dbUrlBase: env.DATABASE_URL_BASE,
   genesisHeight,
   indexerKey: env.SIGNATURE_INDEXER_KEY,
   insertLimit: 2500,
@@ -36,6 +38,7 @@ const config: Config = {
       : Number(env.NEARDATA_CONCURRENCY),
   neardataUrl: env.NEARDATA_URL,
   network: env.NETWORK,
+  rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.SIGNATURE_START_BLOCK,
 };

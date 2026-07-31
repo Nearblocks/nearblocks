@@ -8,6 +8,7 @@ Signature indexer works with mpc signatures
 DATABASE_URL=
 DATABASE_URL_BASE=
 NETWORK=mainnet
+RPC_URL=
 SIGNATURE_INDEXER_KEY=
 S3_ACCESS_KEY=
 S3_SECRET_KEY=
