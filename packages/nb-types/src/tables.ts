@@ -34,6 +34,7 @@ export interface TTables {
   ft_meta: FTMeta;
   ft_prices: PriceHistory;
   ft_prices_daily: PriceHistory;
+  mpc_derived_keys: MpcDerivedKey;
   multichain_signatures: MultichainSignature;
   multichain_transactions: MultichainTransaction;
   nft_events: NFTEvent;
@@ -346,6 +347,14 @@ export type MTTokenMeta = {
   title?: null | string;
   token: string;
   updated_at?: null | string;
+};
+
+export type MpcDerivedKey = {
+  account_id: string;
+  block_timestamp: string;
+  domain_id: number;
+  path: string;
+  public_key: string;
 };
 
 export type MultichainSignature = {

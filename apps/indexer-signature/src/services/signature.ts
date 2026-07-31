@@ -3,15 +3,29 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { hasScheme, isFunctionCallAction } from '#libs/guards';
-import { db } from '#libs/knex';
+import { db, dbBase } from '#libs/knex';
+import {
+  deriveKey,
+  ED25519_DOMAIN_ID,
+  getRootKeys,
+  SECP256K1_DOMAIN_ID,
+} from '#libs/mpc';
 import { decodeArgs, toRSV } from '#libs/utils';
-import { MPCSignature, MSReceipt, MSSignature, Sign } from '#types/types';
+import {
+  MPCSignature,
+  MSMpcKey,
+  MSReceipt,
+  MSSignature,
+  Sign,
+  SignRequest,
+} from '#types/types';
 
 const batchSize = config.insertLimit;
 const signers = ['v1.signer', 'v1.signer-prod.testnet'];
 const methods = ['sign', 'verify_foreign_transaction'];
 
 export const storeSignature = async (message: Message) => {
+  const mpcKeys: MSMpcKey[] = [];
   const receipts: MSReceipt[] = [];
   const signatures: MSSignature[] = [];
 
@@ -21,6 +35,7 @@ export const storeSignature = async (message: Message) => {
       shard.receiptExecutionOutcomes,
     );
 
+    mpcKeys.push(...chunk.mpcKeys);
     receipts.push(...chunk.receipts);
     signatures.push(...chunk.signatures);
   });
@@ -74,6 +89,42 @@ export const storeSignature = async (message: Message) => {
     }
   }
 
+  if (mpcKeys.length) {
+    const roots = getRootKeys();
+    const dedupedByPublicKey = new Map<
+      string,
+      MSMpcKey & { public_key: string }
+    >();
+
+    for (const mpcKey of mpcKeys) {
+      const publicKey = deriveKey(
+        mpcKey.domain_id,
+        roots,
+        mpcKey.account_id,
+        mpcKey.path,
+      );
+
+      if (!dedupedByPublicKey.has(publicKey)) {
+        dedupedByPublicKey.set(publicKey, { ...mpcKey, public_key: publicKey });
+      }
+    }
+
+    const derivedKeys = [...dedupedByPublicKey.values()];
+
+    for (let i = 0; i < derivedKeys.length; i += batchSize) {
+      const batch = derivedKeys.slice(i, i + batchSize);
+
+      promises.push(
+        retry(async () => {
+          await dbBase('mpc_derived_keys')
+            .insert(batch)
+            .onConflict('public_key')
+            .ignore();
+        }),
+      );
+    }
+  }
+
   await Promise.all(promises);
 };
 
@@ -81,6 +132,7 @@ export const getChunkExecutions = (
   blockTimestamp: string,
   executionOutcomes: ExecutionOutcomeWithReceipt[],
 ) => {
+  const mpcKeys: MSMpcKey[] = [];
   const receipts: MSReceipt[] = [];
   const signatures: MSSignature[] = [];
 
@@ -93,6 +145,7 @@ export const getChunkExecutions = (
         'Action' in outcome.receipt.receipt
       ) {
         const signer = outcome.receipt.receipt.Action.signerId;
+        const predecessorId = outcome.receipt.predecessorId;
         const publicKey = outcome.receipt.receipt.Action.signerPublicKey;
         const receiptId = outcome.executionOutcome.id;
         const successReceipt =
@@ -114,6 +167,20 @@ export const getChunkExecutions = (
               receipt_id: receiptId,
               success_receipt_id: successReceipt,
             });
+
+            if (action.FunctionCall.methodName === 'sign') {
+              const domainId = resolveMpcDomainId(args?.request);
+
+              if (domainId !== null) {
+                mpcKeys.push({
+                  account_id: predecessorId,
+                  block_timestamp: blockTimestamp,
+                  domain_id: domainId,
+                  path: args?.request?.path ?? '',
+                });
+              }
+            }
+
             return;
           }
         });
@@ -145,7 +212,23 @@ export const getChunkExecutions = (
     }
   });
 
-  return { receipts, signatures };
+  return { mpcKeys, receipts, signatures };
+};
+
+const resolveMpcDomainId = (request?: SignRequest): null | number => {
+  if (request?.domain_id !== undefined) {
+    const domainId = Number(request.domain_id);
+
+    return domainId === SECP256K1_DOMAIN_ID || domainId === ED25519_DOMAIN_ID
+      ? domainId
+      : null;
+  }
+
+  if (request?.key_version !== undefined) {
+    return SECP256K1_DOMAIN_ID;
+  }
+
+  return null;
 };
 
 const getSignature = (
