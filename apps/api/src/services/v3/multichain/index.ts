@@ -17,7 +17,7 @@ import { bytesParse, callFunction, getProvider } from '#libs/near';
 import { dbBase, dbMultichain, pgp } from '#libs/pgp';
 import redis from '#libs/redis';
 import {
-  cappedCount,
+  countFromEstimate,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -150,22 +150,43 @@ const count = responseHandler(
     const txn = req.validator.txn;
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;
-    const count = await rollingWindowCount(
-      (start, end, limit) =>
-        dbMultichain.one<{ count: string }>(sql.signatureCount, {
-          account,
-          address,
-          before,
-          chain,
-          end,
-          limit,
-          start,
-          txn,
-        }),
-      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
-    );
 
-    return { data: { count: cappedCount(count, config.maxQueryCount) } };
+    const count = await countFromEstimate({
+      db: dbMultichain,
+      exactCount: () =>
+        rollingWindowCount(
+          (start, end, limit) =>
+            dbMultichain.one<{ count: string }>(sql.signatureCount, {
+              account,
+              address,
+              before,
+              chain,
+              end,
+              limit,
+              start,
+              txn,
+            }),
+          {
+            end: beforeTs,
+            limit: config.maxQueryCount,
+            start: config.baseStart,
+          },
+        ),
+      limit: config.maxQueryCount,
+      maxCost: config.maxQueryCost,
+      maxRows: config.maxQueryRows,
+      query: sql.signatureCountEstimate,
+      values: {
+        account: account ?? null,
+        address: address ?? null,
+        before: before ?? null,
+        chain: chain ?? null,
+        start: config.baseStart.toString(),
+        txn: txn ?? null,
+      },
+    });
+
+    return { data: { count } };
   },
 );
 

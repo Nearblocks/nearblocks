@@ -17,7 +17,7 @@ import cursors from '#libs/cursors';
 import dayjs from '#libs/dayjs';
 import { dbBase, dbStaking, pgp } from '#libs/pgp';
 import {
-  cappedCount,
+  countFromEstimate,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -134,21 +134,41 @@ const count = responseHandler(
     const before = req.validator.before_ts;
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;
-    const count = await rollingWindowCount(
-      (start, end, limit) =>
-        dbStaking.one<{ count: string }>(sql.staking.count, {
-          account,
-          before,
-          contract,
-          end,
-          limit,
-          start,
-          type,
-        }),
-      { end: beforeTs, limit: config.maxQueryCount, start: config.baseStart },
-    );
 
-    return { data: { count: cappedCount(count, config.maxQueryCount) } };
+    const count = await countFromEstimate({
+      db: dbStaking,
+      exactCount: () =>
+        rollingWindowCount(
+          (start, end, limit) =>
+            dbStaking.one<{ count: string }>(sql.staking.count, {
+              account,
+              before,
+              contract,
+              end,
+              limit,
+              start,
+              type,
+            }),
+          {
+            end: beforeTs,
+            limit: config.maxQueryCount,
+            start: config.baseStart,
+          },
+        ),
+      limit: config.maxQueryCount,
+      maxCost: config.maxQueryCost,
+      maxRows: config.maxQueryRows,
+      query: sql.staking.countEstimate,
+      values: {
+        account,
+        before: before ?? null,
+        contract: contract ?? null,
+        start: config.baseStart.toString(),
+        type: type ?? null,
+      },
+    });
+
+    return { data: { count } };
   },
 );
 
