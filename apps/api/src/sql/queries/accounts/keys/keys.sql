@@ -37,9 +37,14 @@ SELECT
   ks.permission_kind,
   ks.permission,
   COALESCE(c.txn, '{}'::JSONB) AS created,
-  COALESCE(d.txn, '{}'::JSONB) AS deleted
+  COALESCE(d.txn, '{}'::JSONB) AS deleted,
+  CASE
+    WHEN m.public_key IS NULL THEN NULL
+    ELSE JSONB_BUILD_OBJECT('account_id', m.account_id, 'path', m.path)
+  END AS mpc
 FROM
   keys_selected ks
+  LEFT JOIN mpc_derived_keys m ON m.public_key = ks.public_key
   LEFT JOIN LATERAL (
     SELECT
       JSONB_BUILD_OBJECT(
