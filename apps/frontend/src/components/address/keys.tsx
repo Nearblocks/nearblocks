@@ -9,6 +9,7 @@ import { ExportType } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
+import { MpcBadge } from '@/components/mpc-badge';
 import { QuantumSafeBadge } from '@/components/quantum-safe-badge';
 import { SkeletonSlot } from '@/components/skeleton';
 import { FilterClearData, FilterData } from '@/components/table-filter';
@@ -65,6 +66,7 @@ export const AccessKeys = ({
       cell: (key) => (
         <div className="flex items-center gap-1">
           <QuantumSafeBadge publicKey={key.public_key} />
+          <MpcBadge mpc={key.mpc} />
           <Truncate>
             <TruncateText text={key.public_key} />
             <TruncateCopy text={key.public_key} />

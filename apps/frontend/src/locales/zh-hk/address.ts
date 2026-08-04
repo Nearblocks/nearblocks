@@ -251,6 +251,7 @@ export const address = {
     created: 'Created',
     deleted: 'Deleted',
     empty: 'No access keys found',
+    mpcKey: 'MPC-controlled key, derived by',
     total: 'More than {{count}} access keys found',
     totalExact: 'A total of {{count}} access keys found',
     unlimited: 'Unlimited',

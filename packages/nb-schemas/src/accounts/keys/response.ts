@@ -18,10 +18,16 @@ const deleted = v.object({
   transaction_hash: v.optional(v.string()),
 });
 
+const mpc = v.object({
+  account_id: v.string(),
+  path: v.string(),
+});
+
 const key = v.object({
   action_timestamp: v.string(),
   created,
   deleted,
+  mpc: v.nullable(mpc),
   permission: v.nullable(jsonSchema),
   permission_kind: v.string(),
   public_key: v.string(),
