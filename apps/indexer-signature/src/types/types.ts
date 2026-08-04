@@ -1,6 +1,7 @@
 import { MultichainSignature, Network } from 'nb-types';
 
 export interface Config {
+  backfillWindowSize: bigint;
   dbCa: string;
   dbCert: string;
   dbKey: string;
@@ -14,6 +15,8 @@ export interface Config {
   network: Network;
   rpcUrl: string;
   sentryDsn?: string;
+  signerEndTimestamp: string;
+  signerStartTimestamp: string;
   startBlockHeight: number;
 }
 

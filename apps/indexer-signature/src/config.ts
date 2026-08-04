@@ -10,6 +10,7 @@ const env = cleanEnv(process.env, {
   DATABASE_KEY: str({ default: '' }),
   DATABASE_URL: str(),
   DATABASE_URL_BASE: str(),
+  MPC_BACKFILL_WINDOW_SIZE: str({ default: '300000000000' }), // 5m in ns
   NEARDATA_CONCURRENCY: str({ default: 'auto' }),
   NEARDATA_URL: url(),
   NETWORK: str({
@@ -22,8 +23,14 @@ const env = cleanEnv(process.env, {
 });
 
 const genesisHeight = env.NETWORK === Network.MAINNET ? 9_820_210 : 42_376_888;
+const signerStartTimestamp =
+  env.NETWORK === Network.MAINNET
+    ? '1722614400000000000'
+    : '1721977200000000000';
+const signerEndTimestamp = '1785542400000000000';
 
 const config: Config = {
+  backfillWindowSize: BigInt(env.MPC_BACKFILL_WINDOW_SIZE),
   dbCa: env.DATABASE_CA,
   dbCert: env.DATABASE_CERT,
   dbKey: env.DATABASE_KEY,
@@ -40,6 +47,8 @@ const config: Config = {
   network: env.NETWORK,
   rpcUrl: env.RPC_URL,
   sentryDsn: env.SENTRY_DSN,
+  signerEndTimestamp,
+  signerStartTimestamp,
   startBlockHeight: env.SIGNATURE_START_BLOCK,
 };
 

@@ -215,7 +215,7 @@ export const getChunkExecutions = (
   return { mpcKeys, receipts, signatures };
 };
 
-const resolveMpcDomainId = (request?: SignRequest): null | number => {
+export const resolveMpcDomainId = (request?: SignRequest): null | number => {
   if (request?.domain_id !== undefined) {
     const domainId = Number(request.domain_id);
 

@@ -18,7 +18,7 @@ export const ED25519_DOMAIN_ID = 1;
 
 const EPSILON_PREFIX = 'near-mpc-recovery v0.1.0 epsilon derivation:';
 
-const MPC_CONTRACT: Record<Network, string> = {
+export const MPC_CONTRACT: Record<Network, string> = {
   [Network.MAINNET]: 'v1.signer',
   [Network.TESTNET]: 'v1.signer-prod.testnet',
 };
