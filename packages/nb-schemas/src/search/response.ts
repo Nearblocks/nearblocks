@@ -13,19 +13,31 @@ const block = v.object({
 
 const ft = v.object({
   contract: v.string(),
+  decimals: v.nullable(v.number()),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
 });
 
 const key = v.object({
   account_id: v.string(),
+  public_key: v.string(),
 });
 
 const mt = v.object({
   contract: v.string(),
+  decimals: v.nullable(v.number()),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
   token: v.string(),
 });
 
 const nft = v.object({
   contract: v.string(),
+  icon: v.nullable(v.string()),
+  name: v.nullable(v.string()),
+  symbol: v.nullable(v.string()),
 });
 
 const receipt = v.object({

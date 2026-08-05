@@ -42,10 +42,6 @@ const isValidBlockHeight = (height: string) => {
   return /^[0-9]+$/.test(height) && BigInt(height) <= BLOCK_HEIGHT_LIMIT;
 };
 
-const isValidHexAddress = (address: string) => {
-  return /^0x[a-f0-9]{40}$/.test(address);
-};
-
 const isValidRlpHash = (hash: string) => {
   return /^0x[a-f0-9]{64}$/.test(hash);
 };
@@ -81,14 +77,14 @@ const getKeys = async (keyword: string) => {
 
 const getFts = async (keyword: string) => {
   const query = keyword.toLowerCase();
-  const hex = isValidHexAddress(query) ? query : null;
-  const contract = isValidAccountId(query) ? query : null;
 
-  if (!hex && !contract) return [];
+  if (query.length < 2) return [];
+
+  const contract = isValidAccountId(query) ? query : null;
 
   return dbEvents.manyOrNone<SearchFT>(sql.fts, {
     contract,
-    hex,
+    keyword: query,
   });
 };
 
@@ -103,10 +99,13 @@ const getMts = async (keyword: string) => {
 const getNfts = async (keyword: string) => {
   const query = keyword.toLowerCase();
 
-  if (!isValidAccountId(query)) return [];
+  if (query.length < 2) return [];
+
+  const contract = isValidAccountId(query) ? query : null;
 
   return dbEvents.manyOrNone<SearchNFT>(sql.nfts, {
-    contract: query,
+    contract,
+    keyword: query,
   });
 };
 

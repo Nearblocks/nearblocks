@@ -22,8 +22,8 @@ export const SearchLink = ({
     <Link
       aria-selected={active}
       className={cn(
-        'text-headline-sm hover:bg-muted hover:text-link focus:bg-muted focus:text-link focus-visible:ring-ring/50 inline-block w-full flex-col gap-1 truncate rounded-sm p-2 align-middle transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1',
-        'data-[active]:bg-muted data-[active]:text-link',
+        'text-headline-sm hover:bg-muted hover:text-link focus:bg-muted focus:text-link focus-visible:ring-ring/50 flex w-full min-w-0 items-center gap-1 rounded-sm p-2 align-middle transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1',
+        'data-active:bg-muted data-active:text-link',
       )}
       data-active={active || undefined}
       href={href}

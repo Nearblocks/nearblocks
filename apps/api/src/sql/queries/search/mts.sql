@@ -1,6 +1,10 @@
 SELECT
   contract,
-  token
+  token,
+  name,
+  symbol,
+  decimals,
+  icon
 FROM
   mt_list
 WHERE

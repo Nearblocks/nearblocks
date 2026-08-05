@@ -23,40 +23,29 @@ export const initialResults: Search = {
   txns: [],
 };
 
-export const searchKeyword = async (keyword: string, filter: string) => {
-  const results = initialResults;
+const FILTERS = {
+  addresses: { fetch: searchAccounts, key: 'accounts' },
+  blocks: { fetch: searchBlocks, key: 'blocks' },
+  keys: { fetch: searchKeys, key: 'keys' },
+  mts: { fetch: searchMTs, key: 'mts' },
+  nfts: { fetch: searchNFTs, key: 'nfts' },
+  receipts: { fetch: searchReceipts, key: 'receipts' },
+  tokens: { fetch: searchFTs, key: 'fts' },
+  txns: { fetch: searchTxns, key: 'txns' },
+} as const satisfies Record<
+  string,
+  { fetch: (keyword: string) => Promise<unknown[]>; key: keyof Search }
+>;
 
-  if (filter === 'accounts') {
-    results.accounts = await searchAccounts(keyword);
-  }
+export const searchKeyword = async (
+  keyword: string,
+  filter: string,
+): Promise<null | Search> => {
+  const entry = FILTERS[filter as keyof typeof FILTERS];
 
-  if (filter === 'blocks') {
-    results.blocks = await searchBlocks(keyword);
-  }
+  if (!entry) return search(keyword);
 
-  if (filter === 'keys') {
-    results.keys = await searchKeys(keyword);
-  }
+  const rows = await entry.fetch(keyword);
 
-  if (filter === 'mts') {
-    results.mts = await searchMTs(keyword);
-  }
-
-  if (filter === 'nfts') {
-    results.nfts = await searchNFTs(keyword);
-  }
-
-  if (filter === 'receipts') {
-    results.receipts = await searchReceipts(keyword);
-  }
-
-  if (filter === 'tokens') {
-    results.fts = await searchFTs(keyword);
-  }
-
-  if (filter === 'txns') {
-    results.txns = await searchTxns(keyword);
-  }
-
-  return search(keyword);
+  return { ...initialResults, [entry.key]: rows };
 };

@@ -34,6 +34,13 @@ export const SearchFilter = ({ className, filter, onSelect }: Props) => {
       <NativeSelectOption value="mts">
         {t('search.mtTokens')}
       </NativeSelectOption>
+      <NativeSelectOption value="nfts">
+        {t('search.nftTokens')}
+      </NativeSelectOption>
+      <NativeSelectOption value="keys">{t('search.keys')}</NativeSelectOption>
+      <NativeSelectOption value="receipts">
+        {t('search.receipts')}
+      </NativeSelectOption>
     </NativeSelect>
   );
 };

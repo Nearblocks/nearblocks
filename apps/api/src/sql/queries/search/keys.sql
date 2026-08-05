@@ -1,5 +1,6 @@
 SELECT
-  account_id
+  account_id,
+  public_key
 FROM
   access_keys
 WHERE

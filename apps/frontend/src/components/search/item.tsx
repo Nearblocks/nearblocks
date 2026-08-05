@@ -1,7 +1,5 @@
 'use client';
 
-import { Separator } from '@/ui/separator';
-
 type Props = {
   button?: React.ReactNode;
   children: React.ReactNode;
@@ -20,7 +18,6 @@ export const SearchItem = ({ button, children, title }: Props) => {
         </div>
         {button && button}
       </div>
-      <Separator className="bg-border" orientation="horizontal" />
       <div className="p-2">{children}</div>
     </>
   );
