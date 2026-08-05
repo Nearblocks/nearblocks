@@ -2,11 +2,12 @@
 
 import { use } from 'react';
 
-import { MCMpcParametersRes } from 'nb-schemas';
+import { MCMpcParametersRes, MCMpcParticipant } from 'nb-schemas';
 
 import { AccountLink, Link } from '@/components/link';
 import { Truncate, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
+import { dateFormat } from '@/lib/format';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -18,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 import { Copy } from '../copy';
 
@@ -26,12 +28,72 @@ type Props = {
   mpcsPromise?: Promise<MCMpcParametersRes>;
 };
 
+const TeeCell = ({ tee }: { tee: MCMpcParticipant['tee'] }) => {
+  const { t } = useLocale('chainSignatures');
+
+  if (tee.status === 'tdx') {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge className="cursor-default" variant="teal">
+            TDX
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent className="flex flex-col gap-1">
+          <span>{t('operators.tee.tdx')}</span>
+          {tee.image_hash && (
+            <>
+              {t('operators.tee.image')}{' '}
+              {`${tee.image_hash.slice(0, 8)}…${tee.image_hash.slice(-7)}`}{' '}
+            </>
+          )}
+          {tee.expiry && (
+            <>
+              {t('operators.tee.expires', {
+                date: dateFormat(tee.expiry * 1000, 'MMM DD, YYYY'),
+              })}
+            </>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  if (tee.status === 'unknown') {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="text-muted-foreground cursor-default">—</span>
+        </TooltipTrigger>
+        <TooltipContent>{t('operators.tee.unknown')}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Badge className="cursor-default" variant="gray">
+          {t('operators.tee.no')}
+        </Badge>
+      </TooltipTrigger>
+      <TooltipContent>
+        {tee.status === 'mock'
+          ? t('operators.tee.mock')
+          : t('operators.tee.none')}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
 export const Operators = ({ loading, mpcsPromise }: Props) => {
   const { t } = useLocale('chainSignatures');
   const mpcs = !loading && mpcsPromise ? use(mpcsPromise) : null;
   if (mpcs?.errors?.length) throw new Error('Failed to load MPC operators');
   const isLoading = !!loading;
-  const participants = mpcs?.data?.participants ?? [];
+  const participants = [...(mpcs?.data?.participants ?? [])].sort((a, b) =>
+    a.account.localeCompare(b.account),
+  );
 
   return (
     <Card>
@@ -49,6 +111,7 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
               <TableHead>{t('operators.list.account')}</TableHead>
               <TableHead>{t('operators.list.publicKey')}</TableHead>
               <TableHead>{t('operators.list.url')}</TableHead>
+              <TableHead>{t('operators.list.tee')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -64,13 +127,16 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
                   <TableCell>
                     <Skeleton className="w-40" />
                   </TableCell>
+                  <TableCell>
+                    <Skeleton className="w-14" />
+                  </TableCell>
                 </TableRow>
               ))}
             {!isLoading && !participants.length && (
               <TableRow className="h-15">
                 <TableCell
                   className="text-muted-foreground text-center"
-                  colSpan={3}
+                  colSpan={4}
                 >
                   {t('operators.empty')}
                 </TableCell>
@@ -112,13 +178,19 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
                           rel="noopener noreferrer"
                           target="_blank"
                         >
-                          <TruncateText text={participant.url} />
+                          <TruncateText
+                            className="max-w-60"
+                            text={participant.url}
+                          />
                         </a>
                         <Copy text={participant.url} />
                       </Truncate>
                     ) : (
                       <span className="text-muted-foreground">—</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <TeeCell tee={participant.tee} />
                   </TableCell>
                 </TableRow>
               ))}
