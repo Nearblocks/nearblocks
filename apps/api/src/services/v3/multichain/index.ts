@@ -2,6 +2,7 @@ import { unionWith } from 'es-toolkit';
 
 import type {
   MCMpcParameters,
+  MCMpcTee,
   MCStats,
   MCTxn,
   MCTxnCountReq,
@@ -37,6 +38,11 @@ type RawRunning = {
     threshold: number;
   };
 };
+
+type RawAttestation =
+  | { Dstack: { expiry_timestamp_seconds: number; mpc_image_hash: string } }
+  | { Mock: string }
+  | null;
 
 const MPC_CONTRACT: Record<string, string> = {
   [Network.MAINNET]: 'v1.signer',
@@ -182,11 +188,10 @@ const mpcs = responseHandler(response.mpcState, async () => {
   }
 
   const contract = MPC_CONTRACT[config.network];
-  const res = (await callFunction(
-    getProvider(),
-    contract,
-    'state',
-  )) as unknown as { result: number[] };
+  const provider = getProvider();
+  const res = (await callFunction(provider, contract, 'state')) as unknown as {
+    result: number[];
+  };
   const state = bytesParse(Buffer.from(res.result)) as Record<string, unknown>;
 
   if (!('Running' in state)) {
@@ -214,11 +219,40 @@ const mpcs = responseHandler(response.mpcState, async () => {
   );
   const validatorIds = new Set(validators.map((v) => v.account_id));
 
+  const tees = await Promise.all(
+    participants.map(async (p): Promise<MCMpcTee> => {
+      try {
+        const res = (await callFunction(provider, contract, 'get_attestation', {
+          tls_public_key: p.public_key,
+        })) as unknown as { result: number[] };
+        const attestation = bytesParse(
+          Buffer.from(res.result),
+        ) as RawAttestation;
+
+        if (attestation && 'Dstack' in attestation) {
+          return {
+            expiry: attestation.Dstack.expiry_timestamp_seconds,
+            image_hash: attestation.Dstack.mpc_image_hash,
+            status: 'tdx',
+          };
+        }
+        if (attestation && 'Mock' in attestation) {
+          return { expiry: null, image_hash: null, status: 'mock' };
+        }
+
+        return { expiry: null, image_hash: null, status: 'none' };
+      } catch {
+        return { expiry: null, image_hash: null, status: 'unknown' };
+      }
+    }),
+  );
+
   const result: MCMpcParameters = {
     contract,
-    participants: participants.map((p) => ({
+    participants: participants.map((p, index) => ({
       ...p,
       is_validator: validatorIds.has(p.account),
+      tee: tees[index],
     })),
     threshold: parameters.threshold,
   };

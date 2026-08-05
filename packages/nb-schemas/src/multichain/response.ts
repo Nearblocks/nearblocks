@@ -4,10 +4,17 @@ import { DestinationChain } from 'nb-types';
 
 import { responseSchema } from '../common.js';
 
+const mpcTee = v.object({
+  expiry: v.nullable(v.number()),
+  image_hash: v.nullable(v.string()),
+  status: v.picklist(['tdx', 'mock', 'none', 'unknown']),
+});
+
 const mpcParticipant = v.object({
   account: v.string(),
   is_validator: v.boolean(),
   public_key: v.string(),
+  tee: mpcTee,
   url: v.string(),
 });
 
@@ -19,6 +26,7 @@ const mpcParameters = v.object({
 
 const mpcParametersResponse = responseSchema(mpcParameters);
 
+export type MCMpcTee = v.InferOutput<typeof mpcTee>;
 export type MCMpcParticipant = v.InferOutput<typeof mpcParticipant>;
 export type MCMpcParameters = v.InferOutput<typeof mpcParameters>;
 export type MCMpcParametersRes = v.InferOutput<typeof mpcParametersResponse>;

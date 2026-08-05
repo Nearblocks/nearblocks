@@ -66,6 +66,21 @@ export const Overview = ({
                 )}
               </ListRight>
             </ListItem>
+            <ListItem>
+              <ListLeft>{t('overview.network.inTee')}</ListLeft>
+              <ListRight>
+                {isMpcsLoading ? (
+                  <Skeleton className="w-14" />
+                ) : mpcs ? (
+                  `${
+                    mpcs.participants.filter((p) => p.tee.status === 'tdx')
+                      .length
+                  } / ${mpcs.participants.length}`
+                ) : (
+                  <span className="text-muted-foreground">N/A</span>
+                )}
+              </ListRight>
+            </ListItem>
           </List>
         </CardContent>
       </Card>
