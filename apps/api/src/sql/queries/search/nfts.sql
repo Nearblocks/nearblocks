@@ -1,9 +1,15 @@
 SELECT
-  contract
+  contract,
+  name,
+  symbol,
+  icon
 FROM
-  nft_meta
+  nft_list
 WHERE
   contract = ${contract}
-  AND modified_at IS NOT NULL
+  OR LOWER(symbol) = ${keyword}
+ORDER BY
+  (contract = ${contract}) DESC,
+  tokens DESC NULLS LAST
 LIMIT
-  1
+  5

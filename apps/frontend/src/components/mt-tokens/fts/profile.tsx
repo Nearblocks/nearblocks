@@ -2,6 +2,7 @@
 
 import { AccountLink } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
+import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 
@@ -31,7 +32,10 @@ export const MtFtProfile = ({ cid, tid }: Props) => {
           <ListItem>
             <ListLeft className="min-w-36">{t('token.tokenId')}</ListLeft>
             <ListRight>
-              <span className="text-body-sm">{tid}</span>
+              <Truncate className="text-body-sm">
+                <TruncateText text={tid} />
+                <TruncateCopy text={tid} />
+              </Truncate>
             </ListRight>
           </ListItem>
           <ListItem>

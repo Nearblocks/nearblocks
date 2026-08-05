@@ -50,19 +50,19 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
           },
           resp.fts?.[0] && {
             href: `/tokens/${resp.fts[0].contract}`,
-            label: resp.fts[0].contract,
+            label: resp.fts[0].name ?? resp.fts[0].contract,
             type: 'token',
           },
           resp.mts?.[0] && {
-            href: `/mt-tokens/${resp.mts[0].contract}/tokens/${encodeToken(
-              resp.mts[0].token,
-            )}`,
-            label: resp.mts[0].token,
+            href: `/mt-tokens/${resp.mts[0].contract}/${
+              resp.mts[0].decimals === null ? 'nft-tokens' : 'tokens'
+            }/${encodeToken(resp.mts[0].token)}`,
+            label: resp.mts[0].name ?? resp.mts[0].token,
             type: 'token',
           },
           resp.nfts?.[0] && {
             href: `/nft-tokens/${resp.nfts[0].contract}`,
-            label: resp.nfts[0].contract,
+            label: resp.nfts[0].name ?? resp.nfts[0].contract,
             type: 'token',
           },
           resp.txns?.[0] && {

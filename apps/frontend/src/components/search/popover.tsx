@@ -1,9 +1,18 @@
 import { useDebounceFn } from 'ahooks';
-import { ArrowLeftRight, Box, Coins, Trash, User, X } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  Box,
+  Coins,
+  KeyRound,
+  Trash,
+  User,
+  X,
+} from 'lucide-react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { Search } from 'nb-schemas';
 
+import { TokenImage } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import type { HistoryEntry } from '@/hooks/use-search-history';
 import { initialResults, searchKeyword } from '@/lib/search';
@@ -14,6 +23,9 @@ import { Popover, PopoverAnchor, PopoverContent } from '@/ui/popover';
 
 import { SearchItem } from './item';
 import { SearchLink } from './link';
+import { SearchRow, TokenTitle } from './row';
+
+const ICON_CLASS = 'text-muted-foreground size-4 shrink-0';
 
 type Props = {
   addToHistory: (entry: HistoryEntry) => void;
@@ -156,10 +168,10 @@ export const SearchPopover = ({
             href: item.href,
             id: optionId(),
             label: (
-              <>
-                <Icon className="text-muted-foreground mr-2 inline size-3 shrink-0" />
-                {item.label}
-              </>
+              <SearchRow
+                icon={<Icon className={ICON_CLASS} />}
+                title={item.label}
+              />
             ),
             onRemove: () => removeFromHistory(item.href),
             onSelect: () => setOpen(false),
@@ -176,7 +188,12 @@ export const SearchPopover = ({
           options: results.accounts.map((account) => ({
             href: `/address/${account.account_id}`,
             id: optionId(),
-            label: account.account_id,
+            label: (
+              <SearchRow
+                icon={<User className={ICON_CLASS} />}
+                title={account.account_id}
+              />
+            ),
             onSelect: () =>
               addToHistory({
                 href: `/address/${account.account_id}`,
@@ -193,7 +210,13 @@ export const SearchPopover = ({
           options: results.blocks.map((block) => ({
             href: `/blocks/${block.block_hash}`,
             id: optionId(),
-            label: block.block_hash,
+            label: (
+              <SearchRow
+                icon={<Box className={ICON_CLASS} />}
+                subtitle={block.block_hash}
+                title={block.block_height}
+              />
+            ),
             onSelect: () =>
               addToHistory({
                 href: `/blocks/${block.block_hash}`,
@@ -210,11 +233,29 @@ export const SearchPopover = ({
           options: results.fts.map((ft) => ({
             href: `/tokens/${ft.contract}`,
             id: optionId(),
-            label: ft.contract,
+            label: (
+              <SearchRow
+                icon={
+                  <TokenImage
+                    alt={ft.name ?? ''}
+                    className="size-5 shrink-0 rounded-full border"
+                    src={ft.icon ?? ''}
+                  />
+                }
+                subtitle={ft.contract}
+                title={
+                  <TokenTitle
+                    fallback={ft.contract}
+                    name={ft.name}
+                    symbol={ft.symbol}
+                  />
+                }
+              />
+            ),
             onSelect: () =>
               addToHistory({
                 href: `/tokens/${ft.contract}`,
-                label: ft.contract,
+                label: ft.name ?? ft.contract,
                 type: 'token',
               }),
           })),
@@ -227,11 +268,29 @@ export const SearchPopover = ({
           options: results.nfts.map((nft) => ({
             href: `/nft-tokens/${nft.contract}`,
             id: optionId(),
-            label: nft.contract,
+            label: (
+              <SearchRow
+                icon={
+                  <TokenImage
+                    alt={nft.name ?? ''}
+                    className="size-5 shrink-0 rounded-full border"
+                    src={nft.icon ?? ''}
+                  />
+                }
+                subtitle={nft.contract}
+                title={
+                  <TokenTitle
+                    fallback={nft.contract}
+                    name={nft.name}
+                    symbol={nft.symbol}
+                  />
+                }
+              />
+            ),
             onSelect: () =>
               addToHistory({
                 href: `/nft-tokens/${nft.contract}`,
-                label: nft.contract,
+                label: nft.name ?? nft.contract,
                 type: 'token',
               }),
           })),
@@ -242,17 +301,36 @@ export const SearchPopover = ({
         out.push({
           key: 'mts',
           options: results.mts.map((mt) => {
-            const href = `/mt-tokens/${mt.contract}/tokens/${encodeToken(
-              mt.token,
-            )}`;
+            const isNft = mt.decimals === null;
+            const href = `/mt-tokens/${mt.contract}/${
+              isNft ? 'nft-tokens' : 'tokens'
+            }/${encodeToken(mt.token)}`;
             return {
               href,
               id: optionId(),
-              label: `${mt.token} (${mt.contract})`,
+              label: (
+                <SearchRow
+                  icon={
+                    <TokenImage
+                      alt={mt.name ?? ''}
+                      className="size-5 shrink-0 rounded-full border"
+                      src={mt.icon ?? ''}
+                    />
+                  }
+                  subtitle={mt.contract}
+                  title={
+                    <TokenTitle
+                      fallback={mt.token}
+                      name={mt.name}
+                      symbol={mt.symbol}
+                    />
+                  }
+                />
+              ),
               onSelect: () =>
                 addToHistory({
                   href,
-                  label: mt.token,
+                  label: mt.name ?? mt.token,
                   type: 'token',
                 }),
             };
@@ -266,7 +344,12 @@ export const SearchPopover = ({
           options: results.txns.map((txn) => ({
             href: `/txns/${txn.transaction_hash}`,
             id: optionId(),
-            label: txn.transaction_hash,
+            label: (
+              <SearchRow
+                icon={<ArrowLeftRight className={ICON_CLASS} />}
+                title={txn.transaction_hash}
+              />
+            ),
             onSelect: () =>
               addToHistory({
                 href: `/txns/${txn.transaction_hash}`,
@@ -285,7 +368,13 @@ export const SearchPopover = ({
             return {
               href,
               id: optionId(),
-              label: receipt.receipt_id,
+              label: (
+                <SearchRow
+                  icon={<ArrowLeftRight className={ICON_CLASS} />}
+                  subtitle={receipt.transaction_hash}
+                  title={receipt.receipt_id}
+                />
+              ),
               onSelect: () =>
                 addToHistory({
                   href,
@@ -303,7 +392,13 @@ export const SearchPopover = ({
           options: results.keys.map((key) => ({
             href: `/address/${key.account_id}/keys`,
             id: optionId(),
-            label: key.account_id,
+            label: (
+              <SearchRow
+                icon={<KeyRound className={ICON_CLASS} />}
+                subtitle={key.public_key}
+                title={key.account_id}
+              />
+            ),
             onSelect: () =>
               addToHistory({
                 href: `/address/${key.account_id}/keys`,

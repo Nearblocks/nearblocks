@@ -1,18 +1,16 @@
 SELECT
-  contract
+  contract,
+  name,
+  symbol,
+  decimals,
+  icon
 FROM
-  ft_meta
+  ft_list
 WHERE
-  (
-    (
-      ${hex}::TEXT IS NOT NULL
-      AND hex_address = ${hex}
-    )
-    OR (
-      ${hex}::TEXT IS NULL
-      AND contract = ${contract}
-    )
-  )
-  AND modified_at IS NOT NULL
+  contract = ${contract}
+  OR LOWER(symbol) = ${keyword}
+ORDER BY
+  (contract = ${contract}) DESC,
+  market_cap DESC NULLS LAST
 LIMIT
-  1
+  5

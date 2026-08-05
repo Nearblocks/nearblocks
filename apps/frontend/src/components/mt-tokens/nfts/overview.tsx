@@ -8,6 +8,7 @@ import { AccountLink } from '@/components/link';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { NFTMedia } from '@/components/token';
+import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { useLocale } from '@/hooks/use-locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -88,7 +89,14 @@ export const MtNftOverview = ({ cid, loading, tokenPromise }: Props) => {
                   }
                   loading={!!loading}
                 >
-                  {() => <span className="text-body-sm">{token?.token}</span>}
+                  {() =>
+                    token?.token && (
+                      <Truncate className="text-body-sm">
+                        <TruncateText text={token.token} />
+                        <TruncateCopy text={token.token} />
+                      </Truncate>
+                    )
+                  }
                 </SkeletonSlot>
               </ListRight>
             </ListItem>
