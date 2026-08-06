@@ -16,6 +16,7 @@ import { useState } from 'react';
 import type { Validator, ValidatorsListRes } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
+import { NearCircle } from '@/icons/near-circle';
 import { nearFormat, numberFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/ui/badge';
@@ -491,7 +492,14 @@ const ValidatorRows = ({
             : 'N/A'}
         </TableCell>
         <TableCell className="whitespace-nowrap">
-          {stake ? `${nearFormat(stake, { maximumFractionDigits: 0 })} Ⓝ` : ''}
+          {stake ? (
+            <span className="flex items-center gap-1">
+              <NearCircle className="size-4 shrink-0" />
+              {nearFormat(stake, { maximumFractionDigits: 0 })}
+            </span>
+          ) : (
+            ''
+          )}
         </TableCell>
         <TableCell>
           {row.own_stake_percent ? `${row.own_stake_percent}%` : ''}
@@ -511,19 +519,23 @@ const ValidatorRows = ({
         </TableCell>
         <TableCell>
           {row.stake_change_value ? (
-            <span
-              className={
-                row.stake_change_symbol === '+'
-                  ? 'text-lime-foreground'
-                  : 'text-red-foreground'
-              }
-            >
-              {row.stake_change_symbol}
-              {row.stake_change_value} Ⓝ
+            <span className="flex items-center gap-1">
+              <NearCircle className="size-4 shrink-0" />
+              <span
+                className={
+                  row.stake_change_symbol === '+'
+                    ? 'text-lime-foreground'
+                    : 'text-red-foreground'
+                }
+              >
+                {row.stake_change_symbol}
+                {row.stake_change_value}
+              </span>
             </span>
           ) : stake ? (
-            <span className="text-muted-foreground">
-              {nearFormat(stake, { maximumFractionDigits: 0 })} Ⓝ
+            <span className="text-muted-foreground flex items-center gap-1">
+              <NearCircle className="size-4 shrink-0" />
+              {nearFormat(stake, { maximumFractionDigits: 0 })}
             </span>
           ) : null}
         </TableCell>

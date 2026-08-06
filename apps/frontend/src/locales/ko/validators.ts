@@ -13,6 +13,11 @@ export const validators = {
     title: 'NEAR Validator List',
   },
   nodeDetails: {
+    analytics: {
+      blocks: 'Blocks Produced',
+      chunks: 'Chunks Produced',
+      noData: 'No production data available',
+    },
     blocks: 'Blocks',
     chunks: 'Chunks',
     columns: {
@@ -20,11 +25,17 @@ export const validators = {
       stakedBalance: 'Staked Balance',
       unstakedBalance: 'Unstaked Balance',
     },
+    delegators: 'Delegators',
     delegatorsTotal: '{{count}} Delegators found',
     fee: 'Fee',
     overview: 'Overview',
     producedExpected: '{{produced}} produced / {{expected}} expected',
     status: 'Status',
+    tabs: {
+      analytics: 'Analytics',
+      delegators: 'Delegators',
+    },
+    totalStake: 'Total Stake',
     uptimeInfo: 'Uptime Information',
   },
   nodeMeta: {
@@ -37,6 +48,7 @@ export const validators = {
     title: 'Staking Overview',
     totalStaked: 'Total Staked',
     totalSupply: 'Total Supply',
+    totalValidators: 'Total Validators',
   },
   table: {
     columns: {

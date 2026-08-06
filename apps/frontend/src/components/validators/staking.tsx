@@ -36,6 +36,16 @@ export const StakingOverview = ({ info, loading, totalSupply }: Props) => {
             </ListRight>
           </ListItem>
           <ListItem>
+            <ListLeft>{t('staking.totalValidators')}</ListLeft>
+            <ListRight>
+              {loading ? (
+                <Skeleton className="w-10" />
+              ) : (
+                numberFormat(info?.total_validators_count)
+              )}
+            </ListRight>
+          </ListItem>
+          <ListItem>
             <ListLeft>{t('staking.totalStaked')}</ListLeft>
             <ListRight>
               {loading ? (
