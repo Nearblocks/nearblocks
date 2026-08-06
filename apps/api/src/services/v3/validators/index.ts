@@ -1,4 +1,13 @@
-import type { Validator, ValidatorInfo, ValidatorsListReq } from 'nb-schemas';
+import type {
+  Validator,
+  ValidatorBlockStats,
+  ValidatorBlockStatsReq,
+  ValidatorChunkStats,
+  ValidatorChunkStatsReq,
+  ValidatorDetailReq,
+  ValidatorInfo,
+  ValidatorsListReq,
+} from 'nb-schemas';
 import request from 'nb-schemas/dist/validators/request.js';
 import response from 'nb-schemas/dist/validators/response.js';
 
@@ -52,4 +61,39 @@ const info = responseHandler(response.info, async () => {
   return { data };
 });
 
-export default { info, list };
+const detail = responseHandler(
+  response.detail,
+  async (req: RequestValidator<ValidatorDetailReq>) => {
+    const data = await dbBase.oneOrNone<Validator>(sql.detail, {
+      account: req.validator.account,
+    });
+
+    return { data };
+  },
+);
+
+const blocks = responseHandler(
+  response.blocks,
+  async (req: RequestValidator<ValidatorBlockStatsReq>) => {
+    const data = await dbBase.manyOrNone<ValidatorBlockStats>(
+      sql.stats.blocks,
+      { account: req.validator.account, limit: req.validator.limit },
+    );
+
+    return { data };
+  },
+);
+
+const chunks = responseHandler(
+  response.chunks,
+  async (req: RequestValidator<ValidatorChunkStatsReq>) => {
+    const data = await dbBase.manyOrNone<ValidatorChunkStats>(
+      sql.stats.chunks,
+      { account: req.validator.account, limit: req.validator.limit },
+    );
+
+    return { data };
+  },
+);
+
+export default { blocks, chunks, detail, info, list };

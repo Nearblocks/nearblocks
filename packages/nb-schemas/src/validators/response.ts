@@ -54,16 +54,39 @@ const validatorInfo = v.object({
   total_validators_count: v.nullable(v.number()),
 });
 
+const blockStat = v.object({
+  author: v.string(),
+  blocks: v.string(),
+  date: v.string(),
+});
+
+const chunkStat = v.object({
+  author: v.string(),
+  chunks: v.string(),
+  date: v.string(),
+});
+
 const listResponse = responseSchema(v.array(validator));
 const infoResponse = responseSchema(validatorInfo);
+const detailResponse = responseSchema(validator);
+const blockStatResponse = responseSchema(v.array(blockStat));
+const chunkStatResponse = responseSchema(v.array(chunkStat));
 
 export type Validator = v.InferOutput<typeof validator>;
 export type ValidatorInfo = v.InferOutput<typeof validatorInfo>;
+export type ValidatorBlockStats = v.InferOutput<typeof blockStat>;
+export type ValidatorChunkStats = v.InferOutput<typeof chunkStat>;
 
 export type ValidatorsListRes = v.InferOutput<typeof listResponse>;
 export type ValidatorInfoRes = v.InferOutput<typeof infoResponse>;
+export type ValidatorDetailRes = v.InferOutput<typeof detailResponse>;
+export type ValidatorBlockStatsRes = v.InferOutput<typeof blockStatResponse>;
+export type ValidatorChunkStatsRes = v.InferOutput<typeof chunkStatResponse>;
 
 export default {
+  blocks: blockStatResponse,
+  chunks: chunkStatResponse,
+  detail: detailResponse,
   info: infoResponse,
   list: listResponse,
 };

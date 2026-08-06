@@ -56,6 +56,80 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/info', service.info);
+
+  /**
+   * @openapi
+   * /v3/validators/{account}:
+   *   get:
+   *     summary: Get validator details
+   *     tags:
+   *       - Validators
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Validator account ID
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account', validate(request.detail), service.detail);
+
+  /**
+   * @openapi
+   * /v3/validators/{account}/stats/blocks:
+   *   get:
+   *     summary: Get validator daily blocks produced
+   *     tags:
+   *       - Validators
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Validator account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account/stats/blocks', validate(request.blocks), service.blocks);
+
+  /**
+   * @openapi
+   * /v3/validators/{account}/stats/chunks:
+   *   get:
+   *     summary: Get validator daily chunks produced
+   *     tags:
+   *       - Validators
+   *     parameters:
+   *       - in: path
+   *         name: account
+   *         required: true
+   *         description: Validator account ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 365
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get('/:account/stats/chunks', validate(request.chunks), service.chunks);
 };
 
 export default routes;
