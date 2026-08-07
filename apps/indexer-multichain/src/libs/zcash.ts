@@ -1,26 +1,29 @@
 import { randomBytes } from 'crypto';
 import { request } from 'undici';
 
-import { NETWORK, p2pkh, p2wpkh, TEST_NETWORK } from '@scure/btc-signer';
+import { ripemd160 } from '@noble/hashes/ripemd160';
+import { sha256 } from '@noble/hashes/sha256';
+import { createBase58check } from '@scure/base';
 
 import { Network } from 'nb-types';
 
 import config from '#config';
 import { NotFoundError, RateLimitError, RpcError } from '#libs/errors';
-import {
-  BitcoinBlock,
-  BitcoinRpcRequest,
-  BitcoinRpcResponse,
-} from '#types/types';
+import { ZcashBlock, ZcashRpcRequest, ZcashRpcResponse } from '#types/types';
 
-const network = config.network === Network.MAINNET ? NETWORK : TEST_NETWORK;
+const b58check = createBase58check(sha256);
+
+const prefix =
+  config.network === Network.MAINNET
+    ? Uint8Array.from([0x1c, 0xb8]) // t1
+    : Uint8Array.from([0x1d, 0x25]); // tm
 
 export const rpcCall = async <T>(
   url: string,
   method: string,
   params: unknown[] = [],
 ): Promise<T> => {
-  const payload: BitcoinRpcRequest = {
+  const payload: ZcashRpcRequest = {
     id: randomBytes(8).toString('hex'),
     jsonrpc: '2.0',
     method,
@@ -45,7 +48,7 @@ export const rpcCall = async <T>(
     throw new RpcError(error);
   }
 
-  const json = (await body.json()) as BitcoinRpcResponse<T>;
+  const json = (await body.json()) as ZcashRpcResponse<T>;
 
   if (json.error) {
     throw new Error(json.error.message);
@@ -65,20 +68,14 @@ export const getLatestBlock = async (url: string): Promise<number> => {
 export const getBlock = async (
   url: string,
   height: number,
-): Promise<BitcoinBlock> => {
+): Promise<ZcashBlock> => {
   const blockHash = await rpcCall<string>(url, 'getblockhash', [height]);
 
-  return rpcCall<BitcoinBlock>(url, 'getblock', [blockHash, 2]);
+  return rpcCall<ZcashBlock>(url, 'getblock', [blockHash, 2]);
 };
 
-export const pubKeyToP2PKH = (pubKeyHex: string): string => {
-  const pubKeyBuffer = Buffer.from(pubKeyHex, 'hex');
+export const pubKeyToTransparent = (pubKeyHex: string): string => {
+  const hash = ripemd160(sha256(Buffer.from(pubKeyHex, 'hex')));
 
-  return p2pkh(pubKeyBuffer, network).address;
-};
-
-export const pubKeyToP2WPKH = (pubKeyHex: string): string => {
-  const pubKeyBuffer = Buffer.from(pubKeyHex, 'hex');
-
-  return p2wpkh(pubKeyBuffer, network).address;
+  return b58check.encode(Uint8Array.from([...prefix, ...hash]));
 };

@@ -9,6 +9,7 @@ export const Chains = {
   OPTIMISM: 'OPTIMISM',
   POLYGON: 'POLYGON',
   SOLANA: 'SOLANA',
+  ZCASH: 'ZCASH',
 } as const;
 
 export type Chains = (typeof Chains)[keyof typeof Chains];

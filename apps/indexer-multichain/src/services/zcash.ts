@@ -1,18 +1,13 @@
 import { MultichainTransaction } from 'nb-types';
 
 import config from '#config';
-import {
-  getBlock,
-  getLatestBlock,
-  pubKeyToP2PKH,
-  pubKeyToP2WPKH,
-} from '#libs/bitcoin';
 import { decodeDERsignature, parseScriptSigPushes } from '#libs/der';
 import { NotFoundError } from '#libs/errors';
 import { db } from '#libs/knex';
 import { chainLastBlockTimestamp } from '#libs/prom';
 import { syncBlocks } from '#libs/sync';
 import { retry, secToNs } from '#libs/utils';
+import { getBlock, getLatestBlock, pubKeyToTransparent } from '#libs/zcash';
 import { Chains } from '#types/enum';
 import { BlockProcess } from '#types/types';
 
@@ -45,8 +40,6 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
   }
 
-  // Guard against missing timestamp on malformed RPC responses; skip the
-  // gauge update rather than throwing inside the block processor.
   if (typeof block.time === 'number' && Number.isFinite(block.time)) {
     chainLastBlockTimestamp.set({ chain }, block.time);
   }
@@ -57,27 +50,20 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
 
   for (const tx of block.tx) {
     for (const vin of tx.vin) {
-      // P2PKH (Legacy)
       if (vin.scriptSig?.hex) {
         const pushes = parseScriptSigPushes(vin.scriptSig.hex);
 
         if (pushes && pushes.length >= 2) {
-          const txn = getTxn(block.time, tx.txid, pushes, pubKeyToP2PKH);
+          const txn = getTxn(
+            chain,
+            block.time,
+            tx.txid,
+            pushes,
+            pubKeyToTransparent,
+          );
 
           if (txn) txns.push(txn);
         }
-      }
-
-      // P2WPKH (SegWit)
-      if (vin.txinwitness && vin.txinwitness.length > 0) {
-        const txn = getTxn(
-          block.time,
-          tx.txid,
-          vin.txinwitness,
-          pubKeyToP2WPKH,
-        );
-
-        if (txn) txns.push(txn);
       }
     }
   }
@@ -104,6 +90,7 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
 };
 
 const getTxn = (
+  chain: Chains,
   timestamp: number,
   txn: string,
   input: string[],
@@ -115,7 +102,7 @@ const getTxn = (
 
     return {
       address,
-      chain: 'BITCOIN',
+      chain,
       r,
       s,
       signature: null,

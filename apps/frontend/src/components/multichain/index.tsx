@@ -94,6 +94,12 @@ const CHAIN_EXPLORERS: Record<string, ChainExplorer> = {
     name: 'Solana',
     txUrl: 'https://solscan.io/tx/',
   },
+  ZCASH: {
+    addrUrl: 'https://cipherscan.app/address/',
+    icon: '/images/icons/zec.svg',
+    name: 'Zcash',
+    txUrl: 'https://cipherscan.app/tx/',
+  },
 };
 
 const ChainIcon = ({ icon, name }: { icon: string; name: string }) => (

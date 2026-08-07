@@ -33,6 +33,8 @@ const env = cleanEnv(process.env, {
   SENTRY_DSN: str({ default: '' }),
   SOLANA_RPC_URL: str({ default: '' }),
   SOLANA_START_BLOCK: num({ default: 0 }),
+  ZCASH_RPC_URL: str({ default: '' }),
+  ZCASH_START_BLOCK: num({ default: 0 }),
 });
 
 const config: Config = {
@@ -96,6 +98,12 @@ const config: Config = {
       interval: 400, // 0.4s (measured slot time ~0.43s)
       start: env.SOLANA_START_BLOCK,
       url: env.SOLANA_RPC_URL,
+    },
+    ZCASH: {
+      concurrency: 5,
+      interval: env.NETWORK === Network.MAINNET ? 30000 : 15000, // 30s/15s (measured block time ~75s)
+      start: env.ZCASH_START_BLOCK,
+      url: env.ZCASH_RPC_URL,
     },
   },
   dbCa: env.DATABASE_CA,

@@ -16,6 +16,7 @@
     "lint:check": "tsc --noEmit && eslint ./"
   },
   "dependencies": {
+    "@noble/hashes": "1.6.1",
     "@scure/base": "1.2.5",
     "@scure/btc-signer": "1.8.0",
     "@sentry/node": "7.74.1",
