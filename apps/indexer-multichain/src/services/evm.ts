@@ -40,8 +40,7 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
   }
 
   const blockTimestamp = parseInt(block.timestamp, 16);
-  // parseInt yields NaN if the upstream response omits the timestamp; skip
-  // the gauge update so the series is not poisoned with NaN.
+
   if (Number.isFinite(blockTimestamp)) {
     chainLastBlockTimestamp.set({ chain }, blockTimestamp);
   }
@@ -51,15 +50,17 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
   const txns: MultichainTransaction[] = [];
 
   for (const txn of block.transactions) {
-    const r = Buffer.from(txn.r.replace(/^0x/, ''), 'hex');
-    const s = Buffer.from(txn.s.replace(/^0x/, ''), 'hex');
+    const rHex = txn.r.replace(/^0x/, '');
+    const sHex = txn.s.replace(/^0x/, '');
+    const r = Buffer.from(rHex, 'hex');
+    const s = Buffer.from(sHex, 'hex');
 
     if (isValid(r, s)) {
       txns.push({
         address: txn.from.toLowerCase(),
         chain,
-        r,
-        s,
+        r: Buffer.from(rHex.padStart(64, '0'), 'hex'),
+        s: Buffer.from(sHex.padStart(64, '0'), 'hex'),
         signature: null,
         timestamp: secToNs(parseInt(block.timestamp, 16)),
         transaction: txn.hash.toLowerCase(),

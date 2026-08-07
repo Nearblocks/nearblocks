@@ -6,6 +6,7 @@ import Sentry from '#libs/sentry';
 import bitcoin from '#services/bitcoin';
 import evm from '#services/evm';
 import solana from '#services/solana';
+import zcash from '#services/zcash';
 import { Chains } from '#types/enum';
 
 export const syncData = async () => {
@@ -29,6 +30,7 @@ export const syncData = async () => {
       evm.processBlocks(Chains.POLYGON),
       solana.processBlocks(Chains.SOLANA),
       bitcoin.processBlocks(Chains.BITCOIN),
+      zcash.processBlocks(Chains.ZCASH),
     ]);
   } catch (error) {
     logger.error(error);

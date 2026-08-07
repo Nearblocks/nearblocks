@@ -73,7 +73,7 @@ export type BitcoinTransaction = {
 
 export type BitcoinBlock = {
   height: number;
-  timestamp: number;
+  time: number;
   tx: BitcoinTransaction[];
 };
 
@@ -112,6 +112,34 @@ export type SolanaBlock = {
   blockHeight: number;
   blockTime: number;
   transactions: SolanaTransaction[];
+};
+
+export type ZcashRpcRequest = {
+  id: string;
+  jsonrpc: '2.0';
+  method: string;
+  params: unknown[];
+};
+
+export type ZcashRpcResponse<T> = {
+  error?: { code: number; message: string };
+  id: string;
+  result: T;
+};
+
+export type ZcashVin = {
+  scriptSig?: { asm: string; hex: string };
+};
+
+export type ZcashTransaction = {
+  txid: string;
+  vin: ZcashVin[];
+};
+
+export type ZcashBlock = {
+  height: number;
+  time: number;
+  tx: ZcashTransaction[];
 };
 
 export type BlockProcess = {

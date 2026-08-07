@@ -44,7 +44,7 @@ const routes = (app: Router) => {
    *         description: Destination chain to filter results by
    *         schema:
    *           type: string
-   *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA]
+   *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA, ZCASH]
    *       - in: query
    *         name: address
    *         description: Destination address to filter results by
@@ -105,7 +105,7 @@ const routes = (app: Router) => {
    *         description: Destination chain to filter results by
    *         schema:
    *           type: string
-   *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA]
+   *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA, ZCASH]
    *       - in: query
    *         name: address
    *         description: Destination address to filter results by

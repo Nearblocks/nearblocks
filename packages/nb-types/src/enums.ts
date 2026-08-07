@@ -160,6 +160,7 @@ export enum DestinationChain {
   OPTIMISM = 'OPTIMISM',
   POLYGON = 'POLYGON',
   SOLANA = 'SOLANA',
+  ZCASH = 'ZCASH',
 }
 
 export enum ExportType {
