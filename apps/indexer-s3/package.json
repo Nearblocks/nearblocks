@@ -22,7 +22,7 @@
     "axios": "1.5.1",
     "envalid": "8.0.0",
     "ethers": "6.13.2",
-    "lodash-es": "4.17.21",
+    "lodash-es": "4.17.23",
     "near-lake-framework": "2.0.0",
     "stream-json": "1.8.0"
   },
