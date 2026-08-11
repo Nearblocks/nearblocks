@@ -1,14 +1,24 @@
 # Migrating to NearBlocks API v3
 
-This guide covers migrating from API v1 (`/v1/*`) and v2 (`/v2/*`) to v3 (`/v3/*`).
+v3 reworks the whole API. If you only remember one thing: paths move to `/v3/*`, every response is `{ "data": ..., "meta": ... }`, and pagination is cursor-based. Your API key doesn't change; it's the same bearer token (`Authorization: Bearer <key>`).
 
-v3 is a full redesign of the API surface. The three biggest changes:
+Most integrations only touch `txns` and `accounts`, so start there. The rest of this guide is reference you can pull from as needed.
 
-1. **New pagination model** — opaque, bidirectional cursors (`next` / `prev`) replace `page` / `per_page` and raw-value cursors.
-2. **Standard response envelope** — every response is `{ "data": ..., "meta": ... }` instead of domain-keyed wrappers like `{ "txns": [...] }`.
-3. **Expanded surface** — new endpoint families for multi-tokens (NEP-245), intents, account/token analytics, and multichain signatures.
+The three changes that will actually break existing code:
 
-Authentication is unchanged: pass your API key as a bearer token (`Authorization: Bearer <key>`).
+1. **Pagination.** `page`/`per_page` are gone; you walk opaque `next`/`prev` cursors instead.
+2. **Response shape.** Results come back under `data`, not domain keys like `txns`, `blocks`, or `tokens`.
+3. **Renamed filters and fields.** For example, `from`/`to` became `signer`/`receiver`.
+
+Everything else is additive: the new multi-token (NEP-245), intents, analytics, and multichain endpoints. Ignore them until you need them.
+
+## Migrate with an AI assistant
+
+These changes are mechanical, so an AI coding assistant can handle most of them. Paste this guide and your integration code into Claude Code, Cursor, or your agent of choice with a prompt like:
+
+> Migrate this codebase from NearBlocks API v1/v2 to v3. Apply: (1) endpoint paths `/v1/`,`/v2/` → `/v3/` (and `/account/` → `/accounts/`, `stake-txns` → `staking-txns`, `chain-abstraction` → `multichain`); (2) pagination `page`/`per_page` → opaque `next`/`prev` cursors + `limit`; (3) read results from `data` and pagination from `meta` instead of keys like `txns`; (4) rename filters `from`/`to` → `signer`/`receiver`; (5) date filters → nanosecond `before_ts`; (6) block metadata from the nested `block` object; (7) capped counts as strings like `"10000+"`. Flag any use of deprecated endpoints (activities, ETH-implicit accounts, kitwallet, legacy, health) that have no v3 equivalent. Do not change authentication; API keys stay the same.
+
+Then review its changes against the reference tables below.
 
 ---
 
@@ -337,9 +347,9 @@ v2 exposed only `GET /v2/mts/contract/{contract}/{token_id}` (metadata). v3 adds
 
 ---
 
-## 6. Endpoints with no v3 equivalent
+## 6. Deprecated endpoints (no v3 equivalent)
 
-These remain available on v1 only. Plan around them — they will not be carried into v3:
+These are being retired along with v1/v2 and will not be carried into v3. They have no replacement, so plan alternatives before the deprecation date:
 
 - `GET /v1/account/{account}/activities` — use `/v3/accounts/{account}/stats/*` instead
 - `GET /v1/account/{account}/txns-only` — merged into `/v3/accounts/{account}/txns`
@@ -412,4 +422,4 @@ After: `/v3/accounts/alice.near/ft-txns?limit=25` → metadata under `meta`; ite
 5. Rename query params: `from`/`to` → `signer`/`receiver`; date ranges → `before_ts` (nanoseconds).
 6. Update field access: nested `block{}` object, `meta` for token metadata, `status_key` for outcome detail.
 7. Remove dependence on public `/count` endpoints; where still available, parse counts as strings with a possible `+` suffix.
-8. If you use DEX, activities, kitwallet, or legacy endpoints, keep those on v1 and plan alternatives.
+8. If you use DEX, activities, kitwallet, or legacy endpoints, note they are being deprecated with no v3 replacement — plan alternatives before the deprecation date.

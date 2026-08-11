@@ -125,6 +125,7 @@ export const submitContactForm = async (data: unknown) => {
       },
       Subject: { Data: subject },
     },
+    ReplyToAddresses: [email],
     Source: config.AWS_SES_FROM_EMAIL,
   });
 
