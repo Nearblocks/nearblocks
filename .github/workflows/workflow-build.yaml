@@ -29,6 +29,7 @@ jobs:
             aggregates,
             block-proxy,
             indexer-intents,
+            indexer-tvl,
           ]
       fail-fast: false
     steps:
