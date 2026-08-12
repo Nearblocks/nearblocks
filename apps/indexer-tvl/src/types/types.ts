@@ -23,9 +23,9 @@ export interface Config {
   solanaUrl: string;
 }
 
-// tvl_sources row
 export type Source = {
   address: string;
+  authority: null | string;
   chain: string;
   protocol: string;
   start_block: null | string;
@@ -117,8 +117,40 @@ export type SolanaTokenBalance = {
 export type SolanaTransaction = {
   blockTime: null | number;
   meta: {
-    postBalances: number[];
+    loadedAddresses?: { readonly: string[]; writable: string[] };
     postTokenBalances: SolanaTokenBalance[];
   } | null;
   slot: number;
+  transaction: {
+    message: {
+      accountKeys: string[];
+    };
+  };
+};
+
+export type SolanaTokenAccount = {
+  decimals: number;
+  mint: string;
+  pubkey: string;
+};
+
+export type SolanaAccount = {
+  ata: string;
+  chain: string;
+  decimals: number;
+  mint: string;
+  newest_signature: null | string;
+  protocol: string;
+  scan_before: null | string;
+  scan_complete: boolean;
+};
+
+export type SolanaDayTx = {
+  amount: null | string;
+  ata: string;
+  chain: string;
+  date: string;
+  protocol: string;
+  resolved: boolean;
+  signature: string;
 };

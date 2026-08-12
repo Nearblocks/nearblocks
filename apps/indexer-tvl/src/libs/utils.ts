@@ -12,6 +12,7 @@ import {
 } from '#types/types';
 
 export const DAY_MS = 86_400_000n;
+export const NATIVE_TOKEN = 'native';
 
 export const balanceSyncKey = (protocol: string, chain: string) =>
   `tvl_balances_${protocol}_${chain}`;

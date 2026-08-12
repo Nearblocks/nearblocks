@@ -12,6 +12,10 @@ export const syncData = async () => {
   try {
     const sources = await db<Source>('tvl_sources').select('*');
 
+    if (!sources.length) {
+      throw new Error('tvl_sources is empty -- migration not applied?');
+    }
+
     logger.info(`sources: ${sources.map((s) => s.chain).join(', ')}`);
 
     await Promise.all(

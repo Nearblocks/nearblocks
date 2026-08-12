@@ -1,6 +1,9 @@
 import { Interface } from 'ethers';
 
 import { ethCall } from '#libs/evm';
+import { NATIVE_TOKEN } from '#libs/utils';
+
+export { NATIVE_TOKEN };
 
 export const MULTICALL3_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
 
@@ -18,20 +21,18 @@ const erc20Iface = new Interface([
 export type Call3 = { allowFailure: boolean; callData: string; target: string };
 export type Result3 = { returnData: string; success: boolean };
 
-export const NATIVE_TOKEN = 'native';
+export const nativeBalanceCall = (bridge: string): Call3 => ({
+  allowFailure: false,
+  callData: multicallIface.encodeFunctionData('getEthBalance', [bridge]),
+  target: MULTICALL3_ADDRESS,
+});
 
-export const balanceCalls = (bridge: string, tokens: string[]): Call3[] => [
-  {
-    allowFailure: false,
-    callData: multicallIface.encodeFunctionData('getEthBalance', [bridge]),
-    target: MULTICALL3_ADDRESS,
-  },
-  ...tokens.map((token) => ({
+export const tokenBalanceCalls = (bridge: string, tokens: string[]): Call3[] =>
+  tokens.map((token) => ({
     allowFailure: true, // a token can be paused/broken without failing the whole batch
     callData: erc20Iface.encodeFunctionData('balanceOf', [bridge]),
     target: token,
-  })),
-];
+  }));
 
 export const aggregate3 = async (
   url: string,
