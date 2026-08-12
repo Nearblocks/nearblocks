@@ -31,11 +31,13 @@ type ViewOptionsProps = {
   control: Control<FormData>;
   errors: FieldErrors<FormData>;
   register: UseFormRegister<FormData>;
+  uid: string;
 };
 
 type ChangeOptionsProps = {
   errors: FieldErrors<FormData>;
   register: UseFormRegister<FormData>;
+  uid: string;
 };
 
 export const ViewOptions = ({
@@ -43,6 +45,7 @@ export const ViewOptions = ({
   control,
   errors,
   register,
+  uid,
 }: ViewOptionsProps) => {
   const { t } = useLocale('address');
 
@@ -67,7 +70,7 @@ export const ViewOptions = ({
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-5 pt-4">
         <Field>
-          <FieldLabel htmlFor="blockRef">
+          <FieldLabel htmlFor={`${uid}-blockRef`}>
             {t('contract.methods.finalLabel')}
           </FieldLabel>
           <FieldDescription>{t('contract.methods.finalDesc')}</FieldDescription>
@@ -80,22 +83,22 @@ export const ViewOptions = ({
                 onValueChange={field.onChange}
                 value={field.value}
               >
-                <FieldLabel htmlFor="finality">
+                <FieldLabel htmlFor={`${uid}-finality`}>
                   <Field orientation="horizontal">
                     <FieldContent>
                       <FieldTitle>{t('contract.methods.finality')}</FieldTitle>
                     </FieldContent>
-                    <RadioGroupItem id="finality" value="finality" />
+                    <RadioGroupItem id={`${uid}-finality`} value="finality" />
                   </Field>
                 </FieldLabel>
-                <FieldLabel htmlFor="blockId">
+                <FieldLabel htmlFor={`${uid}-blockId`}>
                   <Field orientation="horizontal">
                     <FieldContent>
                       <FieldTitle>
                         {t('contract.methods.finalBlockId')}
                       </FieldTitle>
                     </FieldContent>
-                    <RadioGroupItem id="blockId" value="blockId" />
+                    <RadioGroupItem id={`${uid}-blockId`} value="blockId" />
                   </Field>
                 </FieldLabel>
               </RadioGroup>
@@ -104,7 +107,7 @@ export const ViewOptions = ({
         </Field>
         {blockRef === 'finality' && (
           <Field data-invalid={!!errors.finality}>
-            <FieldLabel htmlFor="finality-select">
+            <FieldLabel htmlFor={`${uid}-finality-select`}>
               {t('contract.methods.finality')}
             </FieldLabel>
             <FieldDescription>
@@ -131,7 +134,7 @@ export const ViewOptions = ({
         )}
         {blockRef === 'blockId' && (
           <Field data-invalid={!!errors.blockId}>
-            <FieldLabel htmlFor="blockId-input">
+            <FieldLabel htmlFor={`${uid}-blockId-input`}>
               {t('contract.methods.blockId')}
             </FieldLabel>
             <FieldDescription>
@@ -139,7 +142,7 @@ export const ViewOptions = ({
             </FieldDescription>
             <Input
               aria-invalid={!!errors.blockId}
-              id="blockId-input"
+              id={`${uid}-blockId-input`}
               type="text"
               {...register('blockId')}
             />
@@ -151,28 +154,34 @@ export const ViewOptions = ({
   );
 };
 
-export const ChangeOptions = ({ errors, register }: ChangeOptionsProps) => {
+export const ChangeOptions = ({
+  errors,
+  register,
+  uid,
+}: ChangeOptionsProps) => {
   const { t } = useLocale('address');
 
   return (
     <div className="grid grid-cols-2 gap-4">
       <Field data-invalid={!!errors.gas}>
-        <FieldLabel htmlFor="gas">{t('contract.methods.gas')}</FieldLabel>
+        <FieldLabel htmlFor={`${uid}-gas`}>
+          {t('contract.methods.gas')}
+        </FieldLabel>
         <Input
           aria-invalid={!!errors.gas}
-          id="gas"
+          id={`${uid}-gas`}
           type="text"
           {...register('gas')}
         />
         <FieldError errors={[errors.gas]} />
       </Field>
       <Field data-invalid={!!errors.deposit}>
-        <FieldLabel htmlFor="deposit">
+        <FieldLabel htmlFor={`${uid}-deposit`}>
           {t('contract.methods.deposit')}
         </FieldLabel>
         <Input
           aria-invalid={!!errors.deposit}
-          id="deposit"
+          id={`${uid}-deposit`}
           type="text"
           {...register('deposit')}
         />

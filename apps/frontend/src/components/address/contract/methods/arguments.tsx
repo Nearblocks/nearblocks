@@ -18,6 +18,7 @@ type Props = {
   mode: 'change' | 'view';
   onFetchArgs: () => void;
   selectedMethod: string;
+  uid: string;
 };
 
 export const Arguments = ({
@@ -28,13 +29,16 @@ export const Arguments = ({
   mode,
   onFetchArgs,
   selectedMethod,
+  uid,
 }: Props) => {
   const { t } = useLocale('address');
 
   return (
     <Field data-invalid={!!errors.args}>
       <div className="flex items-center justify-between">
-        <FieldLabel htmlFor="args">{t('contract.methods.args')}</FieldLabel>
+        <FieldLabel htmlFor={`${uid}-args`}>
+          {t('contract.methods.args')}
+        </FieldLabel>
         {mode === 'change' && !hasSchema && selectedMethod && (
           <Tooltip>
             <TooltipTrigger asChild>

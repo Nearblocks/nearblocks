@@ -122,6 +122,7 @@ export const layout = {
   search: {
     addresses: 'Addresses',
     blocks: 'Blocks',
+    clear: 'Clear search',
     filters: 'All Filters',
     history: 'Recent Searches',
     keys: 'Access Keys',
