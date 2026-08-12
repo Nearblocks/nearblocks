@@ -140,6 +140,13 @@ export const SearchPopover = ({
     setOpen(hasResults(results));
   };
 
+  const onClear = () => {
+    setKeyword('');
+    setResults(initialResults);
+    setOpen(history.length > 0);
+    inputRef.current?.focus();
+  };
+
   const hasLiveResults = hasResults(results);
 
   const sections = useMemo<SearchSection[]>(() => {
@@ -486,27 +493,43 @@ export const SearchPopover = ({
   return (
     <Popover onOpenChange={(open) => setOpen(open)} open={open}>
       <PopoverAnchor asChild>
-        <Input
-          aria-activedescendant={
-            activeIndex >= 0 ? flatOptions[activeIndex]?.id : undefined
-          }
-          aria-autocomplete="list"
-          aria-controls={open ? listboxId : undefined}
-          aria-expanded={open}
-          autoComplete="off"
-          className={cn(
-            'bg-card dark:bg-card border-0 shadow-none focus-visible:border-neutral-300 focus-visible:ring-neutral-300/50',
-            className,
+        <div className="relative flex flex-1 items-center">
+          <Input
+            aria-activedescendant={
+              activeIndex >= 0 ? flatOptions[activeIndex]?.id : undefined
+            }
+            aria-autocomplete="list"
+            aria-controls={open ? listboxId : undefined}
+            aria-expanded={open}
+            autoComplete="off"
+            className={cn(
+              'bg-card dark:bg-card border-0 shadow-none focus-visible:border-neutral-300 focus-visible:ring-neutral-300/50',
+              keyword && 'pr-8',
+              className,
+            )}
+            name="keyword"
+            onChange={onChange}
+            onFocus={onFocus}
+            onKeyDown={onKeyDown}
+            placeholder={t('search.placeholder')}
+            ref={inputRef}
+            role="combobox"
+            value={keyword}
+          />
+          {keyword && (
+            <Button
+              aria-label={t('search.clear')}
+              className="absolute right-1 rounded-lg"
+              onClick={onClear}
+              size="icon-xs"
+              tabIndex={-1}
+              type="button"
+              variant="ghost"
+            >
+              <X className="size-3.5" />
+            </Button>
           )}
-          name="keyword"
-          onChange={onChange}
-          onFocus={onFocus}
-          onKeyDown={onKeyDown}
-          placeholder={t('search.placeholder')}
-          ref={inputRef}
-          role="combobox"
-          value={keyword}
-        />
+        </div>
       </PopoverAnchor>
       <PopoverContent
         className="divide-border max-h-(--radix-popover-content-available-height) w-(--radix-popper-anchor-width) max-w-200 divide-y overflow-y-auto p-0"

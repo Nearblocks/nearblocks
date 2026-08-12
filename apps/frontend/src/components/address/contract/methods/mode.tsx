@@ -15,20 +15,18 @@ import { RadioGroup, RadioGroupItem } from '@/ui/radio-group';
 
 type Props = {
   control: Control<FormData>;
-  hasSchema: boolean;
+  uid: string;
 };
 
-export const ExecutionMode = ({ control, hasSchema }: Props) => {
+export const ExecutionMode = ({ control, uid }: Props) => {
   const { t } = useLocale('address');
 
   return (
     <Field>
-      <FieldLabel htmlFor="mode">{t('contract.methods.execMode')}</FieldLabel>
-      <FieldDescription>
-        {hasSchema
-          ? t('contract.methods.hasSchemaMode')
-          : t('contract.methods.noSchemaMode')}
-      </FieldDescription>
+      <FieldLabel htmlFor={`${uid}-mode`}>
+        {t('contract.methods.execMode')}
+      </FieldLabel>
+      <FieldDescription>{t('contract.methods.noSchemaMode')}</FieldDescription>
       <Controller
         control={control}
         name="mode"
@@ -38,7 +36,7 @@ export const ExecutionMode = ({ control, hasSchema }: Props) => {
             onValueChange={field.onChange}
             value={field.value}
           >
-            <FieldLabel htmlFor="view">
+            <FieldLabel htmlFor={`${uid}-view`}>
               <Field orientation="horizontal">
                 <FieldContent>
                   <FieldTitle>{t('contract.methods.view')}</FieldTitle>
@@ -46,10 +44,10 @@ export const ExecutionMode = ({ control, hasSchema }: Props) => {
                     {t('contract.methods.viewFree')}
                   </FieldDescription>
                 </FieldContent>
-                <RadioGroupItem id="view" value="view" />
+                <RadioGroupItem id={`${uid}-view`} value="view" />
               </Field>
             </FieldLabel>
-            <FieldLabel htmlFor="change">
+            <FieldLabel htmlFor={`${uid}-change`}>
               <Field orientation="horizontal">
                 <FieldContent>
                   <FieldTitle>{t('contract.methods.change')}</FieldTitle>
@@ -57,7 +55,7 @@ export const ExecutionMode = ({ control, hasSchema }: Props) => {
                     {t('contract.methods.stateAltering')}
                   </FieldDescription>
                 </FieldContent>
-                <RadioGroupItem id="change" value="change" />
+                <RadioGroupItem id={`${uid}-change`} value="change" />
               </Field>
             </FieldLabel>
           </RadioGroup>

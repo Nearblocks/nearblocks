@@ -149,6 +149,8 @@ export const address = {
       blockIdDesc: 'Enter block height or block hash',
       callMethods: 'Call Methods',
       change: 'Change',
+      clearSearch: 'Clear search',
+      collapseAll: 'Collapse all',
       deposit: 'Deposit (NEAR)',
       error: 'Error',
       execMode: 'Execution mode',
@@ -166,8 +168,8 @@ export const address = {
       hasSchemaMode:
         'Auto-selected based on schema. You can override if needed.',
       method: 'Method',
+      methodCount: '{{count}} methods',
       methodEmpty: 'No methods found.',
-      methodPlaceholder: 'Select a method',
       methodSearch: 'Search methods...',
       noSchemaArgs: 'Specify an arguments JSON schema',
       noSchemaMode:

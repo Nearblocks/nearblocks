@@ -1,37 +1,39 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { RiCloseLine } from '@remixicon/react';
+import { useMemo, useState } from 'react';
 
-import { action } from '@/actions/contract';
-import { CodeBlock } from '@/components/code-block';
-import { Copy } from '@/components/copy';
 import { useLocale } from '@/hooks/use-locale';
-import { useViewMutation } from '@/hooks/use-rpc';
-import { useWallet } from '@/hooks/use-wallet';
-import {
-  generateSampleArgs,
-  generateSampleValueFromData,
-} from '@/lib/contract';
-import { toGas, toYocto } from '@/lib/format';
-import { FormData, formSchema } from '@/lib/schema/contract';
-import { zodResolver } from '@/lib/zod';
 import { ContractAbiSchema, ContractSchemaFunction } from '@/types/types';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/ui/accordion';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
-import { Field, FieldGroup } from '@/ui/field';
-import { Label } from '@/ui/label';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/ui/input-group';
+import { Skeleton } from '@/ui/skeleton';
 
-import { Arguments } from './arguments';
 import { Info } from './info';
-import { MethodSelector } from './method';
-import { ExecutionMode } from './mode';
-import { ChangeOptions, ViewOptions } from './options';
+import { MethodPanel } from './panel';
 
 export type Props = {
   loading?: boolean;
   methods?: string[];
   schema?: ContractAbiSchema;
+};
+
+type Entry = {
+  func?: ContractSchemaFunction;
+  kind: 'call' | 'unknown' | 'view';
+  name: string;
 };
 
 export const MethodsForm = ({
@@ -40,257 +42,161 @@ export const MethodsForm = ({
   schema,
 }: Props) => {
   const { t } = useLocale('address');
-  const { address } = useParams();
-  const wallet = useWallet((s) => s.wallet);
-  const connector = useWallet((s) => s.connector);
-  const [result, setResult] = useState<null | string>(null);
-  const [error, setError] = useState<null | string>(null);
-  const [isFetchingArgs, setIsFetchingArgs] = useState(false);
-  const { trigger: triggerViewFunction } = useViewMutation();
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState<string[]>([]);
 
   const hasSchema = !!schema;
 
-  const functions = useMemo(() => {
-    return schema?.body.functions ?? [];
-  }, [schema]);
+  const entries = useMemo<Entry[]>(() => {
+    if (schema) {
+      return schema.body.functions
+        .toSorted((a, b) => a.name.localeCompare(b.name))
+        .map((func) => ({ func, kind: func.kind, name: func.name }));
+    }
 
-  const groupedMethods = useMemo(() => {
-    const viewMethods = functions
-      .filter((f) => f.kind === 'view')
-      .map((f) => f.name)
-      .toSorted((a, b) => a.localeCompare(b));
+    return methods
+      .toSorted((a, b) => a.localeCompare(b))
+      .map((name) => ({ kind: 'unknown' as const, name }));
+  }, [methods, schema]);
 
-    const callMethods = functions
-      .filter((f) => f.kind === 'call')
-      .map((f) => f.name)
-      .toSorted((a, b) => a.localeCompare(b));
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return entries;
+    return entries.filter((entry) => entry.name.toLowerCase().includes(q));
+  }, [entries, query]);
 
-    const groups: { items: string[]; value: string }[] = [];
+  const groups = useMemo(() => {
+    if (!hasSchema) {
+      return [{ items: filtered, value: null }];
+    }
 
-    if (viewMethods.length > 0) {
-      groups.push({
-        items: viewMethods,
+    const viewItems = filtered.filter((entry) => entry.kind === 'view');
+    const callItems = filtered.filter((entry) => entry.kind === 'call');
+
+    const result: { items: Entry[]; value: null | string }[] = [];
+    if (viewItems.length > 0) {
+      result.push({
+        items: viewItems,
         value: t('contract.methods.viewMethods'),
       });
     }
-    if (callMethods.length > 0) {
-      groups.push({
-        items: callMethods,
+    if (callItems.length > 0) {
+      result.push({
+        items: callItems,
         value: t('contract.methods.callMethods'),
       });
     }
+    return result;
+  }, [filtered, hasSchema, t]);
 
-    return groups;
-  }, [functions, t]);
-
-  const methodsMap = useMemo(() => {
-    const map = new Map<string, ContractSchemaFunction>();
-    for (const func of functions) {
-      map.set(func.name, func);
-    }
-    return map;
-  }, [functions]);
-
-  const {
-    control,
-    formState: { errors, isSubmitting },
-    handleSubmit,
-    register,
-    setValue,
-    trigger,
-    watch,
-  } = useForm<FormData>({
-    defaultValues: {
-      args: '{}',
-      blockId: '',
-      blockRef: 'finality',
-      deposit: '0',
-      finality: 'final',
-      gas: '30',
-      method: '',
-      mode: 'view',
-    },
-    mode: 'onBlur',
-    resolver: zodResolver(formSchema),
-    reValidateMode: 'onBlur',
-  });
-
-  const mode = watch('mode');
-  const blockRef = watch('blockRef');
-  const selectedMethod = watch('method');
-  const selectedFunc = selectedMethod ? methodsMap.get(selectedMethod) : null;
-
-  useEffect(() => {
-    const subscription = watch(() => {
-      setResult(null);
-      setError(null);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  useEffect(() => {
-    if (selectedFunc) {
-      setValue('mode', selectedFunc.kind === 'view' ? 'view' : 'change');
-      setValue('args', generateSampleArgs(selectedFunc));
-    }
-  }, [selectedFunc, setValue]);
-
-  const handleFetchArgs = async () => {
-    if (!address || !selectedMethod) return;
-
-    setIsFetchingArgs(true);
-    try {
-      const response = await action(address as string, selectedMethod);
-      if (response?.args) {
-        const argsData = response.args as {
-          args_base64?: null | string;
-          args_json?: unknown;
-        };
-
-        if (argsData.args_json) {
-          const sampleArgs = generateSampleValueFromData(argsData.args_json);
-          setValue('args', JSON.stringify(sampleArgs, null, 2));
-        } else {
-          setValue('args', '{}');
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch arguments:', err);
-    } finally {
-      setIsFetchingArgs(false);
-    }
-  };
-
-  const onSubmit = async (data: FormData): Promise<void> => {
-    setResult(null);
-    setError(null);
-
-    if (!address) return;
-
-    try {
-      if (data.mode === 'change') {
-        if (!wallet) {
-          await connector?.connect();
-          return;
-        }
-        const response = await wallet.signAndSendTransaction({
-          actions: [
-            {
-              params: {
-                args: JSON.parse(data.args || '{}'),
-                deposit: toYocto(data.deposit ?? '0'),
-                gas: toGas(data.gas),
-                methodName: data.method,
-              },
-              type: 'FunctionCall',
-            },
-          ],
-          receiverId: address as string,
-        });
-        setResult(JSON.stringify(response, null, 2));
-      } else {
-        let blockId: number | string | undefined;
-        if (data.blockRef === 'blockId' && data.blockId?.trim()) {
-          const trimmed = data.blockId.trim();
-          const parsed = Number(trimmed);
-          blockId =
-            !isNaN(parsed) && Number.isInteger(parsed) ? parsed : trimmed;
-        }
-
-        const response = await triggerViewFunction({
-          args: JSON.parse(data.args || '{}'),
-          blockId,
-          contract: address as string,
-          finality: data.blockRef === 'finality' ? data.finality : undefined,
-          method: data.method,
-        });
-        setResult(JSON.stringify(response, null, 2));
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'An unknown error occurred',
-      );
-    }
-  };
+  if (loading) {
+    return (
+      <>
+        <Info hasSchema={false} loading />
+        <div className="border-border overflow-hidden rounded-lg border">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              className="flex h-10 items-center border-b px-3 last:border-b-0"
+              key={i}
+            >
+              <Skeleton className="w-full" />
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
-      <Info hasSchema={hasSchema} loading={loading} />
-      <form
-        className="pt-3 pb-5 md:rounded-lg md:border md:px-4"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <FieldGroup className="w-full max-w-lg gap-5">
-          <MethodSelector
-            control={control}
-            errors={errors}
-            groupedMethods={groupedMethods}
-            hasSchema={hasSchema}
-            loading={loading ?? false}
-            methods={methods}
-            onMethodChange={(value) => {
-              if (value) {
-                trigger('method');
-              }
-            }}
+      <Info hasSchema={hasSchema} loading={false} />
+      <div className="mb-3 flex items-center gap-3">
+        <InputGroup className="max-w-xs">
+          <InputGroupInput
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('contract.methods.methodSearch')}
+            value={query}
           />
-          <ExecutionMode control={control} hasSchema={hasSchema} />
-          <Arguments
-            control={control}
-            errors={errors}
-            hasSchema={hasSchema}
-            isFetchingArgs={isFetchingArgs}
-            mode={mode}
-            onFetchArgs={handleFetchArgs}
-            selectedMethod={selectedMethod}
-          />
-          {mode === 'view' && (
-            <ViewOptions
-              blockRef={blockRef}
-              control={control}
-              errors={errors}
-              register={register}
-            />
+          {query && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                aria-label={t('contract.methods.clearSearch')}
+                className="rounded-md"
+                onClick={() => setQuery('')}
+                size="icon-xs"
+              >
+                <RiCloseLine className="size-3.5" />
+              </InputGroupButton>
+            </InputGroupAddon>
           )}
-          {mode === 'change' && (
-            <ChangeOptions errors={errors} register={register} />
-          )}
-          <Field orientation="horizontal">
-            <Button
-              className="w-full"
-              disabled={isSubmitting}
-              type="submit"
-              variant="secondary"
+        </InputGroup>
+        <span className="text-muted-foreground text-body-xs">
+          {t('contract.methods.methodCount', { count: entries.length })}
+        </span>
+        {open.length > 0 && (
+          <Button
+            className="ml-auto"
+            onClick={() => setOpen([])}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            {t('contract.methods.collapseAll')}
+          </Button>
+        )}
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="text-muted-foreground text-body-sm py-6 text-center">
+          {t('contract.methods.methodEmpty')}
+        </p>
+      )}
+
+      <div className="space-y-5">
+        {groups.map((group) => (
+          <div key={group.value ?? 'all'}>
+            {group.value && (
+              <h3 className="text-muted-foreground text-body-xs mb-2 ml-1 font-medium">
+                {group.value}
+              </h3>
+            )}
+            <Accordion
+              className="border-border overflow-hidden rounded-lg border"
+              onValueChange={setOpen}
+              type="multiple"
+              value={open}
             >
-              {mode === 'change'
-                ? t('contract.methods.write')
-                : t('contract.methods.read')}
-            </Button>
-          </Field>
-          {result && (
-            <Field>
-              <div className="flex items-center justify-between">
-                <Label>{t('contract.methods.response')}</Label>
-                <Copy size="sm" text={result} />
-              </div>
-              <div className="scroll-overlay max-h-116 overflow-auto">
-                <CodeBlock code={result} language="json" lineNumbers />
-              </div>
-            </Field>
-          )}
-          {error && (
-            <Field>
-              <div className="flex items-center justify-between">
-                <Label>{t('contract.methods.error')}</Label>
-                <Copy size="sm" text={error} />
-              </div>
-              <div className="bg-red-background text-red-foreground text-body-xs scroll-overlay max-h-40 overflow-y-auto rounded-lg border p-3">
-                {error}
-              </div>
-            </Field>
-          )}
-        </FieldGroup>
-      </form>
+              {group.items.map((entry) => (
+                <AccordionItem
+                  className="rounded-none border-0 border-b last:border-b-0"
+                  key={entry.name}
+                  value={entry.name}
+                >
+                  <AccordionTrigger className="hover:bg-muted/50 data-[state=open]:bg-muted/50 h-10 items-center rounded-none px-3 py-0 hover:no-underline [&>svg]:translate-y-0">
+                    <span className="font-mono">{entry.name}</span>
+                    {entry.kind !== 'unknown' && (
+                      <Badge
+                        className="ml-auto"
+                        variant={entry.kind === 'view' ? 'teal' : 'amber'}
+                      >
+                        {entry.kind}
+                      </Badge>
+                    )}
+                  </AccordionTrigger>
+                  <AccordionContent className="border-border border-t px-3 pt-3">
+                    <MethodPanel
+                      func={entry.func}
+                      hasSchema={hasSchema}
+                      kind={entry.kind}
+                      name={entry.name}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        ))}
+      </div>
     </>
   );
 };

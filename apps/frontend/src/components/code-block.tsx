@@ -87,7 +87,7 @@ export const CodeBlock = ({
         <tbody>
           {lines.map((line, i) => (
             <tr key={i}>
-              <td className="text-muted-foreground/50 sticky left-0 w-px bg-(--prism-bg) pr-3 pl-4 text-right align-top select-none">
+              <td className="text-muted-foreground/50 sticky left-0 w-px bg-(--prism-bg) pr-2 pl-3 text-right align-top whitespace-nowrap select-none">
                 {i + 1}
               </td>
               <td
