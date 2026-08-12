@@ -20,7 +20,6 @@ import { tvlDayHeight, tvlTokensDiscovered } from '#libs/prom';
 import {
   balanceSyncKey,
   DAY_MS,
-  errorHandler,
   getSyncedValue,
   retry,
   todayUtc,
@@ -387,14 +386,10 @@ export const processSource = async (source: Source) => {
   let startBlock: number | undefined;
 
   while (true) {
-    try {
-      startBlock ??= await resolveStartBlock(source, url);
-      await bootstrapNativeToken(source, startBlock);
-      await discoverTokens(source, url, startBlock);
-      await snapshotDays(source, url, startBlock);
-    } catch (error) {
-      errorHandler(error);
-    }
+    startBlock ??= await resolveStartBlock(source, url);
+    await bootstrapNativeToken(source, startBlock);
+    await discoverTokens(source, url, startBlock);
+    await snapshotDays(source, url, startBlock);
 
     await sleep(config.intervalMs);
   }
