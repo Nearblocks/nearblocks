@@ -5,12 +5,7 @@ import { sleep } from 'nb-utils';
 
 import config from '#config';
 import { db } from '#libs/knex';
-import {
-  balanceSyncKey,
-  DAY_MS,
-  errorHandler,
-  getSyncedValue,
-} from '#libs/utils';
+import { balanceSyncKey, DAY_MS, getSyncedValue } from '#libs/utils';
 import { Source } from '#types/types';
 
 const DAY_NS = 86_400_000_000_000n;
@@ -77,7 +72,7 @@ const discoverTokens = async (
         m.symbol,
         m.decimals,
         m.coingecko_id,
-        ?
+        ?::BIGINT
       FROM
         ft_events e
         LEFT JOIN ft_meta m ON m.contract = e.contract_account_id
@@ -209,12 +204,7 @@ export const processSource = async (source: Source) => {
   }
 
   while (true) {
-    try {
-      await sync(source);
-    } catch (error) {
-      errorHandler(error);
-    }
-
+    await sync(source);
     await sleep(config.intervalMs);
   }
 };
