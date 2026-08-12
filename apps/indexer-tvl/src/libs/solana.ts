@@ -5,10 +5,16 @@ import {
   SolanaRpcRequest,
   SolanaRpcResponse,
   SolanaSignatureInfo,
+  SolanaTokenAccount,
   SolanaTransaction,
 } from '#types/types';
 
 const ERROR_CODES = new Set([-32001, -32007, -32009]); // slot skipped / not available
+
+const TOKEN_PROGRAMS = [
+  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb',
+];
 
 export const rpcCall = async <T>(
   url: string,
@@ -61,15 +67,50 @@ export const rpcCall = async <T>(
 export const getSignaturesForAddress = async (
   url: string,
   address: string,
-  options: { before?: string; limit: number },
+  options: { before?: string; limit: number; until?: string },
 ): Promise<SolanaSignatureInfo[]> => {
   return rpcCall<SolanaSignatureInfo[]>(url, 'getSignaturesForAddress', [
     address,
     {
       before: options.before,
       limit: options.limit,
+      until: options.until,
     },
   ]);
+};
+
+type TokenAccountsResponse = {
+  value: {
+    account: {
+      data: {
+        parsed: { info: { mint: string; tokenAmount: { decimals: number } } };
+      };
+    };
+    pubkey: string;
+  }[];
+};
+
+export const getTokenAccountsByOwner = async (
+  url: string,
+  owner: string,
+): Promise<SolanaTokenAccount[]> => {
+  const results = await Promise.all(
+    TOKEN_PROGRAMS.map((programId) =>
+      rpcCall<TokenAccountsResponse>(url, 'getTokenAccountsByOwner', [
+        owner,
+        { programId },
+        { encoding: 'jsonParsed' },
+      ]),
+    ),
+  );
+
+  return results.flatMap((r) =>
+    r.value.map((entry) => ({
+      decimals: entry.account.data.parsed.info.tokenAmount.decimals,
+      mint: entry.account.data.parsed.info.mint,
+      pubkey: entry.pubkey,
+    })),
+  );
 };
 
 export const getTransaction = async (

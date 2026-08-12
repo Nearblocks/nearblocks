@@ -22,7 +22,7 @@ const env = cleanEnv(process.env, {
   SOLANA_ARCHIVE_RPC_URL: str(),
 });
 
-const CHUNK_BLOCKS = 2_000;
+const CHUNK_BLOCKS = 10_000;
 const CHUNK_DELAY_MS = 3_000;
 
 const config: Config = {
@@ -60,9 +60,9 @@ const config: Config = {
   intervalMs: 60_000,
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,
-  snapshotDayDelayMs: 3000,
-  solanaPageDelayMs: 1000,
-  solanaTxDelayMs: 1500,
+  snapshotDayDelayMs: 3_000,
+  solanaPageDelayMs: 1_000,
+  solanaTxDelayMs: 1_500,
   solanaUrl: env.SOLANA_ARCHIVE_RPC_URL,
 };
 

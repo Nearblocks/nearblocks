@@ -17,6 +17,7 @@ export const getDayBlock = async (
   chain: string,
   url: string,
   dateMs: bigint,
+  startBlock = 0,
 ): Promise<null | number> => {
   const cached = await db('tvl_daily_blocks')
     .where({ chain, date: dateMs.toString() })
@@ -32,6 +33,13 @@ export const getDayBlock = async (
   if (tipTs === null || tipTs < targetSec) return null; // chain hasn't reached this day yet
 
   let lo = 0;
+
+  if (startBlock > 0) {
+    const startTs = await headerTimestampSec(url, startBlock);
+
+    if (startTs !== null && startTs <= targetSec) lo = startBlock;
+  }
+
   let hi = tip;
 
   while (lo < hi) {

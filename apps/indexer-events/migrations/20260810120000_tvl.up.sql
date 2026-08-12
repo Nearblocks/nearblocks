@@ -3,6 +3,7 @@ CREATE TABLE tvl_sources (
   chain TEXT NOT NULL,
   address TEXT NOT NULL,
   start_block BIGINT,
+  authority TEXT,
   PRIMARY KEY (protocol, chain)
 );
 
@@ -15,6 +16,8 @@ CREATE TABLE tvl_tokens (
   coingecko_id TEXT,
   first_seen_block BIGINT,
   first_seen_date BIGINT,
+  cg_checked_at BIGINT,
+  cg_attempts INT NOT NULL DEFAULT 0,
   PRIMARY KEY (protocol, chain, token)
 );
 
@@ -73,38 +76,71 @@ CREATE TABLE tvl_daily_blocks (
   PRIMARY KEY (chain, date)
 );
 
+CREATE TABLE tvl_solana_accounts (
+  protocol TEXT NOT NULL,
+  chain TEXT NOT NULL,
+  ata TEXT NOT NULL,
+  mint TEXT NOT NULL,
+  decimals INT NOT NULL,
+  scan_before TEXT,
+  scan_complete BOOLEAN NOT NULL DEFAULT FALSE,
+  newest_signature TEXT,
+  PRIMARY KEY (protocol, chain, ata)
+);
+
+CREATE TABLE tvl_solana_day_tx (
+  protocol TEXT NOT NULL,
+  chain TEXT NOT NULL,
+  ata TEXT NOT NULL,
+  date BIGINT NOT NULL,
+  signature TEXT NOT NULL,
+  amount NUMERIC(40, 0),
+  resolved BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (protocol, chain, ata, date)
+);
+
+CREATE INDEX tvl_solana_day_tx_pending_idx ON tvl_solana_day_tx (protocol, chain, date)
+WHERE
+  resolved = FALSE;
+
 INSERT INTO
-  tvl_sources (protocol, chain, address)
+  tvl_sources (protocol, chain, address, authority)
 VALUES
   (
     'omni-bridge',
     'ethereum',
-    '0xe00c629afaccb0510995a2b95560e446a24c85b9'
+    '0xe00c629afaccb0510995a2b95560e446a24c85b9',
+    NULL
   ),
   (
     'omni-bridge',
     'arbitrum',
-    '0xd025b38762b4a4e36f0cde483b86cb13ea00d989'
+    '0xd025b38762b4a4e36f0cde483b86cb13ea00d989',
+    NULL
   ),
   (
     'omni-bridge',
     'base',
-    '0xd025b38762b4a4e36f0cde483b86cb13ea00d989'
+    '0xd025b38762b4a4e36f0cde483b86cb13ea00d989',
+    NULL
   ),
   (
     'omni-bridge',
     'polygon',
-    '0xd025b38762b4a4e36f0cde483b86cb13ea00d989'
+    '0xd025b38762b4a4e36f0cde483b86cb13ea00d989',
+    NULL
   ),
   (
     'omni-bridge',
     'bsc',
-    '0x073c8a225c8cf9d3f9157f5c1a1dbe02407f5720'
+    '0x073c8a225c8cf9d3f9157f5c1a1dbe02407f5720',
+    NULL
   ),
-  ('omni-bridge', 'near', 'omni.bridge.near'),
+  ('omni-bridge', 'near', 'omni.bridge.near', NULL),
   (
     'omni-bridge',
     'solana',
-    'dahPEoZGXfyV58JqqH85okdHmpN8U2q8owgPUXSCPxe'
+    'dahPEoZGXfyV58JqqH85okdHmpN8U2q8owgPUXSCPxe',
+    'FvULawNPGBbuwYus74ECaQoV1oH9Tk6XPN7VPN51NYds'
   )
 ON CONFLICT (protocol, chain) DO NOTHING;
