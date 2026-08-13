@@ -16,7 +16,7 @@ const env = cleanEnv(process.env, {
   SENTRY_DSN: str({ default: '' }),
 });
 
-const startHeight = env.NETWORK === Network.MAINNET ? 185_429_400 : 225_030_600;
+const startHeight = env.NETWORK === Network.MAINNET ? 146_051_440 : 192_898_203;
 const stopHeight = env.NETWORK === Network.MAINNET ? 206_240_000 : 258_460_000;
 
 const config: Config = {
@@ -26,7 +26,7 @@ const config: Config = {
   dbUrl: env.DATABASE_URL,
   endBlockHeight: stopHeight,
   fastnearApiKey: env.FASTNEAR_API_KEY,
-  indexerKey: 'contracts_deterministic',
+  indexerKey: 'contracts_global',
   network: env.NETWORK,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: startHeight,

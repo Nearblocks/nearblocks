@@ -1,5 +1,3 @@
-import { base58 } from '@scure/base';
-
 import { Knex } from 'nb-knex';
 import {
   BlockHeader,
@@ -11,7 +9,10 @@ import {
 import { ContractCodeEvent, ContractEventType } from 'nb-types';
 import { retry } from 'nb-utils';
 
-import { isDeterministicStateInitAction } from '#libs/guards';
+import {
+  isUseGlobalContractAction,
+  isUseGlobalContractByAccountIdAction,
+} from '#libs/guards';
 
 type ContractEvents = {
   code: ContractCodeEvent[];
@@ -54,13 +55,7 @@ const getReceiptChanges = (
       outcome.receipt.receipt.Action.actions.length
     ) {
       for (const action of outcome.receipt.receipt.Action.actions) {
-        if (isDeterministicStateInitAction(action)) {
-          const identifier = getGlobalContractIdentifier(
-            action.DeterministicStateInit.code,
-          );
-
-          if (!identifier) continue;
-
+        if (isUseGlobalContractAction(action)) {
           result.code.push({
             block_height: block.height,
             block_timestamp: block.timestampNanosec,
@@ -68,8 +63,22 @@ const getReceiptChanges = (
             code_hash: null,
             contract_account_id: outcome.receipt.receiverId,
             event_type: ContractEventType.UPDATE,
-            global_account_id: identifier.accountId,
-            global_code_hash: identifier.codeHash,
+            global_account_id: null,
+            global_code_hash: action.UseGlobalContract.codeHash,
+            index_in_chunk: 0, // placeholder; actual value will be set later
+            receipt_id: receiptId,
+            shard_id: 0, // placeholder; actual value will be set later
+          });
+        } else if (isUseGlobalContractByAccountIdAction(action)) {
+          result.code.push({
+            block_height: block.height,
+            block_timestamp: block.timestampNanosec,
+            code_base64: null,
+            code_hash: null,
+            contract_account_id: outcome.receipt.receiverId,
+            event_type: ContractEventType.UPDATE,
+            global_account_id: action.UseGlobalContractByAccountId.accountId,
+            global_code_hash: null,
             index_in_chunk: 0, // placeholder; actual value will be set later
             receipt_id: receiptId,
             shard_id: 0, // placeholder; actual value will be set later
@@ -82,34 +91,7 @@ const getReceiptChanges = (
   return result;
 };
 
-// Global contract identifier from DeterministicStateInit action
-const getGlobalContractIdentifier = (
-  code: { accountId: string } | { hash: string } | string,
-): { accountId: null | string; codeHash: null | string } | null => {
-  if (typeof code === 'string') {
-    try {
-      if (base58.decode(code).length === 32) {
-        return { accountId: null, codeHash: code };
-      }
-    } catch {
-      // not base58, treat as account id
-    }
-
-    return { accountId: code, codeHash: null };
-  }
-
-  if ('hash' in code) {
-    return { accountId: null, codeHash: code.hash };
-  }
-
-  if ('accountId' in code) {
-    return { accountId: code.accountId, codeHash: null };
-  }
-
-  return null;
-};
-
-const INDEX_IN_CHUNK_OFFSET = 100;
+const INDEX_IN_CHUNK_OFFSET = 50;
 
 const insertCodeChanges = async (
   knex: Knex,
