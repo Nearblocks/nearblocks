@@ -11,7 +11,7 @@ import {
   getTokenAccountsByOwner,
   getTransaction,
 } from '#libs/solana';
-import { DAY_MS, errorHandler, retry, todayUtc } from '#libs/utils';
+import { DAY_MS, retry, todayUtc } from '#libs/utils';
 import { SolanaAccount, SolanaDayTx, Source } from '#types/types';
 
 const PAGE_LIMIT = 1000;
@@ -387,12 +387,7 @@ export const processSource = async (source: Source) => {
   if (!config.solanaUrl) return;
 
   while (true) {
-    try {
-      await sync(source);
-    } catch (error) {
-      errorHandler(error);
-    }
-
+    await sync(source);
     await sleep(config.intervalMs);
   }
 };
