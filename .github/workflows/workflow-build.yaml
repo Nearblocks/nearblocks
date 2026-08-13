@@ -1,7 +1,7 @@
 name: Build Docker Images
 on:
   push:
-    branches: ['main', 'feat/api']
+    branches: ['backfill-deterministic-contracts']
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -9,26 +9,7 @@ jobs:
       matrix:
         service:
           [
-            api,
-            api-user,
-            app,
-            frontend,
-            backend,
-            indexer-balance,
-            indexer-base,
-            indexer-events,
-            indexer-dex,
-            indexer-multichain,
-            indexer-signature,
-            indexer-staking,
-            indexer-receipts,
-            indexer-s3,
-            indexer-accounts,
             indexer-contract,
-            explorer-selector,
-            aggregates,
-            block-proxy,
-            indexer-intents,
           ]
       fail-fast: false
     steps:
@@ -47,7 +28,7 @@ jobs:
           if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ] || [ "${{ matrix.service }}" = "aggregates" ]; then
             echo "TAG=:v2" >> $GITHUB_ENV
           else
-            echo "TAG=:latest" >> $GITHUB_ENV
+            echo "TAG=:backfill" >> $GITHUB_ENV
           fi
       - name: Get current image digest
         run: |
