@@ -50,7 +50,7 @@ const bearerVerify: VerifyFunction = async (token, done) => {
         `api_key:${token}`,
         JSON.stringify(user),
         'EX',
-        86400,
+        300, // 5m — short TTL so key changes converge fast; invalidated on mutation
       );
 
       return done(null, user);
