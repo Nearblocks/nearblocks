@@ -244,10 +244,17 @@ const action = responseHandler(
     const account = req.validator.account;
     const method = req.validator.method;
 
-    const data = await dbBase.oneOrNone<Contract>(sql.contracts.action, {
-      account,
-      method,
-    });
+    const data = await rollingWindow(
+      (start, end) => {
+        return dbBase.oneOrNone<Contract>(sql.contracts.action, {
+          account,
+          end,
+          method,
+          start,
+        });
+      },
+      { start: config.baseStart },
+    );
 
     return { data };
   },

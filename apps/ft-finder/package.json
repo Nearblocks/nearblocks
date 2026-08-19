@@ -1,0 +1,34 @@
+{
+  "name": "ft-finder",
+  "version": "0.1.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc",
+    "lint": "tsc --noEmit && eslint ./ --fix",
+    "lint:check": "tsc --noEmit && eslint ./"
+  },
+  "dependencies": {
+    "@sentry/node": "7.120.0",
+    "envalid": "8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "~22.10",
+    "eslint-config-custom-node": "*",
+    "nb-knex": "*",
+    "nb-logger": "*",
+    "nb-near": "*",
+    "nb-tsconfig": "*",
+    "nb-types": "*",
+    "nb-utils": "*",
+    "rimraf": "~6.0",
+    "typescript": "~5.2"
+  }
+}

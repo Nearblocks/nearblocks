@@ -5,6 +5,8 @@ FROM
 WHERE
   receipt_receiver_account_id = ${account}
   AND method = ${method}
+  AND receipt_included_in_block_timestamp >= ${start} -- rolling window start
+  AND receipt_included_in_block_timestamp <= ${end} -- rolling window end
 ORDER BY
   receipt_included_in_block_timestamp DESC,
   shard_id DESC,

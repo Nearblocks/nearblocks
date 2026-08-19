@@ -63,6 +63,24 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     env_file: testnet.indexer.env
+  indexer-ft-state:
+    container_name: testnet-indexer-ft-state
+    build:
+      context: .
+      dockerfile: ./apps/indexer-ft-state/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: testnet.indexer.env
+  ft-finder:
+    container_name: testnet-ft-finder
+    build:
+      context: .
+      dockerfile: ./apps/ft-finder/Dockerfile
+    restart: 'no'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: testnet.indexer.env
 
 volumes:
   redis-data:

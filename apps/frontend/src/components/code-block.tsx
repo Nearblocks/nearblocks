@@ -93,7 +93,9 @@ export const CodeBlock = ({
               <td
                 className={cn(
                   'pr-4',
-                  wrap ? 'break-words whitespace-pre-wrap' : 'whitespace-pre',
+                  wrap
+                    ? 'wrap-break-word whitespace-pre-wrap'
+                    : 'whitespace-pre',
                 )}
               >
                 <code
@@ -112,7 +114,7 @@ export const CodeBlock = ({
     <pre
       className={cn(
         'prism-code text-body-sm m-0 px-4 py-2 leading-relaxed',
-        wrap ? 'break-words whitespace-pre-wrap' : 'whitespace-pre',
+        wrap ? 'wrap-break-word whitespace-pre-wrap' : 'whitespace-pre',
         className,
       )}
     >
@@ -120,7 +122,7 @@ export const CodeBlock = ({
         <code
           className={cn(
             'text-body-sm block',
-            wrap ? 'break-words whitespace-pre-wrap' : 'whitespace-pre',
+            wrap ? 'wrap-break-word whitespace-pre-wrap' : 'whitespace-pre',
           )}
           dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }}
           key={i}

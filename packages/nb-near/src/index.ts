@@ -57,11 +57,11 @@ export class RPC {
     });
   }
 
-  async viewState(accountId: string, blockId: number | string) {
+  async viewState(accountId: string, blockId: number | string, prefix = '') {
     return this.query({
       account_id: accountId,
       block_id: blockId,
-      prefix_base64: '',
+      prefix_base64: prefix,
       request_type: 'view_state',
     });
   }
