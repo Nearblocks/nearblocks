@@ -30,10 +30,13 @@ export interface TTables {
   errored_contracts: ErroredContracts;
   execution_outcome_receipts: ExecutionOutcomeReceipt;
   execution_outcomes: ExecutionOutcome;
+  ft_contract_layouts: FTContractLayout;
   ft_events: FTEvent;
   ft_meta: FTMeta;
   ft_prices: PriceHistory;
   ft_prices_daily: PriceHistory;
+  ft_state_balances: FTStateBalance;
+  ft_state_holders: FTStateHolder;
   mpc_derived_keys: MpcDerivedKey;
   multichain_signatures: MultichainSignature;
   multichain_transactions: MultichainTransaction;
@@ -285,6 +288,52 @@ export type PriceHistory = {
   date: string;
   price: string;
   source: string;
+};
+
+export type FTStateBalance = {
+  affected_account_id: string;
+  amount: string;
+  block_height: number;
+  block_timestamp: string;
+  contract_account_id: string;
+  index_in_chunk: number;
+  receipt_id: null | string;
+  shard_id: number;
+};
+
+export type FTContractLayoutStatus =
+  | 'pending'
+  | 'rejected'
+  | 'unsupported'
+  | 'verified';
+
+export type FTKeyEncoding = 'borsh' | 'index';
+
+export type FTValueEncoding = 'json' | 'u128le';
+
+export type FTContractLayout = {
+  account_offset: null | number;
+  account_path: null | string;
+  code_hash: null | string;
+  contract: string;
+  discovered_at_height: null | number;
+  key_encoding: FTKeyEncoding | null;
+  key_prefix: Buffer | null;
+  note: null | string;
+  observations: number;
+  probed_at: null | number;
+  status: FTContractLayoutStatus;
+  value_encoding: FTValueEncoding | null;
+  value_offset: null | number;
+  value_path: null | string;
+  verified_at_height: null | number;
+};
+
+export type FTStateHolder = {
+  account: string;
+  amount: string;
+  block_height: number;
+  contract: string;
 };
 
 export type IntentsMeta = {

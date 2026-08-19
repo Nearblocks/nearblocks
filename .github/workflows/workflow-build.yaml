@@ -30,6 +30,7 @@ jobs:
             block-proxy,
             indexer-intents,
             indexer-tvl,
+            ft-finder,
           ]
       fail-fast: false
     steps:
