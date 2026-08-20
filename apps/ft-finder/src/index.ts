@@ -133,9 +133,7 @@ const run = async (): Promise<void> => {
     );
 
     for (const family of families) {
-      const cached = family.codeHash
-        ? resolvedByHash.get(family.codeHash)
-        : undefined;
+      const cached = resolvedByHash.get(family.codeHash);
 
       if (cached) {
         await write(family, cached);
@@ -149,7 +147,7 @@ const run = async (): Promise<void> => {
         family.blockHeight,
       );
 
-      if (family.codeHash && isDecisive(resolution)) {
+      if (isDecisive(resolution)) {
         resolvedByHash.set(family.codeHash, resolution);
       }
 

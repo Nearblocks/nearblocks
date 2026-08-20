@@ -19,7 +19,7 @@ export type Config = {
 
 export type CodeHashFamily = {
   blockHeight: number;
-  codeHash: null | string;
+  codeHash: string;
   contracts: string[];
 };
 

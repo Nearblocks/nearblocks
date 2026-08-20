@@ -108,9 +108,11 @@ export const persistFamily = async (
   }
 
   logger.info(
-    `${family.codeHash ?? 'no code_hash'}: ${
-      family.contracts.length
-    } contracts ${status}`,
+    `${family.contracts[0]}: ${status}` +
+      (family.contracts.length > 1
+        ? ` +${family.contracts.length - 1} more`
+        : '') +
+      (family.codeHash ? ` (code_hash ${family.codeHash})` : ''),
   );
 
   return status;
