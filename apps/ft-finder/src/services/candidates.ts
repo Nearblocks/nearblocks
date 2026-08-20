@@ -6,16 +6,9 @@ import { dbBase } from '#libs/knex';
 import { chunks, getSyncedValue, iso, updateSyncedValue } from '#libs/utils';
 import { CandidateBatch } from '#types/types';
 
-const FT_METHODS = [
-  'ft_transfer',
-  'ft_transfer_call',
-  'ft_resolve_transfer',
-  'storage_deposit',
-];
+const DISCOVERY_METHODS = ['storage_deposit', 'ft_resolve_transfer'];
 
 const PROBE_METHODS = ['ft_transfer', 'ft_transfer_call'];
-
-const PROBE_METHOD_PLACEHOLDERS = PROBE_METHODS.map(() => '?').join(', ');
 
 const SUCCESS_STATUSES = [
   ExecutionOutcomeStatus.SUCCESS_VALUE,
@@ -58,6 +51,46 @@ const succeededReceipts = async (
   return succeeded;
 };
 
+type Receipt = { contract: string; receipt_id: string; timestamp: string };
+
+const latestByContract = (
+  methods: string[],
+  start: bigint,
+  end: bigint,
+  contracts?: string[],
+) =>
+  dbBase('action_receipt_actions')
+    .distinctOn('receipt_receiver_account_id')
+    .whereIn('method', methods)
+    .where('receipt_included_in_block_timestamp', '>=', start.toString())
+    .where('receipt_included_in_block_timestamp', '<', end.toString())
+    .modify((builder) => {
+      if (contracts) builder.whereIn('receipt_receiver_account_id', contracts);
+    })
+    .orderBy('receipt_receiver_account_id')
+    .orderBy('receipt_included_in_block_timestamp', 'desc')
+    .select<Receipt[]>(
+      'receipt_receiver_account_id as contract',
+      'receipt_included_in_block_timestamp as timestamp',
+      'receipt_id',
+    );
+
+const probeReceipts = async (
+  contracts: string[],
+  start: bigint,
+  end: bigint,
+): Promise<Map<string, Receipt>> => {
+  const probes = new Map<string, Receipt>();
+
+  for (const batch of chunks(contracts, CHUNK)) {
+    const rows = await latestByContract(PROBE_METHODS, start, end, batch);
+
+    for (const row of rows) probes.set(row.contract, row);
+  }
+
+  return probes;
+};
+
 export const iterateCandidateBatches =
   async function* (): AsyncGenerator<CandidateBatch> {
     const nowNs = BigInt(Date.now()) * 1_000_000n;
@@ -71,20 +104,17 @@ export const iterateCandidateBatches =
       const end = start + bucketNs;
       const label = iso(start).slice(0, config.bucketHours < 24 ? 13 : 10);
 
-      const rows = await dbBase('action_receipt_actions')
-        .distinctOn('receipt_receiver_account_id')
-        .whereIn('method', FT_METHODS)
-        .where('receipt_included_in_block_timestamp', '>=', start.toString())
-        .where('receipt_included_in_block_timestamp', '<', end.toString())
-        .orderByRaw(
-          `receipt_receiver_account_id, (method in (${PROBE_METHOD_PLACEHOLDERS})) desc, receipt_included_in_block_timestamp desc`,
-          PROBE_METHODS,
-        )
-        .select<{ contract: string; receipt_id: string; timestamp: string }[]>(
-          'receipt_receiver_account_id as contract',
-          'receipt_included_in_block_timestamp as timestamp',
-          'receipt_id',
-        );
+      const discovered = await latestByContract(DISCOVERY_METHODS, start, end);
+
+      const probes = discovered.length
+        ? await probeReceipts(
+            discovered.map((row) => row.contract),
+            start,
+            end,
+          )
+        : new Map<string, Receipt>();
+
+      const rows = discovered.map((row) => probes.get(row.contract) ?? row);
 
       const timestamps = rows.map((row) => BigInt(row.timestamp));
 

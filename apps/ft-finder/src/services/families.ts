@@ -92,17 +92,13 @@ export const buildFamilies = async (
   );
 
   const byHash = new Map<string, PendingFamily>();
-  const singletons: PendingFamily[] = [];
+  let dropped = 0;
 
   for (const entry of unresolved) {
     const codeHash = codeHashByContract.get(entry.contract);
 
     if (!codeHash) {
-      singletons.push({
-        blockTimestamp: entry.blockTimestamp,
-        codeHash: null,
-        contracts: [entry.contract],
-      });
+      dropped++;
       continue;
     }
 
@@ -120,7 +116,7 @@ export const buildFamilies = async (
     });
   }
 
-  const pending = [...byHash.values(), ...singletons];
+  const pending = [...byHash.values()];
   const heights = await heightsFor([
     ...new Set(pending.map((family) => family.blockTimestamp)),
   ]);
@@ -140,7 +136,7 @@ export const buildFamilies = async (
 
   logger.info(
     `families: ${families.length}, code_hash groups: ${byHash.size}, ` +
-      `singletons: ${singletons.length}, resolved: ${
+      `no contract: ${dropped}, resolved: ${
         candidates.length - unresolved.length
       }`,
   );
