@@ -5,7 +5,7 @@ CREATE TABLE ft_state_balances (
   index_in_chunk INT NOT NULL,
   contract_account_id TEXT NOT NULL,
   affected_account_id TEXT NOT NULL,
-  amount NUMERIC(40) NOT NULL,
+  absolute_amount NUMERIC(40) NOT NULL,
   receipt_id TEXT
 );
 
@@ -45,69 +45,6 @@ SET
 SELECT
   add_compression_policy ('ft_state_balances', BIGINT '2592000000000000');
 
-CREATE TABLE ft_contract_layouts (
-  contract TEXT PRIMARY KEY,
-  code_hash TEXT,
-  key_prefix BYTEA,
-  key_encoding TEXT,
-  account_offset INT,
-  account_path TEXT,
-  value_offset INT,
-  value_path TEXT,
-  value_encoding TEXT,
-  status TEXT NOT NULL DEFAULT 'pending',
-  observations INT NOT NULL DEFAULT 0,
-  discovered_at_height BIGINT,
-  verified_at_height BIGINT,
-  probed_at BIGINT,
-  note TEXT,
-  CONSTRAINT fcl_status_chk CHECK (
-    status IN ('pending', 'verified', 'unsupported', 'rejected')
-  ),
-  CONSTRAINT fcl_key_encoding_chk CHECK (
-    key_encoding IS NULL
-    OR key_encoding IN ('borsh', 'index')
-  ),
-  CONSTRAINT fcl_account_offset_chk CHECK (
-    account_offset IS NULL
-    OR key_encoding = 'index'
-  ),
-  CONSTRAINT fcl_value_encoding_chk CHECK (
-    value_encoding IS NULL
-    OR value_encoding IN ('u128le', 'json')
-  ),
-  CONSTRAINT fcl_index_needs_offsets_chk CHECK (
-    key_encoding <> 'index'
-    OR value_encoding <> 'u128le'
-    OR (
-      account_offset IS NOT NULL
-      AND value_offset IS NOT NULL
-    )
-  ),
-  CONSTRAINT fcl_json_needs_paths_chk CHECK (
-    value_encoding <> 'json'
-    OR (
-      account_path IS NOT NULL
-      AND value_path IS NOT NULL
-    )
-  ),
-  CONSTRAINT fcl_verified_needs_layout_chk CHECK (
-    status <> 'verified'
-    OR (
-      key_prefix IS NOT NULL
-      AND key_encoding IS NOT NULL
-      AND value_encoding IS NOT NULL
-    )
-  )
-);
-
-CREATE INDEX fcl_status_idx ON ft_contract_layouts (status);
-
-CREATE INDEX fcl_code_hash_verified_idx ON ft_contract_layouts (code_hash)
-WHERE
-  status = 'verified'
-  AND code_hash IS NOT NULL;
-
 CREATE TABLE ft_state_holders (
   contract TEXT NOT NULL,
   account TEXT NOT NULL,
@@ -119,3 +56,48 @@ CREATE TABLE ft_state_holders (
 CREATE INDEX fsh_account_amount_desc ON ft_state_holders (account, amount DESC);
 
 CREATE INDEX fsh_contract_amount_desc ON ft_state_holders (contract, amount DESC, account ASC);
+
+CREATE TABLE ft_state_untracked (
+  contract TEXT PRIMARY KEY,
+  reason TEXT NOT NULL,
+  block_height BIGINT NOT NULL
+);
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS account_ft_balances
+WITH
+  (timescaledb.continuous) AS
+SELECT
+  TIME_BUCKET (86400000000000, block_timestamp) AS date, -- 1d in ns
+  affected_account_id AS account,
+  contract_account_id AS contract,
+  LAST (
+    absolute_amount,
+    block_timestamp + shard_id * 1000000 + index_in_chunk
+  ) AS absolute_amount,
+  LAST (
+    block_height,
+    block_timestamp + shard_id * 1000000 + index_in_chunk
+  ) AS block_height
+FROM
+  ft_state_balances
+GROUP BY
+  date,
+  account,
+  contract
+ORDER BY
+  date,
+  account,
+  contract
+WITH
+  NO DATA;
+
+SELECT
+  add_continuous_aggregate_policy (
+    'account_ft_balances',
+    start_offset => '259200000000000', -- 3d
+    end_offset => BIGINT '3600000000000', -- 1h in ns
+    schedule_interval => INTERVAL '1 hour',
+    if_not_exists => true
+  );
+
+CREATE INDEX IF NOT EXISTS ca_afb_account_contract_idx ON account_ft_balances (account, contract, date DESC);

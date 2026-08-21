@@ -1,6 +1,7 @@
 import { Readable } from 'stream';
 
 import { logger } from 'nb-logger';
+import { Network } from 'nb-types';
 import { retry, sleep } from 'nb-utils';
 
 import { Message } from './type.js';
@@ -12,7 +13,7 @@ export type BlockStreamConfig = {
   limit?: number;
   network: string;
   start: number;
-  url: string;
+  url?: string;
 };
 
 interface CamelCaseObject {
@@ -20,6 +21,12 @@ interface CamelCaseObject {
 }
 
 const retries = 10;
+
+const endpoint = (network: string) => {
+  return network === Network.MAINNET
+    ? 'https://mainnet.neardata.xyz'
+    : 'https://testnet.neardata.xyz';
+};
 
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
@@ -72,10 +79,15 @@ const fetchBlock = async (url: string, block: number): Promise<Message> => {
   );
 };
 
-const fetchFinal = async (url: string): Promise<Message> => {
+export const fetchFinal = async (
+  network: string,
+  url?: string,
+): Promise<Message> => {
+  const base = url ?? endpoint(network);
+
   return await retry(
     async () => {
-      const response = await fetch(`${url}/v0/last_block/final`, {
+      const response = await fetch(`${base}/v0/last_block/final`, {
         method: 'GET',
         signal: AbortSignal.timeout(30000),
       });
@@ -95,7 +107,7 @@ const fetchFinal = async (url: string): Promise<Message> => {
 export const streamBlock = (config: BlockStreamConfig) => {
   let finalFetch = 0;
   let isFetching = false;
-  const url = config.url;
+  const url = config.url ?? endpoint(config.network);
   let block = config.start;
   const limit = config.limit || 10;
   const concurrencyMode = config.concurrency ?? 'auto';
@@ -129,7 +141,8 @@ export const streamBlock = (config: BlockStreamConfig) => {
         if (concurrencyMode === 'auto') {
           if (!finalFetch || block - finalFetch >= 10) {
             finalFetch = block;
-            const final = (await fetchFinal(url)).block.header.height;
+            const final = (await fetchFinal(config.network, url)).block.header
+              .height;
             concurrency = Math.min(limit, final - block, remaining - 5);
             logger.warn({ concurrency, finalBlock: final });
           }

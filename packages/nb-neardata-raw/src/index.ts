@@ -11,6 +11,7 @@ import { retry } from 'nb-utils';
 import { camelCaseKeys } from './utils.js';
 
 export type BlockStreamConfig = {
+  apiKey?: string;
   end: number;
   network: string;
   start: number;
@@ -25,18 +26,36 @@ const retryLogger = (attempt: number, error: unknown) => {
   logger.error({ attempt });
 };
 
-const endpoint = (network: string) => {
-  return network === Network.MAINNET
-    ? 'https://mainnet.neardata.xyz/raw'
-    : 'https://testnet.neardata.xyz/raw';
+const MAINNET_ARCHIVE_BOUNDARIES = [122_000_000, 142_000_000, 177_000_000];
+
+const endpoint = (network: string, blockHeight: number) => {
+  if (network === Network.MAINNET) {
+    const position = MAINNET_ARCHIVE_BOUNDARIES.findIndex(
+      (boundary) => blockHeight < boundary,
+    );
+    const shard =
+      position === -1 ? MAINNET_ARCHIVE_BOUNDARIES.length : position;
+
+    return `https://a${shard}.mainnet.neardata.xyz/raw`;
+  }
+
+  return 'https://testnet.neardata.xyz/raw';
 };
 
-const fetch = async (url: string) => {
+const fetch = async (url: string, apiKey?: string) => {
   return await retry(
     async () => {
       const response = await axios.get(url, {
+        headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
         responseType: 'stream',
+        validateStatus: (status) => status === 200 || status === 404,
       });
+
+      if (response.status === 404) {
+        (response.data as Readable).destroy();
+
+        return null;
+      }
 
       return response.data as Readable;
     },
@@ -44,10 +63,12 @@ const fetch = async (url: string) => {
   );
 };
 
-export const streamFiles = async (file: string) => {
+export const streamFiles = async (file: string, apiKey?: string) => {
   return await retry(
     async () => {
-      const response = await fetch(file);
+      const response = await fetch(file, apiKey);
+
+      if (!response) return null;
 
       return new Promise<Readable>((resolve, reject) => {
         const readable = new Readable({
@@ -103,7 +124,6 @@ export const streamFiles = async (file: string) => {
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const url = config.url ?? endpoint(config.network);
   const startBlock = config.start;
   const endBlock = config.end;
 
@@ -134,26 +154,33 @@ export const streamBlock = (config: BlockStreamConfig) => {
       const remaining = highWaterMark - readable.readableLength;
 
       if (remaining > 10) {
-        const promises: Promise<Readable>[] = [];
+        const batch: number[] = [];
+        const promises: Promise<null | Readable>[] = [];
         const concurrency = Math.min(limit, blocks.length - next, remaining);
 
         for (let i = next; i < next + concurrency; i++) {
           const block = blocks[i];
+          const url = config.url ?? endpoint(config.network, block);
           const base = String(block).padStart(12, '0');
           const folder = base.slice(0, 6);
           const subFolder = base.slice(6, 9);
           const file = `${url}/${folder}/${subFolder}/${base}.tgz`;
 
-          promises.push(streamFiles(file));
+          batch.push(block);
+          promises.push(streamFiles(file, config.apiKey));
         }
 
         const streams = await Promise.all(promises);
 
-        for (const stream of streams) {
-          for await (const message of stream) {
-            if (message && !readable.push(message)) {
-              return;
+        for (const [index, stream] of streams.entries()) {
+          if (stream) {
+            for await (const message of stream) {
+              if (message && !readable.push(message)) {
+                return;
+              }
             }
+          } else {
+            logger.warn({ block: batch[index] }, 'missing raw batch');
           }
 
           next++;

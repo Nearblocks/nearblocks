@@ -3,6 +3,7 @@ import { logger } from 'nb-logger';
 import knex from '#libs/knex';
 import sentry from '#libs/sentry';
 import { syncFTHolders } from '#services/ft';
+import { syncFTStateHolders } from '#services/ftState';
 import { syncIntentsAccounts, syncIntentsStats } from '#services/intents';
 import { syncMTHolders } from '#services/mt';
 import { syncNFTHolders } from '#services/nft';
@@ -11,6 +12,7 @@ import { syncNFTHolders } from '#services/nft';
   try {
     await Promise.all([
       syncFTHolders(),
+      syncFTStateHolders(),
       syncNFTHolders(),
       syncMTHolders(),
       syncIntentsStats(),

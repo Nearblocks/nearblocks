@@ -37,6 +37,7 @@ export interface TTables {
   ft_prices_daily: PriceHistory;
   ft_state_balances: FTStateBalance;
   ft_state_holders: FTStateHolder;
+  ft_state_untracked: FTStateUntracked;
   mpc_derived_keys: MpcDerivedKey;
   multichain_signatures: MultichainSignature;
   multichain_transactions: MultichainTransaction;
@@ -291,8 +292,8 @@ export type PriceHistory = {
 };
 
 export type FTStateBalance = {
+  absolute_amount: string;
   affected_account_id: string;
-  amount: string;
   block_height: number;
   block_timestamp: string;
   contract_account_id: string;
@@ -329,9 +330,15 @@ export type FTContractLayout = {
   verified_at_height: null | number;
 };
 
+export type FTStateUntracked = {
+  block_height: number;
+  contract: string;
+  reason: string;
+};
+
 export type FTStateHolder = {
+  absolute_amount: string;
   account: string;
-  amount: string;
   block_height: number;
   contract: string;
 };

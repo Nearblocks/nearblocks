@@ -11,6 +11,7 @@
     "lint": "tsc --noEmit && eslint ./ --fix"
   },
   "devDependencies": {
+    "@types/node": "~22.10",
     "eslint-config-custom-node": "*",
     "minio": "8.0.4",
     "nb-knex": "*",
