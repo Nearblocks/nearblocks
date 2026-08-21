@@ -5,18 +5,22 @@ import { NftTokens } from '@/components/nft-tokens';
 import { PageHeading } from '@/components/page-heading';
 import { fetchNFTTokenCount, fetchNFTTokens } from '@/data/nft-tokens';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/nft-tokens'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'nfts');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/nft-tokens' },
     description: t('meta.description'),
     title: t('meta.title'),

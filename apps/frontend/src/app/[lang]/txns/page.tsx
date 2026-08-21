@@ -11,18 +11,22 @@ import {
 } from '@/data/address/txns';
 import { fetchTxnCount, fetchTxns, fetchTxnStats } from '@/data/txns';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/txns'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'txns');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/txns' },
     description: t('meta.description'),
     title: t('meta.title'),

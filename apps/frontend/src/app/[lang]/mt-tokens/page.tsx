@@ -5,18 +5,22 @@ import { MtTokens } from '@/components/mt-tokens';
 import { PageHeading } from '@/components/page-heading';
 import { fetchMTList, fetchMTListCount } from '@/data/mt-tokens';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/mt-tokens'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'mts');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/mt-tokens' },
     description: t('meta.description'),
     title: t('meta.title'),

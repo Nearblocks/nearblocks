@@ -1,9 +1,16 @@
+import type { Metadata } from 'next';
+
 import { Txns } from '@/components/address/txns';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { fetchTxnCount, fetchTxns } from '@/data/address/txns';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 
 type Props = PageProps<'/[lang]/address/[address]'>;
+
+export const generateMetadata = async ({
+  searchParams,
+}: Props): Promise<Metadata> => queryRobots(await searchParams);
 
 const AddressPage = async ({ params, searchParams }: Props) => {
   const [{ address }, filters] = await Promise.all([params, searchParams]);

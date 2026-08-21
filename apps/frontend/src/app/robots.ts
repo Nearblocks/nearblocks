@@ -8,7 +8,12 @@ const robots = (): MetadataRoute.Robots => {
   const config = getRuntimeConfig();
 
   return {
-    rules: { allow: '/', userAgent: '*' },
+    rules: {
+      allow: '/',
+      crawlDelay: 10,
+      disallow: '/*?',
+      userAgent: '*',
+    },
     sitemap: `${config.siteUrl}/sitemap.xml`,
   };
 };

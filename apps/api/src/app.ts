@@ -73,8 +73,11 @@ app.use((_req: Request, res: Response) => {
 
 app.use(sentry.Handlers.errorHandler());
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
   if (v.isValiError(err)) {
     const errors = err.issues.map(
       (issue) => `${v.getDotPath(issue)}: ${issue.message}`,

@@ -9,18 +9,22 @@ import {
   fetchMCTxns,
 } from '@/data/multichain-txns';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/multichain-txns'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'multichain');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/multichain-txns' },
     description: t('meta.description'),
     title: t('meta.title'),
