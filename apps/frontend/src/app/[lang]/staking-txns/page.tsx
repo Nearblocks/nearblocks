@@ -10,18 +10,22 @@ import {
 } from '@/data/address/staking';
 import { fetchStaking, fetchStakingCount } from '@/data/staking';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/staking-txns'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'staking');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/staking-txns' },
     description: t('meta.description'),
     title: t('meta.title'),

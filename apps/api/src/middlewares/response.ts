@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import * as v from 'valibot';
 
 import { CursorError } from '#libs/errors';
+import logger from '#libs/logger';
 
 /**
  * Async route handler to catch and forward any errors to the next middleware.
@@ -45,10 +46,13 @@ export const responseHandler = <
         res.json(parsed);
       } catch (error) {
         if (error instanceof CursorError) {
+          logger.warn({ url: req.originalUrl }, 'invalid cursor');
           res.status(422).json({
             data: null,
             errors: [{ message: error.message, path: 'cursor' }],
           });
+
+          return;
         }
 
         next(error);

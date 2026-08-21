@@ -10,18 +10,22 @@ import {
 } from '@/data/address/receipts';
 import { fetchReceiptCount, fetchReceipts } from '@/data/receipts';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/receipts'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'receipts');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/receipts' },
     description: t('meta.description'),
     title: t('meta.title'),

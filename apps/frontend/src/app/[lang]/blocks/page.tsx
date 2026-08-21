@@ -5,18 +5,22 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { PageHeading } from '@/components/page-heading';
 import { fetchBlockCount, fetchBlocks, fetchBlockStats } from '@/data/blocks';
 import { holdNav } from '@/lib/hold-nav';
+import { queryRobots } from '@/lib/metadata';
 import { hasLocale, translator } from '@/locales/dictionaries';
 
 type Props = PageProps<'/[lang]/blocks'>;
 
 export const generateMetadata = async ({
   params,
+  searchParams,
 }: Props): Promise<Metadata> => {
   const { lang } = await params;
+  const filters = await searchParams;
   const locale = hasLocale(lang) ? lang : 'en';
   const t = await translator(locale, 'blocks');
 
   return {
+    ...queryRobots(filters),
     alternates: { canonical: '/blocks' },
     description: t('meta.description'),
     title: t('meta.title'),
