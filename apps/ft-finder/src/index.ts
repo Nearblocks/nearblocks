@@ -10,73 +10,14 @@ import {
   buildFamilies,
   loadAlreadyResolvedContracts,
 } from '#services/families';
-import { assertArchival, inferLayout } from '#services/layout';
+import { assertArchival } from '#services/layout';
+import { recheckRejected } from '#services/recheck';
+import { resolveFamily } from '#services/resolve';
 import { persistFamily } from '#services/seed';
-import { hasFtMetadata, verifyLayout } from '#services/verify';
-import { LayoutResult, Resolution, VerifyResult } from '#types/types';
+import { Resolution } from '#types/types';
 
 const ARCHIVAL_PROBE_DEPTH = 500_000;
 const ARCHIVAL_PROBE_ACCOUNT = 'ft-finder-archival-probe.near';
-
-const NOT_A_TOKEN: LayoutResult = {
-  candidates: null,
-  reason: 'ft_metadata not implemented, not a fungible token',
-  unsupported: false,
-};
-
-const resolveFamily = async (
-  rpc: RPC,
-  contract: string,
-  blockHeight: number,
-): Promise<Resolution> => {
-  if (!(await hasFtMetadata(rpc, contract, blockHeight))) {
-    return { layout: null, result: NOT_A_TOKEN, verifyResult: 'rejected' };
-  }
-
-  let result: LayoutResult;
-
-  try {
-    result = await inferLayout(rpc, contract, blockHeight);
-  } catch (error) {
-    const reason = `data_changes/RPC call failed: ${error}`;
-    logger.warn(`${contract}: layout inference failed: ${reason}`);
-
-    return {
-      layout: null,
-      result: { candidates: null, reason, unsupported: false },
-      verifyResult: 'inconclusive',
-    };
-  }
-
-  if (!result.candidates)
-    return { layout: null, result, verifyResult: 'inconclusive' };
-
-  const outcomes: VerifyResult[] = [];
-
-  for (const candidate of result.candidates) {
-    const verifyResult = await verifyLayout(
-      rpc,
-      contract,
-      candidate.samples,
-      candidate.blockHeight,
-    );
-
-    if (verifyResult === 'match')
-      return { layout: candidate, result, verifyResult };
-
-    outcomes.push(verifyResult);
-  }
-
-  if (outcomes.every((outcome) => outcome === 'rejected')) {
-    return { layout: null, result, verifyResult: 'rejected' };
-  }
-
-  if (outcomes.includes('inconclusive')) {
-    return { layout: null, result, verifyResult: 'inconclusive' };
-  }
-
-  return { layout: null, result, verifyResult: 'mismatch' };
-};
 
 const run = async (): Promise<void> => {
   logger.info({ network: config.network }, 'initializing ft finder...');
@@ -158,9 +99,11 @@ const run = async (): Promise<void> => {
   }
 
   logger.info(
-    `done, verified: ${tally.verified}, unsupported: ${tally.unsupported}, ` +
+    `scan done, verified: ${tally.verified}, unsupported: ${tally.unsupported}, ` +
       `rejected: ${tally.rejected}, pending: ${tally.pending}`,
   );
+
+  await recheckRejected(rpc);
 };
 
 run()

@@ -8,7 +8,7 @@ import { CandidateBatch } from '#types/types';
 
 const DISCOVERY_METHODS = ['storage_deposit', 'ft_resolve_transfer'];
 
-const PROBE_METHODS = ['ft_transfer', 'ft_transfer_call'];
+export const PROBE_METHODS = ['ft_transfer', 'ft_transfer_call'];
 
 const SUCCESS_STATUSES = [
   ExecutionOutcomeStatus.SUCCESS_VALUE,
@@ -26,7 +26,7 @@ const FT_START_NS: Record<Network, bigint> = {
   [Network.TESTNET]: 1_617_307_200_000_000_000n,
 };
 
-const succeededReceipts = async (
+export const succeededReceipts = async (
   receiptIds: string[],
   minTimestamp: bigint,
   maxTimestamp: bigint,

@@ -34,7 +34,7 @@ const codeHashesAsOf = async (
   return result;
 };
 
-const heightsFor = async (
+export const heightsFor = async (
   timestamps: string[],
 ): Promise<Map<string, number>> => {
   const heights = new Map<string, number>();
