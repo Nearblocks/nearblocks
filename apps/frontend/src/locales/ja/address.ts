@@ -1,6 +1,8 @@
 export const address = {
   alerts: {
     deleted: 'This account was deleted on {{date}}',
+    lockedContract:
+      'This contract is locked and cannot be updated, as the account has no full access keys',
     noFullAccessKeys: 'This account has no full access keys',
   },
   analytics: {

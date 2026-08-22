@@ -169,8 +169,9 @@ export const rollingWindowCount = async (
 };
 
 /**
- * Searches for a single result by repeatedly querying over rolling time windows, moving backwards in time.
- * Calls the provided query function with each window's start and end timestamps.
+ * Searches for a single result in two phases: first the most recent window, then the
+ * remainder of history in one query.
+ * Calls the provided query function with each phase's start and end timestamps.
  * Returns the first non-null result found, or null if no result is found within the range.
  *
  * @param queryFn - An async function that takes (start, end) and returns a result or null.
@@ -182,23 +183,18 @@ export const rollingWindow = async <T>(
   options: WindowOptions,
 ): Promise<null | T> => {
   const { start } = options;
-  const windowSize = WINDOW_SIZE;
-  let endNs = BigInt(Date.now()) * 1_000_000n; // Current time in ns
+  const nowNs = BigInt(Date.now()) * 1_000_000n;
+  const recentStart = nowNs - WINDOW_SIZE;
 
-  while (endNs > start) {
-    const startNs = endNs - windowSize;
-    const windowStart = startNs > start ? startNs : start;
-
-    const result = await queryFn(windowStart.toString(), endNs.toString());
-
-    if (result) {
-      return result;
-    }
-
-    endNs = windowStart;
+  if (recentStart <= start) {
+    return queryFn(start.toString(), nowNs.toString());
   }
 
-  return null;
+  const recent = await queryFn(recentStart.toString(), nowNs.toString());
+
+  if (recent) return recent;
+
+  return queryFn(start.toString(), (recentStart - 1n).toString());
 };
 
 /**
