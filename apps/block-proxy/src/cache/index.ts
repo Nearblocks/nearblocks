@@ -10,6 +10,22 @@ import type { StatsCollector } from '#stats';
 
 import { blockHeightToPath } from './path.js';
 
+/**
+ * Hard bound on a single cache read.
+ *
+ * `fsp.readFile` runs on the libuv threadpool and has no timeout of its own,
+ * making it the only unbounded await in the request path.
+ *
+ * Scope, precisely: Node checks the signal between chunk reads, and the
+ * initial open(2) takes no signal. So this bounds a slow-but-responsive disk;
+ * it does NOT interrupt a blocking open on a hung mount, and it does NOT free
+ * the libuv worker. That hazard is still open — see the dedup deadline, which
+ * limits the blast radius to a 502 rather than an infinite hang.
+ *
+ * A safety bound, not an operational tuning knob, so it is not configurable.
+ */
+const READ_TIMEOUT_MS = 2_000;
+
 export class CacheStore {
   private cacheDir: string;
   private cacheTtlMs: number;
@@ -32,7 +48,9 @@ export class CacheStore {
     const filePath = blockHeightToPath(this.cacheDir, height, this.compression);
 
     try {
-      const data = await fsp.readFile(filePath);
+      const data = await fsp.readFile(filePath, {
+        signal: AbortSignal.timeout(READ_TIMEOUT_MS),
+      });
       logger.debug({ bytes: data.length, height }, 'cache hit');
       return data;
     } catch (err: unknown) {

@@ -45,6 +45,24 @@ export const dedupLeaders = new client.Counter({
   registers: [register],
 });
 
+export const dedupDeadlines = new client.Counter({
+  help: 'Total dedup entries released by hitting their deadline',
+  name: 'block_proxy_dedup_deadlines',
+  registers: [register],
+});
+
+export const dedupSaves = new client.Counter({
+  help: 'Total requests answered from an in-flight leader instead of upstream',
+  name: 'block_proxy_dedup_saves',
+  registers: [register],
+});
+
+export const lastServedTimestamp = new client.Gauge({
+  help: 'Unix timestamp (seconds) of the last completed data response',
+  name: 'block_proxy_last_served_timestamp',
+  registers: [register],
+});
+
 export const upstreamRequests = new client.Counter({
   help: 'Total upstream request count by source and result',
   labelNames: ['source', 'result'] as const,

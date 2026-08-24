@@ -28,6 +28,22 @@ export function createDataServer(state: AppState): express.Express {
     next();
   });
 
+  // Liveness accounting. `finish` fires only when a response was actually
+  // written, so a request the client aborted mid-flight does NOT count as
+  // served — which is the whole point: during the 2026-08-24 outage requests
+  // kept arriving and none ever completed.
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/v0/')) {
+      state.lastRequestAt = Date.now();
+      res.on('finish', () => {
+        state.lastServedAt = Date.now();
+        metrics.lastServedTimestamp.set(state.lastServedAt / 1000);
+      });
+    }
+
+    next();
+  });
+
   // GET /v0/block/:height
   app.get('/v0/block/:height', async (req, res) => {
     const heightStr = req.params.height;
@@ -160,6 +176,33 @@ export function createDataServer(state: AppState): express.Express {
       uptime_secs: Math.floor((Date.now() - state.startTime) / 1000),
       version: state.version,
     });
+  });
+
+  // GET /livez — is the data path making progress?
+  //
+  // Deliberately measures progress, not success: an upstream outage still
+  // produces 502 responses, which keeps this green. It reports a stall only
+  // when requests are arriving and none of them complete. An idle proxy stays
+  // green too, because lastRequestAt stops advancing as well.
+  app.get('/livez', (_req, res) => {
+    const stalledMs = state.lastRequestAt - state.lastServedAt;
+
+    if (state.ready && stalledMs > state.config.stallTimeoutMs) {
+      logger.error(
+        {
+          stall_timeout_ms: state.config.stallTimeoutMs,
+          stalled_ms: stalledMs,
+        },
+        'liveness stalled: requests arriving, none completing',
+      );
+      res.status(503).json({ stalled_ms: stalledMs, status: 'stalled' });
+
+      return;
+    }
+
+    res
+      .status(200)
+      .json({ stalled_ms: Math.max(0, stalledMs), status: 'live' });
   });
 
   // GET /readyz

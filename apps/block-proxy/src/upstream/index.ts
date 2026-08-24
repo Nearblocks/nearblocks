@@ -1,5 +1,6 @@
 import { logger } from 'nb-logger';
 
+import { withDeadline } from '#dedup';
 import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import type { UpstreamError } from '#types';
@@ -19,10 +20,6 @@ function recordUpstreamOk(
     case 'fastnear':
       state.stats.upstreamRequestsFastnear++;
       state.stats.upstreamDurationUsFastnear += durationUs;
-      break;
-    case 'near_lake':
-      state.stats.upstreamRequestsNearLake++;
-      state.stats.upstreamDurationUsNearLake += durationUs;
       break;
     case 's3':
       state.stats.upstreamRequestsS3++;
@@ -47,11 +44,6 @@ function recordUpstreamErr(
       state.stats.upstreamRequestsFastnear++;
       state.stats.upstreamErrorsFastnear++;
       state.stats.upstreamDurationUsFastnear += durationUs;
-      break;
-    case 'near_lake':
-      state.stats.upstreamRequestsNearLake++;
-      state.stats.upstreamErrorsNearLake++;
-      state.stats.upstreamDurationUsNearLake += durationUs;
       break;
     case 's3':
       state.stats.upstreamRequestsS3++;
@@ -152,36 +144,6 @@ export async function fetchBlock(
     }
   }
 
-  // 4. NEAR Lake
-  if (state.nearLakeEnabled && state.nearLake) {
-    const upstreamStart = Date.now();
-    try {
-      const bytes = await state.nearLake.fetch(height, () => state.tipHeight);
-      recordUpstreamOk(state, 'near_lake', Date.now() - upstreamStart);
-      logger.info(
-        { height, latency_ms: Date.now() - start, source: 'near_lake' },
-        'block served',
-      );
-      if (state.config.cacheEnabled) {
-        metrics.cacheWrites.inc();
-        state.stats.cacheWrites++;
-        state.cache.writeBackground(height, bytes);
-      }
-      return { bytes, source: 'near_lake' };
-    } catch (err) {
-      recordUpstreamErr(state, 'near_lake', Date.now() - upstreamStart);
-      logger.warn(
-        { error: String(err), height, source: 'near_lake' },
-        'upstream fetch failed',
-      );
-      errors.push({
-        error: String(err),
-        notFound: !!(err as Error & { notFound?: boolean }).notFound,
-        source: 'near_lake',
-      });
-    }
-  }
-
   // All sources exhausted
   logger.error({ errors, height }, 'all upstream sources failed');
   const err = new Error('all upstream sources failed') as Error & {
@@ -210,29 +172,86 @@ export async function fetchBlockDeduped(
   height: number,
 ): Promise<{ bytes: Buffer; source: string }> {
   const key = `block:${height}`;
+  const ttlMs = state.config.dedupTtlMs;
 
   metrics.dedupRequests.inc();
   state.stats.dedupTotal++;
 
   const existing = state.dedup.get(key);
   if (existing) {
-    // Follower: wait for the leader's result
-    return existing;
+    if (Date.now() - existing.createdAt < ttlMs) {
+      // Follower: answered from the leader's in-flight promise. It performs no
+      // cache read and no upstream fetch, so it is counted here rather than as
+      // a cache hit — see block_proxy_dedup_saves.
+      metrics.dedupSaves.inc();
+
+      return existing.promise;
+    }
+
+    // The leader outlived its deadline without its timer releasing the entry.
+    // Never hand out a corpse: drop it and lead a fresh attempt.
+    logger.error(
+      { age_ms: Date.now() - existing.createdAt, height },
+      'stale dedup entry evicted on read',
+    );
+    state.dedup.delete(key);
   }
 
-  // Bypass dedup if map is at capacity to prevent memory exhaustion
+  const onDeadline = (): Error => {
+    metrics.dedupDeadlines.inc();
+    state.stats.dedupDeadlines++;
+    logger.error(
+      { height, ttl_ms: ttlMs },
+      'dedup deadline exceeded, releasing height for retry',
+    );
+
+    const err = new Error(
+      `dedup deadline exceeded for block ${height} after ${ttlMs}ms`,
+    ) as Error & { errors: UpstreamError[] };
+
+    // Give the request handler something to log. Without this the follower's
+    // 502 is reported as 'all upstreams exhausted' with an empty error array,
+    // which is exactly the signature that made this incident hard to read.
+    err.errors = [
+      { error: `dedup deadline exceeded after ${ttlMs}ms`, source: 'dedup' },
+    ];
+
+    return err;
+  };
+
+  // Bypass dedup if map is at capacity to prevent memory exhaustion. The
+  // deadline still applies: an unbounded fetch here would reintroduce the
+  // same hazard, just without a map entry to show for it.
   if (state.dedup.size >= MAX_DEDUP_SIZE) {
-    return fetchBlock(state, height);
+    // Still a real upstream fetch: count it, or `saves = total - leaders`
+    // reports every bypassed request as a deduplication — wrong in exactly
+    // the overload case an operator would be reading /stats to understand.
+    metrics.dedupLeaders.inc();
+    state.stats.dedupLeaders++;
+
+    return withDeadline(fetchBlock(state, height), ttlMs, onDeadline);
   }
 
   // Leader: create the promise, store it, execute
   metrics.dedupLeaders.inc();
   state.stats.dedupLeaders++;
 
-  const promise = fetchBlock(state, height).finally(() => {
-    state.dedup.delete(key);
+  // The entry must never outlive its deadline. Removal is driven by the
+  // promise settling, so an upstream promise that never settles would pin
+  // this height forever and every later request would attach to it instead
+  // of retrying.
+  const promise = withDeadline(
+    fetchBlock(state, height),
+    ttlMs,
+    onDeadline,
+  ).finally(() => {
+    // Only clear our own entry: a stale-eviction may already have replaced it
+    // with a newer leader, which must not be deleted by this one settling.
+    // The callback is a microtask, so `promise` is always initialised by then.
+    if (state.dedup.get(key)?.promise === promise) state.dedup.delete(key);
   });
 
-  state.dedup.set(key, promise);
+  state.dedup.set(key, { createdAt: Date.now(), promise });
+
   return promise;
 }
