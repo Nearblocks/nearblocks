@@ -61,7 +61,7 @@ All env vars have safe defaults. With zero config, the proxy starts on port 3000
 | Variable                | Default | Description                                                  |
 | ----------------------- | ------- | ------------------------------------------------------------ |
 | `UPSTREAM_TIMEOUT_SECS` | `10`    | Per-upstream timeout. Must be below the 30s client abort.    |
-| `DEDUP_TTL_SECS`        | `25`    | Max lifetime of an in-flight singleflight entry. Range 5-30. |
+| `DEDUP_TTL_SECS`        | `25`    | Max lifetime of an in-flight singleflight entry. Range 5-60. |
 
 ### Upstream: fastnear (neardata.xyz)
 

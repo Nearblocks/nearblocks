@@ -7,7 +7,7 @@ const MAX_BODY_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /**
  * undici keeps a connection checked out until its body is read or cancelled.
- * Blocks above the chain tip 404 constantly, so these paths are hot.
+ * Only worth it where the body may be large; small ones are reclaimed anyway.
  */
 const discardBody = async (response: Response): Promise<void> => {
   try {
@@ -44,7 +44,6 @@ export class FastnearUpstream {
       });
 
     if (response.status === 404) {
-      await discardBody(response);
       const err = new Error(
         `block ${height} not found on fastnear`,
       ) as Error & { notFound: boolean };
@@ -114,7 +113,6 @@ export class FastnearUpstream {
       });
 
     if (response.status === 404) {
-      await discardBody(response);
       throw new Error('last_block/final not found on fastnear');
     }
 

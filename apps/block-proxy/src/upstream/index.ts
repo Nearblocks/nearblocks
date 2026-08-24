@@ -1,6 +1,5 @@
 import { logger } from 'nb-logger';
 
-import { withDeadline } from '#dedup';
 import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import type { UpstreamError } from '#types';
@@ -178,66 +177,47 @@ export async function fetchBlockDeduped(
   state.stats.dedupTotal++;
 
   const existing = state.dedup.get(key);
-  if (existing) {
-    if (Date.now() - existing.createdAt < ttlMs) {
-      // Follower: served from the leader's promise, so it does no cache read
-      // and no upstream fetch. Counted here, not as a cache hit.
-      metrics.dedupSaves.inc();
+  if (existing) return existing;
 
-      return existing.promise;
-    }
-
-    // Leader outlived its deadline without its timer releasing the entry.
-    logger.error(
-      { age_ms: Date.now() - existing.createdAt, height },
-      'stale dedup entry evicted on read',
-    );
-    state.dedup.delete(key);
-  }
-
-  const onDeadline = (): Error => {
-    metrics.dedupDeadlines.inc();
-    state.stats.dedupDeadlines++;
-    logger.error(
-      { height, ttl_ms: ttlMs },
-      'dedup deadline exceeded, releasing height for retry',
-    );
-
-    const err = new Error(
-      `dedup deadline exceeded for block ${height} after ${ttlMs}ms`,
-    ) as Error & { errors: UpstreamError[] };
-
-    // Without this the 502 logs as 'all upstreams exhausted' with no errors.
-    err.errors = [
-      { error: `dedup deadline exceeded after ${ttlMs}ms`, source: 'dedup' },
-    ];
-
-    return err;
-  };
-
-  // Bypass dedup if map is at capacity to prevent memory exhaustion. Still
-  // deadline-bounded, and still counted as a leader so `saves` stays honest.
-  if (state.dedup.size >= MAX_DEDUP_SIZE) {
-    metrics.dedupLeaders.inc();
-    state.stats.dedupLeaders++;
-
-    return withDeadline(fetchBlock(state, height), ttlMs, onDeadline);
-  }
-
-  // Leader: create the promise, store it, execute
   metrics.dedupLeaders.inc();
   state.stats.dedupLeaders++;
 
-  const promise = withDeadline(
-    fetchBlock(state, height),
-    ttlMs,
-    onDeadline,
-  ).finally(() => {
-    // Only clear our own entry: an eviction may have installed a successor.
-    if (state.dedup.get(key)?.promise === promise) state.dedup.delete(key);
-  });
+  // A leader that never settles once pinned its height for the life of the
+  // process, and every later request attached to it instead of retrying. The
+  // deadline guarantees the entry is always released.
+  const promise = new Promise<{ bytes: Buffer; source: string }>(
+    (resolve, reject) => {
+      const timer = setTimeout(() => {
+        const err = new Error(
+          `dedup deadline exceeded for block ${height} after ${ttlMs}ms`,
+        ) as Error & { errors: UpstreamError[] };
 
-  state.dedup.set(key, { createdAt: Date.now(), promise });
+        // Without this the 502 logs as 'all upstreams exhausted' with no errors.
+        err.errors = [{ error: 'dedup deadline exceeded', source: 'dedup' }];
+
+        // Reject before any side effect that could throw.
+        reject(err);
+        metrics.dedupDeadlines.inc();
+        state.stats.dedupDeadlines++;
+        logger.error({ height, ttl_ms: ttlMs }, 'dedup deadline exceeded');
+      }, ttlMs);
+
+      fetchBlock(state, height).then(
+        (value) => {
+          clearTimeout(timer);
+          resolve(value);
+        },
+        (err) => {
+          clearTimeout(timer);
+          reject(err);
+        },
+      );
+    },
+  ).finally(() => state.dedup.delete(key));
+
+  // Skip the map at capacity to prevent memory exhaustion; the deadline still
+  // applies either way.
+  if (state.dedup.size < MAX_DEDUP_SIZE) state.dedup.set(key, promise);
 
   return promise;
 }

@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { logger } from 'nb-logger';
 
-import { CACHE_READ_TIMEOUT_MS, type Config } from '#config';
+import type { Config } from '#config';
 import * as metrics from '#metrics';
 import type { StatsCollector } from '#stats';
 
@@ -32,11 +32,7 @@ export class CacheStore {
     const filePath = blockHeightToPath(this.cacheDir, height, this.compression);
 
     try {
-      const data = await fsp.readFile(filePath, {
-        // Only checked between chunk reads: bounds a slow disk, not a
-        // blocking open on a hung mount.
-        signal: AbortSignal.timeout(CACHE_READ_TIMEOUT_MS),
-      });
+      const data = await fsp.readFile(filePath);
       logger.debug({ bytes: data.length, height }, 'cache hit');
       return data;
     } catch (err: unknown) {

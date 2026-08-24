@@ -28,20 +28,6 @@ export function createDataServer(state: AppState): express.Express {
     next();
   });
 
-  // Liveness accounting. `finish` fires only when a response was written, so
-  // a request the client aborted does not count as served.
-  app.use((req, res, next) => {
-    if (req.path.startsWith('/v0/')) {
-      state.lastRequestAt = Date.now();
-      res.on('finish', () => {
-        state.lastServedAt = Date.now();
-        metrics.lastServedTimestamp.set(state.lastServedAt / 1000);
-      });
-    }
-
-    next();
-  });
-
   // GET /v0/block/:height
   app.get('/v0/block/:height', async (req, res) => {
     const heightStr = req.params.height;
@@ -174,30 +160,6 @@ export function createDataServer(state: AppState): express.Express {
       uptime_secs: Math.floor((Date.now() - state.startTime) / 1000),
       version: state.version,
     });
-  });
-
-  // GET /livez — progress, not success. A 502 still counts as progress, and
-  // an idle proxy stays green. Stalls only when requests arrive and none
-  // complete.
-  app.get('/livez', (_req, res) => {
-    const stalledMs = state.lastRequestAt - state.lastServedAt;
-
-    if (state.ready && stalledMs > state.config.stallTimeoutMs) {
-      logger.error(
-        {
-          stall_timeout_ms: state.config.stallTimeoutMs,
-          stalled_ms: stalledMs,
-        },
-        'liveness stalled: requests arriving, none completing',
-      );
-      res.status(503).json({ stalled_ms: stalledMs, status: 'stalled' });
-
-      return;
-    }
-
-    res
-      .status(200)
-      .json({ stalled_ms: Math.max(0, stalledMs), status: 'live' });
   });
 
   // GET /readyz
