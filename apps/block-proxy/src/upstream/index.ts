@@ -185,7 +185,7 @@ export async function fetchBlockDeduped(
   // A leader that never settles once pinned its height for the life of the
   // process, and every later request attached to it instead of retrying. The
   // deadline guarantees the entry is always released.
-  const promise = new Promise<{ bytes: Buffer; source: string }>(
+  const fetch = new Promise<{ bytes: Buffer; source: string }>(
     (resolve, reject) => {
       const timer = setTimeout(() => {
         const err = new Error(
@@ -195,11 +195,17 @@ export async function fetchBlockDeduped(
         // Without this the 502 logs as 'all upstreams exhausted' with no errors.
         err.errors = [{ error: 'dedup deadline exceeded', source: 'dedup' }];
 
-        // Reject before any side effect that could throw.
+        // Reject first, then guard the side effects: a throw here escapes the
+        // timer callback as an uncaught exception, and index.ts exits on those.
         reject(err);
-        metrics.dedupDeadlines.inc();
-        state.stats.dedupDeadlines++;
-        logger.error({ height, ttl_ms: ttlMs }, 'dedup deadline exceeded');
+
+        try {
+          metrics.dedupDeadlines.inc();
+          state.stats.dedupDeadlines++;
+          logger.error({ height, ttl_ms: ttlMs }, 'dedup deadline exceeded');
+        } catch {
+          // Telemetry must never take the process down.
+        }
       }, ttlMs);
 
       fetchBlock(state, height).then(
@@ -213,11 +219,15 @@ export async function fetchBlockDeduped(
         },
       );
     },
-  ).finally(() => state.dedup.delete(key));
+  );
 
-  // Skip the map at capacity to prevent memory exhaustion; the deadline still
-  // applies either way.
-  if (state.dedup.size < MAX_DEDUP_SIZE) state.dedup.set(key, promise);
+  // At capacity, skip the map to prevent memory exhaustion. Such a leader must
+  // not carry the cleanup: it does not own the key, and would evict whichever
+  // leader is stored under it later. The deadline still applies either way.
+  if (state.dedup.size >= MAX_DEDUP_SIZE) return fetch;
+
+  const promise = fetch.finally(() => state.dedup.delete(key));
+  state.dedup.set(key, promise);
 
   return promise;
 }

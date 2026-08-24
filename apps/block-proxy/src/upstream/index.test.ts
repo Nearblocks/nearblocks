@@ -6,6 +6,8 @@ import { StatsCollector } from '#stats';
 import { fetchBlockDeduped } from './index.js';
 
 const HEIGHT = 212615360;
+const BYTES = Buffer.from('{}');
+const KEY = `block:${HEIGHT}`;
 
 const makeState = (
   fetchImpl: () => Promise<Buffer>,
@@ -84,5 +86,87 @@ describe('fetchBlockDeduped', () => {
 
     expect(result.source).toBe('fastnear');
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  // A leader created while the map is full is never stored, so it must not
+  // carry the cleanup: it does not own the key and would evict whichever
+  // leader is stored under it later.
+  it('a capacity-bypassed leader does not evict a later leader', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(BYTES)
+      .mockImplementation(() => new Promise<Buffer>(() => {}));
+    const state = makeState(fetch, 10_000);
+
+    for (let i = 0; i < 10_000; i++) {
+      state.dedup.set(
+        `block:${i}`,
+        Promise.resolve({ bytes: BYTES, source: 'x' }),
+      );
+    }
+
+    const bypassed = fetchBlockDeduped(state, HEIGHT);
+    expect(state.dedup.has(KEY)).toBe(false);
+
+    state.dedup.clear();
+    const stored = fetchBlockDeduped(state, HEIGHT);
+    stored.catch(() => {});
+    expect(state.dedup.has(KEY)).toBe(true);
+
+    // The bypassed leader settles last. It must not take the stored one with it.
+    await bypassed;
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(state.dedup.has(KEY)).toBe(true);
+  });
+
+  it('stops storing entries at capacity', async () => {
+    const state = makeState(() => Promise.resolve(Buffer.from('{}')));
+
+    for (let i = 0; i < 10_000; i++) {
+      state.dedup.set(
+        `block:${i}`,
+        Promise.resolve({ bytes: BYTES, source: 'x' }),
+      );
+    }
+
+    await fetchBlockDeduped(state, HEIGHT);
+
+    expect(state.dedup.size).toBe(10_000);
+  });
+
+  // index.ts exits the process on an uncaught exception, and the deadline's
+  // side effects run inside a timer callback.
+  it('survives telemetry throwing when the deadline fires', async () => {
+    const state = makeState(() => new Promise<Buffer>(() => {}), 30);
+    Object.defineProperty(state.stats, 'dedupDeadlines', {
+      get: () => 0,
+      set: () => {
+        throw new Error('metrics backend down');
+      },
+    });
+
+    const uncaught = vi.fn();
+    process.on('uncaughtException', uncaught);
+
+    try {
+      await expect(fetchBlockDeduped(state, HEIGHT)).rejects.toThrow(
+        /dedup deadline exceeded/,
+      );
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(uncaught).not.toHaveBeenCalled();
+      expect(state.dedup.size).toBe(0);
+    } finally {
+      process.off('uncaughtException', uncaught);
+    }
+  });
+
+  it('tags the deadline error so the 502 logs a cause', async () => {
+    const state = makeState(() => new Promise<Buffer>(() => {}), 30);
+
+    await expect(fetchBlockDeduped(state, HEIGHT)).rejects.toMatchObject({
+      errors: [{ source: 'dedup' }],
+    });
   });
 });

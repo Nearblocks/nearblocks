@@ -7,7 +7,7 @@ const MAX_BODY_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /**
  * undici keeps a connection checked out until its body is read or cancelled.
- * Only worth it where the body may be large; small ones are reclaimed anyway.
+ * Used where the body size is unknown; small 404 bodies are reclaimed anyway.
  */
 const discardBody = async (response: Response): Promise<void> => {
   try {

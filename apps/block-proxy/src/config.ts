@@ -54,6 +54,13 @@ if (!env.FASTNEAR_ENABLED && !s3Ready) {
   );
 }
 
+if (env.UPSTREAM_TIMEOUT_SECS < 1) {
+  throw new Error(
+    `UPSTREAM_TIMEOUT_SECS=${env.UPSTREAM_TIMEOUT_SECS} must be at least 1: ` +
+      'at zero every upstream fetch aborts instantly.',
+  );
+}
+
 if (env.DEDUP_TTL_SECS < 5 || env.DEDUP_TTL_SECS > 60) {
   throw new Error(`DEDUP_TTL_SECS=${env.DEDUP_TTL_SECS} must be 5-60.`);
 }
