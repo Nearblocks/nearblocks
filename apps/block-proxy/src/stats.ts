@@ -18,7 +18,6 @@ export class StatsCollector {
   upstreamRequestsS3 = 0;
 
   snapshot(
-    cacheDisabled: boolean,
     tipHeight: number,
     uptimeSecs: number,
     upstreamEnabled: { fastnear: boolean; s3: boolean },
@@ -32,7 +31,6 @@ export class StatsCollector {
 
     return {
       cache: {
-        disabled: cacheDisabled,
         evictions: this.cacheEvictions,
         hit_rate: cacheHitRate,
         hits: this.cacheHits,

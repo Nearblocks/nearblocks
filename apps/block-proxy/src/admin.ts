@@ -17,15 +17,10 @@ export function createAdminServer(state: AppState): express.Express {
   app.get('/stats', (_req, res) => {
     const tipHeight = state.tipHeight;
     const uptimeSecs = Math.floor((Date.now() - state.startTime) / 1000);
-    const snapshot = state.stats.snapshot(
-      state.cache.isDisabled,
-      tipHeight,
-      uptimeSecs,
-      {
-        fastnear: state.fastnearEnabled,
-        s3: state.s3Enabled,
-      },
-    );
+    const snapshot = state.stats.snapshot(tipHeight, uptimeSecs, {
+      fastnear: state.fastnearEnabled,
+      s3: state.s3Enabled,
+    });
     res.json(snapshot);
   });
 

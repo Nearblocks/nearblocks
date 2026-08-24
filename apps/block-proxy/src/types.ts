@@ -24,7 +24,6 @@ export interface StatsSnapshot {
 }
 
 export interface CacheStats {
-  disabled: boolean;
   evictions: number;
   hit_rate: number;
   hits: number;

@@ -26,18 +26,6 @@ export const cacheEvictions = new client.Counter({
   registers: [register],
 });
 
-export const cacheDisabled = new client.Gauge({
-  help: 'Whether the disk cache has been disabled after stalled operations',
-  name: 'block_proxy_cache_disabled',
-  registers: [register],
-});
-
-export const cacheTimeouts = new client.Counter({
-  help: 'Total cache operations abandoned for overrunning',
-  name: 'block_proxy_cache_timeouts',
-  registers: [register],
-});
-
 export const requests = new client.Counter({
   help: 'Total request count by endpoint',
   labelNames: ['endpoint'] as const,
