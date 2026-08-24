@@ -18,6 +18,9 @@ RUN yarn turbo run build --filter=block-proxy...
 
 FROM base AS runner
 ENV NODE_ENV production
+# Three stalled cache operations are tolerated before the cache is disabled;
+# the default pool of 4 leaves no margin for the DNS lookups fetch needs.
+ENV UV_THREADPOOL_SIZE 8
 USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .

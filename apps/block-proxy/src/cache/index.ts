@@ -10,10 +10,29 @@ import type { StatsCollector } from '#stats';
 
 import { blockHeightToPath } from './path.js';
 
+/**
+ * Every filesystem call in this process shares one libuv worker pool, four
+ * wide by default, and none of them can be cancelled. A volume that stops
+ * responding parks a worker per call, permanently. Reads, background writes
+ * and the eviction sweep all draw on that pool, so a hung mount drains it
+ * within seconds and stops all file and DNS work process-wide — taking the
+ * proxy down entirely, not just the cache.
+ *
+ * So watch for calls that never finish and, after a few, stop touching the
+ * disk for the life of the process. The proxy then serves from upstream:
+ * slower, but serving. Deliberately one-way, because re-probing a hung mount
+ * costs another worker that never comes back.
+ */
+const OP_TIMEOUT_MS = 5_000;
+const TIMEOUTS_BEFORE_DISABLE = 3;
+
 export class CacheStore {
   private cacheDir: string;
   private cacheTtlMs: number;
   private compression: boolean;
+  private disabled = false;
+  private evicting = false;
+  private timeouts = 0;
 
   constructor(config: Config) {
     this.cacheDir = config.cacheDir;
@@ -21,30 +40,18 @@ export class CacheStore {
     this.compression = config.cacheCompression;
   }
 
-  /**
-   * Create the cache directory at startup.
-   */
-  ensureDir(): void {
-    fs.mkdirSync(this.cacheDir, { recursive: true });
+  private disable(reason: string): void {
+    if (this.disabled) return;
+
+    this.disabled = true;
+    metrics.cacheDisabled.set(1);
+    logger.error(
+      { reason },
+      'cache disabled for the life of this process; serving from upstream only',
+    );
   }
 
-  async read(height: number): Promise<Buffer | null> {
-    const filePath = blockHeightToPath(this.cacheDir, height, this.compression);
-
-    try {
-      const data = await fsp.readFile(filePath);
-      logger.debug({ bytes: data.length, height }, 'cache hit');
-      return data;
-    } catch (err: unknown) {
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-        logger.debug({ height }, 'cache miss');
-        return null;
-      }
-      throw err;
-    }
-  }
-
-  async runEviction(stats: StatsCollector): Promise<void> {
+  private async sweep(stats: StatsCollector): Promise<void> {
     const start = Date.now();
     let scanned = 0;
     let evicted = 0;
@@ -120,6 +127,86 @@ export class CacheStore {
   }
 
   /**
+   * Abandon an operation that overruns, and count it. The call itself keeps
+   * running and keeps its worker — that is exactly why they must be counted
+   * rather than merely timed out.
+   */
+  private async withTimeout<T>(op: Promise<T>, what: string): Promise<T> {
+    // We stop waiting, so claim any later rejection: index.ts exits on an
+    // unhandled one.
+    op.catch(() => {});
+
+    let timedOut = false;
+    let timer: NodeJS.Timeout | undefined;
+
+    const expiry = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        timedOut = true;
+        reject(new Error(`cache ${what} did not finish in ${OP_TIMEOUT_MS}ms`));
+      }, OP_TIMEOUT_MS);
+    });
+
+    try {
+      return await Promise.race([op, expiry]);
+    } finally {
+      clearTimeout(timer);
+
+      if (timedOut) {
+        this.timeouts += 1;
+        metrics.cacheTimeouts.inc();
+
+        if (this.timeouts >= TIMEOUTS_BEFORE_DISABLE) {
+          this.disable(`${this.timeouts} cache operations did not finish`);
+        }
+      } else {
+        // The volume answered, even if with an error.
+        this.timeouts = 0;
+      }
+    }
+  }
+
+  /**
+   * Create the cache directory at startup.
+   */
+  ensureDir(): void {
+    fs.mkdirSync(this.cacheDir, { recursive: true });
+  }
+
+  async read(height: number): Promise<Buffer | null> {
+    if (this.disabled) return null;
+
+    const filePath = blockHeightToPath(this.cacheDir, height, this.compression);
+
+    try {
+      const data = await this.withTimeout(fsp.readFile(filePath), 'read');
+      logger.debug({ bytes: data.length, height }, 'cache hit');
+      return data;
+    } catch (err: unknown) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        logger.debug({ height }, 'cache miss');
+        return null;
+      }
+      throw err;
+    }
+  }
+
+  async runEviction(stats: StatsCollector): Promise<void> {
+    // A sweep touches every cached file, so a hung one must never overlap with
+    // the next: that would multiply the workers lost rather than cost one.
+    if (this.disabled || this.evicting) return;
+
+    this.evicting = true;
+
+    try {
+      await this.sweep(stats);
+    } finally {
+      // Left set only if the sweep never returns, which is the point: one
+      // stuck worker, not one per minute.
+      this.evicting = false;
+    }
+  }
+
+  /**
    * Start the background eviction loop (every 60s).
    */
   startEvictionLoop(stats: StatsCollector): ReturnType<typeof setInterval> {
@@ -175,12 +262,20 @@ export class CacheStore {
   }
 
   writeBackground(height: number, jsonBytes: Buffer): void {
-    this.write(height, jsonBytes).catch((err) => {
+    if (this.disabled) return;
+
+    // Three filesystem calls per block, fire-and-forget: the heaviest draw on
+    // the pool, and the one nothing would otherwise notice stalling.
+    this.withTimeout(this.write(height, jsonBytes), 'write').catch((err) => {
       logger.warn(
         { error: String(err), height },
         'background cache write failed',
       );
     });
+  }
+
+  get isDisabled(): boolean {
+    return this.disabled;
   }
 }
 
