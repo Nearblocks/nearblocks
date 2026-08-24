@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "test": "vitest"
+    "test": "vitest run --passWithNoTests"
   },
   "devDependencies": {
     "eslint-config-custom-node": "*",

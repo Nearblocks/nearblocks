@@ -8,15 +8,11 @@ const env = cleanEnv(process.env, {
   CACHE_DIR: str({ default: '/app/cache' }),
   CACHE_ENABLED: bool({ default: true }),
   CACHE_TTL_SECS: num({ default: 3600 }),
+  DEDUP_TTL_SECS: num({ default: 25 }),
   FASTNEAR_API_KEY: str({ default: '' }),
   FASTNEAR_ENABLED: bool({ default: true }),
   FASTNEAR_URL: str({ default: '' }),
   LOG_LEVEL: str({ default: 'info' }),
-  NEAR_LAKE_ACCESS_KEY: str({ default: '' }),
-  NEAR_LAKE_BUCKET: str({ default: '' }),
-  NEAR_LAKE_ENABLED: bool({ default: false }),
-  NEAR_LAKE_REGION: str({ default: 'eu-central-1' }),
-  NEAR_LAKE_SECRET_KEY: str({ default: '' }),
   NETWORK: str({ choices: ['mainnet', 'testnet'], default: 'mainnet' }),
   PORT: port({ default: 3000 }),
   S3_ACCESS_KEY: str({ default: '' }),
@@ -25,7 +21,9 @@ const env = cleanEnv(process.env, {
   S3_ENDPOINT: str({ default: '' }),
   S3_REGION: str({ default: 'us-east-1' }),
   S3_SECRET_KEY: str({ default: '' }),
-  UPSTREAM_TIMEOUT_SECS: num({ default: 30 }),
+  // One timeout for every upstream, kept below the client abort. When equal,
+  // indexers gave up before the proxy could answer.
+  UPSTREAM_TIMEOUT_SECS: num({ default: 10 }),
 });
 
 function deriveFastnearUrl(network: string, override_: string): string {
@@ -35,17 +33,36 @@ function deriveFastnearUrl(network: string, override_: string): string {
     : 'https://mainnet.neardata.xyz';
 }
 
-function deriveNearLakeBucket(network: string, override_: string): string {
-  if (override_) return override_;
-  return network === 'testnet'
-    ? 'near-lake-data-testnet'
-    : 'near-lake-data-mainnet';
-}
-
 function mask(val: string): string {
   if (!val) return '<unset>';
   if (val.length <= 4) return '***';
   return `${val.slice(0, 4)}***`;
+}
+
+// Mirrors S3Upstream.create: the flag alone does not make S3 usable.
+const s3Ready =
+  env.S3_ENABLED &&
+  !!env.S3_ENDPOINT &&
+  !!env.S3_BUCKET &&
+  !!env.S3_ACCESS_KEY &&
+  !!env.S3_SECRET_KEY;
+
+if (!env.FASTNEAR_ENABLED && !s3Ready) {
+  throw new Error(
+    'no working upstream: set FASTNEAR_ENABLED=true, or S3_ENABLED=true with ' +
+      'S3_ENDPOINT/S3_BUCKET/S3_ACCESS_KEY/S3_SECRET_KEY all set.',
+  );
+}
+
+if (env.UPSTREAM_TIMEOUT_SECS < 1) {
+  throw new Error(
+    `UPSTREAM_TIMEOUT_SECS=${env.UPSTREAM_TIMEOUT_SECS} must be at least 1: ` +
+      'at zero every upstream fetch aborts instantly.',
+  );
+}
+
+if (env.DEDUP_TTL_SECS < 5 || env.DEDUP_TTL_SECS > 60) {
+  throw new Error(`DEDUP_TTL_SECS=${env.DEDUP_TTL_SECS} must be 5-60.`);
 }
 
 if (env.CACHE_COMPRESSION) {
@@ -61,15 +78,11 @@ const config = {
   cacheDir: env.CACHE_DIR,
   cacheEnabled: env.CACHE_ENABLED,
   cacheTtlSecs: env.CACHE_TTL_SECS,
+  dedupTtlMs: env.DEDUP_TTL_SECS * 1000,
   fastnearApiKey: env.FASTNEAR_API_KEY,
   fastnearBaseUrl: deriveFastnearUrl(env.NETWORK, env.FASTNEAR_URL),
   fastnearEnabled: env.FASTNEAR_ENABLED,
   logLevel: env.LOG_LEVEL,
-  nearLakeAccessKey: env.NEAR_LAKE_ACCESS_KEY,
-  nearLakeBucket: deriveNearLakeBucket(env.NETWORK, env.NEAR_LAKE_BUCKET),
-  nearLakeEnabled: env.NEAR_LAKE_ENABLED,
-  nearLakeRegion: env.NEAR_LAKE_REGION,
-  nearLakeSecretKey: env.NEAR_LAKE_SECRET_KEY,
   network: env.NETWORK,
   port: env.PORT,
   s3AccessKey: env.S3_ACCESS_KEY,
@@ -91,18 +104,10 @@ export function logConfigSummary(): void {
       cacheDir: config.cacheDir,
       cacheEnabled: config.cacheEnabled,
       cacheTtlSecs: config.cacheTtlSecs,
+      dedupTtlSecs: env.DEDUP_TTL_SECS,
       fastnearApiKey: mask(config.fastnearApiKey),
       fastnearEnabled: config.fastnearEnabled,
       fastnearUrl: config.fastnearBaseUrl,
-      nearLakeAccessKey: mask(config.nearLakeAccessKey),
-      nearLakeBucket: config.nearLakeBucket,
-      nearLakeEffectivelyEnabled:
-        config.nearLakeEnabled &&
-        !!config.nearLakeAccessKey &&
-        !!config.nearLakeSecretKey,
-      nearLakeEnabled: config.nearLakeEnabled,
-      nearLakeRegion: config.nearLakeRegion,
-      nearLakeSecretKey: mask(config.nearLakeSecretKey),
       network: config.network,
       port: config.port,
       s3AccessKey: mask(config.s3AccessKey),

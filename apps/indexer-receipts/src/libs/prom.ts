@@ -1,5 +1,6 @@
 import client from 'prom-client';
 
+import { logger } from 'nb-logger';
 import { createMetrics } from 'nb-prom';
 
 import config from '#config';
@@ -9,7 +10,10 @@ const metrics = createMetrics({ indexer: 'receipts', network: config.network });
 export const { register } = metrics;
 export default metrics;
 
-metrics.startMetricsServer(3010);
+export const server = metrics.startMetricsServer(3010);
+server.on('listening', () =>
+  logger.info('metrics server listening on port 3010'),
+);
 
 export const cacheHistogram = new client.Histogram({
   buckets: [0.25, 0.5, 0.75, 1, 2, 3, 5, 10, 25, 50, 100, 500, 1000],

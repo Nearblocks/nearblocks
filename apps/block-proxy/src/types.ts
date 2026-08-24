@@ -32,6 +32,7 @@ export interface CacheStats {
 }
 
 export interface DedupStats {
+  deadlines: number;
   leaders: number;
   saves: number;
   total: number;
@@ -39,7 +40,6 @@ export interface DedupStats {
 
 export interface UpstreamStats {
   fastnear: SourceStats;
-  near_lake: SourceStats;
   s3: SourceStats;
 }
 

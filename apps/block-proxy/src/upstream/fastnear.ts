@@ -5,6 +5,18 @@ import * as metrics from '#metrics';
 
 const MAX_BODY_SIZE = 100 * 1024 * 1024; // 100 MB
 
+/**
+ * undici keeps a connection checked out until its body is read or cancelled.
+ * Used where the body size is unknown; small 404 bodies are reclaimed anyway.
+ */
+const discardBody = async (response: Response): Promise<void> => {
+  try {
+    await response.body?.cancel();
+  } catch {
+    // Already consumed, or the socket is gone. Nothing left to release.
+  }
+};
+
 export class FastnearUpstream {
   private apiKey: string;
   private baseUrl: string;
@@ -54,6 +66,7 @@ export class FastnearUpstream {
     }
 
     if (!response.ok) {
+      await discardBody(response);
       throw new Error(
         `fastnear returned error status for block ${height}: ${response.status}`,
       );
@@ -61,6 +74,7 @@ export class FastnearUpstream {
 
     const contentLength = response.headers.get('content-length');
     if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+      await discardBody(response);
       throw new Error(
         `fastnear response too large for block ${height}: ${contentLength} bytes`,
       );
@@ -116,6 +130,7 @@ export class FastnearUpstream {
     }
 
     if (!response.ok) {
+      await discardBody(response);
       throw new Error(
         `fastnear returned error status for last_block/final: ${response.status}`,
       );
@@ -123,6 +138,7 @@ export class FastnearUpstream {
 
     const contentLength = response.headers.get('content-length');
     if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+      await discardBody(response);
       throw new Error(
         `fastnear response too large for last_block/final: ${contentLength} bytes`,
       );

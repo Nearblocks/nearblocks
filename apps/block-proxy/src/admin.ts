@@ -19,7 +19,6 @@ export function createAdminServer(state: AppState): express.Express {
     const uptimeSecs = Math.floor((Date.now() - state.startTime) / 1000);
     const snapshot = state.stats.snapshot(tipHeight, uptimeSecs, {
       fastnear: state.fastnearEnabled,
-      nearLake: state.nearLakeEnabled,
       s3: state.s3Enabled,
     });
     res.json(snapshot);

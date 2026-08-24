@@ -1,10 +1,10 @@
 # block-proxy
 
-Caching reverse proxy for NEAR block data. Sits between indexers and upstream block sources (fastnear/neardata, S3/MinIO, NEAR Lake), providing:
+Caching reverse proxy for NEAR block data. Sits between indexers and upstream block sources (fastnear/neardata, S3/MinIO), providing:
 
 - **Local disk cache** with sharded storage and TTL-based eviction
 - **Singleflight dedup** — concurrent requests for the same block height are collapsed into one upstream fetch
-- **Fallback chain** — cache → S3/MinIO → fastnear → NEAR Lake, with per-source metrics
+- **Fallback chain** — cache → S3/MinIO → fastnear, with per-source metrics
 - **Prometheus metrics** and JSON stats on a separate admin port
 
 ## Quick Start
@@ -12,8 +12,8 @@ Caching reverse proxy for NEAR block data. Sits between indexers and upstream bl
 The proxy is URL-compatible with neardata.xyz — any client that fetches `/v0/block/{height}` or `/v0/last_block/final` can point at the proxy instead.
 
 ```bash
-# Minimal config — fastnear-only proxy, no S3/NEAR Lake
-FASTNEAR_ENABLED=true S3_ENABLED=false NEAR_LAKE_ENABLED=false node dist/index.js
+# Minimal config — fastnear-only proxy, no S3
+FASTNEAR_ENABLED=true S3_ENABLED=false node dist/index.js
 ```
 
 All env vars have safe defaults. With zero config, the proxy starts on port 3000 serving mainnet blocks via fastnear.
@@ -56,6 +56,13 @@ All env vars have safe defaults. With zero config, the proxy starts on port 3000
 | `CACHE_TTL_SECS`    | `3600`       | TTL for cached block eviction (seconds)      |
 | `CACHE_COMPRESSION` | `false`      | Reserved for future zstd compression support |
 
+### Timeouts
+
+| Variable                | Default | Description                                                  |
+| ----------------------- | ------- | ------------------------------------------------------------ |
+| `UPSTREAM_TIMEOUT_SECS` | `10`    | Per-upstream timeout. Must be below the 30s client abort.    |
+| `DEDUP_TTL_SECS`        | `25`    | Max lifetime of an in-flight singleflight entry. Range 5-60. |
+
 ### Upstream: fastnear (neardata.xyz)
 
 | Variable           | Default                  | Description                |
@@ -74,15 +81,6 @@ All env vars have safe defaults. With zero config, the proxy starts on port 3000
 | `S3_ACCESS_KEY` | _(required if enabled)_ | Access key               |
 | `S3_SECRET_KEY` | _(required if enabled)_ | Secret key               |
 
-### Upstream: NEAR Lake
-
-| Variable                | Default                  | Description                          |
-| ----------------------- | ------------------------ | ------------------------------------ |
-| `NEAR_LAKE_ENABLED`     | `false`                  | Enable NEAR Lake upstream            |
-| `NEAR_LAKE_BUCKET`      | _(derived from NETWORK)_ | Override NEAR Lake S3 bucket         |
-| `NEAR_LAKE_REGION`      | `eu-central-1`           | NEAR Lake S3 region                  |
-| `UPSTREAM_TIMEOUT_SECS` | `7`                      | Per-source request timeout (seconds) |
-
 ## Architecture
 
 ```
@@ -97,16 +95,9 @@ All env vars have safe defaults. With zero config, the proxy starts on port 3000
          │ cache  │  │ S3/MinIO │  │ fastnear  │
          │ (disk) │  │          │  │ neardata  │
          └────────┘  └──────────┘  └──────────┘
-                                        │
-                                   ┌────┘
-                                   ▼
-                              ┌──────────┐
-                              │NEAR Lake │
-                              │  (S3)    │
-                              └──────────┘
 ```
 
-Fallback order: cache → S3 → fastnear → NEAR Lake. On any upstream hit, the block is written to cache in the background.
+Fallback order: cache → S3 → fastnear. On any upstream hit, the block is written to cache in the background.
 
 ### Singleflight Dedup
 

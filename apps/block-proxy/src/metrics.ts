@@ -45,6 +45,12 @@ export const dedupLeaders = new client.Counter({
   registers: [register],
 });
 
+export const dedupDeadlines = new client.Counter({
+  help: 'Total dedup entries released by hitting their deadline',
+  name: 'block_proxy_dedup_deadlines',
+  registers: [register],
+});
+
 export const upstreamRequests = new client.Counter({
   help: 'Total upstream request count by source and result',
   labelNames: ['source', 'result'] as const,

@@ -5,24 +5,22 @@ export class StatsCollector {
   cacheHits = 0;
   cacheMisses = 0;
   cacheWrites = 0;
+  dedupDeadlines = 0;
   dedupLeaders = 0;
   dedupTotal = 0;
   requestsBlock = 0;
   requestsLastBlock = 0;
   upstreamDurationUsFastnear = 0;
-  upstreamDurationUsNearLake = 0;
   upstreamDurationUsS3 = 0;
   upstreamErrorsFastnear = 0;
-  upstreamErrorsNearLake = 0;
   upstreamErrorsS3 = 0;
   upstreamRequestsFastnear = 0;
-  upstreamRequestsNearLake = 0;
   upstreamRequestsS3 = 0;
 
   snapshot(
     tipHeight: number,
     uptimeSecs: number,
-    upstreamEnabled: { fastnear: boolean; nearLake: boolean; s3: boolean },
+    upstreamEnabled: { fastnear: boolean; s3: boolean },
   ): StatsSnapshot {
     const cacheTotal = this.cacheHits + this.cacheMisses;
     const cacheHitRate = cacheTotal > 0 ? this.cacheHits / cacheTotal : 0;
@@ -40,6 +38,7 @@ export class StatsCollector {
         writes: this.cacheWrites,
       },
       dedup: {
+        deadlines: this.dedupDeadlines,
         leaders: this.dedupLeaders,
         saves: dedupSaves,
         total: this.dedupTotal,
@@ -58,15 +57,6 @@ export class StatsCollector {
           enabled: upstreamEnabled.fastnear,
           errors: this.upstreamErrorsFastnear,
           requests: this.upstreamRequestsFastnear,
-        },
-        near_lake: {
-          avg_latency_ms: avgLatencyMs(
-            this.upstreamDurationUsNearLake,
-            this.upstreamRequestsNearLake,
-          ),
-          enabled: upstreamEnabled.nearLake,
-          errors: this.upstreamErrorsNearLake,
-          requests: this.upstreamRequestsNearLake,
         },
         s3: {
           avg_latency_ms: avgLatencyMs(
