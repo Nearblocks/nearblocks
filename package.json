@@ -14,7 +14,8 @@
     "lint:check": "turbo run lint:check",
     "format": "prettier --write --ignore-unknown './**/*'",
     "format:check": "prettier --check --ignore-unknown './**/*'",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "turbo run test"
   },
   "dependencies": {},
   "devDependencies": {
