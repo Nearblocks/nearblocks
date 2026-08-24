@@ -16,13 +16,23 @@ import {
   isDataDeletion,
   isDataUpdate,
 } from '#libs/guards';
+import { PREFIXES } from '#libs/layouts';
 import {
+  clearUntracked,
   collectEvidence,
-  detectLayout,
-  forgetLayout,
   getLayout,
+  isUntracked,
+  markUntracked,
 } from '#services/detect';
-import { Layout, Resolved, StateChange, StorageWrite } from '#types/types';
+import {
+  Evidence,
+  Layout,
+  Resolved,
+  StateChange,
+  StorageWrite,
+} from '#types/types';
+
+const EMPTY_EVIDENCE: Evidence = { accounts: new Set(), mints: new Map() };
 
 const resolveBorsh = (
   contract: string,
@@ -123,17 +133,19 @@ const resolveJson = (
     );
   }
 
+  if (amount === undefined || amount === null) return { account, amount: 0n };
+
   if (typeof amount !== 'string' && typeof amount !== 'number') {
     throw new Error(
       `contradiction: ${contract} verified json layout, path ` +
-        `${layout.valuePath} is missing for ${account}`,
+        `${layout.valuePath} has an unexpected value for ${account}`,
     );
   }
 
   return { account, amount: BigInt(amount) };
 };
 
-const resolve = (
+const resolveStatic = (
   contract: string,
   layout: Layout,
   write: StorageWrite,
@@ -145,6 +157,40 @@ const resolve = (
     return resolveIndexed(contract, layout, write.key, write.value);
 
   return resolveBorsh(contract, layout, write.key, write.value);
+};
+
+const resolveGlobal = (
+  contract: string,
+  key: Buffer,
+  value: Buffer | null,
+  evidence: Evidence,
+): null | Resolved => {
+  let account: null | string = null;
+
+  for (const prefix of PREFIXES) {
+    const decoded = decodeBorshAccountKey(key, prefix);
+    if (decoded === null) continue;
+
+    if (account !== null) {
+      throw new Error(
+        `contradiction: ${contract} key matches more than one global prefix`,
+      );
+    }
+
+    account = decoded;
+  }
+
+  if (account === null) return null;
+
+  if (value === null) {
+    if (!evidence.accounts.has(account)) return null;
+
+    return { account, amount: 0n };
+  }
+
+  if (value.length !== 16) return null;
+
+  return { account, amount: decodeU128LE(value) };
 };
 
 export const storeFTState = async (
@@ -167,10 +213,11 @@ const storeShardFTState = async (
   const blockHeight = block.height;
   const evidences = collectEvidence(shard);
   const writesByContract = new Map<string, StorageWrite[]>();
+  const redeployed = new Set<string>();
 
   for (const change of stateChanges) {
     if (isContractCodeUpdate(change)) {
-      forgetLayout(change.change.accountId);
+      redeployed.add(change.change.accountId);
       continue;
     }
 
@@ -178,7 +225,11 @@ const storeShardFTState = async (
     if (!update && !isDataDeletion(change)) continue;
 
     const contract = change.change.accountId;
-    if (!getLayout(contract) && !evidences.has(contract)) continue;
+
+    if (isUntracked(contract)) continue;
+
+    const hasLayout = getLayout(contract) !== undefined;
+    if (!hasLayout && !evidences.has(contract)) continue;
 
     const writes = writesByContract.get(contract) ?? [];
 
@@ -191,41 +242,60 @@ const storeShardFTState = async (
     writesByContract.set(contract, writes);
   }
 
+  if (redeployed.size) {
+    await Promise.all(
+      [...redeployed].map((contract) => clearUntracked(knex, contract)),
+    );
+  }
+
   const rows: FTStateBalance[] = [];
 
   for (const [contract, writes] of writesByContract) {
-    let layout = getLayout(contract);
-
-    if (!layout) {
-      const evidence = evidences.get(contract);
-      if (!evidence?.accounts.size) continue;
-
-      layout = await detectLayout(
-        knex,
-        contract,
-        writes,
-        evidence,
-        blockHeight,
-      );
-    }
-
-    if (!layout) continue;
+    const evidence = evidences.get(contract);
+    const layout = getLayout(contract);
+    const decodedAccounts = new Set<string>();
+    const candidateRows: FTStateBalance[] = [];
 
     for (const write of writes) {
-      const resolved = resolve(contract, layout, write);
+      const resolved = layout
+        ? resolveStatic(contract, layout, write)
+        : resolveGlobal(
+            contract,
+            write.key,
+            write.value,
+            evidence ?? EMPTY_EVIDENCE,
+          );
 
       if (!resolved) continue;
 
-      rows.push({
+      decodedAccounts.add(resolved.account);
+
+      candidateRows.push({
         absolute_amount: resolved.amount.toString(),
         affected_account_id: resolved.account,
         block_height: blockHeight,
         block_timestamp: block.timestampNanosec,
         contract_account_id: contract,
-        index_in_chunk: rows.length,
+        index_in_chunk: 0,
         receipt_id: write.causeReceiptHash ?? null,
         shard_id: shard.shardId,
       });
+    }
+
+    if (!layout && evidence) {
+      const contradicts = [...evidence.accounts].some(
+        (account) => !decodedAccounts.has(account),
+      );
+
+      if (contradicts) {
+        await markUntracked(knex, contract, blockHeight);
+        continue;
+      }
+    }
+
+    for (const row of candidateRows) {
+      row.index_in_chunk = rows.length;
+      rows.push(row);
     }
   }
 

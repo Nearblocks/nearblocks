@@ -4,11 +4,13 @@ import config from '#config';
 import { db } from '#libs/knex';
 import { server } from '#libs/prom';
 import sentry from '#libs/sentry';
+import { loadUntracked } from '#services/detect';
 import { syncData } from '#services/stream';
 
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
+    await loadUntracked(db);
     await syncData();
   } catch (error) {
     logger.error('aborting...');

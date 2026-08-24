@@ -64,3 +64,38 @@ const testnet: Record<string, Layout> = {};
 
 export const staticLayouts: Record<string, Layout> =
   config.network === Network.MAINNET ? mainnet : testnet;
+
+export const PREFIXES: Buffer[] =
+  config.network === Network.MAINNET
+    ? [
+        Buffer.from('00', 'hex'),
+        Buffer.from('74', 'hex'),
+        Buffer.from('61', 'hex'),
+        Buffer.from('6674', 'hex'),
+        Buffer.from('01', 'hex'),
+        Buffer.from('04', 'hex'),
+        Buffer.from('05', 'hex'),
+        Buffer.from('03', 'hex'),
+        Buffer.from('0c', 'hex'),
+        Buffer.from('07', 'hex'),
+        Buffer.from('7e2431343101', 'hex'),
+        Buffer.from('7374757364', 'hex'),
+      ]
+    : [];
+
+for (const a of PREFIXES) {
+  for (const b of PREFIXES) {
+    if (a === b) continue;
+
+    const shorter = a.length <= b.length ? a : b;
+    const longer = a.length <= b.length ? b : a;
+
+    if (longer.subarray(0, shorter.length).equals(shorter)) {
+      throw new Error(
+        `ft-state PREFIXES overlap: ${a.toString('hex')} / ${b.toString(
+          'hex',
+        )}`,
+      );
+    }
+  }
+}

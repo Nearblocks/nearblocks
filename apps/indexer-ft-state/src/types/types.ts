@@ -74,16 +74,7 @@ export type Evidence = {
   mints: Map<string, bigint>;
 };
 
-export type Candidate = {
-  mixedLength: boolean;
-  prefix: Buffer;
-  values: Map<string, Buffer>;
-};
-
-export type UntrackedReason =
-  | 'ambiguous_prefix'
-  | 'no_account_keys'
-  | 'unsupported_layout';
+export type UntrackedReason = 'event_contradiction';
 
 export type EventLog = {
   data?: unknown;
