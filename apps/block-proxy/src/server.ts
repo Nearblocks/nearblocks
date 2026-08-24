@@ -28,10 +28,8 @@ export function createDataServer(state: AppState): express.Express {
     next();
   });
 
-  // Liveness accounting. `finish` fires only when a response was actually
-  // written, so a request the client aborted mid-flight does NOT count as
-  // served — which is the whole point: during the 2026-08-24 outage requests
-  // kept arriving and none ever completed.
+  // Liveness accounting. `finish` fires only when a response was written, so
+  // a request the client aborted does not count as served.
   app.use((req, res, next) => {
     if (req.path.startsWith('/v0/')) {
       state.lastRequestAt = Date.now();
@@ -178,12 +176,9 @@ export function createDataServer(state: AppState): express.Express {
     });
   });
 
-  // GET /livez — is the data path making progress?
-  //
-  // Deliberately measures progress, not success: an upstream outage still
-  // produces 502 responses, which keeps this green. It reports a stall only
-  // when requests are arriving and none of them complete. An idle proxy stays
-  // green too, because lastRequestAt stops advancing as well.
+  // GET /livez — progress, not success. A 502 still counts as progress, and
+  // an idle proxy stays green. Stalls only when requests arrive and none
+  // complete.
   app.get('/livez', (_req, res) => {
     const stalledMs = state.lastRequestAt - state.lastServedAt;
 

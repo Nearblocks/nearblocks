@@ -180,16 +180,14 @@ export async function fetchBlockDeduped(
   const existing = state.dedup.get(key);
   if (existing) {
     if (Date.now() - existing.createdAt < ttlMs) {
-      // Follower: answered from the leader's in-flight promise. It performs no
-      // cache read and no upstream fetch, so it is counted here rather than as
-      // a cache hit — see block_proxy_dedup_saves.
+      // Follower: served from the leader's promise, so it does no cache read
+      // and no upstream fetch. Counted here, not as a cache hit.
       metrics.dedupSaves.inc();
 
       return existing.promise;
     }
 
-    // The leader outlived its deadline without its timer releasing the entry.
-    // Never hand out a corpse: drop it and lead a fresh attempt.
+    // Leader outlived its deadline without its timer releasing the entry.
     logger.error(
       { age_ms: Date.now() - existing.createdAt, height },
       'stale dedup entry evicted on read',
@@ -209,9 +207,7 @@ export async function fetchBlockDeduped(
       `dedup deadline exceeded for block ${height} after ${ttlMs}ms`,
     ) as Error & { errors: UpstreamError[] };
 
-    // Give the request handler something to log. Without this the follower's
-    // 502 is reported as 'all upstreams exhausted' with an empty error array,
-    // which is exactly the signature that made this incident hard to read.
+    // Without this the 502 logs as 'all upstreams exhausted' with no errors.
     err.errors = [
       { error: `dedup deadline exceeded after ${ttlMs}ms`, source: 'dedup' },
     ];
@@ -219,13 +215,9 @@ export async function fetchBlockDeduped(
     return err;
   };
 
-  // Bypass dedup if map is at capacity to prevent memory exhaustion. The
-  // deadline still applies: an unbounded fetch here would reintroduce the
-  // same hazard, just without a map entry to show for it.
+  // Bypass dedup if map is at capacity to prevent memory exhaustion. Still
+  // deadline-bounded, and still counted as a leader so `saves` stays honest.
   if (state.dedup.size >= MAX_DEDUP_SIZE) {
-    // Still a real upstream fetch: count it, or `saves = total - leaders`
-    // reports every bypassed request as a deduplication — wrong in exactly
-    // the overload case an operator would be reading /stats to understand.
     metrics.dedupLeaders.inc();
     state.stats.dedupLeaders++;
 
@@ -236,18 +228,12 @@ export async function fetchBlockDeduped(
   metrics.dedupLeaders.inc();
   state.stats.dedupLeaders++;
 
-  // The entry must never outlive its deadline. Removal is driven by the
-  // promise settling, so an upstream promise that never settles would pin
-  // this height forever and every later request would attach to it instead
-  // of retrying.
   const promise = withDeadline(
     fetchBlock(state, height),
     ttlMs,
     onDeadline,
   ).finally(() => {
-    // Only clear our own entry: a stale-eviction may already have replaced it
-    // with a newer leader, which must not be deleted by this one settling.
-    // The callback is a microtask, so `promise` is always initialised by then.
+    // Only clear our own entry: an eviction may have installed a successor.
     if (state.dedup.get(key)?.promise === promise) state.dedup.delete(key);
   });
 

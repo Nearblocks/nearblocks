@@ -22,10 +22,8 @@ const env = cleanEnv(process.env, {
   S3_REGION: str({ default: 'us-east-1' }),
   S3_SECRET_KEY: str({ default: '' }),
   STALL_TIMEOUT_SECS: num({ default: 90 }),
-  // One timeout for every upstream, kept strictly below the client abort
-  // (nb-neardata aborts at 30s). When these were equal, indexers gave up at
-  // the same instant the proxy would have answered, so the whole fallback
-  // chain and the 404-vs-502 distinction were invisible to them.
+  // One timeout for every upstream, kept below the client abort. When equal,
+  // indexers gave up before the proxy could answer.
   UPSTREAM_TIMEOUT_SECS: num({ default: 10 }),
 });
 
@@ -43,9 +41,8 @@ function mask(val: string): string {
 }
 
 /**
- * nb-neardata aborts every attempt at 30s. A dedup entry older than that is
- * useless by construction: nobody is still waiting on it, and anyone who
- * attaches to it can never receive its result. So the TTL has a hard ceiling.
+ * nb-neardata aborts at 30s, so an entry older than that has no waiter left
+ * and caps the useful dedup TTL.
  */
 const CLIENT_ABORT_SECS = 30;
 const MIN_DEDUP_TTL_SECS = 5;
@@ -53,8 +50,7 @@ const MIN_DEDUP_TTL_SECS = 5;
 /** Mirrors READ_TIMEOUT_MS in cache/index.ts. */
 const CACHE_READ_TIMEOUT_MS = 2_000;
 
-// The stall window must exceed the longest a single request can legitimately
-// take, or /livez reports a stall while the proxy is merely slow.
+// Must exceed the longest a single request can legitimately take.
 if (env.STALL_TIMEOUT_SECS <= env.DEDUP_TTL_SECS) {
   throw new Error(
     `STALL_TIMEOUT_SECS=${env.STALL_TIMEOUT_SECS} must exceed ` +
@@ -78,9 +74,7 @@ if (
   );
 }
 
-// S3 is only a real upstream when its credentials are present, so checking the
-// flags alone would let a credential-less S3_ENABLED=true satisfy this guard
-// while the proxy 502s every request. Mirror S3Upstream.create's test.
+// Mirrors S3Upstream.create: the flag alone does not make S3 usable.
 const s3Effective =
   env.S3_ENABLED &&
   !!env.S3_ENDPOINT &&
@@ -88,8 +82,7 @@ const s3Effective =
   !!env.S3_ACCESS_KEY &&
   !!env.S3_SECRET_KEY;
 
-// With every source off the proxy starts happily and 502s every request. It
-// is the sole block source for every indexer, so fail at boot instead.
+// With every source off the proxy would start and 502 every request.
 if (!env.FASTNEAR_ENABLED && !s3Effective) {
   throw new Error(
     'no upstream enabled: set FASTNEAR_ENABLED=true (and/or S3_ENABLED=true). ' +
@@ -150,7 +143,7 @@ export function worstCaseChainMs(): number {
   const upstreams =
     (config.s3Enabled ? 1 : 0) + (config.fastnearEnabled ? 1 : 0);
 
-  // The cache read is the first leg of the chain, not a free lookup.
+  // The cache read is the first leg of the chain.
   const cacheReadMs = config.cacheEnabled ? CACHE_READ_TIMEOUT_MS : 0;
 
   return cacheReadMs + config.upstreamTimeoutMs * upstreams;

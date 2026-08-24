@@ -6,11 +6,8 @@ import * as metrics from '#metrics';
 const MAX_BODY_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /**
- * Release the socket behind a response we are about to discard.
- *
  * undici keeps a connection checked out until its body is read or cancelled.
- * Throwing without doing either leaks the socket until GC. Blocks above the
- * chain tip 404 constantly, so these paths are hot.
+ * Blocks above the chain tip 404 constantly, so these paths are hot.
  */
 const discardBody = async (response: Response): Promise<void> => {
   try {

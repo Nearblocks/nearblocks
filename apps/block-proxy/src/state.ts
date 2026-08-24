@@ -4,11 +4,7 @@ import { StatsCollector } from '#stats';
 import { FastnearUpstream } from '#upstream/fastnear';
 import { S3Upstream } from '#upstream/s3';
 
-/**
- * A dedup entry. `createdAt` lets readers reject an entry whose leader
- * outlived its deadline, so the map can never serve a corpse even if the
- * deadline timer itself failed to fire.
- */
+/** `createdAt` lets readers drop an entry whose leader outlived its TTL. */
 export interface DedupEntry {
   createdAt: number;
   promise: Promise<{ bytes: Buffer; source: string }>;
