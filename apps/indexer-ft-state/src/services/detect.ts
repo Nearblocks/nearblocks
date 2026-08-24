@@ -2,7 +2,6 @@ import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import { Shard } from 'nb-neardata';
 import { NEP } from 'nb-types';
-import { decodeU128LE } from 'nb-utils';
 
 import {
   isActionReceipt,
@@ -11,32 +10,60 @@ import {
 } from '#libs/guards';
 import { staticLayouts } from '#libs/layouts';
 import {
-  Candidate,
   EventLog,
   Evidence,
   FTEventData,
   Layout,
-  StorageWrite,
   UntrackedReason,
 } from '#types/types';
 
 const EVENT_PREFIX = 'EVENT_JSON:';
 const FT_METHODS = ['ft_transfer', 'ft_transfer_call'];
 const ACCOUNT_ID = /^[a-z0-9._-]{2,64}$/;
-const MIN_MATCHES = 2;
-const MIN_ATTEMPTS = 3;
-const MAX_ATTEMPTS = 10_000;
 
-const detected = new Map<string, Layout>();
-const attempts = new Map<string, number>();
 const untracked = new Set<string>();
 
 export const getLayout = (contract: string): Layout | undefined =>
-  staticLayouts[contract] ?? detected.get(contract);
+  staticLayouts[contract];
 
-export const forgetLayout = (contract: string): void => {
-  detected.delete(contract);
-  attempts.delete(contract);
+export const loadUntracked = async (db: Knex): Promise<void> => {
+  const blocked = await db('ft_state_untracked').pluck('contract');
+
+  for (const contract of blocked) untracked.add(contract);
+
+  logger.info(`loaded ${untracked.size} untracked contracts`);
+};
+
+export const isUntracked = (contract: string): boolean =>
+  untracked.has(contract);
+
+export const markUntracked = async (
+  db: Knex,
+  contract: string,
+  blockHeight: number,
+  reason: UntrackedReason = 'event_contradiction',
+): Promise<void> => {
+  if (untracked.has(contract)) return;
+
+  untracked.add(contract);
+
+  await db('ft_state_untracked')
+    .insert({ block_height: blockHeight, contract, reason })
+    .onConflict('contract')
+    .ignore();
+
+  logger.warn(`${contract}: untracked, ${reason}`);
+};
+
+export const clearUntracked = async (
+  db: Knex,
+  contract: string,
+): Promise<void> => {
+  if (!untracked.has(contract)) return;
+
+  untracked.delete(contract);
+
+  await db('ft_state_untracked').where('contract', contract).del();
 };
 
 const parseEvents = (logs: string[]): EventLog[] => {
@@ -142,164 +169,4 @@ export const collectEvidence = (shard: Shard): Map<string, Evidence> => {
   }
 
   return evidences;
-};
-
-const splits = (key: Buffer): { account: string; prefix: Buffer }[] => {
-  const found: { account: string; prefix: Buffer }[] = [];
-
-  for (let length = 1; length + 4 < key.length; length++) {
-    const declared = key.readUInt32LE(length);
-    if (declared !== key.length - length - 4) continue;
-
-    const account = key.subarray(length + 4).toString('utf8');
-    if (!ACCOUNT_ID.test(account)) continue;
-
-    found.push({ account, prefix: key.subarray(0, length) });
-  }
-
-  return found;
-};
-
-const candidatesFor = (writes: StorageWrite[]): Map<string, Candidate> => {
-  const candidates = new Map<string, Candidate>();
-
-  for (const write of writes) {
-    if (!write.value) continue;
-
-    for (const split of splits(write.key)) {
-      const hex = split.prefix.toString('hex');
-      let candidate = candidates.get(hex);
-
-      if (!candidate) {
-        candidate = {
-          mixedLength: false,
-          prefix: split.prefix,
-          values: new Map(),
-        };
-        candidates.set(hex, candidate);
-      }
-
-      if (write.value.length === 16) {
-        candidate.values.set(split.account, write.value);
-        continue;
-      }
-
-      candidate.mixedLength = true;
-    }
-  }
-
-  return candidates;
-};
-
-const reasonFor = (
-  writes: StorageWrite[],
-  candidates: Map<string, Candidate>,
-): UntrackedReason => {
-  if (!candidates.size) {
-    return writes.some((write) => write.value?.length === 16)
-      ? 'no_account_keys'
-      : 'unsupported_layout';
-  }
-
-  return [...candidates.values()].every((candidate) => candidate.mixedLength)
-    ? 'unsupported_layout'
-    : 'ambiguous_prefix';
-};
-
-const markUntracked = async (
-  db: Knex,
-  contract: string,
-  reason: UntrackedReason,
-  blockHeight: number,
-): Promise<void> => {
-  if (untracked.has(contract)) return;
-
-  untracked.add(contract);
-
-  await db('ft_state_untracked')
-    .insert({ block_height: blockHeight, contract, reason })
-    .onConflict('contract')
-    .ignore();
-
-  logger.warn(`${contract}: untracked, ${reason}`);
-};
-
-export const detectLayout = async (
-  db: Knex,
-  contract: string,
-  writes: StorageWrite[],
-  evidence: Evidence,
-  blockHeight: number,
-): Promise<Layout | undefined> => {
-  const candidates = candidatesFor(writes);
-  const usable = [...candidates.values()].filter(
-    (candidate) => !candidate.mixedLength,
-  );
-  const minMatches = usable.length === 1 ? 1 : MIN_MATCHES;
-
-  let best: Candidate | undefined;
-  let bestScore = 0;
-  let bestMints = 0;
-  let tied = false;
-
-  for (const candidate of usable) {
-    let score = 0;
-    let mints = 0;
-
-    for (const [account, value] of candidate.values) {
-      if (!evidence.accounts.has(account)) continue;
-
-      score++;
-
-      const minted = evidence.mints.get(account);
-
-      if (minted !== undefined && decodeU128LE(value) === minted) mints++;
-    }
-
-    if (score < minMatches) continue;
-
-    if (score > bestScore || (score === bestScore && mints > bestMints)) {
-      best = candidate;
-      bestScore = score;
-      bestMints = mints;
-      tied = false;
-      continue;
-    }
-
-    if (score === bestScore && mints === bestMints) tied = true;
-  }
-
-  if (best && !tied) {
-    const layout: Layout = {
-      accountOffset: null,
-      accountPath: null,
-      keyEncoding: 'borsh',
-      keyPrefix: Buffer.from(best.prefix),
-      valueEncoding: 'u128le',
-      valueOffset: null,
-      valuePath: null,
-    };
-
-    detected.set(contract, layout);
-    attempts.delete(contract);
-
-    return layout;
-  }
-
-  if (attempts.size >= MAX_ATTEMPTS) attempts.clear();
-
-  const seen = (attempts.get(contract) ?? 0) + 1;
-
-  attempts.set(contract, seen);
-
-  if (seen >= MIN_ATTEMPTS) {
-    await markUntracked(
-      db,
-      contract,
-      reasonFor(writes, candidates),
-      blockHeight,
-    );
-  }
-
-  return undefined;
 };
