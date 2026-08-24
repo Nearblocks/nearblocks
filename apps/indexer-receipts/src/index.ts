@@ -1,8 +1,8 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
-import { server } from '#libs/http';
 import { db } from '#libs/knex';
+import { server } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { syncData } from '#services/stream';
 
