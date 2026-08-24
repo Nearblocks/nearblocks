@@ -40,65 +40,61 @@ function mask(val: string): string {
   return `${val.slice(0, 4)}***`;
 }
 
-/**
- * nb-neardata aborts at 30s, so an entry older than that has no waiter left
- * and caps the useful dedup TTL.
- */
+// nb-neardata aborts every attempt at 30s, which bounds every timeout here.
 const CLIENT_ABORT_SECS = 30;
-const MIN_DEDUP_TTL_SECS = 5;
 
-/** Mirrors READ_TIMEOUT_MS in cache/index.ts. */
-const CACHE_READ_TIMEOUT_MS = 2_000;
-
-// Must exceed the longest a single request can legitimately take.
-if (env.STALL_TIMEOUT_SECS <= env.DEDUP_TTL_SECS) {
-  throw new Error(
-    `STALL_TIMEOUT_SECS=${env.STALL_TIMEOUT_SECS} must exceed ` +
-      `DEDUP_TTL_SECS=${env.DEDUP_TTL_SECS}: a request may legitimately run ` +
-      `for the full dedup TTL, and reporting that as a stall would restart a ` +
-      `healthy pod.`,
-  );
-}
-
-const MIN_UPSTREAM_TIMEOUT_SECS = 1;
-
-if (
-  env.UPSTREAM_TIMEOUT_SECS < MIN_UPSTREAM_TIMEOUT_SECS ||
-  env.UPSTREAM_TIMEOUT_SECS >= CLIENT_ABORT_SECS
-) {
-  throw new Error(
-    `UPSTREAM_TIMEOUT_SECS=${env.UPSTREAM_TIMEOUT_SECS} is out of range: must ` +
-      `be between ${MIN_UPSTREAM_TIMEOUT_SECS} and ${CLIENT_ABORT_SECS - 1}. ` +
-      `At or below zero every upstream fetch aborts instantly; at or above ` +
-      `the client abort the proxy can never answer before indexers give up.`,
-  );
-}
+/** Hard bound on one cache read. Not an operational knob. */
+export const CACHE_READ_TIMEOUT_MS = 2_000;
 
 // Mirrors S3Upstream.create: the flag alone does not make S3 usable.
-const s3Effective =
+const s3Ready =
   env.S3_ENABLED &&
   !!env.S3_ENDPOINT &&
   !!env.S3_BUCKET &&
   !!env.S3_ACCESS_KEY &&
   !!env.S3_SECRET_KEY;
 
-// With every source off the proxy would start and 502 every request.
-if (!env.FASTNEAR_ENABLED && !s3Effective) {
+// Longest a healthy request can take: one cache read plus every upstream.
+const chainSecs =
+  (env.CACHE_ENABLED ? CACHE_READ_TIMEOUT_MS / 1000 : 0) +
+  env.UPSTREAM_TIMEOUT_SECS *
+    ((env.FASTNEAR_ENABLED ? 1 : 0) + (s3Ready ? 1 : 0));
+
+if (!env.FASTNEAR_ENABLED && !s3Ready) {
   throw new Error(
-    'no upstream enabled: set FASTNEAR_ENABLED=true (and/or S3_ENABLED=true). ' +
-      'block-proxy cannot serve a single block with every source disabled.',
+    'no working upstream: set FASTNEAR_ENABLED=true, or S3_ENABLED=true with ' +
+      'S3_ENDPOINT/S3_BUCKET/S3_ACCESS_KEY/S3_SECRET_KEY all set.',
   );
 }
 
 if (
-  env.DEDUP_TTL_SECS < MIN_DEDUP_TTL_SECS ||
-  env.DEDUP_TTL_SECS > CLIENT_ABORT_SECS
+  env.UPSTREAM_TIMEOUT_SECS < 1 ||
+  env.UPSTREAM_TIMEOUT_SECS >= CLIENT_ABORT_SECS
 ) {
   throw new Error(
-    `DEDUP_TTL_SECS=${env.DEDUP_TTL_SECS} is out of range: must be between ` +
-      `${MIN_DEDUP_TTL_SECS} and ${CLIENT_ABORT_SECS} (the client abort). ` +
-      `Below the range every request becomes its own leader and singleflight ` +
-      `stops working; above it, entries outlive every waiter.`,
+    `UPSTREAM_TIMEOUT_SECS=${env.UPSTREAM_TIMEOUT_SECS} must be between 1 and ` +
+      `${
+        CLIENT_ABORT_SECS - 1
+      }: at zero every fetch aborts instantly, and at ` +
+      `the client abort the proxy can never answer before indexers give up.`,
+  );
+}
+
+// Below the chain the deadline fires on healthy requests; above the client
+// abort the entry outlives every waiter.
+if (env.DEDUP_TTL_SECS <= chainSecs || env.DEDUP_TTL_SECS > CLIENT_ABORT_SECS) {
+  throw new Error(
+    `DEDUP_TTL_SECS=${env.DEDUP_TTL_SECS} must be above the ${chainSecs}s ` +
+      `upstream chain and at most ${CLIENT_ABORT_SECS}s (the client abort).`,
+  );
+}
+
+// A request may legitimately run for the full dedup TTL; calling that a stall
+// would restart a healthy pod.
+if (env.STALL_TIMEOUT_SECS <= env.DEDUP_TTL_SECS) {
+  throw new Error(
+    `STALL_TIMEOUT_SECS=${env.STALL_TIMEOUT_SECS} must exceed ` +
+      `DEDUP_TTL_SECS=${env.DEDUP_TTL_SECS}.`,
   );
 }
 
@@ -134,21 +130,6 @@ const config = {
 
 export type Config = typeof config;
 
-/**
- * Worst case time one request can legitimately spend in the fallback chain.
- * If it exceeds the dedup TTL the deadline can fire on healthy-but-slow
- * requests; if it exceeds the client abort, indexers give up regardless.
- */
-export function worstCaseChainMs(): number {
-  const upstreams =
-    (config.s3Enabled ? 1 : 0) + (config.fastnearEnabled ? 1 : 0);
-
-  // The cache read is the first leg of the chain.
-  const cacheReadMs = config.cacheEnabled ? CACHE_READ_TIMEOUT_MS : 0;
-
-  return cacheReadMs + config.upstreamTimeoutMs * upstreams;
-}
-
 export function logConfigSummary(): void {
   logger.info(
     {
@@ -180,22 +161,6 @@ export function logConfigSummary(): void {
     },
     'block-proxy config',
   );
-
-  const chainMs = worstCaseChainMs();
-
-  if (chainMs > config.dedupTtlMs) {
-    logger.warn(
-      { chain_ms: chainMs, dedup_ttl_ms: config.dedupTtlMs },
-      'upstream chain can outlast the dedup TTL; deadlines may fire on slow but healthy requests',
-    );
-  }
-
-  if (chainMs > CLIENT_ABORT_SECS * 1000) {
-    logger.warn(
-      { chain_ms: chainMs, client_abort_ms: CLIENT_ABORT_SECS * 1000 },
-      'upstream chain can outlast the client abort; indexers will give up before the proxy answers',
-    );
-  }
 }
 
 export default config;

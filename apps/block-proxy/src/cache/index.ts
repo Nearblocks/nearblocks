@@ -4,18 +4,11 @@ import path from 'node:path';
 
 import { logger } from 'nb-logger';
 
-import type { Config } from '#config';
+import { CACHE_READ_TIMEOUT_MS, type Config } from '#config';
 import * as metrics from '#metrics';
 import type { StatsCollector } from '#stats';
 
 import { blockHeightToPath } from './path.js';
-
-/**
- * Bounds a slow-but-responsive disk. Node only checks the signal between
- * chunk reads, so this does NOT interrupt a blocking open on a hung mount or
- * free the libuv worker; the dedup deadline caps that case at a 502.
- */
-const READ_TIMEOUT_MS = 2_000;
 
 export class CacheStore {
   private cacheDir: string;
@@ -40,7 +33,9 @@ export class CacheStore {
 
     try {
       const data = await fsp.readFile(filePath, {
-        signal: AbortSignal.timeout(READ_TIMEOUT_MS),
+        // Only checked between chunk reads: bounds a slow disk, not a
+        // blocking open on a hung mount.
+        signal: AbortSignal.timeout(CACHE_READ_TIMEOUT_MS),
       });
       logger.debug({ bytes: data.length, height }, 'cache hit');
       return data;
