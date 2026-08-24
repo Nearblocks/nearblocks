@@ -107,4 +107,43 @@ describe('CacheStore breaker', () => {
 
     expect(store.isDisabled).toBe(false);
   });
+
+  it('resumes once the volume answers again', async () => {
+    readFile.mockImplementation(hang);
+    const store = new CacheStore(config);
+
+    for (let i = 0; i < 3; i++) await stall(store);
+    expect(store.isDisabled).toBe(true);
+
+    // Backoff has not elapsed: no probe, no disk call.
+    readFile.mockClear();
+    await expect(store.read(9)).resolves.toBeNull();
+    expect(readFile).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(60_000);
+    readFile.mockResolvedValue(Buffer.from('block'));
+
+    await expect(store.read(9)).resolves.toEqual(Buffer.from('block'));
+    expect(store.isDisabled).toBe(false);
+  });
+
+  // Each probe that stalls costs a worker for good, so probing has a budget.
+  it('stops probing once the worker budget is spent', async () => {
+    readFile.mockImplementation(hang);
+    const store = new CacheStore(config);
+
+    for (let i = 0; i < 3; i++) await stall(store);
+
+    // Burn the remaining budget: one abandoned probe per backoff window.
+    for (let i = 0; i < 4; i++) {
+      await vi.advanceTimersByTimeAsync(900_000);
+      await stall(store);
+    }
+
+    readFile.mockClear();
+    await vi.advanceTimersByTimeAsync(900_000);
+
+    await expect(store.read(9)).resolves.toBeNull();
+    expect(readFile).not.toHaveBeenCalled();
+  });
 });

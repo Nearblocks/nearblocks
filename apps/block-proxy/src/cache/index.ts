@@ -19,19 +19,32 @@ import { blockHeightToPath } from './path.js';
  * proxy down entirely, not just the cache.
  *
  * So watch for calls that never finish and, after a few, stop touching the
- * disk for the life of the process. The proxy then serves from upstream:
- * slower, but serving. Deliberately one-way, because re-probing a hung mount
- * costs another worker that never comes back.
+ * disk. The proxy then serves from upstream: slower, but serving.
+ *
+ * Suspension is temporary, because upstream is billed per query and the cache
+ * carries most of the load during catch-up. A single read is let through after
+ * a backoff to see whether the volume recovered. Each probe that stalls costs
+ * another worker for good, so the total is capped: past that the cache stays
+ * off and only a restart brings it back.
  */
 const OP_TIMEOUT_MS = 5_000;
-const TIMEOUTS_BEFORE_DISABLE = 3;
+const TIMEOUTS_BEFORE_SUSPEND = 3;
+const RETRY_BASE_MS = 60_000;
+const RETRY_MAX_MS = 900_000;
+
+/** Workers we are willing to lose proving the volume is broken. */
+const MAX_ABANDONED_OPS = 4;
 
 export class CacheStore {
+  private abandoned = 0;
   private cacheDir: string;
   private cacheTtlMs: number;
   private compression: boolean;
   private disabled = false;
   private evicting = false;
+  private probing = false;
+  private retryAt = 0;
+  private retryDelayMs = RETRY_BASE_MS;
   private timeouts = 0;
 
   constructor(config: Config) {
@@ -40,15 +53,43 @@ export class CacheStore {
     this.compression = config.cacheCompression;
   }
 
-  private disable(reason: string): void {
-    if (this.disabled) return;
+  /** Whether a disk call may be made, including a lone probe while suspended. */
+  private canUseDisk(): boolean {
+    if (!this.disabled) return true;
+    if (this.probing || this.abandoned >= MAX_ABANDONED_OPS) return false;
+    if (Date.now() < this.retryAt) return false;
 
+    this.probing = true;
+
+    return true;
+  }
+
+  private resume(): void {
+    this.disabled = false;
+    this.timeouts = 0;
+    this.retryDelayMs = RETRY_BASE_MS;
+    metrics.cacheDisabled.set(0);
+    logger.warn({ abandoned_ops: this.abandoned }, 'cache resumed');
+  }
+
+  private suspend(): void {
     this.disabled = true;
+    this.retryAt = Date.now() + this.retryDelayMs;
     metrics.cacheDisabled.set(1);
+
+    const permanent = this.abandoned >= MAX_ABANDONED_OPS;
+
     logger.error(
-      { reason },
-      'cache disabled for the life of this process; serving from upstream only',
+      {
+        abandoned_ops: this.abandoned,
+        retry_in_ms: permanent ? null : this.retryDelayMs,
+      },
+      permanent
+        ? 'cache off until restart: too many stalled operations; upstream cost will rise'
+        : 'cache suspended after stalled operations; upstream cost will rise until it recovers',
     );
+
+    this.retryDelayMs = Math.min(this.retryDelayMs * 2, RETRY_MAX_MS);
   }
 
   private async sweep(stats: StatsCollector): Promise<void> {
@@ -151,16 +192,19 @@ export class CacheStore {
     } finally {
       clearTimeout(timer);
 
+      this.probing = false;
+
       if (timedOut) {
+        this.abandoned += 1;
         this.timeouts += 1;
         metrics.cacheTimeouts.inc();
 
-        if (this.timeouts >= TIMEOUTS_BEFORE_DISABLE) {
-          this.disable(`${this.timeouts} cache operations did not finish`);
-        }
+        if (this.timeouts >= TIMEOUTS_BEFORE_SUSPEND) this.suspend();
       } else {
         // The volume answered, even if with an error.
         this.timeouts = 0;
+
+        if (this.disabled) this.resume();
       }
     }
   }
@@ -173,7 +217,9 @@ export class CacheStore {
   }
 
   async read(height: number): Promise<Buffer | null> {
-    if (this.disabled) return null;
+    // Reads are the cheapest call, so they carry the recovery probe. Writes
+    // and sweeps stay off until a probe succeeds.
+    if (!this.canUseDisk()) return null;
 
     const filePath = blockHeightToPath(this.cacheDir, height, this.compression);
 
