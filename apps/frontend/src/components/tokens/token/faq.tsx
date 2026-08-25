@@ -13,6 +13,7 @@ import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import {
+  approxCountFormat,
   countFormat,
   currencyFormat,
   dateFormat,
@@ -275,7 +276,7 @@ export const TokenFaq = ({
                     {symbol}
                     {t('faq.supplySplit')}{' '}
                     <span className="text-foreground">
-                      {numberFormat(holderCount.count)}
+                      {approxCountFormat(holderCount.count)}
                     </span>{' '}
                     {t('faq.supplyWallets')}
                   </>

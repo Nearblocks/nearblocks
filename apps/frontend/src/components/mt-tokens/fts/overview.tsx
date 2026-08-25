@@ -11,7 +11,7 @@ import {
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, currencyFormat, numberFormat } from '@/lib/format';
+import { approxCountFormat, countFormat, currencyFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -105,7 +105,7 @@ export const MtFtOverview = ({
                 {() => (
                   <span className="text-body-sm">
                     {holderCount?.data?.count
-                      ? numberFormat(holderCount.data.count)
+                      ? approxCountFormat(holderCount.data.count)
                       : 'N/A'}
                   </span>
                 )}
