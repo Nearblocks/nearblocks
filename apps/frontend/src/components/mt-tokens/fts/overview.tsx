@@ -11,7 +11,7 @@ import {
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { approxCountFormat, countFormat, currencyFormat } from '@/lib/format';
+import { countFormat, currencyFormat, isApproxCount } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -102,13 +102,21 @@ export const MtFtOverview = ({
                 }
                 loading={!!loading}
               >
-                {() => (
-                  <span className="text-body-sm">
-                    {holderCount?.data?.count
-                      ? approxCountFormat(holderCount.data.count)
-                      : 'N/A'}
-                  </span>
-                )}
+                {() => {
+                  const count = holderCount?.data?.count;
+
+                  return (
+                    <span className="text-body-sm">
+                      {count
+                        ? isApproxCount(count)
+                          ? t('contract.overview.holdersApprox', {
+                              count: countFormat(count),
+                            })
+                          : countFormat(count)
+                        : 'N/A'}
+                    </span>
+                  );
+                }}
               </SkeletonSlot>
             </ListRight>
           </ListItem>

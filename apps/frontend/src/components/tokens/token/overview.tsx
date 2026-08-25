@@ -13,9 +13,9 @@ import { PriceChange } from '@/components/price-change';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import {
-  approxCountFormat,
   countFormat,
   currencyFormat,
+  isApproxCount,
   numberFormat,
 } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
@@ -153,15 +153,17 @@ export const Overview = ({
                 }
                 loading={!!loading}
               >
-                {() => (
-                  <>
-                    {holderCount?.data?.count ? (
-                      approxCountFormat(holderCount.data.count)
-                    ) : (
-                      <span className="text-muted-foreground">N/A</span>
-                    )}
-                  </>
-                )}
+                {() => {
+                  const count = holderCount?.data?.count;
+
+                  if (!count) {
+                    return <span className="text-muted-foreground">N/A</span>;
+                  }
+
+                  return isApproxCount(count)
+                    ? t('overview.holdersApprox', { count: countFormat(count) })
+                    : countFormat(count);
+                }}
               </SkeletonSlot>
             </ListRight>
           </ListItem>

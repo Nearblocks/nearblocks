@@ -40,6 +40,7 @@ export const mts = {
     label: 'MT Contract:',
     overview: {
       holders: 'Holders:',
+      holdersApprox: 'More than {{count}}',
       na: 'N/A',
       title: 'Overview',
       tokens: 'Tokens:',

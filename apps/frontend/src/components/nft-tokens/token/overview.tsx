@@ -11,7 +11,7 @@ import {
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { approxCountFormat, countFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount, numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -86,17 +86,23 @@ export const Overview = ({
                 }
                 loading={!!loading}
               >
-                {() => (
-                  <>
-                    {holderCount?.data?.count ? (
-                      approxCountFormat(holderCount.data.count)
-                    ) : (
+                {() => {
+                  const count = holderCount?.data?.count;
+
+                  if (!count) {
+                    return (
                       <span className="text-muted-foreground">
                         {t('contract.overview.na')}
                       </span>
-                    )}
-                  </>
-                )}
+                    );
+                  }
+
+                  return isApproxCount(count)
+                    ? t('contract.overview.holdersApprox', {
+                        count: countFormat(count),
+                      })
+                    : countFormat(count);
+                }}
               </SkeletonSlot>
             </ListRight>
           </ListItem>

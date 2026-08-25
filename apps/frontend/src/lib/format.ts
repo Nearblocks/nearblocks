@@ -58,15 +58,6 @@ export const countFormat = (
 export const isApproxCount = (value: NumberFormat): boolean =>
   typeof value === 'string' && value.endsWith('+');
 
-/**
- * Format a count that may be capped by the API, preserving the "+".
- * Without the suffix a capped value would read as an exact figure.
- */
-export const approxCountFormat = (
-  value: NumberFormat,
-  options?: Intl.NumberFormatOptions,
-) => `${countFormat(value, options)}${isApproxCount(value) ? '+' : ''}`;
-
 export const nearFormat = (
   yoctoNear: BigSource | null | undefined,
   options?: Intl.NumberFormatOptions,

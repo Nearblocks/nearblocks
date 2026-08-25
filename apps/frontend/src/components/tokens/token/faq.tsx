@@ -13,10 +13,10 @@ import { AccountLink, Link } from '@/components/link';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
 import {
-  approxCountFormat,
   countFormat,
   currencyFormat,
   dateFormat,
+  isApproxCount,
   numberFormat,
   toMs,
 } from '@/lib/format';
@@ -274,9 +274,13 @@ export const TokenFaq = ({
                 {holderCount?.count && (
                   <>
                     {symbol}
-                    {t('faq.supplySplit')}{' '}
+                    {t(
+                      isApproxCount(holderCount.count)
+                        ? 'faq.supplySplitApprox'
+                        : 'faq.supplySplit',
+                    )}{' '}
                     <span className="text-foreground">
-                      {approxCountFormat(holderCount.count)}
+                      {countFormat(holderCount.count)}
                     </span>{' '}
                     {t('faq.supplyWallets')}
                   </>
