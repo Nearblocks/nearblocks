@@ -7,7 +7,7 @@ import { MTContractTxnCountRes, MTTokenCountRes } from 'nb-schemas';
 import { List, ListItem, ListLeft, ListRight } from '@/components/list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, numberFormat } from '@/lib/format';
+import { countFormat, isApproxCount } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -49,17 +49,23 @@ export const Overview = ({
                 }
                 loading={!!loading}
               >
-                {() => (
-                  <>
-                    {tokenCount?.data?.count ? (
-                      numberFormat(tokenCount.data.count)
-                    ) : (
+                {() => {
+                  const count = tokenCount?.data?.count;
+
+                  if (!count) {
+                    return (
                       <span className="text-muted-foreground">
                         {t('contract.overview.na')}
                       </span>
-                    )}
-                  </>
-                )}
+                    );
+                  }
+
+                  return isApproxCount(count)
+                    ? t('contract.overview.tokensApprox', {
+                        count: countFormat(count),
+                      })
+                    : countFormat(count);
+                }}
               </SkeletonSlot>
             </ListRight>
           </ListItem>

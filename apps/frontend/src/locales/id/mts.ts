@@ -44,6 +44,7 @@ export const mts = {
       na: 'N/A',
       title: 'Overview',
       tokens: 'Tokens:',
+      tokensApprox: 'More than {{count}}',
       transfers: 'Transfers:',
     },
     profile: {
