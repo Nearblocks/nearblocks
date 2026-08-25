@@ -317,10 +317,10 @@ const holderCount = responseHandler(
 
     const data = await dbEvents.one<MTTokenHolderCount>(
       sql.tokens.tokenHolderCount,
-      { contract, token },
+      { contract, limit: config.maxQueryCount, token },
     );
 
-    return { data };
+    return { data: { count: cappedCount(data.count, config.maxQueryCount) } };
   },
 );
 

@@ -241,9 +241,10 @@ const holderCount = responseHandler(
 
     const data = await dbEvents.one<NFTContractHolderCount>(sql.holderCount, {
       contract,
+      limit: config.maxQueryCount,
     });
 
-    return { data };
+    return { data: { count: cappedCount(data.count, config.maxQueryCount) } };
   },
 );
 
