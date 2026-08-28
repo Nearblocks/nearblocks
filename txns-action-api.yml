@@ -1,0 +1,15 @@
+services:
+  api:
+    container_name: txns-action-api
+    build:
+      context: .
+      dockerfile: ./apps/txns-action-api/Dockerfile
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: txns-action-api.env
+    ports:
+      - '127.0.0.1:3007:3001'
+
+volumes:
+  redis-data:
