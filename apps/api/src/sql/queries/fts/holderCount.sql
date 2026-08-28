@@ -1,7 +1,14 @@
 SELECT
-  COUNT(*)
+  COUNT(*)::TEXT AS count
 FROM
-  ft_holders
-WHERE
-  contract = ${contract}
-  AND amount > 0
+  (
+    SELECT
+      1
+    FROM
+      ft_holders
+    WHERE
+      contract = ${contract}
+      AND amount > 0
+    LIMIT
+      ${limit}::INT
+  ) t

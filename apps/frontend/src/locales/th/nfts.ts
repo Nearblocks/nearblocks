@@ -11,6 +11,7 @@ export const nfts = {
     label: 'NFT Token:',
     overview: {
       holders: 'Holders:',
+      holdersApprox: 'More than {{count}}',
       na: 'N/A',
       title: 'Overview',
       totalSupply: 'Total Supply:',

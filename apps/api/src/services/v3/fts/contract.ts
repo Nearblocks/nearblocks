@@ -244,9 +244,10 @@ const holderCount = responseHandler(
 
     const data = await dbEvents.one<FTContractHolderCount>(sql.holderCount, {
       contract,
+      limit: config.maxQueryCount,
     });
 
-    return { data };
+    return { data: { count: cappedCount(data.count, config.maxQueryCount) } };
   },
 );
 

@@ -1,7 +1,14 @@
 SELECT
-  COUNT(*)
+  COUNT(*)::TEXT AS count
 FROM
-  nft_holders
-WHERE
-  contract = ${contract}
-  AND quantity > 0
+  (
+    SELECT
+      1
+    FROM
+      nft_holders
+    WHERE
+      contract = ${contract}
+      AND quantity > 0
+    LIMIT
+      ${limit}::INT
+  ) t
