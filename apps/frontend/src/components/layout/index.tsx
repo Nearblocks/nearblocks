@@ -1,6 +1,7 @@
 import { fetchStats, fetchSyncStatus } from '@/data/layout';
 
 import { ErrorSuspense } from '../error-suspense';
+import { ApiMigrationBanner } from './api-migration-banner';
 import { Footer } from './footer';
 import { Header } from './header';
 import { Notice } from './notice';
@@ -16,6 +17,7 @@ export const Layout = ({ children }: Props) => {
 
   return (
     <>
+      <ApiMigrationBanner />
       <ErrorSuspense fallback={null}>
         <Notice syncStatusPromise={syncStatusPromise} />
       </ErrorSuspense>
