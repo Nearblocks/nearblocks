@@ -16,6 +16,7 @@ import {
 } from '#libs/guards';
 import {
   isExecutionSuccess,
+  isNearImplicit,
   jsonStringify,
   normalizePublicKey,
   publicKeyFromImplicitAccount,
@@ -246,7 +247,7 @@ const getChunkAccessKeys = (
         continue;
       }
 
-      if (isTransferAction(action) && accountId.length === 64) {
+      if (isTransferAction(action) && isNearImplicit(accountId)) {
         const publicKey = publicKeyFromImplicitAccount(accountId);
         const mapKey = `${accountId}:${publicKey}`;
 
