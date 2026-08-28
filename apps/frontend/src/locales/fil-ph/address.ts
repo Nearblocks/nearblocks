@@ -1,8 +1,6 @@
 export const address = {
   alerts: {
     deleted: 'This account was deleted on {{date}}',
-    lockedContract:
-      'This contract is locked and cannot be updated, as the account has no full access keys',
     noFullAccessKeys: 'This account has no full access keys',
   },
   analytics: {
@@ -193,7 +191,7 @@ export const address = {
         'Checksum (SHA-256 in base58 encoding) of the contract binary',
       contractLocked: 'Contract Locked:',
       contractLockedTip:
-        'Locked contract means that there are no access keys allowing the contract code to be re-deployed',
+        'This account has no full access keys. The contract may still be upgradable through a privileged method',
       globalContractAccount: 'Global Contract Account:',
       globalContractAccountTip:
         'This account uses shared global contract code from the specified account.',
