@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="container mx-auto px-3 pb-16">
           <div className="flex justify-between border-t border-border-body">
             <div className="font-light text-xs text-text-body pb-1 pt-6 text-center">
-              Built on BOS by{' '}
+              Built by{' '}
               <a
                 className="text-primary"
                 href="https://nearblocks.io"
