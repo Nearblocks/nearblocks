@@ -82,10 +82,7 @@ const AddressLayout = async ({ children, params }: Props) => {
             </div>
           </PageHeading>
           <ErrorSuspense fallback={null}>
-            <AccountAlerts
-              accountPromise={accountPromise}
-              contractPromise={contractPromise}
-            />
+            <AccountAlerts accountPromise={accountPromise} />
           </ErrorSuspense>
           <div className="grid gap-4 lg:grid-cols-2">
             <ErrorSuspense fallback={<Overview loading />}>
