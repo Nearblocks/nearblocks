@@ -67,6 +67,7 @@ export default {
   },
   staking: {
     count: sql('queries/accounts/staking/count.sql'),
+    countEstimate: sql('queries/accounts/staking/countEstimate.sql'),
     export: sql('queries/accounts/staking/export.sql'),
     exportTxn: sql('queries/accounts/staking/exportTxn.sql'),
     txn: sql('queries/accounts/staking/txn.sql'),
