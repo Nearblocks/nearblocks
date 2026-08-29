@@ -1,4 +1,5 @@
 import cursors, { CursorObject } from '#libs/cursors';
+import { recordWindowPhase } from '#libs/windowStats';
 
 export type WindowListQuery<T> = (
   start: string,
@@ -29,6 +30,7 @@ export type WindowListOptions = {
 };
 
 export type WindowOptions = {
+  label?: string;
   start: bigint;
 };
 
@@ -182,19 +184,40 @@ export const rollingWindow = async <T>(
   queryFn: WindowQuery<T>,
   options: WindowOptions,
 ): Promise<null | T> => {
-  const { start } = options;
+  const { label = 'unknown', start } = options;
   const nowNs = BigInt(Date.now()) * 1_000_000n;
   const recentStart = nowNs - WINDOW_SIZE;
+  const began = Date.now();
 
-  if (recentStart <= start) {
-    return queryFn(start.toString(), nowNs.toString());
+  try {
+    if (recentStart <= start) {
+      const only = await queryFn(start.toString(), nowNs.toString());
+
+      recordWindowPhase(label, 'single', Date.now() - began);
+
+      return only;
+    }
+
+    const recent = await queryFn(recentStart.toString(), nowNs.toString());
+
+    if (recent) {
+      recordWindowPhase(label, 'phase1', Date.now() - began);
+
+      return recent;
+    }
+
+    const older = await queryFn(start.toString(), (recentStart - 1n).toString());
+
+    recordWindowPhase(label, older ? 'phase2' : 'miss', Date.now() - began);
+
+    return older;
+  } catch (error) {
+    // Failures skew slow (statement_timeout is 15s, and every Patroni failover
+    // kills in-flight queries). Dropping them would bias the means downward.
+    recordWindowPhase(label, 'error', Date.now() - began);
+
+    throw error;
   }
-
-  const recent = await queryFn(recentStart.toString(), nowNs.toString());
-
-  if (recent) return recent;
-
-  return queryFn(start.toString(), (recentStart - 1n).toString());
 };
 
 /**

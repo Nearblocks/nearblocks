@@ -122,7 +122,7 @@ const block = responseHandler(
           start,
         });
       },
-      { start: config.baseStart },
+      { label: 'block', start: config.baseStart },
     );
 
     return { data: block };
