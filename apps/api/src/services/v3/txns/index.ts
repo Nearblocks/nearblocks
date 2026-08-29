@@ -199,7 +199,7 @@ const txn = responseHandler(
 
           return dbBase.oneOrNone<Txn>(sql.txn, { cte });
         },
-        { start: config.baseStart },
+        { label: 'txn', start: config.baseStart },
       );
 
       return { data: txn };
@@ -211,7 +211,7 @@ const txn = responseHandler(
 
         return dbBase.oneOrNone<Txn>(sql.txn, { cte });
       },
-      { start: config.baseStart },
+      { label: 'txn', start: config.baseStart },
     );
 
     return { data: txn };
@@ -230,7 +230,7 @@ const receipts = responseHandler(
 
           return dbBase.oneOrNone<TxnReceipt>(sql.receipts, { cte });
         },
-        { start: config.baseStart },
+        { label: 'txn.receipts', start: config.baseStart },
       );
 
       return { data: receipts };
@@ -242,7 +242,7 @@ const receipts = responseHandler(
 
         return dbBase.oneOrNone<TxnReceipt>(sql.receipts, { cte });
       },
-      { start: config.baseStart },
+      { label: 'txn.receipts', start: config.baseStart },
     );
 
     return { data: receipts };
@@ -267,7 +267,7 @@ const fts = responseHandler(
 
           return receipts.length ? receipts : null;
         },
-        { start: config.baseStart },
+        { label: 'txn.fts', start: config.baseStart },
       );
 
       if (!receipts || !receipts.length) {
@@ -295,7 +295,7 @@ const fts = responseHandler(
 
         return receipts.length ? receipts : null;
       },
-      { start: config.baseStart },
+      { label: 'txn.fts', start: config.baseStart },
     );
 
     if (!receipts || !receipts.length) {
@@ -330,7 +330,7 @@ const nfts = responseHandler(
 
           return receipts.length ? receipts : null;
         },
-        { start: config.baseStart },
+        { label: 'txn.nfts', start: config.baseStart },
       );
 
       if (!receipts || !receipts.length) {
@@ -358,7 +358,7 @@ const nfts = responseHandler(
 
         return receipts.length ? receipts : null;
       },
-      { start: config.baseStart },
+      { label: 'txn.nfts', start: config.baseStart },
     );
 
     if (!receipts || !receipts.length) {
@@ -393,7 +393,7 @@ const mts = responseHandler(
 
           return receipts.length ? receipts : null;
         },
-        { start: config.baseStart },
+        { label: 'txn.mts', start: config.baseStart },
       );
 
       if (!receipts || !receipts.length) {
@@ -421,7 +421,7 @@ const mts = responseHandler(
 
         return receipts.length ? receipts : null;
       },
-      { start: config.baseStart },
+      { label: 'txn.mts', start: config.baseStart },
     );
 
     if (!receipts || !receipts.length) {
