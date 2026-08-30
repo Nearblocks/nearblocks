@@ -6,6 +6,7 @@ export default {
   events: sql('queries/txns/events.sql'),
   eventsRlp: sql('queries/txns/eventsRlp.sql'),
   ft: sql('queries/txns/ft.sql'),
+  ftBatch: sql('queries/txns/ftBatch.sql'),
   latestCte: sql('queries/txns/latestCte.sql'),
   mt: sql('queries/txns/mt.sql'),
   nft: sql('queries/txns/nft.sql'),

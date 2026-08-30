@@ -249,6 +249,33 @@ const receipts = responseHandler(
   },
 );
 
+/**
+ * ft_events has no index on receipt_id, so a lookup scans the 5-minute
+ * timestamp window and filters. Formatting ft.sql per receipt and joining with
+ * UNION ALL repeats that scan once per receipt; every receipt of a transaction
+ * shares the same window, so one query over the combined range reads those
+ * rows once. Timestamps are nanosecond BIGINTs carried as strings.
+ */
+const ftBatchParams = (
+  receipts: Pick<TxnFT, 'block_timestamp' | 'receipt_id'>[],
+) => {
+  let max = BigInt(receipts[0].block_timestamp);
+  let min = max;
+
+  for (const receipt of receipts) {
+    const ts = BigInt(receipt.block_timestamp);
+
+    if (ts > max) max = ts;
+    if (ts < min) min = ts;
+  }
+
+  return {
+    max_timestamp: max.toString(),
+    min_timestamp: min.toString(),
+    receipt_ids: receipts.map((receipt) => receipt.receipt_id),
+  };
+};
+
 const fts = responseHandler(
   response.fts,
   async (req: RequestValidator<TxnFTsReq>) => {
@@ -274,11 +301,10 @@ const fts = responseHandler(
         return { data: [] };
       }
 
-      const queries = receipts.map((receipt) => {
-        return pgp.as.format(sql.ft, receipt);
-      });
-      const unionQuery = queries.join('\nUNION ALL\n');
-      const fts = await dbEvents.manyOrNone<TxnFT>(unionQuery);
+      const fts = await dbEvents.manyOrNone<TxnFT>(
+        sql.ftBatch,
+        ftBatchParams(receipts),
+      );
 
       return { data: sortFtEvents(fts) };
     }
@@ -302,11 +328,10 @@ const fts = responseHandler(
       return { data: [] };
     }
 
-    const queries = receipts.map((receipt) => {
-      return pgp.as.format(sql.ft, receipt);
-    });
-    const unionQuery = queries.join('\nUNION ALL\n');
-    const fts = await dbEvents.manyOrNone<TxnFT>(unionQuery);
+    const fts = await dbEvents.manyOrNone<TxnFT>(
+      sql.ftBatch,
+      ftBatchParams(receipts),
+    );
 
     return { data: sortFtEvents(fts) };
   },
