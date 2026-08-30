@@ -1,0 +1,70 @@
+-- Batched variant of nft.sql. See ftBatch.sql for the measurements.
+--
+-- nft.sql was formatted once per receipt and the branches joined with UNION
+-- ALL, so N receipts meant N scans. nft_events has no index on receipt_id, so
+-- each branch scans the 5-minute window and filters. Every receipt of a
+-- transaction shares that window, so one query over the combined range reads
+-- those rows once and filters by the id set.
+
+SELECT
+  nft.receipt_id,
+  nft.contract_account_id,
+  nft.affected_account_id,
+  nft.involved_account_id,
+  nft.token_id,
+  nft.cause,
+  nft.delta_amount,
+  nft.block_timestamp,
+  nft.shard_id,
+  nft.event_index,
+  m.meta,
+  tm.token_meta
+FROM
+  nft_events nft
+  JOIN LATERAL (
+    SELECT
+      JSONB_BUILD_OBJECT(
+        'contract',
+        contract,
+        'name',
+        name,
+        'symbol',
+        symbol,
+        'base_uri',
+        base_uri,
+        'icon',
+        icon,
+        'reference',
+        reference
+      ) AS meta
+    FROM
+      nft_meta nm
+    WHERE
+      nm.contract = nft.contract_account_id
+      AND nm.modified_at IS NOT NULL
+  ) m ON TRUE
+  JOIN LATERAL (
+    SELECT
+      JSONB_BUILD_OBJECT(
+        'contract',
+        contract,
+        'token',
+        token,
+        'title',
+        title,
+        'media',
+        media,
+        'reference',
+        reference
+      ) AS token_meta
+    FROM
+      nft_token_meta ntm
+    WHERE
+      ntm.contract = nft.contract_account_id
+      AND ntm.token = nft.token_id
+      AND ntm.modified_at IS NOT NULL
+  ) tm ON TRUE
+WHERE
+  nft.receipt_id = ANY (${receipt_ids}::TEXT[])
+  AND nft.block_timestamp <= ${max_timestamp}::BIGINT
+  AND nft.block_timestamp >= ${min_timestamp}::BIGINT - 300000000000 -- 5m in ns

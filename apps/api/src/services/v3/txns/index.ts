@@ -250,13 +250,18 @@ const receipts = responseHandler(
 );
 
 /**
- * ft_events has no index on receipt_id, so a lookup scans the 5-minute
- * timestamp window and filters. Formatting ft.sql per receipt and joining with
- * UNION ALL repeats that scan once per receipt; every receipt of a transaction
- * shares the same window, so one query over the combined range reads those
- * rows once. Timestamps are nanosecond BIGINTs carried as strings.
+ * Shared by the FT, NFT and MT event lookups.
+ *
+ * None of ft_events, nft_events or mt_events has an index on receipt_id, so a
+ * lookup scans the 5-minute timestamp window and filters. Formatting the query
+ * per receipt and joining the branches repeats that scan once per receipt;
+ * every receipt of a transaction shares the same window, so one query over the
+ * combined range reads those rows once.
+ *
+ * Timestamps are nanosecond BIGINTs carried as strings, so they are compared
+ * as BigInt -- lexicographic ordering would break the day they change width.
  */
-const ftBatchParams = (
+const batchParams = (
   receipts: Pick<TxnFT, 'block_timestamp' | 'receipt_id'>[],
 ) => {
   let max = BigInt(receipts[0].block_timestamp);
@@ -303,7 +308,7 @@ const fts = responseHandler(
 
       const fts = await dbEvents.manyOrNone<TxnFT>(
         sql.ftBatch,
-        ftBatchParams(receipts),
+        batchParams(receipts),
       );
 
       return { data: sortFtEvents(fts) };
@@ -330,7 +335,7 @@ const fts = responseHandler(
 
     const fts = await dbEvents.manyOrNone<TxnFT>(
       sql.ftBatch,
-      ftBatchParams(receipts),
+      batchParams(receipts),
     );
 
     return { data: sortFtEvents(fts) };
@@ -362,11 +367,10 @@ const nfts = responseHandler(
         return { data: [] };
       }
 
-      const queries = receipts.map((receipt) => {
-        return pgp.as.format(sql.nft, receipt);
-      });
-      const unionQuery = queries.join('\nUNION ALL\n');
-      const nfts = await dbEvents.manyOrNone<TxnNFT>(unionQuery);
+      const nfts = await dbEvents.manyOrNone<TxnNFT>(
+        sql.nftBatch,
+        batchParams(receipts),
+      );
 
       return { data: sortEvents(nfts) };
     }
@@ -390,11 +394,10 @@ const nfts = responseHandler(
       return { data: [] };
     }
 
-    const queries = receipts.map((receipt) => {
-      return pgp.as.format(sql.nft, receipt);
-    });
-    const unionQuery = queries.join('\nUNION ALL\n');
-    const nfts = await dbEvents.manyOrNone<TxnNFT>(unionQuery);
+    const nfts = await dbEvents.manyOrNone<TxnNFT>(
+      sql.nftBatch,
+      batchParams(receipts),
+    );
 
     return { data: sortEvents(nfts) };
   },
@@ -425,11 +428,10 @@ const mts = responseHandler(
         return { data: [] };
       }
 
-      const queries = receipts.map((receipt) => {
-        return pgp.as.format(sql.mt, receipt);
-      });
-      const unionQuery = queries.join('\nUNION ALL\n');
-      const mts = await dbEvents.manyOrNone<TxnMT>(unionQuery);
+      const mts = await dbEvents.manyOrNone<TxnMT>(
+        sql.mtBatch,
+        batchParams(receipts),
+      );
 
       return { data: sortEvents(mts) };
     }
@@ -453,11 +455,10 @@ const mts = responseHandler(
       return { data: [] };
     }
 
-    const queries = receipts.map((receipt) => {
-      return pgp.as.format(sql.mt, receipt);
-    });
-    const unionQuery = queries.join('\nUNION ALL\n');
-    const mts = await dbEvents.manyOrNone<TxnMT>(unionQuery);
+    const mts = await dbEvents.manyOrNone<TxnMT>(
+      sql.mtBatch,
+      batchParams(receipts),
+    );
 
     return { data: sortEvents(mts) };
   },
