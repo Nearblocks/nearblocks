@@ -162,14 +162,11 @@ export const AccessKeysRpc = ({
               loading={!!loading}
             >
               {() => {
-                const count = keyCount?.count ?? 0;
-                return (
-                  <>
-                    {t(
-                      isApproxCount(count) ? 'keys.total' : 'keys.totalExact',
-                      { count: countFormat(count) },
-                    )}
-                  </>
+                const count = keyCount?.count;
+                if (!count || count === '0') return null;
+                return t(
+                  isApproxCount(count) ? 'keys.total' : 'keys.totalExact',
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

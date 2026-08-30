@@ -58,7 +58,11 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
             </>
           }
         />
-        <ErrorSuspense fallback={<AddressReceipts loading />}>
+        <ErrorSuspense
+          fallback={
+            <AddressReceipts address={account} basePath="/receipts" loading />
+          }
+        >
           <AddressReceipts
             address={account}
             basePath="/receipts"

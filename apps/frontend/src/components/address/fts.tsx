@@ -16,11 +16,22 @@ import { TokenAmount, TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, isApproxCount } from '@/lib/format';
+import {
+  countFormat,
+  isApproxCount,
+  toTimestampCsv,
+  toTokenAmountCsv,
+} from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
+
+const ftFrom = (ft: AccountFTTxn) =>
+  Number(ft.delta_amount) < 0 ? ft.affected_account_id : ft.involved_account_id;
+
+const ftTo = (ft: AccountFTTxn) =>
+  Number(ft.delta_amount) < 0 ? ft.involved_account_id : ft.affected_account_id;
 
 type Props = {
   address?: string;
@@ -63,11 +74,15 @@ export const FTTxns = ({
           <Skeleton className="w-30" />
         ),
       className: 'w-44',
+      csvLabel: 'Transaction Hash',
+      csvValue: (ft) => ft.transaction_hash ?? '',
       header: t('fts.columns.txnHash'),
       id: 'txn_hash',
     },
     {
       cell: (ft) => <MethodBadge text={ft.cause} />,
+      csvLabel: 'Method',
+      csvValue: (ft) => ft.cause ?? '',
       enableFilter: true,
       filterName: 'cause',
       filterPlaceholder: t('fts.filterMethod'),
@@ -76,15 +91,9 @@ export const FTTxns = ({
       skeletonCell: <Skeleton className="h-4.5 w-[103px] rounded-md" />,
     },
     {
-      cell: (ft) => (
-        <AccountLink
-          account={
-            Number(ft.delta_amount) < 0
-              ? ft.affected_account_id
-              : ft.involved_account_id
-          }
-        />
-      ),
+      cell: (ft) => <AccountLink account={ftFrom(ft)} />,
+      csvLabel: 'From',
+      csvValue: (ft) => ftFrom(ft) ?? '',
       header: t('fts.columns.from'),
       id: 'from',
     },
@@ -96,15 +105,9 @@ export const FTTxns = ({
       skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
-      cell: (ft) => (
-        <AccountLink
-          account={
-            Number(ft.delta_amount) < 0
-              ? ft.involved_account_id
-              : ft.affected_account_id
-          }
-        />
-      ),
+      cell: (ft) => <AccountLink account={ftTo(ft)} />,
+      csvLabel: 'To',
+      csvValue: (ft) => ftTo(ft) ?? '',
       header: t('fts.columns.to'),
       id: 'to',
     },
@@ -115,6 +118,9 @@ export const FTTxns = ({
           decimals={ft.meta?.decimals ?? 0}
         />
       ),
+      csvLabel: 'Quantity',
+      csvValue: (ft) =>
+        toTokenAmountCsv(ft.delta_amount, ft.meta?.decimals ?? 0),
       header: t('fts.columns.quantity'),
       id: 'quantity',
     },
@@ -129,6 +135,8 @@ export const FTTxns = ({
           <TokenLink contract={ft.contract_account_id} name={ft.meta?.name} />
         </span>
       ),
+      csvLabel: 'Token',
+      csvValue: (ft) => ft.meta?.name ?? ft.contract_account_id ?? '',
       enableFilter: true,
       filterName: 'contract',
       filterPlaceholder: t('fts.filterContract'),
@@ -144,6 +152,8 @@ export const FTTxns = ({
         ),
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Timestamp (UTC)',
+      csvValue: (ft) => toTimestampCsv(ft.block?.block_timestamp),
       header: <TimestampToggle />,
       id: 'age',
     },
@@ -205,6 +215,11 @@ export const FTTxns = ({
           }
           columns={columns}
           data={fts?.data}
+          downloadFilename={
+            resolvedAddress
+              ? `nearblocks-ft-txns-${resolvedAddress}`
+              : undefined
+          }
           emptyMessage={t('fts.empty')}
           extraFilters={extraFilters}
           getRowKey={(ft) => `${ft.receipt_id}-${ft.event_index}`}
@@ -226,8 +241,7 @@ export const FTTxns = ({
           loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={onPaginate}
-          paginated={!!basePath}
+          onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? fts?.meta : undefined}
         />
         {loading && !basePath && (

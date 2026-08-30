@@ -275,6 +275,7 @@ export const address = {
       txnHash: 'Transaction Hash',
     },
     empty: 'No MT transfers found',
+    filterContract: 'MT contract',
     filterMethod: 'Method',
     latest: 'Latest {{count}} MT transfers',
     total: 'More than {{count}} MT transfers found',

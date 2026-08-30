@@ -21,6 +21,8 @@ import {
   isApproxCount,
   nearFormat,
   numberFormat,
+  toNearCsv,
+  toTimestampCsv,
 } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
@@ -127,7 +129,7 @@ export const Txns = ({
         </span>
       ),
       csvLabel: 'Deposit Value (NEAR)',
-      csvValue: (txn) => nearFormat(txn.actions_agg?.deposit),
+      csvValue: (txn) => toNearCsv(txn.actions_agg?.deposit),
       header: t('txns.columns.depositValue'),
       id: 'deposit',
     },
@@ -177,6 +179,8 @@ export const Txns = ({
       cell: (txn) => <TimestampCell ns={txn.block?.block_timestamp} />,
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Timestamp (UTC)',
+      csvValue: (txn) => toTimestampCsv(txn.block?.block_timestamp),
       header: <TimestampToggle />,
       id: 'age',
     },

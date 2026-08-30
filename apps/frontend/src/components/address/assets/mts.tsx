@@ -132,7 +132,8 @@ export const MTAssets = ({
             loading={!!loading}
           >
             {() => {
-              const value = count?.count ?? '0';
+              const value = count?.count;
+              if (!value || value === '0') return null;
               return (
                 <>
                   {t(

@@ -20,11 +20,21 @@ import { TokenImage, TokenLink } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, isApproxCount } from '@/lib/format';
+import { countFormat, isApproxCount, toTimestampCsv } from '@/lib/format';
 import { buildParams, encodeToken } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
+
+const nftFrom = (nft: AccountNFTTxn) =>
+  Number(nft.delta_amount) < 0
+    ? nft.affected_account_id
+    : nft.involved_account_id;
+
+const nftTo = (nft: AccountNFTTxn) =>
+  Number(nft.delta_amount) < 0
+    ? nft.involved_account_id
+    : nft.affected_account_id;
 
 type Props = {
   address?: string;
@@ -66,11 +76,16 @@ export const NFTTxns = ({
         ) : (
           <Skeleton className="w-30" />
         ),
+      className: 'w-44',
+      csvLabel: 'Transaction Hash',
+      csvValue: (nft) => nft.transaction_hash ?? '',
       header: t('nfts.columns.txnHash'),
       id: 'txn_hash',
     },
     {
       cell: (nft) => <MethodBadge text={nft.cause} />,
+      csvLabel: 'Method',
+      csvValue: (nft) => nft.cause ?? '',
       enableFilter: true,
       filterName: 'cause',
       filterPlaceholder: t('nfts.filterMethod'),
@@ -79,15 +94,9 @@ export const NFTTxns = ({
       skeletonCell: <Skeleton className="h-4.5 w-[103px] rounded-md" />,
     },
     {
-      cell: (nft) => (
-        <AccountLink
-          account={
-            Number(nft.delta_amount) < 0
-              ? nft.affected_account_id
-              : nft.involved_account_id
-          }
-        />
-      ),
+      cell: (nft) => <AccountLink account={nftFrom(nft)} />,
+      csvLabel: 'From',
+      csvValue: (nft) => nftFrom(nft) ?? '',
       header: t('nfts.columns.from'),
       id: 'from',
     },
@@ -99,15 +108,9 @@ export const NFTTxns = ({
       skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
-      cell: (nft) => (
-        <AccountLink
-          account={
-            Number(nft.delta_amount) < 0
-              ? nft.involved_account_id
-              : nft.affected_account_id
-          }
-        />
-      ),
+      cell: (nft) => <AccountLink account={nftTo(nft)} />,
+      csvLabel: 'To',
+      csvValue: (nft) => nftTo(nft) ?? '',
       header: t('nfts.columns.to'),
       id: 'to',
     },
@@ -125,8 +128,10 @@ export const NFTTxns = ({
           </Truncate>
         </Link>
       ),
+      csvLabel: 'Token ID',
+      csvValue: (nft) => nft.token_id ?? '',
       enableFilter: true,
-      filterName: 'contract',
+      filterName: 'token',
       filterPlaceholder: t('nfts.filterToken'),
       header: t('nfts.columns.tokenId'),
       id: 'token',
@@ -146,6 +151,8 @@ export const NFTTxns = ({
           />
         </span>
       ),
+      csvLabel: 'Token',
+      csvValue: (nft) => nft.meta?.name ?? nft.contract_account_id ?? '',
       enableFilter: true,
       filterName: 'contract',
       filterPlaceholder: t('nfts.filterContract'),
@@ -161,6 +168,8 @@ export const NFTTxns = ({
         ),
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Timestamp (UTC)',
+      csvValue: (nft) => toTimestampCsv(nft.block?.block_timestamp),
       header: <TimestampToggle />,
       id: 'age',
     },
@@ -222,6 +231,11 @@ export const NFTTxns = ({
           }
           columns={columns}
           data={nfts?.data}
+          downloadFilename={
+            resolvedAddress
+              ? `nearblocks-nft-txns-${resolvedAddress}`
+              : undefined
+          }
           emptyMessage={t('nfts.empty')}
           extraFilters={extraFilters}
           getRowKey={(nft) => `${nft.receipt_id}-${nft.event_index}`}
@@ -243,8 +257,7 @@ export const NFTTxns = ({
           loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={onPaginate}
-          paginated={!!basePath}
+          onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? nfts?.meta : undefined}
         />
         {loading && !basePath && (

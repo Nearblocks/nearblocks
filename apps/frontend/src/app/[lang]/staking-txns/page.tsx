@@ -48,7 +48,15 @@ const StakingTxnsPage = async ({ params, searchParams }: Props) => {
     return (
       <>
         <PageHeading apiTag="staking" title={t('title')} />
-        <ErrorSuspense fallback={<AddressStakingTxns loading />}>
+        <ErrorSuspense
+          fallback={
+            <AddressStakingTxns
+              address={account}
+              basePath="/staking-txns"
+              loading
+            />
+          }
+        >
           <AddressStakingTxns
             address={account}
             basePath="/staking-txns"

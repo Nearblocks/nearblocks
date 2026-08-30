@@ -130,16 +130,13 @@ export const SubAccounts = ({
               loading={!!loading}
             >
               {() => {
-                const count = subAccountCount?.count ?? 0;
-                return (
-                  <>
-                    {t(
-                      isApproxCount(count)
-                        ? 'subaccounts.total'
-                        : 'subaccounts.totalExact',
-                      { count: countFormat(count) },
-                    )}
-                  </>
+                const count = subAccountCount?.count;
+                if (!count || count === '0') return null;
+                return t(
+                  isApproxCount(count)
+                    ? 'subaccounts.total'
+                    : 'subaccounts.totalExact',
+                  { count: countFormat(count) },
                 );
               }}
             </SkeletonSlot>

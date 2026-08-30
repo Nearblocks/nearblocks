@@ -25,6 +25,8 @@ import {
   isApproxCount,
   nearFormat,
   numberFormat,
+  toNearCsv,
+  toTimestampCsv,
 } from '@/lib/format';
 import { actionMethod } from '@/lib/txn';
 import { buildParams } from '@/lib/utils';
@@ -111,11 +113,16 @@ export const Receipts = ({
           </Truncate>
         </Link>
       ),
+      className: 'w-44',
+      csvLabel: 'Receipt ID',
+      csvValue: (receipt) => receipt.receipt_id,
       header: t('receipts.columns.receiptId'),
       id: 'receipt_id',
     },
     {
       cell: (receipt) => <MethodBadge text={actionMethod(receipt.actions)} />,
+      csvLabel: 'Method',
+      csvValue: (receipt) => actionMethod(receipt.actions),
       header: t('receipts.columns.method'),
       id: 'method',
       skeletonCell: <Skeleton className="h-4.5 w-[114px] rounded-md" />,
@@ -127,6 +134,8 @@ export const Receipts = ({
           {nearFormat(receipt.actions_agg?.deposit)}
         </span>
       ),
+      csvLabel: 'Deposit Value (NEAR)',
+      csvValue: (receipt) => toNearCsv(receipt.actions_agg?.deposit),
       header: t('receipts.columns.depositValue'),
       id: 'deposit',
     },
@@ -134,6 +143,8 @@ export const Receipts = ({
       cell: (receipt) => (
         <AccountLink account={receipt.predecessor_account_id} />
       ),
+      csvLabel: 'From',
+      csvValue: (receipt) => receipt.predecessor_account_id ?? '',
       enableFilter: true,
       filterName: 'predecessor',
       filterPlaceholder: t('receipts.filterFrom'),
@@ -155,6 +166,8 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => <AccountLink account={receipt.receiver_account_id} />,
+      csvLabel: 'To',
+      csvValue: (receipt) => receipt.receiver_account_id ?? '',
       enableFilter: true,
       filterName: 'receiver',
       filterPlaceholder: t('receipts.filterTo'),
@@ -177,6 +190,8 @@ export const Receipts = ({
       cell: (receipt) => <TimestampCell ns={receipt.block?.block_timestamp} />,
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Timestamp (UTC)',
+      csvValue: (receipt) => toTimestampCsv(receipt.block?.block_timestamp),
       header: <TimestampToggle />,
       id: 'age',
     },
@@ -200,6 +215,11 @@ export const Receipts = ({
           }
           columns={columns}
           data={receipts?.data}
+          downloadFilename={
+            resolvedAddress
+              ? `nearblocks-receipts-${resolvedAddress}`
+              : undefined
+          }
           emptyMessage={t('receipts.empty')}
           extraFilters={extraFilters}
           getRowKey={(receipt) => receipt.receipt_id}
@@ -223,8 +243,7 @@ export const Receipts = ({
           loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={onPaginate}
-          paginated={!!basePath}
+          onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? receipts?.meta : undefined}
         />
         {loading && !basePath && (

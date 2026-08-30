@@ -44,7 +44,15 @@ const MtTransfersPage = async ({ params, searchParams }: Props) => {
     return (
       <>
         <PageHeading apiTag="mts" title={t('transfers.heading')} />
-        <ErrorSuspense fallback={<AddressMTTxns loading />}>
+        <ErrorSuspense
+          fallback={
+            <AddressMTTxns
+              address={account}
+              basePath="/mt-tokens/transfers"
+              loading
+            />
+          }
+        >
           <AddressMTTxns
             address={account}
             basePath="/mt-tokens/transfers"

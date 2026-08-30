@@ -161,6 +161,26 @@ export const toTokenPrice = (
 
 export const toMs = (ns: BigSource) => +ns / 10 ** 6;
 
+// CSV cells carry raw values: display separators get re-parsed as text on
+// spreadsheet import, and Big's toString emits exponential notation outside
+// [1e-7, 1e21). toFixed keeps plain decimal.
+export const toNearCsv = (yoctoNear: BigSource | null | undefined) =>
+  yoctoNear == null ? '' : new Big(yoctoNear).div(Big(10 ** 24)).toFixed();
+
+export const toTokenAmountCsv = (
+  value: BigSource | null | undefined,
+  decimal: number,
+) => {
+  if (value == null) return '';
+  const amount = new Big(value);
+  return decimal === 0
+    ? amount.toFixed()
+    : amount.div(Big(10 ** decimal)).toFixed();
+};
+
+export const toTimestampCsv = (ns: null | string | undefined) =>
+  ns ? dateFormat(toMs(ns), 'YYYY-MM-DDTHH:mm:ss[Z]') : '';
+
 export const toYearsAndDays = (totalDays: number) => {
   const start = Dayjs.utc();
   const end = start.add(totalDays, 'day');

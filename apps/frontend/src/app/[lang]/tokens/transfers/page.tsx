@@ -44,7 +44,11 @@ const TransfersPage = async ({ params, searchParams }: Props) => {
     return (
       <>
         <PageHeading apiTag="fts" title={t('transfers.title')} />
-        <ErrorSuspense fallback={<FTTxns loading />}>
+        <ErrorSuspense
+          fallback={
+            <FTTxns address={account} basePath="/tokens/transfers" loading />
+          }
+        >
           <FTTxns
             address={account}
             basePath="/tokens/transfers"

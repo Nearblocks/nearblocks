@@ -44,7 +44,15 @@ const NftTransfersPage = async ({ params, searchParams }: Props) => {
     return (
       <>
         <PageHeading apiTag="nfts" title={t('transfers.heading')} />
-        <ErrorSuspense fallback={<NFTTxns loading />}>
+        <ErrorSuspense
+          fallback={
+            <NFTTxns
+              address={account}
+              basePath="/nft-tokens/transfers"
+              loading
+            />
+          }
+        >
           <NFTTxns
             address={account}
             basePath="/nft-tokens/transfers"

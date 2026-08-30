@@ -99,6 +99,10 @@ type DataTableProps<TData> = {
   loading?: boolean;
   onClear?: (data: FilterClearData) => void;
   onFilter?: (value: FilterData) => void;
+  // Omit on tables that only ever show page 1: this gates the pager AND the
+  // "Showing X to Y" label. Account tabs over unbounded lists (txns,
+  // receipts, transfers, staking) omit it and link out to a list route; the
+  // bounded ones (keys, sub accounts, assets) paginate in place.
   onPaginationNavigate?: (
     type: 'first' | 'next' | 'prev',
     cursor: string,

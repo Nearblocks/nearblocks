@@ -1,9 +1,11 @@
 'use client';
 
+import { Download } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { use } from 'react';
 
 import { AccountMTTxn, AccountMTTxnCount, AccountMTTxnsRes } from 'nb-schemas';
+import { ExportType } from 'nb-types';
 
 import { DataTable, DataTableColumnDef } from '@/components/data-table';
 import { AccountLink, Link } from '@/components/link';
@@ -14,11 +16,22 @@ import { MTTokenLink, TokenAmount, TokenImage } from '@/components/token';
 import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { MethodBadge, TxnDirection, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import { countFormat, isApproxCount } from '@/lib/format';
+import {
+  countFormat,
+  isApproxCount,
+  toTimestampCsv,
+  toTokenAmountCsv,
+} from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
+
+const mtFrom = (mt: AccountMTTxn) =>
+  Number(mt.delta_amount) < 0 ? mt.affected_account_id : mt.involved_account_id;
+
+const mtTo = (mt: AccountMTTxn) =>
+  Number(mt.delta_amount) < 0 ? mt.involved_account_id : mt.affected_account_id;
 
 type Props = {
   address?: string;
@@ -58,13 +71,18 @@ export const MTTxns = ({
             </Truncate>
           </Link>
         ) : (
-          <Skeleton className="w-25" />
+          <Skeleton className="w-30" />
         ),
+      className: 'w-44',
+      csvLabel: 'Transaction Hash',
+      csvValue: (mt) => mt.transaction_hash ?? '',
       header: t('mts.columns.txnHash'),
       id: 'txn_hash',
     },
     {
       cell: (mt) => <MethodBadge text={mt.cause} />,
+      csvLabel: 'Method',
+      csvValue: (mt) => mt.cause ?? '',
       enableFilter: true,
       filterName: 'cause',
       filterPlaceholder: t('mts.filterMethod'),
@@ -74,15 +92,10 @@ export const MTTxns = ({
     },
     {
       cell: (mt) => (
-        <AccountLink
-          account={
-            Number(mt.delta_amount) < 0
-              ? mt.affected_account_id
-              : mt.involved_account_id
-          }
-          textClassName="max-w-25"
-        />
+        <AccountLink account={mtFrom(mt)} textClassName="max-w-25" />
       ),
+      csvLabel: 'From',
+      csvValue: (mt) => mtFrom(mt) ?? '',
       header: t('mts.columns.from'),
       id: 'from',
     },
@@ -94,16 +107,9 @@ export const MTTxns = ({
       skeletonCell: <Skeleton className="h-4.5 w-12.5 rounded-md" />,
     },
     {
-      cell: (mt) => (
-        <AccountLink
-          account={
-            Number(mt.delta_amount) < 0
-              ? mt.involved_account_id
-              : mt.affected_account_id
-          }
-          textClassName="max-w-25"
-        />
-      ),
+      cell: (mt) => <AccountLink account={mtTo(mt)} textClassName="max-w-25" />,
+      csvLabel: 'To',
+      csvValue: (mt) => mtTo(mt) ?? '',
       header: t('mts.columns.to'),
       id: 'to',
     },
@@ -114,6 +120,9 @@ export const MTTxns = ({
           decimals={mt.base_meta?.decimals ?? 0}
         />
       ),
+      csvLabel: 'Quantity',
+      csvValue: (mt) =>
+        toTokenAmountCsv(mt.delta_amount, mt.base_meta?.decimals ?? 0),
       header: t('mts.columns.quantity'),
       id: 'quantity',
     },
@@ -134,6 +143,12 @@ export const MTTxns = ({
           />
         </span>
       ),
+      csvLabel: 'Token',
+      csvValue: (mt) =>
+        mt.token_meta?.title ?? mt.base_meta?.name ?? mt.contract_account_id,
+      enableFilter: true,
+      filterName: 'contract',
+      filterPlaceholder: t('mts.filterContract'),
       header: t('mts.columns.token'),
       id: 'token',
     },
@@ -146,6 +161,8 @@ export const MTTxns = ({
         ),
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Timestamp (UTC)',
+      csvValue: (mt) => toTimestampCsv(mt.block?.block_timestamp),
       header: <TimestampToggle />,
       id: 'age',
     },
@@ -193,8 +210,25 @@ export const MTTxns = ({
     <Card>
       <CardContent className="text-body-sm p-0">
         <DataTable
+          actions={
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.MT_TRANSFERS}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
+          }
           columns={columns}
           data={mts?.data}
+          downloadFilename={
+            resolvedAddress
+              ? `nearblocks-mt-txns-${resolvedAddress}`
+              : undefined
+          }
           emptyMessage={t('mts.empty')}
           extraFilters={extraFilters}
           getRowKey={(mt) => `${mt.receipt_id}-${mt.event_index}`}
@@ -216,8 +250,7 @@ export const MTTxns = ({
           loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={onPaginate}
-          paginated={!!basePath}
+          onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? mts?.meta : undefined}
         />
         {loading && !basePath && (

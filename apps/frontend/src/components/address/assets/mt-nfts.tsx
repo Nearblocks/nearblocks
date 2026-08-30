@@ -136,7 +136,8 @@ export const MTNFTAssets = ({
           loading={!!loading}
         >
           {() => {
-            const value = count?.count ?? '0';
+            const value = count?.count;
+            if (!value || value === '0') return null;
             return (
               <span className="leading-7">
                 {t(

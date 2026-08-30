@@ -20,7 +20,13 @@ import { Truncate, TruncateCopy, TruncateText } from '@/components/truncate';
 import { MethodBadge, TxnStatusIcon } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
-import { countFormat, isApproxCount, nearFormat } from '@/lib/format';
+import {
+  countFormat,
+  isApproxCount,
+  nearFormat,
+  toNearCsv,
+  toTimestampCsv,
+} from '@/lib/format';
 import { buildParams } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
@@ -109,11 +115,16 @@ export const StakingTxns = ({
         ) : (
           <Skeleton className="w-30" />
         ),
+      className: 'w-44',
+      csvLabel: 'Transaction Hash',
+      csvValue: (staking) => staking.transaction_hash ?? '',
       header: t('staking.columns.txnHash'),
       id: 'txn_hash',
     },
     {
       cell: (staking) => <MethodBadge text={staking.type} />,
+      csvLabel: 'Method',
+      csvValue: (staking) => staking.type ?? '',
       enableFilter: true,
       filterName: 'type',
       filterPlaceholder: t('staking.filterMethod'),
@@ -123,6 +134,8 @@ export const StakingTxns = ({
     },
     {
       cell: (staking) => <AccountLink account={staking.contract} />,
+      csvLabel: 'Contract',
+      csvValue: (staking) => staking.contract ?? '',
       enableFilter: true,
       filterName: 'contract',
       filterPlaceholder: t('staking.filterContract'),
@@ -136,6 +149,8 @@ export const StakingTxns = ({
           {nearFormat(staking.amount)}
         </span>
       ),
+      csvLabel: 'Amount (NEAR)',
+      csvValue: (staking) => toNearCsv(staking.amount),
       header: t('staking.columns.amount'),
       id: 'amount',
     },
@@ -148,6 +163,8 @@ export const StakingTxns = ({
         ),
       cellClassName: 'px-1',
       className: 'w-40',
+      csvLabel: 'Timestamp (UTC)',
+      csvValue: (staking) => toTimestampCsv(staking.block?.block_timestamp),
       header: <TimestampToggle />,
       id: 'age',
     },
@@ -158,17 +175,24 @@ export const StakingTxns = ({
       <CardContent className="text-body-sm p-0">
         <DataTable
           actions={
-            <Button asChild size="xs" variant="outline">
-              <Link
-                href={`/export-csv?account=${resolvedAddress}&type=${ExportType.STAKING}`}
-              >
-                <Download className="size-3" />
-                {t('csvExport')}
-              </Link>
-            </Button>
+            !basePath && (
+              <Button asChild size="xs" variant="outline">
+                <Link
+                  href={`/export-csv?account=${resolvedAddress}&type=${ExportType.STAKING}`}
+                >
+                  <Download className="size-3" />
+                  {t('csvExport')}
+                </Link>
+              </Button>
+            )
           }
           columns={columns}
           data={staking?.data}
+          downloadFilename={
+            resolvedAddress
+              ? `nearblocks-staking-txns-${resolvedAddress}`
+              : undefined
+          }
           emptyMessage={t('staking.empty')}
           extraFilters={extraFilters}
           getRowKey={(staking) =>
@@ -192,8 +216,7 @@ export const StakingTxns = ({
           loading={!!loading}
           onClear={onClear}
           onFilter={onFilter}
-          onPaginationNavigate={onPaginate}
-          paginated={!!basePath}
+          onPaginationNavigate={basePath ? onPaginate : undefined}
           pagination={basePath ? staking?.meta : undefined}
         />
         {loading && !basePath && (
