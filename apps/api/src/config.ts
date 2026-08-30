@@ -1,4 +1,4 @@
-import { cleanEnv, num, str, url } from 'envalid';
+import { bool, cleanEnv, num, str, url } from 'envalid';
 
 import { Network } from 'nb-types';
 
@@ -15,6 +15,10 @@ const dbFallback = process.env.DATABASE_URL
 const env = cleanEnv(process.env, {
   API_ACCESS_KEY: str(),
   API_URL: str({ default: 'https://api.nearblocks.io' }),
+  // Logs how the two-phase rollingWindow search resolves, every 5 minutes per
+  // label. Kept on because fallthrough_pct is a useful signal that traffic has
+  // shifted toward older records; set false to silence it.
+  API_WINDOW_STATS: bool({ default: true }),
   CAMPAIGNS_PUBLIC_URL: str({ default: '' }),
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
@@ -113,6 +117,7 @@ const config: Config = {
   usageStreamRedisPassword: env.USAGE_STREAM_REDIS_PASSWORD,
   usageStreamRedisUrl: env.USAGE_STREAM_REDIS_URL,
   userDbUrl: env.DB_URL_USER,
+  windowStats: env.API_WINDOW_STATS,
 };
 
 export default config;

@@ -58,6 +58,7 @@ export type Config = {
   usageStreamRedisPassword: string;
   usageStreamRedisUrl: string;
   userDbUrl: string;
+  windowStats: boolean;
 };
 
 export type StreamTransformWrapper = (
