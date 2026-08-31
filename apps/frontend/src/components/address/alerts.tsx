@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 
-import type { Account } from 'nb-schemas';
+import type { Account, Contract } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
 import { dateFormat, toMs } from '@/lib/format';
@@ -10,14 +10,16 @@ import { Alert, AlertDescription } from '@/ui/alert';
 
 type Props = {
   accountPromise: Promise<Account | null>;
+  contractPromise: Promise<Contract | null>;
 };
 
-export const AccountAlerts = ({ accountPromise }: Props) => {
+export const AccountAlerts = ({ accountPromise, contractPromise }: Props) => {
   const account = use(accountPromise);
+  const contract = use(contractPromise);
   const { t } = useLocale('address');
 
   const deletedAt = account?.deleted?.block_timestamp;
-  const locked = !deletedAt && account?.locked === true;
+  const locked = !deletedAt && account?.locked === true && contract === null;
 
   if (!deletedAt && !locked) return null;
 
