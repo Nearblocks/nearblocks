@@ -73,6 +73,7 @@ export const backfillData = async () => {
   let from = BigInt(
     String(settings?.value?.backfillTimestamp ?? config.genesisTimestamp),
   );
+  let syncHeight = Number(settings?.value?.sync ?? config.genesisHeight);
 
   logger.info(`backfilling from timestamp: ${from}`);
 
@@ -92,7 +93,6 @@ export const backfillData = async () => {
 
     const rows = await retry(async () => fetchWindow(from, to));
     const blocks = groupBlocks(rows);
-    let lastHeight: null | string = null;
 
     for (const block of blocks) {
       const message = buildMessage(block);
@@ -100,7 +100,7 @@ export const backfillData = async () => {
       await storeAccounts(db, message);
       await storeAccessKeys(db, message);
 
-      lastHeight = block.height;
+      syncHeight = Math.max(syncHeight, Number(block.height));
     }
 
     await db(tbl('settings'))
@@ -108,18 +108,17 @@ export const backfillData = async () => {
         key: indexerKey,
         value: {
           backfillTimestamp: to.toString(),
-          sync: lastHeight ?? settings?.value?.sync ?? config.genesisHeight,
+          sync: syncHeight,
         },
       })
       .onConflict('key')
       .merge();
 
-    if (lastHeight) {
-      metrics.sync.blockHeight.set(Number(lastHeight));
-      logger.info(
-        `backfilled ${blocks.length} blocks upto: ${lastHeight}, window: ${to}`,
-      );
-    }
+    metrics.sync.blockHeight.set(syncHeight);
+    metrics.sync.lastBlockTimestamp.set(Number(to) / 1e9);
+    logger.info(
+      `backfilled ${blocks.length} blocks upto: ${syncHeight}, window: ${to}`,
+    );
 
     from = to;
   }
