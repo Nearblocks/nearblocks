@@ -14,6 +14,7 @@ import {
   isDeleteKeyAction,
   isTransferAction,
 } from '#libs/guards';
+import { tbl } from '#libs/knex';
 import {
   isExecutionSuccess,
   jsonStringify,
@@ -30,7 +31,7 @@ export const storeGenesisAccessKeys = async (
   accessKeys: AccessKey[],
 ) => {
   await retry(async () => {
-    await knex('access_keys')
+    await knex(tbl('access_keys'))
       .insert(accessKeys)
       .onConflict(['public_key', 'account_id'])
       .ignore();
@@ -63,7 +64,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
 
   if (accessKeys.size) {
     await retry(async () => {
-      return knex('access_keys')
+      return knex(tbl('access_keys'))
         .insert([...accessKeys.values()])
         .onConflict(['public_key', 'account_id'])
         .merge()
@@ -75,7 +76,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
 
   if (implicitKeys.size) {
     await retry(async () => {
-      return knex('access_keys')
+      return knex(tbl('access_keys'))
         .insert([...implicitKeys.values()])
         .onConflict(['public_key', 'account_id'])
         .ignore();
@@ -84,7 +85,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
     await Promise.all(
       [...implicitKeys.values()].map(async (accessKey) => {
         return retry(async () => {
-          return knex('access_keys')
+          return knex(tbl('access_keys'))
             .update({
               created_by_block_timestamp: accessKey.created_by_block_timestamp,
               created_by_receipt_id: accessKey.created_by_receipt_id,
@@ -103,7 +104,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
             )
             .whereExists(function () {
               this.select('account_id')
-                .from('accounts')
+                .from(tbl('accounts'))
                 .where('accounts.account_id', accessKey.account_id)
                 .where(
                   'accounts.created_by_receipt_id',
@@ -119,7 +120,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
     await Promise.all(
       [...accessKeysToUpdate.values()].map(async (accessKey) => {
         return retry(async () => {
-          return knex('access_keys')
+          return knex(tbl('access_keys'))
             .update({
               deleted_by_block_timestamp: accessKey.deleted_by_block_timestamp,
               deleted_by_receipt_id: accessKey.deleted_by_receipt_id,
@@ -147,7 +148,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
     await Promise.all(
       [...deletedAccounts.values()].map(async (deleted) => {
         return retry(async () => {
-          return knex('access_keys')
+          return knex(tbl('access_keys'))
             .update({
               deleted_by_block_timestamp: message.block.header.timestampNanosec,
               deleted_by_receipt_id: deleted.receiptId,

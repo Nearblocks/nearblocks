@@ -12,7 +12,7 @@ import { JsonObject } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { db } from '#libs/knex';
+import { db, tbl } from '#libs/knex';
 import { getAccessKeyData, storeGenesisAccessKeys } from '#services/accessKey';
 import { getAccountData, storeGenesisAccounts } from '#services/account';
 
@@ -20,7 +20,7 @@ const genesisKey = 'genesis';
 const genesisValue = { sync: true } as JsonObject;
 
 export const syncGenesis = async () => {
-  const settings = await db('settings').where({ key: genesisKey }).first();
+  const settings = await db(tbl('settings')).where({ key: genesisKey }).first();
 
   const genesis = settings?.value as JsonObject;
 
@@ -36,7 +36,7 @@ export const syncGenesis = async () => {
   logger.info('inserting genesis data...');
   await insertGenesisData(path);
   await retry(async () => {
-    await db('settings')
+    await db(tbl('settings'))
       .insert({ key: genesisKey, value: genesisValue })
       .onConflict('key')
       .merge();

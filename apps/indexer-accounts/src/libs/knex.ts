@@ -29,7 +29,8 @@ const dbConfig = {
     min: 5,
     propagateCreateError: false,
   },
-  searchPath: [config.dbSchema],
 };
 
 export const db: Knex = createKnex(dbConfig);
+
+export const tbl = (name: string) => `${config.dbSchema}.${name}`;

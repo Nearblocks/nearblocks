@@ -9,13 +9,17 @@ import {
   isDeterministicStateInitAction,
   isTransferAction,
 } from '#libs/guards';
+import { tbl } from '#libs/knex';
 import { isEthImplicit, isExecutionSuccess, isNearImplicit } from '#libs/utils';
 
 type AccountMap = Map<string, Account>;
 
 export const storeGenesisAccounts = async (knex: Knex, accounts: Account[]) => {
   await retry(async () => {
-    await knex('accounts').insert(accounts).onConflict(['account_id']).ignore();
+    await knex(tbl('accounts'))
+      .insert(accounts)
+      .onConflict(['account_id'])
+      .ignore();
   });
 };
 
@@ -41,7 +45,7 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
 
   if (accounts.size) {
     await retry(async () => {
-      return knex('accounts')
+      return knex(tbl('accounts'))
         .insert([...accounts.values()])
         .onConflict(['account_id'])
         .merge()
@@ -55,7 +59,7 @@ export const storeAccounts = async (knex: Knex, message: Message) => {
     await Promise.all(
       [...accountsToUpdate.values()].map(async (account) => {
         return retry(async () => {
-          return knex('accounts')
+          return knex(tbl('accounts'))
             .update({
               deleted_by_block_timestamp: account.deleted_by_block_timestamp,
               deleted_by_receipt_id: account.deleted_by_receipt_id,

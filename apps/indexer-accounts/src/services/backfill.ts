@@ -4,7 +4,7 @@ import { AccessKeyPermissionKind, ActionKind } from 'nb-types';
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { db } from '#libs/knex';
+import { db, tbl } from '#libs/knex';
 import metrics from '#libs/prom';
 import { storeAccessKeys } from '#services/accessKey';
 import { storeAccounts } from '#services/account';
@@ -69,7 +69,7 @@ type BackfillBlock = {
 };
 
 export const backfillData = async () => {
-  const settings = await db('settings').where({ key: indexerKey }).first();
+  const settings = await db(tbl('settings')).where({ key: indexerKey }).first();
   let from = BigInt(
     String(settings?.value?.backfillTimestamp ?? config.genesisTimestamp),
   );
@@ -103,7 +103,7 @@ export const backfillData = async () => {
       lastHeight = block.height;
     }
 
-    await db('settings')
+    await db(tbl('settings'))
       .insert({
         key: indexerKey,
         value: {
