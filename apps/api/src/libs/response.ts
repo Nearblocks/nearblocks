@@ -206,7 +206,10 @@ export const rollingWindow = async <T>(
       return recent;
     }
 
-    const older = await queryFn(start.toString(), (recentStart - 1n).toString());
+    const older = await queryFn(
+      start.toString(),
+      (recentStart - 1n).toString(),
+    );
 
     recordWindowPhase(label, older ? 'phase2' : 'miss', Date.now() - began);
 
