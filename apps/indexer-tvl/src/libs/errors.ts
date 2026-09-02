@@ -36,3 +36,9 @@ export class ReconciliationError extends AppError {
     super('ReconciliationError', message);
   }
 }
+
+export class StartBlockMismatchError extends AppError {
+  constructor(message: string) {
+    super('StartBlockMismatchError', message);
+  }
+}

@@ -29,7 +29,7 @@ export const nativeBalanceCall = (bridge: string): Call3 => ({
 
 export const tokenBalanceCalls = (bridge: string, tokens: string[]): Call3[] =>
   tokens.map((token) => ({
-    allowFailure: true, // a token can be paused/broken without failing the whole batch
+    allowFailure: true,
     callData: erc20Iface.encodeFunctionData('balanceOf', [bridge]),
     target: token,
   }));

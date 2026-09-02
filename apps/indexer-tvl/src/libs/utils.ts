@@ -4,7 +4,6 @@ import { sleep } from 'nb-utils';
 
 import { RetryFailedError } from '#libs/errors';
 import { db } from '#libs/knex';
-import Sentry from '#libs/sentry';
 import {
   RetryErrorContext,
   RetryInputContext,
@@ -76,11 +75,6 @@ export const retry = async <A>(
   }
 
   throw new RetryFailedError(`all retries failed${label ? ` (${label})` : ''}`);
-};
-
-export const errorHandler = (error: unknown) => {
-  logger.error(error);
-  Sentry.captureException(error);
 };
 
 export const todayUtc = (): bigint => {

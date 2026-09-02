@@ -113,6 +113,41 @@ export const getTokenAccountsByOwner = async (
   );
 };
 
+export const getAccountInfo = async (
+  url: string,
+  pubkey: string,
+): Promise<null | string> => {
+  const result = await rpcCall<{ value: { data: [string, string] } | null }>(
+    url,
+    'getAccountInfo',
+    [pubkey, { encoding: 'base64' }],
+  );
+
+  return result.value ? result.value.data[0] : null;
+};
+
+type ParsedMintExtension = {
+  extension: string;
+  state?: { symbol?: string };
+};
+
+export const getMintMetadataSymbol = async (
+  url: string,
+  mint: string,
+): Promise<null | string> => {
+  const result = await rpcCall<{
+    value: {
+      data: { parsed?: { info?: { extensions?: ParsedMintExtension[] } } };
+    } | null;
+  }>(url, 'getAccountInfo', [mint, { encoding: 'jsonParsed' }]);
+
+  const extensions = result.value?.data?.parsed?.info?.extensions ?? [];
+  const metadata = extensions.find((e) => e.extension === 'tokenMetadata');
+  const symbol = metadata?.state?.symbol;
+
+  return symbol ? symbol : null;
+};
+
 export const getTransaction = async (
   url: string,
   signature: string,

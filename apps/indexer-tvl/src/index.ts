@@ -8,7 +8,7 @@ import { syncData } from '#services/tvl';
 
 (async () => {
   try {
-    logger.info({ network: config.network }, 'initializing tvl indexer...');
+    logger.info({ network: config.network }, 'initializing indexer...');
     await syncData();
   } catch (error) {
     logger.error('aborting...');
