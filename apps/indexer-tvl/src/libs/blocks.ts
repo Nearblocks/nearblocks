@@ -30,7 +30,7 @@ export const getDayBlock = async (
   const tip = await retry(() => getLatestBlock(url), { label: 'tip' });
   const tipTs = await headerTimestampSec(url, tip);
 
-  if (tipTs === null || tipTs < targetSec) return null; // chain hasn't reached this day yet
+  if (tipTs === null || tipTs < targetSec) return null;
 
   let lo = 0;
 

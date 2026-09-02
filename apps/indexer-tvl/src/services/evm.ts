@@ -4,6 +4,7 @@ import { sleep } from 'nb-utils';
 
 import config from '#config';
 import { getDayBlock } from '#libs/blocks';
+import { StartBlockMismatchError } from '#libs/errors';
 import { getBlockHeader, getCode, getLatestBlock, getLogs } from '#libs/evm';
 import { db } from '#libs/knex';
 import {
@@ -35,6 +36,7 @@ const CONFIRMATIONS = 30;
 const SNAPSHOT_BATCH_DAYS = 10n;
 const DISCOVERY_BATCH_CHUNKS = 20;
 const MULTICALL_BATCH_SIZE = 100;
+const MIN_CHUNK_BLOCKS = 2_000;
 const NATIVE_META: Record<
   EvmChains,
   { coingeckoId: string; decimals: number; symbol: string }
@@ -80,7 +82,37 @@ const bootstrapNativeToken = async (source: Source, startBlock: number) => {
 };
 
 const resolveStartBlock = async (source: Source, url: string) => {
-  if (source.start_block) return Number(source.start_block);
+  if (source.start_block) {
+    const cached = Number(source.start_block);
+
+    if (cached === 0) return cached;
+
+    const [beforeCode, atCode] = await Promise.all([
+      retry(
+        () => getCode(url, source.address, '0x' + (cached - 1).toString(16)),
+        {
+          label: `code ${cached - 1}`,
+        },
+      ),
+      retry(() => getCode(url, source.address, '0x' + cached.toString(16)), {
+        label: `code ${cached}`,
+      }),
+    ]);
+
+    if (beforeCode !== '0x' || atCode === '0x') {
+      throw new StartBlockMismatchError(
+        `${source.protocol}/${source.chain}: cached start_block ${cached} failed validation ` +
+          `(code before: ${
+            beforeCode === '0x' ? 'empty' : 'present'
+          }, code at: ${
+            atCode === '0x' ? 'empty' : 'present'
+          }) -- set tvl_sources.start_block to NULL and delete this source's tvl_tokens, ` +
+          `tvl_balances_daily and settings cursors to re-resolve`,
+      );
+    }
+
+    return cached;
+  }
 
   logger.info(`${source.protocol}/${source.chain}: resolving deployment block`);
 
@@ -106,7 +138,7 @@ const resolveStartBlock = async (source: Source, url: string) => {
     .where({ chain: source.chain, protocol: source.protocol })
     .update({ start_block: lo });
 
-  logger.info(`${source.protocol}/${source.chain}: deployment block ${lo}`);
+  logger.info(`${source.protocol}/${source.chain}: deployment block: ${lo}`);
 
   return lo;
 };
@@ -116,39 +148,79 @@ const sweepTransfers = async (
   bridge: string,
   fromBlock: number,
   toBlock: number,
-): Promise<string[]> => {
+): Promise<Map<string, number>> => {
   const padded = topicAddress(bridge);
+  const splittable = toBlock - fromBlock + 1 > MIN_CHUNK_BLOCKS;
 
-  const [incoming, outgoing] = await Promise.all([
-    retry(
-      () =>
-        getLogs(url, {
-          fromBlock,
-          toBlock,
-          topics: [TRANSFER_TOPIC0, null, padded],
-        }),
-      { label: `logs in ${fromBlock}-${toBlock}` },
-    ),
-    retry(
-      () =>
-        getLogs(url, {
-          fromBlock,
-          toBlock,
-          topics: [TRANSFER_TOPIC0, padded, null],
-        }),
-      { label: `logs out ${fromBlock}-${toBlock}` },
-    ),
-  ]);
+  try {
+    const [incoming, outgoing] = await Promise.all([
+      retry(
+        () =>
+          getLogs(url, {
+            fromBlock,
+            toBlock,
+            topics: [TRANSFER_TOPIC0, null, padded],
+          }),
+        {
+          label: `logs in ${fromBlock}-${toBlock}`,
+          retries: splittable ? 2 : 10,
+        },
+      ),
+      retry(
+        () =>
+          getLogs(url, {
+            fromBlock,
+            toBlock,
+            topics: [TRANSFER_TOPIC0, padded, null],
+          }),
+        {
+          label: `logs out ${fromBlock}-${toBlock}`,
+          retries: splittable ? 2 : 10,
+        },
+      ),
+    ]);
 
-  const tokens = new Set<string>();
+    const tokens = new Map<string, number>();
 
-  for (const log of [...incoming, ...outgoing]) {
-    if (log.topics.length !== 3) continue;
+    for (const log of [...incoming, ...outgoing]) {
+      if (log.topics.length !== 3) continue;
 
-    tokens.add(log.address.toLowerCase());
+      const address = log.address.toLowerCase();
+      const block = parseInt(log.blockNumber, 16);
+      const seen = tokens.get(address);
+
+      if (seen === undefined || block < seen) tokens.set(address, block);
+    }
+
+    return tokens;
+  } catch (error) {
+    if (!splittable) throw error;
+
+    const mid = fromBlock + Math.floor((toBlock - fromBlock) / 2);
+    const [left, right] = await Promise.all([
+      sweepTransfers(url, bridge, fromBlock, mid),
+      sweepTransfers(url, bridge, mid + 1, toBlock),
+    ]);
+
+    for (const [address, block] of right) {
+      const seen = left.get(address);
+
+      if (seen === undefined || block < seen) left.set(address, block);
+    }
+
+    return left;
   }
+};
 
-  return [...tokens];
+const deployDay = async (url: string, startBlock: number): Promise<bigint> => {
+  const header = await retry(() => getBlockHeader(url, startBlock), {
+    label: `header ${startBlock}`,
+  });
+  const ts = header
+    ? BigInt(parseInt(header.timestamp, 16)) * 1000n
+    : todayUtc();
+
+  return (ts / DAY_MS) * DAY_MS;
 };
 
 const discoverTokens = async (
@@ -172,18 +244,20 @@ const discoverTokens = async (
     logger.info(
       `${source.protocol}/${
         source.chain
-      }: sweeping blocks ${from}..${to} (tip ${safeTip}, lag ${safeTip - to})`,
+      }: sweeping blocks, from: ${from}, to: ${to}, tip: ${safeTip}, lag: ${
+        safeTip - to
+      }`,
     );
 
     const tokens = await sweepTransfers(url, source.address, from, to);
 
-    if (tokens.length) {
+    if (tokens.size) {
       const known = await db('tvl_tokens')
-        .whereIn('token', tokens)
+        .whereIn('token', [...tokens.keys()])
         .andWhere({ chain: source.chain, protocol: source.protocol })
         .pluck('token');
       const knownSet = new Set(known);
-      const fresh = tokens.filter((token) => !knownSet.has(token));
+      const fresh = [...tokens.keys()].filter((token) => !knownSet.has(token));
 
       for (const token of fresh) {
         const meta = await retry(() => fetchTokenMeta(url, token), {
@@ -195,7 +269,7 @@ const discoverTokens = async (
             chain: source.chain,
             coingecko_id: null,
             decimals: meta.decimals,
-            first_seen_block: to,
+            first_seen_block: tokens.get(token),
             first_seen_date: null,
             protocol: source.protocol,
             symbol: meta.symbol,
@@ -205,9 +279,11 @@ const discoverTokens = async (
           .ignore();
 
         logger.info(
-          `${source.protocol}/${source.chain}: discovered token ${token} (${
+          `${source.protocol}/${
+            source.chain
+          }: discovered token, address: ${token}, symbol: ${
             meta.symbol ?? '?'
-          })`,
+          }`,
         );
       }
     }
@@ -278,6 +354,9 @@ const snapshotDays = async (
 ) => {
   const key = balanceSyncKey(source.protocol, source.chain);
   const synced = await getSyncedValue(key);
+  const tokensSynced = await getSyncedValue(
+    tokenSyncKey(source.protocol, source.chain),
+  );
 
   const tokens = await db('tvl_tokens')
     .where({ chain: source.chain, protocol: source.protocol })
@@ -285,29 +364,19 @@ const snapshotDays = async (
     .select('token');
   const tokenAddresses = tokens.map((t) => t.token as string);
 
-  let day: bigint;
+  let day: bigint =
+    synced !== null ? synced + DAY_MS : await deployDay(url, startBlock);
 
-  if (synced !== null) {
-    day = synced + DAY_MS;
-  } else {
-    const header = await retry(() => getBlockHeader(url, startBlock), {
-      label: `header ${startBlock}`,
-    });
-    const ts = header
-      ? BigInt(parseInt(header.timestamp, 16)) * 1000n
-      : todayUtc();
-
-    day = (ts / DAY_MS) * DAY_MS;
-  }
-
-  const yesterday = todayUtc() - DAY_MS; // today is not final yet
+  const yesterday = todayUtc() - DAY_MS;
   let processed = 0n;
 
   while (day <= yesterday && processed < SNAPSHOT_BATCH_DAYS) {
     const next = await getDayBlock(source.chain, url, day + DAY_MS, startBlock);
 
-    if (next === null) break; // chain hasn't reached day D+1 yet
+    if (next === null) break;
     const block = Math.max(next - 1, startBlock);
+
+    if (tokensSynced === null || tokensSynced < BigInt(block)) break;
 
     const { native, tokens: tokenResults } = await snapshotBalances(
       url,
@@ -347,9 +416,11 @@ const snapshotDays = async (
     );
 
     logger.info(
-      `${source.protocol}/${source.chain}: day ${day} @ block ${block} (lag ${
+      `${source.protocol}/${
+        source.chain
+      }: snapshotted day: ${day}, block: ${block}, lag: ${
         (yesterday - day) / DAY_MS
-      }d)`,
+      }d`,
     );
 
     day += DAY_MS;
@@ -386,6 +457,8 @@ export const processSource = async (source: Source) => {
   let startBlock: number | undefined;
 
   while (true) {
+    logger.info(`${source.protocol}/${source.chain}: polling`);
+
     startBlock ??= await resolveStartBlock(source, url);
     await bootstrapNativeToken(source, startBlock);
     await discoverTokens(source, url, startBlock);

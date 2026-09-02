@@ -12,39 +12,32 @@ const DAY_NS = 86_400_000_000_000n;
 const OFFSET_NS = 3_000_000_000n; // 3s
 const REBUILD_DAYS = 1n;
 const CATCHUP_DAYS = 30n;
+const CAGG_LOOKBACK_DAYS = 3n;
 
 const window = async (source: Source) => {
-  const [settings, events] = await Promise.all([
+  const [settings, indexer, first] = await Promise.all([
     db('settings')
       .where('key', balanceSyncKey(source.protocol, source.chain))
       .first(),
-    db('settings').where('key', 'events').first(),
-  ]);
-
-  const last = events?.value?.timestamp as string | undefined;
-
-  if (!last) return null;
-
-  const lastDay = ((BigInt(last) - OFFSET_NS) / DAY_NS) * DAY_MS;
-  const synced = settings?.value?.sync as string | undefined;
-
-  let startDay: bigint;
-
-  if (synced) {
-    startDay = BigInt(synced) - REBUILD_DAYS * DAY_MS;
-  } else {
-    const first = await db
+    db('settings').where('key', 'ft_state').first(),
+    db
       .select('block_timestamp')
-      .from('ft_events')
+      .from('ft_state_balances')
       .where('affected_account_id', source.address)
       .orderBy('block_timestamp', 'asc')
       .limit(1)
-      .first();
+      .first(),
+  ]);
 
-    if (!first) return null;
+  const last = indexer?.value?.timestamp as string | undefined;
 
-    startDay = (BigInt(first.block_timestamp) / DAY_NS) * DAY_MS;
-  }
+  if (!last || !first) return null;
+
+  const lastDay = ((BigInt(last) - OFFSET_NS) / DAY_NS) * DAY_MS;
+  const genesisDay = (BigInt(first.block_timestamp) / DAY_NS) * DAY_MS;
+  const synced = settings?.value?.sync as string | undefined;
+
+  const startDay = synced ? BigInt(synced) - REBUILD_DAYS * DAY_MS : genesisDay;
 
   if (startDay > lastDay) return null;
 
@@ -68,18 +61,18 @@ const discoverTokens = async (
       SELECT DISTINCT
         ?,
         ?,
-        e.contract_account_id,
+        s.contract_account_id,
         m.symbol,
         m.decimals,
         m.coingecko_id,
         ?::BIGINT
       FROM
-        ft_events e
-        LEFT JOIN ft_meta m ON m.contract = e.contract_account_id
+        ft_state_balances s
+        LEFT JOIN ft_meta m ON m.contract = s.contract_account_id
       WHERE
-        e.affected_account_id = ?
-        AND e.block_timestamp >= ?
-        AND e.block_timestamp < ?
+        s.affected_account_id = ?
+        AND s.block_timestamp >= ?
+        AND s.block_timestamp < ?
       ON CONFLICT (protocol, chain, token) DO NOTHING
     `,
     [
@@ -99,6 +92,8 @@ const foldBalances = async (
   startDay: bigint,
   endDay: bigint,
 ) => {
+  const tailCutoff = endDay - CAGG_LOOKBACK_DAYS * DAY_MS;
+
   await trx.raw(
     `
       WITH seed AS (
@@ -113,40 +108,56 @@ const foldBalances = async (
       days AS (
         SELECT generate_series(?::BIGINT, ?::BIGINT, 86400000) AS date
       ),
-      deltas AS (
-        SELECT
-          (block_timestamp / 86400000000000) * 86400000 AS date,
-          contract_account_id AS token,
-          SUM(delta_amount) AS delta
-        FROM ft_events
+      readings AS (
+        SELECT contract AS token, date, absolute_amount AS amount
+        FROM account_ft_balances
         WHERE
-          affected_account_id = ?
-          AND block_timestamp >= ?
-          AND block_timestamp < ?
-        GROUP BY 1, 2
+          account = ?
+          AND date >= ?
+          AND date <= ?
+          AND date < ?
+        UNION ALL
+        SELECT DISTINCT ON (contract_account_id, day)
+          contract_account_id AS token,
+          day AS date,
+          absolute_amount AS amount
+        FROM (
+          SELECT
+            contract_account_id,
+            (block_timestamp / 86400000000000) * 86400000 AS day,
+            absolute_amount,
+            block_timestamp,
+            shard_id,
+            index_in_chunk
+          FROM ft_state_balances
+          WHERE affected_account_id = ? AND block_timestamp >= ?
+        ) tail
+        ORDER BY
+          contract_account_id,
+          day,
+          block_timestamp DESC,
+          shard_id DESC,
+          index_in_chunk DESC
       ),
-      grid AS (
+      filled AS (
         SELECT
           t.token,
           d.date,
-          COALESCE(x.delta, 0) AS delta
+          (
+            SELECT r.amount FROM readings r
+            WHERE r.token = t.token AND r.date <= d.date
+            ORDER BY r.date DESC
+            LIMIT 1
+          ) AS amount
         FROM tokens t
         CROSS JOIN days d
-        LEFT JOIN deltas x ON x.token = t.token AND x.date = d.date
       )
       INSERT INTO
         tvl_balances_daily (date, protocol, chain, token, amount)
       SELECT
-        g.date,
-        ?,
-        ?,
-        g.token,
-        COALESCE(s.seed_amount, 0) + SUM(g.delta) OVER (
-          PARTITION BY g.token
-          ORDER BY g.date
-        )
-      FROM grid g
-        LEFT JOIN seed s ON s.token = g.token
+        f.date, ?, ?, f.token, COALESCE(f.amount, s.seed_amount, 0)
+      FROM filled f
+        LEFT JOIN seed s ON s.token = f.token
       ON CONFLICT (date, protocol, chain, token) DO UPDATE
       SET amount = EXCLUDED.amount
     `,
@@ -159,8 +170,11 @@ const foldBalances = async (
       startDay.toString(),
       endDay.toString(),
       source.address,
-      (startDay * 1_000_000n).toString(),
-      ((endDay + DAY_MS) * 1_000_000n).toString(),
+      startDay.toString(),
+      endDay.toString(),
+      tailCutoff.toString(),
+      source.address,
+      (tailCutoff * 1_000_000n).toString(),
       source.protocol,
       source.chain,
     ],
@@ -175,7 +189,7 @@ const sync = async (source: Source) => {
   const { endDay, startDay } = win;
 
   logger.info(
-    `${source.protocol}/${source.chain}: days ${startDay} - ${endDay}`,
+    `${source.protocol}/${source.chain}: syncing days, from: ${startDay}, to: ${endDay}`,
   );
 
   await discoverTokens(source, startDay, endDay);
@@ -204,6 +218,8 @@ export const processSource = async (source: Source) => {
   }
 
   while (true) {
+    logger.info(`${source.protocol}/${source.chain}: polling`);
+
     await sync(source);
     await sleep(config.intervalMs);
   }

@@ -5,8 +5,11 @@ import { sleep } from 'nb-utils';
 import config from '#config';
 import { ReconciliationError } from '#libs/errors';
 import { db } from '#libs/knex';
+import { findMetadataPda, parseSymbol } from '#libs/metaplex';
 import { tvlDayHeight } from '#libs/prom';
 import {
+  getAccountInfo,
+  getMintMetadataSymbol,
   getSignaturesForAddress,
   getTokenAccountsByOwner,
   getTransaction,
@@ -17,11 +20,45 @@ import { SolanaAccount, SolanaDayTx, Source } from '#types/types';
 const PAGE_LIMIT = 1000;
 const MAX_SCAN_PAGES_PER_PASS = 30;
 const MAX_RESOLUTIONS_PER_PASS = 500;
+const MAX_SYMBOL_BACKFILL_PER_PASS = 20;
 
 type DayTxRow = Pick<
   SolanaDayTx,
   'amount' | 'ata' | 'chain' | 'date' | 'protocol' | 'resolved' | 'signature'
 >;
+
+const fetchSymbol = async (mint: string): Promise<string> => {
+  const pda = findMetadataPda(mint);
+  const data = await retry(() => getAccountInfo(config.solanaUrl, pda), {
+    label: `metadata ${mint}`,
+  });
+  const symbol = data ? parseSymbol(data) : null;
+
+  if (symbol) return symbol;
+
+  const extSymbol = await retry(
+    () => getMintMetadataSymbol(config.solanaUrl, mint),
+    { label: `mint metadata ${mint}` },
+  );
+
+  return extSymbol ?? '';
+};
+
+const backfillSymbols = async (source: Source) => {
+  const stale = await db('tvl_tokens')
+    .where({ chain: source.chain, protocol: source.protocol })
+    .whereNull('symbol')
+    .limit(MAX_SYMBOL_BACKFILL_PER_PASS)
+    .select('token');
+
+  for (const { token } of stale) {
+    const symbol = await fetchSymbol(token);
+
+    await db('tvl_tokens')
+      .where({ chain: source.chain, protocol: source.protocol, token })
+      .update({ symbol });
+  }
+};
 
 const discoverAccounts = async (
   source: Source,
@@ -47,19 +84,31 @@ const discoverAccounts = async (
       .ignore();
   }
 
-  const tokenRows = tokenAccounts.map((t) => ({
-    chain: source.chain,
-    coingecko_id: null,
-    decimals: t.decimals,
-    first_seen_date: null,
-    protocol: source.protocol,
-    symbol: null,
-    token: t.mint,
-  }));
+  await backfillSymbols(source);
 
-  if (tokenRows.length) {
+  const known = await db('tvl_tokens')
+    .whereIn(
+      'token',
+      tokenAccounts.map((t) => t.mint),
+    )
+    .andWhere({ chain: source.chain, protocol: source.protocol })
+    .pluck('token');
+  const knownSet = new Set(known);
+  const fresh = tokenAccounts.filter((t) => !knownSet.has(t.mint));
+
+  for (const t of fresh) {
+    const symbol = await fetchSymbol(t.mint);
+
     await db('tvl_tokens')
-      .insert(tokenRows)
+      .insert({
+        chain: source.chain,
+        coingecko_id: null,
+        decimals: t.decimals,
+        first_seen_date: null,
+        protocol: source.protocol,
+        symbol,
+        token: t.mint,
+      })
       .onConflict(['protocol', 'chain', 'token'])
       .ignore();
   }
@@ -78,7 +127,7 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
 
   let pages = 0;
   let newestSeen: string | undefined;
-  let todayRow: DayTxRow | undefined; // newest row for `today` across this whole pass
+  let todayRow: DayTxRow | undefined;
   let reachedEnd = false;
 
   while (pages < MAX_SCAN_PAGES_PER_PASS) {
@@ -94,10 +143,10 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
 
     logger.info(
       `${source.protocol}/${source.chain}: ${
-        backward ? 'scan' : 'sync'
-      } ${account.ata.slice(0, 8)}.. ${before ?? until ?? 'tip'} +${
-        entries.length
-      }`,
+        backward ? 'scanning' : 'syncing'
+      } account: ${account.ata}, from: ${
+        before ?? until ?? 'tip'
+      }, signatures: ${entries.length}`,
     );
 
     if (!entries.length) {
@@ -124,7 +173,7 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
       };
 
       if (day === today) {
-        todayRow ??= row; // entries stream newest-first overall, across pages
+        todayRow ??= row;
       } else {
         closedRows.push(row);
       }
@@ -191,13 +240,12 @@ const resolveDayTx = async (
 
   const resolved: { amount: null | string; ata: string; date: string }[] = [];
   let matched = 0;
-  let sawMeta = false;
 
   for (let i = 0; i < pending.length; i++) {
     const row = pending[i];
     const account = accounts.get(row.ata);
 
-    if (!account) continue; // account removed from tvl_solana_accounts; skip
+    if (!account) continue;
 
     const tx = await retry(
       () => getTransaction(config.solanaUrl, row.signature),
@@ -207,55 +255,42 @@ const resolveDayTx = async (
     );
 
     if (!tx?.meta) {
-      logger.warn(
+      logger.info(
         `${source.protocol}/${source.chain}: tx ${row.signature} missing meta, retrying next pass`,
       );
-    } else {
-      sawMeta = true;
-      const keys = [
-        ...tx.transaction.message.accountKeys,
-        ...(tx.meta.loadedAddresses?.writable ?? []),
-        ...(tx.meta.loadedAddresses?.readonly ?? []),
-      ];
-      const idx = keys.indexOf(account.ata);
 
-      let amount: bigint | null = null;
+      continue;
+    }
 
-      const balance = tx.meta.postTokenBalances?.find(
-        (b) => b.accountIndex === idx,
-      );
+    const keys = [
+      ...tx.transaction.message.accountKeys,
+      ...(tx.meta.loadedAddresses?.writable ?? []),
+      ...(tx.meta.loadedAddresses?.readonly ?? []),
+    ];
+    const idx = keys.indexOf(account.ata);
 
-      if (balance) {
-        if (balance.owner && balance.owner !== authority) {
-          throw new ReconciliationError(
-            `${source.protocol}/${source.chain}: postTokenBalances owner ${balance.owner} != configured authority ${authority} for ${account.ata}`,
-          );
-        }
+    const balance = tx.meta.postTokenBalances?.find(
+      (b) => b.accountIndex === idx,
+    );
 
-        amount = BigInt(balance.uiTokenAmount.amount);
-      }
-
-      if (amount !== null) {
-        resolved.push({
-          amount: amount.toString(),
-          ata: row.ata,
-          date: row.date,
-        });
-        matched++;
-      } else {
-        logger.warn(
-          `${source.protocol}/${source.chain}: tx ${row.signature} didn't touch ${account.ata}, retrying next pass`,
+    if (balance) {
+      if (balance.owner && balance.owner !== authority) {
+        throw new ReconciliationError(
+          `${source.protocol}/${source.chain}: postTokenBalances owner ${balance.owner} != configured authority ${authority} for ${account.ata}`,
         );
       }
+
+      resolved.push({
+        amount: BigInt(balance.uiTokenAmount.amount).toString(),
+        ata: row.ata,
+        date: row.date,
+      });
+      matched++;
+    } else {
+      resolved.push({ amount: null, ata: row.ata, date: row.date });
     }
 
     if (i < pending.length - 1) await sleep(config.solanaTxDelayMs);
-  }
-
-  if (matched === 0 && sawMeta) {
-    throw new ReconciliationError(
-      `${source.protocol}/${source.chain}: resolved 0/${pending.length} pending readings -- check tvl_sources.authority`,
-    );
   }
 
   await db.transaction(async (trx) => {
@@ -272,7 +307,7 @@ const resolveDayTx = async (
   });
 
   logger.info(
-    `${source.protocol}/${source.chain}: resolved ${resolved.length}/${pending.length} readings`,
+    `${source.protocol}/${source.chain}: resolved ${resolved.length}/${pending.length} readings (${matched} with a balance)`,
   );
 };
 
@@ -387,6 +422,8 @@ export const processSource = async (source: Source) => {
   if (!config.solanaUrl) return;
 
   while (true) {
+    logger.info(`${source.protocol}/${source.chain}: polling`);
+
     await sync(source);
     await sleep(config.intervalMs);
   }
