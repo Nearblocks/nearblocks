@@ -108,10 +108,7 @@ const TokenRow = ({
                 <span>{currencyFormat(value)}</span>
                 {unitPrice && (
                   <span className="text-muted-foreground">
-                    @$
-                    {numberFormat(unitPrice, {
-                      maximumFractionDigits: 6,
-                    })}
+                    @{currencyFormat(unitPrice)}
                   </span>
                 )}
               </>
