@@ -29,6 +29,7 @@
     "nb-neardata-raw": "*",
     "nb-knex": "*",
     "nb-logger": "*",
+    "nb-near": "*",
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",

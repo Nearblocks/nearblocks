@@ -1,5 +1,6 @@
 import {
   FTKeyEncoding,
+  FTStateVerificationStatus,
   FTValueEncoding,
   Network,
   StateChangeValueView,
@@ -18,8 +19,17 @@ export type Config = {
   network: Network;
   rawLag: number;
   rawThreshold: number;
+  rpcUrl?: string;
   sentryDsn?: string;
   startBlockHeight: number;
+  verifyCooldownDays: number;
+  verifyDrawAttempts: number;
+  verifyIntervalMs: number;
+  verifyKey: string;
+  verifyMaxAttempts: number;
+  verifyMinLagBlocks: number;
+  verifySamples: number;
+  verifySeedBatch: number;
 };
 
 export type StateChange<TChange> = {
@@ -74,7 +84,7 @@ export type Evidence = {
   mints: Map<string, bigint>;
 };
 
-export type UntrackedReason = 'event_contradiction';
+export type UntrackedReason = 'event_contradiction' | 'not_ft' | 'rpc_mismatch';
 
 export type EventLog = {
   data?: unknown;
@@ -96,3 +106,19 @@ export type StorageWrite = {
 };
 
 export type Resolved = { account: string; amount: bigint };
+
+export type Raw<T> = {
+  rows: T[];
+};
+
+export type Sample = { account: string; amount: bigint; blockHeight: number };
+
+export type VerifyStatus = FTStateVerificationStatus;
+
+export type VerificationRow = {
+  attempts: number;
+  block_height: number;
+  checked_at: null | string;
+  contract: string;
+  status: VerifyStatus;
+};
