@@ -18,6 +18,7 @@
     "eslint-config-custom-node": "*",
     "near-lake-framework": "2.0.0",
     "nb-tsconfig": "*",
+    "nb-utils": "*",
     "typescript": "~5.2"
   }
 }

@@ -1,9 +1,136 @@
 import axios, { AxiosInstance } from 'axios';
 import { validators } from 'near-api-js';
 
+import { retry } from 'nb-utils';
+
 export * from './types.js';
 
 export const validatorApi = validators;
+
+export type ViewCall = { errorName: string; result: null | number[] };
+
+export type RpcErrorBody = {
+  error?: { cause?: { name?: string }; data?: string; message?: string };
+};
+
+export const REJECT_MARKERS = [
+  'methodnotfound',
+  'methodresolveerror',
+  'compilationerror',
+  'wasmerruntimeerror',
+  'functioncallerror',
+  'contract_execution_error',
+  'codedoesnotexist',
+  'unknown_account',
+  'no_contract_code',
+];
+
+export const ABSENT_MARKERS = [
+  'methodnotfound',
+  'methodresolveerror',
+  'codedoesnotexist',
+  'unknown_account',
+  'no_contract_code',
+];
+
+const describeRpcErrorBody = (data: unknown): string | undefined => {
+  const body = data as RpcErrorBody | undefined;
+  return body?.error?.cause?.name ?? body?.error?.data ?? body?.error?.message;
+};
+
+export const callView = async (
+  rpc: RPC,
+  contract: string,
+  method: string,
+  args: unknown,
+  blockHeight: number,
+): Promise<ViewCall> => {
+  try {
+    const res = await retry(
+      () =>
+        rpc.callFunction(contract, method, rpc.encodeArgs(args), blockHeight),
+      { exponential: true, retries: 5 },
+    );
+
+    const data = res.data as {
+      error?: { cause?: { name?: string }; message?: string };
+      result?: { error?: string; result?: number[] };
+    };
+
+    if (data?.result?.result)
+      return { errorName: '', result: data.result.result };
+
+    const errorName = String(
+      data?.result?.error ||
+        data?.error?.cause?.name ||
+        data?.error?.message ||
+        '',
+    ).toLowerCase();
+
+    return { errorName, result: null };
+  } catch {
+    return { errorName: 'rpc_error', result: null };
+  }
+};
+
+export const fetchBalance = async (
+  rpc: RPC,
+  contract: string,
+  account: string,
+  blockHeight: number,
+): Promise<{ balance: bigint | null; errorName: string }> => {
+  const { errorName, result } = await callView(
+    rpc,
+    contract,
+    'ft_balance_of',
+    { account_id: account },
+    blockHeight,
+  );
+
+  if (!result) return { balance: null, errorName };
+
+  try {
+    return {
+      balance: BigInt(JSON.parse(Buffer.from(result).toString())),
+      errorName: '',
+    };
+  } catch {
+    return { balance: null, errorName: 'parse_error' };
+  }
+};
+
+export const checkArchival = async (
+  rpc: RPC,
+  contract: string,
+  blockHeight: number,
+): Promise<void> => {
+  try {
+    const res = await retry(
+      () =>
+        rpc.query(
+          {
+            account_ids: [contract],
+            block_id: blockHeight,
+            changes_type: 'data_changes',
+            key_prefix_base64: '',
+          },
+          'EXPERIMENTAL_changes',
+        ),
+      { exponential: true, retries: 5 },
+    );
+
+    const changes = res.data?.result?.changes;
+
+    if (!changes) {
+      throw new Error(describeRpcErrorBody(res.data) ?? 'no changes');
+    }
+  } catch (error) {
+    throw new Error(
+      `RPC_URL must point at an archival node, reading block ${blockHeight} ` +
+        `failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+};
 
 export class RPC {
   request: AxiosInstance;

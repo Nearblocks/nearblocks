@@ -73,6 +73,10 @@ const discoverTokens = async (
         s.affected_account_id = ?
         AND s.block_timestamp >= ?
         AND s.block_timestamp < ?
+        AND NOT EXISTS (
+          SELECT 1 FROM ft_state_untracked u
+          WHERE u.contract = s.contract_account_id
+        )
       ON CONFLICT (protocol, chain, token) DO NOTHING
     `,
     [
@@ -130,7 +134,13 @@ const foldBalances = async (
             shard_id,
             index_in_chunk
           FROM ft_state_balances
-          WHERE affected_account_id = ? AND block_timestamp >= ?
+          WHERE
+            affected_account_id = ?
+            AND block_timestamp >= ?
+            AND NOT EXISTS (
+              SELECT 1 FROM ft_state_untracked u
+              WHERE u.contract = ft_state_balances.contract_account_id
+            )
         ) tail
         ORDER BY
           contract_account_id,

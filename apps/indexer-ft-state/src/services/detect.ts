@@ -9,6 +9,7 @@ import {
   isFunctionCallAction,
 } from '#libs/guards';
 import { staticLayouts } from '#libs/layouts';
+import { resetVerification } from '#services/roster';
 import {
   EventLog,
   Evidence,
@@ -63,7 +64,10 @@ export const clearUntracked = async (
 
   untracked.delete(contract);
 
-  await db('ft_state_untracked').where('contract', contract).del();
+  await Promise.all([
+    db('ft_state_untracked').where('contract', contract).del(),
+    resetVerification(db, contract),
+  ]);
 };
 
 const parseEvents = (logs: string[]): EventLog[] => {

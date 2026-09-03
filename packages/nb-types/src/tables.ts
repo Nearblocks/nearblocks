@@ -38,6 +38,7 @@ export interface TTables {
   ft_state_balances: FTStateBalance;
   ft_state_holders: FTStateHolder;
   ft_state_untracked: FTStateUntracked;
+  ft_state_verifications: FTStateVerification;
   mpc_derived_keys: MpcDerivedKey;
   multichain_signatures: MultichainSignature;
   multichain_transactions: MultichainTransaction;
@@ -341,6 +342,26 @@ export type FTStateHolder = {
   amount: string;
   block_height: number;
   contract: string;
+};
+
+export type FTStateVerificationStatus =
+  | 'absent'
+  | 'inconclusive'
+  | 'mismatch'
+  | 'pending'
+  | 'skipped'
+  | 'verified';
+
+export type FTStateVerification = {
+  attempts: number;
+  block_height: number;
+  checked_at: null | string;
+  checks: number;
+  contract: string;
+  matched: number;
+  mismatched: number;
+  samples: number;
+  status: FTStateVerificationStatus;
 };
 
 export type IntentsMeta = {

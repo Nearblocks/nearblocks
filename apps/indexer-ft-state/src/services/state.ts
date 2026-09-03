@@ -24,6 +24,7 @@ import {
   isUntracked,
   markUntracked,
 } from '#services/detect';
+import { noteContract } from '#services/roster';
 import {
   Evidence,
   Layout,
@@ -292,6 +293,8 @@ const storeShardFTState = async (
         continue;
       }
     }
+
+    if (candidateRows.length) noteContract(knex, contract);
 
     for (const row of candidateRows) {
       row.index_in_chunk = rows.length;

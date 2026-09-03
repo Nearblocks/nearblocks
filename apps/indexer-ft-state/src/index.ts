@@ -3,7 +3,9 @@ import { logger } from 'nb-logger';
 import config from '#config';
 import { db } from '#libs/knex';
 import { server } from '#libs/prom';
+import { rpc } from '#libs/rpc';
 import sentry from '#libs/sentry';
+import { checkAuditorReady, syncAudit } from '#services/audit';
 import { loadUntracked } from '#services/detect';
 import { syncData } from '#services/stream';
 
@@ -11,6 +13,18 @@ import { syncData } from '#services/stream';
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
     await loadUntracked(db);
+
+    if (rpc) {
+      await checkAuditorReady(rpc);
+
+      syncAudit(db, rpc).catch((error) => {
+        logger.error(error, 'ft state audit: auditor crashed');
+        sentry.captureException(error);
+      });
+    } else {
+      logger.warn('RPC_URL not set, ft state audit disabled');
+    }
+
     await syncData();
   } catch (error) {
     logger.error('aborting...');
