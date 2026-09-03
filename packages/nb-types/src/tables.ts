@@ -337,8 +337,8 @@ export type FTStateUntracked = {
 };
 
 export type FTStateHolder = {
-  absolute_amount: string;
   account: string;
+  amount: string;
   block_height: number;
   contract: string;
 };

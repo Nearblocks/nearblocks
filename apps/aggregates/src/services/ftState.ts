@@ -60,16 +60,20 @@ const holders = async () => {
       await trx.raw(
         `
           INSERT INTO
-            ${TABLE} (contract, account, absolute_amount, block_height)
+            ${TABLE} (contract, account, amount, block_height)
           SELECT DISTINCT ON (contract_account_id, affected_account_id)
             contract_account_id AS contract,
             affected_account_id AS account,
-            absolute_amount,
+            absolute_amount AS amount,
             block_height
           FROM
-            ${SOURCE}
+            ${SOURCE} s
           WHERE
             block_timestamp BETWEEN ? AND ?
+            AND NOT EXISTS (
+              SELECT 1 FROM ft_state_untracked u
+              WHERE u.contract = s.contract_account_id
+            )
           ORDER BY
             contract_account_id,
             affected_account_id,
@@ -78,7 +82,7 @@ const holders = async () => {
             index_in_chunk DESC
           ON CONFLICT (contract, account) DO UPDATE
           SET
-            absolute_amount = EXCLUDED.absolute_amount,
+            amount = EXCLUDED.amount,
             block_height = EXCLUDED.block_height
           WHERE
             EXCLUDED.block_height >= ${TABLE}.block_height
