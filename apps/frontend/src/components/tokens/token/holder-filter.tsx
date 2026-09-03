@@ -156,7 +156,7 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
                 <span className="text-body-sm">
                   {currencyFormat(toTokenPrice(rawBalance, decimals, price))}
                   <span className="text-muted-foreground ml-2">
-                    @{numberFormat(price, { maximumFractionDigits: 6 })}
+                    @{currencyFormat(price)}
                   </span>
                 </span>
               ) : (
