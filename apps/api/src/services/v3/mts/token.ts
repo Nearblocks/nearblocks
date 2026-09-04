@@ -213,6 +213,67 @@ const txnCount = responseHandler(
     const before = req.validator.before_ts;
 
     if (!before && !affected) {
+      const result = await dbEvents.oneOrNone<{ count: string }>(
+        sql.tokens.tokenTxnCountList,
+        { contract, token },
+      );
+      const count = await countFromCagg(
+        result?.count ?? '0',
+        config.maxQueryCount,
+        () =>
+          rollingWindowCount(
+            (start, end, limit) =>
+              dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
+                affected,
+                before,
+                contract,
+                end,
+                limit,
+                start,
+                token,
+              }),
+            {
+              limit: config.maxQueryCount,
+              start: config.eventsStart,
+            },
+          ),
+      );
+
+      return { data: { count } };
+    }
+
+    const beforeTs = before ? BigInt(before) - 1n : undefined;
+    const count = await rollingWindowCount(
+      (start, end, limit) =>
+        dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
+          affected,
+          before,
+          contract,
+          end,
+          limit,
+          start,
+          token,
+        }),
+      {
+        end: beforeTs,
+        limit: config.maxQueryCount,
+        start: config.eventsStart,
+      },
+    );
+
+    return { data: { count: cappedCount(count, config.maxQueryCount) } };
+  },
+);
+
+const nftTxnCount = responseHandler(
+  response.txnCount,
+  async (req: RequestValidator<MTTokenTxnCountReq>) => {
+    const contract = req.validator.contract;
+    const token = req.validator.token;
+    const affected = req.validator.affected;
+    const before = req.validator.before_ts;
+
+    if (!before && !affected) {
       const result = await dbEvents.one<{ count: string }>(
         sql.tokens.tokenTxnCountCagg,
         { contract, token },
@@ -315,12 +376,12 @@ const holderCount = responseHandler(
     const contract = req.validator.contract;
     const token = req.validator.token;
 
-    const data = await dbEvents.one<MTTokenHolderCount>(
-      sql.tokens.tokenHolderCount,
-      { contract, limit: config.maxQueryCount, token },
+    const data = await dbEvents.oneOrNone<MTTokenHolderCount>(
+      sql.tokens.tokenHolderCountList,
+      { contract, token },
     );
 
-    return { data: { count: cappedCount(data.count, config.maxQueryCount) } };
+    return { data: { count: data?.count ?? '0' } };
   },
 );
 
@@ -328,6 +389,7 @@ export default {
   holderCount,
   holders,
   list,
+  nftTxnCount,
   token,
   tokenCount,
   txnCount,

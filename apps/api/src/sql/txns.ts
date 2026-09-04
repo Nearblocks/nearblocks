@@ -1,14 +1,15 @@
 import { sql } from '#sql/index';
 
 export default {
+  anchor: sql('queries/txns/anchor.sql'),
+  anchorCte: sql('queries/txns/anchorCte.sql'),
   count: sql('queries/txns/count.sql'),
   countCagg: sql('queries/txns/countCagg.sql'),
-  events: sql('queries/txns/events.sql'),
-  eventsRlp: sql('queries/txns/eventsRlp.sql'),
   ft: sql('queries/txns/ft.sql'),
   latestCte: sql('queries/txns/latestCte.sql'),
   mt: sql('queries/txns/mt.sql'),
   nft: sql('queries/txns/nft.sql'),
+  receiptIds: sql('queries/txns/receiptIds.sql'),
   receipts: sql('queries/txns/receipts.sql'),
   rlpCte: sql('queries/txns/rlpCte.sql'),
   stats: sql('queries/txns/stats.sql'),

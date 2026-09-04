@@ -77,31 +77,17 @@ const txnCount = v.object({
   count: v.string(),
 });
 
-const contractHolders = v.object({
-  account: v.string(),
-  amount: v.string(),
-  token: v.string(),
-});
-
-const contractHolderCount = v.object({
-  count: v.string(),
-});
-
 const listResponse = responseSchema(v.array(list));
 const listCountResponse = responseSchema(listCount);
 const txnsResponse = responseSchema(v.array(txn));
 const txnCountResponse = responseSchema(txnCount);
 const contractTxnsResponse = responseSchema(v.array(txn));
 const contractTxnCountResponse = responseSchema(txnCount);
-const contractHoldersResponse = responseSchema(v.array(contractHolders));
-const contractHolderCountResponse = responseSchema(contractHolderCount);
 
 export type MTList = v.InferOutput<typeof list>;
 export type MTListCount = v.InferOutput<typeof listCount>;
 export type MTTxn = v.InferOutput<typeof txn>;
 export type MTTxnCount = v.InferOutput<typeof txnCount>;
-export type MTContractHolders = v.InferOutput<typeof contractHolders>;
-export type MTContractHolderCount = v.InferOutput<typeof contractHolderCount>;
 
 export type MTListRes = v.InferOutput<typeof listResponse>;
 export type MTListCountRes = v.InferOutput<typeof listCountResponse>;
@@ -111,16 +97,8 @@ export type MTContractTxnsRes = v.InferOutput<typeof contractTxnsResponse>;
 export type MTContractTxnCountRes = v.InferOutput<
   typeof contractTxnCountResponse
 >;
-export type MTContractHoldersRes = v.InferOutput<
-  typeof contractHoldersResponse
->;
-export type MTContractHolderCountRes = v.InferOutput<
-  typeof contractHolderCountResponse
->;
 
 export default {
-  contractHolderCount: contractHolderCountResponse,
-  contractHolders: contractHoldersResponse,
   contractTxnCount: contractTxnCountResponse,
   contractTxns: contractTxnsResponse,
   count: txnCountResponse,

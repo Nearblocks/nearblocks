@@ -69,24 +69,6 @@ const contractTxnCount = v.object({
   token: v.optional(v.string()),
 });
 
-const contractHolders = v.object({
-  contract: v.string(),
-  limit: limitSchema,
-  next: cursorSchema,
-  prev: cursorSchema,
-  token: v.optional(v.string()),
-});
-
-const contractHolderCount = v.object({
-  contract: v.string(),
-  token: v.optional(v.string()),
-});
-
-const contractHoldersCursor = v.object({
-  account: v.string(),
-  amount: v.string(),
-});
-
 export type MTListReq = v.InferOutput<typeof list>;
 export type MTListCursor = v.InferOutput<typeof listCursor>;
 export type MTListCountReq = v.InferOutput<typeof listCount>;
@@ -95,18 +77,8 @@ export type MTTxnCountReq = v.InferOutput<typeof count>;
 export type MTTxnsCursor = v.InferOutput<typeof cursor>;
 export type MTContractTxnsReq = v.InferOutput<typeof contractTxns>;
 export type MTContractTxnCountReq = v.InferOutput<typeof contractTxnCount>;
-export type MTContractHoldersReq = v.InferOutput<typeof contractHolders>;
-export type MTContractHolderCountReq = v.InferOutput<
-  typeof contractHolderCount
->;
-export type MTContractHoldersCursor = v.InferOutput<
-  typeof contractHoldersCursor
->;
 
 export default {
-  contractHolderCount,
-  contractHolders,
-  contractHoldersCursor,
   contractTxnCount,
   contractTxns,
   count,

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/nfts/tokens/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -70,6 +71,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/tokens/count',
+    internalOnly,
     validate(request.tokenCount),
     service.tokenCount,
   );
@@ -188,6 +190,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/tokens/:token/txns/count',
+    internalOnly,
     validate(request.txnCount),
     service.txnCount,
   );

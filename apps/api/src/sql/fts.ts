@@ -4,10 +4,10 @@ export default {
   contract: sql('queries/fts/contract.sql'),
   contractTxn: sql('queries/fts/contractTxn.sql'),
   contractTxnCount: sql('queries/fts/contractTxnCount.sql'),
-  contractTxnCountCagg: sql('queries/fts/contractTxnCountCagg.sql'),
+  contractTxnCountList: sql('queries/fts/contractTxnCountList.sql'),
   contractTxns: sql('queries/fts/contractTxns.sql'),
   count: sql('queries/fts/count.sql'),
-  holderCount: sql('queries/fts/holderCount.sql'),
+  holderCountList: sql('queries/fts/holderCountList.sql'),
   holders: sql('queries/fts/holders.sql'),
   list: sql('queries/fts/list.sql'),
   stats: {

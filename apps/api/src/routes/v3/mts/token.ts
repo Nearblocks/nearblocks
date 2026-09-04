@@ -3,6 +3,7 @@ import { Router } from 'express';
 import statsRequest from 'nb-schemas/dist/mts/stats/request.js';
 import request from 'nb-schemas/dist/mts/tokens/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -71,6 +72,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/tokens/count',
+    internalOnly,
     validate(request.tokenCount),
     service.tokenCount,
   );
@@ -188,6 +190,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/tokens/:token/txns/count',
+    internalOnly,
     validate(request.txnCount),
     service.txnCount,
   );
@@ -265,8 +268,47 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/tokens/:token/holders/count',
+    internalOnly,
     validate(request.tokenHolderCount),
     service.holderCount,
+  );
+
+  /**
+   * @openapi
+   * /v3/mts/{contract}/nft-tokens/{token}/txns/count:
+   *   get:
+   *     summary: Get MT NFT-style token transfer count
+   *     tags:
+   *       - MTs
+   *     parameters:
+   *       - in: path
+   *         name: contract
+   *         required: true
+   *         description: Contract ID
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: token
+   *         required: true
+   *         description: Token ID
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: before_ts
+   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         schema:
+   *           type: string
+   *           minLength: 19
+   *           maxLength: 19
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  route.get(
+    '/:contract/nft-tokens/:token/txns/count',
+    internalOnly,
+    validate(request.txnCount),
+    service.nftTxnCount,
   );
 
   /**

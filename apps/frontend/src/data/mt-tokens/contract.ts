@@ -140,6 +140,24 @@ export const fetchMTTokenTxnCount = cache(
   },
 );
 
+export const fetchMTNftTokenTxnCount = cache(
+  async (
+    contract: string,
+    token: string,
+    params: SearchParams,
+  ): Promise<MTTokenTxnCountRes> => {
+    const keys: (keyof MTTokenTxnCountReq)[] = ['affected', 'before_ts'];
+    const queryParams = safeParams(params, keys);
+
+    const resp = await fetcher<MTTokenTxnCountRes>(
+      `/v3/mts/${contract}/nft-tokens/${encodeToken(
+        token,
+      )}/txns/count?${queryParams.toString()}`,
+    );
+    return resp;
+  },
+);
+
 export const fetchMTTokenHolders = cache(
   async (
     contract: string,

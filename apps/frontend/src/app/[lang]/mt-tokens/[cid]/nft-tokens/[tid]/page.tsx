@@ -4,8 +4,8 @@ import { ErrorSuspense } from '@/components/error-suspense';
 import { MtNftOverview } from '@/components/mt-tokens/nfts/overview';
 import { MtNftTransfers } from '@/components/mt-tokens/nfts/transfers';
 import {
+  fetchMTNftTokenTxnCount,
   fetchMTToken,
-  fetchMTTokenTxnCount,
   fetchMTTokenTxns,
 } from '@/data/mt-tokens/contract';
 import { holdNav } from '@/lib/hold-nav';
@@ -58,7 +58,7 @@ const NftTokenDetailPage = async ({ params, searchParams }: Props) => {
   const tid = decodeToken(rawTid);
   const tokenPromise = fetchMTToken(cid, tid);
   const txnsPromise = fetchMTTokenTxns(cid, tid, filters);
-  const txnCountPromise = fetchMTTokenTxnCount(cid, tid, filters);
+  const txnCountPromise = fetchMTNftTokenTxnCount(cid, tid, filters);
   await holdNav();
 
   return (

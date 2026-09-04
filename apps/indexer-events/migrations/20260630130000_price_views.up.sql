@@ -1,3 +1,5 @@
+CREATE INDEX IF NOT EXISTS mh_contract_token_amount_desc ON mt_holders (contract, token, amount DESC, account ASC);
+
 DROP MATERIALIZED VIEW IF EXISTS ft_list;
 
 CREATE MATERIALIZED VIEW ft_list AS
@@ -47,6 +49,7 @@ FROM
       ft_holders
     WHERE
       contract = m.contract
+      AND amount > 0
   ) h ON true
   LEFT JOIN LATERAL (
     SELECT
@@ -134,6 +137,7 @@ FROM
     WHERE
       contract = b.contract
       AND token = b.token
+      AND amount > 0
   ) h ON true
   LEFT JOIN LATERAL (
     SELECT
@@ -165,6 +169,8 @@ FROM
   ) vol ON true
 WHERE
   b.modified_at IS NOT NULL
-  AND b.decimals IS NOT NULL;
+  AND b.decimals IS NOT NULL
+WITH
+  NO DATA;
 
 CREATE UNIQUE INDEX IF NOT EXISTS mt_list_contract_token_idx ON mt_list (contract, token);
