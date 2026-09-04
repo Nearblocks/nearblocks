@@ -147,12 +147,12 @@ const txnCount = responseHandler(
     const before = req.validator.before_ts;
 
     if (!affected && !before) {
-      const result = await dbEvents.one<{ count: string }>(
-        sql.contractTxnCountCagg,
+      const result = await dbEvents.oneOrNone<{ count: string }>(
+        sql.contractTxnCountList,
         { contract },
       );
       const count = await countFromCagg(
-        result.count,
+        result?.count ?? '0',
         config.maxQueryCount,
         () =>
           rollingWindowCount(
@@ -242,12 +242,12 @@ const holderCount = responseHandler(
   async (req: RequestValidator<FTContractHolderCountReq>) => {
     const contract = req.validator.contract;
 
-    const data = await dbEvents.one<FTContractHolderCount>(sql.holderCount, {
-      contract,
-      limit: config.maxQueryCount,
-    });
+    const data = await dbEvents.oneOrNone<FTContractHolderCount>(
+      sql.holderCountList,
+      { contract },
+    );
 
-    return { data: { count: cappedCount(data.count, config.maxQueryCount) } };
+    return { data: { count: data?.count ?? '0' } };
   },
 );
 

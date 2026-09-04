@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/mts/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -104,6 +105,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/txns/count',
+    internalOnly,
     validate(request.contractTxnCount),
     service.txnCount,
   );

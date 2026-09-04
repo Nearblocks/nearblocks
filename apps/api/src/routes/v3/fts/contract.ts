@@ -3,6 +3,7 @@ import { Router } from 'express';
 import request from 'nb-schemas/dist/fts/request.js';
 import statsRequest from 'nb-schemas/dist/fts/stats/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -116,6 +117,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/txns/count',
+    internalOnly,
     validate(request.contractTxnCount),
     service.txnCount,
   );
@@ -182,6 +184,7 @@ const routes = (app: Router) => {
    */
   route.get(
     '/:contract/holders/count',
+    internalOnly,
     validate(request.contractHolderCount),
     service.holderCount,
   );

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import request from 'nb-schemas/dist/intents/request.js';
 
+import internalOnly from '#middlewares/internalOnly';
 import { bearerAuth } from '#middlewares/passport';
 import rateLimiter from '#middlewares/rateLimiter';
 import { validate } from '#middlewares/validate';
@@ -70,7 +71,12 @@ const routes = (app: Router) => {
    *       200:
    *         description: Success response
    */
-  route.get('/txns/count', validate(request.count), service.txnCount);
+  route.get(
+    '/txns/count',
+    internalOnly,
+    validate(request.count),
+    service.txnCount,
+  );
 
   /**
    * @openapi

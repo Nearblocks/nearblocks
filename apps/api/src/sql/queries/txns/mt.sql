@@ -46,7 +46,7 @@ FROM
           SELECT
             (
               CASE
-                WHEN (${block_timestamp}::BIGINT / 1000000 / 86400000) = (
+                WHEN (mt.block_timestamp / 1000000 / 86400000) = (
                   EXTRACT(
                     EPOCH
                     FROM
@@ -59,7 +59,7 @@ FROM
                     ft_prices fp
                   WHERE
                     fp.coingecko_id = it.coingecko_id
-                    AND fp.date <= ${block_timestamp}::BIGINT / 1000000
+                    AND fp.date <= mt.block_timestamp / 1000000
                   ORDER BY
                     fp.date DESC
                   LIMIT
@@ -72,7 +72,7 @@ FROM
                     ft_prices_daily fpd
                   WHERE
                     fpd.coingecko_id = it.coingecko_id
-                    AND fpd.date <= ${block_timestamp}::BIGINT / 1000000
+                    AND fpd.date <= mt.block_timestamp / 1000000
                   ORDER BY
                     fpd.date DESC
                   LIMIT
@@ -115,6 +115,6 @@ FROM
       AND mtm.modified_at IS NOT NULL
   ) tm ON TRUE
 WHERE
-  mt.receipt_id = ${receipt_id}::TEXT
-  AND mt.block_timestamp <= ${block_timestamp}::BIGINT
+  mt.receipt_id = ANY (${receipt_ids}::TEXT [])
   AND mt.block_timestamp >= ${block_timestamp}::BIGINT - 300000000000 -- 5m in ns
+  AND mt.block_timestamp <= ${block_timestamp}::BIGINT + 300000000000 -- 5m in ns

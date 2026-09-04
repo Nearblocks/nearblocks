@@ -1,0 +1,15 @@
+WITH
+  ${cte:raw}
+SELECT
+  block_timestamp,
+  shard_id,
+  index_in_chunk,
+  transaction_hash,
+  receiver_account_id,
+  signer_account_id,
+  included_in_block_hash,
+  converted_into_receipt_id,
+  receipt_conversion_tokens_burnt,
+  receipt_conversion_gas_burnt
+FROM
+  txn_selected
