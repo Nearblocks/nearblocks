@@ -3,6 +3,7 @@ import { ISSLConfig } from 'pg-promise/typescript/pg-subset.js';
 
 import config from '#config';
 import logger from '#libs/logger';
+import { recordQuery } from '#libs/queryStats';
 
 export const ssl: ISSLConfig = {
   rejectUnauthorized: true,
@@ -16,6 +17,8 @@ if (config.dbCa) {
 
 export const pgp = pgpromise({
   error: (_err, e) => {
+    recordQuery(e.queryFilePath, 0, true);
+
     if (e.cn) {
       logger.error(e.cn);
     }
@@ -31,6 +34,9 @@ export const pgp = pgpromise({
     if (e.ctx) {
       logger.error(e.ctx);
     }
+  },
+  receive: (e) => {
+    recordQuery(e.ctx.queryFilePath, e.result?.duration ?? 0, false);
   },
 });
 
