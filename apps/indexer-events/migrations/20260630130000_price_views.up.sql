@@ -128,17 +128,21 @@ FROM
     LIMIT
       1
   ) p ON true
-  LEFT JOIN LATERAL (
+  LEFT JOIN (
     SELECT
+      contract,
+      token,
       COUNT(*) AS holders,
       COALESCE(SUM(amount), 0) AS supply
     FROM
       mt_holders
     WHERE
-      contract = b.contract
-      AND token = b.token
-      AND amount > 0
-  ) h ON true
+      amount > 0
+    GROUP BY
+      contract,
+      token
+  ) h ON h.contract = b.contract
+  AND h.token = b.token
   LEFT JOIN LATERAL (
     SELECT
       COALESCE(SUM(transfers_count), 0) AS transfers
