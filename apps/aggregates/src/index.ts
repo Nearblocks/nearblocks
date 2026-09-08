@@ -7,6 +7,7 @@ import { syncFTStateHolders } from '#services/ftState';
 import { syncIntentsAccounts, syncIntentsStats } from '#services/intents';
 import { syncMTHolders } from '#services/mt';
 import { syncNFTHolders } from '#services/nft';
+import { syncNFTAccountHolders } from '#services/nftAccount';
 
 (async () => {
   try {
@@ -14,6 +15,7 @@ import { syncNFTHolders } from '#services/nft';
       syncFTHolders(),
       syncFTStateHolders(),
       syncNFTHolders(),
+      syncNFTAccountHolders(),
       syncMTHolders(),
       syncIntentsStats(),
       syncIntentsAccounts(),
