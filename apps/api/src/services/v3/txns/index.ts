@@ -1,6 +1,8 @@
 import type {
   Txn,
   TxnCountReq,
+  TxnDetail,
+  TxnDetailReq,
   TxnFT,
   TxnFTsReq,
   TxnMT,
@@ -31,7 +33,13 @@ import {
   WindowListQuery,
   windowStart,
 } from '#libs/response';
-import { resolveTxnAnchor, TxnAnchor } from '#libs/txnAnchor';
+import {
+  FINALIZED_TTL_S,
+  isFinalized,
+  RECENT_TTL_S,
+  resolveTxnAnchor,
+  TxnAnchor,
+} from '#libs/txnAnchor';
 import { bigintMax, bigintMin } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
@@ -218,11 +226,53 @@ const receipts = responseHandler(
   },
 );
 
-const fetchReceiptIds = (anchor: TxnAnchor) =>
-  dbBase.any<{ block_timestamp: string; receipt_id: string }>(sql.receiptIds, {
-    block_timestamp: anchor.block_timestamp,
-    transaction_hash: anchor.transaction_hash,
-  });
+type ReceiptId = { block_timestamp: string; receipt_id: string };
+
+const receiptIdsInflight = new Map<string, Promise<ReceiptId[]>>();
+
+const receiptIdsCacheKey = (hash: string) => `v3:txn:receiptIds:${hash}`;
+
+const fetchReceiptIds = async (anchor: TxnAnchor): Promise<ReceiptId[]> => {
+  const key = receiptIdsCacheKey(anchor.transaction_hash);
+  const pending = receiptIdsInflight.get(key);
+
+  if (pending) return pending;
+
+  const promise = (async () => {
+    try {
+      const cached = await redis.parse(key);
+
+      if (cached) return cached as ReceiptId[];
+    } catch {
+      // cache read unavailable, fall through to the source
+    }
+
+    const receipts = await dbBase.any<ReceiptId>(sql.receiptIds, {
+      block_timestamp: anchor.block_timestamp,
+      transaction_hash: anchor.transaction_hash,
+    });
+
+    try {
+      await redis.stringify(
+        key,
+        receipts,
+        isFinalized(anchor.block_timestamp) ? FINALIZED_TTL_S : RECENT_TTL_S,
+      );
+    } catch {
+      // cache write unavailable (full/down), serve the uncached result
+    }
+
+    return receipts;
+  })();
+
+  receiptIdsInflight.set(key, promise);
+
+  try {
+    return await promise;
+  } finally {
+    receiptIdsInflight.delete(key);
+  }
+};
 
 const receiptTimestampRange = (
   receipts: { block_timestamp: string }[],
@@ -295,4 +345,86 @@ const mts = responseHandler(
   },
 );
 
-export default { count, fts, latest, mts, nfts, receipts, stats, txn, txns };
+const detailCacheKey = (hash: string) => `v3:txn:detail:${hash}`;
+
+const fetchTxnDetail = async (anchor: TxnAnchor): Promise<null | TxnDetail> => {
+  const cte = pgp.as.format(sql.anchorCte, anchor);
+
+  const [txn, receipts, receiptRows] = await Promise.all([
+    dbBase.oneOrNone<Txn>(sql.txn, { cte }),
+    dbBase.oneOrNone<TxnReceipt>(sql.receipts, { cte }),
+    fetchReceiptIds(anchor),
+  ]);
+
+  if (!txn) return null;
+
+  if (!receiptRows.length) {
+    return { fts: [], mts: [], nfts: [], receipts, txn };
+  }
+
+  const range = receiptTimestampRange(receiptRows);
+  const receipt_ids = receiptRows.map((r) => r.receipt_id);
+
+  const [fts, nfts, mts] = await Promise.all([
+    dbEvents.manyOrNone<TxnFT>(sql.ft, { ...range, receipt_ids }),
+    dbEvents.manyOrNone<TxnNFT>(sql.nft, { ...range, receipt_ids }),
+    dbEvents.manyOrNone<TxnMT>(sql.mt, { ...range, receipt_ids }),
+  ]);
+
+  return {
+    fts: sortFtEvents(fts),
+    mts: sortEvents(mts),
+    nfts: sortEvents(nfts),
+    receipts,
+    txn,
+  };
+};
+
+const detail = responseHandler(
+  response.detail,
+  async (req: RequestValidator<TxnDetailReq>) => {
+    const hash = req.validator.hash;
+    const key = detailCacheKey(hash);
+
+    try {
+      const cached = await redis.parse(key);
+
+      if (cached) return { data: cached as TxnDetail };
+    } catch {
+      // cache read unavailable, fall through to the source
+    }
+
+    const anchor = await resolveTxnAnchor(hash);
+
+    if (!anchor) return { data: null };
+
+    const data = await fetchTxnDetail(anchor);
+
+    if (data) {
+      try {
+        await redis.stringify(
+          key,
+          data,
+          isFinalized(anchor.block_timestamp) ? FINALIZED_TTL_S : RECENT_TTL_S,
+        );
+      } catch {
+        // cache write unavailable (full/down), serve the uncached result
+      }
+    }
+
+    return { data };
+  },
+);
+
+export default {
+  count,
+  detail,
+  fts,
+  latest,
+  mts,
+  nfts,
+  receipts,
+  stats,
+  txn,
+  txns,
+};
