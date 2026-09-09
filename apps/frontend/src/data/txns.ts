@@ -5,6 +5,8 @@ import {
   TxnCount,
   TxnCountReq,
   TxnCountRes,
+  TxnDetail,
+  TxnDetailRes,
   TxnFT,
   TxnFTsRes,
   TxnMT,
@@ -54,6 +56,13 @@ export const fetchTxn = cache(async (txn: string): Promise<null | Txn> => {
   const resp = await fetcher<TxnRes>(`/v3/txns/${txn}`);
   return resp.data;
 });
+
+export const fetchTxnDetail = cache(
+  async (txn: string): Promise<null | TxnDetail> => {
+    const resp = await fetcher<TxnDetailRes>(`/v3/txns/${txn}/detail`);
+    return resp.data;
+  },
+);
 
 export const fetchTxnReceipts = cache(
   async (txn: string): Promise<null | TxnReceipt> => {

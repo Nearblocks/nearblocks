@@ -227,6 +227,13 @@ const routes = (app: Router) => {
    *         description: Success response
    */
   route.get('/:hash/mts', validate(request.mts), service.mts);
+
+  route.get(
+    '/:hash/detail',
+    internalOnly,
+    validate(request.detail),
+    service.detail,
+  );
 };
 
 export default routes;

@@ -21,12 +21,17 @@ export type TxnAnchor = Pick<
   included_in_block_hash: string;
 };
 
-// Anchor is immutable once the txn's block is old enough not to be reorged,
-// so it can sit in cache for a long time. Still-recent txns get a short TTL
-// so a not-yet-indexed miss doesn't stick around.
-const FINALIZED_TTL_S = 3600;
-const RECENT_TTL_S = 5;
+// Anchor is immutable once the txn's block is old enough not to be reorged.
+// Still-recent txns get a short TTL so a not-yet-indexed miss doesn't stick around.
+export const FINALIZED_TTL_S = 600;
+export const RECENT_TTL_S = 5;
 const FINALITY_MARGIN_NS = 60_000_000_000n; // 60s in ns
+
+export const isFinalized = (blockTimestamp: string): boolean => {
+  const nowNs = BigInt(Date.now()) * 1_000_000n;
+
+  return nowNs - BigInt(blockTimestamp) > FINALITY_MARGIN_NS;
+};
 
 const inflight = new Map<string, Promise<null | TxnAnchor>>();
 
@@ -85,9 +90,7 @@ export const resolveTxnAnchor = async (
     const anchor = await queryAnchor(hash);
 
     if (anchor) {
-      const nowNs = BigInt(Date.now()) * 1_000_000n;
-      const finalized =
-        nowNs - BigInt(anchor.block_timestamp) > FINALITY_MARGIN_NS;
+      const finalized = isFinalized(anchor.block_timestamp);
 
       try {
         await redis.stringify(
