@@ -15,9 +15,18 @@ if (config.dbCa) {
   ssl.key = Buffer.from(config.dbKey, 'base64').toString('utf-8');
 }
 
+const queryStartedAt = new WeakMap<object, number>();
+
 export const pgp = pgpromise({
   error: (_err, e) => {
-    recordQuery(e.queryFilePath, 0, true);
+    const startedAt = e.client ? queryStartedAt.get(e.client) : undefined;
+    const ms = startedAt ? Date.now() - startedAt : 0;
+
+    if (e.client) {
+      queryStartedAt.delete(e.client);
+    }
+
+    recordQuery(e.queryFilePath, ms, true);
 
     if (e.cn) {
       logger.error(e.cn);
@@ -35,7 +44,16 @@ export const pgp = pgpromise({
       logger.error(e.ctx);
     }
   },
+  query: (e) => {
+    if (e.client) {
+      queryStartedAt.set(e.client, Date.now());
+    }
+  },
   receive: (e) => {
+    if (e.ctx.client) {
+      queryStartedAt.delete(e.ctx.client);
+    }
+
     recordQuery(e.ctx.queryFilePath, e.result?.duration ?? 0, false);
   },
 });

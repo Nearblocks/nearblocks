@@ -142,7 +142,11 @@ const deployments = responseHandler(
           start,
         });
       },
-      { label: 'account.contract.first', start: config.baseStart },
+      {
+        label: 'account.contract.first',
+        skipRecentWindow: true,
+        start: config.baseStart,
+      },
     );
 
     const last = await rollingWindow(
@@ -154,7 +158,11 @@ const deployments = responseHandler(
           start,
         });
       },
-      { label: 'account.contract.last', start: config.baseStart },
+      {
+        label: 'account.contract.last',
+        skipRecentWindow: true,
+        start: config.baseStart,
+      },
     );
 
     if (!first && !last) {

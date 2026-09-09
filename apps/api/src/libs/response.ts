@@ -31,6 +31,7 @@ export type WindowListOptions = {
 
 export type WindowOptions = {
   label?: string;
+  skipRecentWindow?: boolean;
   start: bigint;
 };
 
@@ -184,13 +185,13 @@ export const rollingWindow = async <T>(
   queryFn: WindowQuery<T>,
   options: WindowOptions,
 ): Promise<null | T> => {
-  const { label = 'unknown', start } = options;
+  const { label = 'unknown', skipRecentWindow, start } = options;
   const nowNs = BigInt(Date.now()) * 1_000_000n;
   const recentStart = nowNs - WINDOW_SIZE;
   const began = Date.now();
 
   try {
-    if (recentStart <= start) {
+    if (skipRecentWindow || recentStart <= start) {
       const only = await queryFn(start.toString(), nowNs.toString());
 
       recordWindowPhase(label, 'single', Date.now() - began);

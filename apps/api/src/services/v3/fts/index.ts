@@ -14,7 +14,7 @@ import response from 'nb-schemas/dist/fts/response.js';
 
 import config from '#config';
 import cursors from '#libs/cursors';
-import { dbBase, dbEvents, pgp } from '#libs/pgp';
+import { dbBase, dbEvents } from '#libs/pgp';
 import {
   cappedCount,
   countFromCagg,
@@ -25,6 +25,7 @@ import {
   WindowListQuery,
   windowStart,
 } from '#libs/response';
+import { bigintMax, bigintMin } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/fts';
@@ -133,11 +134,22 @@ const txns = responseHandler(
       return { data: [] };
     }
 
-    const queries = events.map((event) => {
-      return pgp.as.format(sql.txn, event);
+    const eventTimestamps = events.map((e) => BigInt(e.block_timestamp));
+    const txns = await dbBase.manyOrNone<FTTxn>(sql.txn, {
+      affected_account_id: events.map((e) => e.affected_account_id),
+      block_timestamp: events.map((e) => e.block_timestamp),
+      cause: events.map((e) => e.cause),
+      contract_account_id: events.map((e) => e.contract_account_id),
+      delta_amount: events.map((e) => e.delta_amount),
+      end_timestamp: bigintMax(eventTimestamps).toString(),
+      event_index: events.map((e) => e.event_index),
+      event_type: events.map((e) => e.event_type),
+      involved_account_id: events.map((e) => e.involved_account_id),
+      meta: events.map((e) => e.meta),
+      receipt_id: events.map((e) => e.receipt_id),
+      shard_id: events.map((e) => e.shard_id),
+      start_timestamp: bigintMin(eventTimestamps).toString(),
     });
-    const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<FTTxn>(unionQuery);
 
     // If lengths don't match, receipts are missing (maybe delayed).
     if (txns.length !== events.length) {
