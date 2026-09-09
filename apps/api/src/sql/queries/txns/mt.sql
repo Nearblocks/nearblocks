@@ -116,5 +116,5 @@ FROM
   ) tm ON TRUE
 WHERE
   mt.receipt_id = ANY (${receipt_ids}::TEXT [])
-  AND mt.block_timestamp >= ${block_timestamp}::BIGINT - 300000000000 -- 5m in ns
-  AND mt.block_timestamp <= ${block_timestamp}::BIGINT + 300000000000 -- 5m in ns
+  AND mt.block_timestamp >= ${start_timestamp}::BIGINT
+  AND mt.block_timestamp <= ${end_timestamp}::BIGINT

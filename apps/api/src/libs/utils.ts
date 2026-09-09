@@ -82,6 +82,12 @@ export const errorHandler = (error: Error) => {
   Sentry.captureException(error);
 };
 
+export const bigintMin = (values: bigint[]): bigint =>
+  values.reduce((min, value) => (value < min ? value : min));
+
+export const bigintMax = (values: bigint[]): bigint =>
+  values.reduce((max, value) => (value > max ? value : max));
+
 export const cmp = (a: Big, b: Big) => {
   if (a.eq(b)) return 0;
   if (a.gt(b)) return 1;

@@ -32,6 +32,7 @@ import {
   windowStart,
 } from '#libs/response';
 import { resolveTxnAnchor, TxnAnchor } from '#libs/txnAnchor';
+import { bigintMax, bigintMin } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/txns';
@@ -223,6 +224,17 @@ const fetchReceiptIds = (anchor: TxnAnchor) =>
     transaction_hash: anchor.transaction_hash,
   });
 
+const receiptTimestampRange = (
+  receipts: { block_timestamp: string }[],
+): { end_timestamp: string; start_timestamp: string } => {
+  const timestamps = receipts.map((r) => BigInt(r.block_timestamp));
+
+  return {
+    end_timestamp: bigintMax(timestamps).toString(),
+    start_timestamp: bigintMin(timestamps).toString(),
+  };
+};
+
 const fts = responseHandler(
   response.fts,
   async (req: RequestValidator<TxnFTsReq>) => {
@@ -235,7 +247,7 @@ const fts = responseHandler(
     if (!receipts.length) return { data: [] };
 
     const fts = await dbEvents.manyOrNone<TxnFT>(sql.ft, {
-      block_timestamp: anchor.block_timestamp,
+      ...receiptTimestampRange(receipts),
       receipt_ids: receipts.map((r) => r.receipt_id),
     });
 
@@ -255,7 +267,7 @@ const nfts = responseHandler(
     if (!receipts.length) return { data: [] };
 
     const nfts = await dbEvents.manyOrNone<TxnNFT>(sql.nft, {
-      block_timestamp: anchor.block_timestamp,
+      ...receiptTimestampRange(receipts),
       receipt_ids: receipts.map((r) => r.receipt_id),
     });
 
@@ -275,7 +287,7 @@ const mts = responseHandler(
     if (!receipts.length) return { data: [] };
 
     const mts = await dbEvents.manyOrNone<TxnMT>(sql.mt, {
-      block_timestamp: anchor.block_timestamp,
+      ...receiptTimestampRange(receipts),
       receipt_ids: receipts.map((r) => r.receipt_id),
     });
 

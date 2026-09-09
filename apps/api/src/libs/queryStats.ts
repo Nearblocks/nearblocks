@@ -1,16 +1,16 @@
 import logger from '#libs/logger';
 
-type Tally = { ms: number; n: number };
+const REPORT_INTERVAL_MS = 60_000;
+
+type Tally = { max: number; ms: number; n: number };
 
 type Entry = { error: Tally; ok: Tally };
-
-const REPORT_INTERVAL_MS = 60_000;
 
 const tallies = new Map<string, Entry>();
 
 const empty = (): Entry => ({
-  error: { ms: 0, n: 0 },
-  ok: { ms: 0, n: 0 },
+  error: { max: 0, ms: 0, n: 0 },
+  ok: { max: 0, ms: 0, n: 0 },
 });
 
 const mean = (tally: Tally): number =>
@@ -30,6 +30,7 @@ export const recordQuery = (
 
   tally.ms += ms;
   tally.n += 1;
+  tally.max = Math.max(tally.max, ms);
   tallies.set(label, entry);
 };
 
@@ -43,8 +44,10 @@ const report = (): void => {
       {
         calls,
         db_ms: Math.round(entry.ok.ms + entry.error.ms),
+        error_max_ms: entry.error.max,
         error_n: entry.error.n,
         label,
+        ok_max_ms: entry.ok.max,
         ok_mean_ms: mean(entry.ok),
         ok_n: entry.ok.n,
       },

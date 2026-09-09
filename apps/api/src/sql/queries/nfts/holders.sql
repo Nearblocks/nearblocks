@@ -1,23 +1,12 @@
-WITH
-  holders AS (
-    SELECT
-      account,
-      COUNT(token) AS quantity
-    FROM
-      nft_holders
-    WHERE
-      contract = ${contract}
-      AND quantity > 0
-    GROUP BY
-      account
-  )
 SELECT
   account,
   quantity
 FROM
-  holders
+  nft_account_holders
 WHERE
-  (
+  contract = ${contract}
+  AND quantity > 0
+  AND (
     ${cursor.quantity}::NUMERIC IS NULL
     OR (
       (

@@ -105,12 +105,9 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
       FROM
         blocks
       WHERE
-        block_timestamp = (
-          SELECT
-            r.included_in_block_timestamp
-          FROM
-            receipt_selected r
-        )
+        block_timestamp >= p_timestamp
+        AND block_timestamp < (p_timestamp + 300000000000) -- 5m in ns
+        AND block_timestamp = rs.included_in_block_timestamp
         AND block_hash = rs.included_in_block_hash
     ) b ON TRUE
     LEFT JOIN LATERAL (
@@ -132,12 +129,9 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
       FROM
         action_receipt_actions ara
       WHERE
-        ara.receipt_included_in_block_timestamp = (
-          SELECT
-            r.included_in_block_timestamp
-          FROM
-            receipt_selected r
-        )
+        ara.receipt_included_in_block_timestamp >= p_timestamp
+        AND ara.receipt_included_in_block_timestamp < (p_timestamp + 300000000000) -- 5m in ns
+        AND ara.receipt_included_in_block_timestamp = rs.included_in_block_timestamp
         AND ara.receipt_id = rs.receipt_id
     ) a ON TRUE
     LEFT JOIN LATERAL (
@@ -161,18 +155,8 @@ OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS
       FROM
         execution_outcomes eo
       WHERE
-        executed_in_block_timestamp >= (
-          SELECT
-            r.included_in_block_timestamp
-          FROM
-            receipt_selected r
-        )
-        AND executed_in_block_timestamp < (
-          SELECT
-            r.included_in_block_timestamp + 300000000000 -- 5m in ns
-          FROM
-            receipt_selected r
-        )
+        executed_in_block_timestamp >= p_timestamp
+        AND executed_in_block_timestamp < (p_timestamp + 600000000000) -- 10m in ns
         AND receipt_id = rs.receipt_id
     ) o ON TRUE
 $$;
