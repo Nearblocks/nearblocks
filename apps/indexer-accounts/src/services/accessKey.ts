@@ -8,6 +8,7 @@ import {
 import { AccessKey, AccessKeyPermissionKind, JsonValue } from 'nb-types';
 import { retry } from 'nb-utils';
 
+import config from '#config';
 import {
   isAddKeyAction,
   isDeleteAccountAction,
@@ -22,9 +23,13 @@ import {
   publicKeyFromImplicitAccount,
 } from '#libs/utils';
 
-type AccessKeyMap = Map<string, AccessKey>;
-type DeletedAccount = { accountId: string; receiptId: string };
-type DeletedAccountMap = Map<string, DeletedAccount>;
+export type AccessKeyMap = Map<string, AccessKey>;
+export type DeletedAccount = {
+  accountId: string;
+  blockTimestamp: string;
+  receiptId: string;
+};
+export type DeletedAccountMap = Map<string, DeletedAccount>;
 
 export const storeGenesisAccessKeys = async (
   knex: Knex,
@@ -44,6 +49,29 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
   const accessKeysToUpdate: AccessKeyMap = new Map();
   const deletedAccounts: DeletedAccountMap = new Map();
 
+  collectAccessKeys(
+    message,
+    accessKeys,
+    implicitKeys,
+    accessKeysToUpdate,
+    deletedAccounts,
+  );
+  await flushAccessKeys(
+    knex,
+    accessKeys,
+    implicitKeys,
+    accessKeysToUpdate,
+    deletedAccounts,
+  );
+};
+
+export const collectAccessKeys = (
+  message: Message,
+  accessKeys: AccessKeyMap,
+  implicitKeys: AccessKeyMap,
+  accessKeysToUpdate: AccessKeyMap,
+  deletedAccounts: DeletedAccountMap,
+) => {
   for (const shard of message.shards) {
     for (const outcome of shard.receiptExecutionOutcomes) {
       if (
@@ -61,11 +89,21 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
       }
     }
   }
+};
 
-  if (accessKeys.size) {
+const insertAccessKeys = async (knex: Knex, accessKeys: AccessKeyMap) => {
+  if (!accessKeys.size) {
+    return;
+  }
+
+  const rows = [...accessKeys.values()];
+
+  for (let i = 0; i < rows.length; i += config.insertLimit) {
+    const batch = rows.slice(i, i + config.insertLimit);
+
     await retry(async () => {
       return knex(tbl('access_keys'))
-        .insert([...accessKeys.values()])
+        .insert(batch)
         .onConflict(['public_key', 'account_id'])
         .merge()
         .whereRaw(
@@ -73,98 +111,187 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
         );
     });
   }
+};
 
-  if (implicitKeys.size) {
+const insertImplicitKeys = async (knex: Knex, implicitKeys: AccessKeyMap) => {
+  if (!implicitKeys.size) {
+    return;
+  }
+
+  const rows = [...implicitKeys.values()];
+
+  for (let i = 0; i < rows.length; i += config.insertLimit) {
+    const batch = rows.slice(i, i + config.insertLimit);
+
     await retry(async () => {
       return knex(tbl('access_keys'))
-        .insert([...implicitKeys.values()])
+        .insert(batch)
         .onConflict(['public_key', 'account_id'])
         .ignore();
     });
-
-    await Promise.all(
-      [...implicitKeys.values()].map(async (accessKey) => {
-        return retry(async () => {
-          return knex(tbl('access_keys'))
-            .update({
-              created_by_block_timestamp: accessKey.created_by_block_timestamp,
-              created_by_receipt_id: accessKey.created_by_receipt_id,
-              deleted_by_block_timestamp: null,
-              deleted_by_receipt_id: null,
-              permission: accessKey.permission,
-              permission_kind: accessKey.permission_kind,
-            })
-            .where('public_key', accessKey.public_key)
-            .where('account_id', accessKey.account_id)
-            .whereNotNull('deleted_by_block_timestamp')
-            .where(
-              'deleted_by_block_timestamp',
-              '<=',
-              accessKey.created_by_block_timestamp,
-            )
-            .whereExists(function () {
-              this.select('account_id')
-                .from(tbl('accounts'))
-                .where('accounts.account_id', accessKey.account_id)
-                .where(
-                  'accounts.created_by_receipt_id',
-                  accessKey.created_by_receipt_id,
-                );
-            });
-        });
-      }),
-    );
   }
 
-  if (accessKeysToUpdate.size) {
-    await Promise.all(
-      [...accessKeysToUpdate.values()].map(async (accessKey) => {
-        return retry(async () => {
-          return knex(tbl('access_keys'))
-            .update({
-              deleted_by_block_timestamp: accessKey.deleted_by_block_timestamp,
-              deleted_by_receipt_id: accessKey.deleted_by_receipt_id,
-            })
-            .where('public_key', accessKey.public_key)
-            .where('account_id', accessKey.account_id)
-            .where(
-              'created_by_block_timestamp',
-              '<=',
-              accessKey.deleted_by_block_timestamp,
+  const updateRows = rows.map((accessKey) => ({
+    account_id: accessKey.account_id,
+    created_by_block_timestamp: accessKey.created_by_block_timestamp,
+    created_by_receipt_id: accessKey.created_by_receipt_id,
+    permission: accessKey.permission as null | string,
+    permission_kind: accessKey.permission_kind,
+    public_key: accessKey.public_key,
+  }));
+
+  for (let i = 0; i < updateRows.length; i += config.insertLimit) {
+    const batch = updateRows.slice(i, i + config.insertLimit);
+
+    await retry(async () => {
+      return knex.raw(
+        `
+          UPDATE ${tbl('access_keys')} k
+          SET
+            created_by_block_timestamp = v.created_by_block_timestamp,
+            created_by_receipt_id = v.created_by_receipt_id,
+            deleted_by_block_timestamp = NULL,
+            deleted_by_receipt_id = NULL,
+            permission = v.permission::jsonb,
+            permission_kind = v.permission_kind
+          FROM jsonb_to_recordset(:rows) AS v(
+            public_key text,
+            account_id text,
+            created_by_block_timestamp bigint,
+            created_by_receipt_id text,
+            permission text,
+            permission_kind text
+          )
+          WHERE k.public_key = v.public_key
+            AND k.account_id = v.account_id
+            AND k.deleted_by_block_timestamp IS NOT NULL
+            AND k.deleted_by_block_timestamp <= v.created_by_block_timestamp
+            AND EXISTS (
+              SELECT 1 FROM ${tbl('accounts')} a
+              WHERE a.account_id = v.account_id
+                AND a.created_by_receipt_id = v.created_by_receipt_id
             )
-            .andWhere(function () {
-              this.whereNull('deleted_by_block_timestamp').orWhere(
-                'deleted_by_block_timestamp',
-                '<',
-                accessKey.deleted_by_block_timestamp,
-              );
-            });
-        });
-      }),
-    );
+        `,
+        { rows: JSON.stringify(batch) },
+      );
+    });
+  }
+};
+
+export const flushAccessKeys = async (
+  knex: Knex,
+  accessKeys: AccessKeyMap,
+  implicitKeys: AccessKeyMap,
+  accessKeysToUpdate: AccessKeyMap,
+  deletedAccounts: DeletedAccountMap,
+) => {
+  await insertAccessKeys(knex, accessKeys);
+  await insertImplicitKeys(knex, implicitKeys);
+
+  if (accessKeysToUpdate.size) {
+    const rows = [...accessKeysToUpdate.values()].map((accessKey) => ({
+      account_id: accessKey.account_id,
+      deleted_by_block_timestamp: accessKey.deleted_by_block_timestamp,
+      deleted_by_receipt_id: accessKey.deleted_by_receipt_id,
+      public_key: accessKey.public_key,
+    }));
+
+    for (let i = 0; i < rows.length; i += config.insertLimit) {
+      const batch = rows.slice(i, i + config.insertLimit);
+
+      await retry(async () => {
+        return knex.raw(
+          `
+            UPDATE ${tbl('access_keys')} k
+            SET
+              deleted_by_block_timestamp = v.deleted_by_block_timestamp,
+              deleted_by_receipt_id = v.deleted_by_receipt_id
+            FROM jsonb_to_recordset(:rows) AS v(
+              public_key text,
+              account_id text,
+              deleted_by_block_timestamp bigint,
+              deleted_by_receipt_id text
+            )
+            WHERE k.public_key = v.public_key
+              AND k.account_id = v.account_id
+              AND k.created_by_block_timestamp <= v.deleted_by_block_timestamp
+              AND (
+                k.deleted_by_block_timestamp IS NULL
+                OR k.deleted_by_block_timestamp < v.deleted_by_block_timestamp
+              )
+          `,
+          { rows: JSON.stringify(batch) },
+        );
+      });
+    }
   }
 
   if (deletedAccounts.size) {
-    await Promise.all(
-      [...deletedAccounts.values()].map(async (deleted) => {
-        return retry(async () => {
-          return knex(tbl('access_keys'))
-            .update({
-              deleted_by_block_timestamp: message.block.header.timestampNanosec,
-              deleted_by_receipt_id: deleted.receiptId,
-            })
-            .where('account_id', deleted.accountId)
-            .andWhere(function () {
-              this.whereNull('deleted_by_block_timestamp').orWhere(
-                'deleted_by_block_timestamp',
-                '<',
-                message.block.header.timestampNanosec,
-              );
-            });
-        });
-      }),
-    );
+    const rows = [...deletedAccounts.values()].map((deleted) => ({
+      account_id: deleted.accountId,
+      block_timestamp: deleted.blockTimestamp,
+      receipt_id: deleted.receiptId,
+    }));
+
+    for (let i = 0; i < rows.length; i += config.insertLimit) {
+      const batch = rows.slice(i, i + config.insertLimit);
+
+      await retry(async () => {
+        return knex.raw(
+          `
+            UPDATE ${tbl('access_keys')} k
+            SET
+              deleted_by_block_timestamp = v.block_timestamp,
+              deleted_by_receipt_id = v.receipt_id
+            FROM jsonb_to_recordset(:rows) AS v(
+              account_id text,
+              block_timestamp bigint,
+              receipt_id text
+            )
+            WHERE k.account_id = v.account_id
+              AND k.created_by_block_timestamp <= v.block_timestamp
+              AND (
+                k.deleted_by_block_timestamp IS NULL
+                OR k.deleted_by_block_timestamp < v.block_timestamp
+              )
+          `,
+          { rows: JSON.stringify(batch) },
+        );
+      });
+    }
   }
+
+  await insertAccessKeys(knex, accessKeys);
+  await insertImplicitKeys(knex, implicitKeys);
+};
+
+const needsFreshImplicitEntry = (
+  accessKeys: AccessKeyMap,
+  implicitKeys: AccessKeyMap,
+  deletedAccounts: DeletedAccountMap,
+  accountId: string,
+  mapKey: string,
+): boolean => {
+  const pending = accessKeys.get(mapKey) ?? implicitKeys.get(mapKey);
+
+  if (!pending) {
+    return true;
+  }
+
+  const createdTs = BigInt(pending.created_by_block_timestamp);
+  const ownDeletedTs = pending.deleted_by_block_timestamp
+    ? BigInt(pending.deleted_by_block_timestamp)
+    : null;
+  const sweepDeletedTs = deletedAccounts.get(accountId)?.blockTimestamp;
+  const sweepTs = sweepDeletedTs ? BigInt(sweepDeletedTs) : null;
+  const latestDeleteTs =
+    ownDeletedTs && sweepTs
+      ? ownDeletedTs > sweepTs
+        ? ownDeletedTs
+        : sweepTs
+      : ownDeletedTs ?? sweepTs;
+
+  return latestDeleteTs !== null && latestDeleteTs > createdTs;
 };
 
 const getChunkAccessKeys = (
@@ -183,6 +310,7 @@ const getChunkAccessKeys = (
       if (isDeleteAccountAction(action)) {
         deletedAccounts.set(accountId, {
           accountId,
+          blockTimestamp: block.timestampNanosec,
           receiptId,
         });
 
@@ -193,11 +321,6 @@ const getChunkAccessKeys = (
         const { accessKey } = action.AddKey;
         const publicKey = normalizePublicKey(action.AddKey.publicKey);
         const mapKey = `${accountId}:${publicKey}`;
-        const keyToUpdate = accessKeysToUpdate.get(mapKey);
-
-        if (keyToUpdate) {
-          accessKeysToUpdate.delete(mapKey);
-        }
 
         implicitKeys.delete(mapKey);
 
@@ -251,7 +374,17 @@ const getChunkAccessKeys = (
         const publicKey = publicKeyFromImplicitAccount(accountId);
         const mapKey = `${accountId}:${publicKey}`;
 
-        if (publicKey && !accessKeys.has(mapKey)) {
+        if (
+          publicKey &&
+          needsFreshImplicitEntry(
+            accessKeys,
+            implicitKeys,
+            deletedAccounts,
+            accountId,
+            mapKey,
+          )
+        ) {
+          accessKeys.delete(mapKey);
           implicitKeys.set(
             mapKey,
             getAccessKeyData(

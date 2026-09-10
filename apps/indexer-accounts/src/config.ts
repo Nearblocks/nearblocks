@@ -6,7 +6,7 @@ import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
   ACCOUNTS_START_BLOCK: num({ default: 0 }),
-  BACKFILL_WINDOW_SIZE: str({ default: '60000000000000' }), // 1m in ns
+  BACKFILL_WINDOW_SIZE: str({ default: '3600000000000' }), // 1h in ns
   DATABASE_CA: str({ default: '' }),
   DATABASE_CERT: str({ default: '' }),
   DATABASE_KEY: str({ default: '' }),

@@ -6,8 +6,13 @@ import { retry } from 'nb-utils';
 import config from '#config';
 import { db, tbl } from '#libs/knex';
 import metrics from '#libs/prom';
-import { storeAccessKeys } from '#services/accessKey';
-import { storeAccounts } from '#services/account';
+import {
+  AccessKeyMap,
+  collectAccessKeys,
+  DeletedAccountMap,
+  flushAccessKeys,
+} from '#services/accessKey';
+import { AccountMap, collectAccounts, flushAccounts } from '#services/account';
 
 const indexerKey = 'accounts';
 const CATCH_UP_DELAY_MS = 60_000;
@@ -56,7 +61,6 @@ type BackfillRow = {
 
 type BackfillReceipt = {
   actions: { action: Action; index: number }[];
-  hasDelegate: boolean;
   predecessorId: string;
   receiptId: string;
   receiverId: string;
@@ -94,14 +98,36 @@ export const backfillData = async () => {
     const rows = await retry(async () => fetchWindow(from, to));
     const blocks = groupBlocks(rows);
 
+    const accounts: AccountMap = new Map();
+    const accountsToUpdate: AccountMap = new Map();
+    const accessKeys: AccessKeyMap = new Map();
+    const implicitKeys: AccessKeyMap = new Map();
+    const accessKeysToUpdate: AccessKeyMap = new Map();
+    const deletedAccounts: DeletedAccountMap = new Map();
+
     for (const block of blocks) {
       const message = buildMessage(block);
 
-      await storeAccounts(db, message);
-      await storeAccessKeys(db, message);
+      collectAccounts(message, accounts, accountsToUpdate);
+      collectAccessKeys(
+        message,
+        accessKeys,
+        implicitKeys,
+        accessKeysToUpdate,
+        deletedAccounts,
+      );
 
       syncHeight = Math.max(syncHeight, Number(block.height));
     }
+
+    await flushAccounts(db, accounts, accountsToUpdate);
+    await flushAccessKeys(
+      db,
+      accessKeys,
+      implicitKeys,
+      accessKeysToUpdate,
+      deletedAccounts,
+    );
 
     await db(tbl('settings'))
       .insert({
@@ -138,38 +164,43 @@ const sourceTip = async (): Promise<bigint | null> => {
 const fetchWindow = async (from: bigint, to: bigint) => {
   const result = await db.raw(
     `
-      SELECT
-        eo.executed_in_block_timestamp,
-        eo.shard_id,
-        eo.index_in_chunk,
-        ara.receipt_id,
-        ara.receipt_predecessor_account_id,
-        ara.receipt_receiver_account_id,
-        ara.action_kind,
-        ara.args,
-        ara.index_in_action_receipt,
-        b.block_height
-      FROM public.execution_outcomes eo
-      JOIN public.action_receipt_actions ara ON ara.receipt_id = eo.receipt_id
-      JOIN public.blocks b ON b.block_timestamp = eo.executed_in_block_timestamp
-      WHERE eo.executed_in_block_timestamp >= :from
-        AND eo.executed_in_block_timestamp < :to
-        AND eo.status IN ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID')
-        AND ara.receipt_included_in_block_timestamp >= :araFrom
-        AND ara.receipt_included_in_block_timestamp < :to
-        AND b.block_timestamp >= :from
-        AND b.block_timestamp < :to
-        AND ara.action_kind = ANY(:kinds)
-        AND (
-          ara.action_kind <> 'TRANSFER'
-          OR char_length(ara.receipt_receiver_account_id) = 64
-          OR ara.receipt_receiver_account_id LIKE '0x%'
-        )
+      SELECT * FROM (
+        SELECT
+          eo.executed_in_block_timestamp,
+          eo.shard_id,
+          eo.index_in_chunk,
+          ara.receipt_id,
+          ara.receipt_predecessor_account_id,
+          ara.receipt_receiver_account_id,
+          ara.action_kind,
+          ara.args,
+          ara.index_in_action_receipt,
+          b.block_height,
+          bool_or(ara.action_kind = 'DELEGATE_ACTION')
+            OVER (PARTITION BY ara.receipt_id) AS has_delegate
+        FROM public.execution_outcomes eo
+        JOIN public.action_receipt_actions ara ON ara.receipt_id = eo.receipt_id
+        JOIN public.blocks b ON b.block_timestamp = eo.executed_in_block_timestamp
+        WHERE eo.executed_in_block_timestamp >= :from
+          AND eo.executed_in_block_timestamp < :to
+          AND eo.status IN ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID')
+          AND ara.receipt_included_in_block_timestamp >= :araFrom
+          AND ara.receipt_included_in_block_timestamp < :to
+          AND b.block_timestamp >= :from
+          AND b.block_timestamp < :to
+          AND ara.action_kind = ANY(:kinds)
+          AND (
+            ara.action_kind <> 'TRANSFER'
+            OR char_length(ara.receipt_receiver_account_id) = 64
+            OR ara.receipt_receiver_account_id LIKE '0x%'
+          )
+      ) t
+      WHERE NOT has_delegate
       ORDER BY
-        eo.executed_in_block_timestamp ASC,
-        eo.shard_id ASC,
-        eo.index_in_chunk ASC,
-        ara.index_in_action_receipt ASC
+        executed_in_block_timestamp ASC,
+        shard_id ASC,
+        index_in_chunk ASC,
+        index_in_action_receipt ASC
     `,
     {
       araFrom: (from - RECEIPT_EXECUTION_CAP_NS).toString(),
@@ -202,17 +233,11 @@ const groupBlocks = (rows: BackfillRow[]): BackfillBlock[] => {
     if (!receipt) {
       receipt = {
         actions: [],
-        hasDelegate: false,
         predecessorId: row.receipt_predecessor_account_id,
         receiptId: row.receipt_id,
         receiverId: row.receipt_receiver_account_id,
       };
       block.receipts.set(row.receipt_id, receipt);
-    }
-
-    if (row.action_kind === ActionKind.DELEGATE_ACTION) {
-      receipt.hasDelegate = true;
-      continue;
     }
 
     if (receipt.actions.some((a) => a.index === row.index_in_action_receipt)) {
@@ -276,9 +301,8 @@ const buildAction = (row: BackfillRow): Action => {
 };
 
 const buildMessage = (block: BackfillBlock): Message => {
-  const receiptExecutionOutcomes = [...block.receipts.values()]
-    .filter((receipt) => !receipt.hasDelegate)
-    .map((receipt) => ({
+  const receiptExecutionOutcomes = [...block.receipts.values()].map(
+    (receipt) => ({
       executionOutcome: {
         id: receipt.receiptId,
         outcome: {
@@ -295,7 +319,8 @@ const buildMessage = (block: BackfillBlock): Message => {
         receiptId: receipt.receiptId,
         receiverId: receipt.receiverId,
       },
-    }));
+    }),
+  );
 
   return {
     block: {
