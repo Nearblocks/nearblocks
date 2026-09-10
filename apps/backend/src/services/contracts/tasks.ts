@@ -9,7 +9,6 @@ import {
 } from 'nb-types';
 import { yoctoToNear } from 'nb-utils';
 
-import config from '#config';
 import { dbBase } from '#libs/knex';
 import { axiosRpc as RPC } from '#libs/rpc';
 
@@ -33,14 +32,8 @@ type ExpProtocolConfig = {
 
 export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
 
-export const validator = {
-  stakingPool: {
-    mainnet: 'poolv1.near',
-    testnet: undefined,
-  },
-};
-
 const CHUNK_SIZE = 100;
+const POOL_INFO_CONCURRENCY = 15;
 const DEFAULT_MIN_STAKE_RATIO = [1, 62500];
 
 const findSeatPrice = (
@@ -122,6 +115,12 @@ export const protocolConfigCheck = async () => {
 };
 
 export const genesisProtocolInfoFetch = async () => {
+  const existing = await dbBase('validator_config')
+    .where('id', 1)
+    .first('genesis_height');
+
+  if (existing?.genesis_height) return;
+
   const [{ data }, genesisAccount] = await Promise.all([
     RPC.query({ finality: 'final' }, 'EXPERIMENTAL_genesis_config'),
     dbBase('accounts').count('account_id').whereNull('created_by_receipt_id'),
@@ -160,17 +159,7 @@ export const genesisProtocolInfoFetch = async () => {
 };
 
 export const poolIdsCheck = async () => {
-  const network = config.network;
-  const address =
-    network === 'mainnet'
-      ? validator.stakingPool.mainnet
-      : validator.stakingPool.testnet;
-
-  if (!address) return;
-
-  const rows = await dbBase('accounts')
-    .select('account_id')
-    .where('parent', address);
+  const rows = await dbBase('staking_pools').select('account_id');
 
   const accounts = rows.map((row) => ({ account_id: row.account_id }));
 
@@ -254,26 +243,32 @@ const fetchStakingPoolInfo = async () => {
 
   if (validators.length === 0) return;
 
-  await Promise.all(
-    validators.map(async ({ account_id }) => {
-      try {
-        const { data } = await RPC.callFunction(
-          account_id,
-          'get_total_staked_balance',
-          RPC.encodeArgs({}),
-        );
+  for (let i = 0; i < validators.length; i += POOL_INFO_CONCURRENCY) {
+    await Promise.all(
+      validators
+        .slice(i, i + POOL_INFO_CONCURRENCY)
+        .map(async ({ account_id }) => {
+          try {
+            const { data } = await RPC.callFunction(
+              account_id,
+              'get_total_staked_balance',
+              RPC.encodeArgs({}),
+            );
 
-        if (data.result) {
-          const stake = JSON.parse(Buffer.from(data.result.result).toString());
-          await dbBase('validator_epoch_data')
-            .where('account_id', account_id)
-            .update({ contract_stake: stake, updated_at: new Date() });
-        }
-      } catch (e) {
-        // ignore RPC errors for individual validators
-      }
-    }),
-  );
+            if (data.result) {
+              const stake = JSON.parse(
+                Buffer.from(data.result.result).toString(),
+              );
+              await dbBase('validator_epoch_data')
+                .where('account_id', account_id)
+                .update({ contract_stake: stake, updated_at: new Date() });
+            }
+          } catch (e) {
+            // ignore RPC errors for individual validators
+          }
+        }),
+    );
+  }
 };
 
 export const updateStakingPoolStake = async () => {
@@ -293,54 +288,58 @@ const fetchPoolInfo = async () => {
 
   if (validators.length === 0) return;
 
-  await Promise.all(
-    validators.map(async ({ account_id }) => {
-      try {
-        const { data } = await RPC.query(
-          {
-            account_id,
-            finality: 'final',
-            request_type: 'view_account',
-          },
-          'query',
-        );
+  for (let i = 0; i < validators.length; i += POOL_INFO_CONCURRENCY) {
+    await Promise.all(
+      validators
+        .slice(i, i + POOL_INFO_CONCURRENCY)
+        .map(async ({ account_id }) => {
+          try {
+            const { data } = await RPC.query(
+              {
+                account_id,
+                finality: 'final',
+                request_type: 'view_account',
+              },
+              'query',
+            );
 
-        const account = data.result as AccountView;
+            const account = data.result as AccountView;
 
-        if (account.code_hash !== EMPTY_CODE_HASH) {
-          const { data: countData } = await RPC.callFunction(
-            account_id,
-            'get_number_of_accounts',
-            RPC.encodeArgs({}),
-          );
-          const delegatorsCount = RPC.decodeResult(
-            countData.result.result,
-          ) as number;
+            if (account.code_hash !== EMPTY_CODE_HASH) {
+              const { data: countData } = await RPC.callFunction(
+                account_id,
+                'get_number_of_accounts',
+                RPC.encodeArgs({}),
+              );
+              const delegatorsCount = RPC.decodeResult(
+                countData.result.result,
+              ) as number;
 
-          const { data: feeData } = await RPC.callFunction(
-            account_id,
-            'get_reward_fee_fraction',
-            RPC.encodeArgs({}),
-          );
-          const fee = RPC.decodeResult(feeData.result.result) as {
-            denominator: number;
-            numerator: number;
-          };
+              const { data: feeData } = await RPC.callFunction(
+                account_id,
+                'get_reward_fee_fraction',
+                RPC.encodeArgs({}),
+              );
+              const fee = RPC.decodeResult(feeData.result.result) as {
+                denominator: number;
+                numerator: number;
+              };
 
-          await dbBase('validator_epoch_data')
-            .where('account_id', account_id)
-            .update({
-              delegators_count: delegatorsCount,
-              fee_denominator: fee.denominator,
-              fee_numerator: fee.numerator,
-              updated_at: new Date(),
-            });
-        }
-      } catch (e) {
-        // ignore RPC errors for individual validators
-      }
-    }),
-  );
+              await dbBase('validator_epoch_data')
+                .where('account_id', account_id)
+                .update({
+                  delegators_count: delegatorsCount,
+                  fee_denominator: fee.denominator,
+                  fee_numerator: fee.numerator,
+                  updated_at: new Date(),
+                });
+            }
+          } catch (e) {
+            // ignore RPC errors for individual validators
+          }
+        }),
+    );
+  }
 };
 
 export const updatePoolInfoMap = async () => {
@@ -444,7 +443,7 @@ export const validatorsCheck = async () => {
 
     const isNewEpoch =
       !configData?.epoch_start_height ||
-      configData.epoch_start_height !== validators.epoch_start_height;
+      Number(configData.epoch_start_height) !== validators.epoch_start_height;
 
     if (isNewEpoch) {
       await Promise.all([fetchStakingPoolInfo(), fetchPoolInfo()]);

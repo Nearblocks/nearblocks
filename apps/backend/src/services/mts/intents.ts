@@ -62,9 +62,13 @@ const copyFromFTMeta = async (
     [sourceContract],
   );
 
-  const source: FTMeta | FTMetadata | null = rows.length
-    ? rows[0]
-    : await fetchFTMeta(sourceContract);
+  let source: FTMeta | FTMetadata | null = rows.length ? rows[0] : null;
+
+  if (!source) {
+    const outcome = await fetchFTMeta(sourceContract);
+
+    if (outcome.ok) source = outcome.data;
+  }
 
   if (!source) return false;
 
@@ -204,9 +208,9 @@ const copyFromNFTMeta = async (
     fetchNFTTokenMeta(sourceContract, sourceToken),
   ]);
 
-  if (!rpcBase || !rpcToken) return false;
+  if (!rpcBase.ok || !rpcToken.ok) return false;
 
-  await writeNFTToMT(contract, token, rpcBase, rpcToken.metadata);
+  await writeNFTToMT(contract, token, rpcBase.data, rpcToken.data.metadata);
   return true;
 };
 
@@ -294,10 +298,11 @@ const copyFromMTMeta = async (
     return true;
   }
 
-  const meta = await fetchMTTokenMeta(sourceContract, sourceToken);
+  const outcome = await fetchMTTokenMeta(sourceContract, sourceToken);
 
-  if (!meta) return false;
+  if (!outcome.ok) return false;
 
+  const meta = outcome.data;
   const now = dayjs.utc().toISOString();
 
   await dbEvents.transaction(async (tx) => {

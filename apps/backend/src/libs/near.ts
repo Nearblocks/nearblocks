@@ -1,10 +1,7 @@
-import { viewFunctionAsJson } from '@near-js/jsonrpc-client';
-import { validators } from '@near-js/jsonrpc-client/no-validation';
-
 import { logger } from 'nb-logger';
+import { REJECT_MARKERS } from 'nb-near';
 
-import { rpc } from '#libs/rpc';
-import { encodeArgs } from '#libs/utils';
+import { axiosRpc as RPC } from '#libs/rpc';
 import {
   FTMetadata,
   MTContractMetadata,
@@ -13,124 +10,136 @@ import {
   NFTTokenInfo,
 } from '#types/types';
 
-export const fetchFTSupply = async (contract: string) => {
-  try {
-    const supply = await viewFunctionAsJson<string>(rpc, {
-      accountId: contract,
-      methodName: 'ft_total_supply',
-    });
+export type FetchOutcome<T> =
+  | { data: T; ok: true }
+  | { ok: false; permanent: boolean };
 
-    return supply;
-  } catch (error) {
-    logger.error(`near: fetchFTSupply: ${contract}`);
-    logger.error(error);
-  }
+const permanentResult = { ok: false as const, permanent: true };
+const transientResult = { ok: false as const, permanent: false };
 
-  return null;
+type RpcErrorBody = {
+  error?: { cause?: { name?: string }; message?: string };
+  result?: { error?: string };
 };
 
-export const fetchFTMeta = async (contract: string) => {
-  try {
-    const meta = await viewFunctionAsJson<FTMetadata>(rpc, {
-      accountId: contract,
-      methodName: 'ft_metadata',
-    });
+const errorMarker = (body: unknown): string => {
+  const b = body as RpcErrorBody | undefined;
 
-    if (meta?.name && meta?.symbol) {
-      return meta;
+  return String(
+    b?.result?.error ?? b?.error?.cause?.name ?? b?.error?.message ?? '',
+  ).toLowerCase();
+};
+
+const isPermanentMarker = (marker: string): boolean =>
+  REJECT_MARKERS.some((rejectMarker) => marker.includes(rejectMarker));
+
+type RawOutcome<T> = { ok: false; permanent: boolean } | { ok: true; raw: T };
+
+const fetchView = async <T>(
+  contract: string,
+  method: string,
+  args: unknown = {},
+): Promise<RawOutcome<T>> => {
+  try {
+    const { data } = await RPC.callFunction(
+      contract,
+      method,
+      RPC.encodeArgs(args),
+    );
+
+    if (data?.result?.result) {
+      return { ok: true, raw: RPC.decodeResult<T>(data.result.result) };
     }
-  } catch (error) {
-    logger.error(`near: fetchFTMeta: ${contract}`);
-    logger.error(error);
-  }
 
-  return null;
+    return isPermanentMarker(errorMarker(data))
+      ? permanentResult
+      : transientResult;
+  } catch (error) {
+    logger.error(`near: fetchView: ${contract}: ${method}`);
+    logger.error(error);
+
+    return transientResult;
+  }
 };
 
-export const fetchMTMeta = async (contract: string) => {
-  try {
-    const meta = await viewFunctionAsJson<MTContractMetadata>(rpc, {
-      accountId: contract,
-      methodName: 'mt_metadata_contract',
-    });
+export const fetchFTSupply = async (
+  contract: string,
+): Promise<FetchOutcome<string>> => {
+  const outcome = await fetchView<string>(contract, 'ft_total_supply');
 
-    if (meta?.name) {
-      return meta;
-    }
-  } catch (error) {
-    logger.error(`near: fetchMTMeta: ${contract}`);
-    logger.error(error);
-  }
+  if (!outcome.ok) return outcome;
+  if (outcome.raw) return { data: outcome.raw, ok: true };
 
-  return null;
+  return permanentResult;
 };
 
-export const fetchMTTokenMeta = async (contract: string, token: string) => {
-  try {
-    const metas = await viewFunctionAsJson<MTTokenMetadataInfo[]>(rpc, {
-      accountId: contract,
-      argsBase64: encodeArgs({ token_ids: [token] }),
-      methodName: 'mt_metadata_token_all',
-    });
-    const meta = metas?.[0];
+export const fetchFTMeta = async (
+  contract: string,
+): Promise<FetchOutcome<FTMetadata>> => {
+  const outcome = await fetchView<FTMetadata>(contract, 'ft_metadata');
 
-    if (meta?.base && meta?.token) {
-      return meta;
-    }
-  } catch (error) {
-    logger.error(`near: fetchMTTokenMeta: ${contract}: ${token}`);
-    logger.error(error);
+  if (!outcome.ok) return outcome;
+  if (outcome.raw?.name && outcome.raw?.symbol) {
+    return { data: outcome.raw, ok: true };
   }
 
-  return null;
+  return permanentResult;
 };
 
-export const fetchNFTMeta = async (contract: string) => {
-  try {
-    const meta = await viewFunctionAsJson<NFTMetadata>(rpc, {
-      accountId: contract,
-      methodName: 'nft_metadata',
-    });
+export const fetchMTMeta = async (
+  contract: string,
+): Promise<FetchOutcome<MTContractMetadata>> => {
+  const outcome = await fetchView<MTContractMetadata>(
+    contract,
+    'mt_metadata_contract',
+  );
 
-    if (meta?.name) {
-      return meta;
-    }
-  } catch (error) {
-    logger.error(`near: fetchNFTMeta: ${contract}`);
-    logger.error(error);
-  }
+  if (!outcome.ok) return outcome;
+  if (outcome.raw?.name) return { data: outcome.raw, ok: true };
 
-  return null;
+  return permanentResult;
 };
 
-export const fetchNFTTokenMeta = async (contract: string, token: string) => {
-  try {
-    const meta = await viewFunctionAsJson<NFTTokenInfo>(rpc, {
-      accountId: contract,
-      argsBase64: encodeArgs({ token_id: token }),
-      methodName: 'nft_token',
-    });
+export const fetchMTTokenMeta = async (
+  contract: string,
+  token: string,
+): Promise<FetchOutcome<MTTokenMetadataInfo>> => {
+  const outcome = await fetchView<MTTokenMetadataInfo[]>(
+    contract,
+    'mt_metadata_token_all',
+    { token_ids: [token] },
+  );
 
-    if (meta?.metadata) {
-      return meta;
-    }
-  } catch (error) {
-    logger.error(`near: fetchNFTTokenMeta: ${contract}: ${token}`);
-    logger.error(error);
-  }
+  if (!outcome.ok) return outcome;
 
-  return null;
+  const meta = outcome.raw?.[0];
+
+  if (meta?.base && meta?.token) return { data: meta, ok: true };
+
+  return permanentResult;
 };
 
-export const fetchValidators = async () => {
-  try {
-    const resp = await validators(rpc, 'latest');
+export const fetchNFTMeta = async (
+  contract: string,
+): Promise<FetchOutcome<NFTMetadata>> => {
+  const outcome = await fetchView<NFTMetadata>(contract, 'nft_metadata');
 
-    return resp;
-  } catch (error) {
-    logger.error(`near: fetchValidators`);
-    logger.error(error);
-  }
+  if (!outcome.ok) return outcome;
+  if (outcome.raw?.name) return { data: outcome.raw, ok: true };
 
-  return null;
+  return permanentResult;
+};
+
+export const fetchNFTTokenMeta = async (
+  contract: string,
+  token: string,
+): Promise<FetchOutcome<NFTTokenInfo>> => {
+  const outcome = await fetchView<NFTTokenInfo>(contract, 'nft_token', {
+    token_id: token,
+  });
+
+  if (!outcome.ok) return outcome;
+  if (outcome.raw?.metadata) return { data: outcome.raw, ok: true };
+
+  return permanentResult;
 };

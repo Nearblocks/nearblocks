@@ -24,7 +24,7 @@ export const syncFTSupply = async () => {
         WHERE
           fm.contract = ec.contract
           AND ec.type = 'ft'
-          AND ec.attempts >= 5
+          AND ec.attempts >= 3
       )
     ORDER BY
       fm.synced_at ASC NULLS FIRST
@@ -37,12 +37,12 @@ export const syncFTSupply = async () => {
 
 const updateFTSupply = async (ft: FTContractDecimals) => {
   try {
-    const supply = await fetchFTSupply(ft.contract);
+    const outcome = await fetchFTSupply(ft.contract);
 
-    if (supply) {
-      await updateSupply(ft, supply);
+    if (outcome.ok) {
+      await updateSupply(ft, outcome.data);
     } else {
-      await upsertError(ft.contract, 'ft', null);
+      await upsertError(ft.contract, 'ft', null, outcome.permanent);
     }
   } catch (error) {
     logger.error(`tokenSupply: updateFTSupply: ${ft.contract}: ${ft.decimals}`);
