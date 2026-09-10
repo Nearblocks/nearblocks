@@ -1,11 +1,14 @@
 import { logger } from 'nb-logger';
 
+import { setRpcJob } from '#libs/rpcCounter';
 import sentry from '#libs/sentry';
 import {
   updatePoolInfoMap,
   updateStakingPoolStake,
   validatorsCheck,
 } from '#services/contracts/tasks';
+
+setRpcJob('nodes');
 
 export const task = async () => {
   try {

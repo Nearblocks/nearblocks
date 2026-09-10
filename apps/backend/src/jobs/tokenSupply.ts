@@ -1,7 +1,10 @@
 import { logger } from 'nb-logger';
 
+import { setRpcJob } from '#libs/rpcCounter';
 import sentry from '#libs/sentry';
 import { syncFTSupply } from '#services/fts/supply';
+
+setRpcJob('tokenSupply');
 
 export const task = async () => {
   try {

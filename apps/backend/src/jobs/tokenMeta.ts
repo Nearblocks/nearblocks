@@ -1,9 +1,12 @@
 import { logger } from 'nb-logger';
 
+import { setRpcJob } from '#libs/rpcCounter';
 import sentry from '#libs/sentry';
 import { refreshFTMeta, syncFTMeta } from '#services/fts/meta';
 import { syncMTMeta, syncMTTokenMeta } from '#services/mts/meta';
 import { refreshNFTMeta, syncNFTMeta } from '#services/nfts/meta';
+
+setRpcJob('tokenMeta');
 
 export const task = async () => {
   try {

@@ -1,7 +1,10 @@
 import { logger } from 'nb-logger';
 
+import { setRpcJob } from '#libs/rpcCounter';
 import sentry from '#libs/sentry';
 import { syncStats } from '#services/stats/stats';
+
+setRpcJob('stats');
 
 export const task = async () => {
   try {
