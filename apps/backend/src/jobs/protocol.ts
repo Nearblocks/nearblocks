@@ -1,7 +1,10 @@
 import { logger } from 'nb-logger';
 
+import { setRpcJob } from '#libs/rpcCounter';
 import sentry from '#libs/sentry';
 import { apyCheck, protocolConfigCheck } from '#services/contracts/tasks';
+
+setRpcJob('protocol');
 
 export const task = async () => {
   try {

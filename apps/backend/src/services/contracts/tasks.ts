@@ -1,7 +1,6 @@
 import Big from 'big.js';
 
 import { AccountView, BlockResult, EpochValidatorInfo } from 'nb-near';
-import { RPC as NearRPC } from 'nb-near';
 import {
   ValidatorConfig,
   ValidatorDescription,
@@ -12,6 +11,7 @@ import { yoctoToNear } from 'nb-utils';
 
 import config from '#config';
 import { dbBase } from '#libs/knex';
+import { axiosRpc as RPC } from '#libs/rpc';
 
 type ExpGenesisConfig = {
   genesis_height: number;
@@ -31,7 +31,6 @@ type ExpProtocolConfig = {
   protocol_version: number;
 };
 
-const RPC = new NearRPC(config.rpcUrl);
 export const EMPTY_CODE_HASH = '11111111111111111111111111111111';
 
 export const validator = {

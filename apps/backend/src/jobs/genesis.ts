@@ -1,7 +1,10 @@
 import { logger } from 'nb-logger';
 
+import { setRpcJob } from '#libs/rpcCounter';
 import sentry from '#libs/sentry';
 import { genesisProtocolInfoFetch } from '#services/contracts/tasks';
+
+setRpcJob('genesis');
 
 export const task = async () => {
   try {
