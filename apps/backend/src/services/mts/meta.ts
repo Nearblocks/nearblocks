@@ -32,52 +32,13 @@ export const syncMTMeta = async () => {
           mm.contract = ec.contract
           AND ec.type = 'mt'
           AND ec.token IS NULL
-          AND ec.attempts >= 5
+          AND ec.attempts >= 3
       )
     LIMIT
       5
   `);
 
   await Promise.all(mts.map((mt) => updateMTMeta(mt.contract)));
-};
-
-export const refreshMTMeta = async () => {
-  const { rows: mts } = await dbEvents.raw<Raw<MetaContract>>(
-    `
-      SELECT
-        contract
-      FROM
-        mt_meta
-      WHERE
-        modified_at < ?
-      ORDER BY
-        modified_at ASC
-      LIMIT
-        10
-    `,
-    [dayjs.utc().subtract(7, 'day').toISOString()],
-  );
-
-  await Promise.all(
-    mts.map(async (mt) => {
-      const meta = await fetchMTMeta(mt.contract);
-
-      if (meta) {
-        await updateMeta(mt.contract, meta);
-      } else {
-        await dbEvents.raw(
-          `
-            UPDATE mt_meta
-            SET
-              modified_at = ?
-            WHERE
-              contract = ?
-          `,
-          [dayjs.utc().toISOString(), mt.contract],
-        );
-      }
-    }),
-  );
 };
 
 export const syncMTTokenMeta = async () => {
@@ -98,7 +59,18 @@ export const syncMTTokenMeta = async () => {
           mbm.contract = ec.contract
           AND ec.type = 'mt'
           AND mbm.token = ec.token
-          AND ec.attempts >= 5
+          AND ec.attempts >= 3
+      )
+      AND NOT EXISTS (
+        SELECT
+          1
+        FROM
+          errored_contracts ec
+        WHERE
+          mbm.contract = ec.contract
+          AND ec.type = 'mt'
+          AND ec.token IS NULL
+          AND ec.attempts >= 3
       )
     LIMIT
       25
@@ -109,12 +81,12 @@ export const syncMTTokenMeta = async () => {
 
 export const updateMTMeta = async (contract: string) => {
   try {
-    const meta = await fetchMTMeta(contract);
+    const outcome = await fetchMTMeta(contract);
 
-    if (meta) {
-      await updateMeta(contract, meta);
+    if (outcome.ok) {
+      await updateMeta(contract, outcome.data);
     } else {
-      await upsertError(contract, 'mt', null);
+      await upsertError(contract, 'mt', null, outcome.permanent);
     }
   } catch (error) {
     logger.error(`tokenMeta: updateMTMeta: ${contract}`);
@@ -144,17 +116,17 @@ const updateMeta = async (contract: string, meta: MTContractMetadata) => {
 
 export const updateMTTokenMeta = async (contract: string, token: string) => {
   try {
-    const meta = await fetchMTTokenMeta(contract, token);
+    const outcome = await fetchMTTokenMeta(contract, token);
 
-    if (meta) {
-      await updateTokenMeta(contract, token, meta);
+    if (outcome.ok) {
+      await updateTokenMeta(contract, token, outcome.data);
       return;
     }
 
     const copied = await copyExternalTokenMeta(contract, token);
 
     if (!copied) {
-      await upsertError(contract, 'mt', token);
+      await upsertError(contract, 'mt', token, outcome.permanent);
     }
   } catch (error) {
     logger.error(`tokenMeta: updateMTTokenMeta: ${contract}: ${token}`);
@@ -214,6 +186,39 @@ const updateTokenMeta = async (
     });
   } catch (error) {
     logger.error(`tokenMeta: updateTokenMeta: ${contract}: ${token}`);
+    logger.error(error);
+  }
+};
+
+export const resetMTMeta = async (contracts: string[]) => {
+  try {
+    await dbEvents.transaction(async (tx) => {
+      return Promise.all([
+        tx.raw(
+          `
+            UPDATE mt_meta
+            SET
+              modified_at = NULL
+            WHERE
+              contract = ANY(?)
+              AND modified_at IS NOT NULL
+          `,
+          [contracts],
+        ),
+        tx.raw(
+          `
+            DELETE FROM errored_contracts
+            WHERE
+              contract = ANY(?)
+              AND type = ?
+              AND token IS NULL
+          `,
+          [contracts, 'mt'],
+        ),
+      ]);
+    });
+  } catch (error) {
+    logger.error(`tokenMetaReset: resetMTMeta: ${contracts.join(',')}`);
     logger.error(error);
   }
 };

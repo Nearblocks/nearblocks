@@ -6,7 +6,6 @@ import { msToNsTime } from 'nb-utils';
 import config from '#config';
 import cg from '#libs/cg';
 import { dbBase } from '#libs/knex';
-import { fetchValidators } from '#libs/near';
 import { Raw } from '#types/types';
 
 export const syncStats = async () => {
@@ -95,12 +94,17 @@ const marketData = async () => {
 };
 
 const networkData = async () => {
-  const validators = await fetchValidators();
-
-  if (!validators) return {};
+  const { rows } = await dbBase.raw<Raw<{ count: number }>>(`
+    SELECT
+      COUNT(*) AS count
+    FROM
+      validator_epoch_data
+    WHERE
+      current_epoch_stake IS NOT NULL
+  `);
 
   return {
-    nodes_online: validators.currentValidators.length,
+    nodes_online: +rows[0].count,
   };
 };
 

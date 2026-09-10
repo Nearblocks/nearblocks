@@ -3,8 +3,10 @@ import cron from 'node-cron';
 import { logger } from 'nb-logger';
 
 const options = {
+  logger,
   maxRandomDelay: 1000,
   noOverlap: true,
+  startTimeout: 20_000,
 };
 
 export const scheduleJobs = () => {
@@ -25,7 +27,7 @@ export const scheduleJobs = () => {
     // Validator jobs
     cron.schedule('*/15 * * * * *', './jobs/block.js', options); // 15s
     cron.schedule('0 * * * * *', './jobs/nodes.js', options); // 1m
-    cron.schedule('0 0 * * * *', './jobs/pools.js', options); // 1h
+    cron.schedule('0 0 */6 * * *', './jobs/pools.js', options); // 6h
     cron.schedule('0 0 */6 * * *', './jobs/protocol.js', options); // 6h
     cron.schedule('0 0 0 * * *', './jobs/genesis.js', options); // 1d
 

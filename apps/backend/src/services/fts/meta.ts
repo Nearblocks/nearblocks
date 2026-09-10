@@ -23,7 +23,7 @@ export const syncFTMeta = async () => {
         WHERE
           fm.contract = ec.contract
           AND ec.type = 'ft'
-          AND ec.attempts >= 5
+          AND ec.attempts >= 3
       )
     LIMIT
       10
@@ -38,9 +38,19 @@ export const refreshFTMeta = async () => {
       SELECT
         contract
       FROM
-        ft_meta
+        ft_meta fm
       WHERE
         modified_at < ?
+        AND NOT EXISTS (
+          SELECT
+            1
+          FROM
+            errored_contracts ec
+          WHERE
+            fm.contract = ec.contract
+            AND ec.type = 'ft'
+            AND ec.attempts >= 3
+        )
       ORDER BY
         modified_at ASC
       LIMIT
@@ -51,10 +61,10 @@ export const refreshFTMeta = async () => {
 
   await Promise.all(
     fts.map(async (ft) => {
-      const meta = await fetchFTMeta(ft.contract);
+      const outcome = await fetchFTMeta(ft.contract);
 
-      if (meta) {
-        await updateMeta(ft.contract, meta);
+      if (outcome.ok) {
+        await updateMeta(ft.contract, outcome.data);
       } else {
         await dbEvents.raw(
           `
@@ -73,12 +83,12 @@ export const refreshFTMeta = async () => {
 
 const updateFTMeta = async (contract: string) => {
   try {
-    const meta = await fetchFTMeta(contract);
+    const outcome = await fetchFTMeta(contract);
 
-    if (meta) {
-      await updateMeta(contract, meta);
+    if (outcome.ok) {
+      await updateMeta(contract, outcome.data);
     } else {
-      await upsertError(contract, 'ft', null);
+      await upsertError(contract, 'ft', null, outcome.permanent);
     }
   } catch (error) {
     logger.error(`tokenMeta: updateFTMeta: ${contract}`);

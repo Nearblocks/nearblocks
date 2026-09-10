@@ -1,4 +1,5 @@
 import { NearRpcClient } from '@near-js/jsonrpc-client/no-validation';
+import axios from 'axios';
 
 import { RPC as NearRPC } from 'nb-near';
 import { sleep } from 'nb-utils';
@@ -74,18 +75,29 @@ class CountedAxiosRpc extends NearRPC {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async query(params: unknown, method = 'query'): Promise<any> {
     const path = callPath(method, params);
+    let attempt = 0;
 
-    try {
-      const response = await super.query(params, method);
-      const body = response.data as { error?: unknown } | undefined;
+    for (;;) {
+      attempt += 1;
 
-      recordRpcCall(path, 1, !body?.error);
+      try {
+        const response = await super.query(params, method);
+        const body = response.data as { error?: unknown } | undefined;
 
-      return response;
-    } catch (error) {
-      recordRpcCall(path, 1, false);
+        recordRpcCall(path, attempt, !body?.error);
 
-      throw error;
+        return response;
+      } catch (error) {
+        recordRpcCall(path, attempt, false);
+
+        const rateLimited =
+          axios.isAxiosError(error) && error.response?.status === 429;
+        const retriable = !rateLimited && attempt <= RPC_RETRIES;
+
+        if (!retriable) throw error;
+
+        await sleep(Math.pow(2, attempt - 1) * 1000);
+      }
     }
   }
 }
@@ -93,3 +105,4 @@ class CountedAxiosRpc extends NearRPC {
 export const rpc = new CountedRpcClient(config.rpcUrl);
 
 export const axiosRpc = new CountedAxiosRpc(config.rpcUrl);
+axiosRpc.request.defaults.timeout = 30_000;

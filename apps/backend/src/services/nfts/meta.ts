@@ -30,7 +30,7 @@ export const syncNFTMeta = async () => {
           nm.contract = ec.contract
           AND ec.type = 'nft'
           AND ec.token IS NULL
-          AND ec.attempts >= 5
+          AND ec.attempts >= 3
       )
     LIMIT
       5
@@ -45,9 +45,20 @@ export const refreshNFTMeta = async () => {
       SELECT
         contract
       FROM
-        nft_meta
+        nft_meta nm
       WHERE
         modified_at < ?
+        AND NOT EXISTS (
+          SELECT
+            1
+          FROM
+            errored_contracts ec
+          WHERE
+            nm.contract = ec.contract
+            AND ec.type = 'nft'
+            AND ec.token IS NULL
+            AND ec.attempts >= 3
+        )
       ORDER BY
         modified_at ASC
       LIMIT
@@ -58,10 +69,10 @@ export const refreshNFTMeta = async () => {
 
   await Promise.all(
     nfts.map(async (nft) => {
-      const meta = await fetchNFTMeta(nft.contract);
+      const outcome = await fetchNFTMeta(nft.contract);
 
-      if (meta) {
-        await updateMeta(nft.contract, meta);
+      if (outcome.ok) {
+        await updateMeta(nft.contract, outcome.data);
       } else {
         await dbEvents.raw(
           `
@@ -96,7 +107,18 @@ export const syncNFTTokenMeta = async () => {
           ntm.contract = ec.contract
           AND ec.type = 'nft'
           AND ntm.token = ec.token
-          AND ec.attempts >= 5
+          AND ec.attempts >= 3
+      )
+      AND NOT EXISTS (
+        SELECT
+          1
+        FROM
+          errored_contracts ec
+        WHERE
+          ntm.contract = ec.contract
+          AND ec.type = 'nft'
+          AND ec.token IS NULL
+          AND ec.attempts >= 3
       )
     LIMIT
       25
@@ -109,12 +131,12 @@ export const syncNFTTokenMeta = async () => {
 
 export const updateNFTMeta = async (contract: string) => {
   try {
-    const meta = await fetchNFTMeta(contract);
+    const outcome = await fetchNFTMeta(contract);
 
-    if (meta) {
-      await updateMeta(contract, meta);
+    if (outcome.ok) {
+      await updateMeta(contract, outcome.data);
     } else {
-      await upsertError(contract, 'nft', null);
+      await upsertError(contract, 'nft', null, outcome.permanent);
     }
   } catch (error) {
     logger.error(`tokenMeta: updateNFTMeta: ${contract}`);
@@ -149,12 +171,12 @@ const updateMeta = async (contract: string, meta: NFTMetadata) => {
 
 export const updateNFTTokenMeta = async (contract: string, token: string) => {
   try {
-    const meta = await fetchNFTTokenMeta(contract, token);
+    const outcome = await fetchNFTTokenMeta(contract, token);
 
-    if (meta) {
-      await updateTokenMeta(contract, token, meta);
+    if (outcome.ok) {
+      await updateTokenMeta(contract, token, outcome.data);
     } else {
-      await upsertError(contract, 'nft', token);
+      await upsertError(contract, 'nft', token, outcome.permanent);
     }
   } catch (error) {
     logger.error(`nftTokenMeta: updateNFTTokenMeta: ${contract}: ${token}`);

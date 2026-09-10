@@ -23,13 +23,13 @@ const onSignal = async (signal: number | string) => {
 };
 
 process.on('uncaughtException', (error) => {
-  log.error('Uncaught exception:', error);
+  log.error({ err: error }, 'Uncaught exception');
   sentry.captureException(error, { tags: { type: 'uncaughtException' } });
   setTimeout(() => process.exit(1), 1000);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  log.error('Unhandled rejection:', { promise, reason });
+process.on('unhandledRejection', (reason) => {
+  log.error({ err: reason }, 'Unhandled rejection');
   sentry.captureException(reason, { tags: { type: 'unhandledRejection' } });
 });
 
