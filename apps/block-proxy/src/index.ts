@@ -4,6 +4,7 @@ import { logger } from 'nb-logger';
 
 import { createAdminServer } from '#admin';
 import config, { logConfigSummary } from '#config';
+import * as metrics from '#metrics';
 import { createDataServer } from '#server';
 import { createAppState } from '#state';
 
@@ -30,6 +31,9 @@ logger.info(
 );
 
 const state = createAppState(config);
+
+// Cooldown is time-based, so the gauge reads pool state at scrape time.
+metrics.setCooldownProvider(() => state.pool.cooldownState());
 
 // Create cache directory (fail fast, only when caching is enabled)
 if (config.cacheEnabled) {

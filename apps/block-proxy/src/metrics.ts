@@ -77,3 +77,31 @@ export const tipHeight = new client.Gauge({
   name: 'block_proxy_tip_height',
   registers: [register],
 });
+
+/**
+ * Cooldown is time-based, so it has to be read at scrape time rather than
+ * written on transition — otherwise an endpoint whose cooldown expired during
+ * a quiet period would still report as cooling.
+ */
+let cooldownProvider: (() => { cooling: boolean; name: string }[]) | null =
+  null;
+
+export const setCooldownProvider = (
+  provider: () => { cooling: boolean; name: string }[],
+): void => {
+  cooldownProvider = provider;
+};
+
+export const upstreamCooldown = new client.Gauge({
+  collect() {
+    if (!cooldownProvider) return;
+
+    for (const { cooling, name } of cooldownProvider()) {
+      this.set({ source: name }, cooling ? 1 : 0);
+    }
+  },
+  help: '1 while an upstream endpoint is in rate-limit cooldown, else 0',
+  labelNames: ['source'] as const,
+  name: 'block_proxy_upstream_cooldown',
+  registers: [register],
+});

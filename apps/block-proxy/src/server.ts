@@ -7,6 +7,7 @@ import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import type { UpstreamError } from '#types';
 import { fetchBlockDeduped } from '#upstream/index';
+import { shouldCooldown } from '#upstream/pool';
 
 export function createDataServer(state: AppState): express.Express {
   const app = express();
@@ -84,6 +85,21 @@ export function createDataServer(state: AppState): express.Express {
         return;
       }
 
+      // Pass a rate limit on as a rate limit. Another block-proxy may be
+      // reading this response, and a 502 would tell it nothing — it would
+      // keep sending traffic at an upstream already asking us to stop.
+      if (
+        upstreamErrors.length > 0 &&
+        upstreamErrors.every((e) => e.rateLimited)
+      ) {
+        logger.warn({ errors, height }, 'every upstream is rate limiting');
+        res
+          .status(429)
+          .set('retry-after', String(state.config.cooldownBaseMs / 1000))
+          .json({ error: 'upstreams rate limited', height });
+        return;
+      }
+
       logger.error(
         { errors, height },
         'block request failed: all upstreams exhausted',
@@ -116,8 +132,24 @@ export function createDataServer(state: AppState): express.Express {
       return;
     }
 
-    try {
-      const bytes = await state.fastnear.fetchLastBlockFinal();
+    const errors: string[] = [];
+
+    for (const entry of state.pool.available()) {
+      let bytes: Buffer;
+
+      try {
+        bytes = await entry.upstream.fetchLastBlockFinal();
+        state.pool.reset(entry.name);
+      } catch (err) {
+        if (shouldCooldown(err)) state.pool.penalise(entry.name, err);
+
+        logger.warn(
+          { error: String(err), source: entry.name },
+          'last_block/final fetch failed',
+        );
+        errors.push(`${entry.name}: ${String(err)}`);
+        continue;
+      }
 
       // Update tip height from response
       try {
@@ -140,17 +172,15 @@ export function createDataServer(state: AppState): express.Express {
       res
         .status(200)
         .set('content-type', 'application/json')
-        .set('x-upstream-source', 'fastnear')
+        .set('x-upstream-source', entry.name)
         .send(bytes);
-    } catch (err) {
-      logger.error(
-        { error: String(err) },
-        'last_block/final fetch from fastnear failed',
-      );
-      res
-        .status(502)
-        .json({ error: 'upstream fetch failed for last_block/final' });
+      return;
     }
+
+    logger.error({ errors }, 'last_block/final failed on every upstream');
+    res
+      .status(502)
+      .json({ error: 'upstream fetch failed for last_block/final' });
   });
 
   // GET /healthz

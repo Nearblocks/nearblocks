@@ -4,7 +4,8 @@ Caching reverse proxy for NEAR block data. Sits between indexers and upstream bl
 
 - **Local disk cache** with sharded storage and TTL-based eviction
 - **Singleflight dedup** — concurrent requests for the same block height are collapsed into one upstream fetch
-- **Fallback chain** — cache → S3/MinIO → fastnear, with per-source metrics
+- **Fallback chain** — cache → S3/MinIO → neardata upstream pool, with per-source metrics
+- **Upstream pool** — several neardata endpoints in priority order, with a rate-limit cooldown
 - **Prometheus metrics** and JSON stats on a separate admin port
 
 ## Quick Start
@@ -63,12 +64,16 @@ All env vars have safe defaults. With zero config, the proxy starts on port 3000
 | `UPSTREAM_TIMEOUT_SECS` | `10`    | Per-upstream timeout. Must be below the 30s client abort.    |
 | `DEDUP_TTL_SECS`        | `25`    | Max lifetime of an in-flight singleflight entry. Range 5-60. |
 
-### Upstream: fastnear (neardata.xyz)
+### Upstream: neardata
 
-| Variable           | Default                  | Description                |
-| ------------------ | ------------------------ | -------------------------- |
-| `FASTNEAR_ENABLED` | `true`                   | Enable fastnear upstream   |
-| `FASTNEAR_URL`     | _(derived from NETWORK)_ | Override fastnear base URL |
+| Variable                      | Default                  | Description                                           |
+| ----------------------------- | ------------------------ | ----------------------------------------------------- |
+| `FASTNEAR_ENABLED`            | `true`                   | Enable the neardata upstream pool                     |
+| `FASTNEAR_URL`                | _(derived from NETWORK)_ | Base URL, when running with a single upstream         |
+| `FASTNEAR_API_KEY`            | _(empty)_                | API key, when running with a single upstream          |
+| `NEARDATA_UPSTREAMS`          | _(unset)_                | JSON array of upstreams in priority order. See below. |
+| `NEARDATA_COOLDOWN_BASE_SECS` | `60`                     | First cooldown applied to a rate-limited upstream     |
+| `NEARDATA_COOLDOWN_MAX_SECS`  | `900`                    | Cap on the doubling backoff                           |
 
 ### Upstream: S3/MinIO
 
@@ -97,7 +102,36 @@ All env vars have safe defaults. With zero config, the proxy starts on port 3000
          └────────┘  └──────────┘  └──────────┘
 ```
 
-Fallback order: cache → S3 → fastnear. On any upstream hit, the block is written to cache in the background.
+Fallback order: cache → S3 → each neardata upstream in priority order. On any upstream hit, the block is written to cache in the background.
+
+### Upstream Pool
+
+`NEARDATA_UPSTREAMS` is an ordered list of neardata-compatible endpoints, tried in order. Any such
+endpoint works, including another `block-proxy`. Unset, a single upstream is used from
+`FASTNEAR_URL` / `FASTNEAR_API_KEY` — the previous behaviour exactly.
+
+```json
+[
+  { "name": "secondary", "url": "http://10.0.0.11:3000" },
+  { "name": "primary", "url": "https://mainnet.neardata.xyz", "apiKey": "..." }
+]
+```
+
+`name` labels metrics, stats and the `x-upstream-source` header; it must be unique and stable.
+`cache`, `s3` and `dedup` are reserved. All endpoints in a pool must serve the same `NETWORK` —
+nothing checks this, and a mismatch returns a plausible 200 for the wrong chain.
+
+A `429`/`503` rests that endpoint and the next is tried, with a doubling delay from
+`NEARDATA_COOLDOWN_BASE_SECS` to `NEARDATA_COOLDOWN_MAX_SECS` (`Retry-After` is preferred, clamped
+to the same bounds). When all are resting, the one nearest recovery is used. If every upstream is
+rate limiting, the response is `429` rather than `502`, so a chained block-proxy rests us correctly.
+
+A `404` never rests an endpoint, and resting endpoints are woken and tried before any `404` is
+returned — "not found" means not found on every endpoint.
+
+An additional instance is a plain `block-proxy` (`CACHE_ENABLED=true`, `S3_ENABLED=false`). Keep its
+`UPSTREAM_TIMEOUT_SECS` below the primary's, and bind it to a private interface — it has no
+authentication.
 
 ### Singleflight Dedup
 

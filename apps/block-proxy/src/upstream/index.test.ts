@@ -2,23 +2,37 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AppState } from '#state';
 import { StatsCollector } from '#stats';
+import type { FastnearUpstream } from '#upstream/fastnear';
+import { UpstreamPool } from '#upstream/pool';
 
 import { fetchBlockDeduped } from './index.js';
 
 const HEIGHT = 212615360;
 const BYTES = Buffer.from('{}');
 const KEY = `block:${HEIGHT}`;
+const BASE_MS = 60_000;
+const MAX_MS = 900_000;
 
-const makeState = (
-  fetchImpl: () => Promise<Buffer>,
-  dedupTtlMs = 50,
-): AppState =>
+type Fetcher = (height: number) => Promise<Buffer>;
+
+/** Priority order is list order, so callers pass an ordered list of pairs. */
+const poolOf = (upstreams: [string, Fetcher][]) =>
+  new UpstreamPool(
+    upstreams.map(([name, fetch]) => ({
+      name,
+      upstream: { fetch } as unknown as FastnearUpstream,
+    })),
+    BASE_MS,
+    MAX_MS,
+  );
+
+const stateWithPool = (pool: UpstreamPool, dedupTtlMs = 50): AppState =>
   ({
     cache: {} as never,
     config: { cacheEnabled: false, dedupTtlMs } as never,
     dedup: new Map(),
-    fastnear: { fetch: fetchImpl } as never,
     fastnearEnabled: true,
+    pool,
     ready: true,
     s3: null,
     s3Enabled: false,
@@ -27,6 +41,14 @@ const makeState = (
     tipHeight: 0,
     version: 'test',
   }) as AppState;
+
+const makeState = (fetchImpl: Fetcher, dedupTtlMs = 50): AppState =>
+  stateWithPool(poolOf([['fastnear', fetchImpl]]), dedupTtlMs);
+
+const httpError = (status: number, extra: Record<string, unknown> = {}) =>
+  Object.assign(new Error(`status ${status}`), { status, ...extra });
+
+const notFound = () => httpError(404, { notFound: true });
 
 describe('fetchBlockDeduped', () => {
   beforeEach(() => vi.useRealTimers());
@@ -168,5 +190,204 @@ describe('fetchBlockDeduped', () => {
     await expect(fetchBlockDeduped(state, HEIGHT)).rejects.toMatchObject({
       errors: [{ source: 'dedup' }],
     });
+  });
+});
+
+describe('fetchBlock upstream pool', () => {
+  it('serves from the highest-priority endpoint and leaves the rest alone', async () => {
+    const first = vi.fn().mockResolvedValue(BYTES);
+    const second = vi.fn().mockResolvedValue(BYTES);
+    const state = stateWithPool(
+      poolOf([
+        ['vm-a', first],
+        ['fastnear', second],
+      ]),
+    );
+
+    const result = await fetchBlockDeduped(state, HEIGHT);
+
+    expect(result.source).toBe('vm-a');
+    expect(second).not.toHaveBeenCalled();
+  });
+
+  it('falls over to the next endpoint on a 429 and parks the offender', async () => {
+    const limited = vi.fn().mockRejectedValue(httpError(429));
+    const backstop = vi.fn().mockResolvedValue(BYTES);
+    const pool = poolOf([
+      ['vm-a', limited],
+      ['fastnear', backstop],
+    ]);
+    const state = stateWithPool(pool);
+
+    const result = await fetchBlockDeduped(state, HEIGHT);
+
+    expect(result.source).toBe('fastnear');
+    expect(pool.cooldownState()).toContainEqual({
+      cooling: true,
+      name: 'vm-a',
+    });
+
+    // Parked, so the next request must not spend another call on it.
+    await fetchBlockDeduped(state, HEIGHT);
+    expect(limited).toHaveBeenCalledTimes(1);
+  });
+
+  // The whole point of the pool: a lagging peer must never end the search,
+  // or an indexer would see a 404 for a block that does exist upstream.
+  it('keeps trying later endpoints after a 404', async () => {
+    const missing = vi.fn().mockRejectedValue(notFound());
+    const has = vi.fn().mockResolvedValue(BYTES);
+    const state = stateWithPool(
+      poolOf([
+        ['vm-a', missing],
+        ['fastnear', has],
+      ]),
+    );
+
+    const result = await fetchBlockDeduped(state, HEIGHT);
+
+    expect(result.source).toBe('fastnear');
+    expect(missing).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not park an endpoint that 404s', async () => {
+    const missing = vi.fn().mockRejectedValue(notFound());
+    const pool = poolOf([
+      ['vm-a', missing],
+      ['fastnear', () => Promise.resolve(BYTES)],
+    ]);
+    const state = stateWithPool(pool);
+
+    await fetchBlockDeduped(state, HEIGHT);
+
+    expect(pool.cooldownState()).toEqual([
+      { cooling: false, name: 'vm-a' },
+      { cooling: false, name: 'fastnear' },
+    ]);
+  });
+
+  it('reports notFound only when every endpoint 404s', async () => {
+    const state = stateWithPool(
+      poolOf([
+        ['vm-a', () => Promise.reject(notFound())],
+        ['fastnear', () => Promise.reject(notFound())],
+      ]),
+    );
+
+    await expect(fetchBlockDeduped(state, HEIGHT)).rejects.toMatchObject({
+      errors: [
+        { notFound: true, source: 'vm-a' },
+        { notFound: true, source: 'fastnear' },
+      ],
+    });
+  });
+
+  it('marks the result as not-all-notFound when one endpoint really failed', async () => {
+    const state = stateWithPool(
+      poolOf([
+        ['vm-a', () => Promise.reject(httpError(500))],
+        ['fastnear', () => Promise.reject(notFound())],
+      ]),
+    );
+
+    await expect(fetchBlockDeduped(state, HEIGHT)).rejects.toMatchObject({
+      errors: [
+        { notFound: false, source: 'vm-a' },
+        { notFound: true, source: 'fastnear' },
+      ],
+    });
+  });
+
+  it('records per-endpoint stats', async () => {
+    const state = stateWithPool(
+      poolOf([
+        ['vm-a', () => Promise.reject(httpError(429))],
+        ['fastnear', () => Promise.resolve(BYTES)],
+      ]),
+    );
+
+    await fetchBlockDeduped(state, HEIGHT);
+
+    const snapshot = state.stats.snapshot(0, 0, ['vm-a', 'fastnear']);
+
+    expect(snapshot.upstreams['vm-a']).toMatchObject({
+      errors: 1,
+      requests: 1,
+    });
+    expect(snapshot.upstreams.fastnear).toMatchObject({
+      errors: 0,
+      requests: 1,
+    });
+  });
+
+  it('recovers an endpoint after its cooldown expires', async () => {
+    const flaky = vi
+      .fn()
+      .mockRejectedValueOnce(httpError(429))
+      .mockResolvedValue(BYTES);
+    const pool = poolOf([
+      ['vm-a', flaky],
+      ['fastnear', () => Promise.resolve(BYTES)],
+    ]);
+    const state = stateWithPool(pool);
+
+    await fetchBlockDeduped(state, HEIGHT);
+
+    expect(pool.available().map((e) => e.name)).toEqual(['fastnear']);
+    expect(pool.available(Date.now() + BASE_MS + 1).map((e) => e.name)).toEqual(
+      ['vm-a', 'fastnear'],
+    );
+  });
+});
+
+describe('fetchBlock resting-upstream recovery', () => {
+  // The regression this guards: available() hides resting endpoints, so a
+  // single 404 from the one ready endpoint used to be reported as "not found
+  // anywhere" — stalling the indexer on a block another endpoint had.
+  it('wakes a resting endpoint rather than returning a false 404', async () => {
+    const hasBlock = vi.fn().mockResolvedValue(BYTES);
+    const pool = poolOf([
+      ['vm-a', () => Promise.reject(notFound())],
+      ['fastnear', hasBlock],
+    ]);
+    pool.penalise('fastnear', httpError(429));
+
+    const state = stateWithPool(pool);
+    const result = await fetchBlockDeduped(state, HEIGHT);
+
+    expect(hasBlock).toHaveBeenCalledTimes(1);
+    expect(result.source).toBe('fastnear');
+  });
+
+  it('still returns 404 when the woken endpoint also lacks the block', async () => {
+    const pool = poolOf([
+      ['vm-a', () => Promise.reject(notFound())],
+      ['fastnear', () => Promise.reject(notFound())],
+    ]);
+    pool.penalise('fastnear', httpError(429));
+
+    await expect(
+      fetchBlockDeduped(stateWithPool(pool), HEIGHT),
+    ).rejects.toMatchObject({
+      errors: [
+        { notFound: true, source: 'vm-a' },
+        { notFound: true, source: 'fastnear' },
+      ],
+    });
+  });
+
+  // Only a would-be 404 wakes them; an ordinary failure must leave them rested.
+  it('does not wake a resting endpoint for a non-404 failure', async () => {
+    const rested = vi.fn().mockResolvedValue(BYTES);
+    const pool = poolOf([
+      ['vm-a', () => Promise.reject(httpError(500))],
+      ['fastnear', rested],
+    ]);
+    pool.penalise('fastnear', httpError(429));
+
+    await expect(
+      fetchBlockDeduped(stateWithPool(pool), HEIGHT),
+    ).rejects.toThrow();
+    expect(rested).not.toHaveBeenCalled();
   });
 });

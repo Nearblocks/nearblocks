@@ -1,6 +1,14 @@
-import type { StatsSnapshot } from '#types';
+import type { SourceStats, StatsSnapshot, UpstreamStats } from '#types';
+
+interface UpstreamCounters {
+  durationUs: number;
+  errors: number;
+  requests: number;
+}
 
 export class StatsCollector {
+  // Keyed by upstream name, so the pool can grow without touching this file.
+  private upstreams = new Map<string, UpstreamCounters>();
   cacheEvictions = 0;
   cacheHits = 0;
   cacheMisses = 0;
@@ -9,18 +17,26 @@ export class StatsCollector {
   dedupLeaders = 0;
   dedupTotal = 0;
   requestsBlock = 0;
+
   requestsLastBlock = 0;
-  upstreamDurationUsFastnear = 0;
-  upstreamDurationUsS3 = 0;
-  upstreamErrorsFastnear = 0;
-  upstreamErrorsS3 = 0;
-  upstreamRequestsFastnear = 0;
-  upstreamRequestsS3 = 0;
+
+  recordUpstream(source: string, elapsedMs: number, ok: boolean): void {
+    let counters = this.upstreams.get(source);
+
+    if (!counters) {
+      counters = { durationUs: 0, errors: 0, requests: 0 };
+      this.upstreams.set(source, counters);
+    }
+
+    counters.requests += 1;
+    counters.durationUs += elapsedMs * 1000;
+    if (!ok) counters.errors += 1;
+  }
 
   snapshot(
     tipHeight: number,
     uptimeSecs: number,
-    upstreamEnabled: { fastnear: boolean; s3: boolean },
+    enabledSources: string[],
   ): StatsSnapshot {
     const cacheTotal = this.cacheHits + this.cacheMisses;
     const cacheHitRate = cacheTotal > 0 ? this.cacheHits / cacheTotal : 0;
@@ -28,6 +44,26 @@ export class StatsCollector {
 
     const avgLatencyMs = (durationUs: number, count: number): number =>
       count > 0 ? durationUs / count / 1000 : 0;
+
+    const enabled = new Set(enabledSources);
+    const upstreams: UpstreamStats = {};
+
+    // Union of configured and observed, so a disabled-but-used source still
+    // shows its history and a configured-but-idle one still shows as enabled.
+    for (const source of new Set([...enabled, ...this.upstreams.keys()])) {
+      const counters = this.upstreams.get(source);
+      const stats: SourceStats = {
+        avg_latency_ms: avgLatencyMs(
+          counters?.durationUs ?? 0,
+          counters?.requests ?? 0,
+        ),
+        enabled: enabled.has(source),
+        errors: counters?.errors ?? 0,
+        requests: counters?.requests ?? 0,
+      };
+
+      upstreams[source] = stats;
+    }
 
     return {
       cache: {
@@ -48,26 +84,7 @@ export class StatsCollector {
         last_block: this.requestsLastBlock,
       },
       tip_height: tipHeight,
-      upstreams: {
-        fastnear: {
-          avg_latency_ms: avgLatencyMs(
-            this.upstreamDurationUsFastnear,
-            this.upstreamRequestsFastnear,
-          ),
-          enabled: upstreamEnabled.fastnear,
-          errors: this.upstreamErrorsFastnear,
-          requests: this.upstreamRequestsFastnear,
-        },
-        s3: {
-          avg_latency_ms: avgLatencyMs(
-            this.upstreamDurationUsS3,
-            this.upstreamRequestsS3,
-          ),
-          enabled: upstreamEnabled.s3,
-          errors: this.upstreamErrorsS3,
-          requests: this.upstreamRequestsS3,
-        },
-      },
+      upstreams,
       uptime_secs: uptimeSecs,
     };
   }

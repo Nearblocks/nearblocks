@@ -3,28 +3,19 @@ import { logger } from 'nb-logger';
 import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import type { UpstreamError } from '#types';
+import type { PoolEntry } from '#upstream/pool';
+import { shouldCooldown } from '#upstream/pool';
+
+type Fetched = { bytes: Buffer; source: string };
 
 function recordUpstreamOk(
   state: AppState,
   source: string,
   elapsedMs: number,
 ): void {
-  const durationSecs = elapsedMs / 1000;
-  const durationUs = elapsedMs * 1000;
-
   metrics.upstreamRequests.inc({ result: 'ok', source });
-  metrics.upstreamDuration.observe({ source }, durationSecs);
-
-  switch (source) {
-    case 'fastnear':
-      state.stats.upstreamRequestsFastnear++;
-      state.stats.upstreamDurationUsFastnear += durationUs;
-      break;
-    case 's3':
-      state.stats.upstreamRequestsS3++;
-      state.stats.upstreamDurationUsS3 += durationUs;
-      break;
-  }
+  metrics.upstreamDuration.observe({ source }, elapsedMs / 1000);
+  state.stats.recordUpstream(source, elapsedMs, true);
 }
 
 function recordUpstreamErr(
@@ -32,24 +23,9 @@ function recordUpstreamErr(
   source: string,
   elapsedMs: number,
 ): void {
-  const durationSecs = elapsedMs / 1000;
-  const durationUs = elapsedMs * 1000;
-
   metrics.upstreamRequests.inc({ result: 'error', source });
-  metrics.upstreamDuration.observe({ source }, durationSecs);
-
-  switch (source) {
-    case 'fastnear':
-      state.stats.upstreamRequestsFastnear++;
-      state.stats.upstreamErrorsFastnear++;
-      state.stats.upstreamDurationUsFastnear += durationUs;
-      break;
-    case 's3':
-      state.stats.upstreamRequestsS3++;
-      state.stats.upstreamErrorsS3++;
-      state.stats.upstreamDurationUsS3 += durationUs;
-      break;
-  }
+  metrics.upstreamDuration.observe({ source }, elapsedMs / 1000);
+  state.stats.recordUpstream(source, elapsedMs, false);
 }
 
 export async function fetchBlock(
@@ -113,33 +89,67 @@ export async function fetchBlock(
     }
   }
 
-  // 3. fastnear
-  if (state.fastnearEnabled) {
-    const upstreamStart = Date.now();
-    try {
-      const bytes = await state.fastnear.fetch(height);
-      recordUpstreamOk(state, 'fastnear', Date.now() - upstreamStart);
-      logger.info(
-        { height, latency_ms: Date.now() - start, source: 'fastnear' },
-        'block served',
-      );
-      if (state.config.cacheEnabled) {
-        metrics.cacheWrites.inc();
-        state.stats.cacheWrites++;
-        state.cache.writeBackground(height, bytes);
+  // 3. neardata pool, in configured order
+  const tryEntries = async (entries: PoolEntry[]): Promise<Fetched | null> => {
+    for (const entry of entries) {
+      const upstreamStart = Date.now();
+      const generation = state.pool.generationOf(entry.name);
+
+      try {
+        const bytes = await entry.upstream.fetch(height);
+        state.pool.reset(entry.name, generation);
+        recordUpstreamOk(state, entry.name, Date.now() - upstreamStart);
+        logger.info(
+          { height, latency_ms: Date.now() - start, source: entry.name },
+          'block served',
+        );
+        if (state.config.cacheEnabled) {
+          metrics.cacheWrites.inc();
+          state.stats.cacheWrites++;
+          state.cache.writeBackground(height, bytes);
+        }
+        return { bytes, source: entry.name };
+      } catch (err) {
+        recordUpstreamErr(state, entry.name, Date.now() - upstreamStart);
+
+        // Only an explicit rate limit rests an endpoint. A 404 describes the
+        // block, not the endpoint, so it must fall through to the next one.
+        if (shouldCooldown(err)) state.pool.penalise(entry.name, err);
+
+        logger.warn(
+          { error: String(err), height, source: entry.name },
+          'upstream fetch failed',
+        );
+        errors.push({
+          error: String(err),
+          notFound: !!(err as Error & { notFound?: boolean }).notFound,
+          rateLimited: shouldCooldown(err),
+          source: entry.name,
+        });
       }
-      return { bytes, source: 'fastnear' };
-    } catch (err) {
-      recordUpstreamErr(state, 'fastnear', Date.now() - upstreamStart);
+    }
+
+    return null;
+  };
+
+  const served = await tryEntries(state.pool.available());
+  if (served) return served;
+
+  // "Not found" has to mean not found *anywhere*. Endpoints resting from an
+  // earlier rate limit were skipped above, so before a 404 reaches the client
+  // — which stalls the indexer — ask them too. Only a would-be 404 wakes them,
+  // so a resting endpoint is still spared every ordinary failure.
+  if (errors.length > 0 && errors.every((e) => e.notFound)) {
+    const resting = state.pool.resting();
+
+    if (resting.length > 0) {
       logger.warn(
-        { error: String(err), height, source: 'fastnear' },
-        'upstream fetch failed',
+        { height, sources: resting.map((e) => e.name) },
+        'not found on every ready upstream, waking resting upstreams',
       );
-      errors.push({
-        error: String(err),
-        notFound: !!(err as Error & { notFound?: boolean }).notFound,
-        source: 'fastnear',
-      });
+
+      const late = await tryEntries(resting);
+      if (late) return late;
     }
   }
 
