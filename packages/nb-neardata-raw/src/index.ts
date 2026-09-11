@@ -10,21 +10,30 @@ import { retry } from 'nb-utils';
 
 import { camelCaseKeys } from './utils.js';
 
+export type StreamStats = {
+  bufferLength: number;
+  fetchSeconds: number;
+  inFlight: number;
+};
+
 export type BlockStreamConfig = {
   apiKey?: string;
+  bufferMultiplier?: number;
+  concurrency?: number;
   end: number;
   network: string;
+  onStats?: (stats: StreamStats) => void;
+  project?: (message: unknown) => unknown;
   start: number;
   url?: string;
 };
 
 const retries = 5;
+const requestTimeoutMs = 30_000;
+const idleTimeoutMs = 30_000;
 EventEmitter.defaultMaxListeners = 20;
 
-const retryLogger = (attempt: number, error: unknown) => {
-  logger.error(error);
-  logger.error({ attempt });
-};
+export const BLOCKS_PER_ARCHIVE = 10;
 
 const MAINNET_ARCHIVE_BOUNDARIES = [122_000_000, 142_000_000, 177_000_000];
 
@@ -43,27 +52,27 @@ const endpoint = (network: string, blockHeight: number) => {
 };
 
 const fetch = async (url: string, apiKey?: string) => {
-  return await retry(
-    async () => {
-      const response = await axios.get(url, {
-        headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
-        responseType: 'stream',
-        validateStatus: (status) => status === 200 || status === 404,
-      });
+  const response = await axios.get(url, {
+    headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
+    responseType: 'stream',
+    timeout: requestTimeoutMs,
+    validateStatus: (status) => status === 200 || status === 404,
+  });
 
-      if (response.status === 404) {
-        (response.data as Readable).destroy();
+  if (response.status === 404) {
+    (response.data as Readable).destroy();
 
-        return null;
-      }
+    return null;
+  }
 
-      return response.data as Readable;
-    },
-    { exponential: true, logger: retryLogger, retries },
-  );
+  return response.data as Readable;
 };
 
-export const streamFiles = async (file: string, apiKey?: string) => {
+export const streamFiles = async (
+  file: string,
+  apiKey?: string,
+  project?: (message: unknown) => unknown,
+) => {
   return await retry(
     async () => {
       const response = await fetch(file, apiKey);
@@ -78,11 +87,22 @@ export const streamFiles = async (file: string, apiKey?: string) => {
 
         const stream = new tar.Parser();
 
+        let idleTimer: NodeJS.Timeout;
+        const resetIdleTimer = () => {
+          clearTimeout(idleTimer);
+          idleTimer = setTimeout(() => {
+            response.destroy(new Error(`idle timeout fetching ${file}`));
+          }, idleTimeoutMs);
+        };
+        const clearIdleTimer = () => clearTimeout(idleTimer);
+
         stream.on('error', (err) => {
+          clearIdleTimer();
           reject(err);
         });
 
         response.on('error', (err) => {
+          clearIdleTimer();
           reject(err);
         });
 
@@ -94,7 +114,8 @@ export const streamFiles = async (file: string, apiKey?: string) => {
               try {
                 const json = Buffer.concat(chunks).toString();
                 const parsed = JSON.parse(json);
-                readable.push(camelCaseKeys(parsed));
+                const message = camelCaseKeys(parsed);
+                readable.push(project ? project(message) : message);
               } catch (error) {
                 readable.emit('error', error);
                 readable.push(null);
@@ -112,90 +133,185 @@ export const streamFiles = async (file: string, apiKey?: string) => {
         });
 
         stream.on('end', () => {
+          clearIdleTimer();
           readable.push(null);
           resolve(readable);
         });
 
         response.pipe(stream);
+        resetIdleTimer();
+        response.on('data', resetIdleTimer);
       });
     },
-    { exponential: true, logger: retryLogger, retries },
+    {
+      exponential: true,
+      logger: (attempt, error) => {
+        logger.warn(
+          {
+            attempt,
+            error: error instanceof Error ? error.message : error,
+            file,
+          },
+          'retrying archive fetch',
+        );
+      },
+      retries,
+    },
   );
 };
 
 export const streamBlock = (config: BlockStreamConfig) => {
-  const startBlock = config.start;
-  const endBlock = config.end;
+  const limit = config.concurrency ?? 20;
+  const bufferMultiplier = config.bufferMultiplier ?? 2;
+  const highWaterMark = limit * BLOCKS_PER_ARCHIVE * bufferMultiplier;
 
-  let isFetching = false;
-  let next = 0;
-  const limit = 10;
-  const highWaterMark = limit * 20;
-  const blocks: number[] = [];
-  const start = Math.floor(startBlock / 10) * 10;
-  const end = Math.floor(endBlock / 10) * 10;
+  const start =
+    Math.floor(config.start / BLOCKS_PER_ARCHIVE) * BLOCKS_PER_ARCHIVE;
+  const end = Math.floor(config.end / BLOCKS_PER_ARCHIVE) * BLOCKS_PER_ARCHIVE;
 
-  for (let i = start; i <= end; i += limit) {
-    blocks.push(i);
+  const archives: number[] = [];
+  for (let i = start; i <= end; i += BLOCKS_PER_ARCHIVE) {
+    archives.push(i);
   }
+
+  let nextToFetch = 0;
+  let nextToEmit = 0;
+  let inFlight = 0;
+  let draining = false;
+  let closed = false;
+
+  const pending = new Map<number, Promise<null | Readable>>();
+  const iterators = new Map<number, AsyncIterator<unknown>>();
+
+  const archiveUrl = (index: number) => {
+    const block = archives[index];
+    const url = config.url ?? endpoint(config.network, block);
+    const base = String(block).padStart(12, '0');
+    const folder = base.slice(0, 6);
+    const subFolder = base.slice(6, 9);
+
+    return `${url}/${folder}/${subFolder}/${base}.tgz`;
+  };
 
   const readable = new Readable({
     highWaterMark,
     objectMode: true,
-    read() {},
+    read() {
+      pump();
+    },
   });
 
-  const fetchBlocks = async () => {
-    if (isFetching) return;
+  const fill = () => {
+    if (closed) return;
 
-    isFetching = true;
+    while (
+      nextToFetch < archives.length &&
+      nextToFetch - nextToEmit < limit &&
+      inFlight * BLOCKS_PER_ARCHIVE + readable.readableLength <= highWaterMark
+    ) {
+      const index = nextToFetch;
+      nextToFetch++;
+      inFlight++;
 
-    try {
-      const remaining = highWaterMark - readable.readableLength;
+      const startedAt = performance.now();
+      const promise = streamFiles(
+        archiveUrl(index),
+        config.apiKey,
+        config.project,
+      );
 
-      if (remaining > 10) {
-        const batch: number[] = [];
-        const promises: Promise<null | Readable>[] = [];
-        const concurrency = Math.min(limit, blocks.length - next, remaining);
+      pending.set(index, promise);
 
-        for (let i = next; i < next + concurrency; i++) {
-          const block = blocks[i];
-          const url = config.url ?? endpoint(config.network, block);
-          const base = String(block).padStart(12, '0');
-          const folder = base.slice(0, 6);
-          const subFolder = base.slice(6, 9);
-          const file = `${url}/${folder}/${subFolder}/${base}.tgz`;
+      promise
+        .then(() => {
+          inFlight--;
 
-          batch.push(block);
-          promises.push(streamFiles(file, config.apiKey));
-        }
-
-        const streams = await Promise.all(promises);
-
-        for (const [index, stream] of streams.entries()) {
-          if (stream) {
-            for await (const message of stream) {
-              if (message && !readable.push(message)) {
-                return;
-              }
-            }
-          } else {
-            logger.warn({ block: batch[index] }, 'missing raw batch');
+          try {
+            config.onStats?.({
+              bufferLength: readable.readableLength,
+              fetchSeconds: (performance.now() - startedAt) / 1000,
+              inFlight,
+            });
+          } catch (error) {
+            logger.warn(error, 'onStats callback threw');
           }
 
-          next++;
+          drain();
+        })
+        .catch((error) => {
+          inFlight--;
+          readable.destroy(error as Error);
+        });
+    }
+  };
+
+  const drain = async () => {
+    if (draining || closed) return;
+
+    draining = true;
+
+    try {
+      while (nextToEmit < archives.length) {
+        const promise = pending.get(nextToEmit);
+
+        if (!promise) break;
+
+        let iterator = iterators.get(nextToEmit);
+
+        if (!iterator) {
+          const stream = await promise;
+
+          if (!stream) {
+            logger.warn({ block: archives[nextToEmit] }, 'missing raw archive');
+            pending.delete(nextToEmit);
+            nextToEmit++;
+            fill();
+            continue;
+          }
+
+          iterator = stream[Symbol.asyncIterator]();
+          iterators.set(nextToEmit, iterator);
         }
+
+        let result = await iterator.next();
+
+        while (!result.done) {
+          if (!readable.push(result.value)) {
+            return;
+          }
+
+          result = await iterator.next();
+        }
+
+        pending.delete(nextToEmit);
+        iterators.delete(nextToEmit);
+        nextToEmit++;
+        fill();
+      }
+
+      if (nextToEmit >= archives.length) {
+        readable.push(null);
       }
     } catch (error) {
       readable.destroy(error as Error);
     } finally {
-      isFetching = false;
+      draining = false;
     }
   };
 
-  const interval = setInterval(fetchBlocks, 10);
+  const pump = () => {
+    fill();
+    drain();
+  };
 
-  readable.on('close', () => clearInterval(interval));
+  const safetyInterval = setInterval(pump, 250);
+
+  readable.on('close', () => {
+    closed = true;
+    clearInterval(safetyInterval);
+  });
+
+  pump();
 
   return readable;
 };
