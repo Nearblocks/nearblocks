@@ -11,9 +11,10 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
+    "build": "yarn clean && tsc -p tsconfig.build.json",
     "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "lint:check": "tsc --noEmit && eslint ./",
+    "test:local": "vitest run"
   },
   "dependencies": {
     "@scure/base": "1.2.4",
@@ -25,10 +26,13 @@
     "stream-json": "1.9.1"
   },
   "devDependencies": {
+    "@testcontainers/postgresql": "~12.1.0",
     "@types/lodash-es": "~4.17",
     "@types/node": "~22.13",
+    "@types/pg": "~8.11",
     "@types/stream-json": "~1.7",
     "eslint-config-custom-node": "*",
+    "knex": "3.1.0",
     "nb-json": "*",
     "nb-knex": "*",
     "nb-logger": "*",
@@ -36,7 +40,9 @@
     "nb-tsconfig": "*",
     "nb-types": "*",
     "nb-utils": "*",
+    "pg": "8.13.1",
     "rimraf": "~5.0",
-    "typescript": "~5.8"
+    "typescript": "~5.8",
+    "vitest": "~3.0"
   }
 }

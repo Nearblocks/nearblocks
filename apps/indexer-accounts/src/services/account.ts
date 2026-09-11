@@ -91,6 +91,7 @@ const getChunkAccounts = (
       const accountId = receipt.receiverId;
 
       if (isCreateAccountAction(action)) {
+        accountsToUpdate.delete(accountId);
         accounts.set(
           accountId,
           getAccountData(accountId, block.timestampNanosec, receiptId),
@@ -115,6 +116,7 @@ const getChunkAccounts = (
       }
 
       if (isDeterministicStateInitAction(action)) {
+        accountsToUpdate.delete(accountId);
         accounts.set(
           accountId,
           getAccountData(accountId, block.timestampNanosec, receiptId),
@@ -125,8 +127,10 @@ const getChunkAccounts = (
 
       if (
         isTransferAction(action) &&
-        (isNearImplicit(accountId) || isEthImplicit(accountId))
+        (isNearImplicit(accountId) || isEthImplicit(accountId)) &&
+        (!accounts.has(accountId) || accountsToUpdate.has(accountId))
       ) {
+        accountsToUpdate.delete(accountId);
         accounts.set(
           accountId,
           getAccountData(accountId, block.timestampNanosec, receiptId),

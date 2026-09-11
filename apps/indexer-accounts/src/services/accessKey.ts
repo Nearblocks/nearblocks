@@ -25,6 +25,7 @@ import {
 type AccessKeyMap = Map<string, AccessKey>;
 type DeletedAccount = { accountId: string; receiptId: string };
 type DeletedAccountMap = Map<string, DeletedAccount>;
+type RecreatedKeysMap = Map<string, Set<string>>;
 
 export const storeGenesisAccessKeys = async (
   knex: Knex,
@@ -43,6 +44,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
   const implicitKeys: AccessKeyMap = new Map();
   const accessKeysToUpdate: AccessKeyMap = new Map();
   const deletedAccounts: DeletedAccountMap = new Map();
+  const recreatedKeys: RecreatedKeysMap = new Map();
 
   for (const shard of message.shards) {
     for (const outcome of shard.receiptExecutionOutcomes) {
@@ -57,6 +59,7 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
           implicitKeys,
           accessKeysToUpdate,
           deletedAccounts,
+          recreatedKeys,
         );
       }
     }
@@ -147,6 +150,8 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
   if (deletedAccounts.size) {
     await Promise.all(
       [...deletedAccounts.values()].map(async (deleted) => {
+        const keep = recreatedKeys.get(deleted.accountId);
+
         return retry(async () => {
           return knex('access_keys')
             .update({
@@ -154,6 +159,11 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
               deleted_by_receipt_id: deleted.receiptId,
             })
             .where('account_id', deleted.accountId)
+            .modify((qb) => {
+              if (keep?.size) {
+                qb.whereNotIn('public_key', [...keep]);
+              }
+            })
             .andWhere(function () {
               this.whereNull('deleted_by_block_timestamp').orWhere(
                 'deleted_by_block_timestamp',
@@ -167,6 +177,17 @@ export const storeAccessKeys = async (knex: Knex, message: Message) => {
   }
 };
 
+const addRecreatedKey = (
+  recreatedKeys: RecreatedKeysMap,
+  accountId: string,
+  publicKey: string,
+) => {
+  const keys = recreatedKeys.get(accountId) ?? new Set<string>();
+
+  keys.add(publicKey);
+  recreatedKeys.set(accountId, keys);
+};
+
 const getChunkAccessKeys = (
   block: BlockHeader,
   receipt: Receipt,
@@ -174,6 +195,7 @@ const getChunkAccessKeys = (
   implicitKeys: AccessKeyMap,
   accessKeysToUpdate: AccessKeyMap,
   deletedAccounts: DeletedAccountMap,
+  recreatedKeys: RecreatedKeysMap,
 ) => {
   if (receipt?.receipt && 'Action' in receipt.receipt) {
     for (const action of receipt.receipt.Action.actions) {
@@ -185,6 +207,7 @@ const getChunkAccessKeys = (
           accountId,
           receiptId,
         });
+        recreatedKeys.delete(accountId);
 
         continue;
       }
@@ -200,6 +223,10 @@ const getChunkAccessKeys = (
         }
 
         implicitKeys.delete(mapKey);
+
+        if (deletedAccounts.has(accountId)) {
+          addRecreatedKey(recreatedKeys, accountId, publicKey);
+        }
 
         accessKeys.set(
           mapKey,
@@ -250,8 +277,21 @@ const getChunkAccessKeys = (
       if (isTransferAction(action) && isNearImplicit(accountId)) {
         const publicKey = publicKeyFromImplicitAccount(accountId);
         const mapKey = `${accountId}:${publicKey}`;
+        const pending = accessKeys.get(mapKey) ?? implicitKeys.get(mapKey);
+        const accountRecreated = deletedAccounts.has(accountId);
+        const needsFreshEntry =
+          !pending ||
+          pending.deleted_by_block_timestamp !== null ||
+          accountRecreated;
 
-        if (publicKey && !accessKeys.has(mapKey)) {
+        if (publicKey && needsFreshEntry) {
+          accessKeys.delete(mapKey);
+
+          if (accountRecreated) {
+            accessKeysToUpdate.delete(mapKey);
+            addRecreatedKey(recreatedKeys, accountId, publicKey);
+          }
+
           implicitKeys.set(
             mapKey,
             getAccessKeyData(
