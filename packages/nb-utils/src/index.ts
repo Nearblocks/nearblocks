@@ -57,6 +57,11 @@ export const nsToMsTime = (ns: string) => +String(BigInt(ns) / NS_IN_A_MS);
 
 export const yoctoToNear = (yn: string) => String(BigInt(yn) / YOCTO_IN_A_NEAR);
 
+const ACCOUNT_ID = /^[a-z0-9._-]{2,64}$/;
+
+export const isAccountId = (value: unknown): value is string =>
+  typeof value === 'string' && ACCOUNT_ID.test(value);
+
 export const decodeBorshAccountKey = (
   key: Buffer,
   prefix: Buffer,

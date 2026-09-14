@@ -4,6 +4,7 @@ import {
   decodeBorshString,
   decodeU128LE,
   decodeU128LEAt,
+  isAccountId,
   readJsonPath,
   retry,
 } from 'nb-utils';
@@ -31,7 +32,6 @@ const MAX_JSON_DEPTH = 5;
 const ASCII_INDEX = /[0-9]+$/;
 const PRINTABLE_KEY = /^[\x20-\x7e]+$/;
 const DIGITS = /^[0-9]+$/;
-const ACCOUNT_ID = /^[a-z0-9._-]{2,64}$/;
 const STATE_KEY = Buffer.from('STATE');
 
 const describeRpcErrorBody = (data: unknown): string | undefined => {
@@ -120,7 +120,7 @@ const keyObservation = (change: DataChange): null | Observation => {
     if (declared !== change.key.length - prefixLen - 4) continue;
 
     const account = change.key.subarray(prefixLen + 4).toString('utf8');
-    if (!ACCOUNT_ID.test(account)) continue;
+    if (!isAccountId(account)) continue;
 
     return {
       account,
@@ -141,7 +141,7 @@ const keyObservation = (change: DataChange): null | Observation => {
 const valueObservations = (change: DataChange): Observation[] => {
   for (let offset = 0; offset <= MAX_ACCOUNT_OFFSET; offset++) {
     const decoded = decodeBorshString(change.value, offset);
-    if (!decoded || !ACCOUNT_ID.test(decoded.text)) continue;
+    if (!decoded || !isAccountId(decoded.text)) continue;
 
     return INDEX_WIDTHS.filter((width) => change.key.length > width).map(
       (width): Observation => ({
@@ -212,7 +212,7 @@ const jsonObservations = (change: DataChange): Observation[] => {
   if (typeof json !== 'object' || json === null) return [];
 
   return leavesOf(json)
-    .filter((leaf) => ACCOUNT_ID.test(leaf.text))
+    .filter((leaf) => isAccountId(leaf.text))
     .sort((a, b) => Number(b.text.includes('.')) - Number(a.text.includes('.')))
     .slice(0, MAX_JSON_ACCOUNTS)
     .map(

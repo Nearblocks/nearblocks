@@ -6,6 +6,7 @@ import {
   decodeBorshString,
   decodeU128LE,
   decodeU128LEAt,
+  isAccountId,
   readJsonPath,
   retry,
 } from 'nb-utils';
@@ -43,6 +44,13 @@ const resolveBorsh = (
 ): null | Resolved => {
   const account = decodeBorshAccountKey(key, layout.keyPrefix);
   if (account === null) return null;
+
+  if (!isAccountId(account)) {
+    throw new Error(
+      `contradiction: ${contract} verified borsh layout, key ` +
+        `${key.toString('hex')} decoded to an invalid account id`,
+    );
+  }
 
   if (value === null) return { account, amount: 0n };
 
@@ -84,6 +92,13 @@ const resolveIndexed = (
 
   const decoded = decodeBorshString(value, layout.accountOffset as number);
   if (decoded === null) return null;
+
+  if (!isAccountId(decoded.text)) {
+    throw new Error(
+      `contradiction: ${contract} verified index layout, key ` +
+        `${key.toString('hex')} decoded to an invalid account id`,
+    );
+  }
 
   const amount = decodeU128LEAt(
     value,
@@ -127,10 +142,12 @@ const resolveJson = (
   const account = readJsonPath(parsed, layout.accountPath as string);
   const amount = readJsonPath(parsed, layout.valuePath as string);
 
-  if (typeof account !== 'string' || !account) {
+  if (!isAccountId(account)) {
     throw new Error(
       `contradiction: ${contract} verified json layout, path ` +
-        `${layout.accountPath} is missing for key ${key.toString('utf8')}`,
+        `${layout.accountPath} is missing or invalid for key ${key.toString(
+          'utf8',
+        )}`,
     );
   }
 
@@ -170,7 +187,7 @@ const resolveGlobal = (
 
   for (const prefix of PREFIXES) {
     const decoded = decodeBorshAccountKey(key, prefix);
-    if (decoded === null) continue;
+    if (decoded === null || !isAccountId(decoded)) continue;
 
     if (account !== null) {
       throw new Error(
@@ -303,6 +320,18 @@ const storeShardFTState = async (
   }
 
   if (!rows.length) return;
+
+  for (const row of rows) {
+    if (
+      !isAccountId(row.affected_account_id) ||
+      !isAccountId(row.contract_account_id)
+    ) {
+      throw new Error(
+        `contradiction: ${row.contract_account_id} produced an invalid ` +
+          `account id at block ${blockHeight}`,
+      );
+    }
+  }
 
   await retry(async () => {
     for (let i = 0; i < rows.length; i += config.insertLimit) {
