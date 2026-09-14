@@ -17,6 +17,9 @@ export type Config = {
   neardataConcurrency: 'auto' | number;
   neardataUrl?: string;
   network: Network;
+  rawBatchSize: number;
+  rawBufferMultiplier: number;
+  rawConcurrency: number;
   rawLag: number;
   rawThreshold: number;
   rpcUrl?: string;
