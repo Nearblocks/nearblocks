@@ -2,6 +2,7 @@ import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import { Shard } from 'nb-neardata';
 import { NEP } from 'nb-types';
+import { isAccountId } from 'nb-utils';
 
 import {
   isActionReceipt,
@@ -20,7 +21,6 @@ import {
 
 const EVENT_PREFIX = 'EVENT_JSON:';
 const FT_METHODS = ['ft_transfer', 'ft_transfer_call'];
-const ACCOUNT_ID = /^[a-z0-9._-]{2,64}$/;
 
 const untracked = new Set<string>();
 
@@ -102,7 +102,7 @@ const evidenceFor = (
 };
 
 const addAccount = (evidence: Evidence, account: unknown): void => {
-  if (typeof account === 'string' && ACCOUNT_ID.test(account)) {
+  if (isAccountId(account)) {
     evidence.accounts.add(account);
   }
 };
