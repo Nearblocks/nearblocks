@@ -96,15 +96,19 @@ export const streamFiles = async (
         };
         const clearIdleTimer = () => clearTimeout(idleTimer);
 
-        stream.on('error', (err) => {
-          clearIdleTimer();
-          reject(err);
-        });
+        let settled = false;
+        const teardown = (err: Error) => {
+          if (settled) return;
+          settled = true;
 
-        response.on('error', (err) => {
           clearIdleTimer();
+          response.destroy();
+          stream.abort(err);
           reject(err);
-        });
+        };
+
+        stream.on('error', teardown);
+        response.on('error', teardown);
 
         stream.on('entry', (entry: tar.ReadEntry) => {
           if (entry.type === 'File' && entry.path.endsWith('.json')) {
@@ -169,10 +173,8 @@ export const streamBlock = (config: BlockStreamConfig) => {
     Math.floor(config.start / BLOCKS_PER_ARCHIVE) * BLOCKS_PER_ARCHIVE;
   const end = Math.floor(config.end / BLOCKS_PER_ARCHIVE) * BLOCKS_PER_ARCHIVE;
 
-  const archives: number[] = [];
-  for (let i = start; i <= end; i += BLOCKS_PER_ARCHIVE) {
-    archives.push(i);
-  }
+  const archiveCount = Math.floor((end - start) / BLOCKS_PER_ARCHIVE) + 1;
+  const archiveBlock = (index: number) => start + index * BLOCKS_PER_ARCHIVE;
 
   let nextToFetch = 0;
   let nextToEmit = 0;
@@ -184,7 +186,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
   const iterators = new Map<number, AsyncIterator<unknown>>();
 
   const archiveUrl = (index: number) => {
-    const block = archives[index];
+    const block = archiveBlock(index);
     const url = config.url ?? endpoint(config.network, block);
     const base = String(block).padStart(12, '0');
     const folder = base.slice(0, 6);
@@ -205,7 +207,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
     if (closed) return;
 
     while (
-      nextToFetch < archives.length &&
+      nextToFetch < archiveCount &&
       nextToFetch - nextToEmit < limit &&
       inFlight * BLOCKS_PER_ARCHIVE + readable.readableLength <= highWaterMark
     ) {
@@ -251,7 +253,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
     draining = true;
 
     try {
-      while (nextToEmit < archives.length) {
+      while (nextToEmit < archiveCount) {
         const promise = pending.get(nextToEmit);
 
         if (!promise) break;
@@ -262,7 +264,10 @@ export const streamBlock = (config: BlockStreamConfig) => {
           const stream = await promise;
 
           if (!stream) {
-            logger.warn({ block: archives[nextToEmit] }, 'missing raw archive');
+            logger.warn(
+              { block: archiveBlock(nextToEmit) },
+              'missing raw archive',
+            );
             pending.delete(nextToEmit);
             nextToEmit++;
             fill();
@@ -289,7 +294,7 @@ export const streamBlock = (config: BlockStreamConfig) => {
         fill();
       }
 
-      if (nextToEmit >= archives.length) {
+      if (nextToEmit >= archiveCount) {
         readable.push(null);
       }
     } catch (error) {

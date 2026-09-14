@@ -23,11 +23,15 @@ export const syncData = async () => {
 
     if (end - block <= config.rawThreshold) break;
 
-    logger.info(`backfilling from block: ${block} to block: ${end}`);
+    const windowEnd = Math.min(end, block + config.rawBatchSize);
+
+    logger.info(`backfilling from block: ${block} to block: ${windowEnd}`);
 
     const raw = streamRawBlock({
       apiKey: config.fastnearApiKey,
-      end,
+      bufferMultiplier: config.rawBufferMultiplier,
+      concurrency: config.rawConcurrency,
+      end: windowEnd,
       network: config.network,
       start: block,
     });
@@ -40,7 +44,7 @@ export const syncData = async () => {
       await onMessage(message as Message);
       block = height + 1;
 
-      if (height >= end) break;
+      if (height >= windowEnd) break;
     }
   }
 
