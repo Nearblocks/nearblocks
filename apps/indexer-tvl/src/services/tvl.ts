@@ -3,7 +3,7 @@ import { logger } from 'nb-logger';
 import { db } from '#libs/knex';
 import * as evm from '#services/evm';
 import * as solana from '#services/solana';
-import { Chains, EvmChains } from '#types/enum';
+import { Chains } from '#types/enum';
 import { Source } from '#types/types';
 
 export const syncData = async () => {
@@ -17,10 +17,7 @@ export const syncData = async () => {
 
   await Promise.all(
     sources
-      .filter(
-        (source) =>
-          source.chain !== Chains.NEAR && source.chain !== EvmChains.POLYGON,
-      )
+      .filter((source) => source.chain !== Chains.NEAR)
       .map((source) => {
         if (source.chain === Chains.SOLANA) return solana.processSource(source);
 
