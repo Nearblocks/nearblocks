@@ -16,7 +16,7 @@ FROM
         OR r.included_in_block_timestamp < ${before}
       )
       AND (
-        COALESCE(${action}::TEXT, ${method}::TEXT) IS NULL
+        ${method}::TEXT IS NULL
         OR EXISTS (
           SELECT
             1
@@ -25,14 +25,7 @@ FROM
           WHERE
             a.receipt_id = r.receipt_id
             AND a.receipt_included_in_block_timestamp = r.included_in_block_timestamp
-            AND (
-              ${action}::TEXT IS NULL
-              OR a.action_kind = ${action}
-            )
-            AND (
-              ${method}::TEXT IS NULL
-              OR a.method = ${method}
-            )
+            AND a.method = ${method}
         )
       )
     LIMIT

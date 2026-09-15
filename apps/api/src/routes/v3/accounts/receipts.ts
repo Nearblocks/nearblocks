@@ -32,11 +32,6 @@ const routes = (route: Router) => {
    *         schema:
    *           type: string
    *       - in: query
-   *         name: action
-   *         description: Receipt action to filter results by
-   *         schema:
-   *           type: string
-   *       - in: query
    *         name: method
    *         description: Function call method to filter results by
    *         schema:
@@ -95,11 +90,6 @@ const routes = (route: Router) => {
    *       - in: query
    *         name: receiver
    *         description: Receipt receiver account to filter results by
-   *         schema:
-   *           type: string
-   *       - in: query
-   *         name: action
-   *         description: Receipt action to filter results by
    *         schema:
    *           type: string
    *       - in: query

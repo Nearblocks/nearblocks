@@ -116,6 +116,9 @@ export const Receipts = ({
     },
     {
       cell: (receipt) => <MethodBadge text={actionMethod(receipt.actions)} />,
+      enableFilter: true,
+      filterName: 'method',
+      filterPlaceholder: t('receipts.filterMethod'),
       header: t('receipts.columns.method'),
       id: 'method',
       skeletonCell: <Skeleton className="h-4.5 w-[114px] rounded-md" />,

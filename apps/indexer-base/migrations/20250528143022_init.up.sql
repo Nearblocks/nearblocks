@@ -34,13 +34,6 @@ CREATE UNIQUE INDEX ara_hash_index_timestamp_uidx ON action_receipt_actions (
   receipt_included_in_block_timestamp DESC
 );
 
-CREATE INDEX ara_shard_chunk_index_idx ON action_receipt_actions (
-  receipt_included_in_block_timestamp DESC,
-  shard_id DESC,
-  index_in_chunk DESC,
-  index_in_action_receipt DESC
-);
-
 CREATE INDEX ara_block_timestamp_idx ON action_receipt_actions (receipt_included_in_block_timestamp DESC);
 
 CREATE TABLE action_receipt_input_data (
