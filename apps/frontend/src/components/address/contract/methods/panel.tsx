@@ -10,30 +10,28 @@ import { Copy } from '@/components/copy';
 import { useLocale } from '@/hooks/use-locale';
 import { useViewMutation } from '@/hooks/use-rpc';
 import { useWallet } from '@/hooks/use-wallet';
-import {
-  generateSampleArgs,
-  generateSampleValueFromData,
-} from '@/lib/contract';
+import { generateSampleValueFromData, MethodDoc } from '@/lib/contract';
 import { toGas, toYocto } from '@/lib/format';
 import { FormData, formSchema } from '@/lib/schema/contract';
 import { zodResolver } from '@/lib/zod';
-import { ContractSchemaFunction } from '@/types/types';
 import { Button } from '@/ui/button';
 import { Field, FieldGroup } from '@/ui/field';
 import { Label } from '@/ui/label';
 
 import { Arguments } from './arguments';
+import { MethodDocs } from './docs';
 import { ExecutionMode } from './mode';
 import { ChangeOptions, ViewOptions } from './options';
 
 export type Props = {
-  func?: ContractSchemaFunction;
+  args?: string;
+  doc?: MethodDoc;
   hasSchema: boolean;
   kind: 'call' | 'unknown' | 'view';
   name: string;
 };
 
-export const MethodPanel = ({ func, hasSchema, kind, name }: Props) => {
+export const MethodPanel = ({ args, doc, hasSchema, kind, name }: Props) => {
   const { t } = useLocale('address');
   const { address } = useParams();
   const uid = useId();
@@ -53,7 +51,7 @@ export const MethodPanel = ({ func, hasSchema, kind, name }: Props) => {
     watch,
   } = useForm<FormData>({
     defaultValues: {
-      args: func ? generateSampleArgs(func) : '{}',
+      args: args ?? '{}',
       blockId: '',
       blockRef: 'finality',
       deposit: '0',
@@ -77,6 +75,13 @@ export const MethodPanel = ({ func, hasSchema, kind, name }: Props) => {
     });
     return () => subscription.unsubscribe();
   }, [watch]);
+
+  useEffect(() => {
+    if (args !== undefined && watch('args') === '{}') {
+      setValue('args', args);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [args]);
 
   const handleFetchArgs = async () => {
     if (!address) return;
@@ -157,66 +162,72 @@ export const MethodPanel = ({ func, hasSchema, kind, name }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <FieldGroup className="w-full max-w-lg gap-4">
-        {!hasSchema && <ExecutionMode control={control} uid={uid} />}
-        <Arguments
-          control={control}
-          errors={errors}
-          hasSchema={hasSchema}
-          isFetchingArgs={isFetchingArgs}
-          mode={mode}
-          onFetchArgs={handleFetchArgs}
-          selectedMethod={name}
-          uid={uid}
-        />
-        {mode === 'view' && (
-          <ViewOptions
-            blockRef={blockRef}
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <form
+        className="w-full lg:max-w-lg lg:shrink-0"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <FieldGroup className="gap-4">
+          {!hasSchema && <ExecutionMode control={control} uid={uid} />}
+          <Arguments
             control={control}
             errors={errors}
-            register={register}
+            hasSchema={hasSchema}
+            isFetchingArgs={isFetchingArgs}
+            mode={mode}
+            onFetchArgs={handleFetchArgs}
+            selectedMethod={name}
             uid={uid}
           />
-        )}
-        {mode === 'change' && (
-          <ChangeOptions errors={errors} register={register} uid={uid} />
-        )}
-        <Field orientation="horizontal">
-          <Button
-            className="w-full"
-            disabled={isSubmitting}
-            type="submit"
-            variant="secondary"
-          >
-            {mode === 'change'
-              ? t('contract.methods.write')
-              : t('contract.methods.read')}
-          </Button>
-        </Field>
-        {result && (
-          <Field>
-            <div className="flex items-center justify-between">
-              <Label>{t('contract.methods.response')}</Label>
-              <Copy size="sm" text={result} />
-            </div>
-            <div className="scroll-overlay max-h-116 overflow-auto">
-              <CodeBlock code={result} language="json" lineNumbers />
-            </div>
+          {mode === 'view' && (
+            <ViewOptions
+              blockRef={blockRef}
+              control={control}
+              errors={errors}
+              register={register}
+              uid={uid}
+            />
+          )}
+          {mode === 'change' && (
+            <ChangeOptions errors={errors} register={register} uid={uid} />
+          )}
+          <Field orientation="horizontal">
+            <Button
+              className="w-full"
+              disabled={isSubmitting}
+              type="submit"
+              variant="secondary"
+            >
+              {mode === 'change'
+                ? t('contract.methods.write')
+                : t('contract.methods.read')}
+            </Button>
           </Field>
-        )}
-        {error && (
-          <Field>
-            <div className="flex items-center justify-between">
-              <Label>{t('contract.methods.error')}</Label>
-              <Copy size="sm" text={error} />
-            </div>
-            <div className="bg-red-background text-red-foreground text-body-xs scroll-overlay max-h-40 overflow-y-auto rounded-lg border p-3">
-              {error}
-            </div>
-          </Field>
-        )}
-      </FieldGroup>
-    </form>
+          {result && (
+            <Field>
+              <div className="flex items-center justify-between">
+                <Label>{t('contract.methods.response')}</Label>
+                <Copy size="sm" text={result} />
+              </div>
+              <div className="scroll-overlay max-h-116 overflow-auto">
+                <CodeBlock code={result} language="json" lineNumbers />
+              </div>
+            </Field>
+          )}
+          {error && (
+            <Field>
+              <div className="flex items-center justify-between">
+                <Label>{t('contract.methods.error')}</Label>
+                <Copy size="sm" text={error} />
+              </div>
+              <div className="bg-red-background text-red-foreground text-body-xs scroll-overlay max-h-40 overflow-y-auto rounded-lg border p-3">
+                {error}
+              </div>
+            </Field>
+          )}
+        </FieldGroup>
+      </form>
+      {doc && <MethodDocs doc={doc} />}
+    </div>
   );
 };

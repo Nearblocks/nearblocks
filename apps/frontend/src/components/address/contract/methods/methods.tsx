@@ -4,7 +4,8 @@ import { RiCloseLine } from '@remixicon/react';
 import { useMemo, useState } from 'react';
 
 import { useLocale } from '@/hooks/use-locale';
-import { ContractAbiSchema, ContractSchemaFunction } from '@/types/types';
+import { buildMethodDoc, generateSampleArgs, MethodDoc } from '@/lib/contract';
+import { ContractAbiSchema } from '@/types/types';
 import {
   Accordion,
   AccordionContent,
@@ -31,7 +32,8 @@ export type Props = {
 };
 
 type Entry = {
-  func?: ContractSchemaFunction;
+  args?: string;
+  doc?: MethodDoc;
   kind: 'call' | 'unknown' | 'view';
   name: string;
 };
@@ -49,9 +51,15 @@ export const MethodsForm = ({
 
   const entries = useMemo<Entry[]>(() => {
     if (schema) {
+      const definitions = schema.body.root_schema?.definitions;
       return schema.body.functions
         .toSorted((a, b) => a.name.localeCompare(b.name))
-        .map((func) => ({ func, kind: func.kind, name: func.name }));
+        .map((func) => ({
+          args: generateSampleArgs(func, definitions),
+          doc: buildMethodDoc(func),
+          kind: func.kind,
+          name: func.name,
+        }));
     }
 
     return methods
@@ -185,7 +193,8 @@ export const MethodsForm = ({
                   </AccordionTrigger>
                   <AccordionContent className="border-border border-t px-3 pt-3">
                     <MethodPanel
-                      func={entry.func}
+                      args={entry.args}
+                      doc={entry.doc}
                       hasSchema={hasSchema}
                       kind={entry.kind}
                       name={entry.name}

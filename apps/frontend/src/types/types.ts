@@ -89,17 +89,34 @@ export type AccessKeyPermission = {
   receiverId: string;
 };
 
+export type JsonSchemaNode = {
+  $ref?: string;
+  additionalProperties?: boolean | JsonSchemaNode;
+  allOf?: JsonSchemaNode[];
+  anyOf?: JsonSchemaNode[];
+  const?: unknown;
+  enum?: unknown[];
+  format?: string;
+  items?: JsonSchemaNode | JsonSchemaNode[];
+  oneOf?: JsonSchemaNode[];
+  properties?: Record<string, JsonSchemaNode>;
+  required?: string[];
+  type?: string | string[];
+};
+
+export type ContractRootSchema = {
+  definitions?: Record<string, JsonSchemaNode>;
+};
+
 export type ContractFunctionArg = {
   name: string;
-  type_schema: {
-    format?: string;
-    items?: { type: string };
-    type: string | string[];
-  };
+  type_schema: JsonSchemaNode;
 };
 
 export type ContractSchemaFunction = {
+  doc?: string;
   kind: 'call' | 'view';
+  modifiers?: string[];
   name: string;
   params?: {
     args: ContractFunctionArg[];
@@ -107,14 +124,14 @@ export type ContractSchemaFunction = {
   };
   result?: {
     serialization_type: string;
-    type_schema: unknown;
+    type_schema: JsonSchemaNode;
   };
 };
 
 export type ContractAbiSchema = {
   body: {
     functions: ContractSchemaFunction[];
-    root_schema?: unknown;
+    root_schema?: ContractRootSchema;
   };
   metadata: {
     authors?: string[];
