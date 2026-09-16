@@ -8,6 +8,7 @@ import { syncIntentsAccounts, syncIntentsStats } from '#services/intents';
 import { syncMTHolders } from '#services/mt';
 import { syncNFTHolders } from '#services/nft';
 import { syncNFTAccountHolders } from '#services/nftAccount';
+import { syncTvlStats } from '#services/tvl';
 
 (async () => {
   try {
@@ -19,6 +20,7 @@ import { syncNFTAccountHolders } from '#services/nftAccount';
       syncMTHolders(),
       syncIntentsStats(),
       syncIntentsAccounts(),
+      syncTvlStats(),
     ]);
   } catch (error) {
     logger.error('aborting...');

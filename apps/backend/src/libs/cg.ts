@@ -43,6 +43,19 @@ const search = async (contract: string) => {
   }
 };
 
+const searchByPlatform = async (platform: string, address: string) => {
+  try {
+    const meta = await axios.get<CGInfo>(
+      `https://pro-api.coingecko.com/api/v3/coins/${platform}/contract/${address}`,
+      { headers: { 'x-cg-pro-api-key': config.cgApiKey }, timeout: 60000 },
+    );
+
+    return meta.data?.id ?? null;
+  } catch (error) {
+    return null;
+  }
+};
+
 const price = async (id: string) => {
   try {
     // Demo api
@@ -159,4 +172,4 @@ const getPriceData = (data: CGInfo): CGPriceData => {
   };
 };
 
-export default { history, ids, marketChart, price, search };
+export default { history, ids, marketChart, price, search, searchByPlatform };
