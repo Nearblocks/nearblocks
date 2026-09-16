@@ -72,7 +72,7 @@ const RootLayout = async ({ children, params }: LayoutProps<'/[lang]'>) => {
       suppressHydrationWarning
     >
       <body
-        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${roboto.variable} ${geist.variable} overflow-x-hidden wrap-anywhere`}
+        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${roboto.variable} ${geist.variable} overflow-x-clip wrap-anywhere`}
       >
         <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>

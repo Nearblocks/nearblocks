@@ -15,6 +15,10 @@ import {
 
 import { copyExternalTokenMeta } from './intents.js';
 
+const TOKEN_META_SCAN_CURSOR_KEY = 'mt_base_meta_scan_cursor';
+const TOKEN_META_CANDIDATE_BATCH = 3000;
+const TOKEN_META_PROCESS_BATCH = 25;
+
 export const syncMTMeta = async () => {
   const { rows: mts } = await dbEvents.raw<Raw<MetaContract>>(`
     SELECT
@@ -42,39 +46,88 @@ export const syncMTMeta = async () => {
 };
 
 export const syncMTTokenMeta = async () => {
-  const { rows: mts } = await dbEvents.raw<Raw<MetaContractToken>>(`
-    SELECT
-      contract,
-      token
-    FROM
-      mt_base_meta mbm
-    WHERE
-      mbm.modified_at IS NULL
-      AND NOT EXISTS (
+  const cursorRow = await dbEvents('settings')
+    .where('key', TOKEN_META_SCAN_CURSOR_KEY)
+    .first();
+  const cursor = cursorRow?.value as
+    | { contract: string; token: string }
+    | undefined;
+
+  const { rows: batch } = await dbEvents.raw<
+    Raw<MetaContractToken & { eligible: boolean }>
+  >(
+    `
+      WITH candidates AS (
         SELECT
-          1
+          contract,
+          token
         FROM
-          errored_contracts ec
+          mt_base_meta
         WHERE
-          mbm.contract = ec.contract
-          AND ec.type = 'mt'
-          AND mbm.token = ec.token
-          AND ec.attempts >= 3
+          modified_at IS NULL
+          AND (
+            ?::text IS NULL
+            OR (contract, token) > (?::text, ?::text)
+          )
+        ORDER BY
+          contract,
+          token
+        LIMIT
+          ?
       )
-      AND NOT EXISTS (
-        SELECT
-          1
-        FROM
-          errored_contracts ec
-        WHERE
-          mbm.contract = ec.contract
-          AND ec.type = 'mt'
-          AND ec.token IS NULL
-          AND ec.attempts >= 3
-      )
-    LIMIT
-      25
-  `);
+      SELECT
+        contract,
+        token,
+        NOT EXISTS (
+          SELECT
+            1
+          FROM
+            errored_contracts ec
+          WHERE
+            ec.contract = candidates.contract
+            AND ec.type = 'mt'
+            AND ec.token = candidates.token
+            AND ec.attempts >= 3
+        )
+        AND NOT EXISTS (
+          SELECT
+            1
+          FROM
+            errored_contracts ec
+          WHERE
+            ec.contract = candidates.contract
+            AND ec.type = 'mt'
+            AND ec.token IS NULL
+            AND ec.attempts >= 3
+        ) AS eligible
+      FROM
+        candidates
+      ORDER BY
+        contract,
+        token
+    `,
+    [
+      cursor?.contract ?? null,
+      cursor?.contract ?? null,
+      cursor?.token ?? null,
+      TOKEN_META_CANDIDATE_BATCH,
+    ],
+  );
+
+  const last = batch[batch.length - 1];
+  const nextCursor =
+    batch.length < TOKEN_META_CANDIDATE_BATCH || !last
+      ? {} // wrapped past the end of the table -- start over next run
+      : { contract: last.contract, token: last.token };
+
+  await dbEvents('settings')
+    .insert({ key: TOKEN_META_SCAN_CURSOR_KEY, value: nextCursor })
+    .onConflict('key')
+    .merge();
+
+  const mts = batch
+    .filter((row) => row.eligible)
+    .slice(0, TOKEN_META_PROCESS_BATCH);
 
   await Promise.all(mts.map((mt) => updateMTTokenMeta(mt.contract, mt.token)));
 };

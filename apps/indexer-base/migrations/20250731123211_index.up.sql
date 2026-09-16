@@ -33,8 +33,6 @@ CREATE INDEX IF NOT EXISTS ara_method_idx ON action_receipt_actions (method)
 WHERE
   method IS NOT NULL;
 
-CREATE INDEX IF NOT EXISTS ara_action_kind_idx ON action_receipt_actions (action_kind);
-
 DROP INDEX IF EXISTS ak_account_last_action_idx;
 
 ALTER TABLE access_keys

@@ -181,7 +181,9 @@ export const MethodsForm = ({
                   value={entry.name}
                 >
                   <AccordionTrigger className="hover:bg-muted/50 data-[state=open]:bg-muted/50 h-10 items-center rounded-none px-3 py-0 hover:no-underline [&>svg]:translate-y-0">
-                    <span className="font-mono">{entry.name}</span>
+                    <span className="min-w-0 truncate font-mono">
+                      {entry.name}
+                    </span>
                     {entry.kind !== 'unknown' && (
                       <Badge
                         className="ml-auto"

@@ -324,6 +324,7 @@ export const address = {
     },
     empty: 'No receipts found',
     filterFrom: 'Account',
+    filterMethod: 'Method',
     filterTo: 'Account',
     latest: 'Latest {{count}} receipts',
     total: 'More than {{count}} receipts found',

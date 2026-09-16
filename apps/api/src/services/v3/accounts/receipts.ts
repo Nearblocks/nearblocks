@@ -32,6 +32,8 @@ import { blockRange as blockRangeSql } from '#sql/accounts';
 import sql from '#sql/accounts';
 import { ActionKind } from '#types/enums';
 
+const filterIndexed = (method?: string) => !!method;
+
 const receipts = responseHandler(
   response.receipts,
   async (req: RequestValidator<AccountReceiptsReq>) => {
@@ -40,7 +42,6 @@ const receipts = responseHandler(
     const receiver = req.validator.receiver;
     const limit = req.validator.limit;
     const before = req.validator.before_ts;
-    const action = req.validator.action;
     const method = req.validator.method;
     const next = req.validator.next
       ? cursors.decode(request.cursor, req.validator.next)
@@ -65,25 +66,30 @@ const receipts = responseHandler(
       end,
       limit,
     ) => {
-      const cte = pgp.as.format(
-        predecessor || receiver ? sql.receipts.cte : sql.receipts.cteUnion,
-        {
-          action,
-          before,
-          cursor: {
-            index: cursor?.index,
-            shard: cursor?.shard,
-            timestamp: cursor?.timestamp,
-          },
-          direction,
-          end,
-          limit,
-          method,
-          predecessor: predecessor || account,
-          receiver: receiver || account,
-          start,
+      const indexed = filterIndexed(method);
+      const cteSql =
+        predecessor || receiver
+          ? indexed
+            ? sql.receipts.filterCte
+            : sql.receipts.cte
+          : indexed
+          ? sql.receipts.filterCteUnion
+          : sql.receipts.cteUnion;
+      const cte = pgp.as.format(cteSql, {
+        before,
+        cursor: {
+          index: cursor?.index,
+          shard: cursor?.shard,
+          timestamp: cursor?.timestamp,
         },
-      );
+        direction,
+        end,
+        limit,
+        method,
+        predecessor: predecessor || account,
+        receiver: receiver || account,
+        start,
+      });
 
       return dbBase.manyOrNone<AccountReceipt>(sql.receipts.receipts, {
         cte,
@@ -120,7 +126,6 @@ const count = responseHandler(
     const predecessor = req.validator.predecessor;
     const receiver = req.validator.receiver;
     const before = req.validator.before_ts;
-    const action = req.validator.action;
     const method = req.validator.method;
 
     if (
@@ -132,7 +137,7 @@ const count = responseHandler(
       return { data: { count: '0' } };
     }
 
-    if (!predecessor && !receiver && !action && !method && !before) {
+    if (!predecessor && !receiver && !method && !before) {
       const result = await dbBase.one<{ count: string }>(
         sql.receipts.countCagg,
         { account },
@@ -144,7 +149,6 @@ const count = responseHandler(
           rollingWindowCount(
             (start, end, limit) =>
               dbBase.one<{ count: string }>(sql.receipts.countUnion, {
-                action,
                 before,
                 end,
                 limit,
@@ -160,13 +164,19 @@ const count = responseHandler(
       return { data: { count } };
     }
 
+    const indexed = filterIndexed(method);
     const countSql =
-      predecessor || receiver ? sql.receipts.count : sql.receipts.countUnion;
+      predecessor || receiver
+        ? indexed
+          ? sql.receipts.filterCount
+          : sql.receipts.count
+        : indexed
+        ? sql.receipts.filterCountUnion
+        : sql.receipts.countUnion;
     const beforeTs = before ? BigInt(before) - 1n : undefined;
     const count = await rollingWindowCount(
       (start, end, limit) =>
         dbBase.one<{ count: string }>(countSql, {
-          action,
           before,
           end,
           limit,
