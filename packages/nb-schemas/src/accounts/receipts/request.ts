@@ -1,12 +1,9 @@
 import * as v from 'valibot';
 
-import { ActionKind } from 'nb-types';
-
 import { cursorSchema, limitSchema, tsSchema } from '../../common.js';
 
 const receipts = v.object({
   account: v.string(),
-  action: v.optional(v.enum(ActionKind)),
   before_ts: tsSchema,
   limit: limitSchema,
   method: v.optional(v.string()),
@@ -18,7 +15,6 @@ const receipts = v.object({
 
 const count = v.object({
   account: v.string(),
-  action: v.optional(v.enum(ActionKind)),
   before_ts: tsSchema,
   method: v.optional(v.string()),
   predecessor: v.optional(v.string()),

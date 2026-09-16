@@ -63,6 +63,10 @@ export default {
     cte: sql('queries/accounts/receipts/cte.sql'),
     cteUnion: sql('queries/accounts/receipts/cteUnion.sql'),
     exportCte: sql('queries/accounts/receipts/exportCte.sql'),
+    filterCount: sql('queries/accounts/receipts/filterCount.sql'),
+    filterCountUnion: sql('queries/accounts/receipts/filterCountUnion.sql'),
+    filterCte: sql('queries/accounts/receipts/filterCte.sql'),
+    filterCteUnion: sql('queries/accounts/receipts/filterCteUnion.sql'),
     receipts: sql('queries/accounts/receipts/receipts.sql'),
   },
   staking: {

@@ -26,10 +26,6 @@ FROM
           a.receipt_id = r.receipt_id
           AND a.receipt_included_in_block_timestamp = r.included_in_block_timestamp
           AND (
-            ${action}::TEXT IS NULL
-            OR a.action_kind = ${action}
-          )
-          AND (
             ${method}::TEXT IS NULL
             OR a.method = ${method}
           )
