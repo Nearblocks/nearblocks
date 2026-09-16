@@ -23,6 +23,7 @@ export const scheduleJobs = () => {
     cron.schedule('0 * * * * *', './jobs/tokenPrice.js', options); // 1m
     cron.schedule('0 0 0 * * *', './jobs/tokenPriceDaily.js', options); // 1d
     cron.schedule('0 0 0 * * *', './jobs/tokenMetaReset.js', options); // 1d
+    cron.schedule('0 */5 * * * *', './jobs/tvlTokens.js', options); // 5m
 
     // Validator jobs
     cron.schedule('*/15 * * * * *', './jobs/block.js', options); // 15s

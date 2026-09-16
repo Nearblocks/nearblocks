@@ -31,6 +31,13 @@ const coingeckoIds = async (): Promise<string[]> => {
         mt_intents_tokens
       WHERE
         coingecko_id IS NOT NULL
+      UNION
+      SELECT
+        coingecko_id
+      FROM
+        tvl_tokens
+      WHERE
+        coingecko_id IS NOT NULL
     `,
   );
 
