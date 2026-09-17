@@ -13,17 +13,25 @@ import {
 export type Gap = {
   count: number;
   fromTs: bigint;
+  receiptIds: string[];
   toTs: bigint;
+};
+
+type MissingRow = {
+  receiptId: null | string;
+  ts: bigint;
 };
 
 type AccountRow = {
   account_id: string;
   created_by_block_timestamp: string;
+  created_by_receipt_id: null | string;
 };
 
 type AccessKeyRow = {
   account_id: string;
   created_by_block_timestamp: string;
+  created_by_receipt_id: null | string;
   public_key: string;
 };
 
@@ -39,7 +47,7 @@ export const getBackfillCursor = async (): Promise<bigint> => {
 };
 
 export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
-  const missing: bigint[] = [];
+  const missing: MissingRow[] = [];
   let genesisMissing = 0;
   let pageCursor: null | string = null;
   let page = 0;
@@ -48,7 +56,7 @@ export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
     const rows: AccountRow[] = await retry(async () => {
       const result = await db.raw(
         `
-          SELECT p.account_id, p.created_by_block_timestamp
+          SELECT p.account_id, p.created_by_block_timestamp, p.created_by_receipt_id
           FROM ${groundTruth()}.accounts p
           WHERE (:cursor::text IS NULL OR p.account_id > :cursor)
           ORDER BY p.account_id
@@ -91,7 +99,7 @@ export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
             continue;
           }
 
-          missing.push(ts);
+          missing.push({ receiptId: row.created_by_receipt_id, ts });
         }
       }
     }
@@ -127,7 +135,7 @@ export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
 };
 
 export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
-  const missing: bigint[] = [];
+  const missing: MissingRow[] = [];
   let genesisMissing = 0;
   let pageCursor: { account_id: string; public_key: string } | null = null;
   let page = 0;
@@ -136,7 +144,11 @@ export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
     const rows: AccessKeyRow[] = await retry(async () => {
       const result = await db.raw(
         `
-          SELECT p.account_id, p.public_key, p.created_by_block_timestamp
+          SELECT
+            p.account_id,
+            p.public_key,
+            p.created_by_block_timestamp,
+            p.created_by_receipt_id
           FROM ${groundTruth()}.access_keys p
           WHERE (
             :cursorKey::text IS NULL
@@ -197,7 +209,7 @@ export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
             continue;
           }
 
-          missing.push(ts);
+          missing.push({ receiptId: row.created_by_receipt_id, ts });
         }
       }
     }
@@ -241,34 +253,64 @@ export const serializeGaps = (gaps: Gap[]) =>
     toTs: gap.toTs.toString(),
   }));
 
-export const bandify = (timestamps: bigint[]): Gap[] => {
-  if (!timestamps.length) {
+export const bandify = (rows: MissingRow[]): Gap[] => {
+  if (!rows.length) {
     return [];
   }
 
-  const sorted = [...timestamps].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const sorted = [...rows].sort((a, b) =>
+    a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0,
+  );
   const gaps: Gap[] = [];
 
-  let fromTs = sorted[0];
-  let toTs = sorted[0];
+  let fromTs = sorted[0].ts;
+  let toTs = sorted[0].ts;
   let count = 1;
+  let receiptIds = sorted[0].receiptId ? [sorted[0].receiptId] : [];
 
   for (let i = 1; i < sorted.length; i++) {
-    const ts = sorted[i];
+    const row = sorted[i];
 
-    if (ts - toTs > config.reconcileGapThresholdNs) {
-      gaps.push({ count, fromTs, toTs });
-      fromTs = ts;
+    if (row.ts - toTs > config.reconcileGapThresholdNs) {
+      gaps.push({ count, fromTs, receiptIds, toTs });
+      fromTs = row.ts;
       count = 0;
+      receiptIds = [];
     }
 
-    toTs = ts;
+    toTs = row.ts;
     count += 1;
+
+    if (row.receiptId) {
+      receiptIds.push(row.receiptId);
+    }
   }
 
-  gaps.push({ count, fromTs, toTs });
+  gaps.push({ count, fromTs, receiptIds, toTs });
 
   return gaps;
+};
+
+const getMinIncludedTimestamp = async (
+  receiptIds: string[],
+): Promise<bigint | null> => {
+  const result = await retry(async () => {
+    return db.raw(
+      `
+        SELECT MIN(x.receipt_included_in_block_timestamp) AS min_included
+        FROM (
+          SELECT receipt_included_in_block_timestamp
+          FROM public.action_receipt_actions
+          WHERE receipt_id = ANY(:receiptIds)
+          OFFSET 0
+        ) x
+      `,
+      { receiptIds },
+    );
+  });
+  const minIncluded = result?.rows?.[0]?.min_included;
+
+  return minIncluded ? BigInt(minIncluded) : null;
 };
 
 export const repairGaps = async (
@@ -276,7 +318,15 @@ export const repairGaps = async (
   cursor: bigint,
 ): Promise<void> => {
   for (const gap of gaps) {
-    const from = gap.fromTs - RECEIPT_EXECUTION_CAP_NS;
+    const minIncluded = gap.receiptIds.length
+      ? await getMinIncludedTimestamp(gap.receiptIds)
+      : null;
+    const from = minIncluded
+      ? bigIntMin(
+          gap.fromTs - RECEIPT_EXECUTION_CAP_NS,
+          minIncluded - 1_000_000_000n,
+        )
+      : gap.fromTs - RECEIPT_EXECUTION_CAP_NS;
     const to = bigIntMin(gap.toTs + RECEIPT_EXECUTION_CAP_NS, cursor);
 
     logger.info(

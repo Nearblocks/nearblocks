@@ -17,7 +17,7 @@ import { AccountMap, collectAccounts, flushAccounts } from '#services/account';
 export const indexerKey = 'accounts';
 const CATCH_UP_DELAY_MS = 60_000;
 const TIP_SAFETY_MARGIN_NS = 300_000_000_000n; // 5m in ns
-export const RECEIPT_EXECUTION_CAP_NS = 900_000_000_000n; // 15m in ns
+export const RECEIPT_EXECUTION_CAP_NS = 300_000_000_000n; // 5m in ns
 
 const ACTION_KINDS = [
   ActionKind.ADD_KEY,
