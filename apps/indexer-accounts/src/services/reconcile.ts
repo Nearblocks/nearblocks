@@ -201,6 +201,13 @@ export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
   return bandify(missing);
 };
 
+export const serializeGaps = (gaps: Gap[]) =>
+  gaps.map((gap) => ({
+    count: gap.count,
+    fromTs: gap.fromTs.toString(),
+    toTs: gap.toTs.toString(),
+  }));
+
 export const bandify = (timestamps: bigint[]): Gap[] => {
   if (!timestamps.length) {
     return [];
@@ -265,7 +272,10 @@ export const reconcile = async (): Promise<void> => {
   const keyGaps = await findAccessKeyGaps(cursor);
 
   logger.info(
-    { accountGaps, keyGaps },
+    {
+      accountGaps: serializeGaps(accountGaps),
+      keyGaps: serializeGaps(keyGaps),
+    },
     `gap scan complete: ${accountGaps.length} account gap(s), ${keyGaps.length} access key gap(s)`,
   );
 
@@ -292,8 +302,8 @@ export const reconcile = async (): Promise<void> => {
   if (remaining) {
     throw new Error(
       `${remaining} gap(s) remain after repair: ${JSON.stringify({
-        remainingAccountGaps,
-        remainingKeyGaps,
+        remainingAccountGaps: serializeGaps(remainingAccountGaps),
+        remainingKeyGaps: serializeGaps(remainingKeyGaps),
       })}`,
     );
   }
