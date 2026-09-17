@@ -3,7 +3,12 @@ import { retry } from 'nb-utils';
 
 import config from '#config';
 import { db, tbl } from '#libs/knex';
-import { processWindow, RECEIPT_EXECUTION_CAP_NS } from '#services/backfill';
+import {
+  bigIntMin,
+  indexerKey,
+  processWindow,
+  RECEIPT_EXECUTION_CAP_NS,
+} from '#services/backfill';
 
 export type Gap = {
   count: number;
@@ -24,9 +29,17 @@ type AccessKeyRow = {
 
 const groundTruth = () => config.reconcileGroundTruthSchema;
 
-export const findAccountGaps = async (): Promise<Gap[]> => {
+export const getBackfillCursor = async (): Promise<bigint> => {
+  const settings = await db(tbl('settings')).where({ key: indexerKey }).first();
+
+  return BigInt(
+    String(settings?.value?.backfillTimestamp ?? config.genesisTimestamp),
+  );
+};
+
+export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
   const missing: bigint[] = [];
-  let cursor: null | string = null;
+  let pageCursor: null | string = null;
   let page = 0;
 
   for (;;) {
@@ -39,7 +52,7 @@ export const findAccountGaps = async (): Promise<Gap[]> => {
           ORDER BY p.account_id
           LIMIT :pageSize
         `,
-        { cursor, pageSize: config.reconcilePageSize },
+        { cursor: pageCursor, pageSize: config.reconcilePageSize },
       );
 
       return result.rows;
@@ -49,30 +62,42 @@ export const findAccountGaps = async (): Promise<Gap[]> => {
       break;
     }
 
-    const ids = rows.map((row) => row.account_id);
-    const existing: { account_id: string }[] = await retry(async () => {
-      const result = await db.raw(
-        `SELECT account_id FROM ${tbl(
-          'accounts',
-        )} WHERE account_id = ANY(:ids)`,
-        { ids },
-      );
+    const historicRows = rows.filter(
+      (row) => BigInt(row.created_by_block_timestamp) < cursor,
+    );
 
-      return result.rows;
-    });
-    const existingIds = new Set(existing.map((row) => row.account_id));
+    if (historicRows.length) {
+      const ids = historicRows.map((row) => row.account_id);
+      const existing: { account_id: string }[] = await retry(async () => {
+        const result = await db.raw(
+          `SELECT account_id FROM ${tbl(
+            'accounts',
+          )} WHERE account_id = ANY(:ids)`,
+          { ids },
+        );
 
-    for (const row of rows) {
-      if (!existingIds.has(row.account_id)) {
-        missing.push(BigInt(row.created_by_block_timestamp));
+        return result.rows;
+      });
+      const existingIds = new Set(existing.map((row) => row.account_id));
+
+      for (const row of historicRows) {
+        if (!existingIds.has(row.account_id)) {
+          missing.push(BigInt(row.created_by_block_timestamp));
+        }
       }
     }
 
-    cursor = ids[ids.length - 1];
+    pageCursor = rows[rows.length - 1].account_id;
     page += 1;
 
     logger.info(
-      { cursor, missing: missing.length, page, rows: rows.length },
+      {
+        historic: historicRows.length,
+        missing: missing.length,
+        page,
+        pageCursor,
+        rows: rows.length,
+      },
       'account gap scan progress',
     );
 
@@ -84,9 +109,9 @@ export const findAccountGaps = async (): Promise<Gap[]> => {
   return bandify(missing);
 };
 
-export const findAccessKeyGaps = async (): Promise<Gap[]> => {
+export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
   const missing: bigint[] = [];
-  let cursor: { account_id: string; public_key: string } | null = null;
+  let pageCursor: { account_id: string; public_key: string } | null = null;
   let page = 0;
 
   for (;;) {
@@ -103,8 +128,8 @@ export const findAccessKeyGaps = async (): Promise<Gap[]> => {
           LIMIT :pageSize
         `,
         {
-          cursorAccount: cursor?.account_id ?? null,
-          cursorKey: cursor?.public_key ?? null,
+          cursorAccount: pageCursor?.account_id ?? null,
+          cursorKey: pageCursor?.public_key ?? null,
           pageSize: config.reconcilePageSize,
         },
       );
@@ -116,44 +141,55 @@ export const findAccessKeyGaps = async (): Promise<Gap[]> => {
       break;
     }
 
-    const existing: { account_id: string; public_key: string }[] = await retry(
-      async () => {
-        const result = await db.raw(
-          `
-            SELECT ak.account_id, ak.public_key
-            FROM ${tbl('access_keys')} ak
-            JOIN (
-              SELECT
-                UNNEST(:publicKeys::text[]) AS public_key,
-                UNNEST(:accountIds::text[]) AS account_id
-            ) v ON v.public_key = ak.public_key AND v.account_id = ak.account_id
-          `,
-          {
-            accountIds: rows.map((row) => row.account_id),
-            publicKeys: rows.map((row) => row.public_key),
-          },
-        );
-
-        return result.rows;
-      },
-    );
-    const existingKeys = new Set(
-      existing.map((row) => `${row.public_key}:${row.account_id}`),
+    const historicRows = rows.filter(
+      (row) => BigInt(row.created_by_block_timestamp) < cursor,
     );
 
-    for (const row of rows) {
-      if (!existingKeys.has(`${row.public_key}:${row.account_id}`)) {
-        missing.push(BigInt(row.created_by_block_timestamp));
+    if (historicRows.length) {
+      const existing: { account_id: string; public_key: string }[] =
+        await retry(async () => {
+          const result = await db.raw(
+            `
+              SELECT ak.account_id, ak.public_key
+              FROM ${tbl('access_keys')} ak
+              JOIN (
+                SELECT
+                  UNNEST(:publicKeys::text[]) AS public_key,
+                  UNNEST(:accountIds::text[]) AS account_id
+              ) v ON v.public_key = ak.public_key AND v.account_id = ak.account_id
+            `,
+            {
+              accountIds: historicRows.map((row) => row.account_id),
+              publicKeys: historicRows.map((row) => row.public_key),
+            },
+          );
+
+          return result.rows;
+        });
+      const existingKeys = new Set(
+        existing.map((row) => `${row.public_key}:${row.account_id}`),
+      );
+
+      for (const row of historicRows) {
+        if (!existingKeys.has(`${row.public_key}:${row.account_id}`)) {
+          missing.push(BigInt(row.created_by_block_timestamp));
+        }
       }
     }
 
     const last = rows[rows.length - 1];
 
-    cursor = { account_id: last.account_id, public_key: last.public_key };
+    pageCursor = { account_id: last.account_id, public_key: last.public_key };
     page += 1;
 
     logger.info(
-      { cursor, missing: missing.length, page, rows: rows.length },
+      {
+        historic: historicRows.length,
+        missing: missing.length,
+        page,
+        pageCursor,
+        rows: rows.length,
+      },
       'access key gap scan progress',
     );
 
@@ -195,10 +231,13 @@ export const bandify = (timestamps: bigint[]): Gap[] => {
   return gaps;
 };
 
-export const repairGaps = async (gaps: Gap[]): Promise<void> => {
+export const repairGaps = async (
+  gaps: Gap[],
+  cursor: bigint,
+): Promise<void> => {
   for (const gap of gaps) {
     const from = gap.fromTs - RECEIPT_EXECUTION_CAP_NS;
-    const to = gap.toTs + RECEIPT_EXECUTION_CAP_NS;
+    const to = bigIntMin(gap.toTs + RECEIPT_EXECUTION_CAP_NS, cursor);
 
     logger.info(
       { count: gap.count, from: from.toString(), to: to.toString() },
@@ -215,10 +254,15 @@ export const repairGaps = async (gaps: Gap[]): Promise<void> => {
 };
 
 export const reconcile = async (): Promise<void> => {
-  logger.info({ schema: groundTruth() }, 'scanning for rebuild gaps...');
+  const cursor = await getBackfillCursor();
 
-  const accountGaps = await findAccountGaps();
-  const keyGaps = await findAccessKeyGaps();
+  logger.info(
+    { cursor: cursor.toString(), schema: groundTruth() },
+    'scanning for rebuild gaps behind the backfill cursor...',
+  );
+
+  const accountGaps = await findAccountGaps(cursor);
+  const keyGaps = await findAccessKeyGaps(cursor);
 
   logger.info(
     { accountGaps, keyGaps },
@@ -227,12 +271,12 @@ export const reconcile = async (): Promise<void> => {
 
   if (accountGaps.length) {
     logger.info('repairing account gaps...');
-    await repairGaps(accountGaps);
+    await repairGaps(accountGaps, cursor);
   }
 
   if (keyGaps.length) {
     logger.info('repairing access key gaps...');
-    await repairGaps(keyGaps);
+    await repairGaps(keyGaps, cursor);
   }
 
   if (!accountGaps.length && !keyGaps.length) {
@@ -241,8 +285,8 @@ export const reconcile = async (): Promise<void> => {
 
   logger.info('re-scanning to confirm...');
 
-  const remainingAccountGaps = await findAccountGaps();
-  const remainingKeyGaps = await findAccessKeyGaps();
+  const remainingAccountGaps = await findAccountGaps(cursor);
+  const remainingKeyGaps = await findAccessKeyGaps(cursor);
   const remaining = remainingAccountGaps.length + remainingKeyGaps.length;
 
   if (remaining) {

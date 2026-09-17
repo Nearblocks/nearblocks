@@ -14,7 +14,7 @@ import {
 } from '#services/accessKey';
 import { AccountMap, collectAccounts, flushAccounts } from '#services/account';
 
-const indexerKey = 'accounts';
+export const indexerKey = 'accounts';
 const CATCH_UP_DELAY_MS = 60_000;
 const TIP_SAFETY_MARGIN_NS = 300_000_000_000n; // 5m in ns
 export const RECEIPT_EXECUTION_CAP_NS = 300_000_000_000n; // 5m in ns
@@ -351,4 +351,4 @@ const buildMessage = (block: BackfillBlock): Message => {
   } as unknown as Message;
 };
 
-const bigIntMin = (a: bigint, b: bigint): bigint => (a < b ? a : b);
+export const bigIntMin = (a: bigint, b: bigint): bigint => (a < b ? a : b);
