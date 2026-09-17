@@ -16,8 +16,8 @@ import { AccountMap, collectAccounts, flushAccounts } from '#services/account';
 
 const indexerKey = 'accounts';
 const CATCH_UP_DELAY_MS = 60_000;
-const TIP_SAFETY_MARGIN_NS = 60_000_000_000n;
-const RECEIPT_EXECUTION_CAP_NS = 300_000_000_000n; // 5m in ns
+const TIP_SAFETY_MARGIN_NS = 300_000_000_000n; // 5m in ns
+export const RECEIPT_EXECUTION_CAP_NS = 300_000_000_000n; // 5m in ns
 
 const ACTION_KINDS = [
   ActionKind.ADD_KEY,
@@ -72,6 +72,54 @@ type BackfillBlock = {
   timestamp: string;
 };
 
+export type WindowResult = {
+  blockCount: number;
+  maxHeight: null | number;
+};
+
+export const processWindow = async (
+  from: bigint,
+  to: bigint,
+): Promise<WindowResult> => {
+  const rows = await retry(async () => fetchWindow(from, to));
+  const blocks = groupBlocks(rows);
+
+  const accounts: AccountMap = new Map();
+  const accountsToUpdate: AccountMap = new Map();
+  const accessKeys: AccessKeyMap = new Map();
+  const implicitKeys: AccessKeyMap = new Map();
+  const accessKeysToUpdate: AccessKeyMap = new Map();
+  const deletedAccounts: DeletedAccountMap = new Map();
+
+  let maxHeight: null | number = null;
+
+  for (const block of blocks) {
+    const message = buildMessage(block);
+
+    collectAccounts(message, accounts, accountsToUpdate);
+    collectAccessKeys(
+      message,
+      accessKeys,
+      implicitKeys,
+      accessKeysToUpdate,
+      deletedAccounts,
+    );
+
+    maxHeight = Math.max(maxHeight ?? 0, Number(block.height));
+  }
+
+  await flushAccounts(db, accounts, accountsToUpdate);
+  await flushAccessKeys(
+    db,
+    accessKeys,
+    implicitKeys,
+    accessKeysToUpdate,
+    deletedAccounts,
+  );
+
+  return { blockCount: blocks.length, maxHeight };
+};
+
 export const backfillData = async () => {
   const settings = await db(tbl('settings')).where({ key: indexerKey }).first();
   let from = BigInt(
@@ -95,39 +143,9 @@ export const backfillData = async () => {
       tip - TIP_SAFETY_MARGIN_NS,
     );
 
-    const rows = await retry(async () => fetchWindow(from, to));
-    const blocks = groupBlocks(rows);
+    const { blockCount, maxHeight } = await processWindow(from, to);
 
-    const accounts: AccountMap = new Map();
-    const accountsToUpdate: AccountMap = new Map();
-    const accessKeys: AccessKeyMap = new Map();
-    const implicitKeys: AccessKeyMap = new Map();
-    const accessKeysToUpdate: AccessKeyMap = new Map();
-    const deletedAccounts: DeletedAccountMap = new Map();
-
-    for (const block of blocks) {
-      const message = buildMessage(block);
-
-      collectAccounts(message, accounts, accountsToUpdate);
-      collectAccessKeys(
-        message,
-        accessKeys,
-        implicitKeys,
-        accessKeysToUpdate,
-        deletedAccounts,
-      );
-
-      syncHeight = Math.max(syncHeight, Number(block.height));
-    }
-
-    await flushAccounts(db, accounts, accountsToUpdate);
-    await flushAccessKeys(
-      db,
-      accessKeys,
-      implicitKeys,
-      accessKeysToUpdate,
-      deletedAccounts,
-    );
+    syncHeight = Math.max(syncHeight, maxHeight ?? 0);
 
     await db(tbl('settings'))
       .insert({
@@ -143,7 +161,7 @@ export const backfillData = async () => {
     metrics.sync.blockHeight.set(syncHeight);
     metrics.sync.lastBlockTimestamp.set(Number(to) / 1e9);
     logger.info(
-      `backfilled ${blocks.length} blocks upto: ${syncHeight}, window: ${to}`,
+      `backfilled ${blockCount} blocks upto: ${syncHeight}, window: ${to}`,
     );
 
     from = to;

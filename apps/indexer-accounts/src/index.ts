@@ -6,12 +6,15 @@ import { server } from '#libs/prom';
 import sentry from '#libs/sentry';
 import { backfillData } from '#services/backfill';
 import { syncGenesis } from '#services/genesis';
+import { reconcile } from '#services/reconcile';
 
 (async () => {
   try {
     logger.info({ network: config.network }, 'initializing indexer...');
     logger.info('syncing genesis data...');
     await syncGenesis();
+    await reconcile();
+
     logger.info('backfilling blockchain data from db...');
     await backfillData();
   } catch (error) {

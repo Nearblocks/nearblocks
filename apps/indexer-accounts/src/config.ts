@@ -46,6 +46,9 @@ const config: Config = {
       : Number(env.NEARDATA_CONCURRENCY),
   neardataUrl: env.NEARDATA_URL,
   network: env.NETWORK,
+  reconcileGapThresholdNs: 60_000_000_000n, // 60s in ns
+  reconcileGroundTruthSchema: 'public',
+  reconcilePageSize: 20_000,
   sentryDsn: env.SENTRY_DSN,
   startBlockHeight: env.ACCOUNTS_START_BLOCK,
 };

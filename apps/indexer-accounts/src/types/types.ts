@@ -14,6 +14,9 @@ export type Config = {
   neardataConcurrency: 'auto' | number;
   neardataUrl: string;
   network: Network;
+  reconcileGapThresholdNs: bigint;
+  reconcileGroundTruthSchema: string;
+  reconcilePageSize: number;
   sentryDsn?: string;
   startBlockHeight: number;
 };
