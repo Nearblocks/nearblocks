@@ -28,6 +28,7 @@ type AccessKeyRow = {
 };
 
 const groundTruth = () => config.reconcileGroundTruthSchema;
+const GENESIS_TS = BigInt(config.genesisTimestamp);
 
 export const getBackfillCursor = async (): Promise<bigint> => {
   const settings = await db(tbl('settings')).where({ key: indexerKey }).first();
@@ -39,6 +40,7 @@ export const getBackfillCursor = async (): Promise<bigint> => {
 
 export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
   const missing: bigint[] = [];
+  let genesisMissing = 0;
   let pageCursor: null | string = null;
   let page = 0;
 
@@ -82,7 +84,14 @@ export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
 
       for (const row of historicRows) {
         if (!existingIds.has(row.account_id)) {
-          missing.push(BigInt(row.created_by_block_timestamp));
+          const ts = BigInt(row.created_by_block_timestamp);
+
+          if (ts === GENESIS_TS) {
+            genesisMissing += 1;
+            continue;
+          }
+
+          missing.push(ts);
         }
       }
     }
@@ -92,6 +101,7 @@ export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
 
     logger.info(
       {
+        genesisMissing,
         historic: historicRows.length,
         missing: missing.length,
         page,
@@ -106,11 +116,19 @@ export const findAccountGaps = async (cursor: bigint): Promise<Gap[]> => {
     }
   }
 
+  if (genesisMissing) {
+    logger.warn(
+      { genesisMissing },
+      'accounts missing from rebuild at genesis timestamp; processWindow cannot repair genesis-sourced rows, needs a manual genesis re-sync',
+    );
+  }
+
   return bandify(missing);
 };
 
 export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
   const missing: bigint[] = [];
+  let genesisMissing = 0;
   let pageCursor: { account_id: string; public_key: string } | null = null;
   let page = 0;
 
@@ -172,7 +190,14 @@ export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
 
       for (const row of historicRows) {
         if (!existingKeys.has(`${row.public_key}:${row.account_id}`)) {
-          missing.push(BigInt(row.created_by_block_timestamp));
+          const ts = BigInt(row.created_by_block_timestamp);
+
+          if (ts === GENESIS_TS) {
+            genesisMissing += 1;
+            continue;
+          }
+
+          missing.push(ts);
         }
       }
     }
@@ -184,6 +209,7 @@ export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
 
     logger.info(
       {
+        genesisMissing,
         historic: historicRows.length,
         missing: missing.length,
         page,
@@ -196,6 +222,13 @@ export const findAccessKeyGaps = async (cursor: bigint): Promise<Gap[]> => {
     if (rows.length < config.reconcilePageSize) {
       break;
     }
+  }
+
+  if (genesisMissing) {
+    logger.warn(
+      { genesisMissing },
+      'access keys missing from rebuild at genesis timestamp; processWindow cannot repair genesis-sourced rows, needs a manual genesis re-sync',
+    );
   }
 
   return bandify(missing);
