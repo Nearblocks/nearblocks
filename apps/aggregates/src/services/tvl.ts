@@ -1,6 +1,8 @@
 import { logger } from 'nb-logger';
+import { Network } from 'nb-types';
 import { sleep } from 'nb-utils';
 
+import config from '#config';
 import knex from '#libs/knex';
 import Sentry from '#libs/sentry';
 import { big } from '#libs/utils';
@@ -21,6 +23,10 @@ const balanceSyncKey = (protocol: string, chain: string) =>
   `tvl_balances_${protocol}_${chain}`;
 
 export const syncTvlStats = async () => {
+  if (config.network === Network.TESTNET) {
+    return;
+  }
+
   // eslint-disable-next-line no-constant-condition
   while (true) {
     await stats();
@@ -120,7 +126,7 @@ const statsForSource = async (protocol: string, chain: string) => {
               ft_prices_daily fpd
             WHERE
               fpd.coingecko_id = t.coingecko_id
-              AND fpd.date = b.date - 86400000 -- previous day's 00:00 snapshot
+              AND fpd.date = b.date
             ORDER BY
               fpd.date DESC
             LIMIT
@@ -184,7 +190,7 @@ const repairPricesForSource = async (protocol: string, chain: string) => {
             ft_prices_daily fpd
           WHERE
             fpd.coingecko_id = t.coingecko_id
-            AND fpd.date = b.date - 86400000 -- previous day's 00:00 snapshot
+            AND fpd.date = b.date
           ORDER BY
             fpd.date DESC
           LIMIT
