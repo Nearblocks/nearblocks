@@ -6,6 +6,8 @@ import {
   SignerStatsRes,
   SignerTotalStats,
   SignerTotalStatsRes,
+  TvlStats,
+  TvlStatsRes,
 } from 'nb-schemas';
 
 import { fetcher } from '@/lib/fetcher';
@@ -28,6 +30,14 @@ export const fetchSignerStats = cache(
 export const fetchSignerTotalStats = cache(
   async (): Promise<null | SignerTotalStats> => {
     const resp = await fetcher<SignerTotalStatsRes>('/v3/signer-stats/total');
+    return resp.data;
+  },
+);
+
+export const fetchTvlStats = cache(
+  async (limit?: number): Promise<null | TvlStats[]> => {
+    const url = limit ? `/v3/tvl-stats?limit=${limit}` : '/v3/tvl-stats';
+    const resp = await fetcher<TvlStatsRes>(url);
     return resp.data;
   },
 );

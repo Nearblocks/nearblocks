@@ -1,4 +1,4 @@
-import { Search } from 'nb-schemas';
+import { Search, SearchBlock } from 'nb-schemas';
 
 import {
   search,
@@ -11,6 +11,7 @@ import {
   searchReceipts,
   searchTxns,
 } from '@/actions/search';
+import type { HistoryEntry } from '@/hooks/use-search-history';
 
 export const initialResults: Search = {
   accounts: [],
@@ -36,6 +37,17 @@ const FILTERS = {
   string,
   { fetch: (keyword: string) => Promise<unknown[]>; key: keyof Search }
 >;
+
+export const isBlockHeight = (value: string) => /^\d+$/.test(value.trim());
+
+export const blockEntry = (
+  block: SearchBlock,
+  keyword: string,
+): HistoryEntry => {
+  const value = isBlockHeight(keyword) ? block.block_height : block.block_hash;
+
+  return { href: `/blocks/${value}`, label: value, type: 'block' };
+};
 
 export const searchKeyword = async (
   keyword: string,

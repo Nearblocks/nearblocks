@@ -12,11 +12,14 @@ import type {
   Stats,
   TpsStats,
   TpsStatsReq,
+  TvlStats,
+  TvlStatsReq,
   TxnStatsReq,
 } from 'nb-schemas';
 import response from 'nb-schemas/dist/stats/response.js';
 
-import { dbBase, dbContract } from '#libs/pgp';
+import { dbBase, dbContract, dbEvents } from '#libs/pgp';
+import redis from '#libs/redis';
 import { msToNsTime } from '#libs/utils';
 import { responseHandler } from '#middlewares/response';
 import { RequestValidator } from '#middlewares/validate';
@@ -144,6 +147,24 @@ const tps = responseHandler(
   },
 );
 
+const tvl = responseHandler(
+  response.tvl,
+  async (req: RequestValidator<TvlStatsReq>) => {
+    const limit = req.validator.limit;
+    const date = req.validator.date
+      ? new Date(`${req.validator.date}T00:00:00Z`).getTime()
+      : null;
+
+    const data = await redis.cache<TvlStats[]>(
+      `v3:stats:tvl:${limit ?? ''}:${date ?? ''}`,
+      () => dbEvents.manyOrNone<TvlStats>(sql.tvl, { date, limit }),
+      300,
+    );
+
+    return { data };
+  },
+);
+
 export default {
   address,
   block,
@@ -152,5 +173,6 @@ export default {
   signerTotal,
   stats,
   tps,
+  tvl,
   txn,
 };

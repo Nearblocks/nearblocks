@@ -208,6 +208,36 @@ const routes = (app: Router) => {
     validate(request.tps),
     service.tps,
   );
+
+  /**
+   * @openapi
+   * /v3/tvl-stats:
+   *   get:
+   *     summary: Get daily signer total value locked (TVL) stats
+   *     tags:
+   *       - Stats
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         schema:
+   *           type: integer
+   *       - in: query
+   *         name: date
+   *         description: Date in YYYY-MM-DD format
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Success response
+   */
+  app.get(
+    '/tvl-stats',
+    bearerAuth,
+    rateLimiter,
+    validate(request.tvl),
+    service.tvl,
+  );
 };
 
 export default routes;

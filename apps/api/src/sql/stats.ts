@@ -9,5 +9,6 @@ export default {
   signerTotal: sql('queries/stats/signerTotal.sql'),
   stats: sql('queries/stats/stats.sql'),
   tps: sql('queries/stats/tps.sql'),
+  tvl: sql('queries/stats/tvl.sql'),
   txn: sql('queries/stats/txn.sql'),
 };
