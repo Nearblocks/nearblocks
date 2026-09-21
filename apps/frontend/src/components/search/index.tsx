@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react';
 
 import type { HistoryEntry } from '@/hooks/use-search-history';
 import { useSearchHistory } from '@/hooks/use-search-history';
-import { searchKeyword } from '@/lib/search';
+import { blockEntry, searchKeyword } from '@/lib/search';
 import { cn, encodeToken } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { ButtonGroup, ButtonGroupSeparator } from '@/ui/button-group';
@@ -43,11 +43,7 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
             label: resp.accounts[0].account_id,
             type: 'account',
           },
-          resp.blocks?.[0] && {
-            href: `/blocks/${resp.blocks[0].block_hash}`,
-            label: resp.blocks[0].block_hash,
-            type: 'block',
-          },
+          resp.blocks?.[0] && blockEntry(resp.blocks[0], kw),
           resp.fts?.[0] && {
             href: `/tokens/${resp.fts[0].contract}`,
             label: resp.fts[0].name ?? resp.fts[0].contract,

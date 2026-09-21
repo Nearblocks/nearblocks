@@ -22,6 +22,11 @@ const ChainSignaturesAnalyticsLayout = async ({ children, params }: Props) => {
               </ActiveLink>
             </TabLink>
             <TabLink asChild>
+              <ActiveLink exact href="/chain-signatures/analytics/tvl">
+                {t('analytics.tabs.tvl')}
+              </ActiveLink>
+            </TabLink>
+            <TabLink asChild>
               <ActiveLink exact href="/chain-signatures/analytics/gas-burnt">
                 {t('analytics.tabs.gasBurnt')}
               </ActiveLink>

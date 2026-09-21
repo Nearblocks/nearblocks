@@ -15,7 +15,13 @@ import { Search } from 'nb-schemas';
 import { TokenImage } from '@/components/token';
 import { useLocale } from '@/hooks/use-locale';
 import type { HistoryEntry } from '@/hooks/use-search-history';
-import { initialResults, searchKeyword } from '@/lib/search';
+import { numberFormat } from '@/lib/format';
+import {
+  blockEntry,
+  initialResults,
+  isBlockHeight,
+  searchKeyword,
+} from '@/lib/search';
 import { cn, encodeToken } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Input } from '@/ui/input';
@@ -171,14 +177,15 @@ export const SearchPopover = ({
         key: 'history',
         options: history.map((item) => {
           const Icon = HISTORY_ICONS[item.type];
+          const title =
+            item.type === 'block' && isBlockHeight(item.label)
+              ? numberFormat(item.label)
+              : item.label;
           return {
             href: item.href,
             id: optionId(),
             label: (
-              <SearchRow
-                icon={<Icon className={ICON_CLASS} />}
-                title={item.label}
-              />
+              <SearchRow icon={<Icon className={ICON_CLASS} />} title={title} />
             ),
             onRemove: () => removeFromHistory(item.href),
             onSelect: () => setOpen(false),
@@ -214,23 +221,21 @@ export const SearchPopover = ({
       if (results.blocks.length > 0) {
         out.push({
           key: 'blocks',
-          options: results.blocks.map((block) => ({
-            href: `/blocks/${block.block_hash}`,
-            id: optionId(),
-            label: (
-              <SearchRow
-                icon={<Box className={ICON_CLASS} />}
-                subtitle={block.block_hash}
-                title={block.block_height}
-              />
-            ),
-            onSelect: () =>
-              addToHistory({
-                href: `/blocks/${block.block_hash}`,
-                label: block.block_hash,
-                type: 'block',
-              }),
-          })),
+          options: results.blocks.map((block) => {
+            const entry = blockEntry(block, keyword);
+            return {
+              href: entry.href,
+              id: optionId(),
+              label: (
+                <SearchRow
+                  icon={<Box className={ICON_CLASS} />}
+                  subtitle={block.block_hash}
+                  title={numberFormat(block.block_height)}
+                />
+              ),
+              onSelect: () => addToHistory(entry),
+            };
+          }),
           title: t('search.blocks'),
         });
       }
@@ -424,6 +429,7 @@ export const SearchPopover = ({
     clearHistory,
     hasLiveResults,
     history,
+    keyword,
     listboxId,
     removeFromHistory,
     results,

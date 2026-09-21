@@ -6,7 +6,12 @@ export const chainSignatures = {
     },
     tabs: {
       gasBurnt: 'Gas Burnt',
+      tvl: 'TVL',
       txns: 'Transactions',
+    },
+    tvl: {
+      title: 'Total Value Locked',
+      yAxis: 'TVL (USD)',
     },
     txns: {
       title: 'Daily Transactions',

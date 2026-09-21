@@ -31,11 +31,17 @@ const tps = v.object({
   limit: v.optional(limit(60)),
 });
 
+const tvl = v.object({
+  date: v.optional(v.pipe(v.string(), v.isoDate())),
+  limit: v.optional(limit(365)),
+});
+
 export type SignerStatsReq = v.InferOutput<typeof signer>;
 export type TpsStatsReq = v.InferOutput<typeof tps>;
 export type BlockStatsReq = v.InferOutput<typeof block>;
 export type TxnStatsReq = v.InferOutput<typeof txn>;
 export type AddressStatsReq = v.InferOutput<typeof address>;
 export type PriceStatsReq = v.InferOutput<typeof price>;
+export type TvlStatsReq = v.InferOutput<typeof tvl>;
 
-export default { address, block, price, signer, tps, txn };
+export default { address, block, price, signer, tps, tvl, txn };
