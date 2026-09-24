@@ -224,6 +224,10 @@ a {
   top: 0.55em;
 }
 
+.dark .hierarchy-tree li:before {
+  outline: solid 1px #4b5563;
+}
+
 .hierarchy-tree li:first-child:before {
   left: 50%;
 }
@@ -253,6 +257,12 @@ a {
   position: absolute;
 }
 
+.dark .hierarchy-tree ul:before,
+.dark .hierarchy-tree div:before,
+.dark .hierarchy-tree span:before {
+  outline: solid 1px #4b5563;
+}
+
 .hierarchy-tree ul:before {
   top: -1em;
 }
@@ -270,6 +280,13 @@ a {
 .hierarchy-tree>li:after,
 .hierarchy-tree>li>div:before,
 .hierarchy-tree>li>span:before {
+  outline: none;
+}
+
+.dark .hierarchy-tree>li:before,
+.dark .hierarchy-tree>li:after,
+.dark .hierarchy-tree>li>div:before,
+.dark .hierarchy-tree>li>span:before {
   outline: none;
 }
 
@@ -316,7 +333,7 @@ a {
 .mostly-customized-scrollbar::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color:#f4f6f7; 
+  background-color: #f4f6f7;
   border-radius: 12px;
 }
 

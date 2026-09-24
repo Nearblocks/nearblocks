@@ -658,6 +658,8 @@ export type ArgsPropsInfo = {
   stake: string;
   sender_id: string;
   senderId: string;
+  code_hash?: string;
+  code?: string | null;
 };
 
 export type TransactionActionInfo = {
