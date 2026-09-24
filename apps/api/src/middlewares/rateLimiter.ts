@@ -103,7 +103,7 @@ const rateLimiter = catchAsync(
             `user_plan:${id}`,
             JSON.stringify(selectedPlan),
             'EX',
-            86400,
+            300, // 5m — short TTL so plan changes converge fast; invalidated on mutation
           );
         }
       } catch (error) {
