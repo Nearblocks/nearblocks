@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "types": [],
+    "skipLibCheck": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "dist/src",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"],
+      "#config": ["src/config/index.ts"],
+      "#libs/*": ["src/libs/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"]
+}
