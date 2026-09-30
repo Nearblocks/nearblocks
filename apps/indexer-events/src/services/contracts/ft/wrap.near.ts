@@ -6,7 +6,6 @@ import {
   FTMeta,
 } from 'nb-types';
 
-import { decodeArgs } from '#libs/utils';
 import { EVENT_PATTERN, updateFTEvents } from '#services/events';
 import {
   ftResolveTransfer,
@@ -20,10 +19,6 @@ import {
   FTContractMatchAction,
   FTEventEntry,
 } from '#types/types';
-
-type FtWithdraw = {
-  amount: string;
-};
 
 const EVENT_TYPE = EventType.WRAP_NEAR;
 const EVENT_STANDARD = EventStandard.FT_LEGACY;
@@ -76,22 +71,23 @@ const matchActions: FTContractMatchAction = (action, predecessor, logs) => {
       return items;
     }
     case 'near_withdraw': {
-      const args = decodeArgs<FtWithdraw>(action.FunctionCall.args);
-      const amount = BigInt(args.amount);
+      const items: FTEventEntry[] = [];
 
-      if (amount) {
-        return [
-          {
-            affected: predecessor,
-            amount: String(amount * -1n),
+      logs.forEach((log) => {
+        const match = log.match(EVENT_PATTERN.WRAP_NEAR_WITHDRAW);
+
+        if (match?.length === 3 && match[2] && BigInt(match[1])) {
+          items.push({
+            affected: match[2],
+            amount: String(BigInt(match[1]) * -1n),
             cause: EventCause.BURN,
             involved: null,
             memo: null,
-          },
-        ];
-      }
+          });
+        }
+      });
 
-      return [];
+      return items;
     }
     case 'ft_transfer':
     case 'ft_transfer_call': {

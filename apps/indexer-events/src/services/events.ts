@@ -17,6 +17,7 @@ export const EVENT_PATTERN = {
   REFUND: /^Refund (\d+) from ([\S]+) to ([\S]+)/,
   TRANSFER: /^Transfer (\d+) from ([\S]+) to ([\S]+)/,
   WRAP_NEAR_DEPOSIT: /^Deposit (\d+) NEAR to ([\S]+)/,
+  WRAP_NEAR_WITHDRAW: /^Withdraw (\d+) NEAR from ([\S]+)/,
 };
 
 export const storeEvents = async (knex: Knex, message: Message) => {
