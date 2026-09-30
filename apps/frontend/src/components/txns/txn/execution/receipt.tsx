@@ -18,14 +18,20 @@ import { ReceiptOutputRows } from './output';
 type Props = {
   loading?: boolean;
   receipt?: TxnReceipt;
+  signer?: string;
 };
 
-export const ReceiptBlock = ({ loading = false, receipt }: Props) => {
+export const ReceiptBlock = ({ loading = false, receipt, signer }: Props) => {
   const { t } = useLocale('txns');
 
   return (
     <div className="mx-3 scroll-mt-11" id={receipt?.receipt_id}>
-      <ReceiptInspectRows loading={loading} receipt={receipt} showPublicKey />
+      <ReceiptInspectRows
+        loading={loading}
+        receipt={receipt}
+        showPublicKey
+        signer={signer}
+      />
       <hr className="border-border" />
       <List pairsPerRow={1}>
         <ListItem>

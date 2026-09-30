@@ -30,12 +30,14 @@ type Props = {
   loading?: boolean;
   receipt?: TxnReceipt;
   showPublicKey?: boolean;
+  signer?: string;
 };
 
 export const ReceiptInspectRows = ({
   loading = false,
   receipt,
   showPublicKey = false,
+  signer,
 }: Props) => {
   const { t } = useLocale('txns');
   const { nearPrice } = useContext(RpcContext);
@@ -202,7 +204,8 @@ export const ReceiptInspectRows = ({
                   textClassName="max-w-60"
                 />
                 {showPublicKey &&
-                  receipt?.predecessor_account_id !== 'system' && (
+                  receipt?.predecessor_account_id !== 'system' &&
+                  (!signer || receipt?.predecessor_account_id === signer) && (
                     <span className="text-muted-foreground flex items-center">
                       (
                       {isQuantumSafeKey(receipt!.public_key) ? (
