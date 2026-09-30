@@ -35,7 +35,12 @@ export const ExecutionPlan = ({ nearPrice, receipts, tid }: Props) => {
         rpcLoading,
       }}
     >
-      <ReceiptTree depth={0} isFirst receipt={receipts} />
+      <ReceiptTree
+        depth={0}
+        isFirst
+        receipt={receipts}
+        signer={receipts.predecessor_account_id}
+      />
     </RpcContext.Provider>
   );
 };

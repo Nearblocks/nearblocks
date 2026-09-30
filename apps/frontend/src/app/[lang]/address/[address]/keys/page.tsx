@@ -1,22 +1,19 @@
-import { AccessKeysRpc } from '@/components/address/keys-rpc';
+import { AccessKeys } from '@/components/address/keys';
 import { ErrorSuspense } from '@/components/error-suspense';
-import { fetchRpcKeyCount, fetchRpcKeys } from '@/data/address/keys-rpc';
+import { fetchKeyCount, fetchKeys } from '@/data/address/keys';
 import { holdNav } from '@/lib/hold-nav';
 
 type Props = PageProps<'/[lang]/address/[address]/keys'>;
 
 const KeysPage = async ({ params, searchParams }: Props) => {
   const [{ address }, filters] = await Promise.all([params, searchParams]);
-  const keysPromise = fetchRpcKeys(address, filters);
-  const keyCountPromise = fetchRpcKeyCount(address);
+  const keysPromise = fetchKeys(address, filters);
+  const keyCountPromise = fetchKeyCount(address);
   await holdNav();
 
   return (
-    <ErrorSuspense fallback={<AccessKeysRpc loading />}>
-      <AccessKeysRpc
-        keyCountPromise={keyCountPromise}
-        keysPromise={keysPromise}
-      />
+    <ErrorSuspense fallback={<AccessKeys loading />}>
+      <AccessKeys keyCountPromise={keyCountPromise} keysPromise={keysPromise} />
     </ErrorSuspense>
   );
 };
