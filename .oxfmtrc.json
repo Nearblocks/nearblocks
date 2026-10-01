@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "singleQuote": true,
+  "sortPackageJson": false,
+  "sortImports": {
+    "newlinesBetween": true,
+    "internalPattern": ["#", "@/"],
+    "groups": [
+      "builtin",
+      "external",
+      "nb",
+      ["internal", "subpath"],
+      ["parent", "sibling", "index"],
+      "unknown"
+    ],
+    "customGroups": [
+      {
+        "groupName": "nb",
+        "elementNamePattern": ["nb-*", "nb-*/**"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["apps/frontend/**/*.{ts,tsx}"],
+      "options": {
+        "sortTailwindcss": {
+          "stylesheet": "./apps/frontend/src/app/globals.css"
+        }
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "apps/explorer-selector/**",
+    "**/*.sql",
+    "/AGENTS.md",
+    "pnpm-lock.yaml"
+  ]
+}

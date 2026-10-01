@@ -53,7 +53,7 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
           <div className="w-full">
             <SkeletonSlot
               fallback={
-                <span className="text-body-sm block">
+                <span className="block text-body-sm">
                   <span className="block">
                     <Skeleton className="w-full" />
                   </span>
@@ -73,7 +73,7 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
 
                 if (result === undefined || result === null || result === '') {
                   return (
-                    <p className="text-muted-foreground py-1">Empty Result</p>
+                    <p className="py-1 text-muted-foreground">Empty Result</p>
                   );
                 }
                 if (isReceiptIdResult) {
@@ -82,7 +82,7 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
                     <span className="inline-flex items-center gap-1 py-1">
                       {hasAnchor ? (
                         <Link
-                          className="text-link font-mono"
+                          className="font-mono text-link"
                           href={`#${result}`}
                         >
                           {result}
@@ -133,7 +133,7 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
           <div className="w-full space-y-3">
             <SkeletonSlot
               fallback={
-                <span className="text-body-sm block">
+                <span className="block text-body-sm">
                   <span className="block">
                     <Skeleton className="w-full" />
                   </span>

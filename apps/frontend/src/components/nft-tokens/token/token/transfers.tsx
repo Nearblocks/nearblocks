@@ -141,7 +141,7 @@ export const NftTransfers = ({
 
   return (
     <Card className="mt-10">
-      <CardContent className="text-body-sm p-0">
+      <CardContent className="p-0 text-body-sm">
         <DataTable
           columns={txnColumns}
           data={txns?.data}

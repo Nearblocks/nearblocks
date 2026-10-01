@@ -11,28 +11,29 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "build": "pnpm clean && tsc",
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "@noble/curves": "2.2.0",
-    "@sentry/node": "7.74.1",
-    "bs58": "6.0.0",
-    "envalid": "8.0.0",
-    "ethers": "6.15.0",
-    "undici": "7.8.0"
+    "@noble/curves": "catalog:",
+    "@sentry/node": "catalog:",
+    "bs58": "catalog:",
+    "envalid": "catalog:",
+    "ethers": "catalog:",
+    "prom-client": "catalog:",
+    "undici": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "22",
-    "eslint-config-custom-node": "*",
-    "nb-knex": "*",
-    "nb-logger": "*",
-    "nb-prom": "*",
-    "nb-tsconfig": "*",
-    "nb-types": "*",
-    "nb-utils": "*",
+    "@types/node": "catalog:",
+    "knex": "catalog:",
+    "nb-knex": "workspace:*",
+    "nb-logger": "workspace:*",
+    "nb-prom": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
     "rimraf": "~5.0",
-    "typescript": "~5.2"
+    "typescript": "catalog:"
   }
 }

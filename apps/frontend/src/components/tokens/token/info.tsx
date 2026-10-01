@@ -192,7 +192,7 @@ export const TokenInfo = ({ contractPromise, loading }: Props) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="py-3">
-              <p className="text-muted-foreground text-body-sm">
+              <p className="text-body-sm text-muted-foreground">
                 {contract.description}
               </p>
             </CardContent>

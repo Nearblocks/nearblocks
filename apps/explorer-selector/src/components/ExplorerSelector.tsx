@@ -6,8 +6,8 @@ import { getNetworkId } from '@/utils/config';
 import Image from 'next/image';
 
 const imageStyle = {
-  width: 'auto',
   height: '45px',
+  width: 'auto',
 };
 
 const footerImageStyle = {
@@ -23,10 +23,6 @@ export default function ExplorerSelector() {
   const network = getNetworkId();
 
   const config = {
-    nearrocks:
-      network === 'testnet'
-        ? 'https://testnet.near.rocks'
-        : 'https://near.rocks',
     nearblocks:
       network === 'testnet'
         ? 'https://testnet.nearblocks.io'
@@ -35,6 +31,10 @@ export default function ExplorerSelector() {
       network === 'testnet'
         ? 'https://nearvalidate.org'
         : 'https://nearvalidate.org',
+    nearrocks:
+      network === 'testnet'
+        ? 'https://testnet.near.rocks'
+        : 'https://near.rocks',
     pikespeakai: network === 'testnet' ? null : 'https://pikespeak.ai',
   };
 
@@ -272,10 +272,10 @@ export default function ExplorerSelector() {
       <Head>
         <title>NEAR Explorer Selector</title>
         <meta
-          name="description"
           content="Choose from available NEAR blockchain explorers"
+          name="description"
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
       </Head>
 
       <div className={styles.container}>
@@ -310,86 +310,86 @@ export default function ExplorerSelector() {
                 }`}
               >
                 <a
+                  className={`${styles.nearExplorerButton} ${
+                    isNearRocksInactive ? styles.inactive : ''
+                  }`}
                   href={
                     !isNearRocksInactive
                       ? nearRocksHref || config.nearrocks
                       : config.nearrocks
                   }
-                  className={`${styles.nearExplorerButton} ${
-                    isNearRocksInactive ? styles.inactive : ''
-                  }`}
                 >
                   <Image
+                    alt="Near Rocks"
+                    height={45}
                     src="/images/nearrocks.svg"
                     style={imageStyle}
                     width={45}
-                    height={45}
-                    alt="Near Rocks"
                   />
                   <h3 className={styles.explorerHead}>Near Rocks</h3>
                 </a>
 
                 <a
+                  className={`${styles.nearExplorerButton} ${
+                    isNearblocksLiteInactive ? styles.inactive : ''
+                  }`}
                   href={
                     !isNearblocksLiteInactive
                       ? (nearblocksLiteHref && nearblocksLiteHref) ||
                         (config.nearblocksLite ?? '') + path
                       : config.nearblocksLite ?? ''
                   }
-                  className={`${styles.nearExplorerButton} ${
-                    isNearblocksLiteInactive ? styles.inactive : ''
-                  }`}
                 >
                   <Image
+                    alt="Near Validate"
+                    height={45}
                     src="https://nearvalidate.org/images/near-validate.svg"
                     style={imageStyle}
                     width={216}
-                    height={45}
-                    alt="Near Validate"
                   />
                   <h3 className={styles.explorerHead}>Near Validate</h3>
                 </a>
 
                 <a
+                  className={`${styles.nearExplorerButton} ${
+                    styles.mobileFirst
+                  } ${isNearblocksInactive ? styles.inactive : ''}`}
                   href={
                     !isNearblocksInactive
                       ? href || config.nearblocks
                       : config.nearblocks
                   }
-                  className={`${styles.nearExplorerButton} ${
-                    styles.mobileFirst
-                  } ${isNearblocksInactive ? styles.inactive : ''}`}
                 >
                   <span className={styles.tag}>Recommended</span>
 
                   <Image
+                    alt="Nearblocks"
+                    height={45}
                     src="/images/nearblocksblack.svg"
                     style={imageStyle}
                     width={216}
-                    height={45}
-                    alt="Nearblocks"
                   />
                   <h3 className={styles.explorerHead}>Nearblocks</h3>
                 </a>
 
                 {config.pikespeakai && (
                   <a
+                    className={`${styles.nearExplorerButton} ${
+                      isPikespeakInactive ? styles.inactive : ''
+                    }`}
                     href={
                       !isPikespeakInactive
                         ? (pikespeakHref && pikespeakHref) ||
                           (config.pikespeakai ?? '') + path
                         : config.pikespeakai ?? ''
                     }
-                    className={`${styles.nearExplorerButton} ${
-                      isPikespeakInactive ? styles.inactive : ''
-                    }`}
                   >
                     <Image
+                      alt="Pikespeak"
+                      height={45}
                       src="/images/pikespeak_logo.png"
                       style={imageStyle}
                       width={51}
-                      height={45}
-                      alt="Pikespeak"
                     />
                     <h3 className={styles.explorerHead}>Pikespeak</h3>
                   </a>
@@ -401,11 +401,11 @@ export default function ExplorerSelector() {
               <div className={styles.footerText}>
                 <a href="https://github.com/Nearblocks/nearblocks/blob/main/apps/explorer-selector/src/components/ExplorerSelector.tsx">
                   <Image
+                    alt="ExplorerSelector"
+                    height={45}
                     src="/images/github_icon.svg"
                     style={footerImageStyle}
                     width={51}
-                    height={45}
-                    alt="ExplorerSelector"
                   />
                 </a>
               </div>

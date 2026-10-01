@@ -3,7 +3,10 @@ services:
     container_name: mainnet-block-proxy
     build:
       context: .
-      dockerfile: ./apps/block-proxy/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: block-proxy
+        APT_PACKAGES: 'ca-certificates wget'
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'

@@ -11,8 +11,8 @@ export const Info = ({ hasSchema, loading }: Props) => {
 
   if (hasSchema)
     return (
-      <Alert className="bg-teal-background mb-3 border-0">
-        <AlertDescription className="text-teal-foreground text-body-xs inline-block">
+      <Alert className="mb-3 border-0 bg-teal-background">
+        <AlertDescription className="inline-block text-body-xs text-teal-foreground">
           Methods and arguments are automatically shown from the embedded{' '}
           <a
             className="font-bold underline"
@@ -28,8 +28,8 @@ export const Info = ({ hasSchema, loading }: Props) => {
     );
 
   return (
-    <Alert className="bg-amber-background mb-3 border-0">
-      <AlertDescription className="text-amber-foreground text-body-xs block">
+    <Alert className="mb-3 border-0 bg-amber-background">
+      <AlertDescription className="block text-body-xs text-amber-foreground">
         Near ABI schema not found. If you are the contract owner, please
         consider recompiling your contract with{' '}
         <a

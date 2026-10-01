@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { getBlockHeader, getLatestBlock } from '#libs/evm';
 import { db } from '#libs/knex';
 import { retry } from '#libs/utils';

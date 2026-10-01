@@ -63,10 +63,10 @@ export const Contact = () => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-6">
+    <div className="rounded-lg bg-card p-6">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-headline-2xl mb-6">{t('heading')}</h1>
-        <div className="bg-blue-background text-blue-foreground text-body-sm mb-10 rounded p-4">
+        <h1 className="mb-6 text-headline-2xl">{t('heading')}</h1>
+        <div className="mb-10 rounded bg-blue-background p-4 text-body-sm text-blue-foreground">
           <p className="mb-3">{t('disclaimer.heading')}</p>
           <ul className="flex flex-col gap-4 pl-5">
             <li>
@@ -102,7 +102,7 @@ export const Contact = () => {
         </div>
 
         <div className="mb-4">
-          <p className="text-headline-sm mb-2">{t('subjectLabel')}</p>
+          <p className="mb-2 text-headline-sm">{t('subjectLabel')}</p>
           <Select onValueChange={handleSubjectChange} value={subject}>
             <SelectTrigger className="w-72">
               <SelectValue placeholder={t('subjectPlaceholder')} />
@@ -115,8 +115,8 @@ export const Contact = () => {
               ))}
             </SelectContent>
           </Select>
-          <p className="text-muted-foreground text-body-sm mt-2">
-            <span className="text-foreground font-medium">{t('note')}</span>{' '}
+          <p className="mt-2 text-body-sm text-muted-foreground">
+            <span className="font-medium text-foreground">{t('note')}</span>{' '}
             {t('noteText')}
           </p>
         </div>

@@ -56,7 +56,7 @@ export const generateSampleValue = (
   }
 
   const type = Array.isArray(typeSchema.type)
-    ? typeSchema.type.find((t) => t !== 'null') ?? typeSchema.type[0]
+    ? (typeSchema.type.find((t) => t !== 'null') ?? typeSchema.type[0])
     : typeSchema.type;
 
   switch (type) {

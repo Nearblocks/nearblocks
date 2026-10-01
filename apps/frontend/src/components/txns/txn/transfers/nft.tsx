@@ -28,7 +28,7 @@ export const NFTTransfers = ({ nfts, spamPatterns }: Props) => {
         {displayNfts.map((nft, i) => (
           <div className="flex items-center gap-2" key={i}>
             <Link
-              className="text-link size-11"
+              className="size-11 text-link"
               href={`/nft-tokens/${
                 nft.contract_account_id
               }/tokens/${encodeToken(nft.token_id)}`}

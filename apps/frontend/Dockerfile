@@ -1,3 +1,4 @@
+# check=skip=SecretsUsedInArgOrEnv
 FROM node:24-alpine AS base 
 RUN apk update
 RUN apk add --no-cache libc6-compat
@@ -5,13 +6,16 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 FROM base AS prepare
-RUN yarn global add turbo
+RUN npm install -g turbo@2.11.6
 COPY . .
 RUN turbo prune frontend --docker
 
 FROM base AS builder
 COPY --from=prepare /app/out/json/ .
-RUN yarn install
+COPY --from=prepare /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=prepare /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
+RUN npm install -g pnpm@12.8.1
+RUN pnpm install --frozen-lockfile
 COPY --from=prepare /app/out/full/ .
 
 ARG GITHUB_SHA
@@ -19,7 +23,7 @@ ARG NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=$NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
 
-RUN yarn turbo build
+RUN pnpm turbo build
 
 FROM base AS runner
 WORKDIR /app

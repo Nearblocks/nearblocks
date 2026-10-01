@@ -9,5 +9,5 @@ export type NetworkId = ProductionNetwork['networkId'];
 export type Network = ProductionNetwork;
 
 type ProductionNetwork = {
-  networkId: 'testnet' | 'mainnet';
+  networkId: 'mainnet' | 'testnet';
 };

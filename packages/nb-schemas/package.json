@@ -9,15 +9,16 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "devDependencies": {
-    "@types/node": "~22.14",
-    "eslint-config-custom-node": "*",
-    "nb-tsconfig": "*",
-    "typescript": "~5.8"
+    "@types/node": "catalog:",
+    "nb-tsconfig": "workspace:*",
+    "typescript": "catalog:"
   },
   "dependencies": {
-    "valibot": "1.1.0"
+    "nb-types": "workspace:*",
+    "valibot": "catalog:"
   }
 }

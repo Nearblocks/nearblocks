@@ -4,7 +4,9 @@ services:
     container_name: mainnet-api
     build:
       context: .
-      dockerfile: ./apps/api/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: api
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'

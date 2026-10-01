@@ -50,9 +50,9 @@ export const StorageCostForm = () => {
   const yocto = compute();
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h1 className="mb-1 text-xl font-semibold">{t('storageCost.title')}</h1>
-      <p className="text-muted-foreground mb-6 text-sm">
+    <div className="rounded-lg bg-card p-6">
+      <h1 className="text-xl mb-1 font-semibold">{t('storageCost.title')}</h1>
+      <p className="text-sm mb-6 text-muted-foreground">
         {t('storageCost.subtitle')}
       </p>
 
@@ -87,13 +87,13 @@ export const StorageCostForm = () => {
       </form>
 
       {configError && (
-        <p className="text-destructive mt-4 max-w-xl text-sm">
+        <p className="text-sm mt-4 max-w-xl text-destructive">
           {configError instanceof Error ? configError.message : 'RPC error'}
         </p>
       )}
 
       {!storageAmountPerByte && !configError && (
-        <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
+        <div className="mt-6 max-w-xl rounded-lg border border-border bg-card p-6">
           <div className="space-y-3">
             <span className="block">
               <Skeleton className="w-1/3" />
@@ -109,19 +109,19 @@ export const StorageCostForm = () => {
       )}
 
       {yocto && (
-        <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
-          <h2 className="mb-4 text-base font-semibold">
+        <div className="mt-6 max-w-xl rounded-lg border border-border bg-card p-6">
+          <h2 className="text-base mb-4 font-semibold">
             {t('storageCost.resultTitle')}
           </h2>
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <dt className="text-muted-foreground text-xs">
+              <dt className="text-xs text-muted-foreground">
                 {t('storageCost.size')}
               </dt>
               <dd className="mt-1 font-medium">{bytesFormat(bytes)}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground text-xs">
+              <dt className="text-xs text-muted-foreground">
                 {t('storageCost.depositNear')}
               </dt>
               <dd className="mt-1 flex items-center gap-1 font-medium">
@@ -130,15 +130,15 @@ export const StorageCostForm = () => {
               </dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="text-muted-foreground text-xs">
+              <dt className="text-xs text-muted-foreground">
                 {t('storageCost.depositYocto')}
               </dt>
-              <dd className="mt-1 font-mono text-xs break-all">
+              <dd className="text-xs mt-1 font-mono break-all">
                 {yocto.toFixed()}
               </dd>
             </div>
           </dl>
-          <p className="text-muted-foreground mt-4 text-xs">
+          <p className="text-xs mt-4 text-muted-foreground">
             {t('storageCost.hint')}
           </p>
         </div>

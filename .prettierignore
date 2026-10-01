@@ -8,3 +8,5 @@ static
 *.css
 __ENV.js
 next-env.d.ts
+pnpm-lock.yaml
+/AGENTS.md

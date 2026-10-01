@@ -16,13 +16,13 @@ export const MethodDocs = ({ doc }: Props) => {
     <Card className="w-full lg:flex-1">
       <CardContent className="space-y-4 p-4">
         {doc.doc && (
-          <p className="text-body-sm text-muted-foreground whitespace-pre-wrap">
+          <p className="text-body-sm whitespace-pre-wrap text-muted-foreground">
             {doc.doc}
           </p>
         )}
         {doc.doc && <Separator />}
         <div>
-          <p className="text-body-xs text-muted-foreground mb-2 font-medium">
+          <p className="mb-2 text-body-xs font-medium text-muted-foreground">
             {t('contract.methods.parameters')}
           </p>
           {doc.params.length === 0 ? (
@@ -33,7 +33,7 @@ export const MethodDocs = ({ doc }: Props) => {
             <ul className="space-y-1">
               {doc.params.map((param) => (
                 <li
-                  className="text-body-sm flex items-baseline gap-2 font-mono"
+                  className="flex items-baseline gap-2 font-mono text-body-sm"
                   key={param.name}
                 >
                   <span>{param.name}</span>
@@ -45,10 +45,10 @@ export const MethodDocs = ({ doc }: Props) => {
         </div>
         <Separator />
         <div>
-          <p className="text-body-xs text-muted-foreground mb-2 font-medium">
+          <p className="mb-2 text-body-xs font-medium text-muted-foreground">
             {t('contract.methods.returns')}
           </p>
-          <p className="text-body-sm font-mono">
+          <p className="font-mono text-body-sm">
             {doc.returns ?? t('contract.methods.noReturn')}
           </p>
         </div>

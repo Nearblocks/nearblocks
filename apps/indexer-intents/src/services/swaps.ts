@@ -35,7 +35,6 @@ type TokenDiffEvent = {
 };
 
 export const syncIntentsSwaps = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await swaps();
   }
@@ -138,7 +137,7 @@ export const parse = (outcomes: OutcomeRow[]): IntentsSwap[] => {
     const logs =
       typeof outcome.logs === 'string'
         ? (JSON.parse(outcome.logs) as string[])
-        : outcome.logs ?? [];
+        : (outcome.logs ?? []);
 
     for (const log of logs) {
       const trimmed = log.trim();

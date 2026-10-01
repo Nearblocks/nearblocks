@@ -1,0 +1,71 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "jsPlugins": ["eslint-plugin-perfectionist", "./.oxlint/nb-plugin.mjs"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-unused-vars": [
+      "error",
+      {
+        "ignoreRestSiblings": true,
+        "caughtErrors": "none",
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "no-constant-condition": "error",
+    "perfectionist/sort-array-includes": "error",
+    "perfectionist/sort-classes": "error",
+    "perfectionist/sort-enums": "error",
+    "perfectionist/sort-exports": "error",
+    "perfectionist/sort-interfaces": "error",
+    "perfectionist/sort-maps": "error",
+    "perfectionist/sort-named-exports": "error",
+    "perfectionist/sort-named-imports": "error",
+    "perfectionist/sort-object-types": "error",
+    "perfectionist/sort-objects": "error",
+    "perfectionist/sort-union-types": "error",
+    "typescript/no-explicit-any": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "apps/frontend/**/*.{ts,tsx}",
+        "apps/app-lite/**/*.{ts,tsx}",
+        "apps/explorer-selector/**/*.{ts,tsx}"
+      ],
+      "plugins": ["typescript", "react", "nextjs"],
+      "rules": {
+        "react-hooks/exhaustive-deps": "error",
+        "react/rules-of-hooks": "error",
+        "react/set-state-in-effect": "off",
+        "react/purity": "off",
+        "react/refs": "off",
+        "react/immutability": "off",
+        "react/incompatible-library": "off",
+        "nextjs/no-html-link-for-pages": "off",
+        "perfectionist/sort-jsx-props": "error",
+        "typescript/no-explicit-any": "off"
+      }
+    },
+    {
+      "files": [
+        "apps/frontend/src/app/**/page.tsx",
+        "apps/frontend/src/app/**/layout.tsx"
+      ],
+      "rules": {
+        "nb/require-hold-nav": "error"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/.next/**",
+    "**/.turbo/**",
+    "**/public/**",
+    "**/__ENV.js",
+    "apps/explorer-selector/public/**"
+  ]
+}

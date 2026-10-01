@@ -120,9 +120,9 @@ export const EpochInfo = ({ info, loading }: Props) => {
                 </div>
               ) : info != null ? (
                 <div className="flex items-center gap-2">
-                  <div className="bg-muted h-2 w-28 rounded-full">
+                  <div className="h-2 w-28 rounded-full bg-muted">
                     <div
-                      className="bg-link h-2 rounded-full"
+                      className="h-2 rounded-full bg-link"
                       style={{
                         width: `${Math.min(
                           Number(Big(progressPct).toFixed(1)),

@@ -122,8 +122,8 @@ const deployments = responseHandler(
       first && last
         ? unionWith([first], [last], (a, b) => a.receipt_id === b.receipt_id)
         : first
-        ? [first]
-        : [last];
+          ? [first]
+          : [last];
 
     const queries = receipts.map((event) => {
       return pgp.as.format(sql.contracts.deploymentTxn, event);

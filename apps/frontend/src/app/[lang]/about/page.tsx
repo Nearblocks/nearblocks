@@ -58,13 +58,13 @@ const AboutPage = async ({ params }: PageProps<'/[lang]/about'>) => {
     <main className="flex flex-1 flex-col">
       <section className="container mx-auto flex flex-col items-center gap-10 px-4 py-16 md:flex-row md:py-24">
         <div className="flex-1">
-          <p className="text-body-sm text-muted-foreground mb-4 tracking-widest uppercase">
+          <p className="mb-4 text-body-sm tracking-widest text-muted-foreground uppercase">
             About us
           </p>
-          <h1 className="text-headline-3xl mb-6 font-normal text-balance">
+          <h1 className="mb-6 text-headline-3xl font-normal text-balance">
             {t('title')}
           </h1>
-          <p className="text-muted-foreground mb-8 max-w-xl text-pretty">
+          <p className="mb-8 max-w-xl text-pretty text-muted-foreground">
             {t('description')}
           </p>
           <div className="flex flex-wrap gap-3">
@@ -98,8 +98,8 @@ const AboutPage = async ({ params }: PageProps<'/[lang]/about'>) => {
 
       <section className="container mx-auto px-4 py-16">
         <div className="mb-10 max-w-2xl text-center md:mx-auto">
-          <h2 className="text-headline-2xl mb-3 font-normal">What we offer</h2>
-          <p className="text-muted-foreground text-pretty">
+          <h2 className="mb-3 text-headline-2xl font-normal">What we offer</h2>
+          <p className="text-pretty text-muted-foreground">
             The complete data toolkit for the NEAR ecosystem — from raw chain
             data to polished analytics.
           </p>
@@ -107,11 +107,11 @@ const AboutPage = async ({ params }: PageProps<'/[lang]/about'>) => {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {features.map(({ description, icon: Icon, title }) => (
             <Card className="p-6" key={title}>
-              <div className="bg-muted mb-4 inline-flex rounded-lg p-3">
-                <Icon className="text-primary size-5" />
+              <div className="mb-4 inline-flex rounded-lg bg-muted p-3">
+                <Icon className="size-5 text-primary" />
               </div>
-              <h3 className="text-headline-base mb-2 font-medium">{title}</h3>
-              <p className="text-muted-foreground text-body-sm text-pretty">
+              <h3 className="mb-2 text-headline-base font-medium">{title}</h3>
+              <p className="text-body-sm text-pretty text-muted-foreground">
                 {description}
               </p>
             </Card>
@@ -123,8 +123,8 @@ const AboutPage = async ({ params }: PageProps<'/[lang]/about'>) => {
 
       <section className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-headline-2xl mb-4 font-normal">Our mission</h2>
-          <p className="text-muted-foreground text-pretty">
+          <h2 className="mb-4 text-headline-2xl font-normal">Our mission</h2>
+          <p className="text-pretty text-muted-foreground">
             Built and launched in 2022, NearBlocks is one of the earliest
             projects built around the NEAR Protocol and its community — with the
             mission of providing equitable, transparent access to blockchain

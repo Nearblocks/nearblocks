@@ -16,8 +16,8 @@ export const Info = ({ account, isNep330, isVerified }: Props) => {
 
   if (!isVerified)
     return (
-      <Alert className="bg-amber-background mb-3 border-0">
-        <AlertDescription className="text-amber-foreground text-body-xs inline-block">
+      <Alert className="mb-3 border-0 bg-amber-background">
+        <AlertDescription className="inline-block text-body-xs text-amber-foreground">
           {t('contract.code.owner')}{' '}
           <Link
             className="font-bold underline"
@@ -31,8 +31,8 @@ export const Info = ({ account, isNep330, isVerified }: Props) => {
     );
 
   return (
-    <Alert className="bg-teal-background mb-3 border-0">
-      <AlertDescription className="text-teal-foreground text-body-xs block">
+    <Alert className="mb-3 border-0 bg-teal-background">
+      <AlertDescription className="block text-body-xs text-teal-foreground">
         {t('contract.code.verified')}
       </AlertDescription>
     </Alert>

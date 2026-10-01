@@ -71,7 +71,7 @@ receipts_selected AS (
           a.receipt_id = r.receipt_id
           AND a.receipt_included_in_block_timestamp = r.included_in_block_timestamp
           AND (
-            ${method}::text IS NULL
+            ${method}::TEXT IS NULL
             OR a.method = ${method}
           )
       )
@@ -155,7 +155,7 @@ receipts_selected AS (
           a.receipt_id = r.receipt_id
           AND a.receipt_included_in_block_timestamp = r.included_in_block_timestamp
           AND (
-            ${method}::text IS NULL
+            ${method}::TEXT IS NULL
             OR a.method = ${method}
           )
       )

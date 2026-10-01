@@ -1,1 +1,0 @@
-../app-lite/tailwind.config.ts

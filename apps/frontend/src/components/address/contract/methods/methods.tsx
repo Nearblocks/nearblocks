@@ -101,7 +101,7 @@ export const MethodsForm = ({
     return (
       <>
         <Info hasSchema={false} loading />
-        <div className="border-border overflow-hidden rounded-lg border">
+        <div className="overflow-hidden rounded-lg border border-border">
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               className="flex h-10 items-center border-b px-3 last:border-b-0"
@@ -138,7 +138,7 @@ export const MethodsForm = ({
             </InputGroupAddon>
           )}
         </InputGroup>
-        <span className="text-muted-foreground text-body-xs">
+        <span className="text-body-xs text-muted-foreground">
           {t('contract.methods.methodCount', { count: entries.length })}
         </span>
         {open.length > 0 && (
@@ -155,7 +155,7 @@ export const MethodsForm = ({
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-muted-foreground text-body-sm py-6 text-center">
+        <p className="py-6 text-center text-body-sm text-muted-foreground">
           {t('contract.methods.methodEmpty')}
         </p>
       )}
@@ -164,12 +164,12 @@ export const MethodsForm = ({
         {groups.map((group) => (
           <div key={group.value ?? 'all'}>
             {group.value && (
-              <h3 className="text-muted-foreground text-body-xs mb-2 ml-1 font-medium">
+              <h3 className="mb-2 ml-1 text-body-xs font-medium text-muted-foreground">
                 {group.value}
               </h3>
             )}
             <Accordion
-              className="border-border overflow-hidden rounded-lg border"
+              className="overflow-hidden rounded-lg border border-border"
               onValueChange={setOpen}
               type="multiple"
               value={open}
@@ -180,7 +180,7 @@ export const MethodsForm = ({
                   key={entry.name}
                   value={entry.name}
                 >
-                  <AccordionTrigger className="hover:bg-muted/50 data-[state=open]:bg-muted/50 h-10 items-center rounded-none px-3 py-0 hover:no-underline [&>svg]:translate-y-0">
+                  <AccordionTrigger className="h-10 items-center rounded-none px-3 py-0 hover:bg-muted/50 hover:no-underline data-[state=open]:bg-muted/50 [&>svg]:translate-y-0">
                     <span className="min-w-0 truncate font-mono">
                       {entry.name}
                     </span>
@@ -193,7 +193,7 @@ export const MethodsForm = ({
                       </Badge>
                     )}
                   </AccordionTrigger>
-                  <AccordionContent className="border-border border-t px-3 pt-3">
+                  <AccordionContent className="border-t border-border px-3 pt-3">
                     <MethodPanel
                       args={entry.args}
                       doc={entry.doc}

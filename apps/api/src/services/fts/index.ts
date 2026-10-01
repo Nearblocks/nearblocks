@@ -40,17 +40,19 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
     FROM
       ft_list
     WHERE
-      ${search
-      ? sql`
+      ${
+        search
+          ? sql`
           contract ILIKE ${search + '%'}
           OR symbol ILIKE ${search + '%'}
           OR name ILIKE ${search + '%'}
         `
-      : true}
+          : true
+      }
     ORDER BY
-      ${sql(orderBy(sort))} ${order === 'desc'
-      ? sql`DESC NULLS LAST`
-      : sql`ASC NULLS FIRST`},
+      ${sql(orderBy(sort))} ${
+        order === 'desc' ? sql`DESC NULLS LAST` : sql`ASC NULLS FIRST`
+      },
       symbol ASC
     LIMIT
       ${limit}
@@ -78,13 +80,15 @@ const count = catchAsync(
       FROM
         ft_list
       WHERE
-        ${search
-        ? sql`
+        ${
+          search
+            ? sql`
             contract ILIKE ${search + '%'}
             OR symbol ILIKE ${search + '%'}
             OR name ILIKE ${search + '%'}
           `
-        : true}
+            : true
+        }
     `;
 
     return res.status(200).json({ tokens });

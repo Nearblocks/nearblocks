@@ -53,8 +53,8 @@ export const encodeValue = (
     const bytes = base64
       ? base64ToBytes(base64)
       : hasValue
-      ? utf8ToBytes(JSON.stringify(deepUnescape(value)))
-      : null;
+        ? utf8ToBytes(JSON.stringify(deepUnescape(value)))
+        : null;
 
     if (encoding === 'json') {
       if (hasValue) return JSON.stringify(deepUnescape(value), null, 2);

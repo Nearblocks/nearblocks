@@ -1,6 +1,8 @@
-import { describe, it, expect, afterAll } from 'vitest';
 import http from 'http';
+
 import type { MetricObjectWithValues, MetricValue } from 'prom-client';
+import { describe, it, expect, afterAll } from 'vitest';
+
 import { createMetrics } from './index.js';
 
 type Metric = MetricObjectWithValues<MetricValue<string>>;

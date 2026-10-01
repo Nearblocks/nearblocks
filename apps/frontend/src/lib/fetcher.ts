@@ -1,5 +1,4 @@
 import 'server-only';
-
 import { SearchParams } from '@/types/types';
 
 import { getServerConfig } from './config';

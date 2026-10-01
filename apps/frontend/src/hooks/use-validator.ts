@@ -46,12 +46,12 @@ export const useValidator = (node: string) => {
       ? 'active'
       : 'leaving'
     : nextValidator
-    ? 'joining'
-    : isProposal
-    ? 'proposal'
-    : data
-    ? 'idle'
-    : null;
+      ? 'joining'
+      : isProposal
+        ? 'proposal'
+        : data
+          ? 'idle'
+          : null;
 
   return { currentValidator, isLoading, status };
 };

@@ -10,7 +10,7 @@ const NotFound = () => {
 
   return (
     <main className="flex flex-1 flex-col py-10">
-      <div className="bg-card container mx-auto flex flex-1 items-center justify-center rounded-lg">
+      <div className="container mx-auto flex flex-1 items-center justify-center rounded-lg bg-card">
         <EmptyBox
           description={t('errors.notFound.description')}
           icon={<SearchX />}

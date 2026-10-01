@@ -11,24 +11,23 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
+    "build": "pnpm clean && tsc",
     "start": "node dist/index.js",
-    "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "@sentry/node": "7.74.1",
-    "envalid": "8.0.0"
+    "@sentry/node": "catalog:",
+    "envalid": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "~20.8",
-    "eslint-config-custom-node": "*",
+    "@types/node": "catalog:",
     "rimraf": "~5.0",
-    "nb-knex": "*",
-    "nb-logger": "*",
-    "nb-tsconfig": "*",
-    "nb-types": "*",
-    "nb-utils": "*",
-    "typescript": "~5.2"
+    "nb-knex": "workspace:*",
+    "nb-logger": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
+    "typescript": "catalog:"
   }
 }

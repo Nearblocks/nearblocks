@@ -87,7 +87,7 @@ export const NftHeader = ({
 
   return (
     <>
-      <h1 className="text-muted-foreground text-body-xl">
+      <h1 className="text-body-xl text-muted-foreground">
         <SkeletonSlot
           fallback={
             <span className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export const NftHeader = ({
             <Truncate className="flex items-center gap-2">
               {t('token.label')}{' '}
               <TruncateText
-                className="text-foreground max-w-80"
+                className="max-w-80 text-foreground"
                 text={token?.data?.title ?? token?.data?.token ?? ''}
               />
             </Truncate>
@@ -110,7 +110,7 @@ export const NftHeader = ({
         </SkeletonSlot>
       </h1>
       <Link
-        className="text-body-base text-muted-foreground flex flex-wrap items-center gap-2"
+        className="flex flex-wrap items-center gap-2 text-body-base text-muted-foreground"
         href={`/nft-tokens/${cid}`}
       >
         <ErrorSuspense

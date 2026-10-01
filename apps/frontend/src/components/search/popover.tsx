@@ -538,7 +538,7 @@ export const SearchPopover = ({
         </div>
       </PopoverAnchor>
       <PopoverContent
-        className="divide-border max-h-(--radix-popover-content-available-height) w-(--radix-popper-anchor-width) max-w-200 divide-y overflow-y-auto p-0"
+        className="max-h-(--radix-popover-content-available-height) w-(--radix-popper-anchor-width) max-w-200 divide-y divide-border overflow-y-auto p-0"
         id={listboxId}
         onCloseAutoFocus={(event) => event.preventDefault()}
         onOpenAutoFocus={(event) => event.preventDefault()}

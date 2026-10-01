@@ -20,7 +20,7 @@ export const NearPrice = ({ loading = false, statsPromise }: Props) => {
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
   return (
-    <div className="text-headline-xs text-foreground hidden items-center gap-1 lg:flex">
+    <div className="hidden items-center gap-1 text-headline-xs text-foreground lg:flex">
       <span className="text-body-xs text-muted-foreground">
         {t('header.nearPrice')}:
       </span>

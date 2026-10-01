@@ -14,7 +14,7 @@ const AnalyticsLayout = async ({ children, params }: Props) => {
 
   return (
     <Card>
-      <CardContent className="text-body-sm p-3">
+      <CardContent className="p-3 text-body-sm">
         <ScrollArea className="mb-3 w-full whitespace-nowrap">
           <TabLinks>
             <TabLink asChild>

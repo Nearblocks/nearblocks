@@ -7,6 +7,6 @@
     "rootDir": "./src"
   },
   "exclude": ["node_modules"],
-  "extends": "nb-tsconfig/node.json",
+  "extends": "nb-tsconfig/node-app.json",
   "include": ["src"]
 }

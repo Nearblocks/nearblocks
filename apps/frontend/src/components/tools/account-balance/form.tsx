@@ -80,9 +80,9 @@ export const AccountBalanceForm = () => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h1 className="mb-1 text-xl font-semibold">{t('balance.title')}</h1>
-      <p className="text-muted-foreground mb-6 text-sm">
+    <div className="rounded-lg bg-card p-6">
+      <h1 className="text-xl mb-1 font-semibold">{t('balance.title')}</h1>
+      <p className="text-sm mb-6 text-muted-foreground">
         {t('balance.subtitle')}
       </p>
 
@@ -103,7 +103,7 @@ export const AccountBalanceForm = () => {
           </Field>
 
           <div>
-            <p className="mb-2 text-sm font-medium">
+            <p className="text-sm mb-2 font-medium">
               {t('balance.filterMode')}
             </p>
             <Controller
@@ -172,19 +172,19 @@ export const AccountBalanceForm = () => {
       </form>
 
       {result === 'not_found' && (
-        <div className="bg-muted mt-6 max-w-xl rounded-lg p-4 text-sm">
+        <div className="text-sm mt-6 max-w-xl rounded-lg bg-muted p-4">
           {t('balance.notFound')}
         </div>
       )}
 
       {result && result !== 'not_found' && (
-        <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
-          <h2 className="mb-4 text-base font-semibold">
+        <div className="mt-6 max-w-xl rounded-lg border border-border bg-card p-6">
+          <h2 className="text-base mb-4 font-semibold">
             {t('balance.resultTitle')}
           </h2>
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <dt className="text-muted-foreground text-xs">
+              <dt className="text-xs text-muted-foreground">
                 {t('balance.resultTotal')}
               </dt>
               <dd className="mt-1 flex items-center gap-1 font-medium">
@@ -193,7 +193,7 @@ export const AccountBalanceForm = () => {
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground text-xs">
+              <dt className="text-xs text-muted-foreground">
                 {t('balance.resultStaked')}
               </dt>
               <dd className="mt-1 flex items-center gap-1 font-medium">
@@ -202,7 +202,7 @@ export const AccountBalanceForm = () => {
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground text-xs">
+              <dt className="text-xs text-muted-foreground">
                 {t('balance.resultStorage')}
               </dt>
               <dd className="mt-1 font-medium">
@@ -211,7 +211,7 @@ export const AccountBalanceForm = () => {
             </div>
             {result.block_height && (
               <div>
-                <dt className="text-muted-foreground text-xs">
+                <dt className="text-xs text-muted-foreground">
                   {t('balance.resultBlockHeight')}
                 </dt>
                 <dd className="mt-1 font-medium">{result.block_height}</dd>
@@ -219,7 +219,7 @@ export const AccountBalanceForm = () => {
             )}
             {result.block_timestamp && (
               <div>
-                <dt className="text-muted-foreground text-xs">
+                <dt className="text-xs text-muted-foreground">
                   {t('balance.resultBlockTimestamp')}
                 </dt>
                 <dd className="mt-1 font-medium">

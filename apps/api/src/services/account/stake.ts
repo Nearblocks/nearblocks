@@ -66,26 +66,34 @@ const txns = catchAsync(
             receipts r
             JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
           WHERE
-            ${from || to
-        ? sql`
+            ${
+              from || to
+                ? sql`
             r.predecessor_account_id = ${from ?? account}
             AND r.receiver_account_id = ${to ?? account}
           `
-        : sql`
+                : sql`
             (
               r.predecessor_account_id = ${account}
               OR r.receiver_account_id = ${account}
             )
-          `}
-            AND ${cursor
-        ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-        : true}
-            AND ${afterTimestamp
-        ? sql`t.block_timestamp >= ${afterTimestamp}`
-        : true}
-            AND ${beforeTimestamp
-        ? sql`t.block_timestamp < ${beforeTimestamp}`
-        : true}
+          `
+            }
+            AND ${
+              cursor
+                ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+                : true
+            }
+            AND ${
+              afterTimestamp
+                ? sql`t.block_timestamp >= ${afterTimestamp}`
+                : true
+            }
+            AND ${
+              beforeTimestamp
+                ? sql`t.block_timestamp < ${beforeTimestamp}`
+                : true
+            }
             AND EXISTS (
               SELECT
                 1

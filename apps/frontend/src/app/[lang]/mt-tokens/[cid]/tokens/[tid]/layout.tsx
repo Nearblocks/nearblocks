@@ -65,7 +65,7 @@ const FtTokenLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
+      <h1 className="flex flex-wrap items-center gap-2 text-body-xl text-muted-foreground">
         {t('token.label')}{' '}
         <ErrorSuspense fallback={<MtFtHeader cid={cid} loading tid={tid} />}>
           <MtFtHeader cid={cid} tid={tid} tokenPromise={tokenPromise} />

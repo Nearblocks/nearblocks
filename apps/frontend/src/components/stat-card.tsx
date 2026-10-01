@@ -30,13 +30,13 @@ const StatBody = ({
         : 'h-full px-4 py-3'
     }
   >
-    <p className="text-body-xs text-muted-foreground truncate uppercase">
+    <p className="truncate text-body-xs text-muted-foreground uppercase">
       {label}
     </p>
     {href && (
-      <ArrowUpRight className="text-muted-foreground group-hover:text-primary absolute top-3 right-3 size-4 opacity-0 transition-opacity group-hover:opacity-100" />
+      <ArrowUpRight className="absolute top-3 right-3 size-4 text-muted-foreground opacity-0 transition-opacity group-hover:text-primary group-hover:opacity-100" />
     )}
-    <p className="text-body-lg text-foreground mt-1 flex min-h-7 items-center gap-1">
+    <p className="mt-1 flex min-h-7 items-center gap-1 text-body-lg text-foreground">
       <SkeletonSlot
         fallback={
           <>

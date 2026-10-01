@@ -209,7 +209,7 @@ export const Contract = ({
               {() =>
                 deployments?.length ? (
                   <Link
-                    className="text-link inline-block w-50 truncate align-middle"
+                    className="inline-block w-50 truncate align-middle text-link"
                     href={`/txns/${
                       deployments[1]?.transaction_hash ??
                       deployments[0].transaction_hash
@@ -282,7 +282,7 @@ export const Contract = ({
                 {() =>
                   deployments && deployments.length > 1 ? (
                     <Link
-                      className="text-link inline-block w-30 truncate align-middle"
+                      className="inline-block w-30 truncate align-middle text-link"
                       href={`/txns/${deployments[0].transaction_hash}`}
                     >
                       {deployments[0].transaction_hash}

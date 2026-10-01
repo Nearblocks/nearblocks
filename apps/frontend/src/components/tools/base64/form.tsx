@@ -72,9 +72,9 @@ export const Base64Form = () => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h1 className="mb-1 text-xl font-semibold">{t('base64.title')}</h1>
-      <p className="text-muted-foreground mb-6 text-sm">
+    <div className="rounded-lg bg-card p-6">
+      <h1 className="text-xl mb-1 font-semibold">{t('base64.title')}</h1>
+      <p className="text-sm mb-6 text-muted-foreground">
         {t('base64.subtitle')}
       </p>
 

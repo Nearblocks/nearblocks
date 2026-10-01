@@ -26,7 +26,6 @@ export const isExecutionSuccess = (status: ExecutionStatus) => {
 export const monitorProgress = async (): Promise<void> => {
   let lastBlock: number | undefined;
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const event = await retry(async () => {
       return db('ft_events')

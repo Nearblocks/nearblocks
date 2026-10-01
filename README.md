@@ -26,10 +26,10 @@ Once your environment is set up, you can launch your application using Docker Co
 
 ```
 # For Mainnet
-docker compose -f mainnet-aggregates.yml -f mainnet-api.yml -f mainnet-app-lite.yml -f mainnet-app.yml -f mainnet-backend.yml -f mainnet-explorer-selector.yml -f mainnet-indexer.yml up -d --build
+docker compose -f mainnet-aggregates.yml -f mainnet-api.yml -f mainnet-app-lite.yml -f mainnet-backend.yml -f mainnet-explorer-selector.yml -f mainnet-indexer.yml up -d --build
 
 # For Testnet
-docker compose -f testnet-aggregates.yml -f testnet-api.yml -f testnet-app-lite.yml -f testnet-app.yml -f testnet-backend.yml -f testnet-explorer-selector.yml -f testnet-indexer.yml up -d --build
+docker compose -f testnet-aggregates.yml -f testnet-api.yml -f testnet-app-lite.yml -f testnet-backend.yml -f testnet-explorer-selector.yml -f testnet-indexer.yml up -d --build
 ```
 
 ## Modules
@@ -38,10 +38,8 @@ Turborepo is used as the build system for our project. Our main modules reside i
 
 - api: standalone server which serves the indexed data
 - backend: contains database migrations and cron jobs to fetch and generate stats
-- bos-components: our components built on BOS
-- explorer-selector: BOS gateway for selecting your favourite explorer (Nearblocks)
+- explorer-selector: gateway for selecting your favourite explorer (Nearblocks)
 - indexer-base: our indexer built using near lake to index blocks, receipts, transactions, accounts and access keys for storing in timescale
-- indexer-balance: secondary indexer for tracking timeseries account balances
 - indexer-events: secondary indexer for tracking timeseries FT and NFT events
 
 ## Contributing

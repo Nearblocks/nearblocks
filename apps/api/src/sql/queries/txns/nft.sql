@@ -57,6 +57,6 @@ FROM
       AND ntm.modified_at IS NOT NULL
   ) tm ON TRUE
 WHERE
-  nft.receipt_id = ANY (${receipt_ids}::TEXT [])
+  nft.receipt_id = ANY (${receipt_ids}::TEXT[])
   AND nft.block_timestamp >= ${start_timestamp}::BIGINT
   AND nft.block_timestamp <= ${end_timestamp}::BIGINT

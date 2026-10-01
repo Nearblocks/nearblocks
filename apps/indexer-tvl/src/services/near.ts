@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop, no-constant-condition */
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';

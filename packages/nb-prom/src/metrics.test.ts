@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import client from 'prom-client';
 import type { MetricObjectWithValues, MetricValue } from 'prom-client';
+import { describe, it, expect, beforeEach } from 'vitest';
+
 import {
   createSyncMetrics,
   createPerfMetrics,

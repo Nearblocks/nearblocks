@@ -10,11 +10,9 @@ export const size = {
 
 const Image = async () => {
   return new ImageResponse(
-    (
-      <Wrapper hideLogo>
-        <LogoFull />
-      </Wrapper>
-    ),
+    <Wrapper hideLogo>
+      <LogoFull />
+    </Wrapper>,
     { ...size },
   );
 };

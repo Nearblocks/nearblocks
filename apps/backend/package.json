@@ -11,36 +11,37 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
+    "build": "pnpm clean && tsc",
     "start": "node dist/index.js",
     "watch": "tsc -w",
-    "dev": "concurrently 'yarn watch' 'node --watch --watch-path=./dist --env-file=.env dist/index.js'",
-    "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "dev": "concurrently 'pnpm watch' 'node --watch --watch-path=./dist --env-file=.env dist/index.js'",
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "@near-js/jsonrpc-client": "1.3.4",
-    "@near-js/jsonrpc-types": "1.3.4",
-    "@sentry/node": "7.74.1",
+    "@near-js/jsonrpc-client": "catalog:",
+    "@near-js/jsonrpc-types": "catalog:",
+    "@sentry/node": "catalog:",
+    "axios": "catalog:",
     "big.js": "7.0.1",
-    "dayjs": "1.11.13",
-    "envalid": "8.1.0",
-    "es-toolkit": "1.40.0",
-    "ethers": "6.15.0",
+    "dayjs": "catalog:",
+    "envalid": "catalog:",
+    "es-toolkit": "catalog:",
+    "ethers": "catalog:",
     "node-cron": "4.6.0"
   },
   "devDependencies": {
-    "@types/big.js": "~6.2.2",
-    "@types/node": "~22.18",
+    "@types/big.js": "catalog:",
+    "@types/node": "catalog:",
     "concurrently": "~9.2.1",
-    "eslint-config-custom-node": "*",
-    "nb-knex": "*",
-    "nb-logger": "*",
-    "nb-near": "*",
-    "nb-tsconfig": "*",
-    "nb-types": "*",
-    "nb-utils": "*",
+    "knex": "catalog:",
+    "nb-knex": "workspace:*",
+    "nb-logger": "workspace:*",
+    "nb-near": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
     "rimraf": "~6.0",
-    "typescript": "~5.9"
+    "typescript": "catalog:"
   }
 }

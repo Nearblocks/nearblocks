@@ -41,21 +41,21 @@ export const HolderFilterFallback = () => {
     <Card className="mb-4">
       <CardContent className="flex flex-col divide-y px-0 md:flex-row md:divide-x md:divide-y-0">
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('overview.filteredBy')}
           </div>
-          <div className="text-body-sm flex items-center gap-1">
+          <div className="flex items-center gap-1 text-body-sm">
             <Skeleton className="w-40" />
           </div>
         </div>
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('overview.balance')}
           </div>
           <Skeleton className="w-32" />
         </div>
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('overview.value')}
           </div>
           <Skeleton className="w-32" />
@@ -109,10 +109,10 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
     <Card className="mb-4">
       <CardContent className="flex flex-col divide-y px-0 md:flex-row md:divide-x md:divide-y-0">
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('overview.filteredBy')}
           </div>
-          <div className="text-body-sm flex items-center gap-1">
+          <div className="flex items-center gap-1 text-body-sm">
             <AccountLink account={account} hideCopy />
             <Link
               className="text-muted-foreground hover:text-foreground"
@@ -123,7 +123,7 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
           </div>
         </div>
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('overview.balance')}
           </div>
           <SkeletonSlot
@@ -144,7 +144,7 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
           </SkeletonSlot>
         </div>
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('overview.value')}
           </div>
           <SkeletonSlot
@@ -155,7 +155,7 @@ export const HolderFilter = ({ cid, contractPromise }: Props) => {
               rawBalance !== null && hasPrice ? (
                 <span className="text-body-sm">
                   {currencyFormat(toTokenPrice(rawBalance, decimals, price))}
-                  <span className="text-muted-foreground ml-2">
+                  <span className="ml-2 text-muted-foreground">
                     @{currencyFormat(price)}
                   </span>
                 </span>

@@ -34,7 +34,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
       <CardContent className="px-0 py-2">
         {network !== 'mainnet' && (
           <>
-            <p className="text-red-foreground text-body-2xs px-3 py-2">
+            <p className="px-3 py-2 text-body-2xs text-red-foreground">
               [{t('overview.testnetNotice')}]
             </p>
             <hr className="border-border" />
@@ -104,7 +104,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                       <>
                         {block.block_hash}{' '}
                         <Copy
-                          className="text-muted-foreground inline-flex align-middle"
+                          className="inline-flex align-middle text-muted-foreground"
                           size="icon-xs"
                           text={block.block_hash}
                         />
@@ -203,7 +203,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                       <span className="flex flex-wrap items-center gap-1.5">
                         <Badge
                           asChild
-                          className="text-body-xs px-1.5 py-0.5"
+                          className="px-1.5 py-0.5 text-body-xs"
                           variant="teal"
                         >
                           <Link
@@ -218,7 +218,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                         <span className="text-muted-foreground">and</span>
                         <Badge
                           asChild
-                          className="text-body-xs px-1.5 py-0.5"
+                          className="px-1.5 py-0.5 text-body-xs"
                           variant="teal"
                         >
                           <Link
@@ -270,7 +270,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                     return (
                       <span className="flex flex-wrap items-center gap-2">
                         <span>{gasFormat(block.chunks_agg.gas_used)} Tgas</span>
-                        <span className="text-muted-foreground text-body-sm">
+                        <span className="text-body-sm text-muted-foreground">
                           ({utilization.toFixed(2)}%)
                         </span>
                       </span>
@@ -427,7 +427,7 @@ export const Overview = ({ blockPromise, loading }: Props) => {
                           {block.prev_block_hash}
                         </Link>{' '}
                         <Copy
-                          className="text-muted-foreground inline-flex align-middle"
+                          className="inline-flex align-middle text-muted-foreground"
                           size="icon-xs"
                           text={block.prev_block_hash}
                         />

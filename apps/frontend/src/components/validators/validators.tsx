@@ -155,7 +155,7 @@ export const ValidatorsTable = ({
   return (
     <Card>
       <CardContent className="p-0">
-        <div className="text-body-sm border-b px-4 py-3 leading-7">
+        <div className="border-b px-4 py-3 text-body-sm leading-7">
           {loading ? (
             <Skeleton className="w-40" />
           ) : total != null ? (
@@ -263,7 +263,7 @@ export const ValidatorsTable = ({
                       rows.push(
                         <TableRow key="decentralization-warning">
                           <TableCell
-                            className="text-body-sm py-3 text-center whitespace-normal text-amber-500"
+                            className="py-3 text-center text-body-sm whitespace-normal text-amber-500"
                             colSpan={11}
                           >
                             {t('table.warning', {
@@ -450,7 +450,7 @@ const ValidatorRows = ({
         </TableCell>
         <TableCell>
           <Badge
-            className="text-body-xs px-1.5 py-0.5"
+            className="px-1.5 py-0.5 text-body-xs"
             variant={statusVariant(row.staking_status ?? '')}
           >
             {statusLabel(row.staking_status ?? '')}
@@ -468,7 +468,7 @@ const ValidatorRows = ({
                 </Truncate>
               </Link>
               <Copy
-                className="text-muted-foreground h-5"
+                className="h-5 text-muted-foreground"
                 size="icon-xs"
                 text={row.account_id}
               />
@@ -476,7 +476,7 @@ const ValidatorRows = ({
             {row.public_key && (
               <Truncate>
                 <TruncateText
-                  className="text-body-xs max-w-40"
+                  className="max-w-40 text-body-xs"
                   text={row.public_key}
                 />
                 <TruncateCopy className="h-5" text={row.public_key} />
@@ -505,14 +505,14 @@ const ValidatorRows = ({
           {row.own_stake_percent ? `${row.own_stake_percent}%` : ''}
         </TableCell>
         <TableCell>
-          <div className="dark:bg-muted relative h-7 w-40 overflow-hidden rounded-full bg-[#d1d5db]">
+          <div className="relative h-7 w-40 overflow-hidden rounded-full bg-[#d1d5db] dark:bg-muted">
             <div
-              className="bg-link absolute inset-y-0 left-0"
+              className="absolute inset-y-0 left-0 bg-link"
               style={{
                 width: `${row.cumulative_stake_percent ?? 0}%`,
               }}
             />
-            <span className="text-body-xs text-white-950 absolute inset-0 flex items-center justify-center font-medium">
+            <span className="absolute inset-0 flex items-center justify-center text-body-xs font-medium text-white-950">
               {cumulativeLabel}
             </span>
           </div>
@@ -533,7 +533,7 @@ const ValidatorRows = ({
               </span>
             </span>
           ) : stake ? (
-            <span className="text-muted-foreground flex items-center gap-1">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <NearCircle className="size-4 shrink-0" />
               {nearFormat(stake, { maximumFractionDigits: 0 })}
             </span>
@@ -553,10 +553,10 @@ const ValidatorRows = ({
                 className="pt-2 pb-4 pl-8 align-top whitespace-normal"
                 colSpan={3}
               >
-                <div className="text-muted-foreground text-headline-xs uppercase">
+                <div className="text-headline-xs text-muted-foreground uppercase">
                   {t('table.expanded.name')}
                 </div>
-                <div className="text-body-sm mt-2 flex items-center gap-1.5">
+                <div className="mt-2 flex items-center gap-1.5 text-body-sm">
                   {row.logo && row.logo.startsWith('http') && (
                     <Image
                       alt={row.name ?? 'logo'}
@@ -574,7 +574,7 @@ const ValidatorRows = ({
                 className="p-3 align-top whitespace-normal"
                 colSpan={1}
               >
-                <div className="text-muted-foreground text-headline-xs uppercase">
+                <div className="text-headline-xs text-muted-foreground uppercase">
                   {t('table.expanded.socialMedia')}
                 </div>
                 <div className="mt-3 flex items-center gap-2">
@@ -590,7 +590,7 @@ const ValidatorRows = ({
                           rel="noreferrer noopener"
                           target="_blank"
                         >
-                          <Globe className="text-link size-4" />
+                          <Globe className="size-4 text-link" />
                         </a>
                       )}
                       {row.email && (
@@ -599,7 +599,7 @@ const ValidatorRows = ({
                           rel="noreferrer noopener"
                           target="_blank"
                         >
-                          <Mail className="text-link size-4" />
+                          <Mail className="size-4 text-link" />
                         </a>
                       )}
                       {row.twitter && (
@@ -612,7 +612,7 @@ const ValidatorRows = ({
                           rel="noreferrer noopener"
                           target="_blank"
                         >
-                          <RiTwitterXFill className="text-link size-4" />
+                          <RiTwitterXFill className="size-4 text-link" />
                         </a>
                       )}
                       {row.discord && (
@@ -625,7 +625,7 @@ const ValidatorRows = ({
                           rel="noreferrer noopener"
                           target="_blank"
                         >
-                          <MessageCircle className="text-link size-4" />
+                          <MessageCircle className="size-4 text-link" />
                         </a>
                       )}
                       {row.github && (
@@ -638,7 +638,7 @@ const ValidatorRows = ({
                           rel="noreferrer noopener"
                           target="_blank"
                         >
-                          <RiGithubFill className="text-link size-4" />
+                          <RiGithubFill className="size-4 text-link" />
                         </a>
                       )}
                       {row.telegram && (
@@ -651,7 +651,7 @@ const ValidatorRows = ({
                           rel="noreferrer noopener"
                           target="_blank"
                         >
-                          <Send className="text-link size-4" />
+                          <Send className="size-4 text-link" />
                         </a>
                       )}
                     </>
@@ -664,10 +664,10 @@ const ValidatorRows = ({
                 className="p-3 align-top whitespace-normal"
                 colSpan={7}
               >
-                <div className="text-muted-foreground text-headline-xs uppercase">
+                <div className="text-headline-xs text-muted-foreground uppercase">
                   {t('table.expanded.description')}
                 </div>
-                <div className="text-body-sm mt-2">
+                <div className="mt-2 text-body-sm">
                   {row.description ?? '-'}
                 </div>
               </TableCell>
@@ -675,7 +675,7 @@ const ValidatorRows = ({
           ) : (
             <TableRow className="bg-muted/40 hover:bg-muted/40">
               <TableCell
-                className="text-muted-foreground text-body-sm py-4 text-center"
+                className="py-4 text-center text-body-sm text-muted-foreground"
                 colSpan={11}
               >
                 {t('table.expanded.ownerPre')}{' '}

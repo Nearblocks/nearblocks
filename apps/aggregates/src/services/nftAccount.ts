@@ -10,7 +10,6 @@ const TABLE = 'nft_account_holders';
 const SOURCE = 'nft_events';
 
 export const syncNFTAccountHolders = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await holders();
   }

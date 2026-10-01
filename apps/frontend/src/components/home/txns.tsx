@@ -50,11 +50,11 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                     <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="bg-muted shrink-0 rounded-lg p-2">
+                          <div className="shrink-0 rounded-lg bg-muted p-2">
                             <ArrowLeftRight className="size-6" />
                           </div>
-                          <div className="text-body-sm flex flex-col leading-tight">
-                            <h4 className="text-link font-normal">
+                          <div className="flex flex-col text-body-sm leading-tight">
+                            <h4 className="font-normal text-link">
                               <Skeleton className="w-40" />
                             </h4>
                             <p className="text-body-2xs text-muted-foreground">
@@ -63,14 +63,14 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                           </div>
                         </div>
                         <Badge
-                          className="text-body-xs h-6 w-20 shrink-0 @lg:hidden"
+                          className="h-6 w-20 shrink-0 text-body-xs @lg:hidden"
                           variant="teal"
                         >
                           <NearCircle />
                           <Skeleton className="w-10" />
                         </Badge>
                       </div>
-                      <div className="text-body-sm grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1 gap-y-1 @lg:flex-1">
+                      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1 gap-y-1 text-body-sm @lg:flex-1">
                         <h4 className="font-normal whitespace-nowrap">
                           {t('txns.from')}
                         </h4>
@@ -85,7 +85,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                         </span>
                       </div>
                       <Badge
-                        className="text-body-xs hidden h-6 w-20 @lg:ml-auto @lg:inline-flex"
+                        className="hidden h-6 w-20 text-body-xs @lg:ml-auto @lg:inline-flex"
                         variant="teal"
                       >
                         <NearCircle />
@@ -121,11 +121,11 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                         <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                           <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                             <div className="flex min-w-0 items-center gap-3">
-                              <div className="bg-muted shrink-0 rounded-lg p-2">
+                              <div className="shrink-0 rounded-lg bg-muted p-2">
                                 <ArrowLeftRight className="size-6" />
                               </div>
-                              <div className="text-body-sm flex min-w-0 flex-col leading-tight">
-                                <h4 className="text-link flex font-normal">
+                              <div className="flex min-w-0 flex-col text-body-sm leading-tight">
+                                <h4 className="flex font-normal text-link">
                                   <Link
                                     className="inline-block w-40 truncate"
                                     href={`/txns/${txn.transaction_hash}`}
@@ -139,19 +139,19 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                               </div>
                             </div>
                             <Badge
-                              className="text-body-xs h-6 w-20 shrink-0 @lg:hidden"
+                              className="h-6 w-20 shrink-0 text-body-xs @lg:hidden"
                               variant="teal"
                             >
                               <NearCircle />
                               {amount}
                             </Badge>
                           </div>
-                          <div className="text-body-sm grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1 gap-y-1 @lg:flex-1">
+                          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-1 gap-y-1 text-body-sm @lg:flex-1">
                             <h4 className="font-normal whitespace-nowrap">
                               {t('txns.from')}
                             </h4>
                             <Link
-                              className="text-link inline-block w-40 truncate"
+                              className="inline-block w-40 truncate text-link"
                               href={`/address/${txn.signer_account_id}`}
                             >
                               {txn.signer_account_id}
@@ -160,14 +160,14 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
                               {t('txns.to')}
                             </h4>
                             <Link
-                              className="text-link inline-block w-40 truncate"
+                              className="inline-block w-40 truncate text-link"
                               href={`/address/${txn.receiver_account_id}`}
                             >
                               {txn.receiver_account_id}
                             </Link>
                           </div>
                           <Badge
-                            className="text-body-xs hidden h-6 w-20 @lg:ml-auto @lg:inline-flex"
+                            className="hidden h-6 w-20 text-body-xs @lg:ml-auto @lg:inline-flex"
                             variant="teal"
                           >
                             <NearCircle />
@@ -189,7 +189,7 @@ export const Txns = ({ loading, txnsPromise }: Props) => {
       <CardFooter className="border-t">
         <Button
           asChild
-          className="text-headline-sm w-full"
+          className="w-full text-headline-sm"
           size="lg"
           variant="secondary"
         >

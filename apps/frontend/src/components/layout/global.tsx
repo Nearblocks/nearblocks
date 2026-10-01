@@ -83,7 +83,7 @@ export const GlobalLayout = ({ children, head }: Props) => {
     >
       {head}
       <body
-        className={`bg-background text-foreground flex min-h-dvh flex-col font-sans ${roboto.variable} overflow-x-clip`}
+        className={`flex min-h-dvh flex-col bg-background font-sans text-foreground ${roboto.variable} overflow-x-clip`}
       >
         <ConfigProvider config={config}>
           <LocaleProvider dictionary={dictionary} locale={locale}>

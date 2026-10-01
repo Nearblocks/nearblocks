@@ -11,19 +11,17 @@ export const size = {
 
 const Image = async () => {
   return new ImageResponse(
-    (
-      <Wrapper>
-        <Title>Privacy Policy</Title>
-        <Background
-          style={{
-            height: 540,
-            opacity: 0.05,
-            position: 'absolute',
-            width: 540,
-          }}
-        />
-      </Wrapper>
-    ),
+    <Wrapper>
+      <Title>Privacy Policy</Title>
+      <Background
+        style={{
+          height: 540,
+          opacity: 0.05,
+          position: 'absolute',
+          width: 540,
+        }}
+      />
+    </Wrapper>,
     { ...size },
   );
 };

@@ -1,9 +1,9 @@
 import { randomBytes } from 'crypto';
-import { request } from 'undici';
 
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import { createBase58check } from '@scure/base';
+import { request } from 'undici';
 
 import { Network } from 'nb-types';
 

@@ -91,28 +91,33 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
           JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
         WHERE
           r.receipt_kind = 'ACTION'
-          AND ${from || to
-      ? sql`
+          AND ${
+            from || to
+              ? sql`
           r.predecessor_account_id = ${from ?? account}
           AND r.receiver_account_id = ${to ?? account}
         `
-      : sql`
+              : sql`
           (
             r.predecessor_account_id = ${account}
             OR r.receiver_account_id = ${account}
           )
-        `}
-          AND ${cursor
-      ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-      : true}
-          AND ${afterTimestamp
-      ? sql`t.block_timestamp >= ${afterTimestamp}`
-      : true}
-          AND ${beforeTimestamp
-      ? sql`t.block_timestamp < ${beforeTimestamp}`
-      : true}
-          AND ${action || method
-      ? sql`
+        `
+          }
+          AND ${
+            cursor
+              ? sql`r.id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+              : true
+          }
+          AND ${
+            afterTimestamp ? sql`t.block_timestamp >= ${afterTimestamp}` : true
+          }
+          AND ${
+            beforeTimestamp ? sql`t.block_timestamp < ${beforeTimestamp}` : true
+          }
+          AND ${
+            action || method
+              ? sql`
           EXISTS (
             SELECT
               1
@@ -124,9 +129,11 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               AND ${method ? sql`a.args ->> 'method_name' = ${method}` : true}
           )
         `
-      : true}
-          AND ${afterBlock || beforeBlock
-      ? sql`
+              : true
+          }
+          AND ${
+            afterBlock || beforeBlock
+              ? sql`
           EXISTS (
             SELECT
               1
@@ -138,7 +145,8 @@ const txns = catchAsync(async (req: RequestValidator<Txns>, res: Response) => {
               AND ${beforeBlock ? sql`b.block_height < ${beforeBlock}` : true}
           )
         `
-      : true}
+              : true
+          }
         ORDER BY
           t.id ${order === 'desc' ? sql`DESC` : sql`ASC`},
           r.id ${order === 'desc' ? sql`DESC` : sql`ASC`}
@@ -776,9 +784,9 @@ const txnsOnly = catchAsync(
         ) AS outcomes_agg
       FROM
         transactions
-        INNER JOIN (${from || to
-        ? intersect
-        : union}) AS tmp using (transaction_hash)
+        INNER JOIN (${
+          from || to ? intersect : union
+        }) AS tmp using (transaction_hash)
       ORDER BY
         id ${sort}
     `;

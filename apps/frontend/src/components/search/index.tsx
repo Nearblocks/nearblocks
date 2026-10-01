@@ -111,7 +111,7 @@ export const SearchBar = ({ size = 'lg' }: Props) => {
             onSelect={onSelect}
           />
         </ButtonGroup>
-        <ButtonGroupSeparator className="bg-border hidden h-8! self-auto md:flex" />
+        <ButtonGroupSeparator className="hidden h-8! self-auto bg-border md:flex" />
         <ButtonGroup className="grow">
           <SearchPopover
             addToHistory={addToHistory}

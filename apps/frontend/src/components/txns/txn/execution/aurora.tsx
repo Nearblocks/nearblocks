@@ -75,7 +75,7 @@ export const AuroraArgsViewer = ({ argsBase64, method }: Props) => {
     return null;
   })();
 
-  const displayData = format === 'rlp' ? rlpDecoded ?? rawData : rawData;
+  const displayData = format === 'rlp' ? (rlpDecoded ?? rawData) : rawData;
   const code = displayData
     ? safeStringify(displayData, { indentation: 2 })
     : '';

@@ -4,14 +4,13 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link href="https://fonts.gstatic.com" rel="preconnect" />
         <link
           href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="manifest" href="/site.webmanifest" />
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <link href="/favicon.ico" rel="icon" />
+        <link href="/site.webmanifest" rel="manifest" />
         <script src="/__ENV.js" />
       </Head>
       <body>

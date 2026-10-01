@@ -17,48 +17,48 @@ export const Footer = () => {
   const { t } = useLocale('layout');
 
   return (
-    <footer className="text-body-sm bg-neutral-100 dark:bg-neutral-900">
+    <footer className="bg-neutral-100 text-body-sm dark:bg-neutral-900">
       <div className="container mx-auto px-4">
         <div className="flex flex-col flex-wrap justify-between gap-6 py-6 md:flex-row lg:grid lg:grid-cols-[3fr_1fr_1fr_1fr]">
           <div className="flex basis-1/1 flex-col gap-4">
             <Link href="/">
-              <Logo className="text-primary h-9" />
+              <Logo className="h-9 text-primary" />
             </Link>
-            <p className="text-muted-foreground max-w-85">
+            <p className="max-w-85 text-muted-foreground">
               {t('footer.description')}
             </p>
             <div className="flex gap-2">
               <Link
-                className="border-border flex size-8 items-center justify-center rounded-full border"
+                className="flex size-8 items-center justify-center rounded-full border border-border"
                 href="https://x.com/nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
                 title="X"
               >
-                <RiTwitterXLine className="text-primary size-4" />
+                <RiTwitterXLine className="size-4 text-primary" />
               </Link>
               <Link
-                className="border-border flex size-8 items-center justify-center rounded-full border"
+                className="flex size-8 items-center justify-center rounded-full border border-border"
                 href="https://github.com/Nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
                 title="GitHub"
               >
-                <RiGithubFill className="text-primary size-4" />
+                <RiGithubFill className="size-4 text-primary" />
               </Link>
               <Link
-                className="border-border flex size-8 items-center justify-center rounded-full border"
+                className="flex size-8 items-center justify-center rounded-full border border-border"
                 href="https://t.me/nearblocks"
                 rel="noreferrer nofollow noopener"
                 target="_blank"
                 title="Telegram"
               >
-                <RiTelegram2Line className="text-primary size-4" />
+                <RiTelegram2Line className="size-4 text-primary" />
               </Link>
             </div>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3 font-medium">
+            <h3 className="pb-3 text-headline-sm font-medium text-primary">
               {t('footer.menu.tools.title')}
             </h3>
             <ul className="space-y-1">
@@ -84,7 +84,7 @@ export const Footer = () => {
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3 font-medium">
+            <h3 className="pb-3 text-headline-sm font-medium text-primary">
               {t('footer.menu.explore.title')}
             </h3>
             <ul className="space-y-1">
@@ -105,7 +105,7 @@ export const Footer = () => {
             </ul>
           </div>
           <div>
-            <h3 className="text-headline-sm text-primary pb-3 font-medium">
+            <h3 className="pb-3 text-headline-sm font-medium text-primary">
               {t('footer.menu.company.title')}
             </h3>
             <ul className="space-y-1">
@@ -142,7 +142,7 @@ export const Footer = () => {
           <p className="text-body-sm text-primary">
             {t('footer.copyright')} {new Date().getFullYear()}
           </p>
-          <p className="text-body-sm text-muted-foreground flex items-center gap-2">
+          <p className="flex items-center gap-2 text-body-sm text-muted-foreground">
             {t('footer.disclaimer')}{' '}
             <Link href="https://www.coingecko.com/" target="_blank">
               <CoinGecko className="size-5" />

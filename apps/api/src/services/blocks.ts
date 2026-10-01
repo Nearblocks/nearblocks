@@ -145,8 +145,8 @@ const item = catchAsync(async (req: RequestValidator<Item>, res: Response) => {
     hashOrHeight.length >= 43
       ? sql`block_hash = ${hashOrHeight}`
       : !isNaN(+hashOrHeight)
-      ? sql`block_height = ${+hashOrHeight}`
-      : false;
+        ? sql`block_height = ${+hashOrHeight}`
+        : false;
 
   if (!query) return res.status(200).json({ blocks: [] });
 

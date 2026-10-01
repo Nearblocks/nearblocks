@@ -23,19 +23,17 @@ const Image = async ({ params }: Props) => {
       : `TESTNET | ${t('transfersMeta.title')}`;
 
   return new ImageResponse(
-    (
-      <Wrapper>
-        <Title>{title}</Title>
-        <TokenBG
-          style={{
-            height: 540,
-            opacity: 0.05,
-            position: 'absolute',
-            width: 960,
-          }}
-        />
-      </Wrapper>
-    ),
+    <Wrapper>
+      <Title>{title}</Title>
+      <TokenBG
+        style={{
+          height: 540,
+          opacity: 0.05,
+          position: 'absolute',
+          width: 960,
+        }}
+      />
+    </Wrapper>,
     { ...size },
   );
 };

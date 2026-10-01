@@ -28,13 +28,13 @@ const secp256k1 = new EC('secp256k1');
 type MpcDomainEntry = {
   domain_id: number;
   key:
+    | { Bls12381: unknown }
     | {
         Ed25519: {
           edwards_point: number[];
           near_public_key_compressed: string;
         };
       }
-    | { Bls12381: unknown }
     | { Secp256k1: { near_public_key: string } };
 };
 

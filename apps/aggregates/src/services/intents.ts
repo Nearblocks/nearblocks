@@ -16,7 +16,6 @@ const STATS_CATCHUP_DAYS = 3n;
 const STATS_INTERVAL_MS = 60_000;
 
 export const syncIntentsStats = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await stats();
     await sleep(STATS_INTERVAL_MS);
@@ -24,7 +23,6 @@ export const syncIntentsStats = async () => {
 };
 
 export const syncIntentsAccounts = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await accounts();
     await sleep(STATS_INTERVAL_MS);

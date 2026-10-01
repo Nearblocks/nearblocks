@@ -59,21 +59,21 @@ export const TokenFaq = ({
         <div className="py-4">
           <SkeletonSlot
             fallback={
-              <span className="text-headline-sm mb-3 block">
+              <span className="mb-3 block text-headline-sm">
                 <Skeleton className="w-50" />
               </span>
             }
             loading={!!loading}
           >
             {() => (
-              <h3 className="text-headline-sm mb-3">
+              <h3 className="mb-3 text-headline-sm">
                 {t('faq.priceTitle', { name })}
               </h3>
             )}
           </SkeletonSlot>
           <SkeletonSlot
             fallback={
-              <span className="text-body-sm block">
+              <span className="block text-body-sm">
                 <span className="block">
                   <Skeleton className="w-full" />
                 </span>
@@ -150,21 +150,21 @@ export const TokenFaq = ({
         <div className="py-4">
           <SkeletonSlot
             fallback={
-              <span className="text-headline-sm mb-3 block">
+              <span className="mb-3 block text-headline-sm">
                 <Skeleton className="w-80" />
               </span>
             }
             loading={!!loading}
           >
             {() => (
-              <h3 className="text-headline-sm mb-3">
+              <h3 className="mb-3 text-headline-sm">
                 {t('faq.creationTitle', { name })}
               </h3>
             )}
           </SkeletonSlot>
           <SkeletonSlot
             fallback={
-              <span className="text-body-sm block">
+              <span className="block text-body-sm">
                 <span className="block">
                   <Skeleton className="w-full" />
                 </span>
@@ -205,7 +205,7 @@ export const TokenFaq = ({
                     />{' '}
                     {t('faq.creationThrough')}{' '}
                     <Link
-                      className="text-link inline-block underline"
+                      className="inline-block text-link underline"
                       href={`/txns/${firstDeployment.transaction_hash}`}
                     >
                       {t('faq.creationThisTxn')}
@@ -231,21 +231,21 @@ export const TokenFaq = ({
         <div className="py-4">
           <SkeletonSlot
             fallback={
-              <span className="text-headline-sm mb-3 block">
+              <span className="mb-3 block text-headline-sm">
                 <Skeleton className="w-65" />
               </span>
             }
             loading={!!loading}
           >
             {() => (
-              <h3 className="text-headline-sm mb-3">
+              <h3 className="mb-3 text-headline-sm">
                 {t('faq.supplyTitle', { name })}
               </h3>
             )}
           </SkeletonSlot>
           <SkeletonSlot
             fallback={
-              <span className="text-body-sm block">
+              <span className="block text-body-sm">
                 <span className="block">
                   <Skeleton className="w-full" />
                 </span>

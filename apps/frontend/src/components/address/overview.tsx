@@ -101,7 +101,7 @@ export const Overview = ({
                           <span>
                             {nearFiatFormat(balance.amount, stats.near_price)}
                           </span>
-                          <span className="text-muted-foreground inline-flex items-center gap-1">
+                          <span className="inline-flex items-center gap-1 text-muted-foreground">
                             @{currencyFormat(stats.near_price)} /
                             <NearCircle className="size-4" />
                           </span>

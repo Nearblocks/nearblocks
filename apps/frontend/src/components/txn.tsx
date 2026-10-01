@@ -103,8 +103,8 @@ export const TxnDirection = ({ address, amount, from, to }: DirectionProps) => {
 };
 
 export const TxnDirectionIcon = () => (
-  <div className="bg-teal-background mx-auto flex size-5 items-center justify-center rounded-full">
-    <MoveRight className="text-teal-foreground size-3" />
+  <div className="mx-auto flex size-5 items-center justify-center rounded-full bg-teal-background">
+    <MoveRight className="size-3 text-teal-foreground" />
   </div>
 );
 
@@ -119,7 +119,7 @@ export const MethodBadge = ({
   text: null | string | undefined;
   textClassName?: string;
 }) => (
-  <Badge className="text-body-xs max-w-full px-1.5 py-0.5" variant="teal">
+  <Badge className="max-w-full px-1.5 py-0.5 text-body-xs" variant="teal">
     <Truncate>
       <TruncateText
         as="code"

@@ -217,7 +217,7 @@ export const Heatmap = memo(({ data, height = 184 }: Props) => {
           <HeatmapSeries.Series data={points} />
         </Chart>
       </div>
-      <div className="text-body-xs text-muted-foreground flex items-center justify-end gap-1">
+      <div className="flex items-center justify-end gap-1 text-body-xs text-muted-foreground">
         <div className="mr-2">{t('analytics.heatmap.less')}</div>
         {ranges.map((range, index) => (
           <Tooltip key={range.from}>

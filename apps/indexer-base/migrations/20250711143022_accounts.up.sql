@@ -23,8 +23,8 @@ CREATE INDEX ak_account_last_action_idx ON access_keys (
 CREATE TABLE accounts (
   created_by_block_timestamp BIGINT NOT NULL,
   deleted_by_block_timestamp BIGINT,
-  account_id text NOT NULL,
-  created_by_receipt_id text,
-  deleted_by_receipt_id text,
+  account_id TEXT NOT NULL,
+  created_by_receipt_id TEXT,
+  deleted_by_receipt_id TEXT,
   PRIMARY KEY (account_id)
 );

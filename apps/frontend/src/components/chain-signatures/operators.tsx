@@ -63,7 +63,7 @@ const TeeCell = ({ tee }: { tee: MCMpcParticipant['tee'] }) => {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="text-muted-foreground cursor-default">—</span>
+          <span className="cursor-default text-muted-foreground">—</span>
         </TooltipTrigger>
         <TooltipContent>{t('operators.tee.unknown')}</TooltipContent>
       </Tooltip>
@@ -97,7 +97,7 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
 
   return (
     <Card>
-      <div className="text-body-sm border-b px-4 py-3">
+      <div className="border-b px-4 py-3 text-body-sm">
         {isLoading ? (
           <Skeleton className="w-40" />
         ) : (
@@ -135,7 +135,7 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
             {!isLoading && !participants.length && (
               <TableRow className="h-15">
                 <TableCell
-                  className="text-muted-foreground text-center"
+                  className="text-center text-muted-foreground"
                   colSpan={4}
                 >
                   {t('operators.empty')}
@@ -154,7 +154,7 @@ export const Operators = ({ loading, mpcsPromise }: Props) => {
                       {participant.is_validator && (
                         <Link href={`/validators/${participant.account}`}>
                           <Badge
-                            className="text-body-xs px-1.5 py-0.5"
+                            className="px-1.5 py-0.5 text-body-xs"
                             variant="lime"
                           >
                             {t('operators.validator')}

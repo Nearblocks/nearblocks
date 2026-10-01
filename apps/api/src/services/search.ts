@@ -46,9 +46,11 @@ const blockQuery = (keyword: string) => {
     FROM
       blocks
     WHERE
-      ${!isNaN(+query)
-      ? sql`block_height = ${query}`
-      : sql`block_hash = ${query}`}
+      ${
+        !isNaN(+query)
+          ? sql`block_height = ${query}`
+          : sql`block_hash = ${query}`
+      }
     LIMIT
       1
   `;

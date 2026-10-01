@@ -8,14 +8,15 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
     "ioredis": "5.3.2"
   },
   "devDependencies": {
-    "eslint-config-custom-node": "*",
-    "nb-tsconfig": "*",
-    "typescript": "~5.2"
+    "@types/node": "catalog:",
+    "nb-tsconfig": "workspace:*",
+    "typescript": "catalog:"
   }
 }

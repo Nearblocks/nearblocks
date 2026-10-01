@@ -11,29 +11,29 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "build": "pnpm clean && tsc",
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "@scure/base": "1.1.9",
-    "@sentry/node": "7.74.1",
-    "envalid": "8.0.0",
-    "nb-prom": "*",
-    "lodash-es": "4.17.21"
+    "@scure/base": "catalog:",
+    "@sentry/node": "catalog:",
+    "envalid": "catalog:",
+    "nb-prom": "workspace:*",
+    "lodash-es": "catalog:"
   },
   "devDependencies": {
-    "@types/lodash-es": "~4.17",
-    "@types/node": "~22.9",
-    "eslint-config-custom-node": "*",
-    "knex-migrate-sql-file": "~2.0",
-    "nb-neardata": "*",
-    "nb-knex": "*",
-    "nb-logger": "*",
-    "nb-tsconfig": "*",
-    "nb-types": "*",
-    "nb-utils": "*",
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "knex": "catalog:",
+    "knex-migrate-sql-file": "catalog:",
+    "nb-knex": "workspace:*",
+    "nb-logger": "workspace:*",
+    "nb-neardata": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
     "rimraf": "~5.0",
-    "typescript": "~5.2"
+    "typescript": "catalog:"
   }
 }

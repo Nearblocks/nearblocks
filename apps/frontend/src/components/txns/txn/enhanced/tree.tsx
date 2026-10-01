@@ -51,7 +51,7 @@ export const EnhancedTree = ({
       <div className={`${baseWrapperClassName} ${wrapperClassName}`}>
         {isRoot && (
           <div className="flex items-center gap-2 py-1">
-            <span className="bg-border size-4 shrink-0 rounded-full" />
+            <span className="size-4 shrink-0 rounded-full bg-border" />
             <AccountLink
               account={receipt.predecessor_account_id}
               textClassName="max-w-60 text-body-sm"
@@ -69,7 +69,7 @@ export const EnhancedTree = ({
           />
         )}
 
-        <div className="border-link ml-2 border-l py-2 pl-6">
+        <div className="ml-2 border-l border-link py-2 pl-6">
           <div className="flex flex-wrap gap-1">
             {actions.map((action, i) => (
               <ActionCard
@@ -87,8 +87,8 @@ export const EnhancedTree = ({
         </div>
 
         <div className="relative flex items-center gap-2 py-1">
-          <div className="border-link absolute -top-1.5 left-[5.5px] h-1.5 w-1.5 -rotate-45 border-b border-l" />
-          <span className="bg-border size-4 shrink-0 rounded-full" />
+          <div className="absolute -top-1.5 left-[5.5px] h-1.5 w-1.5 -rotate-45 border-b border-l border-link" />
+          <span className="size-4 shrink-0 rounded-full bg-border" />
           <AccountLink
             account={receipt.receiver_account_id}
             textClassName="max-w-60 text-body-sm"

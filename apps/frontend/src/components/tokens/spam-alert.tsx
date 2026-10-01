@@ -14,8 +14,8 @@ export const SpamAlert = async ({ after, before, cid, linkLabel }: Props) => {
   if (!isSpamToken(cid, patterns)) return null;
 
   return (
-    <Alert className="bg-amber-background mt-3 mb-0 border-0">
-      <AlertDescription className="text-amber-foreground text-body-xs block">
+    <Alert className="mt-3 mb-0 border-0 bg-amber-background">
+      <AlertDescription className="block text-body-xs text-amber-foreground">
         {before}
         <a
           className="font-bold underline"

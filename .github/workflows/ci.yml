@@ -6,29 +6,45 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build, Lint & Format
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: 'yarn'
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
       - name: Lint & Format
-        run: yarn lint:check && yarn format:check
+        run: pnpm lint:check && pnpm format:check
+
+      - name: Build affected packages
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="HEAD^1"
+          fi
+          pnpm turbo run build --filter="...[$BASE]"
 
       - name: Test
-        run: yarn test
+        run: pnpm test

@@ -16,11 +16,11 @@ export default async function handler(
 
   try {
     const response = await fetch(url, {
-      method: 'GET',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
+      method: 'GET',
     });
 
     if (!response.ok) {

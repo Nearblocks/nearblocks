@@ -67,19 +67,19 @@ export const Overview = ({
       <div className={gridClass}>
         {network === 'mainnet' && (
           <>
-            <div className="divide-border divide-y">
+            <div className="divide-y divide-border">
               <Link
                 className="group flex items-center gap-3 py-3"
                 href="/charts/near-price"
               >
-                <div className="bg-muted rounded-lg p-3">
+                <div className="rounded-lg bg-muted p-3">
                   <Near className="size-6" />
                 </div>
                 <div>
-                  <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
+                  <h3 className="text-body-xs text-muted-foreground uppercase transition-colors group-hover:text-link">
                     {t('overview.price')}
                   </h3>
-                  <p className="text-body-base text-foreground/80 mt-0.5 font-normal whitespace-nowrap">
+                  <p className="mt-0.5 text-body-base font-normal whitespace-nowrap text-foreground/80">
                     <SkeletonSlot
                       fallback={<Skeleton className="w-45" />}
                       loading={!!loading}
@@ -109,14 +109,14 @@ export const Overview = ({
                 className="group flex items-center gap-3 py-3"
                 href="/charts/market-cap"
               >
-                <div className="bg-muted rounded-lg p-3">
+                <div className="rounded-lg bg-muted p-3">
                   <Globe className="size-6" />
                 </div>
                 <div>
-                  <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
+                  <h3 className="text-body-xs text-muted-foreground uppercase transition-colors group-hover:text-link">
                     {t('overview.marketCap')}
                   </h3>
-                  <p className="text-body-base text-foreground/80 mt-0.5 font-normal">
+                  <p className="mt-0.5 text-body-base font-normal text-foreground/80">
                     <SkeletonSlot
                       fallback={<Skeleton className="w-30" />}
                       loading={!!loading}
@@ -146,15 +146,15 @@ export const Overview = ({
         )}
         <div className="divide-y">
           <div className="flex items-center gap-3 py-3">
-            <div className="bg-muted rounded-lg p-3">
+            <div className="rounded-lg bg-muted p-3">
               <ArrowRightLeft className="size-6" />
             </div>
             <div className="flex grow flex-wrap justify-between gap-2">
               <Link className="group block" href="/charts/txns">
-                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
+                <h3 className="text-body-xs text-muted-foreground uppercase transition-colors group-hover:text-link">
                   {t('overview.transactions')}
                 </h3>
-                <p className="text-body-base text-foreground/80 mt-0.5 font-normal">
+                <p className="mt-0.5 text-body-base font-normal text-foreground/80">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-30" />}
                     loading={!!loading}
@@ -181,13 +181,13 @@ export const Overview = ({
                 className="group ml-auto block text-right"
                 href="/charts/txn-fee"
               >
-                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
+                <h3 className="text-body-xs text-muted-foreground uppercase transition-colors group-hover:text-link">
                   {t('overview.gas')}
                 </h3>
                 {/* Fixed-width, right-aligned value box so the skeleton and the
                     loaded `Ⓝ x / TGas` readout share the exact footprint — the
                     number no longer jumps when the promise resolves. */}
-                <p className="text-body-base text-foreground/80 mt-0.5 flex w-32 items-center justify-end gap-1 font-normal">
+                <p className="mt-0.5 flex w-32 items-center justify-end gap-1 text-body-base font-normal text-foreground/80">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-full" />}
                     loading={!!loading}
@@ -211,15 +211,15 @@ export const Overview = ({
             </div>
           </div>
           <div className="flex items-center gap-3 py-3">
-            <div className="bg-muted rounded-lg p-3">
+            <div className="rounded-lg bg-muted p-3">
               <Pickaxe className="size-6" />
             </div>
             <div className="flex grow flex-wrap items-center gap-2">
               <Link className="group block" href="/validators">
-                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
+                <h3 className="text-body-xs text-muted-foreground uppercase transition-colors group-hover:text-link">
                   {t('overview.validators')}
                 </h3>
-                <p className="text-body-base text-foreground/80 mt-0.5">
+                <p className="mt-0.5 text-body-base text-foreground/80">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-10" />}
                     loading={!!loading}
@@ -238,10 +238,10 @@ export const Overview = ({
                 className="group ml-auto block text-right"
                 href="/charts/blocks"
               >
-                <h3 className="text-body-xs text-muted-foreground group-hover:text-link uppercase transition-colors">
+                <h3 className="text-body-xs text-muted-foreground uppercase transition-colors group-hover:text-link">
                   {t('overview.blockTime')}
                 </h3>
-                <p className="text-body-base text-foreground/80 mt-0.5">
+                <p className="mt-0.5 text-body-base text-foreground/80">
                   <SkeletonSlot
                     fallback={<Skeleton className="w-15" />}
                     loading={!!loading}
@@ -268,7 +268,7 @@ export const Overview = ({
         <Separator className={sep2Class} orientation="vertical" />
         <div className={cn(chartClass, 'flex flex-col justify-center')}>
           <Link href="/charts/txns">
-            <h3 className="text-body-xs text-muted-foreground hover:text-link pb-1 uppercase transition-colors">
+            <h3 className="pb-1 text-body-xs text-muted-foreground uppercase transition-colors hover:text-link">
               {t('chart.title')}
             </h3>
           </Link>

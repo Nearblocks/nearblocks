@@ -73,8 +73,8 @@ const receipts = responseHandler(
             ? sql.receipts.filterCte
             : sql.receipts.cte
           : indexed
-          ? sql.receipts.filterCteUnion
-          : sql.receipts.cteUnion;
+            ? sql.receipts.filterCteUnion
+            : sql.receipts.cteUnion;
       const cte = pgp.as.format(cteSql, {
         before,
         cursor: {
@@ -171,8 +171,8 @@ const count = responseHandler(
           ? sql.receipts.filterCount
           : sql.receipts.count
         : indexed
-        ? sql.receipts.filterCountUnion
-        : sql.receipts.countUnion;
+          ? sql.receipts.filterCountUnion
+          : sql.receipts.countUnion;
     const beforeTs = before ? BigInt(before) - 1n : undefined;
     const count = await rollingWindowCount(
       (start, end, limit) =>

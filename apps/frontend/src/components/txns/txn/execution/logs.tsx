@@ -36,7 +36,7 @@ const beautify = (raw: string): string => {
 
 export const ReceiptLogs = ({ logs }: Props) => {
   if (logs.length === 0) {
-    return <p className="text-muted-foreground py-1">No Logs</p>;
+    return <p className="py-1 text-muted-foreground">No Logs</p>;
   }
 
   const combined = logs

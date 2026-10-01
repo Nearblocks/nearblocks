@@ -54,7 +54,7 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
             <>
               {t('titleByAccount')}{' '}
               <Link
-                className="text-link text-body-base break-all"
+                className="text-body-base break-all text-link"
                 href={`/address/${account}`}
               >
                 {account}
@@ -86,7 +86,7 @@ const TxnsPage = async ({ params, searchParams }: Props) => {
   const title = block ? (
     <>
       {t('titleByBlock')}{' '}
-      <span className="text-muted-foreground text-body-base">
+      <span className="text-body-base text-muted-foreground">
         {block.length > 12 ? `${block.slice(0, 8)}…${block.slice(-4)}` : block}
       </span>
     </>

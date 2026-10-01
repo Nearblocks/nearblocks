@@ -141,7 +141,7 @@ export const RpcSelector = () => {
       >
         <DialogContent>
           <DialogHeader className="border-b pb-4">
-            <DialogTitle className="text-headline-sm -mt-2">
+            <DialogTitle className="-mt-2 text-headline-sm">
               {dialog?.mode === 'edit' ? 'Edit Provider' : 'Add Provider'}
             </DialogTitle>
           </DialogHeader>

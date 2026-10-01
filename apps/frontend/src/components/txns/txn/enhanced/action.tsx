@@ -147,7 +147,7 @@ export const ActionCard = ({ action, expanded, receipt, toggle }: Props) => {
           {actionLabel}
         </span>
         {receipt.outcome.status === false && (
-          <span className="bg-destructive/10 text-destructive rounded px-1.5 py-0.5 text-xs">
+          <span className="text-xs rounded bg-destructive/10 px-1.5 py-0.5 text-destructive">
             Fail
           </span>
         )}
@@ -170,10 +170,10 @@ export const ReceiptExpandedSection = ({
   const preCharged = loading ? '0' : getPreCharged(receipt!);
 
   return (
-    <div className="border-border bg-card mt-1 space-y-3 rounded-lg border p-3">
+    <div className="mt-1 space-y-3 rounded-lg border border-border bg-card p-3">
       <SkeletonSlot
         fallback={
-          <span className="text-body-sm block">
+          <span className="block text-body-sm">
             <span className="block">
               <Skeleton className="w-full" />
             </span>

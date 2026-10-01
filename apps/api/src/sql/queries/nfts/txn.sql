@@ -22,13 +22,13 @@ SELECT
   ) AS block
 FROM
   UNNEST(
-    ${receipt_id}::TEXT [],
-    ${contract_account_id}::TEXT [],
-    ${affected_account_id}::TEXT [],
-    ${involved_account_id}::TEXT [],
-    ${token_id}::TEXT [],
-    ${cause}::TEXT [],
-    ${delta_amount}::TEXT [],
+    ${receipt_id}::TEXT[],
+    ${contract_account_id}::TEXT[],
+    ${affected_account_id}::TEXT[],
+    ${involved_account_id}::TEXT[],
+    ${token_id}::TEXT[],
+    ${cause}::TEXT[],
+    ${delta_amount}::TEXT[],
     ${block_timestamp}::BIGINT[],
     ${shard_id}::SMALLINT[],
     ${event_index}::INTEGER[],

@@ -85,15 +85,17 @@ const txns = catchAsync(
             affected_account_id = ${account}
             AND ${involved ? sql`involved_account_id = ${involved}` : true}
             AND ${event ? sql`cause = ${event}` : true}
-            AND ${cursor
-        ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-        : true}
-            AND ${afterTimestamp
-        ? sql`block_timestamp >= ${afterTimestamp}`
-        : true}
-            AND ${beforeTimestamp
-        ? sql`block_timestamp < ${beforeTimestamp}`
-        : true}
+            AND ${
+              cursor
+                ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+                : true
+            }
+            AND ${
+              afterTimestamp ? sql`block_timestamp >= ${afterTimestamp}` : true
+            }
+            AND ${
+              beforeTimestamp ? sql`block_timestamp < ${beforeTimestamp}` : true
+            }
             AND EXISTS (
               SELECT
                 1

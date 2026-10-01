@@ -77,7 +77,7 @@ export const TokenHolders = ({
             <span>
               {numberFormat(holder.percentage, { maximumFractionDigits: 4 })}%
             </span>
-            <div className="bg-border mt-1 h-0.5 w-full rounded-full">
+            <div className="mt-1 h-0.5 w-full rounded-full bg-border">
               <div
                 className="h-0.5 rounded-full bg-teal-500"
                 style={{
@@ -135,7 +135,7 @@ export const TokenHolders = ({
 
   return (
     <Card>
-      <CardContent className="text-body-sm p-0">
+      <CardContent className="p-0 text-body-sm">
         <DataTable
           columns={columns}
           data={loading ? undefined : rows}

@@ -58,14 +58,14 @@ export const Overview = ({
               <ListRight className="pt-0!">
                 <SkeletonSlot
                   fallback={
-                    <span className="text-body-xs block">
+                    <span className="block text-body-xs">
                       <Skeleton className="w-28" />
                     </span>
                   }
                   loading={!!loading}
                 >
                   {() => (
-                    <span className="text-body-xs flex items-center gap-1">
+                    <span className="flex items-center gap-1 text-body-xs">
                       {contract?.price ? (
                         <>
                           {currencyFormat(contract.price)}

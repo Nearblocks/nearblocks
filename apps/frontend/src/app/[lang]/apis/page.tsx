@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax -- data is fully awaited before render (no streaming boundary), so the segment holds implicitly */
+/* eslint-disable nb/require-hold-nav -- data is fully awaited before render (no streaming boundary), so the segment holds implicitly */
 import { Metadata } from 'next';
 
 import { Apis } from '@/components/apis';

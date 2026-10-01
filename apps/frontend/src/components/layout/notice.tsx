@@ -18,8 +18,8 @@ export const Notice = ({ syncStatusPromise }: Props) => {
   if (!syncStatus || syncStatus.sync) return null;
 
   return (
-    <Alert className="bg-amber-background rounded-none border-0 py-2 pl-3">
-      <AlertDescription className="text-amber-foreground justify-center text-center">
+    <Alert className="rounded-none border-0 bg-amber-background py-2 pl-3">
+      <AlertDescription className="justify-center text-center text-amber-foreground">
         {t('notice.outOfSync')}
       </AlertDescription>
     </Alert>

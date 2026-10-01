@@ -29,10 +29,10 @@ export type RouteKey<R extends RouteNamespace> = RecursiveKeyOf<Dictionary[R]>;
 type RecursiveValueOf<T, K extends string> = K extends keyof T
   ? T[K]
   : K extends `${infer First}.${infer Rest}`
-  ? First extends keyof T
-    ? RecursiveValueOf<T[First], Rest>
-    : never
-  : never;
+    ? First extends keyof T
+      ? RecursiveValueOf<T[First], Rest>
+      : never
+    : never;
 
 type GetParamKeys<T extends string> =
   T extends `${string}{{${infer Param}}}${infer Rest}`
@@ -47,11 +47,13 @@ export type Translator<T extends object> = <K extends RecursiveKeyOf<T>>(
     ? []
     : [
         {
-          [P in GetParamKeys<
-            RecursiveValueOf<T, K> extends string
-              ? RecursiveValueOf<T, K>
-              : never
-          >]: number | string;
+          [
+            P in GetParamKeys<
+              RecursiveValueOf<T, K> extends string
+                ? RecursiveValueOf<T, K>
+                : never
+            >
+          ]: number | string;
         },
       ]
 ) => string;

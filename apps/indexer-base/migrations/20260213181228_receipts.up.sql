@@ -1,5 +1,4 @@
-CREATE
-OR REPLACE FUNCTION unescape_log (input text) RETURNS text LANGUAGE plpgsql IMMUTABLE STRICT AS $$
+CREATE OR REPLACE FUNCTION unescape_log (input TEXT) RETURNS TEXT LANGUAGE plpgsql IMMUTABLE STRICT AS $$
 DECLARE
   clean_input text;
 BEGIN
@@ -10,8 +9,7 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
-CREATE
-OR REPLACE FUNCTION unescape_logs (logs jsonb) RETURNS jsonb LANGUAGE plpgsql IMMUTABLE AS $$
+CREATE OR REPLACE FUNCTION unescape_logs (logs JSONB) RETURNS JSONB LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF logs IS NULL OR jsonb_typeof(logs) != 'array' THEN
     RETURN COALESCE(logs, '[]'::jsonb);
@@ -28,8 +26,7 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
-CREATE
-OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS JSONB LANGUAGE SQL STABLE AS $$
+CREATE OR REPLACE FUNCTION receipt_tree (p_receipt_id TEXT, p_timestamp BIGINT) RETURNS JSONB LANGUAGE SQL STABLE AS $$
   WITH
     receipt_selected AS (
       SELECT

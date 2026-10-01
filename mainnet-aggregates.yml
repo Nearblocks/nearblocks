@@ -4,7 +4,9 @@ services:
     container_name: mainnet-aggregates
     build:
       context: .
-      dockerfile: ./apps/aggregates/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: aggregates
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'

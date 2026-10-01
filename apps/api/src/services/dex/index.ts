@@ -158,8 +158,9 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
         GROUP BY
           bucket,
           pair_id
-      ) ep1d ON TRUE ${search
-      ? sql`
+      ) ep1d ON TRUE ${
+        search
+          ? sql`
           WHERE
             p.contract ILIKE ${search + '%'}
             OR p.base ILIKE ${search + '%'}
@@ -167,11 +168,12 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
             OR b.symbol ILIKE ${search + '%'}
             OR q.symbol ILIKE ${search + '%'}
         `
-      : sql``}
+          : sql``
+      }
     ORDER BY
-      ${sql(sort)} ${order === 'desc'
-      ? sql`DESC NULLS LAST`
-      : sql`ASC NULLS FIRST`},
+      ${sql(sort)} ${
+        order === 'desc' ? sql`DESC NULLS LAST` : sql`ASC NULLS FIRST`
+      },
       id
     LIMIT
       ${limit}
@@ -196,8 +198,9 @@ const count = catchAsync(
           FROM
             dex_pairs p
             JOIN ft_meta b ON b.contract = p.base
-            JOIN ft_meta q ON q.contract = p.quote ${search
-        ? sql`
+            JOIN ft_meta q ON q.contract = p.quote ${
+              search
+                ? sql`
             WHERE
               p.contract ILIKE ${search + '%'}
               OR p.base ILIKE ${search + '%'}
@@ -205,7 +208,8 @@ const count = catchAsync(
               OR b.symbol ILIKE ${search + '%'}
               OR q.symbol ILIKE ${search + '%'}
           `
-        : sql``}
+                : sql``
+            }
         ) AS temp
     `;
 

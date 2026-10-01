@@ -3,8 +3,8 @@ import dynamic from 'next/dynamic';
 const ExplorerSelector = dynamic(
   () => import('../components/ExplorerSelector'),
   {
-    ssr: false,
     loading: () => <Spinner />,
+    ssr: false,
   },
 );
 const ExplorerPage = () => {

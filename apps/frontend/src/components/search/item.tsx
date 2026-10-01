@@ -13,7 +13,7 @@ export const SearchItem = ({ button, children, title }: Props) => {
         className="align-center flex justify-between p-2"
         role="presentation"
       >
-        <div className="text-headline-xs text-muted-foreground px-2 py-1">
+        <div className="px-2 py-1 text-headline-xs text-muted-foreground">
           {title}
         </div>
         {button && button}

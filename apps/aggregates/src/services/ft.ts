@@ -9,7 +9,6 @@ const OFFSET = 3_000_000_000n; // 3s in ns
 const TABLE = 'ft_holders';
 
 export const syncFTHolders = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await holders();
   }

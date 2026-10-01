@@ -27,7 +27,6 @@ export const syncTvlStats = async () => {
     return;
   }
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await stats();
     await sleep(STATS_INTERVAL_MS);
@@ -218,9 +217,7 @@ const stats = async () => {
     logger.info(`${STATS_TABLE}: polling ${sources.length} sources`);
 
     for (const { chain, protocol } of sources) {
-      // eslint-disable-next-line no-await-in-loop
       await statsForSource(protocol, chain);
-      // eslint-disable-next-line no-await-in-loop
       await repairPricesForSource(protocol, chain);
     }
   } catch (error) {

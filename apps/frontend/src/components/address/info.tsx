@@ -94,7 +94,7 @@ export const Info = ({ accountPromise, balancePromise, loading }: Props) => {
                         <TimeAgo ns={account.created.block_timestamp} />{' '}
                         {t('info.atTxn')}{' '}
                         <Link
-                          className="text-link inline-block w-30 truncate align-middle"
+                          className="inline-block w-30 truncate align-middle text-link"
                           href={`/txns/${account.created.transaction_hash}`}
                         >
                           {account.created.transaction_hash}

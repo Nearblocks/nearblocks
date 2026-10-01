@@ -20,7 +20,7 @@ export const ErrorFallback = () => {
     });
 
   return (
-    <div className="text-body-sm text-muted-foreground flex items-center justify-center gap-3 p-6">
+    <div className="flex items-center justify-center gap-3 p-6 text-body-sm text-muted-foreground">
       <span>Failed to load this section.</span>
       <Button onClick={retry} size="xs" variant="outline">
         Retry

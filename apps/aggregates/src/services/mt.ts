@@ -15,7 +15,6 @@ export const syncMTHolders = async () => {
     return;
   }
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await holders();
   }
