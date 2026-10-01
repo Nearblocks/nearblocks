@@ -359,14 +359,14 @@ export const DataTable = <TData,>({
         canDownload ||
         hasPagination ||
         (loading && (!!downloadFilename || reservePager))) && (
-        <div className="text-body-sm flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 text-body-sm">
           <div className="leading-7">
             {header}
             {/* The Showing line renders on load for every paginatable table
                 (even single-page ones), so its reservation keys off
                 onPaginationNavigate, not the pager reservation. */}
             {loading && !!onPaginationNavigate && (
-              <span className="text-body-xs block leading-5">
+              <span className="block text-body-xs leading-5">
                 <Skeleton className="w-28" />
               </span>
             )}
@@ -374,7 +374,7 @@ export const DataTable = <TData,>({
               !!onPaginationNavigate &&
               !!data?.length &&
               !pageUnknown && (
-                <span className="text-body-xs text-muted-foreground/80 block leading-5">
+                <span className="block text-body-xs leading-5 text-muted-foreground/80">
                   (Showing {numberFormat((currentPage - 1) * effPerPage + 1)} to{' '}
                   {numberFormat((currentPage - 1) * effPerPage + data.length)})
                 </span>
@@ -386,7 +386,7 @@ export const DataTable = <TData,>({
                 geometry identical when data arrives. */}
             {activeFilters.length > 0 && (
               <>
-                <span className="text-muted-foreground shrink-0">
+                <span className="shrink-0 text-muted-foreground">
                   Filtered By:
                 </span>
                 {activeFilters.map((filter) => (

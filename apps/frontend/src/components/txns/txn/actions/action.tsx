@@ -1,8 +1,7 @@
 'use client';
 
-import type { JsonData } from 'nb-schemas/src/common';
-
 import type { ActionReceipt } from 'nb-schemas';
+import type { JsonData } from 'nb-schemas/src/common';
 import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
@@ -38,7 +37,7 @@ export const Action = ({
 
   if (action.action === ActionKind.FUNCTION_CALL) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {full ? (
           <>
             {t('actions.call')}{' '}
@@ -78,7 +77,7 @@ export const Action = ({
 
   if (action.action === ActionKind.TRANSFER) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.transfer')} <NearCircle className="size-4" />
         {nearFormat(String(args.deposit ?? 0))}
         {full && (
@@ -104,7 +103,7 @@ export const Action = ({
 
   if (action.action === ActionKind.STAKE) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.stake')} <NearCircle className="size-4" />
         {nearFormat(String(args.stake ?? 0))}
         {full && (
@@ -132,7 +131,7 @@ export const Action = ({
     const codeHash =
       typeof args.code_hash === 'string' ? args.code_hash : undefined;
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.deployContract')}
         {codeHash && (
           <>
@@ -168,7 +167,7 @@ export const Action = ({
     const codeHash =
       typeof args.code_hash === 'string' ? args.code_hash : undefined;
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.deployGlobalContract')}
         {codeHash && (
           <>
@@ -195,7 +194,7 @@ export const Action = ({
 
   if (action.action === ActionKind.CREATE_ACCOUNT) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.createAccount')}
         {full && (
           <>
@@ -213,7 +212,7 @@ export const Action = ({
 
   if (action.action === ActionKind.DETERMINISTIC_STATE_INIT) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.createDeterministicAccount')}
         {full && (
           <>
@@ -231,7 +230,7 @@ export const Action = ({
 
   if (action.action === ActionKind.DELETE_ACCOUNT) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.deleteAccount')}
         {full && (
           <>
@@ -249,7 +248,7 @@ export const Action = ({
 
   if (action.action === ActionKind.DELEGATE_ACTION) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.delegate')}
         {full && (
           <>
@@ -268,11 +267,11 @@ export const Action = ({
 
   if (action.action === ActionKind.ADD_KEY) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.addKey')}{' '}
         <QuantumSafeBadge publicKey={String(args.public_key ?? '')} />
         <Link
-          className="text-link max-w-32 truncate sm:max-w-40"
+          className="max-w-32 truncate text-link sm:max-w-40"
           href={`/address/${receiver}/keys`}
         >
           {String(args.public_key ?? '')}
@@ -298,11 +297,11 @@ export const Action = ({
 
   if (action.action === ActionKind.DELETE_KEY) {
     return (
-      <span className="text-body-sm flex flex-wrap items-center gap-1">
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.deleteKey')}{' '}
         <QuantumSafeBadge publicKey={String(args.public_key ?? '')} />
         <Link
-          className="text-link max-w-32 truncate sm:max-w-40"
+          className="max-w-32 truncate text-link sm:max-w-40"
           href={`/address/${receiver}/keys`}
         >
           {String(args.public_key ?? '')}

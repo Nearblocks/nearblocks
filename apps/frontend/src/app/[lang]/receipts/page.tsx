@@ -52,7 +52,7 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
           title={
             <>
               {t('titleByAccount')}{' '}
-              <span className="text-muted-foreground text-body-base">
+              <span className="text-body-base text-muted-foreground">
                 {account}
               </span>
             </>
@@ -78,7 +78,7 @@ const ReceiptsPage = async ({ params, searchParams }: Props) => {
   const title = block ? (
     <>
       {t('titleByBlock')}{' '}
-      <span className="text-muted-foreground text-body-base">
+      <span className="text-body-base text-muted-foreground">
         {block.length > 12 ? `${block.slice(0, 8)}…${block.slice(-4)}` : block}
       </span>
     </>

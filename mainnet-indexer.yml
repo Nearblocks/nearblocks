@@ -4,7 +4,10 @@ services:
     container_name: mainnet-indexer-base
     build:
       context: .
-      dockerfile: ./apps/indexer-base/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-base
+        APT_PACKAGES: 'ca-certificates git curl iputils-ping'
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -13,16 +16,11 @@ services:
     container_name: mainnet-indexer-receipts
     build:
       context: .
-      dockerfile: ./apps/indexer-receipts/Dockerfile
-    restart: always
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    env_file: mainnet.indexer.env
-  indexer-balance:
-    container_name: mainnet-indexer-balance
-    build:
-      context: .
-      dockerfile: ./apps/indexer-balance/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-receipts
+        NEON: true
+        APT_PACKAGES: 'ca-certificates git curl iputils-ping'
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -31,16 +29,10 @@ services:
     container_name: mainnet-indexer-events
     build:
       context: .
-      dockerfile: ./apps/indexer-events/Dockerfile
-    restart: always
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    env_file: mainnet.indexer.env
-  indexer-dex:
-    container_name: mainnet-indexer-dex
-    build:
-      context: .
-      dockerfile: ./apps/indexer-dex/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-events
+        NEON: true
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -49,7 +41,10 @@ services:
     container_name: mainnet-indexer-multichain
     build:
       context: .
-      dockerfile: ./apps/indexer-multichain/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-multichain
+        NODE_ARGS: '--max-old-space-size=1536'
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -58,7 +53,9 @@ services:
     container_name: mainnet-indexer-intents
     build:
       context: .
-      dockerfile: ./apps/indexer-intents/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-intents
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -67,7 +64,10 @@ services:
     container_name: mainnet-indexer-staking
     build:
       context: .
-      dockerfile: ./apps/indexer-staking/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-staking
+        NODE_ARGS: '--max-old-space-size=2048'
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -76,17 +76,10 @@ services:
     container_name: mainnet-indexer-ft-state
     build:
       context: .
-      dockerfile: ./apps/indexer-ft-state/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-ft-state
     restart: always
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    env_file: mainnet.indexer.env
-  ft-finder:
-    container_name: mainnet-ft-finder
-    build:
-      context: .
-      dockerfile: ./apps/ft-finder/Dockerfile
-    restart: 'no'
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     env_file: mainnet.indexer.env

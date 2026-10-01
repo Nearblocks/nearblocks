@@ -8,15 +8,16 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "knex": "3.1.0",
-    "pg": "8.13.1"
+    "knex": "catalog:",
+    "pg": "catalog:"
   },
   "devDependencies": {
-    "eslint-config-custom-node": "*",
-    "nb-tsconfig": "*",
-    "typescript": "~5.2"
+    "@types/node": "catalog:",
+    "nb-tsconfig": "workspace:*",
+    "typescript": "catalog:"
   }
 }

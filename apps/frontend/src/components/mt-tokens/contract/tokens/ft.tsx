@@ -46,7 +46,7 @@ const FTCard = ({ token }: { token: MTTokenList }) => (
         type="mt-tokens"
       />
     </span>
-    <span className="text-muted-foreground p-1">
+    <span className="p-1 text-muted-foreground">
       {token.price
         ? `$${numberFormat(token.price, { maximumFractionDigits: 6 })}`
         : '-'}
@@ -80,7 +80,7 @@ export const MtFtTokenList = ({
 
   return (
     <>
-      <div className="text-body-sm flex flex-wrap items-center justify-between gap-1 px-1 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-1 px-1 pb-3 text-body-sm">
         <SkeletonSlot
           fallback={
             <span className="leading-7">
@@ -104,7 +104,7 @@ export const MtFtTokenList = ({
           }}
         </SkeletonSlot>
       </div>
-      <div className="text-body-sm p-1">
+      <div className="p-1 text-body-sm">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {loading ? (
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (

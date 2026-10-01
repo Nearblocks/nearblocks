@@ -81,10 +81,10 @@ export const BurrowEvents = ({ logs, meta }: Props) => {
 
         return (
           <span
-            className="text-body-sm flex flex-wrap items-center gap-1"
+            className="flex flex-wrap items-center gap-1 text-body-sm"
             key={i}
           >
-            <Icon className="text-blue-foreground size-3.5 shrink-0" />
+            <Icon className="size-3.5 shrink-0 text-blue-foreground" />
             {label(event.event)}
             <TokenAmount
               amount={event.amount}

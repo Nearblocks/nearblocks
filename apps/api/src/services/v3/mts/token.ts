@@ -58,7 +58,7 @@ const list = responseHandler(
     const data = await dbEvents.manyOrNone<MTTokenList>(sqlQuery, {
       contract,
       cursor: {
-        price: sortByPrice ? cursor?.price ?? null : undefined,
+        price: sortByPrice ? (cursor?.price ?? null) : undefined,
         token: cursor?.token,
       },
       direction,

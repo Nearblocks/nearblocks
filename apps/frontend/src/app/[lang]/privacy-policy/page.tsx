@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 const PrivacyPolicyPage = () => {
   return (
     <main className="flex flex-1 flex-col py-10">
-      <div className="bg-card container mx-auto flex flex-1 rounded-lg px-4 py-10">
+      <div className="container mx-auto flex flex-1 rounded-lg bg-card px-4 py-10">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-headline-2xl mb-2">Privacy Policy</h1>
-          <p className="text-muted-foreground mb-6 text-sm">
+          <h1 className="mb-2 text-headline-2xl">Privacy Policy</h1>
+          <p className="text-sm mb-6 text-muted-foreground">
             Last updated: Nov 28, 2024
           </p>
           <p className="mb-6 font-semibold uppercase">
@@ -26,8 +26,8 @@ const PrivacyPolicyPage = () => {
             and takes the matter of protecting your privacy as high priority.
           </p>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               1. TYPES OF DATA WE COLLECT
             </h2>
             <p className="mb-4">
@@ -67,8 +67,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               2. HOW DO WE COLLECT PERSONAL DATA?
             </h2>
             <p className="mb-4">
@@ -97,8 +97,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               3. HOW DO WE COLLECT YOUR PERSONAL DATA ON OUR WEBSITE?
             </h2>
             <p className="mb-6">
@@ -228,8 +228,8 @@ const PrivacyPolicyPage = () => {
             </div>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               4. WHAT DO WE USE YOUR PERSONAL DATA FOR?
             </h2>
             <p className="mb-4">
@@ -275,8 +275,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               5. ACCESSING / CORRECTING / UPDATING YOUR PERSONAL DATA
             </h2>
             <p>
@@ -287,8 +287,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               6. WITHDRAWING CONSENT
             </h2>
             <p className="mb-4">
@@ -315,8 +315,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               7. TO WHOM DO WE DISCLOSE YOUR PERSONAL DATA?
             </h2>
             <p className="mb-4">
@@ -357,8 +357,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               8. HOW LONG WILL WE RETAIN YOUR PERSONAL DATA?
             </h2>
             <p>
@@ -370,8 +370,8 @@ const PrivacyPolicyPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               9. LINKS TO THIRD PARTY WEBSITES
             </h2>
             <p className="mb-4">
@@ -394,7 +394,7 @@ const PrivacyPolicyPage = () => {
           </section>
 
           <section className="text-muted-foreground">
-            <h2 className="text-headline-lg text-foreground mb-4">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               10. ADDITIONAL INFORMATION OR ASSISTANCE
             </h2>
             <p>

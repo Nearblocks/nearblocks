@@ -45,13 +45,13 @@ type Props = {
 };
 
 export const PageHeading = ({ apiTag, children, title }: Props) => (
-  <div className="border-border mb-3 flex flex-col gap-2 border-b pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-    <h1 className="text-body-lg min-w-0">{title}</h1>
+  <div className="mb-3 flex flex-col gap-2 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+    <h1 className="min-w-0 text-body-lg">{title}</h1>
     {(apiTag !== undefined || children) && (
       <div className="flex shrink-0 flex-wrap items-center gap-2">
         {apiTag !== undefined && (
           <ApiBadge
-            className="text-body-xs hidden h-7 px-2 sm:inline-flex"
+            className="hidden h-7 px-2 text-body-xs sm:inline-flex"
             tag={apiTag}
           />
         )}

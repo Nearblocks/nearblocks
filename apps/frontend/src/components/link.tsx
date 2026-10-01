@@ -210,7 +210,7 @@ export const AccountLink = ({
   const onLeave = () => setHighlighted(null);
 
   if (!account || account === 'system')
-    return <span className="text-muted-foreground px-1">system</span>;
+    return <span className="px-1 text-muted-foreground">system</span>;
 
   return (
     <Link className={cn('text-link', className)} href={`/address/${account}`}>

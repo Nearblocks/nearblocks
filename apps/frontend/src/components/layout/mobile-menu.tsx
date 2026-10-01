@@ -51,7 +51,7 @@ export const MobileMenu = ({ menu }: Props) => {
                 <ChevronRight className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               </MobileNavigationMenuCollapsibleTrigger>
               <CollapsibleContent>
-                <ul className="border-border my-2 ml-4 border-l pl-2">
+                <ul className="my-2 ml-4 border-l border-border pl-2">
                   {item.menu?.map((subItem, idx) => {
                     if (isNavMenuDivider(subItem)) {
                       return (
@@ -93,7 +93,7 @@ export const MobileMenu = ({ menu }: Props) => {
             <ChevronRight className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           </MobileNavigationMenuCollapsibleTrigger>
           <CollapsibleContent>
-            <ul className="border-border my-2 ml-4 border-l pl-2">
+            <ul className="my-2 ml-4 border-l border-border pl-2">
               <MobileNavigationMenuItem>
                 <a
                   className={cn(mobileNavigationLinkStyle(), 'justify-between')}
@@ -125,7 +125,7 @@ export const MobileMenu = ({ menu }: Props) => {
             <ChevronRight className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
           </MobileNavigationMenuCollapsibleTrigger>
           <CollapsibleContent>
-            <ul className="border-border my-2 ml-4 border-l pl-2">
+            <ul className="my-2 ml-4 border-l border-border pl-2">
               <MobileNavigationMenuItem>
                 <button
                   className={cn(
@@ -167,7 +167,7 @@ export const MobileMenu = ({ menu }: Props) => {
       </li>
       <MobileNavigationMenuItem>
         <Wallet
-          className={`${mobileNavigationCollapsibleTriggerStyle()} border-border! w-full! justify-center border! px-4!`}
+          className={`${mobileNavigationCollapsibleTriggerStyle()} w-full! justify-center border! border-border! px-4!`}
         />
       </MobileNavigationMenuItem>
     </MobileNavigationMenu>

@@ -1,5 +1,4 @@
-CREATE
-OR REPLACE FUNCTION count_cost_estimate (query TEXT) RETURNS TABLE (count NUMERIC, cost NUMERIC) AS $$
+CREATE OR REPLACE FUNCTION count_cost_estimate (query TEXT) RETURNS TABLE (count NUMERIC, cost NUMERIC) AS $$
   DECLARE
     plan JSON;
   BEGIN

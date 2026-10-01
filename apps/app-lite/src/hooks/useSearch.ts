@@ -45,8 +45,8 @@ export const useSearch = () => {
         isQueryLong
           ? getBlock(rpc, query)
           : !isNaN(+query)
-          ? getBlock(rpc, +query)
-          : undefined,
+            ? getBlock(rpc, +query)
+            : undefined,
         isQueryLong ? getTxn(rpc, query) : undefined,
         isQueryLong ? getReceipt(receiptRpc, query) : undefined,
       ]);

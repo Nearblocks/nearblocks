@@ -63,7 +63,7 @@ receipts_selected AS (
       OR r.included_in_block_timestamp < ${before}
     )
     AND (
-      ${method}::text IS NULL
+      ${method}::TEXT IS NULL
       OR EXISTS (
         SELECT
           1

@@ -131,7 +131,7 @@ export const ContractCode = ({
                   {sourceMetadata.build_info?.source_code_snapshot ? (
                     <>
                       <a
-                        className="text-link block truncate"
+                        className="block truncate text-link"
                         href={sourceMetadata.build_info.source_code_snapshot}
                       >
                         {getCommitHash(
@@ -165,7 +165,7 @@ export const ContractCode = ({
                   {verifierData?.cid ? (
                     <>
                       <a
-                        className="text-link block truncate"
+                        className="block truncate text-link"
                         href={`${verifier.ipfs}/${verifierData.cid}`}
                         rel="noopener noreferrer"
                         target="_blank"
@@ -231,7 +231,7 @@ export const ContractCode = ({
             </List>
           </div>
           <div className="mb-4 px-1">
-            <p className="text-muted-foreground flex items-center gap-1 py-2.5">
+            <p className="flex items-center gap-1 py-2.5 text-muted-foreground">
               <RiCodeSSlashLine className="size-4" />{' '}
               {t('contract.code.sourceCode')}
             </p>
@@ -245,18 +245,18 @@ export const ContractCode = ({
         </>
       )}
       <div className="px-1">
-        <div className="text-muted-foreground flex items-center justify-between gap-1 py-2.5">
+        <div className="flex items-center justify-between gap-1 py-2.5 text-muted-foreground">
           <span className="flex items-center gap-1">
             <RiCodeSSlashLine className="size-4" /> {t('contract.code.base64')}
           </span>
           {wasm && (
             <span className="ml-auto">
               {language && (
-                <Badge className="text-body-xs mr-1 truncate" variant="purple">
+                <Badge className="mr-1 truncate text-body-xs" variant="purple">
                   {language}
                 </Badge>
               )}
-              <Badge className="text-body-xs truncate" variant="blue">
+              <Badge className="truncate text-body-xs" variant="blue">
                 {bytesFormat(wasm.size)}
               </Badge>
             </span>

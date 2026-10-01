@@ -49,11 +49,11 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                     <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                       <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="bg-muted shrink-0 rounded-lg p-2">
+                          <div className="shrink-0 rounded-lg bg-muted p-2">
                             <Box className="size-6" />
                           </div>
-                          <div className="text-body-sm flex flex-col leading-tight">
-                            <h4 className="text-link font-normal">
+                          <div className="flex flex-col text-body-sm leading-tight">
+                            <h4 className="font-normal text-link">
                               <Skeleton className="w-20" />
                             </h4>
                             <p className="text-body-2xs text-muted-foreground">
@@ -62,7 +62,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                           </div>
                         </div>
                         <Badge
-                          className="text-body-xs h-6 w-28 shrink-0 @lg:hidden"
+                          className="h-6 w-28 shrink-0 text-body-xs @lg:hidden"
                           variant="teal"
                         >
                           <Fuel />
@@ -81,7 +81,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         </p>
                       </div>
                       <div className="hidden @lg:flex @lg:w-32 @lg:shrink-0 @lg:justify-end">
-                        <Badge className="text-body-xs h-6" variant="teal">
+                        <Badge className="h-6 text-body-xs" variant="teal">
                           <Fuel />
                           <Skeleton className="w-15" />
                         </Badge>
@@ -112,11 +112,11 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                         <div className="flex flex-col gap-2 *:leading-tight @lg:flex-row @lg:items-center @lg:gap-3">
                           <div className="flex items-center justify-between gap-3 @lg:flex-1 @lg:justify-start">
                             <div className="flex min-w-0 items-center gap-3">
-                              <div className="bg-muted shrink-0 rounded-lg p-2">
+                              <div className="shrink-0 rounded-lg bg-muted p-2">
                                 <Box className="size-6" />
                               </div>
-                              <div className="text-body-sm flex flex-col leading-tight">
-                                <h4 className="text-link font-normal">
+                              <div className="flex flex-col text-body-sm leading-tight">
+                                <h4 className="font-normal text-link">
                                   <Link href={`/blocks/${block.block_height}`}>
                                     {numberFormat(block.block_height)}
                                   </Link>
@@ -127,7 +127,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                               </div>
                             </div>
                             <Badge
-                              className="text-body-xs h-6 w-28 shrink-0 @lg:hidden"
+                              className="h-6 w-28 shrink-0 text-body-xs @lg:hidden"
                               variant="teal"
                             >
                               <Fuel />
@@ -138,7 +138,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                             <h4 className="flex gap-1 font-normal whitespace-nowrap">
                               {t('blocks.author')}{' '}
                               <Link
-                                className="text-link inline-block w-40 truncate"
+                                className="inline-block w-40 truncate text-link"
                                 href={`/address/${block.author_account_id}`}
                               >
                                 {block.author_account_id}
@@ -149,7 +149,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
                             </p>
                           </div>
                           <div className="hidden @lg:flex @lg:w-32 @lg:shrink-0 @lg:justify-end">
-                            <Badge className="text-body-xs h-6" variant="teal">
+                            <Badge className="h-6 text-body-xs" variant="teal">
                               <Fuel />
                               {tgas}
                             </Badge>
@@ -170,7 +170,7 @@ export const Blocks = ({ blocksPromise, loading }: Props) => {
       <CardFooter className="border-t">
         <Button
           asChild
-          className="text-headline-sm w-full"
+          className="w-full text-headline-sm"
           size="lg"
           variant="secondary"
         >

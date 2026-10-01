@@ -17,12 +17,12 @@ export const Advertise = () => {
     <>
       <div className="mb-20 flex flex-col items-center gap-10 md:flex-row md:items-start">
         <div className="flex-1 text-balance">
-          <p className="text-body-sm text-muted-foreground mb-4 tracking-widest uppercase">
+          <p className="mb-4 text-body-sm tracking-widest text-muted-foreground uppercase">
             {t('label')}
           </p>
-          <h1 className="text-headline-2xl mb-6">{t('title')}</h1>
-          <p className="text-muted-foreground mb-4">{t('description')}</p>
-          <p className="text-muted-foreground mb-8">{t('body')}</p>
+          <h1 className="mb-6 text-headline-2xl">{t('title')}</h1>
+          <p className="mb-4 text-muted-foreground">{t('description')}</p>
+          <p className="mb-8 text-muted-foreground">{t('body')}</p>
           <Button asChild size="lg" variant="secondary">
             <a href="https://dash.nearblocks.io/login">{t('cta')}</a>
           </Button>
@@ -41,7 +41,7 @@ export const Advertise = () => {
         <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr]">
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">#1</p>
-            <p className="text-body-xs text-muted-foreground mt-1 uppercase">
+            <p className="mt-1 text-body-xs text-muted-foreground uppercase">
               {t('stats.explorer')}
             </p>
           </div>
@@ -52,7 +52,7 @@ export const Advertise = () => {
           <Separator className="my-4 sm:hidden" />
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">3M</p>
-            <p className="text-body-xs text-muted-foreground mt-1 uppercase">
+            <p className="mt-1 text-body-xs text-muted-foreground uppercase">
               {t('stats.pageViews')}
             </p>
           </div>
@@ -63,7 +63,7 @@ export const Advertise = () => {
           <Separator className="my-4 sm:col-span-3 lg:hidden" />
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">900K</p>
-            <p className="text-body-xs text-muted-foreground mt-1 uppercase">
+            <p className="mt-1 text-body-xs text-muted-foreground uppercase">
               {t('stats.visitors')}
             </p>
           </div>
@@ -74,39 +74,39 @@ export const Advertise = () => {
           <Separator className="my-4 sm:hidden" />
           <div className="flex flex-col items-center py-4 text-center">
             <p className="text-headline-2xl">150K</p>
-            <p className="text-body-xs text-muted-foreground mt-1 uppercase">
+            <p className="mt-1 text-body-xs text-muted-foreground uppercase">
               {t('stats.users')}
             </p>
           </div>
         </div>
       </Card>
       <Card className="border-0 px-4 py-10">
-        <h2 className="text-headline-2xl mb-4 text-center">
+        <h2 className="mb-4 text-center text-headline-2xl">
           {t('types.title')}
         </h2>
-        <p className="text-muted-foreground mx-auto mb-20 max-w-2xl text-center">
+        <p className="mx-auto mb-20 max-w-2xl text-center text-muted-foreground">
           {t('types.description')}
         </p>
         <div className="mx-auto max-w-5xl space-y-8">
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex-1">
-              <h3 className="text-headline-lg mb-3">
+              <h3 className="mb-3 text-headline-lg">
                 {t('types.banner.title')}
               </h3>
-              <p className="text-muted-foreground mb-5">
+              <p className="mb-5 text-muted-foreground">
                 {t('types.banner.description')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.banner.graphical')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.banner.eyeball')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.banner.brand')}</span>
                 </li>
               </ul>
@@ -114,7 +114,7 @@ export const Advertise = () => {
             <div className="flex-1">
               <Image
                 alt={t('types.banner.title')}
-                className="bg-muted w-full rounded-lg object-contain"
+                className="w-full rounded-lg bg-muted object-contain"
                 height={380}
                 src={
                   theme === 'dark'
@@ -127,23 +127,23 @@ export const Advertise = () => {
           </div>
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex-1">
-              <h3 className="text-headline-lg mb-3">
+              <h3 className="mb-3 text-headline-lg">
                 {t('types.header.title')}
               </h3>
-              <p className="text-muted-foreground mb-5">
+              <p className="mb-5 text-muted-foreground">
                 {t('types.header.description')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.header.clearMessage')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.header.nonIntrusive')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.header.highCoverage')}</span>
                 </li>
               </ul>
@@ -151,7 +151,7 @@ export const Advertise = () => {
             <div className="flex-1">
               <Image
                 alt={t('types.header.title')}
-                className="bg-muted w-full rounded-lg object-contain"
+                className="w-full rounded-lg bg-muted object-contain"
                 height={380}
                 src={
                   theme === 'dark'
@@ -164,23 +164,23 @@ export const Advertise = () => {
           </div>
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex-1">
-              <h3 className="text-headline-lg mb-3">
+              <h3 className="mb-3 text-headline-lg">
                 {t('types.search.title')}
               </h3>
-              <p className="text-muted-foreground mb-5">
+              <p className="mb-5 text-muted-foreground">
                 {t('types.search.description')}
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.search.clearMessage')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.search.nonIntrusive')}</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CircleCheck className="text-lime-foreground size-4 shrink-0" />
+                  <CircleCheck className="size-4 shrink-0 text-lime-foreground" />
                   <span>{t('types.search.highCoverage')}</span>
                 </li>
               </ul>
@@ -188,7 +188,7 @@ export const Advertise = () => {
             <div className="flex-1">
               <Image
                 alt={t('types.search.title')}
-                className="bg-muted w-full rounded-lg object-contain"
+                className="w-full rounded-lg bg-muted object-contain"
                 height={380}
                 src={
                   theme === 'dark'

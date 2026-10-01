@@ -34,4 +34,4 @@ style.
 
 ## Code Style
 
-We use [prettier](https://prettier.io/) and [ESLint](https://eslint.org/) to keep our codebase tidy.
+We use [oxfmt](https://oxc.rs/docs/guide/usage/formatter) and [oxlint](https://oxc.rs/docs/guide/usage/linter) to keep our codebase tidy.

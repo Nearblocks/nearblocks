@@ -66,7 +66,7 @@ export const Actions = ({
             </div>
             <SkeletonSlot
               fallback={
-                <p className="text-body-sm mt-1">
+                <p className="mt-1 text-body-sm">
                   <Skeleton className="w-1/2" />
                 </p>
               }
@@ -81,7 +81,7 @@ export const Actions = ({
                     ? [txn.actions[0]]
                     : txn.actions;
                 const content = (
-                  <div className="text-body-sm space-y-1">
+                  <div className="space-y-1 text-body-sm">
                     {actions.map((action, index) => (
                       <Action
                         action={action}

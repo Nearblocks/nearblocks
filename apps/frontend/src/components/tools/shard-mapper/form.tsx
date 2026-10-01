@@ -39,9 +39,9 @@ export const ShardMapperForm = () => {
       : null;
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h1 className="mb-1 text-xl font-semibold">{t('shard.title')}</h1>
-      <p className="text-muted-foreground mb-6 text-sm">
+    <div className="rounded-lg bg-card p-6">
+      <h1 className="text-xl mb-1 font-semibold">{t('shard.title')}</h1>
+      <p className="text-sm mb-6 text-muted-foreground">
         {t('shard.subtitle')}
       </p>
 
@@ -72,7 +72,7 @@ export const ShardMapperForm = () => {
       </form>
 
       {configError && (
-        <p className="text-destructive mt-4 max-w-xl text-sm">
+        <p className="text-sm mt-4 max-w-xl text-destructive">
           {configError instanceof Error ? configError.message : 'RPC error'}
         </p>
       )}
@@ -84,12 +84,12 @@ export const ShardMapperForm = () => {
       )}
 
       {shard !== null && (
-        <div className="bg-card border-border mt-6 max-w-xl rounded-lg border p-6">
+        <div className="mt-6 max-w-xl rounded-lg border border-border bg-card p-6">
           <div className="flex items-center gap-3">
             <Badge variant="blue">
               {t('shard.shardOf', { count: shard, total: shardCount })}
             </Badge>
-            <span className="text-muted-foreground font-mono text-sm break-all">
+            <span className="text-sm font-mono break-all text-muted-foreground">
               {account.trim()}
             </span>
           </div>

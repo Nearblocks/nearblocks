@@ -9,7 +9,6 @@ const OFFSET = 3_000_000_000n; // 3s in ns
 const TABLE = 'nft_holders';
 
 export const syncNFTHolders = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await holders();
   }

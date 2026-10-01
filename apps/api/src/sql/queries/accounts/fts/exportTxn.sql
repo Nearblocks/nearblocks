@@ -28,4 +28,4 @@ FROM
       1
   ) eo ON TRUE
 WHERE
-  r.receipt_id = ANY (${ids}::TEXT [])
+  r.receipt_id = ANY (${ids}::TEXT[])

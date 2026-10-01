@@ -40,7 +40,7 @@ const MtTokenLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
+      <h1 className="flex flex-wrap items-center gap-2 text-body-xl text-muted-foreground">
         {t('contract.label')} <MtTokenHeader cid={cid} />
       </h1>
       <div className="mt-6 grid gap-4 lg:grid-cols-2">

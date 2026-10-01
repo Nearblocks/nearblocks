@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from 'react';
 
 import {
@@ -235,7 +234,7 @@ export const TokenLink = ({
 }: LinkProps) => {
   return (
     <Link
-      className="text-link flex items-center gap-1"
+      className="flex items-center gap-1 text-link"
       href={`/${type}/${contract}`}
     >
       <Truncate>
@@ -265,7 +264,7 @@ export const MTTokenLink = ({
 
   return (
     <Link
-      className="text-link flex items-center gap-1"
+      className="flex items-center gap-1 text-link"
       href={
         isNft
           ? `/mt-tokens/${contract}/nft-tokens/${encodeToken(token)}`
@@ -336,7 +335,7 @@ export const MTLink = ({
 
   if (href) {
     return (
-      <Link className="text-link flex items-center gap-1" href={href}>
+      <Link className="flex items-center gap-1 text-link" href={href}>
         {content}
       </Link>
     );

@@ -29,7 +29,6 @@ export const syncBlocks = async ({
     `${chain}: tip ${tip}, start ${cursor}, lag ${Math.max(tip - cursor, 0)}`,
   );
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (cursor > tip) {
       tip = await fetchTip();

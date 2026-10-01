@@ -1,7 +1,8 @@
 'use client';
 
-import type { JsonData } from 'nb-schemas/src/common';
 import { useState } from 'react';
+
+import type { JsonData } from 'nb-schemas/src/common';
 
 import { Button } from '@/ui/button';
 
@@ -45,7 +46,7 @@ export const EncodedData = ({
 
   const code =
     encoding === 'raw'
-      ? rawCode ?? ''
+      ? (rawCode ?? '')
       : encodeValue(encoding, base64, json, hasValue);
 
   const onClick = (value: Encoding) => {

@@ -3,12 +3,6 @@
   "trailingComma": "all",
   "overrides": [
     {
-      "files": ["*.ts"],
-      "options": {
-        "parser": "typescript"
-      }
-    },
-    {
       "files": ["*.sql"],
       "options": {
         "formatter": "sql-formatter",
@@ -17,9 +11,8 @@
       }
     }
   ],
-  "plugins": ["prettier-plugin-embed", "prettier-plugin-sql"],
+  "plugins": ["prettier-plugin-sql"],
   "language": "postgresql",
   "dataTypeCase": "upper",
-  "functionCase": "upper",
-  "embeddedSqlIdentifiers": ["sql", "userSql"]
+  "functionCase": "upper"
 }

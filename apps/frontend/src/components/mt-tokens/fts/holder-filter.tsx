@@ -72,7 +72,7 @@ const ValueCell = ({ balanceData, loading, tokenPromise }: CellProps) => {
         balance !== null && hasPrice ? (
           <span className="text-body-sm">
             {currencyFormat(toTokenPrice(balance, decimals, price))}
-            <span className="text-muted-foreground ml-2">
+            <span className="ml-2 text-muted-foreground">
               @{numberFormat(price, { maximumFractionDigits: 6 })}
             </span>
           </span>
@@ -110,10 +110,10 @@ export const MtFtHolderFilter = ({ cid, tid, tokenPromise }: Props) => {
     <Card className="mb-4">
       <CardContent className="flex flex-col divide-y px-0 md:flex-row md:divide-x md:divide-y-0">
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('token.holderFilter.filteredBy')}
           </div>
-          <div className="text-body-sm flex items-center gap-1">
+          <div className="flex items-center gap-1 text-body-sm">
             <AccountLink account={account} hideCopy />
             <Link
               className="text-muted-foreground hover:text-foreground"
@@ -124,7 +124,7 @@ export const MtFtHolderFilter = ({ cid, tid, tokenPromise }: Props) => {
           </div>
         </div>
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('token.holderFilter.balance')}
           </div>
           <Suspense fallback={<Skeleton className="w-32" />}>
@@ -136,7 +136,7 @@ export const MtFtHolderFilter = ({ cid, tid, tokenPromise }: Props) => {
           </Suspense>
         </div>
         <div className="flex-1 px-4 py-3">
-          <div className="text-muted-foreground text-body-xs mb-2 uppercase">
+          <div className="mb-2 text-body-xs text-muted-foreground uppercase">
             {t('token.holderFilter.value')}
           </div>
           <Suspense fallback={<Skeleton className="w-32" />}>

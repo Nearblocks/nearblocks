@@ -2,36 +2,30 @@
   "name": "nearblocks",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "build": "turbo run build",
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:check": "turbo run lint:check",
-    "format": "prettier --write --ignore-unknown './**/*'",
-    "format:check": "prettier --check --ignore-unknown './**/*'",
-    "prepare": "husky install",
+    "format": "oxfmt && prettier --write 'apps/**/*.sql'",
+    "format:check": "oxfmt --check && prettier --check 'apps/**/*.sql'",
+    "prepare": "husky",
     "test": "turbo run test"
   },
   "dependencies": {},
   "devDependencies": {
-    "eslint-config-custom-nextjs": "*",
-    "eslint-config-custom-node": "*",
-    "husky": "8.0.0",
-    "prettier": "3.0.3",
-    "prettier-plugin-embed": "0.3.2",
-    "prettier-plugin-sql": "0.18.0",
-    "prettier-plugin-tailwindcss": "0.7.2",
-    "turbo": "^2.8.3",
+    "eslint-plugin-perfectionist": "^5.12.1",
+    "husky": "^9.1.7",
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
+    "prettier": "3.9.9",
+    "prettier-plugin-sql": "0.20.0",
+    "turbo": "^2.11.6",
     "wrangler": "^3.86.0"
   },
-  "packageManager": "yarn@1.22.19",
+  "packageManager": "pnpm@12.8.1",
   "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=7.0.0"
+    "node": ">=24"
   }
 }

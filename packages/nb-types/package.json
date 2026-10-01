@@ -8,12 +8,12 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "devDependencies": {
-    "@types/node": "~22.14",
-    "eslint-config-custom-node": "*",
-    "nb-tsconfig": "*",
-    "typescript": "~5.2"
+    "@types/node": "catalog:",
+    "nb-tsconfig": "workspace:*",
+    "typescript": "catalog:"
   }
 }

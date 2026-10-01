@@ -86,8 +86,8 @@ const getSeries = (stats: IntentsAssetPoint[] | null, othersLabel: string) => {
     const name = isOthers
       ? othersLabel
       : (symbolCounts.get(symbol) ?? 0) > 1
-      ? `${symbol} (${blockchains.get(category)})`
-      : symbol;
+        ? `${symbol} (${blockchains.get(category)})`
+        : symbol;
     return { data, key: category, name };
   });
 

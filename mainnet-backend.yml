@@ -4,7 +4,10 @@ services:
     container_name: mainnet-backend
     build:
       context: .
-      dockerfile: ./apps/backend/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP: backend
+        APT_PACKAGES: 'ca-certificates libssl-dev'
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'

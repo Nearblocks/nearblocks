@@ -30,8 +30,8 @@ export const AccountAlerts = ({ accountPromise, contractPromise }: Props) => {
     : t('alerts.noFullAccessKeys');
 
   return (
-    <Alert className="bg-amber-background my-4 border-0">
-      <AlertDescription className="text-body-xs text-amber-foreground block">
+    <Alert className="my-4 border-0 bg-amber-background">
+      <AlertDescription className="block text-body-xs text-amber-foreground">
         {message}
       </AlertDescription>
     </Alert>

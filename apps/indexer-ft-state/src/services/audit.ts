@@ -64,7 +64,6 @@ const probeAll = async (
   const outcomes: SampleOutcome[] = [];
 
   for (const sample of samples) {
-    // eslint-disable-next-line no-await-in-loop
     outcomes.push(await probeSample(rpc, contract, sample));
   }
 
@@ -235,14 +234,12 @@ export const syncAudit = async (db: Knex, rpc: RPC): Promise<void> => {
 
   for (;;) {
     try {
-      // eslint-disable-next-line no-await-in-loop
       await tick(db, rpc);
     } catch (error) {
       logger.error(error, 'ft state audit: tick failed');
       sentry.captureException(error);
     }
 
-    // eslint-disable-next-line no-await-in-loop
     await sleep(config.verifyIntervalMs);
   }
 };

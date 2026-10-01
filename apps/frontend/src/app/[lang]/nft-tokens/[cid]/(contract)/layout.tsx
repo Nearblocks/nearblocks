@@ -58,7 +58,7 @@ const NftTokenLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
+      <h1 className="flex flex-wrap items-center gap-2 text-body-xl text-muted-foreground">
         {t('contract.label')}{' '}
         <ErrorSuspense fallback={<NftTokenHeader cid={cid} loading />}>
           <NftTokenHeader cid={cid} contractPromise={contractPromise} />

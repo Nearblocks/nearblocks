@@ -1,5 +1,4 @@
-CREATE
-OR REPLACE FUNCTION epoch_nano_seconds () RETURNS BIGINT AS $$ -- epoch in ns
+CREATE OR REPLACE FUNCTION epoch_nano_seconds () RETURNS BIGINT AS $$ -- epoch in ns
   SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT * 1000 * 1000 * 1000;
 $$ LANGUAGE SQL STABLE;
 
@@ -89,8 +88,7 @@ CREATE INDEX IF NOT EXISTS s_hash_idx ON signatures (tx_hash);
 
 CREATE INDEX IF NOT EXISTS s_address_idx ON signatures (tx_address);
 
-CREATE
-OR REPLACE FUNCTION match_signatures () RETURNS TABLE (matched_count INT, processed_count INT) LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION match_signatures () RETURNS TABLE (matched_count INT, processed_count INT) LANGUAGE plpgsql AS $$
 DECLARE
   sig RECORD;
   matched INT := 0;
@@ -209,8 +207,7 @@ BEGIN
 END;
 $$;
 
-CREATE
-OR REPLACE PROCEDURE match_signatures_job (job_id INT, config jsonb) LANGUAGE plpgsql AS $$
+CREATE OR REPLACE PROCEDURE match_signatures_job (job_id INT, config JSONB) LANGUAGE plpgsql AS $$
 BEGIN
   PERFORM match_signatures();
 END;
@@ -219,8 +216,7 @@ $$;
 SELECT
   add_job ('match_signatures_job', '1 minute');
 
-CREATE
-OR REPLACE FUNCTION expire_signatures () RETURNS INT LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION expire_signatures () RETURNS INT LANGUAGE plpgsql AS $$
 DECLARE
   cutoff BIGINT;
   expired_count INT;
@@ -236,8 +232,7 @@ BEGIN
 END;
 $$;
 
-CREATE
-OR REPLACE PROCEDURE expire_signatures_job (job_id INT, config jsonb) LANGUAGE plpgsql AS $$
+CREATE OR REPLACE PROCEDURE expire_signatures_job (job_id INT, config JSONB) LANGUAGE plpgsql AS $$
 BEGIN
   PERFORM expire_signatures();
 END;

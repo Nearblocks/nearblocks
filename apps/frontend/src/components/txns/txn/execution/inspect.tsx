@@ -78,7 +78,7 @@ export const ReceiptInspectRows = ({
               <p className="min-w-30 break-all">
                 {receipt!.receipt_id}{' '}
                 <Copy
-                  className="text-muted-foreground inline-flex align-middle"
+                  className="inline-flex align-middle text-muted-foreground"
                   size="icon-xs"
                   text={receipt!.receipt_id}
                 />
@@ -138,7 +138,7 @@ export const ReceiptInspectRows = ({
                   {numberFormat(receipt!.block.block_height)}
                 </Link>
                 <Copy
-                  className="text-muted-foreground shrink-0"
+                  className="shrink-0 text-muted-foreground"
                   size="icon-xs"
                   text={String(receipt!.block.block_height)}
                 />
@@ -206,7 +206,7 @@ export const ReceiptInspectRows = ({
                 {showPublicKey &&
                   receipt?.predecessor_account_id !== 'system' &&
                   (!signer || receipt?.predecessor_account_id === signer) && (
-                    <span className="text-muted-foreground flex items-center">
+                    <span className="flex items-center text-muted-foreground">
                       (
                       {isQuantumSafeKey(receipt!.public_key) ? (
                         <QuantumSafeBadge
@@ -219,7 +219,7 @@ export const ReceiptInspectRows = ({
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Link
-                            className="text-link inline max-w-40 truncate"
+                            className="inline max-w-40 truncate text-link"
                             href={`/address/${
                               receipt!.predecessor_account_id
                             }/keys`}

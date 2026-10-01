@@ -182,9 +182,11 @@ const txns = catchAsync(
             contract_account_id = ${contract}
             AND token_id = ${token}
             AND ${event ? sql`cause = ${event}` : true}
-            AND ${cursor
-        ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-        : true}
+            AND ${
+              cursor
+                ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+                : true
+            }
             AND EXISTS (
               SELECT
                 1

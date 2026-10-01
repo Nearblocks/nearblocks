@@ -31,7 +31,7 @@ export const Execution = ({
       <CardContent className="px-0 py-2">
         <SkeletonSlot
           fallback={
-            <div className="divide-border md:border-border ml-0 md:divide-y md:border-l-4">
+            <div className="ml-0 divide-border md:divide-y md:border-l-4 md:border-border">
               <ReceiptBlock loading />
             </div>
           }

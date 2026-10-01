@@ -84,9 +84,9 @@ export const GasConverterForm = () => {
   const ms = computeTimeMs(values.gas);
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h1 className="mb-1 text-xl font-semibold">{t('gas.title')}</h1>
-      <p className="text-muted-foreground mb-6 text-sm">{t('gas.subtitle')}</p>
+    <div className="rounded-lg bg-card p-6">
+      <h1 className="text-xl mb-1 font-semibold">{t('gas.title')}</h1>
+      <p className="text-sm mb-6 text-muted-foreground">{t('gas.subtitle')}</p>
 
       <form className="max-w-xl" onSubmit={(e) => e.preventDefault()}>
         <FieldSet>
@@ -110,7 +110,7 @@ export const GasConverterForm = () => {
           ))}
 
           {ms !== null && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               {t('gas.hint')} ≈ {ms} ms
             </p>
           )}

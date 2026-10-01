@@ -41,7 +41,7 @@ export const MtFtHeader = ({ cid, loading, tid, tokenPromise }: Props) => {
           />
           <Truncate className="flex items-center gap-2">
             <TruncateText
-              className="text-foreground max-w-60"
+              className="max-w-60 text-foreground"
               text={token?.name ?? token?.token ?? tid}
             />
           </Truncate>
@@ -49,7 +49,7 @@ export const MtFtHeader = ({ cid, loading, tid, tokenPromise }: Props) => {
             <Truncate>
               (
               <TruncateText
-                className="text-foreground max-w-30"
+                className="max-w-30 text-foreground"
                 text={token.symbol}
               />
               )

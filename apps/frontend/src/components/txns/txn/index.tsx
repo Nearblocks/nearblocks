@@ -78,7 +78,7 @@ export const Overview = ({
       <CardContent className="px-0 py-2">
         {network !== 'mainnet' && (
           <>
-            <p className="text-red-foreground text-body-2xs px-3 py-2">
+            <p className="px-3 py-2 text-body-2xs text-red-foreground">
               [{t('overview.testnetNotice')}]
             </p>
             <hr className="border-border" />
@@ -110,7 +110,7 @@ export const Overview = ({
                       <>
                         {txn.transaction_hash}{' '}
                         <Copy
-                          className="text-muted-foreground inline-flex align-middle"
+                          className="inline-flex align-middle text-muted-foreground"
                           size="icon-xs"
                           text={txn.transaction_hash || ''}
                         />
@@ -304,13 +304,13 @@ export const Overview = ({
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Badge
-                                className="text-body-xs inline-flex cursor-help items-center gap-1 px-1.5 py-0.5"
+                                className="inline-flex cursor-help items-center gap-1 px-1.5 py-0.5 text-body-xs"
                                 variant="gray"
                               >
                                 <Radio className="size-3" />
                                 via
                                 <Link
-                                  className="text-link max-w-32 truncate sm:max-w-40"
+                                  className="max-w-32 truncate text-link sm:max-w-40"
                                   href={`/address/${txn.signer_account_id}`}
                                 >
                                   {txn.signer_account_id}

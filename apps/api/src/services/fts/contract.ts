@@ -119,9 +119,11 @@ const txns = catchAsync(
             contract_account_id = ${contract}
             AND ${account ? sql`affected_account_id = ${account}` : true}
             AND ${event ? sql`cause = ${event}` : true}
-            AND ${cursor
-        ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-        : true}
+            AND ${
+              cursor
+                ? sql`event_index ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+                : true
+            }
             AND EXISTS (
               SELECT
                 1

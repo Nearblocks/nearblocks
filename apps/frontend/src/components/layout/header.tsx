@@ -134,14 +134,14 @@ export const Header = () => {
   }, [pathname]);
 
   return (
-    <header className="bg-card border-b">
+    <header className="border-b bg-card">
       <Popover onOpenChange={setOpen} open={open}>
         <PopoverAnchor>
           <div className="container mx-auto flex h-14 items-center px-4">
             <Link className="flex items-center gap-2" href="/">
-              <Logo className="text-primary h-10" />
+              <Logo className="h-10 text-primary" />
             </Link>
-            <div className="text-headline-sm ml-auto flex gap-2">
+            <div className="ml-auto flex gap-2 text-headline-sm">
               <Menu menu={menu} />
               <div className="flex items-center gap-2 lg:hidden">
                 <PopoverTrigger asChild>

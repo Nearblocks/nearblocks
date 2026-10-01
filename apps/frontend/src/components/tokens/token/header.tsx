@@ -40,14 +40,14 @@ export const TokenHeader = ({ cid, contractPromise, loading }: Props) => {
           />
           <Truncate className="flex items-center gap-2">
             <TruncateText
-              className="text-foreground max-w-60"
+              className="max-w-60 text-foreground"
               text={contract?.name ?? cid}
             />
           </Truncate>
           <Truncate>
             (
             <TruncateText
-              className="text-foreground max-w-30"
+              className="max-w-30 text-foreground"
               text={contract?.symbol ?? cid}
             />
             )

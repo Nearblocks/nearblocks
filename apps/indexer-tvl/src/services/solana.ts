@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop, no-constant-condition */
 import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
@@ -122,8 +121,8 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
   const today = todayUtc();
   const backward = !account.scan_complete;
 
-  let before = backward ? account.scan_before ?? undefined : undefined;
-  const until = backward ? undefined : account.newest_signature ?? undefined;
+  let before = backward ? (account.scan_before ?? undefined) : undefined;
+  const until = backward ? undefined : (account.newest_signature ?? undefined);
 
   let pages = 0;
   let newestSeen: string | undefined;

@@ -61,7 +61,7 @@ const TokenLayout = async ({ children, params }: Props) => {
 
   return (
     <>
-      <h1 className="text-body-xl text-muted-foreground flex flex-wrap items-center gap-2">
+      <h1 className="flex flex-wrap items-center gap-2 text-body-xl text-muted-foreground">
         {t('tokenLabel')}{' '}
         <ErrorSuspense fallback={<TokenHeader cid={cid} loading />}>
           <TokenHeader cid={cid} contractPromise={contractPromise} />

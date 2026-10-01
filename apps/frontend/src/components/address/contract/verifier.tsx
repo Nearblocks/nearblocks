@@ -95,13 +95,13 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-6">
+    <div className="rounded-lg bg-card p-6">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-headline-2xl mb-6">{heading}</h1>
+        <h1 className="mb-6 text-headline-2xl">{heading}</h1>
 
         {!account && (
-          <Alert className="bg-amber-background mb-4 border-0">
-            <AlertDescription className="text-amber-foreground text-body-xs">
+          <Alert className="mb-4 border-0 bg-amber-background">
+            <AlertDescription className="text-body-xs text-amber-foreground">
               {t('verifyContract.noAccount')}
             </AlertDescription>
           </Alert>
@@ -120,8 +120,8 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
           hydrated &&
           !isLoadingMetadata &&
           sourceMetadata === undefined && (
-            <Alert className="bg-red-background mb-4 border-0">
-              <AlertDescription className="text-red-foreground text-body-xs">
+            <Alert className="mb-4 border-0 bg-red-background">
+              <AlertDescription className="text-body-xs text-red-foreground">
                 <p className="font-semibold">
                   {t('verifyContract.notFound.title')}
                 </p>
@@ -137,8 +137,8 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
           !isLoadingMetadata &&
           sourceMetadata !== undefined &&
           hasNep330 === false && (
-            <Alert className="bg-red-background mb-4 border-0">
-              <AlertDescription className="text-red-foreground text-body-xs">
+            <Alert className="mb-4 border-0 bg-red-background">
+              <AlertDescription className="text-body-xs text-red-foreground">
                 <p className="font-semibold">
                   {t('verifyContract.nep330.title')}
                 </p>
@@ -148,8 +148,8 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
           )}
 
         {account && hydrated && !isLoadingMetadata && isVerified && (
-          <Alert className="bg-teal-background mb-4 border-0">
-            <AlertDescription className="text-teal-foreground text-body-xs">
+          <Alert className="mb-4 border-0 bg-teal-background">
+            <AlertDescription className="text-body-xs text-teal-foreground">
               {t('verifyContract.alreadyVerified')}
             </AlertDescription>
           </Alert>
@@ -160,8 +160,8 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
           !isLoadingMetadata &&
           hasNep330 &&
           !isVerified && (
-            <Alert className="bg-amber-background mb-4 border-0">
-              <AlertDescription className="text-amber-foreground text-body-xs">
+            <Alert className="mb-4 border-0 bg-amber-background">
+              <AlertDescription className="text-body-xs text-amber-foreground">
                 <p className="font-semibold">
                   {t('verifyContract.instructions.title')}
                 </p>
@@ -220,7 +220,7 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
                       }
                     />
                     {!hasNep330 && (
-                      <p className="text-destructive text-body-xs mt-1">
+                      <p className="mt-1 text-body-xs text-destructive">
                         {t('verifyContract.form.nep330Required')}
                       </p>
                     )}
@@ -263,7 +263,7 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
                       }
                     />
                     {!sourceMetadata?.build_info?.build_environment && (
-                      <p className="text-destructive text-body-xs mt-1">
+                      <p className="mt-1 text-body-xs text-destructive">
                         {t('verifyContract.form.buildEnvRequired')}
                       </p>
                     )}
@@ -283,7 +283,7 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
                       }
                     />
                     {!sourceMetadata?.build_info?.source_code_snapshot && (
-                      <p className="text-destructive text-body-xs mt-1">
+                      <p className="mt-1 text-body-xs text-destructive">
                         {t('verifyContract.form.sourceCodeRequired')}
                       </p>
                     )}

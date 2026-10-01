@@ -85,7 +85,7 @@ export const Uptime = ({ node }: Props) => {
                 {() =>
                   status ? (
                     <Badge
-                      className="text-body-xs px-1.5 py-0.5"
+                      className="px-1.5 py-0.5 text-body-xs"
                       variant={statusVariant(status)}
                     >
                       {statusLabel(status)}
@@ -114,7 +114,7 @@ export const Uptime = ({ node }: Props) => {
                 {() => (
                   <span className="flex flex-wrap items-center gap-2">
                     <Badge
-                      className="text-body-xs px-1.5 py-0.5"
+                      className="px-1.5 py-0.5 text-body-xs"
                       variant={uptimeVariant(blocksRatio)}
                     >
                       {blocksRatio.toFixed(2)} %
@@ -147,7 +147,7 @@ export const Uptime = ({ node }: Props) => {
                 {() => (
                   <span className="flex flex-wrap items-center gap-2">
                     <Badge
-                      className="text-body-xs px-1.5 py-0.5"
+                      className="px-1.5 py-0.5 text-body-xs"
                       variant={uptimeVariant(chunksRatio)}
                     >
                       {chunksRatio.toFixed(2)} %

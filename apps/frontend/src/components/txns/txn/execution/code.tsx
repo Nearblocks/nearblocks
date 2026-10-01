@@ -52,9 +52,9 @@ export const CodeViewer = ({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded border bg-(--prism-bg)">
-      <div className="bg-card/40 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b px-2 py-1">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b bg-card/40 px-2 py-1">
         <button
-          className="text-muted-foreground hover:text-foreground text-body-xs inline-flex shrink-0 items-center gap-1 whitespace-nowrap"
+          className="inline-flex shrink-0 items-center gap-1 text-body-xs whitespace-nowrap text-muted-foreground hover:text-foreground"
           onClick={() => setIsOpen((p) => !p)}
           type="button"
         >
@@ -66,8 +66,8 @@ export const CodeViewer = ({
           {showByteSize
             ? `${isOpen ? 'Hide' : 'Show'} ${byteSize} bytes`
             : isOpen
-            ? 'Hide'
-            : 'Show'}
+              ? 'Hide'
+              : 'Show'}
         </button>
         {isOpen && (
           <div className="flex items-center gap-0.5">

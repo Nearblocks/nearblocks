@@ -1,53 +1,109 @@
 name: Build Docker Images
 on:
   push:
-    branches: ['main', 'feat/api']
+    branches: ['main']
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        service:
-          [
-            api,
-            api-user,
-            app,
-            frontend,
-            backend,
-            indexer-balance,
-            indexer-base,
-            indexer-events,
-            indexer-dex,
-            indexer-multichain,
-            indexer-signature,
-            indexer-staking,
-            indexer-receipts,
-            indexer-s3,
-            indexer-accounts,
-            indexer-contract,
-            explorer-selector,
-            aggregates,
-            block-proxy,
-            indexer-intents,
-            indexer-tvl,
-            indexer-ft-state,
-            ft-finder,
-          ]
+        include:
+          - service: api
+            file: Dockerfile
+            args: |
+              APP=api
+          - service: frontend
+            file: apps/frontend/Dockerfile
+            args: ''
+          - service: backend
+            file: Dockerfile
+            args: |
+              APP=backend
+              APT_PACKAGES=ca-certificates libssl-dev
+          - service: indexer-base
+            file: Dockerfile
+            args: |
+              APP=indexer-base
+              APT_PACKAGES=ca-certificates git curl iputils-ping
+          - service: indexer-events
+            file: Dockerfile
+            args: |
+              APP=indexer-events
+              NEON=true
+          - service: indexer-multichain
+            file: Dockerfile
+            args: |
+              APP=indexer-multichain
+              NODE_ARGS=--max-old-space-size=1536
+          - service: indexer-signature
+            file: Dockerfile
+            args: |
+              APP=indexer-signature
+              NEON=true
+              NODE_ARGS=--max-old-space-size=1536
+          - service: indexer-staking
+            file: Dockerfile
+            args: |
+              APP=indexer-staking
+              NODE_ARGS=--max-old-space-size=2048
+          - service: indexer-receipts
+            file: Dockerfile
+            args: |
+              APP=indexer-receipts
+              NEON=true
+              APT_PACKAGES=ca-certificates git curl iputils-ping
+          - service: indexer-accounts
+            file: Dockerfile
+            args: |
+              APP=indexer-accounts
+              NEON=true
+              NODE_ARGS=--max-old-space-size=1536
+              APT_PACKAGES=ca-certificates git curl iputils-ping xz-utils
+          - service: indexer-contract
+            file: Dockerfile
+            args: |
+              APP=indexer-contract
+              NODE_ARGS=--max-old-space-size=6000
+          - service: explorer-selector
+            file: apps/explorer-selector/Dockerfile
+            args: ''
+          - service: aggregates
+            file: Dockerfile
+            args: |
+              APP=aggregates
+          - service: block-proxy
+            file: Dockerfile
+            args: |
+              APP=block-proxy
+              APT_PACKAGES=ca-certificates wget
+          - service: indexer-intents
+            file: Dockerfile
+            args: |
+              APP=indexer-intents
+          - service: indexer-tvl
+            file: Dockerfile
+            args: |
+              APP=indexer-tvl
+              NODE_ARGS=--max-old-space-size=1536
+          - service: indexer-ft-state
+            file: Dockerfile
+            args: |
+              APP=indexer-ft-state
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
         with:
           platforms: linux/amd64
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine image tag
         run: |
-          if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ] || [ "${{ matrix.service }}" = "aggregates" ]; then
+          if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ] || [ "${{ matrix.service }}" = "aggregates" ]; then
             echo "TAG=:v2" >> $GITHUB_ENV
           else
             echo "TAG=:latest" >> $GITHUB_ENV
@@ -56,11 +112,11 @@ jobs:
         run: |
           CURRENT_DIGEST=$(docker manifest inspect ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }} | jq -r '.config.digest' || echo "")
           echo "CURRENT_DIGEST=$CURRENT_DIGEST" >> $GITHUB_ENV
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v7
         id: build
         with:
           context: .
-          file: apps/${{ matrix.service }}/Dockerfile
+          file: ${{ matrix.file }}
           platforms: linux/amd64
           push: true
           provenance: false
@@ -70,6 +126,7 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/nearblocks/${{ matrix.service }}${{ env.TAG }}
           cache-to: type=inline
           build-args: |
+            ${{ matrix.args }}
             GITHUB_SHA=${{ github.sha }}
             NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
 

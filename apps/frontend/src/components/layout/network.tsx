@@ -18,12 +18,12 @@ type NetworkItemProps = {
 const NetworkItem = ({ active, href, label }: NetworkItemProps) => (
   <PopoverPrimitive.Close asChild>
     <a
-      className="focus:bg-muted hover:bg-muted text-body-sm flex items-center gap-2 rounded-sm px-2 py-1.5 outline-hidden select-none"
+      className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-body-sm outline-hidden select-none hover:bg-muted focus:bg-muted"
       href={href}
       rel="noopener noreferrer"
     >
       <span className="flex-1">{label}</span>
-      {active && <Check className="text-muted-foreground size-4" />}
+      {active && <Check className="size-4 text-muted-foreground" />}
     </a>
   </PopoverPrimitive.Close>
 );

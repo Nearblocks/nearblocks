@@ -59,7 +59,7 @@ const TreeItem = ({ receipt, selectedId, toggle }: ItemProps) => {
           {actionLabel(receipt)}
         </span>
         {isFail && (
-          <span className="bg-destructive/10 text-destructive shrink-0 rounded px-1 py-0.5 text-xs">
+          <span className="text-xs shrink-0 rounded bg-destructive/10 px-1 py-0.5 text-destructive">
             Fail
           </span>
         )}

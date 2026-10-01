@@ -37,7 +37,7 @@ const BlockPage = async ({ params }: Props) => {
         title={
           <>
             {t('overview.heading')}{' '}
-            <span className="text-muted-foreground text-body-base">#{bid}</span>
+            <span className="text-body-base text-muted-foreground">#{bid}</span>
           </>
         }
       />

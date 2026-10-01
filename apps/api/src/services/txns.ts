@@ -126,17 +126,20 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
           ${block ? sql`included_in_block_hash = ${block}` : true}
           AND ${from ? sql`signer_account_id = ${from}` : true}
           AND ${to ? sql`receiver_account_id = ${to}` : true}
-          AND ${cursor
-      ? sql`id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-      : true}
-          AND ${afterTimestamp
-      ? sql`block_timestamp >= ${afterTimestamp}`
-      : true}
-          AND ${beforeTimestamp
-      ? sql`block_timestamp < ${beforeTimestamp}`
-      : true}
-          AND ${action || method
-      ? sql`
+          AND ${
+            cursor
+              ? sql`id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+              : true
+          }
+          AND ${
+            afterTimestamp ? sql`block_timestamp >= ${afterTimestamp}` : true
+          }
+          AND ${
+            beforeTimestamp ? sql`block_timestamp < ${beforeTimestamp}` : true
+          }
+          AND ${
+            action || method
+              ? sql`
           EXISTS (
             SELECT
               1
@@ -152,13 +155,14 @@ const list = catchAsync(async (req: RequestValidator<List>, res: Response) => {
                 WHERE
                   a.receipt_id = r.receipt_id
                   AND ${action ? sql`a.action_kind = ${action}` : true}
-                  AND ${method
-            ? sql`a.args ->> 'method_name' = ${method}`
-            : true}
+                  AND ${
+                    method ? sql`a.args ->> 'method_name' = ${method}` : true
+                  }
               )
           )
         `
-      : true}
+              : true
+          }
         ORDER BY
           id ${order === 'desc' ? sql`DESC` : sql`ASC`}
         LIMIT
@@ -230,11 +234,12 @@ const count = catchAsync(
         AND ${from ? sql`signer_account_id = ${from}` : true}
         AND ${to ? sql`receiver_account_id = ${to}` : true}
         AND ${afterTimestamp ? sql`block_timestamp >= ${afterTimestamp}` : true}
-        AND ${beforeTimestamp
-        ? sql`block_timestamp < ${beforeTimestamp}`
-        : true}
-        AND ${action || method
-        ? sql`
+        AND ${
+          beforeTimestamp ? sql`block_timestamp < ${beforeTimestamp}` : true
+        }
+        AND ${
+          action || method
+            ? sql`
             EXISTS (
               SELECT
                 1
@@ -250,13 +255,14 @@ const count = catchAsync(
                   WHERE
                     a.receipt_id = r.receipt_id
                     AND ${action ? sql`a.action_kind = ${action}` : true}
-                    AND ${method
-              ? sql`a.args ->> 'method_name' = ${method}`
-              : true}
+                    AND ${
+                      method ? sql`a.args ->> 'method_name' = ${method}` : true
+                    }
                 )
             )
           `
-        : true}
+            : true
+        }
     `;
 
     return res.status(200).json({ txns });

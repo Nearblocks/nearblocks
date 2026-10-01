@@ -61,18 +61,18 @@ export const TransferIcon = ({ type }: IconProps) => {
   return (
     <span className="inline-flex items-center gap-1">
       {type === 'mint' ? (
-        <Pickaxe className="text-primary size-3.5 shrink-0" />
+        <Pickaxe className="size-3.5 shrink-0 text-primary" />
       ) : type === 'burn' ? (
-        <Flame className="text-red-foreground size-3.5 shrink-0" />
+        <Flame className="size-3.5 shrink-0 text-red-foreground" />
       ) : (
-        <Send className="text-blue-foreground size-3.5 shrink-0" />
+        <Send className="size-3.5 shrink-0 text-blue-foreground" />
       )}
       <span>
         {type === 'mint'
           ? t('transfer.mint')
           : type === 'burn'
-          ? t('transfer.burn')
-          : t('transfer.transfer')}
+            ? t('transfer.burn')
+            : t('transfer.transfer')}
       </span>
     </span>
   );

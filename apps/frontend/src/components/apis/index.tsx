@@ -43,13 +43,13 @@ export const Apis = ({ plansPromise }: Props) => {
       <section className="py-12">
         <div className="container mx-auto flex flex-col items-center gap-10 px-4 md:flex-row md:items-start">
           <div className="flex-1">
-            <p className="text-body-sm text-muted-foreground mb-4 tracking-widest uppercase">
+            <p className="mb-4 text-body-sm tracking-widest text-muted-foreground uppercase">
               {t('label')}
             </p>
-            <h1 className="text-headline-2xl mb-6 font-normal text-balance md:max-w-xl">
+            <h1 className="mb-6 text-headline-2xl font-normal text-balance md:max-w-xl">
               {t('heading')}
             </h1>
-            <p className="text-muted-foreground mb-8 text-pretty md:max-w-xl">
+            <p className="mb-8 text-pretty text-muted-foreground md:max-w-xl">
               {t('description')}
             </p>
             <div className="flex flex-wrap items-center gap-3">
@@ -87,12 +87,12 @@ export const Apis = ({ plansPromise }: Props) => {
         </div>
       </section>
 
-      <section className="bg-muted/40 border-y py-14 text-center">
+      <section className="border-y bg-muted/40 py-14 text-center">
         <div className="container mx-auto px-4">
-          <h2 className="text-headline-2xl mb-3 font-normal">
+          <h2 className="mb-3 text-headline-2xl font-normal">
             {t('pricing.heading')}
           </h2>
-          <p className="text-muted-foreground mx-auto mb-8 text-balance">
+          <p className="mx-auto mb-8 text-balance text-muted-foreground">
             {t('pricing.subheading')}
           </p>
           <div className="mb-8 flex items-center justify-center gap-3">
@@ -106,7 +106,7 @@ export const Apis = ({ plansPromise }: Props) => {
               className={isAnnual ? 'font-medium' : 'text-muted-foreground'}
             >
               {t('pricing.annually')}{' '}
-              <span className="text-lime-foreground text-body-sm">
+              <span className="text-body-sm text-lime-foreground">
                 {t('pricing.save')}
               </span>
             </span>
@@ -139,16 +139,16 @@ export const Apis = ({ plansPromise }: Props) => {
               return (
                 <Card
                   className={`relative flex flex-col p-6 ${
-                    isFeatured ? 'border-primary border-2' : ''
+                    isFeatured ? 'border-2 border-primary' : ''
                   }`}
                   key={plan.id}
                 >
                   {isFeatured && (
-                    <span className="bg-primary text-primary-foreground text-body-xs absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 font-medium">
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-body-xs font-medium text-primary-foreground">
                       {t('pricing.mostUsed')}
                     </span>
                   )}
-                  <p className="text-body-xs mb-4 tracking-widest uppercase">
+                  <p className="mb-4 text-body-xs tracking-widest uppercase">
                     {plan.title}
                   </p>
                   <div className="mb-1">
@@ -156,17 +156,17 @@ export const Apis = ({ plansPromise }: Props) => {
                       {currentPrice}
                     </span>
                     {currentPrice !== '$0' && (
-                      <span className="text-muted-foreground text-body-sm">
+                      <span className="text-body-sm text-muted-foreground">
                         {t('pricing.mo')}
                       </span>
                     )}
                   </div>
                   {isFree ? (
-                    <p className="text-muted-foreground text-body-xs mb-4 h-5">
+                    <p className="mb-4 h-5 text-body-xs text-muted-foreground">
                       {t('pricing.attribution')}
                     </p>
                   ) : isAnnual ? (
-                    <p className="text-muted-foreground text-body-xs mb-4 h-5">
+                    <p className="mb-4 h-5 text-body-xs text-muted-foreground">
                       <span className="text-red-foreground line-through">
                         {strikethrough}
                       </span>{' '}
@@ -175,7 +175,7 @@ export const Apis = ({ plansPromise }: Props) => {
                       </span>
                     </p>
                   ) : (
-                    <p className="text-muted-foreground text-body-xs mb-4 h-5">
+                    <p className="mb-4 h-5 text-body-xs text-muted-foreground">
                       {t('pricing.or')}{' '}
                       <span className="text-lime-foreground">
                         {annualMonthlyDisplay} {t('pricing.off')}
@@ -184,7 +184,7 @@ export const Apis = ({ plansPromise }: Props) => {
                     </p>
                   )}
                   <Separator className="mb-4" />
-                  <ul className="text-body-sm mb-6 flex-1 space-y-2 text-center">
+                  <ul className="mb-6 flex-1 space-y-2 text-center text-body-sm">
                     <li>
                       {t('pricing.callsPerMinute', {
                         count: numberFormat(limitMinute),
@@ -224,19 +224,19 @@ export const Apis = ({ plansPromise }: Props) => {
 
       <section className="py-14">
         <div className="container mx-auto px-4">
-          <Card className="border-primary border-2 p-6">
+          <Card className="border-2 border-primary p-6">
             <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="bg-teal-background text-primary hidden size-16 shrink-0 items-center justify-center rounded-lg sm:flex">
+              <div className="hidden size-16 shrink-0 items-center justify-center rounded-lg bg-teal-background text-primary sm:flex">
                 <Building2 className="size-8" strokeWidth={1.5} />
               </div>
               <div className="flex-1">
-                <p className="text-body-sm text-muted-foreground mb-1">
+                <p className="mb-1 text-body-sm text-muted-foreground">
                   {t('enterprise.label')}
                 </p>
-                <h3 className="text-headline-lg mb-1 font-normal">
+                <h3 className="mb-1 text-headline-lg font-normal">
                   {t('enterprise.heading')}
                 </h3>
-                <p className="text-muted-foreground text-body-sm text-balance">
+                <p className="text-body-sm text-balance text-muted-foreground">
                   {t('enterprise.description')}
                 </p>
               </div>
@@ -250,16 +250,16 @@ export const Apis = ({ plansPromise }: Props) => {
         </div>
       </section>
 
-      <section className="bg-muted/40 border-y py-14">
+      <section className="border-y bg-muted/40 py-14">
         <div className="container mx-auto px-4">
-          <h2 className="text-headline-2xl mb-8 text-center font-normal">
+          <h2 className="mb-8 text-center text-headline-2xl font-normal">
             {t('faq.heading')}
           </h2>
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2">
             {faqKeys.map((key) => (
               <div key={key}>
                 <p className="mb-2 font-medium">{t(`faq.${key}.question`)}</p>
-                <p className="text-muted-foreground text-body-sm text-balance">
+                <p className="text-body-sm text-balance text-muted-foreground">
                   {t(`faq.${key}.answer`)}
                 </p>
               </div>

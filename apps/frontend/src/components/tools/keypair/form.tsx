@@ -116,14 +116,14 @@ export const KeypairForm = () => {
   };
 
   return (
-    <div className="bg-card rounded-lg p-6">
-      <h1 className="mb-1 text-xl font-semibold">{t('keypair.title')}</h1>
-      <p className="text-muted-foreground mb-6 text-sm">
+    <div className="rounded-lg bg-card p-6">
+      <h1 className="text-xl mb-1 font-semibold">{t('keypair.title')}</h1>
+      <p className="text-sm mb-6 text-muted-foreground">
         {t('keypair.subtitle')}
       </p>
 
-      <Alert className="bg-amber-background mb-6 border-0">
-        <AlertDescription className="text-amber-foreground text-body-xs block">
+      <Alert className="mb-6 border-0 bg-amber-background">
+        <AlertDescription className="block text-body-xs text-amber-foreground">
           {t('keypair.warning')}
         </AlertDescription>
       </Alert>

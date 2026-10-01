@@ -1,9 +1,9 @@
 'use client';
 
-import type { JsonData } from 'nb-schemas/src/common';
 import { useContext, useMemo } from 'react';
 
 import type { ActionReceipt, TxnReceipt } from 'nb-schemas';
+import type { JsonData } from 'nb-schemas/src/common';
 import { ActionKind } from 'nb-types';
 
 import { Action, argsRecord } from '../actions/action';

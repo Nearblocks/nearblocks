@@ -10,7 +10,7 @@ export const SearchRow = ({ icon, subtitle, title }: Props) => (
     <span className="flex min-w-0 flex-col">
       <span className="truncate">{title}</span>
       {subtitle && (
-        <span className="text-body-xs text-muted-foreground truncate">
+        <span className="truncate text-body-xs text-muted-foreground">
           {subtitle}
         </span>
       )}
@@ -30,7 +30,7 @@ export const TokenTitle = ({ fallback, name, symbol }: TokenTitleProps) => (
       {name ?? fallback}
     </span>
     {symbol && (
-      <span className="text-muted-foreground flex min-w-0 items-center">
+      <span className="flex min-w-0 items-center text-muted-foreground">
         (
         <span className="inline-block max-w-15 min-w-0 truncate">{symbol}</span>
         )

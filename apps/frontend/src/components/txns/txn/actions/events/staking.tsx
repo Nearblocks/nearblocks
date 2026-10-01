@@ -38,10 +38,10 @@ export const StakingEvents = ({ contract, logs }: Props) => {
     <>
       {entries.map((entry, i) => (
         <span
-          className="text-body-sm flex flex-wrap items-center gap-1"
+          className="flex flex-wrap items-center gap-1 text-body-sm"
           key={i}
         >
-          <Coins className="text-blue-foreground size-3.5 shrink-0" />
+          <Coins className="size-3.5 shrink-0 text-blue-foreground" />
           {label(entry.kind)}
           <span className="flex items-center gap-1">
             <NearCircle className="size-4" />

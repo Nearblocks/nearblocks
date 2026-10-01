@@ -1,13 +1,11 @@
-/* eslint-disable perfectionist/sort-imports */
 import '#libs/tracing';
-
 import { createTerminus } from '@godaddy/terminus';
 
 import config from '#config';
 import logger from '#libs/logger';
-
 import sql from '#libs/postgres';
 import redis from '#libs/redis';
+
 import app from './app.js';
 
 const server = app.listen(config.port, async () => {

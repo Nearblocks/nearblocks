@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto';
-import { request } from 'undici';
 
 import { NETWORK, p2pkh, p2wpkh, TEST_NETWORK } from '@scure/btc-signer';
+import { request } from 'undici';
 
 import { Network } from 'nb-types';
 

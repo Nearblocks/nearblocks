@@ -220,7 +220,7 @@ export const MethodPanel = ({ args, doc, hasSchema, kind, name }: Props) => {
                 <Label>{t('contract.methods.error')}</Label>
                 <Copy size="sm" text={error} />
               </div>
-              <div className="bg-red-background text-red-foreground text-body-xs scroll-overlay max-h-40 overflow-y-auto rounded-lg border p-3">
+              <div className="scroll-overlay max-h-40 overflow-y-auto rounded-lg border bg-red-background p-3 text-body-xs text-red-foreground">
                 {error}
               </div>
             </Field>

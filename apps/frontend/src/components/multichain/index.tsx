@@ -176,7 +176,7 @@ export const MultichainTxns = ({
             <Truncate>
               <ChainIcon icon={explorer.icon} name={explorer.name} />
               <a
-                className="text-link ml-2 flex"
+                className="ml-2 flex text-link"
                 href={`${explorer.txUrl}${txn.dest_txn}`}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -207,7 +207,7 @@ export const MultichainTxns = ({
             <Truncate>
               <ChainIcon icon={explorer.icon} name={explorer.name} />
               <a
-                className="text-link ml-2 flex"
+                className="ml-2 flex text-link"
                 href={`${explorer.addrUrl}${txn.dest_address}`}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -277,7 +277,7 @@ export const MultichainTxns = ({
         ))}
       </div>
       <Card>
-        <CardContent className="text-body-sm p-0">
+        <CardContent className="p-0 text-body-sm">
           <DataTable
             columns={columns}
             data={txns?.data}

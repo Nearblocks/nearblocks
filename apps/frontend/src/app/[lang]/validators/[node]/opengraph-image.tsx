@@ -26,22 +26,20 @@ const Image = async ({ params }: Props) => {
       : `TESTNET | ${t('meta.label')}`;
 
   return new ImageResponse(
-    (
-      <Wrapper>
-        <TitleWrapper>
-          <Title small>{title}</Title>
-          <SubTitle>{node}</SubTitle>
-        </TitleWrapper>
-        <AccountBG
-          style={{
-            height: 540,
-            opacity: 0.05,
-            position: 'absolute',
-            width: 960,
-          }}
-        />
-      </Wrapper>
-    ),
+    <Wrapper>
+      <TitleWrapper>
+        <Title small>{title}</Title>
+        <SubTitle>{node}</SubTitle>
+      </TitleWrapper>
+      <AccountBG
+        style={{
+          height: 540,
+          opacity: 0.05,
+          position: 'absolute',
+          width: 960,
+        }}
+      />
+    </Wrapper>,
     { ...size },
   );
 };

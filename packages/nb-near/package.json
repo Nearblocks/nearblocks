@@ -8,17 +8,18 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "axios": "1.6.2",
+    "axios": "catalog:",
     "near-api-js": "4.0.1"
   },
   "devDependencies": {
-    "eslint-config-custom-node": "*",
+    "@types/node": "catalog:",
+    "nb-tsconfig": "workspace:*",
+    "nb-utils": "workspace:*",
     "near-lake-framework": "2.0.0",
-    "nb-tsconfig": "*",
-    "nb-utils": "*",
-    "typescript": "~5.2"
+    "typescript": "catalog:"
   }
 }

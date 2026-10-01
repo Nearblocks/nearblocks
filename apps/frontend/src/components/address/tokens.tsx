@@ -73,7 +73,7 @@ const TokenRow = ({
     <>
       <CommandItem asChild>
         <Link
-          className="text-body-xs grid grid-flow-col items-center justify-between gap-2 py-1.5"
+          className="grid grid-flow-col items-center justify-between gap-2 py-1.5 text-body-xs"
           href={href}
         >
           <span className="flex flex-col truncate">
@@ -93,7 +93,7 @@ const TokenRow = ({
               </span>
             </span>
             {decimals && (
-              <span className="text-muted-foreground pl-5.5">
+              <span className="pl-5.5 text-muted-foreground">
                 {numberFormat(toTokenAmount(amount, decimals), {
                   maximumFractionDigits: 6,
                 })}

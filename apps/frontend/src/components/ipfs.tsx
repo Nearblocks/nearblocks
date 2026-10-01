@@ -174,9 +174,9 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
 
   if (loading) {
     return (
-      <div className="border-border overflow-hidden rounded-lg border">
+      <div className="overflow-hidden rounded-lg border border-border">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div className="border-b px-3 py-2 text-sm last:border-b-0" key={i}>
+          <div className="text-sm border-b px-3 py-2 last:border-b-0" key={i}>
             <Skeleton className="w-full" />
           </div>
         ))}
@@ -186,7 +186,7 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
 
   if (error) {
     return (
-      <p className="text-destructive py-4 text-sm">
+      <p className="text-sm py-4 text-destructive">
         Failed to load source files: {error}
       </p>
     );
@@ -194,14 +194,14 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
 
   if (!files.length) {
     return (
-      <p className="text-muted-foreground py-4 text-sm">
+      <p className="text-sm py-4 text-muted-foreground">
         No Rust source files found.
       </p>
     );
   }
 
   return (
-    <div className="border-border overflow-hidden rounded-lg border">
+    <div className="overflow-hidden rounded-lg border border-border">
       {files.map((file) => {
         const isExpanded = expandedFiles.has(file.hash);
         const isLoading = loadingFiles.has(file.hash);
@@ -210,7 +210,7 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
 
         return (
           <div
-            className="border-border border-b last:border-b-0"
+            className="border-b border-border last:border-b-0"
             key={file.hash}
           >
             <button
@@ -221,21 +221,21 @@ export const IpfsSourceViewer = ({ api, cid, gateway, path }: Props) => {
               onClick={() => handleToggle(file)}
             >
               {isExpanded ? (
-                <RiArrowDownSLine className="text-muted-foreground size-4 shrink-0" />
+                <RiArrowDownSLine className="size-4 shrink-0 text-muted-foreground" />
               ) : (
-                <RiArrowRightSLine className="text-muted-foreground size-4 shrink-0" />
+                <RiArrowRightSLine className="size-4 shrink-0 text-muted-foreground" />
               )}
-              <RiFileCodeLine className="text-muted-foreground size-4 shrink-0" />
-              <span className="truncate font-mono text-xs">{file.path}</span>
-              <span className="text-muted-foreground ml-auto shrink-0 text-xs">
+              <RiFileCodeLine className="size-4 shrink-0 text-muted-foreground" />
+              <span className="text-xs truncate font-mono">{file.path}</span>
+              <span className="text-xs ml-auto shrink-0 text-muted-foreground">
                 {formatSize(file.size)}
               </span>
             </button>
             {isExpanded && (
-              <div className="border-border relative border-t">
+              <div className="relative border-t border-border">
                 {isLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="border-muted-foreground size-5 animate-spin rounded-full border-2 border-t-transparent" />
+                    <div className="size-5 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
                   </div>
                 ) : content !== undefined ? (
                   <>

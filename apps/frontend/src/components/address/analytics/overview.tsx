@@ -33,7 +33,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
     <div>
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Card className="px-3 py-4">
-          <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
+          <h3 className="flex items-center gap-1 text-body-xs text-muted-foreground uppercase">
             {t('analytics.overview.txnCount')}{' '}
             <Tooltip>
               <TooltipTrigger>
@@ -44,7 +44,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               </TooltipContent>
             </Tooltip>
           </h3>
-          <p className="text-headline-base mt-0.5">
+          <p className="mt-0.5 text-headline-base">
             <SkeletonSlot
               fallback={<Skeleton className="w-20" />}
               loading={!!loading}
@@ -58,7 +58,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               }
             </SkeletonSlot>
           </p>
-          <p className="text-body-xs text-muted-foreground mt-2">
+          <p className="mt-2 text-body-xs text-muted-foreground">
             {t('analytics.overview.since')}{' '}
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
@@ -75,7 +75,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           </p>
         </Card>
         <Card className="px-3 py-4">
-          <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
+          <h3 className="flex items-center gap-1 text-body-xs text-muted-foreground uppercase">
             {t('analytics.overview.activeAge')}{' '}
             <Tooltip>
               <TooltipTrigger>
@@ -86,7 +86,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               </TooltipContent>
             </Tooltip>
           </h3>
-          <p className="text-headline-base mt-0.5">
+          <p className="mt-0.5 text-headline-base">
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
               loading={!!loading}
@@ -100,7 +100,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               }
             </SkeletonSlot>
           </p>
-          <p className="text-body-xs text-muted-foreground mt-2">
+          <p className="mt-2 text-body-xs text-muted-foreground">
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
               loading={!!loading}
@@ -119,7 +119,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           </p>
         </Card>
         <Card className="px-3 py-4">
-          <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
+          <h3 className="flex items-center gap-1 text-body-xs text-muted-foreground uppercase">
             {t('analytics.overview.uniqueDays')}{' '}
             <Tooltip>
               <TooltipTrigger>
@@ -130,7 +130,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               </TooltipContent>
             </Tooltip>
           </h3>
-          <p className="text-headline-base mt-0.5">
+          <p className="mt-0.5 text-headline-base">
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
               loading={!!loading}
@@ -144,7 +144,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               }
             </SkeletonSlot>
           </p>
-          <p className="text-body-xs text-muted-foreground mt-2">
+          <p className="mt-2 text-body-xs text-muted-foreground">
             {t('analytics.overview.since')}{' '}
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
@@ -161,7 +161,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
           </p>
         </Card>
         <Card className="px-3 py-4">
-          <h3 className="text-body-xs text-muted-foreground flex items-center gap-1 uppercase">
+          <h3 className="flex items-center gap-1 text-body-xs text-muted-foreground uppercase">
             {t('analytics.overview.longestStreak')}{' '}
             <Tooltip>
               <TooltipTrigger>
@@ -172,7 +172,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               </TooltipContent>
             </Tooltip>
           </h3>
-          <p className="text-headline-base mt-0.5">
+          <p className="mt-0.5 text-headline-base">
             <SkeletonSlot
               fallback={<Skeleton className="w-30" />}
               loading={!!loading}
@@ -186,7 +186,7 @@ const Overview = ({ heatmapPromise, loading, overviewPromise }: Props) => {
               }
             </SkeletonSlot>
           </p>
-          <p className="text-body-xs text-muted-foreground mt-2">
+          <p className="mt-2 text-body-xs text-muted-foreground">
             <SkeletonSlot
               fallback={<Skeleton className="w-40" />}
               loading={!!loading}

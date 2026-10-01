@@ -37,6 +37,39 @@ export class S3Upstream {
     return new S3Upstream(config);
   }
 
+  async fetch(height: number): Promise<Buffer> {
+    const key = `${height}.json`;
+    const start = Date.now();
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), this.timeoutMs);
+
+    let result: Buffer;
+    try {
+      result = await this.getObject(key, height, abort.signal);
+    } catch (err) {
+      clearTimeout(timer);
+      if (abort.signal.aborted) {
+        throw new Error(
+          `S3 fetch timed out for block ${height} after ${this.timeoutMs}ms`,
+        );
+      }
+      throw err;
+    }
+    clearTimeout(timer);
+
+    // S3 stores camelCase JSON (uploaded by indexer-base); normalize to snake_case
+    const parsed = JSON.parse(result.toString('utf8'));
+    const normalized = Buffer.from(JSON.stringify(snakeCaseKeys(parsed)));
+
+    const elapsed = Date.now() - start;
+    logger.debug(
+      { bytes: normalized.length, height, latency_ms: elapsed },
+      'S3 upstream fetch complete',
+    );
+
+    return normalized;
+  }
+
   private async getObject(
     key: string,
     height: number,
@@ -72,38 +105,5 @@ export class S3Upstream {
     }
 
     return Buffer.from(bytes);
-  }
-
-  async fetch(height: number): Promise<Buffer> {
-    const key = `${height}.json`;
-    const start = Date.now();
-    const abort = new AbortController();
-    const timer = setTimeout(() => abort.abort(), this.timeoutMs);
-
-    let result: Buffer;
-    try {
-      result = await this.getObject(key, height, abort.signal);
-    } catch (err) {
-      clearTimeout(timer);
-      if (abort.signal.aborted) {
-        throw new Error(
-          `S3 fetch timed out for block ${height} after ${this.timeoutMs}ms`,
-        );
-      }
-      throw err;
-    }
-    clearTimeout(timer);
-
-    // S3 stores camelCase JSON (uploaded by indexer-base); normalize to snake_case
-    const parsed = JSON.parse(result.toString('utf8'));
-    const normalized = Buffer.from(JSON.stringify(snakeCaseKeys(parsed)));
-
-    const elapsed = Date.now() - start;
-    logger.debug(
-      { bytes: normalized.length, height, latency_ms: elapsed },
-      'S3 upstream fetch complete',
-    );
-
-    return normalized;
   }
 }

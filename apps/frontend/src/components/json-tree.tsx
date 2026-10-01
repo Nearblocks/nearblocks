@@ -118,7 +118,7 @@ const Node = ({ depth = 0, isLast = true, name, value }: NodeProps) => {
           onClick={empty ? undefined : () => setOpen((p) => !p)}
         >
           {!empty && (
-            <span className="text-muted-foreground/60 -ml-3.5 inline-flex w-3.5">
+            <span className="-ml-3.5 inline-flex w-3.5 text-muted-foreground/60">
               {open$ ? (
                 <ChevronDown className="size-3.5" />
               ) : (
@@ -131,7 +131,7 @@ const Node = ({ depth = 0, isLast = true, name, value }: NodeProps) => {
           {!open$ && (
             <>
               {!empty && (
-                <span className="text-muted-foreground/60 mx-1">
+                <span className="mx-1 text-muted-foreground/60">
                   {isArr
                     ? `${items.length} item${items.length === 1 ? '' : 's'}`
                     : `${items.length} field${items.length === 1 ? '' : 's'}`}
@@ -180,7 +180,7 @@ type Props = {
 
 export const JsonTree = ({ className, value }: Props) => (
   <div
-    className={`prism-code text-body-sm min-w-0 py-2 pr-4 pl-8 font-mono break-words ${
+    className={`prism-code min-w-0 py-2 pr-4 pl-8 font-mono text-body-sm break-words ${
       className ?? ''
     }`}
   >

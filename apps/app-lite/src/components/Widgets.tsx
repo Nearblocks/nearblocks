@@ -53,30 +53,29 @@ const Widgets = ({ loader, props, src }: WidgetsProps): ReactNode => {
   const configs = { redirectMap };
 
   useEffect(() => {
-    initNear &&
-      initNear({
-        customElements: {
-          AddressKeysSkeleton,
-          AddressSkeleton,
-          BlockSkeleton,
-          ErrorIconSkeleton,
-          ErrorSkeleton,
-          HomeChartSkeleton,
-          HomeSkeleton,
-          HomeStatsSkeleton,
-          JsonView,
-          Link: Links,
-          Skeleton,
-          TxnActionSkeleton,
-          TxnAddressSkeleton,
-          TxnExecutionSkeleton,
-          TxnReceiptSkeleton,
-          TxnSkeleton,
-          TxnTabsSkeleton,
-        },
-        networkId: config.network,
-        selector: selector(),
-      });
+    initNear?.({
+      customElements: {
+        AddressKeysSkeleton,
+        AddressSkeleton,
+        BlockSkeleton,
+        ErrorIconSkeleton,
+        ErrorSkeleton,
+        HomeChartSkeleton,
+        HomeSkeleton,
+        HomeStatsSkeleton,
+        JsonView,
+        Link: Links,
+        Skeleton,
+        TxnActionSkeleton,
+        TxnAddressSkeleton,
+        TxnExecutionSkeleton,
+        TxnReceiptSkeleton,
+        TxnSkeleton,
+        TxnTabsSkeleton,
+      },
+      networkId: config.network,
+      selector: selector(),
+    });
   }, [initNear]);
 
   return <Widget config={configs} loading={loader} props={props} src={src} />;

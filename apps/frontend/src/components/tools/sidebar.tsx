@@ -10,7 +10,7 @@ export const ToolsSidebar = () => {
 
   return (
     <nav className="shrink-0 md:w-44">
-      <h1 className="text-muted-foreground text-headline-lg mb-3 hidden md:block">
+      <h1 className="mb-3 hidden text-headline-lg text-muted-foreground md:block">
         {t('nav.tools')}
       </h1>
       <ScrollArea>

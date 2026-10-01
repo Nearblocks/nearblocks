@@ -99,19 +99,21 @@ const multiChainTxns = catchAsync(
           WHERE
             ${account ? sql`account_id = ${account}` : true}
             AND ${from ? sql`account_id = ${from}` : true}
-            AND ${derivedAddress
-        ? sql`derived_address = ${derivedAddress}`
-        : true}
+            AND ${
+              derivedAddress ? sql`derived_address = ${derivedAddress}` : true
+            }
             AND ${chainId ? sql`chain = ${chainId}` : true}
-            AND ${cursor
-        ? sql`id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
-        : true}
-            AND ${afterTimestamp
-        ? sql`block_timestamp >= ${afterTimestamp}`
-        : true}
-            AND ${beforeTimestamp
-        ? sql`block_timestamp < ${beforeTimestamp}`
-        : true}
+            AND ${
+              cursor
+                ? sql`id ${order === 'desc' ? sql`<` : sql`>`} ${cursor}`
+                : true
+            }
+            AND ${
+              afterTimestamp ? sql`block_timestamp >= ${afterTimestamp}` : true
+            }
+            AND ${
+              beforeTimestamp ? sql`block_timestamp < ${beforeTimestamp}` : true
+            }
             AND ${afterBlock ? sql`block_height > ${afterBlock}` : true}
             AND ${beforeBlock ? sql`block_height < ${beforeBlock}` : true}
         ) AS filtered_mtx USING (id)

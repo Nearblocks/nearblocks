@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 const TermsPage = () => {
   return (
     <main className="flex flex-1 flex-col py-10">
-      <div className="bg-card container mx-auto flex flex-1 rounded-lg px-4 py-10">
+      <div className="container mx-auto flex flex-1 rounded-lg bg-card px-4 py-10">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-headline-2xl mb-6">Terms of Service</h1>
+          <h1 className="mb-6 text-headline-2xl">Terms of Service</h1>
           <p className="mb-6 font-semibold uppercase">
             PLEASE READ THESE TERMS OF SERVICE CAREFULLY.
           </p>
@@ -27,8 +27,8 @@ const TermsPage = () => {
             (&quot;Company,&quot; &quot;we,&quot; or &quot;us&quot;)
           </p>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               1. ELIGIBILITY
             </h2>
             <p className="mb-4">
@@ -47,8 +47,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               2. DISCONTINUANCE OF SERVICES
             </h2>
             <p>
@@ -58,8 +58,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               3. ASSUMPTION OF RISK
             </h2>
             <p className="mb-4">
@@ -80,8 +80,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               4. THIRD-PARTY SERVICES AND CONTENT
             </h2>
             <p className="mb-4">
@@ -106,8 +106,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               5. ACCEPTABLE USE
             </h2>
             <p className="mb-4">
@@ -164,8 +164,8 @@ const TermsPage = () => {
             </ul>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               6. USER-GENERATED CONTENT
             </h2>
             <div className="space-y-4">
@@ -218,8 +218,8 @@ const TermsPage = () => {
             </div>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               7. COPYRIGHTS AND OTHER INTELLECTUAL PROPERTY RIGHTS
             </h2>
             <p className="mb-4">
@@ -243,8 +243,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               8. TRADEMARKS
             </h2>
             <p className="mb-4">
@@ -274,8 +274,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               9. SUSPENSION; TERMINATION
             </h2>
             <p className="mb-4">
@@ -294,8 +294,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               10. COOKIE STATEMENT
             </h2>
             <p className="mb-4">
@@ -345,8 +345,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               11. PRIVACY POLICY
             </h2>
             <p>
@@ -361,8 +361,8 @@ const TermsPage = () => {
             </p>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               12. DISCLAIMER OF WARRANTIES
             </h2>
             <div className="space-y-4">
@@ -392,8 +392,8 @@ const TermsPage = () => {
             </div>
           </section>
 
-          <section className="text-muted-foreground mb-8">
-            <h2 className="text-headline-lg text-foreground mb-4">
+          <section className="mb-8 text-muted-foreground">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               13. LIMITATION OF LIABILITY
             </h2>
             <p>
@@ -417,7 +417,7 @@ const TermsPage = () => {
           </section>
 
           <section className="text-muted-foreground">
-            <h2 className="text-headline-lg text-foreground mb-4">
+            <h2 className="mb-4 text-headline-lg text-foreground">
               14. INDEMNITY
             </h2>
             <p className="mb-4">

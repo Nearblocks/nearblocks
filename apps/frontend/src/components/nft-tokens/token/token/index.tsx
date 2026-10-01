@@ -62,7 +62,7 @@ const TokenCard = ({
         />
       </div>
     </Link>
-    <div className="text-body-xs space-y-0.5">
+    <div className="space-y-0.5 text-body-xs">
       <div className="truncate">
         <span className="text-muted-foreground">{titleLabel}</span>
         <Link
@@ -111,7 +111,7 @@ export const NftTokens = ({
 
   return (
     <Card>
-      <div className="text-body-sm flex flex-wrap items-center justify-between gap-1 border-b px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-1 border-b px-4 py-3 text-body-sm">
         <SkeletonSlot
           fallback={
             <span className="leading-7">
@@ -135,13 +135,13 @@ export const NftTokens = ({
           }}
         </SkeletonSlot>
       </div>
-      <CardContent className="text-body-sm p-4">
+      <CardContent className="p-4 text-body-sm">
         <div className="grid grid-cols-1 gap-4 min-[440px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {loading ? (
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <div className="flex flex-col gap-2" key={i}>
                 <Skeleton className="aspect-square h-auto w-full rounded-lg" />
-                <div className="text-body-xs space-y-0.5">
+                <div className="space-y-0.5 text-body-xs">
                   <span className="block">
                     <Skeleton className="w-1/2" />
                   </span>

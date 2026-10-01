@@ -26,7 +26,7 @@ type Props = {
 const stripLocale = (path: string): string => {
   const segments = path.split('/').filter(Boolean);
   if (segments.length > 0 && supportedLocales.some((l) => l === segments[0])) {
-    return `/${segments.slice(1).join('/')}` || '/';
+    return `/${segments.slice(1).join('/')}`;
   }
   if (path === `/${defaultLocale}`) return '/';
   return path;

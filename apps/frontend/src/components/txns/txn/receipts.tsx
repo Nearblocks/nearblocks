@@ -115,7 +115,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
     },
     {
       cell: (row) => (
-        <Badge className="text-body-xs px-1.5 py-0.5" variant="blue">
+        <Badge className="px-1.5 py-0.5 text-body-xs" variant="blue">
           <Truncate>
             <TruncateText
               as="code"
@@ -178,7 +178,7 @@ export const ReceiptsSummary = ({ loading, receiptsPromise }: Props) => {
 
   return (
     <Card>
-      <CardContent className="text-body-sm p-0">
+      <CardContent className="p-0 text-body-sm">
         <DataTable
           columns={columns}
           data={loading ? undefined : rows}

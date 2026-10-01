@@ -8,16 +8,17 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix"
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "devDependencies": {
-    "axios": "1.6.2",
-    "eslint-config-custom-node": "*",
-    "nb-logger": "*",
-    "nb-tsconfig": "*",
-    "nb-types": "*",
-    "nb-utils": "*",
+    "@types/node": "catalog:",
+    "axios": "catalog:",
+    "nb-logger": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
     "tar": "7.4.3",
-    "typescript": "~5.2"
+    "typescript": "catalog:"
   }
 }

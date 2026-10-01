@@ -140,11 +140,11 @@ export const AccessKeys = ({
     {
       cell: (key) =>
         key.deleted.transaction_hash ? (
-          <Badge className="text-body-xs px-1.5 py-0.5" variant="red">
+          <Badge className="px-1.5 py-0.5 text-body-xs" variant="red">
             {t('keys.deleted')}
           </Badge>
         ) : (
-          <Badge className="text-body-xs px-1.5 py-0.5" variant="lime">
+          <Badge className="px-1.5 py-0.5 text-body-xs" variant="lime">
             {t('keys.created')}
           </Badge>
         ),
@@ -187,7 +187,7 @@ export const AccessKeys = ({
 
   return (
     <Card>
-      <CardContent className="text-body-sm p-0">
+      <CardContent className="p-0 text-body-sm">
         <DataTable
           actions={
             <Button asChild size="xs" variant="outline">

@@ -16,12 +16,12 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <MetaTags
-        title="Near Explorer Selector"
         description="Explore the NEAR Blockchain for transactions, addresses, tokens, prices and other information."
+        title="Near Explorer Selector"
       />
       <Script
-        strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${gTag}`}
+        strategy="afterInteractive"
       />
       <Script id="google-analytics" strategy="afterInteractive">
         {`

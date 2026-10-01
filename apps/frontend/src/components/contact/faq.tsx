@@ -159,13 +159,13 @@ export const ContactFaq = ({ onContactClick }: Props) => {
     <div className="mt-6">
       {sections.map((section) => (
         <div key={section.title}>
-          <h3 className="text-headline-sm mt-6 mb-3">{section.title}</h3>
+          <h3 className="mt-6 mb-3 text-headline-sm">{section.title}</h3>
           <Accordion className="flex flex-col gap-2" type="multiple">
             {section.items.map((item) => (
               <AccordionItem key={item.question} value={item.question}>
                 <AccordionTrigger>{item.question}</AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-muted-foreground px-3">{item.answer}</p>
+                  <p className="px-3 text-muted-foreground">{item.answer}</p>
                 </AccordionContent>
               </AccordionItem>
             ))}

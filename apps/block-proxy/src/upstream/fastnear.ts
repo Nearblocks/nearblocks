@@ -28,11 +28,6 @@ export class FastnearUpstream {
     this.timeoutMs = config.upstreamTimeoutMs;
   }
 
-  private buildUrl(path: string): string {
-    const url = `${this.baseUrl}${path}`;
-    return this.apiKey ? `${url}?apiKey=${this.apiKey}` : url;
-  }
-
   async fetch(height: number): Promise<Buffer> {
     const url = this.buildUrl(`/v0/block/${height}`);
     const start = Date.now();
@@ -159,5 +154,10 @@ export class FastnearUpstream {
     );
 
     return data;
+  }
+
+  private buildUrl(path: string): string {
+    const url = `${this.baseUrl}${path}`;
+    return this.apiKey ? `${url}?apiKey=${this.apiKey}` : url;
   }
 }

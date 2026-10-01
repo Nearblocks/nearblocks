@@ -30,7 +30,7 @@ const Error = ({ error, reset }: Props) => {
 
   return (
     <main className="flex flex-1 flex-col py-10">
-      <div className="bg-card container mx-auto flex flex-1 items-center justify-center rounded-lg">
+      <div className="container mx-auto flex flex-1 items-center justify-center rounded-lg bg-card">
         <EmptyBox
           description={t('errors.serverError.description')}
           icon={<ServerOff />}

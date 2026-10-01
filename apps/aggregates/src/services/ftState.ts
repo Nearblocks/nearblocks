@@ -11,7 +11,6 @@ const SOURCE = 'ft_state_balances';
 const INDEXER_KEY = 'ft_state';
 
 export const syncFTStateHolders = async () => {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     await holders();
   }

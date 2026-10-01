@@ -141,10 +141,10 @@ export const IntentsSwapEvents = ({ logs, meta }: Props) => {
     <>
       {swaps.map((swap, i) => (
         <span
-          className="text-body-sm flex flex-wrap items-center gap-1"
+          className="flex flex-wrap items-center gap-1 text-body-sm"
           key={`swap-${i}`}
         >
-          <ArrowLeftRight className="text-blue-foreground size-3.5 shrink-0" />
+          <ArrowLeftRight className="size-3.5 shrink-0 text-blue-foreground" />
           {t('actions.swap')}
           {swap.sent.map((entry, j) => renderTokenEntry(entry, meta, j))}
           {t('actions.for')}
@@ -166,10 +166,10 @@ export const IntentsSwapEvents = ({ logs, meta }: Props) => {
         const tokenMeta = meta.get(w.token)!;
         return (
           <span
-            className="text-body-sm flex flex-wrap items-center gap-1"
+            className="flex flex-wrap items-center gap-1 text-body-sm"
             key={`withdraw-${i}`}
           >
-            <ArrowUpRight className="text-blue-foreground size-3.5 shrink-0" />
+            <ArrowUpRight className="size-3.5 shrink-0 text-blue-foreground" />
             {t('actions.withdraw')}
             <TokenAmount
               amount={w.amount}
@@ -212,10 +212,10 @@ export const IntentsSwapEvents = ({ logs, meta }: Props) => {
       })}
       {deposits.map((d, i) => (
         <span
-          className="text-body-sm flex flex-wrap items-center gap-1"
+          className="flex flex-wrap items-center gap-1 text-body-sm"
           key={`deposit-${i}`}
         >
-          <ArrowDownLeft className="text-blue-foreground size-3.5 shrink-0" />
+          <ArrowDownLeft className="size-3.5 shrink-0 text-blue-foreground" />
           {t('actions.deposit')}
           {renderTokenEntry({ amount: d.amount, tokenKey: d.token }, meta, 0)}
           {t('actions.by')}

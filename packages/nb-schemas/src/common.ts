@@ -22,13 +22,10 @@ export const responseMeta = v.object({
   prev_page: v.optional(v.string()),
 });
 
-export type ResponseData<T> = T extends v.BaseSchema<
-  unknown,
-  unknown,
-  v.BaseIssue<unknown>
->
-  ? v.InferOutput<ReturnType<typeof responseSchema<T>>>
-  : never;
+export type ResponseData<T> =
+  T extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
+    ? v.InferOutput<ReturnType<typeof responseSchema<T>>>
+    : never;
 
 export type JsonData =
   | { [key: string]: JsonData }

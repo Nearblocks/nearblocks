@@ -51,7 +51,7 @@ export const ViewOptions = ({
 
   return (
     <Collapsible>
-      <CollapsibleTrigger className="text-body-xs text-muted-foreground hover:text-foreground flex w-full items-center gap-2 text-left font-medium [&[data-state=open]>svg]:rotate-90">
+      <CollapsibleTrigger className="flex w-full items-center gap-2 text-left text-body-xs font-medium text-muted-foreground hover:text-foreground [&[data-state=open]>svg]:rotate-90">
         <svg
           className="size-4 shrink-0 transition-transform duration-200"
           fill="none"

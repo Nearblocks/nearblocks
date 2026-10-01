@@ -67,7 +67,7 @@ const NftTokenDetailPage = async ({ params, searchParams }: Props) => {
         <MtNftOverview cid={cid} tokenPromise={tokenPromise} />
       </ErrorSuspense>
       <Card className="mt-10">
-        <CardContent className="text-body-sm p-0">
+        <CardContent className="p-0 text-body-sm">
           <ErrorSuspense fallback={<MtNftTransfers loading />}>
             <MtNftTransfers
               txnCountPromise={txnCountPromise}

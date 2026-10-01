@@ -11,30 +11,30 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "yarn clean && tsc",
-    "lint": "tsc --noEmit && eslint ./ --fix",
-    "lint:check": "tsc --noEmit && eslint ./"
+    "build": "pnpm clean && tsc",
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "@sentry/node": "7.120.0",
-    "axios": "1.7.8",
-    "borsh": "2.0.0",
-    "envalid": "8.0.0",
-    "nb-prom": "*",
-    "hwp": "^0.4.1"
+    "@sentry/node": "catalog:",
+    "axios": "catalog:",
+    "borsh": "catalog:",
+    "envalid": "catalog:",
+    "nb-prom": "workspace:*",
+    "hwp": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "~22.10",
-    "eslint-config-custom-node": "*",
-    "knex-migrate-sql-file": "~2.0",
-    "nb-neardata": "*",
-    "nb-json": "*",
-    "nb-knex": "*",
-    "nb-logger": "*",
-    "nb-tsconfig": "*",
-    "nb-types": "*",
-    "nb-utils": "*",
+    "@types/node": "catalog:",
+    "knex": "catalog:",
+    "knex-migrate-sql-file": "catalog:",
+    "nb-json": "workspace:*",
+    "nb-knex": "workspace:*",
+    "nb-logger": "workspace:*",
+    "nb-neardata": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
     "rimraf": "~6.0",
-    "typescript": "~5.2"
+    "typescript": "catalog:"
   }
 }

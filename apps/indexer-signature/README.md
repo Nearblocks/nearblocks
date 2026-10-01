@@ -34,5 +34,5 @@ SENTRY_DSN=
 Migrations can be applied by accessing the Docker container and executing the following command
 
 ```
-cd apps/indexer-signature && yarn migrate
+cd apps/indexer-signature && pnpm migrate
 ```

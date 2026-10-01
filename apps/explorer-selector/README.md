@@ -22,13 +22,13 @@ If modifying the BOS component in local environment, please add this environment
 
 To set up and start the Explorer Selector Gateway, follow these steps:
 
-Install dependencies using yarn:
+Install dependencies using pnpm:
 
-`yarn`
+`pnpm install`
 
 Start the gateway:
 
-`yarn dev`
+`pnpm dev`
 
 The gateway will be accessible at http://localhost:3000. Users can access the BOS Component ExplorerSelector.
 

@@ -34,10 +34,10 @@ export const RheaSwapEvents = ({ logs, meta }: Props) => {
 
         return (
           <span
-            className="text-body-sm flex flex-wrap items-center gap-1"
+            className="flex flex-wrap items-center gap-1 text-body-sm"
             key={i}
           >
-            <ArrowLeftRight className="text-blue-foreground size-3.5 shrink-0" />
+            <ArrowLeftRight className="size-3.5 shrink-0 text-blue-foreground" />
             {t('actions.swap')}
             <TokenAmount
               amount={row.amountIn}
