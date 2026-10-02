@@ -25,6 +25,10 @@ jobs:
             args: |
               APP=indexer-base
               APT_PACKAGES=ca-certificates git curl iputils-ping
+          - service: indexer-balance
+            file: Dockerfile
+            args: |
+              APP=indexer-balance
           - service: indexer-events
             file: Dockerfile
             args: |
@@ -103,7 +107,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine image tag
         run: |
-          if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ] || [ "${{ matrix.service }}" = "aggregates" ]; then
+          if [ "${{ matrix.service }}" = "api" ] || [ "${{ matrix.service }}" = "indexer-base" ] || [ "${{ matrix.service }}" = "indexer-receipts" ] || [ "${{ matrix.service }}" = "indexer-balance" ] || [ "${{ matrix.service }}" = "indexer-events" ] || [ "${{ matrix.service }}" = "backend" ] || [ "${{ matrix.service }}" = "aggregates" ]; then
             echo "TAG=:v2" >> $GITHUB_ENV
           else
             echo "TAG=:latest" >> $GITHUB_ENV
