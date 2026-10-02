@@ -10,12 +10,16 @@ import { QuantumSafeBadge } from '@/components/quantum-safe-badge';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat } from '@/lib/format';
+import type { NearPrice } from '@/lib/txn';
 import { Badge } from '@/ui/badge';
+
+import { NearFiat } from '../near-fiat';
 
 type Props = {
   action: ActionReceipt;
   full?: boolean;
   hideCopy?: boolean;
+  nearPrice?: NearPrice | null;
   receiver: string;
   signer: string;
 };
@@ -29,6 +33,7 @@ export const Action = ({
   action,
   full = true,
   hideCopy = false,
+  nearPrice,
   receiver,
   signer,
 }: Props) => {
@@ -80,6 +85,9 @@ export const Action = ({
       <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.transfer')} <NearCircle className="size-4" />
         {nearFormat(String(args.deposit ?? 0))}
+        {Number(args.deposit ?? 0) > 0 && (
+          <NearFiat amount={String(args.deposit)} price={nearPrice} />
+        )}
         {full && (
           <>
             {' '}
@@ -106,6 +114,9 @@ export const Action = ({
       <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.stake')} <NearCircle className="size-4" />
         {nearFormat(String(args.stake ?? 0))}
+        {Number(args.stake ?? 0) > 0 && (
+          <NearFiat amount={String(args.stake)} price={nearPrice} />
+        )}
         {full && (
           <>
             {' '}

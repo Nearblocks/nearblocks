@@ -6,16 +6,19 @@ import { AccountLink } from '@/components/link';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import { nearFormat } from '@/lib/format';
+import type { NearPrice } from '@/lib/txn';
 
+import { NearFiat } from '../../near-fiat';
 import type { StakingKind } from './utils';
 import { parseStakingLogs } from './utils';
 
 type Props = {
   contract: string;
   logs: unknown[];
+  nearPrice?: NearPrice | null;
 };
 
-export const StakingEvents = ({ contract, logs }: Props) => {
+export const StakingEvents = ({ contract, logs, nearPrice }: Props) => {
   const { t } = useLocale('txns');
   const entries = parseStakingLogs(logs);
 
@@ -46,6 +49,9 @@ export const StakingEvents = ({ contract, logs }: Props) => {
           <span className="flex items-center gap-1">
             <NearCircle className="size-4" />
             {nearFormat(entry.amount)}
+            {Number(entry.amount) > 0 && (
+              <NearFiat amount={entry.amount} price={nearPrice} />
+            )}
           </span>
           {t('actions.by')}
           <AccountLink

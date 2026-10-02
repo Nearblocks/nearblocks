@@ -6,13 +6,14 @@ import type { TxnReceipt } from 'nb-schemas';
 
 import { useLocale } from '@/hooks/use-locale';
 import { useTxnStatus } from '@/hooks/use-rpc';
+import type { NearPrice } from '@/lib/txn';
 import { Button } from '@/ui/button';
 
 import { RpcContext } from '../execution/context';
 import { EnhancedTree } from './tree';
 
 type Props = {
-  nearPrice?: null | string;
+  nearPrice?: NearPrice | null;
   receipts: TxnReceipt;
   tid?: string;
 };

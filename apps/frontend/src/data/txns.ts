@@ -22,7 +22,11 @@ import {
   TxnStatsRes,
 } from 'nb-schemas';
 
+import { fetchPriceAt } from '@/data/charts';
+import { fetchStats } from '@/data/layout';
+import { Dayjs } from '@/lib/dayjs';
 import { fetcher, safeParams } from '@/lib/fetcher';
+import type { NearPrice } from '@/lib/txn';
 import { SearchParams } from '@/types/types';
 
 export const fetchTxns = cache(
@@ -89,5 +93,24 @@ export const fetchTxnMTs = cache(
   async (txn: string): Promise<null | TxnMT[]> => {
     const resp = await fetcher<TxnMTsRes>(`/v3/txns/${txn}/mts`);
     return resp.data;
+  },
+);
+
+export const fetchTxnNearPrice = cache(
+  async (blockTimestamp?: string): Promise<NearPrice | null> => {
+    if (!blockTimestamp) return null;
+
+    const date = Dayjs.utc(Number(BigInt(blockTimestamp) / 1000000n)).format(
+      'YYYY-MM-DD',
+    );
+    const daily = await fetchPriceAt(date);
+
+    if (daily?.near_price) {
+      return { closing: true, date, price: daily.near_price };
+    }
+
+    const stats = await fetchStats();
+
+    return { closing: false, date, price: stats?.near_price ?? null };
   },
 );
