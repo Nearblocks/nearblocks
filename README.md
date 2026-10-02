@@ -40,6 +40,7 @@ Turborepo is used as the build system for our project. Our main modules reside i
 - backend: contains database migrations and cron jobs to fetch and generate stats
 - explorer-selector: gateway for selecting your favourite explorer (Nearblocks)
 - indexer-base: our indexer built using near lake to index blocks, receipts, transactions, accounts and access keys for storing in timescale
+- indexer-balance: secondary indexer for tracking timeseries account balances
 - indexer-events: secondary indexer for tracking timeseries FT and NFT events
 
 ## Contributing

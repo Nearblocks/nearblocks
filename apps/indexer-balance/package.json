@@ -1,0 +1,39 @@
+{
+  "name": "indexer-balance",
+  "version": "0.2.0",
+  "author": "NearBlocks",
+  "license": "Business Source License 1.1",
+  "type": "module",
+  "imports": {
+    "#*": [
+      "./dist/*.js"
+    ]
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "pnpm clean && tsc",
+    "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
+  },
+  "dependencies": {
+    "@sentry/node": "catalog:",
+    "envalid": "catalog:",
+    "hwp": "catalog:",
+    "lodash-es": "catalog:",
+    "nb-prom": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "catalog:",
+    "@types/node": "catalog:",
+    "knex": "catalog:",
+    "knex-migrate-sql-file": "catalog:",
+    "nb-knex": "workspace:*",
+    "nb-logger": "workspace:*",
+    "nb-neardata": "workspace:*",
+    "nb-tsconfig": "workspace:*",
+    "nb-types": "workspace:*",
+    "nb-utils": "workspace:*",
+    "rimraf": "~5.0",
+    "typescript": "catalog:"
+  }
+}

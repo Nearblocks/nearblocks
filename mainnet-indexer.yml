@@ -25,6 +25,17 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     env_file: mainnet.indexer.env
+  indexer-balance:
+    container_name: mainnet-indexer-balance
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        APP: indexer-balance
+    restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file: mainnet.indexer.env
   indexer-events:
     container_name: mainnet-indexer-events
     build:
