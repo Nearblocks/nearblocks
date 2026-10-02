@@ -8,6 +8,7 @@ import { ActionKind } from 'nb-types';
 import { ScrollableList } from '@/components/scrollable-list';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
+import type { NearPrice } from '@/lib/txn';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
@@ -19,6 +20,7 @@ type Props = {
   ftsPromise?: Promise<null | TxnFT[]>;
   loading?: boolean;
   mtsPromise?: Promise<null | TxnMT[]>;
+  pricePromise?: Promise<NearPrice | null>;
   receiptsPromise?: Promise<null | TxnReceipt>;
   txnPromise?: Promise<null | Txn>;
 };
@@ -27,6 +29,7 @@ export const Actions = ({
   ftsPromise,
   loading,
   mtsPromise,
+  pricePromise,
   receiptsPromise,
   txnPromise,
 }: Props) => {
@@ -35,6 +38,7 @@ export const Actions = ({
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
   const fts = !loading && ftsPromise ? use(ftsPromise) : null;
   const mts = !loading && mtsPromise ? use(mtsPromise) : null;
+  const price = !loading && pricePromise ? use(pricePromise) : null;
 
   return (
     <Card>
@@ -87,6 +91,7 @@ export const Actions = ({
                         action={action}
                         hideCopy
                         key={index}
+                        nearPrice={price}
                         receiver={txn.receiver_account_id}
                         signer={txn.signer_account_id}
                       />
@@ -103,7 +108,12 @@ export const Actions = ({
                       content
                     )}
                     {receipts && (
-                      <ContractEvents fts={fts} mts={mts} receipts={receipts} />
+                      <ContractEvents
+                        fts={fts}
+                        mts={mts}
+                        nearPrice={price}
+                        receipts={receipts}
+                      />
                     )}
                   </div>
                 );

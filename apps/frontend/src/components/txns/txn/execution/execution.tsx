@@ -6,12 +6,13 @@ import type { TxnReceipt } from 'nb-schemas';
 
 import { useHashScroll } from '@/hooks/use-hash-scroll';
 import { useTxnStatus } from '@/hooks/use-rpc';
+import type { NearPrice } from '@/lib/txn';
 
 import { RpcContext } from './context';
 import { ReceiptTree } from './tree';
 
 type Props = {
-  nearPrice?: null | string;
+  nearPrice?: NearPrice | null;
   receipts: TxnReceipt;
   tid?: string;
 };

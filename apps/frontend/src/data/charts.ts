@@ -54,6 +54,15 @@ export const fetchPriceStats = cache(
   },
 );
 
+export const fetchPriceAt = cache(
+  async (date: string): Promise<null | PriceStats> => {
+    const resp = await fetcher<PriceStatsRes>(
+      `/v3/price-stats?date=${date}&limit=1`,
+    );
+    return resp.data?.[0] ?? null;
+  },
+);
+
 export const fetchTpsStats = cache(
   async (limit?: number): Promise<null | TpsStats[]> => {
     const url = limit ? `/v3/tps-stats?limit=${limit}` : '/v3/tps-stats';

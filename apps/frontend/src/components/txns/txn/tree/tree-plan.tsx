@@ -6,6 +6,7 @@ import type { TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { useTxnStatus } from '@/hooks/use-rpc';
+import type { NearPrice } from '@/lib/txn';
 import { ScrollArea, ScrollBar } from '@/ui/scroll-area';
 
 import { ReceiptExpandedSection } from '../enhanced/action';
@@ -13,7 +14,7 @@ import { RpcContext } from '../execution/context';
 import { TreeNode } from './node';
 
 type Props = {
-  nearPrice?: null | string;
+  nearPrice?: NearPrice | null;
   receipts: TxnReceipt;
   tid?: string;
 };

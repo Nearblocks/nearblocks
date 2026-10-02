@@ -2,9 +2,10 @@
 
 import { use } from 'react';
 
-import type { Stats, TxnReceipt } from 'nb-schemas';
+import type { TxnReceipt } from 'nb-schemas';
 
 import { SkeletonSlot } from '@/components/skeleton';
+import type { NearPrice } from '@/lib/txn';
 import { Card, CardContent } from '@/ui/card';
 import { ScrollArea } from '@/ui/scroll-area';
 
@@ -14,19 +15,19 @@ import { TreePlan } from './tree-plan';
 
 type Props = {
   loading?: boolean;
+  pricePromise?: Promise<NearPrice | null>;
   receiptsPromise?: Promise<null | TxnReceipt>;
-  statsPromise?: Promise<null | Stats>;
   tid?: string;
 };
 
 export const Tree = ({
   loading,
+  pricePromise,
   receiptsPromise,
-  statsPromise,
   tid,
 }: Props) => {
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
-  const stats = !loading && statsPromise ? use(statsPromise) : null;
+  const price = !loading && pricePromise ? use(pricePromise) : null;
 
   return (
     <Card>
@@ -48,13 +49,7 @@ export const Tree = ({
         >
           {() => {
             if (!receipts) throw new Error('Failed to load receipts');
-            return (
-              <TreePlan
-                nearPrice={stats?.near_price}
-                receipts={receipts}
-                tid={tid}
-              />
-            );
+            return <TreePlan nearPrice={price} receipts={receipts} tid={tid} />;
           }}
         </SkeletonSlot>
       </CardContent>

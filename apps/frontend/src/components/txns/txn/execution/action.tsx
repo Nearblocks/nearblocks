@@ -28,7 +28,7 @@ export const ReceiptAction = ({
   onlyArgs = false,
   receipt,
 }: Props) => {
-  const { enableRpc, rpcData, rpcLoading } = useContext(RpcContext);
+  const { enableRpc, nearPrice, rpcData, rpcLoading } = useContext(RpcContext);
 
   const { argsBase64, argsValue, hasArgs, method } = useMemo(() => {
     const wrapper = argsRecord(action.args);
@@ -97,6 +97,7 @@ export const ReceiptAction = ({
         <Action
           action={action}
           full={false}
+          nearPrice={nearPrice}
           receiver={receipt.receiver_account_id}
           signer={receipt.predecessor_account_id}
         />

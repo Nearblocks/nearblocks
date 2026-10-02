@@ -2,7 +2,7 @@
 
 import { RiQuestionLine } from '@remixicon/react';
 import { Key } from 'lucide-react';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { TxnReceipt } from 'nb-schemas';
 
@@ -14,17 +14,10 @@ import { SkeletonSlot } from '@/components/skeleton';
 import { LongDate } from '@/components/timestamp';
 import { TxnStatus } from '@/components/txn';
 import { useLocale } from '@/hooks/use-locale';
-import {
-  gasFormat,
-  nearFiatFormat,
-  nearFormat,
-  numberFormat,
-} from '@/lib/format';
+import { gasFormat, nearFormat, numberFormat } from '@/lib/format';
 import { isQuantumSafeKey } from '@/lib/utils';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
-
-import { RpcContext } from './context';
 
 type Props = {
   loading?: boolean;
@@ -40,7 +33,6 @@ export const ReceiptInspectRows = ({
   signer,
 }: Props) => {
   const { t } = useLocale('txns');
-  const { nearPrice } = useContext(RpcContext);
 
   const deposit = useMemo(() => {
     return receipt?.actions
@@ -291,11 +283,6 @@ export const ReceiptInspectRows = ({
             {() => (
               <span className="flex items-center gap-1">
                 {nearFormat(deposit)} Ⓝ
-                {nearPrice && (
-                  <span className="text-muted-foreground">
-                    ({nearFiatFormat(deposit, nearPrice)})
-                  </span>
-                )}
               </span>
             )}
           </SkeletonSlot>

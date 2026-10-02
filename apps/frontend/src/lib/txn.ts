@@ -1,3 +1,9 @@
+export type NearPrice = {
+  closing: boolean;
+  date: string;
+  price: null | string;
+};
+
 type Action = {
   action: string;
   method: null | string;

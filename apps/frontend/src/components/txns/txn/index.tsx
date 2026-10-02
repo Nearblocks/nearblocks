@@ -5,7 +5,7 @@ import { Radio } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { use, useEffect } from 'react';
 
-import { Stats, Txn, TxnFT, TxnMT, TxnNFT, TxnReceipt } from 'nb-schemas';
+import { Txn, TxnFT, TxnMT, TxnNFT, TxnReceipt } from 'nb-schemas';
 import { ActionKind } from 'nb-types';
 
 import { Copy } from '@/components/copy';
@@ -18,24 +18,26 @@ import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { NearCircle } from '@/icons/near-circle';
 import {
+  currencyFormat,
   gasFormat,
-  nearFiatFormat,
   nearFormat,
   numberFormat,
 } from '@/lib/format';
+import type { NearPrice } from '@/lib/txn';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 import { argsRecord } from './actions/action';
+import { NearFiat } from './near-fiat';
 import { Transfers } from './transfers';
 
 type Props = {
   loading?: boolean;
+  pricePromise?: Promise<NearPrice | null>;
   receiptsPromise?: Promise<null | TxnReceipt>;
   spamPatterns?: string[];
-  statsPromise?: Promise<null | Stats>;
   txnFTsPromise?: Promise<null | TxnFT[]>;
   txnMTsPromise?: Promise<null | TxnMT[]>;
   txnNFTsPromise?: Promise<null | TxnNFT[]>;
@@ -44,9 +46,9 @@ type Props = {
 
 export const Overview = ({
   loading,
+  pricePromise,
   receiptsPromise,
   spamPatterns,
-  statsPromise,
   txnFTsPromise,
   txnMTsPromise,
   txnNFTsPromise,
@@ -59,7 +61,7 @@ export const Overview = ({
   const mts = !loading && txnMTsPromise ? use(txnMTsPromise) : null;
   const nfts = !loading && txnNFTsPromise ? use(txnNFTsPromise) : null;
   const receipts = !loading && receiptsPromise ? use(receiptsPromise) : null;
-  const stats = !loading && statsPromise ? use(statsPromise) : null;
+  const price = !loading && pricePromise ? use(pricePromise) : null;
   const router = useRouter();
 
   useEffect(() => {
@@ -396,16 +398,10 @@ export const Overview = ({
                       <span className="flex items-center gap-1">
                         <NearCircle className="size-4" />
                         {nearFormat(txn.actions_agg.deposit)}{' '}
-                        {stats?.near_price && (
-                          <span className="text-muted-foreground">
-                            (
-                            {nearFiatFormat(
-                              txn.actions_agg.deposit,
-                              stats.near_price,
-                            )}
-                            )
-                          </span>
-                        )}
+                        <NearFiat
+                          amount={txn.actions_agg.deposit}
+                          price={price}
+                        />
                       </span>
                     ) : (
                       <span className="text-muted-foreground">N/A</span>
@@ -436,16 +432,10 @@ export const Overview = ({
                       <span className="flex items-center gap-1">
                         <NearCircle className="size-4" />
                         {nearFormat(txn.outcomes_agg.transaction_fee)}{' '}
-                        {stats?.near_price && (
-                          <span className="text-muted-foreground">
-                            (
-                            {nearFiatFormat(
-                              txn.outcomes_agg.transaction_fee,
-                              stats.near_price,
-                            )}
-                            )
-                          </span>
-                        )}
+                        <NearFiat
+                          amount={txn.outcomes_agg.transaction_fee}
+                          price={price}
+                        />
                       </span>
                     ) : (
                       <span className="text-muted-foreground">N/A</span>
@@ -455,6 +445,40 @@ export const Overview = ({
               </p>
             </ListRight>
           </ListItem>
+          {(loading || price?.closing) && (
+            <ListItem>
+              <ListLeft className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <RiQuestionLine className="size-4" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t('overview.nearPriceTip', { date: price?.date ?? '' })}
+                  </TooltipContent>
+                </Tooltip>
+                {t('overview.nearPrice')}
+              </ListLeft>
+              <ListRight>
+                <p>
+                  <SkeletonSlot
+                    fallback={<Skeleton className="w-25" />}
+                    loading={!!loading}
+                  >
+                    {() =>
+                      price?.price ? (
+                        <span>
+                          {currencyFormat(price.price)}{' '}
+                          <span className="text-muted-foreground">/ Ⓝ</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )
+                    }
+                  </SkeletonSlot>
+                </p>
+              </ListRight>
+            </ListItem>
+          )}
           <ListItem>
             <ListLeft className="flex items-center gap-1">
               <Tooltip>

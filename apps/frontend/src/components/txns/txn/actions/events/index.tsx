@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import type { TxnFT, TxnMT, TxnReceipt } from 'nb-schemas';
 
 import { fetchFtsMeta } from '@/actions/ft-meta';
+import type { NearPrice } from '@/lib/txn';
 
 import { BurrowEvents } from './burrow';
 import { IntentsSwapEvents } from './intents';
@@ -24,10 +25,11 @@ import {
 type Props = {
   fts: null | TxnFT[];
   mts: null | TxnMT[];
+  nearPrice?: NearPrice | null;
   receipts: TxnReceipt;
 };
 
-export const ContractEvents = ({ fts, mts, receipts }: Props) => {
+export const ContractEvents = ({ fts, mts, nearPrice, receipts }: Props) => {
   const flat = useMemo(() => flattenReceipts(receipts), [receipts]);
   const baseMeta = useMemo(() => buildMetaMap(fts, mts), [fts, mts]);
 
@@ -76,6 +78,7 @@ export const ContractEvents = ({ fts, mts, receipts }: Props) => {
           contract={receiver}
           key={receipt.receipt_id}
           logs={logs}
+          nearPrice={nearPrice}
         />,
       );
     }
