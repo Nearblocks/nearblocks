@@ -18,6 +18,18 @@ export const useRpcStore = create(
         setRpc: (rpc) => set({ rpc }),
       };
     },
-    { name: 'rpc-url' },
+    {
+      migrate: (persisted) => {
+        const state = persisted as RpcState;
+        const { getCustomRpc, providers } = useNetworkStore.getState();
+        const known = [...providers, ...getCustomRpc()].some(
+          (rpc) => rpc.url === state.rpc,
+        );
+
+        return known ? state : { ...state, rpc: providers[0].url };
+      },
+      name: 'rpc-url',
+      version: 1,
+    },
   ),
 );

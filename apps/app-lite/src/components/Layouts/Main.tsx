@@ -26,8 +26,8 @@ const Layout = ({ children, hideSearch }: LayoutProps) => {
     if (rpcUrl) {
       setRpc(rpcUrl);
     }
-    if (network) {
-      setNetwork(network as Network);
+    if (network === Network.MAINNET || network === Network.TESTNET) {
+      setNetwork(network);
       setRpc(getProviders(network)?.[0]?.url);
     }
   }, [setRpc, setNetwork]);

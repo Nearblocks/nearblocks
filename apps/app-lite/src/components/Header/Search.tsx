@@ -4,12 +4,9 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useRef } from 'react';
 
 import { useSearch } from '@/hooks/useSearch';
-import {
-  numberFormat,
-  shortenAddress,
-  shortenHash,
-  yoctoToNear,
-} from '@/libs/utils';
+import { yoctoToNear } from '@/libs/convertor';
+import { formatNumber } from '@/libs/formatter';
+import { MIN_SEARCH_LENGTH, shortenAddress, shortenHash } from '@/libs/utils';
 
 import Address from '../Icons/Address';
 import Block from '../Icons/Block';
@@ -26,16 +23,28 @@ type SearchProps = {
 const Search = ({ className, dropdownClassName }: SearchProps) => {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  const { loading, results, search } = useSearch();
-  const { run } = useDebounceFn(
-    () => {
-      const text = inputRef.current?.value;
-      const query = text?.replace(/[\s,]/g, '');
-
+  const { loading, results, search, status } = useSearch();
+  const { cancel, run } = useDebounceFn(
+    (query: string) => {
       search(query);
     },
-    { wait: 350 },
+    { wait: 600 },
   );
+
+  const getQuery = () => inputRef.current?.value.replace(/[\s,]/g, '');
+
+  const onChange = () => {
+    const query = getQuery();
+
+    if (!query || query.length < MIN_SEARCH_LENGTH) {
+      cancel();
+      search(undefined);
+
+      return;
+    }
+
+    run(query);
+  };
 
   useEffect(() => {
     const onRouteChange = () => inputRef.current?.blur();
@@ -49,17 +58,18 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const text = inputRef.current?.value;
-    const query = text?.replace(/[\s,]/g, '');
+    cancel();
+
+    const query = getQuery();
+
+    if (!query || query.length < MIN_SEARCH_LENGTH) return;
 
     const resp = await search(query);
 
     if (resp?.account)
-      return router.push(`/address/${resp.query.toLowerCase()}`);
+      return router.push(`/address/${resp.query?.toLowerCase()}`);
     if (resp?.block) return router.push(`/blocks/${resp.query}`);
     if (resp?.txn) return router.push(`/txns/${resp.query}`);
-    if (resp?.receipt)
-      return router.push(`/txns/${resp.receipt.parent_transaction_hash}`);
 
     return;
   };
@@ -78,7 +88,7 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
         <input
           className="bg-transparent w-full h-9 text-text-input outline-none pl-3"
           id="search"
-          onChange={run}
+          onChange={onChange}
           placeholder="Find a transaction, account or block"
           ref={inputRef}
           type="text"
@@ -104,11 +114,23 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                 </div>
               </li>
             )}
+            {!loading && status && (
+              <li>
+                <div className="flex items-center text-base text-text-input h-7 pl-6 pr-6 md:pl-5 md:pr-6">
+                  <span className="w-7">
+                    <Warning className="h-4 w-4" />
+                  </span>
+                  {status === 'rate-limited'
+                    ? 'Rate limited, try another RPC'
+                    : 'Search failed, try again'}
+                </div>
+              </li>
+            )}
             {!loading &&
+              !status &&
               !results.account &&
               !results.block &&
-              !results.txn &&
-              !results.receipt && (
+              !results.txn && (
                 <li>
                   <div className="flex items-center text-base text-text-input h-7 pl-6 pr-6 md:pl-5 md:pr-6">
                     <span className="w-7">
@@ -131,7 +153,7 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                     {shortenAddress(results.query.toLocaleLowerCase())}
                   </span>
                   <span className="text-text-input text-base">
-                    {numberFormat(yoctoToNear(results.account.amount), 2)} Ⓝ
+                    {formatNumber(yoctoToNear(results.account.amount), 2)} Ⓝ
                   </span>
                 </Link>
               </li>
@@ -146,7 +168,7 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                     <span className="w-7 flex-shrink-0">
                       <Block className="text-primary w-4" />
                     </span>
-                    {numberFormat(String(results.block.header.height))}
+                    {formatNumber(String(results.block.header.height), 0)}
                   </span>
                   <span className="text-text-input text-base">
                     {shortenHash(results.block.header.hash)}
@@ -165,21 +187,6 @@ const Search = ({ className, dropdownClassName }: SearchProps) => {
                       <Txn className="text-primary w-4" />
                     </span>
                     {shortenHash(results.txn.transaction.hash)}
-                  </span>
-                </Link>
-              </li>
-            )}
-            {!loading && results.receipt && (
-              <li>
-                <Link
-                  className="flex items-center justify-between text-base hover:text-primary h-7 pl-6 pr-6 md:pl-5 md:pr-6"
-                  href={`/txns/${results.receipt.parent_transaction_hash}`}
-                >
-                  <span className="flex items-center">
-                    <span className="w-7 flex-shrink-0">
-                      <Txn className="text-primary w-4" />
-                    </span>
-                    {shortenHash(results.receipt.parent_transaction_hash)}
                   </span>
                 </Link>
               </li>

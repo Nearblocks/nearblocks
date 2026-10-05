@@ -8,7 +8,7 @@ type JsonViewProps = {
 const JsonView = ({ children, className }: JsonViewProps) => {
   return (
     <pre
-      className={`bg-bg-code text-sm whitespace-pre overflow-y-auto p-3 rounded ${className}`}
+      className={`bg-bg-code text-sm whitespace-pre overflow-y-auto p-3 rounded ${className ?? ''}`}
     >
       {children}
     </pre>

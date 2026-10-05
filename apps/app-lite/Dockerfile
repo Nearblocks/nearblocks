@@ -13,7 +13,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
-COPY --from=builder /app/apps/bos-lite/src/widget ./apps/bos-lite/src/widget
 RUN npm install -g pnpm@12.8.1
 RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
