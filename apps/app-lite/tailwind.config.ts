@@ -4,7 +4,7 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 import plugin from 'tailwindcss/plugin';
 
 const config: Config = {
-  content: ['./src/**/*.{ts,tsx}', '../bos-lite/src/**/*.{ts,tsx}'],
+  content: ['./src/**/*.{ts,tsx}'],
   corePlugins: {
     container: false,
   },

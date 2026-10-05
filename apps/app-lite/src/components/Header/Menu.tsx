@@ -4,6 +4,7 @@ import { Network } from 'nb-types';
 
 import { MenuButton, MenuLink, MenuTitle } from '@/components/Menu';
 import { getProviders } from '@/libs/rpc';
+import { isHttpUrl } from '@/libs/utils';
 import { useNetworkStore } from '@/stores/network';
 import { useRpcStore } from '@/stores/rpc';
 
@@ -96,7 +97,7 @@ export const RpcMenu = ({
               <CopyButton
                 buttonClassName="mx-2"
                 className="text-primary w-3"
-                url={provider.url}
+                text={`https://nearvalidate.org/?rpcUrl=${provider.url}`}
               />
               <button
                 className="mr-2 px-2 text-red rounded"
@@ -132,7 +133,11 @@ export const RpcModal: React.FC<RpcModalProps> = ({
 
     const urlExists = allProviders.some((provider) => provider.url === rpcUrl);
 
-    if (urlExists) {
+    if (!rpcName.trim()) {
+      setUrlError('Enter a name.');
+    } else if (!isHttpUrl(rpcUrl)) {
+      setUrlError('Enter a valid http(s) URL.');
+    } else if (urlExists) {
       setUrlError('This URL already exists.');
     } else {
       setUrlError('');

@@ -1,107 +1,98 @@
-import {
-  RPC,
-  RpcResponse,
-  RpcResultAccount,
-  RpcResultBlock,
-  RpcResultReceipt,
-  RpcResultTxn,
-} from 'nb-near';
+import type { RpcResultAccount, RpcResultBlock, RpcResultTxn } from 'nb-near';
 import { Network } from 'nb-types';
 
-export const getProviders = (netwrok: string) => {
-  return netwrok === Network.MAINNET
+import { rpcFetch } from './fetcher';
+
+export const getProviders = (network: string) => {
+  return network === Network.MAINNET
     ? [
         {
-          name: 'NEAR (Archival)',
-          url: 'https://archival-rpc.mainnet.near.org',
+          name: 'FASTNEAR',
+          url: 'https://free.rpc.fastnear.com',
+        },
+        {
+          name: 'FASTNEAR (Archival)',
+          url: 'https://archival-rpc.mainnet.fastnear.com',
         },
         {
           name: 'NEAR',
           url: 'https://rpc.mainnet.near.org',
         },
         {
-          name: 'FASTNEAR Free',
-          url: 'https://free.rpc.fastnear.com',
+          name: 'NEAR (Archival)',
+          url: 'https://archival-rpc.mainnet.near.org',
         },
         {
-          name: 'Lava Network',
-          url: 'https://near.lava.build',
+          name: 'Intear RPC',
+          url: 'https://rpc.intea.rs',
         },
         {
-          name: 'Lavender.Five',
-          url: 'https://near.lavenderfive.com/',
-        },
-        {
-          name: 'dRPC',
-          url: 'https://near.drpc.org',
-        },
-        {
-          name: 'OMNIA',
-          url: 'https://endpoints.omniatech.io/v1/near/mainnet/public',
+          name: 'Shitzu',
+          url: 'https://rpc.shitzuapes.xyz',
         },
       ]
     : [
         {
-          name: 'NEAR (Archival)',
-          url: 'https://archival-rpc.testnet.near.org',
+          name: 'FASTNEAR',
+          url: 'https://test.rpc.fastnear.com',
         },
         {
           name: 'NEAR',
           url: 'https://rpc.testnet.near.org',
         },
+        {
+          name: 'NEAR (Archival)',
+          url: 'https://archival-rpc.testnet.near.org',
+        },
+        {
+          name: 'Intear RPC',
+          url: 'https://testnet-rpc.intea.rs',
+        },
       ];
 };
 
-export const getAccount = async (rpc: RPC, accountId: string) => {
-  try {
-    const { data } = await rpc.query({
-      account_id: accountId,
-      finality: 'final',
-      request_type: 'view_account',
-    });
+const isNodeError = (error: unknown) =>
+  typeof error === 'object' &&
+  error !== null &&
+  typeof (error as { cause?: { name?: unknown } }).cause?.name === 'string';
 
-    return data as RpcResponse<RpcResultAccount>;
+const lookup = async <T>(
+  rpcUrl: string,
+  method: string,
+  params: unknown,
+  signal: AbortSignal,
+): Promise<T | undefined> => {
+  try {
+    return await rpcFetch<T>(rpcUrl, method, params, { retries: 0, signal });
   } catch (error) {
-    console.log({ error });
-    return;
+    if (isNodeError(error)) return undefined;
+
+    throw error;
   }
 };
 
-export const getBlock = async (rpc: RPC, blockId: number | string) => {
-  try {
-    const { data } = await rpc.query({ block_id: blockId }, 'block');
+export const getAccount = (
+  rpcUrl: string,
+  accountId: string,
+  signal: AbortSignal,
+) =>
+  lookup<RpcResultAccount>(
+    rpcUrl,
+    'query',
+    { account_id: accountId, finality: 'final', request_type: 'view_account' },
+    signal,
+  );
 
-    return data as RpcResponse<RpcResultBlock>;
-  } catch (error) {
-    console.log({ error });
-    return;
-  }
-};
+export const getBlock = (
+  rpcUrl: string,
+  blockId: number | string,
+  signal: AbortSignal,
+) => lookup<RpcResultBlock>(rpcUrl, 'block', { block_id: blockId }, signal);
 
-export const getTxn = async (rpc: RPC, txnHash: string) => {
-  try {
-    const { data } = await rpc.query(
-      { sender_account_id: 'bowen', tx_hash: txnHash, wait_until: 'NONE' },
-      'tx',
-    );
-
-    return data as RpcResponse<RpcResultTxn>;
-  } catch (error) {
-    console.log({ error });
-    return;
-  }
-};
-
-export const getReceipt = async (rpc: RPC, receiptId: string) => {
-  try {
-    const { data } = await rpc.query(
-      { receipt_id: receiptId },
-      'view_receipt_record',
-    );
-
-    return data as RpcResponse<RpcResultReceipt>;
-  } catch (error) {
-    console.log({ error });
-    return;
-  }
-};
+export const getTxn = (rpcUrl: string, txnHash: string, signal: AbortSignal) =>
+  lookup<RpcResultTxn>(
+    rpcUrl,
+    'tx',
+    { sender_account_id: 'bowen', tx_hash: txnHash, wait_until: 'NONE' },
+    signal,
+  );

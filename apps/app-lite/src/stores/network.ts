@@ -65,11 +65,15 @@ export const useNetworkStore = create<NetworkState>()(
       testnet: [],
     }),
     {
+      merge: (persisted, current) => {
+        const state = { ...current, ...(persisted as Partial<NetworkState>) };
+
+        return { ...state, providers: getProviders(state.network) };
+      },
       name: 'network',
       partialize: (state) => ({
         mainnet: state.mainnet,
         network: state.network,
-        providers: state.providers,
         testnet: state.testnet,
       }),
     },

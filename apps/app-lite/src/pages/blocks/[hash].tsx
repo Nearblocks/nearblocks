@@ -1,46 +1,28 @@
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useRef } from 'react';
 
+import Block from '@/components/Block';
 import MainLayout from '@/components/Layouts/Main';
 import Meta from '@/components/Meta';
-import BlockSkeleton from '@/components/Skeletons/Block';
-import config from '@/config';
 import { useRpcStore } from '@/stores/rpc';
 import { PageLayout } from '@/types/types';
 
-const Widgets = dynamic(() => import('@/components/Widgets'), { ssr: false });
-
-const Block: PageLayout = () => {
+const BlockPage: PageLayout = () => {
   const router = useRouter();
-  const { hash } = router.query;
-  const loader = useRef<HTMLDivElement>(null);
+  const hash =
+    typeof router.query.hash === 'string' ? router.query.hash : undefined;
   const rpcUrl = useRpcStore((state) => state.rpc);
-
-  const onFinish = () => {
-    if (loader.current) loader.current.style.display = 'none';
-  };
 
   return (
     <>
       <Meta
-        description={`Near Block Hash ${hash}. The block height, timestamp, block gas used, gas price, author of the block are detailed on Near.`}
-        title={`Near Block ${hash} | Near Validate`}
+        description={`Near Block Hash ${hash ?? ''}. The block height, timestamp, block gas used, gas price, author of the block are detailed on Near.`}
+        title={`Near Block ${hash ?? ''} | Near Validate`}
       />
-      <div className="relative">
-        <div className="absolute inset-0" ref={loader}>
-          <BlockSkeleton />
-        </div>
-        <Widgets
-          loader={<BlockSkeleton onFinish={onFinish} />}
-          props={{ hash, rpcUrl }}
-          src={`${config.account}/widget/lite.Block`}
-        />
-      </div>
+      <Block hash={hash} rpcUrl={rpcUrl} />
     </>
   );
 };
 
-Block.getLayout = (page) => <MainLayout>{page}</MainLayout>;
+BlockPage.getLayout = (page) => <MainLayout>{page}</MainLayout>;
 
-export default Block;
+export default BlockPage;

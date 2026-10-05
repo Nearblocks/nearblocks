@@ -6,19 +6,19 @@ import Copy from './Icons/Copy';
 interface CopyButtonProps {
   buttonClassName: string;
   className: string;
-  url: string;
+  text: string;
 }
 
 const CopyButton: React.FC<CopyButtonProps> = ({
   buttonClassName,
   className,
-  url,
+  text,
 }) => {
   const [copied, setCopied] = useState(false);
 
   const onCopy = () => {
     navigator.clipboard
-      .writeText(`https://nearvalidate.org/?rpcUrl=${url}`)
+      .writeText(text)
       .then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
