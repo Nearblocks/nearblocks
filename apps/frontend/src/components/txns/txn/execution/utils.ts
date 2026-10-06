@@ -5,6 +5,8 @@ import {
 import { deserialize } from 'borsh';
 import { decodeBase64, hexlify, Transaction } from 'ethers';
 
+import { isRawJson, parseJson } from '@/lib/json';
+
 export type AuroraViewFormat = 'default' | 'rlp' | 'table';
 
 export type AuroraSubmitArgs = {
@@ -13,47 +15,86 @@ export type AuroraSubmitArgs = {
   tx_data: number[];
 };
 
-export const deepUnescape = (value: unknown): unknown => {
-  if (typeof value === 'string') {
-    const unescaped = value
-      .replace(/\\{2,}"/g, (m) => '\\'.repeat(m.length / 2 - 1) + '"')
-      .replace(/\\n/g, '\n')
-      .replace(/\\t/g, '\t')
-      .replace(/\\"/g, '"');
+export const ACTION_ARGS_LAYERS = 1;
+export const FUNCTION_ARGS_LAYERS = 2;
+export const RESULT_LAYERS = 1;
 
-    try {
-      const parsed = JSON.parse(unescaped);
-      if (typeof parsed === 'object' && parsed !== null) {
-        return deepUnescape(parsed);
-      }
-      return value;
-    } catch {
-      return value;
-    }
-  }
+const MAX_CODE_POINT = 0x10ffff;
 
-  if (Array.isArray(value)) {
-    return value.map(deepUnescape);
-  }
+const RUST_ESCAPES: Record<string, string> = {
+  "'": "'",
+  '"': '"',
+  '\\': '\\',
+  n: '\n',
+  r: '\r',
+  t: '\t',
+};
 
+const rustUnescape = (value: string): string =>
+  value.replace(
+    /\\(?:u\{([0-9a-fA-F]{1,6})\}|([\\'"nrt]))/g,
+    (match, hex: string | undefined, char: string | undefined) => {
+      if (hex === undefined) return RUST_ESCAPES[char ?? ''] ?? match;
+      const codePoint = parseInt(hex, 16);
+      return codePoint > MAX_CODE_POINT
+        ? match
+        : String.fromCodePoint(codePoint);
+    },
+  );
+
+const unescapeLayers = (value: string, layers: number): string => {
+  let current = value;
+  for (let i = 0; i < layers; i++) current = rustUnescape(current);
+  return current;
+};
+
+export const normalizeArgs = (value: unknown, layers: number): unknown => {
+  if (typeof value === 'string') return unescapeLayers(value, layers);
+  if (Array.isArray(value)) return value.map((v) => normalizeArgs(v, layers));
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>).map(([k, v]) => [
         k,
-        deepUnescape(v),
+        normalizeArgs(v, layers),
       ]),
     );
   }
-
   return value;
 };
+
+const expandJsonStrings = (value: unknown): unknown => {
+  if (typeof value === 'string') {
+    try {
+      const parsed = parseJson(value);
+      if (typeof parsed === 'object' && parsed !== null && !isRawJson(parsed)) {
+        return expandJsonStrings(parsed);
+      }
+    } catch {}
+    return value;
+  }
+  if (isRawJson(value)) return value;
+  if (Array.isArray(value)) return value.map(expandJsonStrings);
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([k, v]) => [
+        k,
+        expandJsonStrings(v),
+      ]),
+    );
+  }
+  return value;
+};
+
+export const deepUnescape = (value: unknown, layers: number): unknown =>
+  expandJsonStrings(normalizeArgs(value, layers));
 
 export const findRawArgs = (
   rpcData: RpcTransactionResponse | undefined,
   receiptId: string,
   actionIndex: number,
 ): null | string => {
-  const receipts = (rpcData as FinalExecutionOutcomeWithReceiptView)?.receipts;
+  const data = rpcData as FinalExecutionOutcomeWithReceiptView | undefined;
+  const receipts = data?.receipts;
   if (!Array.isArray(receipts)) return null;
 
   const receipt = receipts.find((r) => r.receiptId === receiptId);
@@ -61,12 +102,28 @@ export const findRawArgs = (
     receipt?.receipt && 'Action' in receipt.receipt
       ? receipt.receipt.Action
       : null;
-  const action = actionReceipt?.actions?.[actionIndex];
+
+  const action = actionReceipt
+    ? actionReceipt.actions?.[actionIndex]
+    : data?.transactionOutcome?.outcome?.receiptIds?.[0] === receiptId
+      ? data?.transaction?.actions?.[actionIndex]
+      : undefined;
 
   if (!action || typeof action === 'string' || !('FunctionCall' in action))
     return null;
 
   return action.FunctionCall.args ?? null;
+};
+
+export const findRawOutcome = (
+  rpcData: RpcTransactionResponse | undefined,
+  receiptId: string,
+) => {
+  const outcomes = (rpcData as FinalExecutionOutcomeWithReceiptView | undefined)
+    ?.receiptsOutcome;
+  if (!Array.isArray(outcomes)) return null;
+
+  return outcomes.find((o) => o.id === receiptId)?.outcome ?? null;
 };
 
 export const isAuroraAction = (

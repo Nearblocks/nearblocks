@@ -44,9 +44,15 @@ FROM
       receipts r
       LEFT JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
     WHERE
-      r.included_in_block_timestamp = (
+      r.included_in_block_timestamp <= (
         SELECT
           a.created_by_block_timestamp
+        FROM
+          account_selected a
+      )
+      AND r.included_in_block_timestamp >= (
+        SELECT
+          a.created_by_block_timestamp - 300000000000 -- 5m in ns
         FROM
           account_selected a
       )
@@ -76,9 +82,15 @@ FROM
       receipts r
       LEFT JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
     WHERE
-      r.included_in_block_timestamp = (
+      r.included_in_block_timestamp <= (
         SELECT
           a.deleted_by_block_timestamp
+        FROM
+          account_selected a
+      )
+      AND r.included_in_block_timestamp >= (
+        SELECT
+          a.deleted_by_block_timestamp - 300000000000 -- 5m in ns
         FROM
           account_selected a
       )

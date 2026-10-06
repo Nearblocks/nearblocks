@@ -6,7 +6,8 @@ import type {
 import useSWR, { SWRConfiguration } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import { txnStatus, viewFunction } from '@/lib/rpc';
+import { parseJson } from '@/lib/json';
+import { txnStatus, viewFunction, viewFunctionText } from '@/lib/rpc';
 
 import { useConfig } from './use-config';
 import { useSettings } from './use-settings';
@@ -117,7 +118,7 @@ export const useViewMutation = <T = unknown>() => {
   return useSWRMutation<T, Error, string, ViewParams>(
     'rpc-mutation',
     async (_key, { arg }) => {
-      return viewFunction<T>(
+      const text = await viewFunctionText(
         provider || defaultProvider,
         arg.contract,
         arg.method,
@@ -125,6 +126,8 @@ export const useViewMutation = <T = unknown>() => {
         arg.finality,
         arg.blockId,
       );
+
+      return parseJson(text) as T;
     },
   );
 };

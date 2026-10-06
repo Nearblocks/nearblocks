@@ -1,12 +1,12 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { action } from '@/actions/contract';
-import { CodeBlock } from '@/components/code-block';
 import { Copy } from '@/components/copy';
+import { CodeViewer } from '@/components/txns/txn/execution/code';
 import { useLocale } from '@/hooks/use-locale';
 import { useViewMutation } from '@/hooks/use-rpc';
 import { useWallet } from '@/hooks/use-wallet';
@@ -161,6 +161,16 @@ export const MethodPanel = ({ args, doc, hasSchema, kind, name }: Props) => {
     }
   };
 
+  const autoRead = hasSchema && kind === 'view' && doc?.params.length === 0;
+  const autoRan = useRef(false);
+
+  useEffect(() => {
+    if (!autoRead || autoRan.current) return;
+    autoRan.current = true;
+    void handleSubmit(onSubmit)();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
       <form
@@ -205,13 +215,8 @@ export const MethodPanel = ({ args, doc, hasSchema, kind, name }: Props) => {
           </Field>
           {result && (
             <Field>
-              <div className="flex items-center justify-between">
-                <Label>{t('contract.methods.response')}</Label>
-                <Copy size="sm" text={result} />
-              </div>
-              <div className="scroll-overlay max-h-116 overflow-auto">
-                <CodeBlock code={result} language="json" lineNumbers />
-              </div>
+              <Label>{t('contract.methods.response')}</Label>
+              <CodeViewer className="min-h-9" code={result} showByteSize tree />
             </Field>
           )}
           {error && (

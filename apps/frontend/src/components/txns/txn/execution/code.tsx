@@ -6,8 +6,9 @@ import { useMemo, useState } from 'react';
 
 import { CodeBlock } from '@/components/code-block';
 import { Copy } from '@/components/copy';
-import { JsonTree } from '@/components/json-tree';
+import { type Json, JsonTree } from '@/components/json-tree';
 import { useLocale } from '@/hooks/use-locale';
+import { parseJson } from '@/lib/json';
 import { cn } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
@@ -15,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 type Props = {
   className?: string;
   code: string;
+  copyText?: string;
   language?: string;
   showByteSize?: boolean;
   toolbar?: React.ReactNode;
@@ -25,6 +27,7 @@ type Props = {
 export const CodeViewer = ({
   className,
   code,
+  copyText,
   language = 'json',
   showByteSize = false,
   toolbar,
@@ -36,10 +39,10 @@ export const CodeViewer = ({
   const [isOpen, setIsOpen] = useState(true);
   const [wrap, setWrap] = useState(defaultWrap);
 
-  const parsed = useMemo(() => {
+  const parsed = useMemo<Json>(() => {
     if (!tree) return null;
     try {
-      return JSON.parse(code);
+      return parseJson(code) as Json;
     } catch {
       return null;
     }
@@ -72,7 +75,7 @@ export const CodeViewer = ({
         {isOpen && (
           <div className="flex items-center gap-0.5">
             {toolbar}
-            <Copy className="text-muted-foreground" text={code} />
+            <Copy className="text-muted-foreground" text={copyText ?? code} />
             {!tree && (
               <Tooltip>
                 <TooltipTrigger asChild>

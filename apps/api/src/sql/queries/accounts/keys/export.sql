@@ -55,7 +55,8 @@ FROM
       AND b.block_timestamp <= ks.created_by_block_timestamp
       AND b.block_timestamp > ks.created_by_block_timestamp - 300000000000 -- 5m in ns
     WHERE
-      r.included_in_block_timestamp = ks.created_by_block_timestamp
+      r.included_in_block_timestamp <= ks.created_by_block_timestamp
+      AND r.included_in_block_timestamp >= ks.created_by_block_timestamp - 300000000000 -- 5m in ns
       AND r.receipt_id = ks.created_by_receipt_id
   ) c ON TRUE
   LEFT JOIN LATERAL (
@@ -82,7 +83,8 @@ FROM
       AND b.block_timestamp <= ks.deleted_by_block_timestamp
       AND b.block_timestamp > ks.deleted_by_block_timestamp - 300000000000 -- 5m in ns
     WHERE
-      r.included_in_block_timestamp = ks.deleted_by_block_timestamp
+      r.included_in_block_timestamp <= ks.deleted_by_block_timestamp
+      AND r.included_in_block_timestamp >= ks.deleted_by_block_timestamp - 300000000000 -- 5m in ns
       AND r.receipt_id = ks.deleted_by_receipt_id
   ) d ON TRUE
 ORDER BY

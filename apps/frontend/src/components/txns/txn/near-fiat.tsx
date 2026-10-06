@@ -25,7 +25,7 @@ export const NearFiat = ({ amount, price }: Props) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="cursor-help text-muted-foreground">
+        <span className="cursor-help text-body-xs text-muted-foreground">
           ({nearFiatFormat(amount, price.price)})
         </span>
       </TooltipTrigger>

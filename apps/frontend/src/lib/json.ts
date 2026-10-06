@@ -14,6 +14,36 @@ interface Serializable {
   toJSON(): unknown;
 }
 
+export type RawJson = { readonly rawJSON: string };
+
+type JsonWithRaw = {
+  isRawJSON?: (value: unknown) => boolean;
+  parse: (
+    text: string,
+    reviver?: (
+      key: string,
+      value: unknown,
+      context?: { source?: string },
+    ) => unknown,
+  ) => unknown;
+  rawJSON?: (text: string) => RawJson;
+};
+
+const nativeJson = JSON as unknown as JsonWithRaw;
+
+export const isRawJson = (value: unknown): value is RawJson =>
+  nativeJson.isRawJSON?.(value) ?? false;
+
+export const parseJson = (text: string): unknown =>
+  nativeJson.parse(text, (_key, value, context) =>
+    typeof value === 'number' &&
+    nativeJson.rawJSON &&
+    context?.source !== undefined &&
+    String(value) !== context.source
+      ? nativeJson.rawJSON(context.source)
+      : value,
+  );
+
 const hasToJSON = (value: unknown): value is Serializable => {
   return (
     value !== null &&

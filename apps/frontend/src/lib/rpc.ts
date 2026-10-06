@@ -3,6 +3,7 @@ import {
   JsonRpcClientError,
   NearRpcClient,
   viewFunctionAsJson,
+  viewFunction as viewFunctionBytes,
 } from '@near-js/jsonrpc-client';
 import {
   BlockId,
@@ -63,6 +64,27 @@ export const viewFunction = async <T>(
       methodName: method,
     }),
   );
+};
+
+export const viewFunctionText = async (
+  provider: Config['provider'],
+  contract: string,
+  method: string,
+  args: unknown,
+  finality?: Finality,
+  blockId?: BlockId,
+) => {
+  return rpcCall(provider.url, async (client) => {
+    const { result } = await viewFunctionBytes(client, {
+      accountId: contract,
+      argsBase64: encodeArgs(args),
+      blockId,
+      finality,
+      methodName: method,
+    });
+
+    return new TextDecoder().decode(new Uint8Array(result));
+  });
 };
 
 export const txnStatus = async (
