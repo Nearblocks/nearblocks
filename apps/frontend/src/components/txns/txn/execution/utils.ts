@@ -2,7 +2,7 @@ import {
   FinalExecutionOutcomeWithReceiptView,
   RpcTransactionResponse,
 } from '@near-js/jsonrpc-types';
-import { deserialize } from 'borsh';
+import { deserialize, type Schema, serialize } from 'borsh';
 import { decodeBase64, hexlify, Transaction } from 'ethers';
 
 import { isRawJson, parseJson } from '@/lib/json';
@@ -155,10 +155,12 @@ const toPlainObject = (obj: unknown): unknown => {
   if (Array.isArray(obj)) return obj.map(toPlainObject);
 
   const proto = Object.getPrototypeOf(obj);
-  const descriptors = Object.getOwnPropertyDescriptors(proto);
-  const getterKeys = Object.entries(descriptors)
-    .filter(([, d]) => typeof d.get === 'function')
-    .map(([key]) => key);
+  const getterKeys =
+    proto && proto !== Object.prototype
+      ? Object.entries(Object.getOwnPropertyDescriptors(proto))
+          .filter(([, d]) => typeof d.get === 'function')
+          .map(([key]) => key)
+      : [];
 
   if (getterKeys.length === 0) {
     const entries = Object.entries(obj as Record<string, unknown>);
@@ -224,6 +226,170 @@ export const decodeSubmitWithArgs = (
     ) as AuroraSubmitArgs;
     const txData = new Uint8Array(submitArgs.tx_data);
     return parseEvmTransaction(txData);
+  } catch {
+    return null;
+  }
+};
+
+const SUBMIT_RESULT_VERSION = 7;
+const LEGACY_MAX_STATUS_INDEX = 5;
+const LEGACY_MAX_BOOL = 1;
+
+const bytesType: Schema = { array: { type: 'u8' } };
+const unitType: Schema = { struct: {} };
+const addressField: Record<string, Schema> = {
+  address: { array: { len: 20, type: 'u8' } },
+};
+
+/* eslint-disable perfectionist/sort-objects */
+const transactionStatusSchema: Schema = {
+  enum: [
+    { struct: { Succeed: bytesType } },
+    { struct: { Revert: bytesType } },
+    { struct: { OutOfGas: unitType } },
+    { struct: { OutOfFund: unitType } },
+    { struct: { OutOfOffset: unitType } },
+    { struct: { CallTooDeep: unitType } },
+    { struct: { StackUnderflow: unitType } },
+    { struct: { StackOverflow: unitType } },
+    { struct: { InvalidJump: unitType } },
+    { struct: { InvalidRange: unitType } },
+    { struct: { DesignatedInvalid: unitType } },
+    { struct: { CreateCollision: unitType } },
+    { struct: { CreateContractLimit: unitType } },
+    { struct: { InvalidCode: 'u8' } },
+    { struct: { PCUnderflow: unitType } },
+    { struct: { CreateEmpty: unitType } },
+    { struct: { MaxNonce: unitType } },
+    { struct: { UsizeOverflow: unitType } },
+    { struct: { Other: 'string' } },
+    { struct: { CreateContractStartingWithEF: unitType } },
+  ],
+};
+
+const logsSchema = (withAddress: boolean): Schema => ({
+  array: {
+    type: {
+      struct: {
+        ...(withAddress ? addressField : {}),
+        topics: { array: { type: { array: { len: 32, type: 'u8' } } } },
+        data: bytesType,
+      },
+    },
+  },
+});
+
+const submitResultLayouts: {
+  accepts: (firstByte: number) => boolean;
+  schema: Schema;
+}[] = [
+  {
+    accepts: (firstByte) => firstByte === SUBMIT_RESULT_VERSION,
+    schema: {
+      struct: {
+        version: 'u8',
+        status: transactionStatusSchema,
+        gas_used: 'u64',
+        logs: logsSchema(true),
+      },
+    },
+  },
+  {
+    accepts: (firstByte) => firstByte <= LEGACY_MAX_STATUS_INDEX,
+    schema: {
+      struct: {
+        status: transactionStatusSchema,
+        gas_used: 'u64',
+        logs: logsSchema(false),
+      },
+    },
+  },
+  {
+    accepts: (firstByte) => firstByte <= LEGACY_MAX_BOOL,
+    schema: {
+      struct: {
+        status: 'bool',
+        gas_used: 'u64',
+        result: bytesType,
+        logs: logsSchema(false),
+      },
+    },
+  },
+];
+/* eslint-enable perfectionist/sort-objects */
+
+type RawSubmitResult = {
+  gas_used: bigint;
+  logs: { address?: number[]; data: number[]; topics: number[][] }[];
+  result?: number[];
+  status: boolean | Record<string, unknown>;
+  version?: number;
+};
+
+const bytesToHex = (bytes: number[]): string => hexlify(Uint8Array.from(bytes));
+
+const normalizeSubmitResult = (
+  result: RawSubmitResult,
+): Record<string, unknown> => {
+  const gasUsed = result.gas_used.toString();
+  const logs = result.logs.map((log) => ({
+    ...(log.address && { address: bytesToHex(log.address) }),
+    data: bytesToHex(log.data),
+    topics: log.topics.map(bytesToHex),
+  }));
+
+  if (typeof result.status === 'boolean') {
+    /* eslint-disable perfectionist/sort-objects */
+    return {
+      status: result.status ? 'Succeed' : 'Failed',
+      output: bytesToHex(result.result ?? []),
+      gas_used: gasUsed,
+      logs,
+    };
+    /* eslint-enable perfectionist/sort-objects */
+  }
+
+  const [kind, payload] = Object.entries(result.status)[0];
+
+  return {
+    ...(result.version !== undefined && { version: result.version }),
+    status: kind,
+    ...(Array.isArray(payload) && { output: bytesToHex(payload) }),
+    ...((typeof payload === 'number' || typeof payload === 'string') && {
+      reason: payload,
+    }),
+    gas_used: gasUsed,
+    logs,
+  };
+};
+
+export const isAuroraSubmitResult = (
+  methodName: string | undefined,
+  receiver: string,
+): boolean =>
+  receiver === 'aurora' &&
+  (methodName === 'submit' ||
+    methodName === 'submit_with_args' ||
+    methodName === 'call');
+
+export const decodeSubmitResult = (
+  b64: string,
+): null | Record<string, unknown> => {
+  if (!isBase64(b64)) return null;
+  try {
+    const bytes = decodeBase64(b64);
+
+    for (const { accepts, schema } of submitResultLayouts) {
+      if (!accepts(bytes[0])) continue;
+      try {
+        const result = deserialize(schema, bytes) as RawSubmitResult;
+        if (serialize(schema, result).length === bytes.length) {
+          return normalizeSubmitResult(result);
+        }
+      } catch {}
+    }
+
+    return null;
   } catch {
     return null;
   }
