@@ -4,6 +4,7 @@ import { RiQuestionLine } from '@remixicon/react';
 import { useContext } from 'react';
 
 import type { TxnReceipt } from 'nb-schemas';
+import type { JsonData } from 'nb-schemas/src/common';
 import { ExecutionOutcomeStatus } from 'nb-types';
 
 import { Copy } from '@/components/copy';
@@ -17,7 +18,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 import { RpcContext } from './context';
 import { EncodedData } from './encoded-data';
 import { ReceiptLogs } from './logs';
-import { findRawOutcome, RESULT_LAYERS } from './utils';
+import {
+  decodeSubmitResult,
+  findRawOutcome,
+  isAuroraSubmitResult,
+  RESULT_LAYERS,
+} from './utils';
 
 const collectReceiptIds = (
   r: TxnReceipt | undefined,
@@ -119,12 +125,20 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
                 const isSuccessValue =
                   statusKey === ExecutionOutcomeStatus.SUCCESS_VALUE &&
                   typeof result === 'string';
+                const auroraResult =
+                  isSuccessValue &&
+                  isAuroraSubmitResult(
+                    receipt!.actions[0]?.method ?? undefined,
+                    receipt!.receiver_account_id,
+                  )
+                    ? (decodeSubmitResult(result as string) as JsonData | null)
+                    : null;
 
                 return (
                   <EncodedData
                     base64={isSuccessValue ? (result as string) : undefined}
                     className="min-h-12"
-                    json={isSuccessValue ? undefined : result}
+                    json={auroraResult ?? (isSuccessValue ? undefined : result)}
                     layers={RESULT_LAYERS}
                     onRawSelect={() => {
                       if (!rpcData) enableRpc();
