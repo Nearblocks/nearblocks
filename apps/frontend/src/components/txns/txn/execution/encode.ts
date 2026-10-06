@@ -1,4 +1,6 @@
-import { deepUnescape } from './utils';
+import { parseJson } from '@/lib/json';
+
+import { deepUnescape, normalizeArgs } from './utils';
 
 export type Encoding = 'base64' | 'hex' | 'json' | 'raw' | 'utf8';
 
@@ -48,20 +50,21 @@ export const encodeValue = (
   base64: string | undefined,
   value: unknown,
   hasValue: boolean,
+  layers: number,
 ): string => {
   try {
     const bytes = base64
       ? base64ToBytes(base64)
       : hasValue
-        ? utf8ToBytes(JSON.stringify(deepUnescape(value)))
+        ? utf8ToBytes(JSON.stringify(normalizeArgs(value, layers)))
         : null;
 
     if (encoding === 'json') {
-      if (hasValue) return JSON.stringify(deepUnescape(value), null, 2);
+      if (hasValue) return JSON.stringify(deepUnescape(value, layers), null, 2);
       if (bytes) {
         const text = bytesToUtf8(bytes);
         try {
-          return JSON.stringify(JSON.parse(text), null, 2);
+          return JSON.stringify(parseJson(text), null, 2);
         } catch {
           return text;
         }

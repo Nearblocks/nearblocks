@@ -80,19 +80,19 @@ export const CodeBlock = ({
     return (
       <table
         className={cn(
-          'prism-code text-body-sm m-0 w-full border-collapse py-2 leading-relaxed',
+          'prism-code text-body-sm m-0 w-full border-collapse bg-(--prism-bg) py-2 leading-relaxed',
           className,
         )}
       >
         <tbody>
           {lines.map((line, i) => (
             <tr key={i}>
-              <td className="sticky left-0 w-px bg-(--prism-bg) pr-2 pl-3 text-right align-top whitespace-nowrap text-muted-foreground/50 select-none">
+              <td className="sticky left-0 w-px bg-(--prism-gutter) pr-2 pl-3 text-right align-top whitespace-nowrap text-muted-foreground/50 select-none">
                 {i + 1}
               </td>
               <td
                 className={cn(
-                  'pr-4',
+                  'pr-4 pl-3',
                   wrap
                     ? 'wrap-break-word whitespace-pre-wrap'
                     : 'whitespace-pre',

@@ -416,6 +416,7 @@
 /* PrismJS syntax highlighting theme */
 :root {
   --prism-bg: #f6f8fa;
+  --prism-gutter: #eaeef2;
   --prism-text: #24292e;
   --prism-comment: #6a737d;
   --prism-keyword: #d73a49;
@@ -432,6 +433,7 @@
 
 .dark {
   --prism-bg: #161b22;
+  --prism-gutter: #0d1117;
   --prism-text: #e6edf3;
   --prism-comment: #8b949e;
   --prism-keyword: #ff7b72;

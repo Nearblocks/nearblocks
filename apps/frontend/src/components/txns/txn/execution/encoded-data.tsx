@@ -8,6 +8,7 @@ import { Button } from '@/ui/button';
 
 import { CodeViewer } from './code';
 import { encodeValue, type Encoding, hasJsonValue } from './encode';
+import { normalizeArgs } from './utils';
 
 const ENCODINGS: { label: string; value: Encoding }[] = [
   { label: 'JSON', value: 'json' },
@@ -21,6 +22,7 @@ type Props = {
   className?: string;
   defaultEncoding?: Encoding;
   json?: JsonData;
+  layers: number;
   // When provided, a "Raw" toggle is shown. `rawCode` is the content to render
   // for it, and `onRawSelect` is fired when the user picks it (e.g. to fetch
   // the original payload over RPC).
@@ -33,6 +35,7 @@ export const EncodedData = ({
   className,
   defaultEncoding = 'json',
   json,
+  layers,
   onRawSelect,
   rawCode,
 }: Props) => {
@@ -41,13 +44,21 @@ export const EncodedData = ({
   const showRaw = rawCode !== undefined || !!onRawSelect;
 
   const encodings = showRaw
-    ? [...ENCODINGS, { label: 'Raw', value: 'raw' as Encoding }]
+    ? [
+        ...ENCODINGS.filter(({ value }) => value !== 'base64'),
+        { label: 'Raw', value: 'raw' as Encoding },
+      ]
     : ENCODINGS;
 
   const code =
     encoding === 'raw'
       ? (rawCode ?? '')
-      : encodeValue(encoding, base64, json, hasValue);
+      : encodeValue(encoding, base64, json, hasValue, layers);
+
+  const copyText =
+    encoding === 'json' && hasValue
+      ? JSON.stringify(normalizeArgs(json, layers), null, 2)
+      : undefined;
 
   const onClick = (value: Encoding) => {
     setEncoding(value);
@@ -58,6 +69,7 @@ export const EncodedData = ({
     <CodeViewer
       className={className}
       code={code}
+      copyText={copyText}
       language={encoding === 'json' ? 'json' : 'plain'}
       showByteSize
       toolbar={encodings.map(({ label, value }) => (

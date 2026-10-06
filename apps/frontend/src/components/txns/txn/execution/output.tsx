@@ -1,6 +1,7 @@
 'use client';
 
 import { RiQuestionLine } from '@remixicon/react';
+import { useContext } from 'react';
 
 import type { TxnReceipt } from 'nb-schemas';
 import { ExecutionOutcomeStatus } from 'nb-types';
@@ -13,8 +14,10 @@ import { useLocale } from '@/hooks/use-locale';
 import { Skeleton } from '@/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
+import { RpcContext } from './context';
 import { EncodedData } from './encoded-data';
 import { ReceiptLogs } from './logs';
+import { findRawOutcome, RESULT_LAYERS } from './utils';
 
 const collectReceiptIds = (
   r: TxnReceipt | undefined,
@@ -34,6 +37,18 @@ type Props = {
 export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
   const { t } = useLocale('txns');
   const onPageReceiptIds = collectReceiptIds(receipt);
+  const { enableRpc, rpcData, rpcLoading } = useContext(RpcContext);
+
+  const status = receipt
+    ? findRawOutcome(rpcData, receipt.receipt_id)?.status
+    : undefined;
+  const rawResult = status
+    ? typeof status === 'object' && 'SuccessValue' in status
+      ? status.SuccessValue
+      : JSON.stringify(status, null, 2)
+    : rpcLoading
+      ? 'Loading...'
+      : 'No data';
 
   return (
     <List pairsPerRow={1}>
@@ -110,6 +125,11 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
                     base64={isSuccessValue ? (result as string) : undefined}
                     className="min-h-12"
                     json={isSuccessValue ? undefined : result}
+                    layers={RESULT_LAYERS}
+                    onRawSelect={() => {
+                      if (!rpcData) enableRpc();
+                    }}
+                    rawCode={rawResult}
                   />
                 );
               }}
@@ -145,7 +165,10 @@ export const ReceiptOutputRows = ({ loading = false, receipt }: Props) => {
               loading={!receipt || loading}
             >
               {() => (
-                <ReceiptLogs logs={receipt!.outcome!.logs! as unknown[]} />
+                <ReceiptLogs
+                  logs={receipt!.outcome!.logs! as unknown[]}
+                  receiptId={receipt!.receipt_id}
+                />
               )}
             </SkeletonSlot>
           </div>

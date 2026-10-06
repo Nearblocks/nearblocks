@@ -64,7 +64,15 @@ const getAccounts = async (keyword: string) => {
 
   if (!isValidAccountId(query)) return [];
 
-  return dbBase.manyOrNone<SearchAccount>(sql.accounts, { account: query });
+  const [accounts, mtAccount] = await Promise.all([
+    dbBase.manyOrNone<SearchAccount>(sql.accounts, { account: query }),
+    dbEvents.oneOrNone<SearchAccount>(sql.mtAccount, { account: query }),
+  ]);
+
+  if (!mtAccount || accounts.some((a) => a.account_id === mtAccount.account_id))
+    return accounts;
+
+  return [mtAccount, ...accounts].slice(0, 5);
 };
 
 const getKeys = async (keyword: string) => {

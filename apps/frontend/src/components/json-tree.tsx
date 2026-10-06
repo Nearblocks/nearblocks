@@ -4,18 +4,20 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 import { Copy } from '@/components/copy';
+import { isRawJson, type RawJson } from '@/lib/json';
 
-type Json =
+export type Json =
   | { [k: string]: Json }
   | boolean
   | Json[]
   | null
   | number
+  | RawJson
   | string
   | undefined;
 
 const isObject = (v: unknown): v is Record<string, Json> =>
-  v !== null && typeof v === 'object' && !Array.isArray(v);
+  v !== null && typeof v === 'object' && !Array.isArray(v) && !isRawJson(v);
 
 const Punct = ({ children }: { children: React.ReactNode }) => (
   <span className="text-[var(--prism-punctuation)]">{children}</span>
@@ -28,6 +30,8 @@ const Primitive = ({ value }: { value: Json }) => {
     return <span className="text-[var(--prism-keyword)]">{String(value)}</span>;
   if (typeof value === 'number')
     return <span className="text-[var(--prism-number)]">{value}</span>;
+  if (isRawJson(value))
+    return <span className="text-[var(--prism-number)]">{value.rawJSON}</span>;
   if (typeof value === 'string')
     return (
       <span className="break-all text-[var(--prism-string)]">

@@ -46,7 +46,7 @@ export const TruncateText = ({
   ...props
 }: TruncateTextProps) => {
   return (
-    <Tooltip>
+    <Tooltip disableHoverableContent>
       <TooltipTrigger asChild>
         <Component
           className={cn('inline-block max-w-30 min-w-0 truncate', className)}

@@ -13,7 +13,14 @@ import { CodeViewer } from './code';
 import { RpcContext } from './context';
 import { hasJsonValue } from './encode';
 import { EncodedData } from './encoded-data';
-import { deepUnescape, findRawArgs, isAuroraAction } from './utils';
+import {
+  ACTION_ARGS_LAYERS,
+  deepUnescape,
+  findRawArgs,
+  FUNCTION_ARGS_LAYERS,
+  isAuroraAction,
+  normalizeArgs,
+} from './utils';
 
 type Props = {
   action: ActionReceipt;
@@ -30,7 +37,7 @@ export const ReceiptAction = ({
 }: Props) => {
   const { enableRpc, nearPrice, rpcData, rpcLoading } = useContext(RpcContext);
 
-  const { argsBase64, argsValue, hasArgs, method } = useMemo(() => {
+  const { argsBase64, argsValue, hasArgs, layers, method } = useMemo(() => {
     const wrapper = argsRecord(action.args);
     let method: string | undefined =
       typeof action.method === 'string' ? action.method : undefined;
@@ -54,7 +61,16 @@ export const ReceiptAction = ({
       argsValue = action.args ?? undefined;
     }
 
-    return { argsBase64, argsValue, hasArgs: hasJsonValue(argsValue), method };
+    return {
+      argsBase64,
+      argsValue,
+      hasArgs: hasJsonValue(argsValue),
+      layers:
+        action.action === ActionKind.FUNCTION_CALL
+          ? FUNCTION_ARGS_LAYERS
+          : ACTION_ARGS_LAYERS,
+      method,
+    };
   }, [action]);
 
   const isAurora = isAuroraAction(method, receipt.receiver_account_id);
@@ -70,6 +86,7 @@ export const ReceiptAction = ({
         base64={argsBase64}
         className="min-h-17"
         json={argsValue}
+        layers={layers}
         onRawSelect={() => {
           if (!rpcData) enableRpc();
         }}
@@ -78,7 +95,8 @@ export const ReceiptAction = ({
     ) : hasArgs ? (
       <CodeViewer
         className="min-h-17"
-        code={JSON.stringify(deepUnescape(argsValue), null, 2)}
+        code={JSON.stringify(deepUnescape(argsValue, layers), null, 2)}
+        copyText={JSON.stringify(normalizeArgs(argsValue, layers), null, 2)}
         showByteSize
         tree
       />
