@@ -68,7 +68,7 @@ export const getBlock = async (
       slot,
       {
         encoding: 'json',
-        maxSupportedTransactionVersion: 0,
+        maxSupportedTransactionVersion: 1,
         rewards: false,
         transactionDetails: 'accounts',
       },

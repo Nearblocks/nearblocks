@@ -11,6 +11,8 @@ import {
   RetryOptions,
 } from '#types/types';
 
+const CHAINS_KEY = 'mpc_chains';
+
 export const errorHandler = (error: Error) => {
   logger.error(error);
   sentry.captureException(error);
@@ -35,14 +37,26 @@ export const getStartBlock = async (chain: Chains, start: number) => {
 
   logger.info(`${chain}: syncing from block: ${startBlock}`);
 
-  return startBlock;
+  const storedTimestamp = settings?.value?.timestamp;
+
+  return {
+    start: startBlock,
+    timestamp: storedTimestamp ? nsToSec(String(storedTimestamp)) : null,
+  };
 };
 
-export const updateProgress = async (chain: Chains, block: number) => {
+export const updateProgress = async (
+  chain: Chains,
+  block: number,
+  timestamp: null | number,
+) => {
   await db('settings')
     .insert({
       key: getKey(chain),
-      value: { sync: block },
+      value: {
+        sync: block,
+        timestamp: timestamp === null ? null : secToNs(timestamp),
+      },
     })
     .onConflict('key')
     .merge();
@@ -99,4 +113,18 @@ export const retry = async <A>(
 
 export const secToNs = (timestamp: number) => {
   return (BigInt(timestamp) * 1_000_000_000n).toString();
+};
+
+export const nsToSec = (timestamp: string) => {
+  return Number(BigInt(timestamp) / 1_000_000_000n);
+};
+
+export const setChainsEnabled = async (chains: string[]) => {
+  await db('settings')
+    .insert({
+      key: CHAINS_KEY,
+      value: { chains },
+    })
+    .onConflict('key')
+    .merge();
 };

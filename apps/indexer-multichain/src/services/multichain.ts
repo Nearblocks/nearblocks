@@ -3,6 +3,7 @@ import { logger } from 'nb-logger';
 import config from '#config';
 import { db } from '#libs/knex';
 import Sentry from '#libs/sentry';
+import { setChainsEnabled } from '#libs/utils';
 import bitcoin from '#services/bitcoin';
 import evm from '#services/evm';
 import solana from '#services/solana';
@@ -19,6 +20,8 @@ export const syncData = async () => {
   );
 
   try {
+    await setChainsEnabled(enabled.map((name) => name.toLowerCase()));
+
     await Promise.all([
       evm.processBlocks(Chains.ETHEREUM),
       evm.processBlocks(Chains.ARBITRUM),

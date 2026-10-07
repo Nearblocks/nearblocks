@@ -43,7 +43,7 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
     logger.info(
       `${chain}: block missing, skipping: ${height} (fetchMs=${fetchMs})`,
     );
-    return;
+    return null;
   }
 
   if (
@@ -53,7 +53,7 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
     logger.info(
       `${chain}: block ${height} missing blockTime, skipping (fetchMs=${fetchMs})`,
     );
-    return;
+    return null;
   }
 
   chainLastBlockTimestamp.set({ chain }, block.blockTime);
@@ -62,7 +62,7 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
     logger.info(
       `${chain}: block ${height} fetchMs=${fetchMs} insertMs=0 txns=0`,
     );
-    return;
+    return block.blockTime;
   }
 
   const txns: MultichainTransaction[] = [];
@@ -103,6 +103,8 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
   }
 
   await Promise.all(promises);
+
+  return block.blockTime;
 };
 
 export default { processBlocks };

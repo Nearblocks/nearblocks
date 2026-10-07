@@ -40,12 +40,13 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
   }
 
   const blockTimestamp = parseInt(block.timestamp, 16);
+  const timestamp = Number.isFinite(blockTimestamp) ? blockTimestamp : null;
 
-  if (Number.isFinite(blockTimestamp)) {
-    chainLastBlockTimestamp.set({ chain }, blockTimestamp);
+  if (timestamp !== null) {
+    chainLastBlockTimestamp.set({ chain }, timestamp);
   }
 
-  if (!block.transactions?.length) return;
+  if (!block.transactions?.length) return timestamp;
 
   const txns: MultichainTransaction[] = [];
 
@@ -88,6 +89,8 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
   }
 
   await Promise.all(promises);
+
+  return timestamp;
 };
 
 export default { processBlocks };
