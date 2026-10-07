@@ -22,6 +22,7 @@ export const db: Knex = createKnex({
     keepAlive: true,
     keepAliveInitialDelayMillis: 10_000,
     ssl: ssl?.ca ? ssl : false,
+    statement_timeout: 60 * 1000,
   },
   pool: {
     idleTimeoutMillis: 30_000,
