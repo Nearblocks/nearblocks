@@ -1,3 +1,4 @@
+import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
 import { sleep } from 'nb-utils';
 
@@ -13,7 +14,14 @@ import {
   getTokenAccountsByOwner,
   getTransaction,
 } from '#libs/solana';
-import { DAY_MS, retry, todayUtc } from '#libs/utils';
+import {
+  balanceSyncKey,
+  DAY_MS,
+  getSyncedValue,
+  retry,
+  todayUtc,
+  updateSyncedValue,
+} from '#libs/utils';
 import { SolanaAccount, SolanaDayTx, Source } from '#types/types';
 
 const PAGE_LIMIT = 1000;
@@ -123,11 +131,13 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
 
   let before = backward ? (account.scan_before ?? undefined) : undefined;
   const until = backward ? undefined : (account.newest_signature ?? undefined);
+  const refresh = until !== undefined;
 
   let pages = 0;
   let newestSeen: string | undefined;
   let todayRow: DayTxRow | undefined;
   let reachedEnd = false;
+  const seenDays = new Set<bigint>();
 
   while (pages < MAX_SCAN_PAGES_PER_PASS) {
     const entries = await retry(
@@ -173,16 +183,22 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
 
       if (day === today) {
         todayRow ??= row;
-      } else {
+      } else if (!seenDays.has(day)) {
+        seenDays.add(day);
         closedRows.push(row);
       }
     }
 
     if (closedRows.length) {
-      await db('tvl_solana_day_tx')
+      const insert = db('tvl_solana_day_tx')
         .insert(closedRows)
-        .onConflict(['protocol', 'chain', 'ata', 'date'])
-        .ignore();
+        .onConflict(['protocol', 'chain', 'ata', 'date']);
+
+      if (refresh) {
+        await insert.merge(['amount', 'resolved', 'signature']);
+      } else {
+        await insert.ignore();
+      }
     }
 
     pages++;
@@ -209,6 +225,10 @@ const scanAccount = async (source: Source, account: SolanaAccount) => {
   if (backward) {
     update.scan_before = before ?? null;
     if (reachedEnd) update.scan_complete = true;
+
+    if (newestSeen && !account.scan_before && !account.newest_signature) {
+      update.newest_signature = newestSeen;
+    }
   } else if (newestSeen) {
     update.newest_signature = newestSeen;
   }
@@ -292,6 +312,16 @@ const resolveDayTx = async (
     if (i < pending.length - 1) await sleep(config.solanaTxDelayMs);
   }
 
+  const key = balanceSyncKey(source.protocol, source.chain);
+  const synced = await getSyncedValue(key);
+  const earliest = resolved.length
+    ? resolved.map((r) => BigInt(r.date)).reduce((a, b) => (a < b ? a : b))
+    : null;
+  const rewindTo =
+    synced !== null && earliest !== null && earliest <= synced
+      ? earliest - DAY_MS
+      : null;
+
   await db.transaction(async (trx) => {
     for (const r of resolved) {
       await trx('tvl_solana_day_tx')
@@ -303,104 +333,111 @@ const resolveDayTx = async (
         })
         .update({ amount: r.amount, resolved: true });
     }
+
+    if (rewindTo !== null) await updateSyncedValue(trx, key, rewindTo);
   });
+
+  if (rewindTo !== null) {
+    logger.info(
+      `${source.protocol}/${source.chain}: late readings, rewinding balances to: ${rewindTo}`,
+    );
+  }
 
   logger.info(
     `${source.protocol}/${source.chain}: resolved ${resolved.length}/${pending.length} readings (${matched} with a balance)`,
   );
 };
 
-const foldBalances = async (source: Source) => {
-  const yesterday = todayUtc() - DAY_MS; // today isn't final yet
-
-  const result = await db.raw(
+const foldDay = async (trx: Knex, source: Source, day: bigint) => {
+  await trx.raw(
     `
-      WITH accounts AS (
-        SELECT ata, mint FROM tvl_solana_accounts WHERE protocol = ? AND chain = ?
-      ),
-      bounds AS (
-        SELECT MIN(date) AS min_date
-        FROM tvl_solana_day_tx
-        WHERE protocol = ? AND chain = ? AND amount IS NOT NULL
-      ),
-      days AS (
-        SELECT generate_series(b.min_date, ?::BIGINT, 86400000) AS date
-        FROM bounds b
-        WHERE b.min_date IS NOT NULL
-      ),
-      readings AS (
-        SELECT ata, date, amount
-        FROM tvl_solana_day_tx
-        WHERE protocol = ? AND chain = ? AND amount IS NOT NULL
-      ),
-      filled AS (
-        SELECT
-          a.ata,
-          a.mint,
-          d.date,
-          (
-            SELECT r.amount FROM readings r
-            WHERE r.ata = a.ata AND r.date <= d.date
-            ORDER BY r.date DESC
-            LIMIT 1
-          ) AS amount
-        FROM accounts a
-        CROSS JOIN days d
-      )
       INSERT INTO
         tvl_balances_daily (date, protocol, chain, token, amount)
       SELECT
-        date, ?, ?, mint, SUM(COALESCE(amount, 0))
-      FROM filled
-      GROUP BY date, mint
+        ?::BIGINT, ?, ?, a.mint, SUM(COALESCE(r.amount, 0))
+      FROM tvl_solana_accounts a
+        LEFT JOIN LATERAL (
+          SELECT amount FROM tvl_solana_day_tx
+          WHERE
+            protocol = a.protocol
+            AND chain = a.chain
+            AND ata = a.ata
+            AND date <= ?
+            AND amount IS NOT NULL
+          ORDER BY date DESC
+          LIMIT 1
+        ) r ON TRUE
+      WHERE a.protocol = ? AND a.chain = ?
+      GROUP BY a.mint
       ON CONFLICT (date, protocol, chain, token) DO UPDATE
       SET amount = EXCLUDED.amount
-      RETURNING date
     `,
     [
+      day.toString(),
       source.protocol,
       source.chain,
-      source.protocol,
-      source.chain,
-      yesterday.toString(),
-      source.protocol,
-      source.chain,
+      day.toString(),
       source.protocol,
       source.chain,
     ],
   );
+};
 
-  const rows: { date: string }[] = result.rows;
+const foldBalances = async (source: Source) => {
+  const yesterday = todayUtc() - DAY_MS; // today isn't final yet
+  const key = balanceSyncKey(source.protocol, source.chain);
+  const labels = { chain: source.chain, protocol: source.protocol };
+  const synced = await getSyncedValue(key);
 
-  if (rows.length) {
-    await db('settings')
-      .insert({
-        key: `tvl_balances_${source.protocol}_${source.chain}`,
-        value: { sync: yesterday.toString() },
-      })
-      .onConflict('key')
-      .merge();
+  let day: bigint;
 
-    tvlDayHeight.set(
-      { chain: source.chain, protocol: source.protocol },
-      Number(yesterday),
-    );
+  if (synced !== null) {
+    tvlDayHeight.set(labels, Number(synced));
+    day = synced + DAY_MS;
+  } else {
+    const first = await db('tvl_solana_day_tx')
+      .where({ chain: source.chain, protocol: source.protocol })
+      .whereNotNull('amount')
+      .min('date as date')
+      .first();
 
-    await db.raw(
-      `
-        UPDATE tvl_tokens t
-        SET first_seen_date = b.min_date
-        FROM (
-          SELECT token, MIN(date) AS min_date
-          FROM tvl_balances_daily
-          WHERE protocol = ? AND chain = ?
-          GROUP BY token
-        ) b
-        WHERE t.protocol = ? AND t.chain = ? AND t.token = b.token AND t.first_seen_date IS NULL
-      `,
-      [source.protocol, source.chain, source.protocol, source.chain],
-    );
+    if (!first?.date) return;
+
+    day = BigInt(first.date);
   }
+
+  if (day > yesterday) return;
+
+  logger.info(
+    `${source.protocol}/${source.chain}: folding days, from: ${day}, to: ${yesterday}`,
+  );
+
+  while (day <= yesterday) {
+    const current = day;
+
+    await db.transaction(async (trx) => {
+      await foldDay(trx, source, current);
+      await updateSyncedValue(trx, key, current);
+    });
+
+    tvlDayHeight.set(labels, Number(current));
+    day += DAY_MS;
+  }
+
+  await db.raw(
+    `
+      UPDATE tvl_tokens t
+      SET first_seen_date = b.min_date
+      FROM (
+        SELECT token, MIN(date) AS min_date
+        FROM tvl_balances_daily
+        WHERE protocol = ? AND chain = ?
+        GROUP BY token
+      ) b
+      WHERE t.protocol = ? AND t.chain = ? AND t.token = b.token AND t.first_seen_date IS NULL
+    `,
+    [source.protocol, source.chain, source.protocol, source.chain],
+  );
 };
 
 const sync = async (source: Source) => {
