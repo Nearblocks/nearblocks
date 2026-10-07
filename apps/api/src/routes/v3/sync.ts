@@ -68,6 +68,50 @@ const routes = (app: Router) => {
     service.staking,
   );
   app.get(
+    '/sync/status/indexer-ft-state',
+    bearerAuth,
+    rateLimiter,
+    service.ftState,
+  );
+  app.get(
+    '/sync/status/indexer-intents',
+    bearerAuth,
+    rateLimiter,
+    service.intents,
+  );
+  app.get(
+    '/sync/status/indexer-multichain',
+    bearerAuth,
+    rateLimiter,
+    service.multichain,
+  );
+  app.get('/sync/status/indexer-tvl', bearerAuth, rateLimiter, service.tvl);
+  app.get(
+    '/sync/status/ft-state-holders',
+    bearerAuth,
+    rateLimiter,
+    service.ftStateHolders,
+  );
+  app.get(
+    '/sync/status/nft-account-holders',
+    bearerAuth,
+    rateLimiter,
+    service.nftAccountHolders,
+  );
+  app.get(
+    '/sync/status/intents-stats',
+    bearerAuth,
+    rateLimiter,
+    service.intentsStats,
+  );
+  app.get(
+    '/sync/status/intents-account-stats',
+    bearerAuth,
+    rateLimiter,
+    service.intentsAccountStats,
+  );
+  app.get('/sync/status/tvl-stats', bearerAuth, rateLimiter, service.tvlStats);
+  app.get(
     '/sync/status/daily-stats',
     bearerAuth,
     rateLimiter,

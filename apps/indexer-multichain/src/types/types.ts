@@ -153,7 +153,7 @@ export type SyncOptions = {
   concurrency: number;
   getTip: (url: string) => Promise<number>;
   interval: number;
-  processBlock: (params: BlockProcess) => Promise<void>;
+  processBlock: (params: BlockProcess) => Promise<null | number>;
   start: number;
   url: string;
 };

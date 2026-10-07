@@ -40,11 +40,16 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
     throw new NotFoundError(`${chain}: block not found: ${height}`);
   }
 
-  if (typeof block.time === 'number' && Number.isFinite(block.time)) {
-    chainLastBlockTimestamp.set({ chain }, block.time);
+  const timestamp =
+    typeof block.time === 'number' && Number.isFinite(block.time)
+      ? block.time
+      : null;
+
+  if (timestamp !== null) {
+    chainLastBlockTimestamp.set({ chain }, timestamp);
   }
 
-  if (!block.tx?.length) return;
+  if (!block.tx?.length) return timestamp;
 
   const txns: MultichainTransaction[] = [];
 
@@ -87,6 +92,8 @@ const processBlock = async ({ chain, height, url }: BlockProcess) => {
   }
 
   await Promise.all(promises);
+
+  return timestamp;
 };
 
 const getTxn = (

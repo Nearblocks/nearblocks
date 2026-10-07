@@ -21,13 +21,25 @@ export const syncBlocks = async ({
   const fetchTip = async () =>
     retry(async () => getTip(url), { chain, label: 'tip fetch' });
 
-  let cursor = await getStartBlock(chain, start);
+  const { start: startBlock, timestamp: storedTimestamp } = await getStartBlock(
+    chain,
+    start,
+  );
+
+  let cursor = startBlock;
+  let timestamp = storedTimestamp;
   let tip = await fetchTip();
   chainTipHeight.set({ chain }, tip);
 
   logger.info(
     `${chain}: tip ${tip}, start ${cursor}, lag ${Math.max(tip - cursor, 0)}`,
   );
+
+  if (timestamp === null && cursor > 0 && cursor - 1 <= tip) {
+    timestamp = await processBlock({ chain, height: cursor - 1, url });
+
+    if (timestamp !== null) await updateProgress(chain, cursor, timestamp);
+  }
 
   while (true) {
     if (cursor > tip) {
@@ -50,15 +62,19 @@ export const syncBlocks = async ({
       );
     }
 
-    await Promise.all(
+    const timestamps = await Promise.all(
       Array.from({ length: size }, (_, i) =>
         processBlock({ chain, height: cursor + i, url }),
       ),
     );
 
+    const known = timestamps.filter((value): value is number => value !== null);
+
+    if (known.length) timestamp = Math.max(...known);
+
     cursor += size;
 
-    await updateProgress(chain, cursor);
+    await updateProgress(chain, cursor, timestamp);
     chainBlockHeight.set({ chain }, cursor - 1);
     chainBlocksProcessed.inc({ chain }, size);
 

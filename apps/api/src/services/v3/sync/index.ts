@@ -1,4 +1,10 @@
-import type { BlockStatus, DateStatus, SyncStatus } from 'nb-schemas';
+import type {
+  BlockStatus,
+  DateStatus,
+  MultichainStatus,
+  SyncStatus,
+  TvlStatus,
+} from 'nb-schemas';
 import response from 'nb-schemas/dist/sync/response.js';
 
 import dayjs from '#libs/dayjs';
@@ -15,9 +21,15 @@ import { responseHandler } from '#middlewares/response';
 const DATE_RANGE = 2; // 2d
 const BLOCK_RANGE = 600; // 10m
 const BLOCK_HEIGHT_RANGE = 300; // ~5m of blocks — max an indexer may trail base
+const CHAIN_RANGE: Record<string, number> = {
+  bitcoin: 10_800, // 3h
+  zcash: 1_800, // 30m
+};
 
-const isInSync = (timestamp: string) =>
-  dayjs.utc().unix() - +timestamp.slice(0, 10) <= BLOCK_RANGE;
+type Db = typeof dbBase;
+
+const isInSync = (timestamp: string, range = BLOCK_RANGE) =>
+  dayjs.utc().unix() - +timestamp.slice(0, 10) <= range;
 
 const isDateInSync = (date: string) =>
   dayjs.utc().diff(dayjs.utc(date), 'day') <= DATE_RANGE;
@@ -81,57 +93,146 @@ const getContractStatus = getIndexerStatus(dbContract, 'contracts');
 const getSignatureStatus = getIndexerStatus(dbMultichain, 'signatures');
 const getStakingStatus = getIndexerStatus(dbStaking, 'staking');
 
-const getFTHoldersStatus = async (): Promise<BlockStatus> => {
-  const ftSetting = await dbEvents.oneOrNone<{ value: { sync: string } }>(
+const getSetting = async <T>(db: Db, key: string) => {
+  const setting = await db.oneOrNone<{ value: T }>(
     'SELECT value FROM settings WHERE key = $1',
-    ['ft_holders'],
+    [key],
   );
-  const ftHoldersTs = ftSetting?.value?.sync;
 
-  if (!ftHoldersTs) return { height: null, sync: false, timestamp: null };
-
-  // aggregates store nanosecond timestamps, not block heights
-  // isInSync slices first 10 digits → unix seconds, works for ns timestamps too
-  return {
-    height: null,
-    sync: isInSync(String(ftHoldersTs)),
-    timestamp: String(ftHoldersTs),
-  };
+  return setting?.value ?? null;
 };
 
-const getNFTHoldersStatus = async (): Promise<BlockStatus> => {
-  const nftSetting = await dbEvents.oneOrNone<{ value: { sync: string } }>(
-    'SELECT value FROM settings WHERE key = $1',
-    ['nft_holders'],
-  );
-  const nftHoldersTs = nftSetting?.value?.sync;
+const whenTracked =
+  <T>(db: Db, key: string, getStatus: () => Promise<T>) =>
+  async (): Promise<T | undefined> =>
+    (await getSetting(db, key)) === null ? undefined : getStatus();
 
-  if (!nftHoldersTs) return { height: null, sync: false, timestamp: null };
+const getTimestampStatus =
+  (db: Db, key: string) => async (): Promise<BlockStatus> => {
+    const value = await getSetting<{ sync: string }>(db, key);
+    const timestamp = value?.sync;
 
-  // aggregates store nanosecond timestamps, not block heights
-  return {
-    height: null,
-    sync: isInSync(String(nftHoldersTs)),
-    timestamp: String(nftHoldersTs),
+    if (!timestamp) return { height: null, sync: false, timestamp: null };
+
+    return {
+      height: null,
+      sync: isInSync(String(timestamp)),
+      timestamp: String(timestamp),
+    };
   };
+
+const toDayStatus = (sync?: null | number | string): DateStatus => {
+  if (sync === undefined || sync === null) return { date: null, sync: false };
+
+  const date = dayjs.utc(Number(sync)).format('YYYY-MM-DD');
+
+  return { date, sync: isDateInSync(date) };
 };
 
-const getMTHoldersStatus = async (): Promise<BlockStatus> => {
-  const mtSetting = await dbEvents.oneOrNone<{ value: { sync: string } }>(
-    'SELECT value FROM settings WHERE key = $1',
-    ['mt_holders'],
-  );
-  const mtHoldersTs = mtSetting?.value?.sync;
+const getDayStatus = (db: Db, key: string) => async (): Promise<DateStatus> => {
+  const value = await getSetting<{ sync: string }>(db, key);
 
-  if (!mtHoldersTs) return { height: null, sync: false, timestamp: null };
-
-  // aggregates store nanosecond timestamps, not block heights
-  return {
-    height: null,
-    sync: isInSync(String(mtHoldersTs)),
-    timestamp: String(mtHoldersTs),
-  };
+  return toDayStatus(value?.sync);
 };
+
+const getFTHoldersStatus = getTimestampStatus(dbEvents, 'ft_holders');
+const getNFTHoldersStatus = getTimestampStatus(dbEvents, 'nft_holders');
+const getMTHoldersStatus = getTimestampStatus(dbEvents, 'mt_holders');
+
+const getFTStateStatus = whenTracked(
+  dbEvents,
+  'ft_state',
+  getIndexerStatus(dbEvents, 'ft_state'),
+);
+const getIntentsStatus = whenTracked(
+  dbEvents,
+  'mt_intents_swaps',
+  getTimestampStatus(dbEvents, 'mt_intents_swaps'),
+);
+const getFTStateHoldersStatus = whenTracked(
+  dbEvents,
+  'ft_state_holders',
+  getTimestampStatus(dbEvents, 'ft_state_holders'),
+);
+const getNFTAccountHoldersStatus = whenTracked(
+  dbEvents,
+  'nft_account_holders',
+  getTimestampStatus(dbEvents, 'nft_account_holders'),
+);
+const getIntentsStatsStatus = whenTracked(
+  dbEvents,
+  'mt_intents_stats',
+  getDayStatus(dbEvents, 'mt_intents_stats'),
+);
+const getIntentsAccountStatsStatus = whenTracked(
+  dbEvents,
+  'mt_intents_account_stats',
+  getDayStatus(dbEvents, 'mt_intents_account_stats'),
+);
+
+const getMultichainStatus = async (): Promise<MultichainStatus> => {
+  const enabled = await getSetting<{ chains: string[] }>(
+    dbMultichain,
+    'mpc_chains',
+  );
+
+  if (!enabled?.chains?.length) return {};
+
+  const settings = await dbMultichain.manyOrNone<{
+    key: string;
+    value: { sync: string; timestamp: null | string };
+  }>('SELECT key, value FROM settings WHERE key = ANY($1)', [
+    enabled.chains.map((chain) => `mpc_${chain}`),
+  ]);
+  const values = new Map(settings.map((row) => [row.key, row.value]));
+
+  return Object.fromEntries(
+    enabled.chains.map((chain) => {
+      const value = values.get(`mpc_${chain}`);
+      const timestamp = value?.timestamp ? String(value.timestamp) : null;
+
+      return [
+        chain,
+        {
+          height:
+            value?.sync === undefined || value.sync === null
+              ? null
+              : String(value.sync),
+          sync:
+            timestamp !== null &&
+            isInSync(timestamp, CHAIN_RANGE[chain] ?? BLOCK_RANGE),
+          timestamp,
+        },
+      ];
+    }),
+  );
+};
+
+const getTvlStatus = (prefix: string) => async (): Promise<TvlStatus> => {
+  const rows = await dbEvents.manyOrNone<{
+    chain: string;
+    protocol: string;
+    value: { sync: string };
+  }>(
+    `SELECT s.protocol, s.chain, st.value
+     FROM tvl_sources s
+     JOIN settings st ON st.key = $1 || s.protocol || '_' || s.chain
+     ORDER BY s.protocol, s.chain`,
+    [prefix],
+  );
+
+  const status: TvlStatus = {};
+
+  for (const row of rows) {
+    status[row.protocol] ??= {};
+    status[row.protocol][row.chain] = toDayStatus(row.value?.sync);
+  }
+
+  return status;
+};
+
+const getTvlBalancesStatus = getTvlStatus('tvl_balances_');
+const getTvlStatsStatus = getTvlStatus('tvl_stats_');
 
 const getStatStatus = async (): Promise<DateStatus> => {
   const stats = await dbBase.oneOrNone<{ date: string }>(
@@ -168,8 +269,50 @@ const ftHolders = responseHandler(response.ftHolders, async () => ({
   data: await getFTHoldersStatus(),
 }));
 
+const ftState = responseHandler(response.ftState, async () => ({
+  data: (await getFTStateStatus()) ?? null,
+}));
+
+const ftStateHolders = responseHandler(response.ftStateHolders, async () => ({
+  data: (await getFTStateHoldersStatus()) ?? null,
+}));
+
+const intents = responseHandler(response.intents, async () => ({
+  data: (await getIntentsStatus()) ?? null,
+}));
+
+const intentsStats = responseHandler(response.intentsStats, async () => ({
+  data: (await getIntentsStatsStatus()) ?? null,
+}));
+
+const intentsAccountStats = responseHandler(
+  response.intentsAccountStats,
+  async () => ({
+    data: (await getIntentsAccountStatsStatus()) ?? null,
+  }),
+);
+
+const multichain = responseHandler(response.multichain, async () => ({
+  data: await getMultichainStatus(),
+}));
+
+const nftAccountHolders = responseHandler(
+  response.nftAccountHolders,
+  async () => ({
+    data: (await getNFTAccountHoldersStatus()) ?? null,
+  }),
+);
+
 const nftHolders = responseHandler(response.nftHolders, async () => ({
   data: await getNFTHoldersStatus(),
+}));
+
+const tvl = responseHandler(response.tvl, async () => ({
+  data: await getTvlBalancesStatus(),
+}));
+
+const tvlStats = responseHandler(response.tvlStats, async () => ({
+  data: await getTvlStatsStatus(),
 }));
 
 const mtHolders = responseHandler(response.mtHolders, async () => ({
@@ -206,6 +349,15 @@ const status = responseHandler(response.status, async () => {
     nftData,
     mtData,
     statsData,
+    ftStateData,
+    intentsData,
+    multichainData,
+    tvlBalancesData,
+    ftStateHoldersData,
+    nftAccountHoldersData,
+    intentsStatsData,
+    intentsAccountStatsData,
+    tvlStatsData,
   ] = await Promise.all([
     getBaseStatus(),
     getBalanceStatus(),
@@ -219,13 +371,27 @@ const status = responseHandler(response.status, async () => {
     getNFTHoldersStatus(),
     getMTHoldersStatus(),
     getStatStatus(),
+    getFTStateStatus(),
+    getIntentsStatus(),
+    getMultichainStatus(),
+    getTvlBalancesStatus(),
+    getFTStateHoldersStatus(),
+    getNFTAccountHoldersStatus(),
+    getIntentsStatsStatus(),
+    getIntentsAccountStatsStatus(),
+    getTvlStatsStatus(),
   ]);
 
   const data: SyncStatus = {
     aggregates: {
       ft_holders: ftData,
+      ft_state_holders: ftStateHoldersData,
+      intents_account_stats: intentsAccountStatsData,
+      intents_stats: intentsStatsData,
       mt_holders: mtData,
+      nft_account_holders: nftAccountHoldersData,
       nft_holders: nftData,
+      tvl: tvlStatsData,
     },
     indexers: {
       accounts: accountsData,
@@ -233,9 +399,13 @@ const status = responseHandler(response.status, async () => {
       base: baseData,
       contract: contractData,
       events: eventsData,
+      ft_state: ftStateData,
+      intents: intentsData,
+      multichain: multichainData,
       receipts: receiptsData,
       signature: signatureData,
       staking: stakingData,
+      tvl: tvlBalancesData,
     },
     jobs: {
       daily_stats: statsData,
@@ -264,10 +434,19 @@ export default {
   dailyStats,
   events,
   ftHolders,
+  ftState,
+  ftStateHolders,
+  intents,
+  intentsAccountStats,
+  intentsStats,
   mtHolders,
+  multichain,
+  nftAccountHolders,
   nftHolders,
   receipts,
   signature,
   staking,
   status,
+  tvl,
+  tvlStats,
 };
