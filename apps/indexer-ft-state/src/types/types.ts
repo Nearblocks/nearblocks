@@ -1,3 +1,4 @@
+import { BlockHeader, ExecutionStatus, Receipt } from 'nb-neardata';
 import {
   FTKeyEncoding,
   FTStateVerificationStatus,
@@ -69,7 +70,24 @@ export type AccountUpdate = {
 
 export type ContractCodeUpdate = {
   accountId: string;
-  codeBase64: string;
+};
+
+export type FTOutcome = {
+  executionOutcome: {
+    outcome: { executorId: string; logs: string[]; status: ExecutionStatus };
+  };
+  receipt: null | Receipt;
+};
+
+export type FTShard = {
+  receiptExecutionOutcomes: FTOutcome[];
+  shardId: number;
+  stateChanges: StateChange<unknown>[];
+};
+
+export type FTMessage = {
+  block: { header: Pick<BlockHeader, 'height' | 'timestampNanosec'> };
+  shards: FTShard[];
 };
 
 export type Layout = {

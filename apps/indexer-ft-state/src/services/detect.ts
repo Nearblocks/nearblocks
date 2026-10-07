@@ -1,6 +1,5 @@
 import { Knex } from 'nb-knex';
 import { logger } from 'nb-logger';
-import { Shard } from 'nb-neardata';
 import { NEP } from 'nb-types';
 import { isAccountId } from 'nb-utils';
 
@@ -15,12 +14,13 @@ import {
   EventLog,
   Evidence,
   FTEventData,
+  FTShard,
   Layout,
   UntrackedReason,
 } from '#types/types';
 
 const EVENT_PREFIX = 'EVENT_JSON:';
-const FT_METHODS = ['ft_transfer', 'ft_transfer_call'];
+export const FT_METHODS = ['ft_transfer', 'ft_transfer_call'];
 
 const untracked = new Set<string>();
 
@@ -143,7 +143,7 @@ const addMethodCall = (
   }
 };
 
-export const collectEvidence = (shard: Shard): Map<string, Evidence> => {
+export const collectEvidence = (shard: FTShard): Map<string, Evidence> => {
   const evidences = new Map<string, Evidence>();
 
   for (const outcome of shard.receiptExecutionOutcomes) {

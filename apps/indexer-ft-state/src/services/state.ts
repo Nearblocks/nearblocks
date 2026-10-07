@@ -1,5 +1,4 @@
 import { Knex } from 'nb-knex';
-import { BlockHeader, Message, Shard } from 'nb-neardata';
 import { FTStateBalance } from 'nb-types';
 import {
   decodeBorshAccountKey,
@@ -28,9 +27,10 @@ import {
 import { noteContract } from '#services/roster';
 import {
   Evidence,
+  FTMessage,
+  FTShard,
   Layout,
   Resolved,
-  StateChange,
   StorageWrite,
 } from '#types/types';
 
@@ -213,7 +213,7 @@ const resolveGlobal = (
 
 export const storeFTState = async (
   knex: Knex,
-  message: Message,
+  message: FTMessage,
 ): Promise<void> => {
   await Promise.all(
     message.shards.map((shard) =>
@@ -224,16 +224,15 @@ export const storeFTState = async (
 
 const storeShardFTState = async (
   knex: Knex,
-  shard: Shard,
-  block: BlockHeader,
+  shard: FTShard,
+  block: FTMessage['block']['header'],
 ): Promise<void> => {
-  const stateChanges = shard.stateChanges as StateChange<unknown>[];
   const blockHeight = block.height;
   const evidences = collectEvidence(shard);
   const writesByContract = new Map<string, StorageWrite[]>();
   const redeployed = new Set<string>();
 
-  for (const change of stateChanges) {
+  for (const change of shard.stateChanges) {
     if (isContractCodeUpdate(change)) {
       redeployed.add(change.change.accountId);
       continue;
