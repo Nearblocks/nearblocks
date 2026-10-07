@@ -6,7 +6,9 @@ import config from '#config';
 import { db } from '#libs/knex';
 import metrics from '#libs/prom';
 import sentry from '#libs/sentry';
+import { extractMessage } from '#services/extract';
 import { storeFTState } from '#services/state';
+import { FTMessage } from '#types/types';
 
 const indexerKey = config.indexerKey;
 
@@ -33,15 +35,17 @@ export const syncData = async () => {
       concurrency: config.rawConcurrency,
       end: windowEnd,
       network: config.network,
+      project: (message) => extractMessage(message as Message),
       start: block,
     });
 
-    for await (const message of raw) {
-      const height = (message as Message).block.header.height;
+    for await (const item of raw) {
+      const message = item as FTMessage;
+      const height = message.block.header.height;
 
       if (height < block) continue;
 
-      await onMessage(message as Message);
+      await onMessage(message);
       block = height + 1;
 
       if (height >= windowEnd) break;
@@ -58,11 +62,11 @@ export const syncData = async () => {
   });
 
   for await (const message of stream) {
-    await onMessage(message);
+    await onMessage(extractMessage(message));
   }
 };
 
-export const onMessage = async (message: Message) => {
+export const onMessage = async (message: FTMessage) => {
   try {
     const start = performance.now();
     const blockHeight = message.block.header.height;
