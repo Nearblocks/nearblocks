@@ -67,7 +67,7 @@ export const MTAssets = ({
           />
           <Link
             className="text-link"
-            href={`/mt-tokens/${mt.contract}/tokens/ft/${encodeToken(
+            href={`/mt-tokens/${mt.contract}/tokens/${encodeToken(
               mt.token,
             )}${account ? `?account=${account}` : ''}`}
           >
