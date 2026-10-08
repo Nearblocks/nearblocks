@@ -31,8 +31,8 @@ const GlobalError = ({ error, reset }: Props) => {
   return (
     <GlobalLayout head={<title>Error | NearBlocks</title>}>
       {({ t }) => (
-        <main className="flex flex-1 flex-col py-10">
-          <div className="container mx-auto flex flex-1 items-center justify-center rounded-lg bg-card">
+        <main className="flex flex-1 flex-col px-3 py-6 sm:px-4 sm:py-10">
+          <div className="container mx-auto flex w-full flex-1 items-center justify-center rounded-lg bg-card">
             <EmptyBox
               description={t('errors.serverError.description')}
               icon={<ServerOff />}
