@@ -26,11 +26,18 @@ export type TxnAnchor = Pick<
 export const FINALIZED_TTL_S = 600;
 export const RECENT_TTL_S = 5;
 const FINALITY_MARGIN_NS = 60_000_000_000n; // 60s in ns
+const CHAIN_FINALITY_MARGIN_NS = 900_000_000_000n; // 15m in ns
 
 export const isFinalized = (blockTimestamp: string): boolean => {
   const nowNs = BigInt(Date.now()) * 1_000_000n;
 
   return nowNs - BigInt(blockTimestamp) > FINALITY_MARGIN_NS;
+};
+
+export const isChainFinalized = (blockTimestamp: string): boolean => {
+  const nowNs = BigInt(Date.now()) * 1_000_000n;
+
+  return nowNs - BigInt(blockTimestamp) > CHAIN_FINALITY_MARGIN_NS;
 };
 
 const inflight = new Map<string, Promise<null | TxnAnchor>>();

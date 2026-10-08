@@ -50,13 +50,13 @@ FROM
       receipts r
       JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
       AND t.block_timestamp <= ks.created_by_block_timestamp
-      AND t.block_timestamp > ks.created_by_block_timestamp - 300000000000 -- 5m in ns
+      AND t.block_timestamp > ks.created_by_block_timestamp - 900000000000 -- 15m in ns
       JOIN blocks b ON b.block_hash = t.included_in_block_hash
       AND b.block_timestamp <= ks.created_by_block_timestamp
-      AND b.block_timestamp > ks.created_by_block_timestamp - 300000000000 -- 5m in ns
+      AND b.block_timestamp > ks.created_by_block_timestamp - 900000000000 -- 15m in ns
     WHERE
       r.included_in_block_timestamp <= ks.created_by_block_timestamp
-      AND r.included_in_block_timestamp >= ks.created_by_block_timestamp - 300000000000 -- 5m in ns
+      AND r.included_in_block_timestamp >= ks.created_by_block_timestamp - 900000000000 -- 15m in ns
       AND r.receipt_id = ks.created_by_receipt_id
   ) c ON TRUE
   LEFT JOIN LATERAL (
@@ -78,13 +78,13 @@ FROM
       receipts r
       JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
       AND t.block_timestamp <= ks.deleted_by_block_timestamp
-      AND t.block_timestamp > ks.deleted_by_block_timestamp - 300000000000 -- 5m in ns
+      AND t.block_timestamp > ks.deleted_by_block_timestamp - 900000000000 -- 15m in ns
       JOIN blocks b ON b.block_hash = t.included_in_block_hash
       AND b.block_timestamp <= ks.deleted_by_block_timestamp
-      AND b.block_timestamp > ks.deleted_by_block_timestamp - 300000000000 -- 5m in ns
+      AND b.block_timestamp > ks.deleted_by_block_timestamp - 900000000000 -- 15m in ns
     WHERE
       r.included_in_block_timestamp <= ks.deleted_by_block_timestamp
-      AND r.included_in_block_timestamp >= ks.deleted_by_block_timestamp - 300000000000 -- 5m in ns
+      AND r.included_in_block_timestamp >= ks.deleted_by_block_timestamp - 900000000000 -- 15m in ns
       AND r.receipt_id = ks.deleted_by_receipt_id
   ) d ON TRUE
 ORDER BY

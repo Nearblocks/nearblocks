@@ -52,7 +52,7 @@ FROM
       )
       AND r.included_in_block_timestamp >= (
         SELECT
-          a.created_by_block_timestamp - 300000000000 -- 5m in ns
+          a.created_by_block_timestamp - 900000000000 -- 15m in ns
         FROM
           account_selected a
       )
@@ -64,7 +64,7 @@ FROM
       )
       AND t.block_timestamp >= (
         SELECT
-          a.created_by_block_timestamp - 300000000000 -- 5m in ns
+          a.created_by_block_timestamp - 900000000000 -- 15m in ns
         FROM
           account_selected a
       )
@@ -90,7 +90,7 @@ FROM
       )
       AND r.included_in_block_timestamp >= (
         SELECT
-          a.deleted_by_block_timestamp - 300000000000 -- 5m in ns
+          a.deleted_by_block_timestamp - 900000000000 -- 15m in ns
         FROM
           account_selected a
       )
@@ -102,7 +102,7 @@ FROM
       )
       AND t.block_timestamp >= (
         SELECT
-          a.deleted_by_block_timestamp - 300000000000 -- 5m in ns
+          a.deleted_by_block_timestamp - 900000000000 -- 15m in ns
         FROM
           account_selected a
       )
