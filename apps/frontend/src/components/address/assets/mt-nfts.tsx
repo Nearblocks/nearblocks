@@ -49,7 +49,7 @@ const MTNFTCard = ({
 }) => (
   <div className="flex flex-col gap-2">
     <Link
-      href={`/mt-tokens/${nft.contract}/tokens/nft/${encodeToken(nft.token)}${
+      href={`/mt-tokens/${nft.contract}/nft-tokens/${encodeToken(nft.token)}${
         account ? `?account=${account}` : ''
       }`}
     >
@@ -68,7 +68,7 @@ const MTNFTCard = ({
         <span className="text-muted-foreground">{label}</span>
         <Link
           className="text-link"
-          href={`/mt-tokens/${nft.contract}/tokens/nft/${encodeToken(
+          href={`/mt-tokens/${nft.contract}/nft-tokens/${encodeToken(
             nft.token,
           )}${account ? `?account=${account}` : ''}`}
         >
