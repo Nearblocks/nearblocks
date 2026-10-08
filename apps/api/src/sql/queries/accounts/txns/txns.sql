@@ -41,7 +41,7 @@ FROM
       action_receipt_actions
     WHERE
       receipt_included_in_block_timestamp >= ts.block_timestamp
-      AND receipt_included_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
+      AND receipt_included_in_block_timestamp <= ts.block_timestamp + 900000000000 -- 15m in ns
       AND receipt_id = ts.converted_into_receipt_id
   ) a ON TRUE
   LEFT JOIN LATERAL (
@@ -55,9 +55,9 @@ FROM
       JOIN receipts r ON r.receipt_id = ar.receipt_id
     WHERE
       ar.receipt_included_in_block_timestamp >= ts.block_timestamp
-      AND ar.receipt_included_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
+      AND ar.receipt_included_in_block_timestamp <= ts.block_timestamp + 900000000000 -- 15m in ns
       AND r.included_in_block_timestamp >= ts.block_timestamp
-      AND r.included_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
+      AND r.included_in_block_timestamp <= ts.block_timestamp + 900000000000 -- 15m in ns
       AND r.receipt_id = ts.converted_into_receipt_id
   ) aa ON TRUE
   LEFT JOIN LATERAL (
@@ -70,7 +70,7 @@ FROM
       execution_outcomes
     WHERE
       executed_in_block_timestamp >= ts.block_timestamp
-      AND executed_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
+      AND executed_in_block_timestamp <= ts.block_timestamp + 900000000000 -- 15m in ns
       AND receipt_id = ts.converted_into_receipt_id
   ) o ON TRUE
   LEFT JOIN LATERAL (
@@ -86,9 +86,9 @@ FROM
       JOIN receipts r ON r.receipt_id = eo.receipt_id
     WHERE
       eo.executed_in_block_timestamp >= ts.block_timestamp
-      AND eo.executed_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
+      AND eo.executed_in_block_timestamp <= ts.block_timestamp + 900000000000 -- 15m in ns
       AND r.included_in_block_timestamp >= ts.block_timestamp
-      AND r.included_in_block_timestamp <= ts.block_timestamp + 300000000000 -- 5m in ns
+      AND r.included_in_block_timestamp <= ts.block_timestamp + 900000000000 -- 15m in ns
       AND r.originated_from_transaction_hash = ts.transaction_hash
   ) oa ON TRUE
 ORDER BY

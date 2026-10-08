@@ -31,7 +31,7 @@ txn_selected AS (
   WHERE
     t.block_timestamp >= (
       SELECT
-        a.receipt_included_in_block_timestamp - 300000000000 -- 5m in ns
+        a.receipt_included_in_block_timestamp - 900000000000 -- 15m in ns
       FROM
         action_selected a
     )

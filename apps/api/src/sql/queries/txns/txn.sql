@@ -64,7 +64,7 @@ FROM
       )
       AND receipt_included_in_block_timestamp <= (
         SELECT
-          t.block_timestamp + 300000000000 -- 5m in ns
+          t.block_timestamp + 900000000000 -- 15m in ns
         FROM
           txn_selected t
       )
@@ -90,7 +90,7 @@ FROM
       )
       AND ar.receipt_included_in_block_timestamp <= (
         SELECT
-          t.block_timestamp + 300000000000 -- 5m in ns
+          t.block_timestamp + 900000000000 -- 15m in ns
         FROM
           txn_selected t
       )
@@ -102,7 +102,7 @@ FROM
       )
       AND r.included_in_block_timestamp <= (
         SELECT
-          t.block_timestamp + 300000000000 -- 5m in ns
+          t.block_timestamp + 900000000000 -- 15m in ns
         FROM
           txn_selected t
       )
@@ -127,7 +127,7 @@ FROM
       )
       AND executed_in_block_timestamp <= (
         SELECT
-          t.block_timestamp + 300000000000 -- 5m in ns
+          t.block_timestamp + 900000000000 -- 15m in ns
         FROM
           txn_selected t
       )
@@ -157,7 +157,7 @@ FROM
       )
       AND eo.executed_in_block_timestamp <= (
         SELECT
-          t.block_timestamp + 300000000000 -- 5m in ns
+          t.block_timestamp + 900000000000 -- 15m in ns
         FROM
           txn_selected t
       )
@@ -169,7 +169,7 @@ FROM
       )
       AND r.included_in_block_timestamp <= (
         SELECT
-          t.block_timestamp + 300000000000 -- 5m in ns
+          t.block_timestamp + 900000000000 -- 15m in ns
         FROM
           txn_selected t
       )

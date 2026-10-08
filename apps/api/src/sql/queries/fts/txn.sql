@@ -47,16 +47,16 @@ FROM
   )
   JOIN receipts r ON r.receipt_id = ev.receipt_id
   AND r.included_in_block_timestamp <= ev.block_timestamp
-  AND r.included_in_block_timestamp >= ev.block_timestamp - 300000000000 -- 5m in ns
-  AND r.included_in_block_timestamp >= ${start_timestamp}::BIGINT - 300000000000 -- 5m in ns
+  AND r.included_in_block_timestamp >= ev.block_timestamp - 900000000000 -- 15m in ns
+  AND r.included_in_block_timestamp >= ${start_timestamp}::BIGINT - 900000000000 -- 15m in ns
   AND r.included_in_block_timestamp <= ${end_timestamp}::BIGINT
   JOIN transactions t ON t.transaction_hash = r.originated_from_transaction_hash
   AND t.block_timestamp <= ev.block_timestamp
-  AND t.block_timestamp >= ev.block_timestamp - 300000000000 -- 5m in ns
-  AND t.block_timestamp >= ${start_timestamp}::BIGINT - 300000000000 -- 5m in ns
+  AND t.block_timestamp >= ev.block_timestamp - 900000000000 -- 15m in ns
+  AND t.block_timestamp >= ${start_timestamp}::BIGINT - 900000000000 -- 15m in ns
   AND t.block_timestamp <= ${end_timestamp}::BIGINT
   JOIN blocks b ON b.block_hash = t.included_in_block_hash
   AND b.block_timestamp <= ev.block_timestamp
-  AND b.block_timestamp >= ev.block_timestamp - 300000000000 -- 5m in ns
-  AND b.block_timestamp >= ${start_timestamp}::BIGINT - 300000000000 -- 5m in ns
+  AND b.block_timestamp >= ev.block_timestamp - 900000000000 -- 15m in ns
+  AND b.block_timestamp >= ${start_timestamp}::BIGINT - 900000000000 -- 15m in ns
   AND b.block_timestamp <= ${end_timestamp}::BIGINT

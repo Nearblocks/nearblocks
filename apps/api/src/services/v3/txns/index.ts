@@ -35,7 +35,7 @@ import {
 } from '#libs/response';
 import {
   FINALIZED_TTL_S,
-  isFinalized,
+  isChainFinalized,
   RECENT_TTL_S,
   resolveTxnAnchor,
   TxnAnchor,
@@ -256,7 +256,9 @@ const fetchReceiptIds = async (anchor: TxnAnchor): Promise<ReceiptId[]> => {
       await redis.stringify(
         key,
         receipts,
-        isFinalized(anchor.block_timestamp) ? FINALIZED_TTL_S : RECENT_TTL_S,
+        isChainFinalized(anchor.block_timestamp)
+          ? FINALIZED_TTL_S
+          : RECENT_TTL_S,
       );
     } catch {
       // cache write unavailable (full/down), serve the uncached result
@@ -405,7 +407,9 @@ const detail = responseHandler(
         await redis.stringify(
           key,
           data,
-          isFinalized(anchor.block_timestamp) ? FINALIZED_TTL_S : RECENT_TTL_S,
+          isChainFinalized(anchor.block_timestamp)
+            ? FINALIZED_TTL_S
+            : RECENT_TTL_S,
         );
       } catch {
         // cache write unavailable (full/down), serve the uncached result

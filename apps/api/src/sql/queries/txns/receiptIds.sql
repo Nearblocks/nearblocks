@@ -6,4 +6,4 @@ FROM
 WHERE
   r.originated_from_transaction_hash = ${transaction_hash}
   AND r.included_in_block_timestamp >= ${block_timestamp}::BIGINT
-  AND r.included_in_block_timestamp <= ${block_timestamp}::BIGINT + 300000000000 -- 5m in ns
+  AND r.included_in_block_timestamp <= ${block_timestamp}::BIGINT + 900000000000 -- 15m in ns
