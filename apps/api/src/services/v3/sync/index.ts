@@ -25,6 +25,9 @@ const CHAIN_RANGE: Record<string, number> = {
   bitcoin: 10_800, // 3h
   zcash: 1_800, // 30m
 };
+const TEMPORARILY_EXCLUDED_MULTICHAIN_CHAINS = new Set([
+  'solana', // TODO: re-enable after backfill
+]);
 
 type Db = typeof dbBase;
 
@@ -208,6 +211,13 @@ const getMultichainStatus = async (): Promise<MultichainStatus> => {
   );
 };
 
+const getPagedMultichainStatus = (status: MultichainStatus) =>
+  Object.fromEntries(
+    Object.entries(status).filter(
+      ([chain]) => !TEMPORARILY_EXCLUDED_MULTICHAIN_CHAINS.has(chain),
+    ),
+  );
+
 const getTvlStatus = (prefix: string) => async (): Promise<TvlStatus> => {
   const rows = await dbEvents.manyOrNone<{
     chain: string;
@@ -349,11 +359,11 @@ const status = responseHandler(response.status, async () => {
     nftData,
     mtData,
     statsData,
-    ftStateData,
+    // ftStateData,
     intentsData,
     multichainData,
     tvlBalancesData,
-    ftStateHoldersData,
+    // ftStateHoldersData,
     nftAccountHoldersData,
     intentsStatsData,
     intentsAccountStatsData,
@@ -371,11 +381,11 @@ const status = responseHandler(response.status, async () => {
     getNFTHoldersStatus(),
     getMTHoldersStatus(),
     getStatStatus(),
-    getFTStateStatus(),
+    // getFTStateStatus(),
     getIntentsStatus(),
     getMultichainStatus(),
     getTvlBalancesStatus(),
-    getFTStateHoldersStatus(),
+    // getFTStateHoldersStatus(),
     getNFTAccountHoldersStatus(),
     getIntentsStatsStatus(),
     getIntentsAccountStatsStatus(),
@@ -385,7 +395,7 @@ const status = responseHandler(response.status, async () => {
   const data: SyncStatus = {
     aggregates: {
       ft_holders: ftData,
-      ft_state_holders: ftStateHoldersData,
+      // ft_state_holders: ftStateHoldersData,
       intents_account_stats: intentsAccountStatsData,
       intents_stats: intentsStatsData,
       mt_holders: mtData,
@@ -399,9 +409,9 @@ const status = responseHandler(response.status, async () => {
       base: baseData,
       contract: contractData,
       events: eventsData,
-      ft_state: ftStateData,
+      // ft_state: ftStateData,
       intents: intentsData,
-      multichain: multichainData,
+      multichain: getPagedMultichainStatus(multichainData),
       receipts: receiptsData,
       signature: signatureData,
       staking: stakingData,
