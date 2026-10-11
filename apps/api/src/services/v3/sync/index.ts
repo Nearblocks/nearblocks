@@ -6,7 +6,9 @@ import type {
   TvlStatus,
 } from 'nb-schemas';
 import response from 'nb-schemas/dist/sync/response.js';
+import { Network } from 'nb-types';
 
+import config from '#config';
 import dayjs from '#libs/dayjs';
 import {
   dbBalance,
@@ -398,7 +400,8 @@ const status = responseHandler(response.status, async () => {
       // ft_state_holders: ftStateHoldersData,
       intents_account_stats: intentsAccountStatsData,
       intents_stats: intentsStatsData,
-      mt_holders: mtData,
+      // mt_holders: mtData,
+      ...(config.network === Network.MAINNET ? { mt_holders: mtData } : {}),
       nft_account_holders: nftAccountHoldersData,
       nft_holders: nftData,
       tvl: tvlStatsData,
