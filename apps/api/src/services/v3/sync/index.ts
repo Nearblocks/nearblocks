@@ -29,6 +29,7 @@ const CHAIN_RANGE: Record<string, number> = {
 };
 const TEMPORARILY_EXCLUDED_MULTICHAIN_CHAINS = new Set([
   'solana', // TODO: re-enable after backfill
+  'zcash', // TODO: re-enable after backfill
 ]);
 
 type Db = typeof dbBase;
