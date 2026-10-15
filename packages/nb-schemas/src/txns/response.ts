@@ -178,7 +178,7 @@ const txnNFT = v.object({
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: nftTokenMeta,
+  token_meta: v.nullable(nftTokenMeta),
 });
 
 const mtMeta = v.object({
