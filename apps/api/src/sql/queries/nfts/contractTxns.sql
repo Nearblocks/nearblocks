@@ -43,7 +43,7 @@ FROM
       nm.contract = nft.contract_account_id
       AND nm.modified_at IS NOT NULL
   ) m ON TRUE
-  JOIN LATERAL (
+  LEFT JOIN LATERAL (
     SELECT
       JSONB_BUILD_OBJECT(
         'contract',

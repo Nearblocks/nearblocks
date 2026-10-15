@@ -175,6 +175,8 @@ Same aggregate structure as before (`chunks_agg`, `transactions_agg`), with `rec
 
 Core event fields are unchanged: `affected_account_id`, `involved_account_id`, `delta_amount`, `cause`, `event_index`.
 
+NFT events require contract metadata only. `token_meta` is `null` when token metadata has not been indexed.
+
 ### Contracts (`/v3/accounts/{account}/contract`)
 
 Adds `global_account_id` and `global_code_hash` (global contracts support).

@@ -55,7 +55,7 @@ const txn = v.object({
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: tokenMeta,
+  token_meta: v.nullable(tokenMeta),
   transaction_hash: v.optional(v.string()),
 });
 
@@ -90,7 +90,7 @@ const contractTxn = v.object({
   receipt_id: v.string(),
   shard_id: v.number(),
   token_id: v.string(),
-  token_meta: tokenMeta,
+  token_meta: v.nullable(tokenMeta),
   transaction_hash: v.optional(v.string()),
 });
 

@@ -26,16 +26,6 @@ FROM
           nm.contract = ne.contract_account_id
           AND nm.modified_at IS NOT NULL
       )
-      AND EXISTS (
-        SELECT
-          1
-        FROM
-          nft_token_meta ntm
-        WHERE
-          ntm.contract = ne.contract_account_id
-          AND ntm.token = ne.token_id
-          AND ntm.modified_at IS NOT NULL
-      )
     LIMIT
       ${limit}::INT
   ) limited
