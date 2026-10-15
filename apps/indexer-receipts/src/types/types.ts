@@ -7,14 +7,11 @@ export type Config = {
   dbCert: string;
   dbKey: string;
   dbUrl: string;
-  genesisHeight: number;
-  indexerKey: string;
+  fastnearApiKey?: string;
   insertLimit: number;
-  neardataConcurrency: 'auto' | number;
-  neardataUrl: string;
   network: Network;
+  readDbUrl?: string;
   sentryDsn?: string;
-  startBlockHeight: number;
 };
 
 export type ActionReceipt = {

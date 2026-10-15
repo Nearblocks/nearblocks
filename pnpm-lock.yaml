@@ -1420,6 +1420,9 @@ importers:
       nb-neardata:
         specifier: workspace:*
         version: link:../../packages/nb-neardata
+      nb-neardata-raw:
+        specifier: workspace:*
+        version: link:../../packages/nb-neardata-raw
       nb-tsconfig:
         specifier: workspace:*
         version: link:../../packages/nb-tsconfig

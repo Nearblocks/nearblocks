@@ -34,6 +34,7 @@
     "nb-knex": "workspace:*",
     "nb-logger": "workspace:*",
     "nb-neardata": "workspace:*",
+    "nb-neardata-raw": "workspace:*",
     "nb-tsconfig": "workspace:*",
     "nb-types": "workspace:*",
     "nb-utils": "workspace:*",
