@@ -4,10 +4,12 @@ import dayjs from '#libs/dayjs';
 import { upsertError } from '#libs/events';
 import { dbEvents } from '#libs/knex';
 import { fetchNFTMeta, fetchNFTTokenMeta } from '#libs/near';
+import { archivalRpc } from '#libs/rpc';
 import { isDataError } from '#libs/utils';
 import {
   MetaContract,
   MetaContractToken,
+  MetaContractTokenMint,
   NFTMetadata,
   NFTTokenInfo,
   Raw,
@@ -16,6 +18,43 @@ import {
 const TOKEN_META_SCAN_CURSOR_KEY = 'nft_token_meta_scan_cursor';
 const TOKEN_META_CANDIDATE_BATCH = 3000;
 const TOKEN_META_PROCESS_BATCH = 25;
+const TOKEN_META_ARCHIVAL_BATCH = 25;
+const TOKEN_META_ARCHIVAL_MAX_ATTEMPTS = 6;
+
+const mintBlockId = (height: null | string) =>
+  height === null ? undefined : Number(height);
+
+const fetchMintHeights = async (tokens: MetaContractToken[]) => {
+  if (!tokens.length) return [];
+
+  const { rows } = await dbEvents.raw<Raw<MetaContractTokenMint>>(
+    `
+      SELECT
+        t.contract,
+        t.token,
+        mint.block_height
+      FROM
+        unnest(?::text[], ?::text[]) AS t (contract, token)
+        LEFT JOIN LATERAL (
+          SELECT
+            ne.block_height
+          FROM
+            nft_events ne
+          WHERE
+            ne.contract_account_id = t.contract
+            AND ne.token_id = t.token
+            AND ne.cause = 'MINT'
+          ORDER BY
+            ne.block_timestamp DESC
+          LIMIT
+            1
+        ) mint ON TRUE
+    `,
+    [tokens.map((row) => row.contract), tokens.map((row) => row.token)],
+  );
+
+  return rows;
+};
 
 export const syncNFTMeta = async () => {
   const { rows: nfts } = await dbEvents.raw<Raw<MetaContract>>(`
@@ -177,8 +216,51 @@ export const syncNFTTokenMeta = async () => {
     .filter((row) => row.eligible)
     .slice(0, TOKEN_META_PROCESS_BATCH);
 
+  const minted = await fetchMintHeights(nfts);
+
   await Promise.all(
-    nfts.map((nft) => updateNFTTokenMeta(nft.contract, nft.token)),
+    minted.map((nft) =>
+      updateNFTTokenMeta(
+        nft.contract,
+        nft.token,
+        mintBlockId(nft.block_height),
+      ),
+    ),
+  );
+};
+
+export const syncNFTTokenMetaArchival = async () => {
+  const { rows } = await dbEvents.raw<Raw<MetaContractToken>>(
+    `
+      SELECT
+        contract,
+        token
+      FROM
+        errored_contracts
+      WHERE
+        type = 'nft'
+        AND token IS NOT NULL
+        AND attempts >= 3
+        AND attempts < ?
+      ORDER BY
+        attempts,
+        id
+      LIMIT
+        ?
+    `,
+    [TOKEN_META_ARCHIVAL_MAX_ATTEMPTS, TOKEN_META_ARCHIVAL_BATCH],
+  );
+
+  const minted = await fetchMintHeights(rows);
+
+  await Promise.all(
+    minted.map((nft) =>
+      updateNFTTokenMetaArchival(
+        nft.contract,
+        nft.token,
+        mintBlockId(nft.block_height),
+      ),
+    ),
   );
 };
 
@@ -222,9 +304,81 @@ const updateMeta = async (contract: string, meta: NFTMetadata) => {
   }
 };
 
-export const updateNFTTokenMeta = async (contract: string, token: string) => {
+const updateNFTTokenMetaArchival = async (
+  contract: string,
+  token: string,
+  blockId?: number,
+) => {
+  if (blockId === undefined) {
+    await bumpArchivalError(contract, token, true);
+
+    return;
+  }
+
   try {
-    const outcome = await fetchNFTTokenMeta(contract, token);
+    const outcome = await fetchNFTTokenMeta(contract, token, {
+      blockId,
+      rpc: archivalRpc,
+    });
+
+    if (outcome.ok) {
+      await dbEvents.transaction(async (tx) => {
+        await tx('nft_token_meta')
+          .where('contract', contract)
+          .where('token', token)
+          .update(tokenMetaData(outcome.data));
+        await tx('errored_contracts')
+          .where('contract', contract)
+          .where('type', 'nft')
+          .where('token', token)
+          .delete();
+      });
+    } else {
+      await bumpArchivalError(contract, token, outcome.permanent);
+    }
+  } catch (error) {
+    logger.error(
+      `nftTokenMeta: updateNFTTokenMetaArchival: ${contract}: ${token}`,
+    );
+    logger.error(error);
+    await bumpArchivalError(contract, token, false);
+  }
+};
+
+const bumpArchivalError = async (
+  contract: string,
+  token: string,
+  permanent: boolean,
+) => {
+  try {
+    await dbEvents.raw(
+      `
+        UPDATE errored_contracts
+        SET
+          attempts = CASE
+            WHEN ? THEN ?
+            ELSE attempts + 1
+          END
+        WHERE
+          contract = ?
+          AND type = 'nft'
+          AND token = ?
+      `,
+      [permanent, TOKEN_META_ARCHIVAL_MAX_ATTEMPTS, contract, token],
+    );
+  } catch (error) {
+    logger.error(`nftTokenMeta: bumpArchivalError: ${contract}: ${token}`);
+    logger.error(error);
+  }
+};
+
+export const updateNFTTokenMeta = async (
+  contract: string,
+  token: string,
+  blockId?: number,
+) => {
+  try {
+    const outcome = await fetchNFTTokenMeta(contract, token, { blockId });
 
     if (outcome.ok) {
       await updateTokenMeta(contract, token, outcome.data);
@@ -238,28 +392,28 @@ export const updateNFTTokenMeta = async (contract: string, token: string) => {
   }
 };
 
+const tokenMetaData = (meta: NFTTokenInfo) => ({
+  copies: meta.metadata.copies,
+  description: meta.metadata.description,
+  extra: meta.metadata.extra,
+  media: meta.metadata.media,
+  media_hash: meta.metadata.media_hash,
+  modified_at: dayjs.utc().toISOString(),
+  reference: meta.metadata.reference,
+  reference_hash: meta.metadata.reference_hash,
+  title: meta.metadata.title,
+});
+
 const updateTokenMeta = async (
   contract: string,
   token: string,
   meta: NFTTokenInfo,
 ) => {
-  const data = {
-    copies: meta.metadata.copies,
-    description: meta.metadata.description,
-    extra: meta.metadata.extra,
-    media: meta.metadata.media,
-    media_hash: meta.metadata.media_hash,
-    modified_at: dayjs.utc().toISOString(),
-    reference: meta.metadata.reference,
-    reference_hash: meta.metadata.reference_hash,
-    title: meta.metadata.title,
-  };
-
   try {
     await dbEvents('nft_token_meta')
       .where('contract', contract)
       .where('token', token)
-      .update(data);
+      .update(tokenMetaData(meta));
   } catch (error) {
     logger.error(`tokenMeta: updateTokenMeta: ${contract}: ${token}`);
     logger.error(error);

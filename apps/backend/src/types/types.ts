@@ -1,6 +1,7 @@
 import { FTMeta, Network } from 'nb-types';
 
 export interface Config {
+  archivalRpcUrl: string;
   cgApiKey: string;
   cmcApiKey: string;
   dbCa: string;
@@ -104,6 +105,10 @@ export type MetaContract = {
 export type MetaContractToken = {
   contract: string;
   token: string;
+};
+
+export type MetaContractTokenMint = MetaContractToken & {
+  block_height: null | string;
 };
 
 export type FTContractDecimals = Pick<FTMeta, 'contract' | 'decimals'>;
