@@ -35,16 +35,20 @@ const isPermanentMarker = (marker: string): boolean =>
 
 type RawOutcome<T> = { ok: false; permanent: boolean } | { ok: true; raw: T };
 
+export type ViewOptions = { blockId?: number; rpc?: typeof RPC };
+
 const fetchView = async <T>(
   contract: string,
   method: string,
   args: unknown = {},
+  { blockId, rpc = RPC }: ViewOptions = {},
 ): Promise<RawOutcome<T>> => {
   try {
-    const { data } = await RPC.callFunction(
+    const { data } = await rpc.callFunction(
       contract,
       method,
-      RPC.encodeArgs(args),
+      rpc.encodeArgs(args),
+      blockId,
     );
 
     if (data?.result?.result) {
@@ -133,10 +137,14 @@ export const fetchNFTMeta = async (
 export const fetchNFTTokenMeta = async (
   contract: string,
   token: string,
+  options?: ViewOptions,
 ): Promise<FetchOutcome<NFTTokenInfo>> => {
-  const outcome = await fetchView<NFTTokenInfo>(contract, 'nft_token', {
-    token_id: token,
-  });
+  const outcome = await fetchView<NFTTokenInfo>(
+    contract,
+    'nft_token',
+    { token_id: token },
+    options,
+  );
 
   if (!outcome.ok) return outcome;
   if (outcome.raw?.metadata) return { data: outcome.raw, ok: true };

@@ -5,6 +5,7 @@ import { Network } from 'nb-types';
 import { Config } from '#types/types';
 
 const env = cleanEnv(process.env, {
+  ARCHIVAL_RPC_URL: str(),
   COINGECKO_API_KEY: str(),
   COINMARKETCAP_API_KEY: str(),
   DATABASE_CA: str({ default: '' }),
@@ -25,6 +26,7 @@ const genesisDate =
   env.NETWORK === Network.MAINNET ? '2020-07-21' : '2021-04-01';
 
 const config: Config = {
+  archivalRpcUrl: env.ARCHIVAL_RPC_URL,
   cgApiKey: env.COINGECKO_API_KEY,
   cmcApiKey: env.COINMARKETCAP_API_KEY,
   dbCa: env.DATABASE_CA,

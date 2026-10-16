@@ -106,3 +106,6 @@ export const rpc = new CountedRpcClient(config.rpcUrl);
 
 export const axiosRpc = new CountedAxiosRpc(config.rpcUrl);
 axiosRpc.request.defaults.timeout = 30_000;
+
+export const archivalRpc = new CountedAxiosRpc(config.archivalRpcUrl);
+archivalRpc.request.defaults.timeout = 30_000;
