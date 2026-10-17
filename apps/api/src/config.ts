@@ -46,7 +46,9 @@ const env = cleanEnv(process.env, {
   REDIS_SENTINEL_PASSWORD: str({ default: '' }),
   REDIS_SENTINEL_URLS: str({ default: '' }),
   REDIS_URL: url({ default: '' }),
-  RPC_URL: str(),
+  RPC_AUTH_TOKENS: str({ default: '' }),
+  RPC_URL: str({ default: '' }),
+  RPC_URLS: str({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
   TESTNET_URL: str({ default: 'https://api-testnet.nearblocks.io' }),
   // Hard ceiling on the buffered usage events; bounds memory if the
@@ -66,6 +68,39 @@ const eventsStart =
   env.NETWORK === Network.MAINNET ? 1613604394034862539n : 1636002073366363339n;
 const stakingStart =
   env.NETWORK === Network.MAINNET ? 1598366210034965101n : 1617308117501240699n;
+const fastNearRpcFallback = () => {
+  if (!env.FASTNEAR_API_KEY) return undefined;
+
+  return `https://archival-rpc.${env.NETWORK}.fastnear.com`;
+};
+const rpcUrls = env.RPC_URLS
+  ? env.RPC_URLS.split(',')
+      .map((value) => value.trim())
+      .filter(Boolean)
+  : [env.RPC_URL, fastNearRpcFallback()].filter(
+      (value): value is string => !!value,
+    );
+if (!rpcUrls.length) throw new Error('Set RPC_URL or RPC_URLS.');
+if (new Set(rpcUrls).size !== rpcUrls.length) {
+  throw new Error('RPC_URLS must not contain duplicate endpoints.');
+}
+for (const endpoint of rpcUrls) {
+  const url = new URL(endpoint);
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('RPC_URLS endpoints must use HTTP or HTTPS.');
+  }
+}
+const rpcAuthTokens = env.RPC_AUTH_TOKENS
+  ? env.RPC_AUTH_TOKENS.split(',').map((value) => value.trim())
+  : rpcUrls.map((endpoint) =>
+      env.FASTNEAR_API_KEY &&
+      new URL(endpoint).hostname.endsWith('fastnear.com')
+        ? env.FASTNEAR_API_KEY
+        : '',
+    );
+if (rpcAuthTokens.length !== rpcUrls.length) {
+  throw new Error('RPC_AUTH_TOKENS must have one entry per RPC_URLS endpoint.');
+}
 
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
@@ -105,7 +140,9 @@ const config: Config = {
   redisSentinelPassword: env.REDIS_SENTINEL_PASSWORD,
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
-  rpcUrl: env.RPC_URL,
+  rpcAuthTokens,
+  rpcUrl: rpcUrls[0],
+  rpcUrls,
   sentryDsn: env.SENTRY_DSN,
   stakingStart,
   testnetUrl: env.TESTNET_URL,
