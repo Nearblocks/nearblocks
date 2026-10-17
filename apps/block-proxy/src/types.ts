@@ -1,7 +1,22 @@
 export interface UpstreamError {
+  body?: string;
+  contentType?: string;
   error: string;
   notFound?: boolean;
+  pending?: boolean;
+  retryAfter?: string;
   source: string;
+  status?: number;
+}
+
+export class UpstreamRedirectError extends Error {
+  constructor(
+    readonly location: string,
+    readonly status = 302,
+  ) {
+    super(`upstream redirect to ${location}`);
+    this.name = 'UpstreamRedirectError';
+  }
 }
 
 export interface HealthResponse {
@@ -39,7 +54,8 @@ export interface DedupStats {
 }
 
 export interface UpstreamStats {
-  fastnear: SourceStats;
+  neardata: SourceStats;
+  proxy: SourceStats;
   s3: SourceStats;
 }
 

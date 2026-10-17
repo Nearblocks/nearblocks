@@ -1,0 +1,112 @@
+name: near-block-proxy
+
+x-proxy: &proxy
+  build:
+    context: ../..
+    dockerfile: apps/block-proxy/Dockerfile
+  image: nearblocks/block-proxy:compose
+  init: true
+  network_mode: host
+  restart: unless-stopped
+  mem_limit: 2g
+  read_only: true
+  cap_drop: [ALL]
+  security_opt:
+    - no-new-privileges:true
+  ulimits:
+    nofile:
+      soft: 65536
+      hard: 65536
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=16m
+  logging:
+    driver: json-file
+    options:
+      max-size: 20m
+      max-file: '3'
+  healthcheck:
+    test:
+      - CMD
+      - node
+      - -e
+      - fetch(process.env.HEALTH_URL).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 60s
+
+services:
+  storage-init:
+    image: nearblocks/block-proxy:compose
+    build:
+      context: ../..
+      dockerfile: apps/block-proxy/Dockerfile
+    user: '0:0'
+    network_mode: none
+    restart: 'no'
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+    security_opt:
+      - no-new-privileges:true
+    entrypoint: ['/bin/sh', '-ec']
+    command:
+      - >-
+        for path in /mainnet-cache /mainnet-state /testnet-cache /testnet-state; do
+          if [ "$$(stat -c %u:%g "$$path")" != "1000:1000" ]; then
+            chown -R 1000:1000 "$$path";
+          fi;
+        done
+    volumes:
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/mainnet/cache:/mainnet-cache
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/mainnet/state:/mainnet-state
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/testnet/cache:/testnet-cache
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/testnet/state:/testnet-state
+
+  mainnet:
+    <<: *proxy
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+    environment:
+      NETWORK: mainnet
+      BLOCK_SOURCES: node,neardata
+      INDEXER_INTERVAL_MS: '250'
+      NODE_RPC_URL: http://127.0.0.1:3030
+      INDEXER_STATE_DIR: /app/state
+      PROXY_API_KEY: '${PROXY_API_KEY:?set PROXY_API_KEY in the deployment environment}'
+      LISTEN_HOST: 127.0.0.1
+      ADMIN_LISTEN_HOST: 127.0.0.1
+      CACHE_MIN_FREE_BYTES: '0'
+      CACHE_DIR: /app/cache
+      CACHE_TTL_SECS: '43200'
+      PORT: '3015'
+      ADMIN_PORT: '3017'
+      HEALTH_URL: http://127.0.0.1:3015/healthz
+    volumes:
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/mainnet/cache:/app/cache
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/mainnet/state:/app/state
+
+  testnet:
+    <<: *proxy
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
+    environment:
+      NETWORK: testnet
+      BLOCK_SOURCES: node,neardata
+      INDEXER_INTERVAL_MS: '250'
+      NODE_RPC_URL: http://127.0.0.1:3031
+      INDEXER_STATE_DIR: /app/state
+      PROXY_API_KEY: '${PROXY_API_KEY:?set PROXY_API_KEY in the deployment environment}'
+      LISTEN_HOST: 127.0.0.1
+      ADMIN_LISTEN_HOST: 127.0.0.1
+      CACHE_MIN_FREE_BYTES: '0'
+      CACHE_DIR: /app/cache
+      CACHE_TTL_SECS: '43200'
+      PORT: '3016'
+      ADMIN_PORT: '3018'
+      HEALTH_URL: http://127.0.0.1:3016/healthz
+    volumes:
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/testnet/cache:/app/cache
+      - ${BLOCK_PROXY_DATA_DIR:-/srv/near/block-proxy}/testnet/state:/app/state

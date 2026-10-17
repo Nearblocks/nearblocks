@@ -5,6 +5,7 @@ import path from 'node:path';
 import { logger } from 'nb-logger';
 
 import type { Config } from '#config';
+import { ensureFreeSpace } from '#indexer/storage';
 import * as metrics from '#metrics';
 import type { StatsCollector } from '#stats';
 
@@ -14,11 +15,13 @@ export class CacheStore {
   private cacheDir: string;
   private cacheTtlMs: number;
   private compression: boolean;
+  private minFreeBytes: number;
 
   constructor(config: Config) {
     this.cacheDir = config.cacheDir;
     this.cacheTtlMs = config.cacheTtlSecs * 1000;
     this.compression = config.cacheCompression;
+    this.minFreeBytes = config.cacheMinFreeBytes ?? 0;
   }
 
   /**
@@ -150,6 +153,7 @@ export class CacheStore {
     const filePath = blockHeightToPath(this.cacheDir, height, this.compression);
     const dir = path.dirname(filePath);
     await fsp.mkdir(dir, { recursive: true });
+    await ensureFreeSpace(this.cacheDir, this.minFreeBytes, jsonBytes.length);
 
     // Atomic write: temp file in same directory, then rename
     const tmpPath = path.join(
