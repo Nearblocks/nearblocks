@@ -18,10 +18,23 @@ export function createAdminServer(state: AppState): express.Express {
     const tipHeight = state.tipHeight;
     const uptimeSecs = Math.floor((Date.now() - state.startTime) / 1000);
     const snapshot = state.stats.snapshot(tipHeight, uptimeSecs, {
-      fastnear: state.fastnearEnabled,
+      neardata: state.neardataEnabled,
+      proxy: state.config.blockSources.includes('proxy'),
       s3: state.s3Enabled,
     });
-    res.json(snapshot);
+    res.json(
+      state.localIndexer
+        ? {
+            ...snapshot,
+            block_sources: state.config.blockSources,
+            local_indexer: {
+              ...state.localIndexer.status,
+              in_sync: state.localIndexer.isInSync(),
+              lag_secs: state.localIndexer.lagSecs(),
+            },
+          }
+        : { ...snapshot, block_sources: state.config.blockSources },
+    );
   });
 
   return app;

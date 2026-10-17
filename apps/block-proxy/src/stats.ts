@@ -10,17 +10,20 @@ export class StatsCollector {
   dedupTotal = 0;
   requestsBlock = 0;
   requestsLastBlock = 0;
-  upstreamDurationUsFastnear = 0;
+  upstreamDurationUsNeardata = 0;
+  upstreamDurationUsProxy = 0;
   upstreamDurationUsS3 = 0;
-  upstreamErrorsFastnear = 0;
+  upstreamErrorsNeardata = 0;
+  upstreamErrorsProxy = 0;
   upstreamErrorsS3 = 0;
-  upstreamRequestsFastnear = 0;
+  upstreamRequestsNeardata = 0;
+  upstreamRequestsProxy = 0;
   upstreamRequestsS3 = 0;
 
   snapshot(
     tipHeight: number,
     uptimeSecs: number,
-    upstreamEnabled: { fastnear: boolean; s3: boolean },
+    upstreamEnabled: { neardata: boolean; proxy: boolean; s3: boolean },
   ): StatsSnapshot {
     const cacheTotal = this.cacheHits + this.cacheMisses;
     const cacheHitRate = cacheTotal > 0 ? this.cacheHits / cacheTotal : 0;
@@ -49,14 +52,23 @@ export class StatsCollector {
       },
       tip_height: tipHeight,
       upstreams: {
-        fastnear: {
+        neardata: {
           avg_latency_ms: avgLatencyMs(
-            this.upstreamDurationUsFastnear,
-            this.upstreamRequestsFastnear,
+            this.upstreamDurationUsNeardata,
+            this.upstreamRequestsNeardata,
           ),
-          enabled: upstreamEnabled.fastnear,
-          errors: this.upstreamErrorsFastnear,
-          requests: this.upstreamRequestsFastnear,
+          enabled: upstreamEnabled.neardata,
+          errors: this.upstreamErrorsNeardata,
+          requests: this.upstreamRequestsNeardata,
+        },
+        proxy: {
+          avg_latency_ms: avgLatencyMs(
+            this.upstreamDurationUsProxy,
+            this.upstreamRequestsProxy,
+          ),
+          enabled: upstreamEnabled.proxy,
+          errors: this.upstreamErrorsProxy,
+          requests: this.upstreamRequestsProxy,
         },
         s3: {
           avg_latency_ms: avgLatencyMs(

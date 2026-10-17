@@ -28,6 +28,25 @@ const endpoint = (network: string) => {
     : 'https://testnet.neardata.xyz';
 };
 
+export const neardataApiUrl = (base: string, path: string): string => {
+  const url = new URL(base);
+  const basePath = url.pathname.replace(/\/+$/, '');
+  const apiPath = path.startsWith('/v0/') ? path.slice(3) : path;
+  url.pathname = basePath.endsWith('/v0')
+    ? `${basePath}${apiPath}`
+    : `${basePath}/v0${apiPath}`;
+  return url.toString();
+};
+
+export const neardataRequestHeaders = (): Record<string, string> => {
+  const authorization =
+    process.env.NEARDATA_AUTHORIZATION ||
+    (process.env.NEARDATA_API_KEY
+      ? `Bearer ${process.env.NEARDATA_API_KEY}`
+      : undefined);
+  return authorization ? { Authorization: authorization } : {};
+};
+
 const retryLogger = (attempt: number, error: unknown) => {
   logger.error(error);
   logger.error({ attempt });
@@ -58,7 +77,8 @@ export const camelCaseKeys = <T>(obj: T): T => {
 const fetchBlock = async (url: string, block: number): Promise<Message> => {
   return await retry(
     async () => {
-      const response = await fetch(`${url}/v0/block/${block}`, {
+      const response = await fetch(neardataApiUrl(url, `/v0/block/${block}`), {
+        headers: neardataRequestHeaders(),
         method: 'GET',
         signal: AbortSignal.timeout(30000),
       });
@@ -87,10 +107,14 @@ export const fetchFinal = async (
 
   return await retry(
     async () => {
-      const response = await fetch(`${base}/v0/last_block/final`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(30000),
-      });
+      const response = await fetch(
+        neardataApiUrl(base, '/v0/last_block/final'),
+        {
+          headers: neardataRequestHeaders(),
+          method: 'GET',
+          signal: AbortSignal.timeout(30000),
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`status: ${response.status}`);

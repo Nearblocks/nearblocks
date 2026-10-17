@@ -5,9 +5,9 @@ node_modules
 # Build outputs
 **/.next
 **/dist
-**/.turbo
 **/*.tsbuildinfo
 **/build
+**/.turbo
 
 # Version control
 .git

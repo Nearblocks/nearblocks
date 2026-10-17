@@ -77,3 +77,49 @@ export const tipHeight = new client.Gauge({
   name: 'block_proxy_tip_height',
   registers: [register],
 });
+
+export const indexerHead = new client.Gauge({
+  help: 'Local node finalized head height',
+  name: 'block_proxy_indexer_head_height',
+  registers: [register],
+});
+export const indexerPublished = new client.Gauge({
+  help: 'Last durably published local enriched block height',
+  name: 'block_proxy_indexer_published_height',
+  registers: [register],
+});
+export const indexerHeadAge = new client.Gauge({
+  help: 'Local finalized head age at last poll in seconds',
+  name: 'block_proxy_indexer_head_age_seconds',
+  registers: [register],
+});
+export const indexerPending = new client.Gauge({
+  help: 'In-memory receipt origin entries including short executed retention',
+  name: 'block_proxy_indexer_receipt_entries',
+  registers: [register],
+});
+export const indexerHealthy = new client.Gauge({
+  help: 'Whether local ingestion last completed without error',
+  name: 'block_proxy_indexer_healthy',
+  registers: [register],
+});
+export const indexerErrors = new client.Counter({
+  help: 'Local ingestion errors; HTTP fallback remains independent',
+  name: 'block_proxy_indexer_errors_total',
+  registers: [register],
+});
+export const indexerHeadTimestamp = new client.Gauge({
+  help: 'Local finalized head timestamp; use time() minus this for age',
+  name: 'block_proxy_indexer_head_timestamp_seconds',
+  registers: [register],
+});
+export const indexerPublishedTimestamp = new client.Gauge({
+  help: 'Local published block timestamp; use time() minus this for age',
+  name: 'block_proxy_indexer_published_timestamp_seconds',
+  registers: [register],
+});
+export const nodeInSync = new client.Gauge({
+  help: 'Whether the local node is healthy and its finalized head is within the allowed lag (1) or not (0)',
+  name: 'block_proxy_node_in_sync',
+  registers: [register],
+});

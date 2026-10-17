@@ -1,126 +1,99 @@
 # block-proxy
 
-Caching reverse proxy for NEAR block data. Sits between indexers and upstream block sources (fastnear/neardata, S3/MinIO), providing:
-
-- **Local disk cache** with sharded storage and TTL-based eviction
-- **Singleflight dedup** — concurrent requests for the same block height are collapsed into one upstream fetch
-- **Fallback chain** — cache → S3/MinIO → fastnear, with per-source metrics
-- **Prometheus metrics** and JSON stats on a separate admin port
-
-## Quick Start
-
-The proxy is URL-compatible with neardata.xyz — any client that fetches `/v0/block/{height}` or `/v0/last_block/final` can point at the proxy instead.
+Caching proxy for finalized NEAR blocks and node JSON-RPC. Blocks are read from
+the disk cache first, then from the sources in `BLOCK_SOURCES`, in order.
+Concurrent requests for the same height share one upstream fetch.
 
 ```bash
-# Minimal config — fastnear-only proxy, no S3
-FASTNEAR_ENABLED=true S3_ENABLED=false node dist/index.js
+BLOCK_SOURCES=node,neardata NODE_RPC_URL=http://127.0.0.1:3030 node dist/index.js
 ```
 
-All env vars have safe defaults. With zero config, the proxy starts on port 3000 serving mainnet blocks via fastnear.
+## Sources
+
+| Source     | Serves                                                                         |
+| ---------- | ------------------------------------------------------------------------------ |
+| `node`     | Blocks indexed from `NODE_RPC_URL`, from the follower's start (within the TTL) |
+| `proxy`    | Another block-proxy at `BLOCK_PROXY_UPSTREAM_URL`                              |
+| `neardata` | neardata.xyz, or `NEARDATA_URL`                                                |
+| `s3`       | An S3/MinIO block store                                                        |
+
+The `node` source needs a node that tracks all shards, saves transaction
+outcomes and serves `EXPERIMENTAL_indexer_block`. The follower does not fetch
+older blocks on demand, so keep a remote source listed if indexers need
+history beyond `CACHE_TTL_SECS`. The old `FASTNEAR_*` settings still work as
+aliases for `NEARDATA_*`.
 
 ## API
 
-### Data Plane (default port 3000)
+| Method | Path                   | Port | Description                                           |
+| ------ | ---------------------- | ---- | ----------------------------------------------------- |
+| GET    | `/v0/last_block/final` | 3000 | Redirects to the latest finalized block               |
+| GET    | `/v0/block/:height`    | 3000 | Block JSON; `X-Upstream-Source` names the source      |
+| POST   | `/rpc`                 | 3000 | JSON-RPC to `NODE_RPC_URL`, allowlisted methods       |
+| GET    | `/healthz`, `/readyz`  | 3000 | Liveness and readiness (no key required)              |
+| GET    | `/metrics`, `/stats`   | 3001 | Prometheus metrics and JSON stats (loopback, no auth) |
 
-| Method | Path                   | Description                                                          |
-| ------ | ---------------------- | -------------------------------------------------------------------- |
-| GET    | `/v0/block/:height`    | Fetch block by height. Returns JSON with `X-Upstream-Source` header. |
-| GET    | `/v0/last_block/final` | Latest finalized block (proxied from fastnear, never cached).        |
-| GET    | `/healthz`             | Health check — always returns 200.                                   |
-| GET    | `/readyz`              | Readiness — returns 200 when ready, 503 during startup.              |
+When `PROXY_API_KEY` is set, data routes require it as `?api_key=`,
+`Authorization: Bearer` or `X-API-Key`.
 
-### Admin Plane (default port 3001)
+## Configuration
 
-| Method | Path       | Description                                                   |
-| ------ | ---------- | ------------------------------------------------------------- |
-| GET    | `/metrics` | Prometheus metrics (text/plain).                              |
-| GET    | `/stats`   | JSON stats snapshot with hit rates, latencies, dedup savings. |
+| Variable                       | Default                 | Notes                                               |
+| ------------------------------ | ----------------------- | --------------------------------------------------- |
+| `BLOCK_SOURCES`                | _(legacy flags)_        | e.g. `node,proxy,neardata`                          |
+| `NETWORK`                      | `mainnet`               | `mainnet` or `testnet`                              |
+| `PORT` / `ADMIN_PORT`          | `3000` / `3001`         |                                                     |
+| `LISTEN_HOST`                  | `127.0.0.1`             | Non-loopback requires `PROXY_API_KEY`               |
+| `PROXY_API_KEY`                | _(unset)_               | Client key                                          |
+| `NODE_RPC_URL`                 | `http://127.0.0.1:3030` | `node` source and `/rpc`                            |
+| `RPC_ALLOWED_METHODS`          | read-only set           | Methods `/rpc` forwards; others get JSON-RPC -32601 |
+| `INDEXER_STATE_DIR`            | `/app/state`            | Follower checkpoint                                 |
+| `INDEXER_INTERVAL_MS`          | `250`                   | Finalized-head poll interval                        |
+| `NODE_MAX_LAG_SECS`            | `10`                    | Node out of sync when its head is older; min `5`    |
+| `BLOCK_PROXY_UPSTREAM_URL`     | _(unset)_               | Required for the `proxy` source                     |
+| `BLOCK_PROXY_UPSTREAM_API_KEY` | _(unset)_               | Sent as a Bearer token                              |
+| `NEARDATA_URL`                 | _(from `NETWORK`)_      | Origin or `/v0` URL                                 |
+| `NEARDATA_UPSTREAM_API_KEY`    | _(unset)_               | Sent as `apiKey`                                    |
+| `CACHE_DIR`                    | `/app/cache`            |                                                     |
+| `CACHE_TTL_SECS`               | `3600`                  | Also bounds the follower's history                  |
+| `CACHE_MIN_FREE_BYTES`         | `0`                     | Pause cache writes below this free space            |
+| `UPSTREAM_TIMEOUT_SECS`        | `10`                    | Keep below the indexers' 30s client timeout         |
+| `S3_ENDPOINT`, `S3_BUCKET`, …  | _(unset)_               | Required for the `s3` source                        |
 
-## Environment Variables
-
-### Core
-
-| Variable     | Default   | Description                                             |
-| ------------ | --------- | ------------------------------------------------------- |
-| `PORT`       | `3000`    | Data server listen port                                 |
-| `ADMIN_PORT` | `3001`    | Admin server listen port                                |
-| `NETWORK`    | `mainnet` | `mainnet` or `testnet` — controls default upstream URLs |
-| `LOG_LEVEL`  | `info`    | Log level (debug, info, warn, error)                    |
-
-### Cache
-
-| Variable            | Default      | Description                                  |
-| ------------------- | ------------ | -------------------------------------------- |
-| `CACHE_ENABLED`     | `true`       | Enable local disk cache                      |
-| `CACHE_DIR`         | `/app/cache` | Cache directory path                         |
-| `CACHE_TTL_SECS`    | `3600`       | TTL for cached block eviction (seconds)      |
-| `CACHE_COMPRESSION` | `false`      | Reserved for future zstd compression support |
-
-### Timeouts
-
-| Variable                | Default | Description                                                  |
-| ----------------------- | ------- | ------------------------------------------------------------ |
-| `UPSTREAM_TIMEOUT_SECS` | `10`    | Per-upstream timeout. Must be below the 30s client abort.    |
-| `DEDUP_TTL_SECS`        | `25`    | Max lifetime of an in-flight singleflight entry. Range 5-60. |
-
-### Upstream: fastnear (neardata.xyz)
-
-| Variable           | Default                  | Description                |
-| ------------------ | ------------------------ | -------------------------- |
-| `FASTNEAR_ENABLED` | `true`                   | Enable fastnear upstream   |
-| `FASTNEAR_URL`     | _(derived from NETWORK)_ | Override fastnear base URL |
-
-### Upstream: S3/MinIO
-
-| Variable        | Default                 | Description              |
-| --------------- | ----------------------- | ------------------------ |
-| `S3_ENABLED`    | `false`                 | Enable S3/MinIO upstream |
-| `S3_ENDPOINT`   | _(required if enabled)_ | S3/MinIO endpoint URL    |
-| `S3_BUCKET`     | _(required if enabled)_ | Bucket name              |
-| `S3_REGION`     | `us-east-1`             | S3 region                |
-| `S3_ACCESS_KEY` | _(required if enabled)_ | Access key               |
-| `S3_SECRET_KEY` | _(required if enabled)_ | Secret key               |
-
-## Architecture
-
-```
-                    ┌──────────────┐
-  indexers ───────► │  block-proxy │
-                    │  :3000       │
-                    └──────┬───────┘
-                           │
-              ┌────────────┼────────────┐
-              ▼            ▼            ▼
-         ┌────────┐  ┌──────────┐  ┌──────────┐
-         │ cache  │  │ S3/MinIO │  │ fastnear  │
-         │ (disk) │  │          │  │ neardata  │
-         └────────┘  └──────────┘  └──────────┘
-```
-
-Fallback order: cache → S3 → fastnear. On any upstream hit, the block is written to cache in the background.
-
-### Singleflight Dedup
-
-When multiple indexers request the same block simultaneously, only one upstream fetch is made. All other requests wait for the leader's result. This prevents upstream stampede.
-
-### Cache Eviction
-
-Every 60 seconds, the eviction loop scans the cache directory and removes any cached block file older than `CACHE_TTL_SECS`.
-
-## Docker
+## Deploy
 
 ```bash
-docker build -f apps/block-proxy/Dockerfile -t block-proxy .
-docker run -p 3000:3000 -p 3001:3001 block-proxy
+cd apps/block-proxy
+export PROXY_API_KEY='<secret>'
+docker compose up -d --build
 ```
 
-## Connecting Indexers
+Compose runs mainnet and testnet on host networking, bound to loopback, with
+cache and state under `/srv/near/block-proxy`. Put a TLS gateway in front for
+public access.
 
-Since block-proxy is URL-compatible with neardata.xyz, any indexer using `nb-neardata` can point to it:
+### Node box and k8s
+
+- Node box: `BLOCK_SOURCES=node` with `PROXY_API_KEY`, next to the node.
+- k8s proxy: `BLOCK_SOURCES=proxy,neardata`, `BLOCK_PROXY_UPSTREAM_URL` set to
+  the node box. The neardata (FastNear) key lives only here.
+- Indexers use the k8s proxy.
+- API: `RPC_URLS=<node box>/rpc,<FastNear archival>` (client-side failover).
+
+When the node's finalized head is older than `NODE_MAX_LAG_SECS`, `/rpc` and
+`/v0/last_block/final` answer 503 (the `/rpc` guard needs the `node` source).
+Blocks already published or cached are still served. The k8s proxy and the API
+fall back automatically, and the node recovers within one poll of catching up.
+
+## Clients
+
+Indexers using `nb-neardata`:
 
 ```bash
-# In your indexer's env
-NEARDATA_URL=http://localhost:3000
+NEARDATA_URL=https://proxy.example/v0?api_key=<key>
 ```
 
-The `nb-neardata` package accepts an optional `url` field that overrides the default neardata.xyz endpoint.
+The API and backend can use `https://proxy.example/rpc` as an `RPC_URLS`
+endpoint, with the key in `RPC_AUTH_TOKENS`.
+
+Tests: `pnpm --filter block-proxy test`

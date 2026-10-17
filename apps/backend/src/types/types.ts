@@ -12,7 +12,9 @@ export interface Config {
   genesisDate: string;
   genesisHeight: number;
   network: Network;
+  rpcAuthTokens: string[];
   rpcUrl: string;
+  rpcUrls: string[];
   sentryDsn?: string;
 }
 

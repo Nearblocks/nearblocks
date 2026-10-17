@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
-    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
+    "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json .",
+    "test": "pnpm build && node --test test/*.test.mjs"
   },
   "dependencies": {},
   "devDependencies": {
