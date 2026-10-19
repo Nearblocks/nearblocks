@@ -11,7 +11,7 @@ const hour = 3_600_000_000_000n;
 const lookbackNs = 900_000_000_000n;
 const confirmMarginNs = 7n * 86_400_000_000_000n;
 const minWindowNs = 1_000_000_000n;
-const timeoutSeconds = 120;
+const timeoutSeconds = 25;
 
 const checks: Record<CheckName, Check> = {
   A: {
@@ -124,7 +124,7 @@ const confirm = async (client: Knex, name: CheckName, rows: Row[]) => {
     const ids = [...new Set(batch.map((row) => row.receipt_id))];
     const present = await withRetry(() =>
       client.transaction(async (trx) => {
-        await trx.raw(`set local statement_timeout = '${timeoutSeconds * 2}s'`);
+        await trx.raw(`set local statement_timeout = '${timeoutSeconds}s'`);
 
         const result = await trx(table)
           .whereIn('receipt_id', ids)

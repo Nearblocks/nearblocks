@@ -3,6 +3,7 @@ import { logger } from 'nb-logger';
 import { db, dbRead } from '#scripts/db';
 import { CheckName, scanWindow } from '#scripts/findMissing';
 import { checkConcurrency } from '#scripts/range';
+import { readSource, Source } from '#scripts/source';
 
 type Found = Record<CheckName, Map<string, string>>;
 
@@ -11,8 +12,9 @@ type Finding = {
   blocks: [number, number] | null;
   brokenActions: number;
   day: string;
+  ids: string[];
   receipts: number;
-  sample: null | string;
+  unverified: number;
 };
 
 type Cursor = { findings: Finding[]; sync: string };
@@ -105,27 +107,45 @@ const blockRange = async (
     : null;
 };
 
-const summarize = async (
-  label: string,
-  found: Found,
-): Promise<Finding | null> => {
-  const stamps = new Set([
-    ...found.A.values(),
-    ...found.A2.values(),
-    ...found.C.values(),
-  ]);
-
-  if (!stamps.size) return null;
-
-  return {
-    actions: found.A2.size,
-    blocks: await blockRange([...stamps]),
-    brokenActions: found.C.size,
-    day: label,
-    receipts: found.A.size,
-    sample:
-      [...found.A.keys(), ...found.A2.keys(), ...found.C.keys()][0] ?? null,
+const verify = async (found: Found) => {
+  const source = await readSource(new Map([...found.A, ...found.A2]));
+  const verdict = {
+    actions: 0,
+    falsePositives: 0,
+    ids: [] as string[],
+    receipts: 0,
+    stamps: new Set(found.C.values()),
+    unverified: 0,
   };
+
+  const judge = (
+    candidates: Map<string, string>,
+    isReal: (item: Source) => boolean,
+    key: 'actions' | 'receipts',
+  ) =>
+    candidates.forEach((stamp, id) => {
+      const item = source.get(id);
+
+      if (!item) {
+        verdict.unverified += 1;
+        verdict.stamps.add(stamp);
+      } else if (isReal(item)) {
+        verdict[key] += 1;
+        verdict.ids.push(id);
+        verdict.stamps.add(stamp);
+      } else {
+        verdict.falsePositives += 1;
+      }
+    });
+
+  judge(found.A, (item) => item.kind === 'Action', 'receipts');
+  judge(
+    found.A2,
+    (item) => item.kind === 'Action' && item.actions > 0,
+    'actions',
+  );
+
+  return verdict;
 };
 
 export const runReceiptsCheck = async () => {
@@ -185,7 +205,18 @@ export const runReceiptsCheck = async () => {
         smaller(days[index] + day, to),
         state,
       );
-      const finding = await summarize(label, found);
+      const verdict = await verify(found);
+      const finding: Finding | null = verdict.stamps.size
+        ? {
+            actions: verdict.actions,
+            blocks: await blockRange([...verdict.stamps]),
+            brokenActions: found.C.size,
+            day: label,
+            ids: verdict.ids.slice(0, 200),
+            receipts: verdict.receipts,
+            unverified: verdict.unverified,
+          }
+        : null;
 
       if (finding) {
         if (findings.length < maxFindings) findings.push(finding);
@@ -200,6 +231,7 @@ export const runReceiptsCheck = async () => {
       logger.info(
         {
           day: label,
+          falsePositives: verdict.falsePositives,
           remaining: days.length - cursorIndex,
           seconds: (Date.now() - started) / 1000,
         },
