@@ -1,11 +1,11 @@
 import { logger } from 'nb-logger';
 
 import { db, dbRead } from '#scripts/db';
-import { CheckName, scanWindow } from '#scripts/findMissing';
+import { CheckName, Row, scanWindow } from '#scripts/findMissing';
 import { checkConcurrency } from '#scripts/range';
 import { readSource, Source } from '#scripts/source';
 
-type Found = Record<CheckName, Map<string, string>>;
+type Found = Record<CheckName, Map<string, Row>>;
 
 type Finding = {
   actions: number;
@@ -21,6 +21,7 @@ type Cursor = { findings: Finding[]; sync: string };
 
 const cursorKey = 'receipts-check';
 const maxFindings = 3000;
+const sampleSize = 3;
 const minute = 60_000_000_000n;
 const hour = 60n * minute;
 const day = 24n * hour;
@@ -108,33 +109,49 @@ const blockRange = async (
 };
 
 const verify = async (found: Found) => {
-  const source = await readSource(new Map([...found.A, ...found.A2]));
+  const sampled = [...found.A2]
+    .filter(([, row]) => row.empty)
+    .slice(0, sampleSize)
+    .map(([id]) => id);
+  const candidates = new Map<string, string>();
+
+  found.A.forEach((row, id) => candidates.set(id, row.ts));
+  found.A2.forEach((row, id) => {
+    if (!row.empty || sampled.includes(id)) candidates.set(id, row.ts);
+  });
+
+  const source = await readSource(candidates);
+  const confirmed = sampled.every((id) => source.get(id)?.actions === 0);
+  const inferredItem: Source = { actions: 0, kind: 'Action' };
   const verdict = {
     actions: 0,
     falsePositives: 0,
     ids: [] as string[],
+    inferred: 0,
     receipts: 0,
-    stamps: new Set(found.C.values()),
+    stamps: new Set([...found.C.values()].map((row) => row.ts)),
     unverified: 0,
   };
 
   const judge = (
-    candidates: Map<string, string>,
+    rows: Map<string, Row>,
     isReal: (item: Source) => boolean,
     key: 'actions' | 'receipts',
   ) =>
-    candidates.forEach((stamp, id) => {
-      const item = source.get(id);
+    rows.forEach((row, id) => {
+      const inferred = Boolean(row.empty) && confirmed && !source.has(id);
+      const item = inferred ? inferredItem : source.get(id);
 
       if (!item) {
         verdict.unverified += 1;
-        verdict.stamps.add(stamp);
+        verdict.stamps.add(row.ts);
       } else if (isReal(item)) {
         verdict[key] += 1;
         verdict.ids.push(id);
-        verdict.stamps.add(stamp);
+        verdict.stamps.add(row.ts);
       } else {
         verdict.falsePositives += 1;
+        if (inferred) verdict.inferred += 1;
       }
     });
 
@@ -232,6 +249,7 @@ export const runReceiptsCheck = async () => {
         {
           day: label,
           falsePositives: verdict.falsePositives,
+          inferred: verdict.inferred,
           remaining: days.length - cursorIndex,
           seconds: (Date.now() - started) / 1000,
         },

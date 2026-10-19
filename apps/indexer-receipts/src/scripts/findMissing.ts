@@ -2,7 +2,7 @@ import { Knex } from 'nb-knex';
 
 export type CheckName = 'A' | 'A2' | 'C';
 
-type Row = { receipt_id: string; ts: string };
+export type Row = { empty?: boolean; receipt_id: string; ts: string };
 
 type Check = { column: string; sql: string; table: null | string };
 
@@ -12,6 +12,7 @@ const lookbackNs = 900_000_000_000n;
 const confirmMarginNs = 7n * 86_400_000_000_000n;
 const minWindowNs = 1_000_000_000n;
 const timeoutSeconds = 25;
+const emptyReceiptGas = 108_059_500_000;
 
 const checks: Record<CheckName, Check> = {
   A: {
@@ -29,7 +30,9 @@ const checks: Record<CheckName, Check> = {
   },
   A2: {
     column: 'receipt_included_in_block_timestamp',
-    sql: `select eo.receipt_id, eo.executed_in_block_timestamp as ts
+    sql: `select eo.receipt_id, eo.executed_in_block_timestamp as ts,
+        eo.gas_burnt = ${emptyReceiptGas}
+          and eo.status in ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID') as empty
       from execution_outcomes eo
       left join action_receipt_actions x on x.receipt_id = eo.receipt_id
         and x.receipt_included_in_block_timestamp >= :lb
@@ -110,11 +113,11 @@ const query = (client: Knex, name: CheckName, t0: bigint, t1: bigint) =>
 const confirm = async (client: Knex, name: CheckName, rows: Row[]) => {
   const { column, table } = checks[name];
 
-  if (!table || !rows.length) return rows;
+  const probe = rows.filter((row) => !row.empty);
 
-  const sorted = [...rows].sort((a, b) =>
-    BigInt(a.ts) < BigInt(b.ts) ? -1 : 1,
-  );
+  if (!table || !probe.length) return rows;
+
+  const sorted = probe.sort((a, b) => (BigInt(a.ts) < BigInt(b.ts) ? -1 : 1));
   const found = new Set<string>();
 
   for (let i = 0; i < sorted.length; i += 500) {
@@ -139,7 +142,7 @@ const confirm = async (client: Knex, name: CheckName, rows: Row[]) => {
     present.forEach((row) => found.add(row.receipt_id));
   }
 
-  return rows.filter((row) => !found.has(row.receipt_id));
+  return rows.filter((row) => row.empty || !found.has(row.receipt_id));
 };
 
 export const scanWindow = async (
@@ -147,7 +150,7 @@ export const scanWindow = async (
   name: CheckName,
   t0: bigint,
   t1: bigint,
-  out: Map<string, string>,
+  out: Map<string, Row>,
 ): Promise<void> => {
   let rows: null | Row[] = null;
 
@@ -173,20 +176,20 @@ export const scanWindow = async (
   }
 
   (await confirm(client, name, rows)).forEach((row) =>
-    out.set(row.receipt_id, row.ts),
+    out.set(row.receipt_id, row),
   );
 };
 
 export const findMissing = async (client: Knex, from: bigint, to: bigint) => {
-  const out = new Map<string, string>();
+  const rows = new Map<string, Row>();
 
   for (let t0 = from; t0 < to; t0 += hour) {
     const t1 = t0 + hour < to ? t0 + hour : to;
 
     for (const name of ['A', 'A2'] as CheckName[]) {
-      await scanWindow(client, name, t0, t1, out);
+      await scanWindow(client, name, t0, t1, rows);
     }
   }
 
-  return out;
+  return new Map([...rows].map(([id, row]) => [id, row.ts]));
 };
