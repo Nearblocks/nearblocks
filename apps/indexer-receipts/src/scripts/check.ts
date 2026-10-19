@@ -90,22 +90,19 @@ export const checkDay = async (
 const blockRange = async (
   stamps: string[],
 ): Promise<[number, number] | null> => {
-  let low = Infinity;
-  let high = -Infinity;
+  const times = stamps.map((stamp) => BigInt(stamp));
+  const low = await dbRead('blocks')
+    .where('block_timestamp', '>=', String(times.reduce(smaller)))
+    .orderBy('block_timestamp', 'asc')
+    .first('block_height');
+  const high = await dbRead('blocks')
+    .where('block_timestamp', '<=', String(times.reduce(larger)))
+    .orderBy('block_timestamp', 'desc')
+    .first('block_height');
 
-  for (let i = 0; i < stamps.length; i += 1000) {
-    const [row] = await dbRead('blocks')
-      .whereIn('block_timestamp', stamps.slice(i, i + 1000))
-      .min('block_height as low')
-      .max('block_height as high');
-
-    if (row?.low !== null && row?.low !== undefined) {
-      low = Math.min(low, Number(row.low));
-      high = Math.max(high, Number(row.high));
-    }
-  }
-
-  return Number.isFinite(low) ? [low, high] : null;
+  return low && high
+    ? [Number(low.block_height), Number(high.block_height)]
+    : null;
 };
 
 const summarize = async (
