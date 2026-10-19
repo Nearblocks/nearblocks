@@ -13,12 +13,17 @@ const neardataUrl =
     ? 'https://mainnet.neardata.xyz'
     : 'https://testnet.neardata.xyz';
 
+const apiKey = config.fastnearApiKey ? `?apiKey=${config.fastnearApiKey}` : '';
+
 const fetchBlock = (height: number) =>
   retry(
     async () => {
-      const response = await fetch(`${neardataUrl}/v0/block/${height}`, {
-        signal: AbortSignal.timeout(30_000),
-      });
+      const response = await fetch(
+        `${neardataUrl}/v0/block/${height}${apiKey}`,
+        {
+          signal: AbortSignal.timeout(30_000),
+        },
+      );
 
       if (response.status === 404) return null;
       if (!response.ok) throw new Error(`status: ${response.status}`);
