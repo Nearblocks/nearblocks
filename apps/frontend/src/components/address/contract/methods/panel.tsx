@@ -17,6 +17,7 @@ import { zodResolver } from '@/lib/zod';
 import { Button } from '@/ui/button';
 import { Field, FieldGroup } from '@/ui/field';
 import { Label } from '@/ui/label';
+import { Spinner } from '@/ui/spinner';
 
 import { Arguments } from './arguments';
 import { MethodDocs } from './docs';
@@ -208,6 +209,7 @@ export const MethodPanel = ({ args, doc, hasSchema, kind, name }: Props) => {
               type="submit"
               variant="secondary"
             >
+              {isSubmitting && <Spinner />}
               {mode === 'change'
                 ? t('contract.methods.write')
                 : t('contract.methods.read')}

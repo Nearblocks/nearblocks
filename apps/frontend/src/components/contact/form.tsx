@@ -18,6 +18,7 @@ import {
   FieldSet,
 } from '@/ui/field';
 import { Input } from '@/ui/input';
+import { Spinner } from '@/ui/spinner';
 import { Textarea } from '@/ui/textarea';
 
 type Props = {
@@ -139,6 +140,7 @@ export const ContactForm = ({ subject }: Props) => {
 
       <div>
         <Button disabled={isSubmitting} type="submit" variant="secondary">
+          {isSubmitting && <Spinner />}
           {t('form.send')}
         </Button>
       </div>

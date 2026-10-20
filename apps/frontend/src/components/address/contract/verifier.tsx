@@ -17,6 +17,7 @@ import { Field, FieldContent, FieldGroup, FieldLabel } from '@/ui/field';
 import { Input } from '@/ui/input';
 import { NativeSelect, NativeSelectOption } from '@/ui/native-select';
 import { Skeleton } from '@/ui/skeleton';
+import { Spinner } from '@/ui/spinner';
 
 type Props = {
   account?: string;
@@ -302,6 +303,7 @@ export const VerifyContract = ({ account, codeHash, heading }: Props) => {
                     type="submit"
                     variant="secondary"
                   >
+                    {isSubmitting && <Spinner />}
                     {t('verifyContract.form.submit')}
                   </Button>
                 </Field>

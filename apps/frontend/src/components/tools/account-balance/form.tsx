@@ -19,6 +19,7 @@ import {
 import { Input } from '@/ui/input';
 import { Label } from '@/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/ui/radio-group';
+import { Spinner } from '@/ui/spinner';
 
 type FilterMode = 'block' | 'date';
 
@@ -162,6 +163,7 @@ export const AccountBalanceForm = () => {
 
           <div className="flex gap-3">
             <Button disabled={isSubmitting} type="submit" variant="secondary">
+              {isSubmitting && <Spinner />}
               {t('balance.check')}
             </Button>
             <Button onClick={onReset} type="button" variant="outline">
