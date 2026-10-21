@@ -8,6 +8,7 @@ import { useLocale } from '@/hooks/use-locale';
 import { FormData } from '@/lib/schema/contract';
 import { Button } from '@/ui/button';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/ui/field';
+import { Spinner } from '@/ui/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 
 type Props = {
@@ -50,7 +51,11 @@ export const Arguments = ({
                 variant="outline"
               >
                 {t('contract.methods.autoDetect')}{' '}
-                <RiQuestionLine className="size-4" />
+                {isFetchingArgs ? (
+                  <Spinner />
+                ) : (
+                  <RiQuestionLine className="size-4" />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>

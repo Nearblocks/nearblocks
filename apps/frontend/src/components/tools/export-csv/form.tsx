@@ -32,6 +32,7 @@ import { Input } from '@/ui/input';
 import { Label } from '@/ui/label';
 import { NativeSelect, NativeSelectOption } from '@/ui/native-select';
 import { RadioGroup, RadioGroupItem } from '@/ui/radio-group';
+import { Spinner } from '@/ui/spinner';
 
 type FilterMode = 'block' | 'date';
 
@@ -313,6 +314,7 @@ export const ExportCsvForm = ({ defaultAccount, defaultType }: Props) => {
               type="submit"
               variant="secondary"
             >
+              {isSubmitting && <Spinner />}
               {t('export.download')}
             </Button>
             <Button onClick={onReset} type="button" variant="outline">
