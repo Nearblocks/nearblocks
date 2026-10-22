@@ -9,6 +9,19 @@ export type Context = {
   attempt: number;
 };
 
+export {
+  isMissingHistoryFailure,
+  isNodeNotReady,
+  isNodeQueryTimeout,
+  isRetryableRpcFailure,
+  isSoftEndpointFailure,
+  isTransportTimeout,
+  RpcFailover,
+  shouldTryNextRpcEndpoint,
+  withRpcFallback,
+} from './rpc-failover.js';
+export type { RpcEndpoint, RpcFailoverOptions } from './rpc-failover.js';
+
 const NS_IN_A_MS = 10n ** 6n;
 const YOCTO_IN_A_NEAR = 10n ** 24n;
 

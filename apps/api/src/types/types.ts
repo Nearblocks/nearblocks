@@ -50,7 +50,9 @@ export type Config = {
   redisSentinelPassword: string;
   redisSentinelUrls: string;
   redisUrl: string;
+  rpcAuthTokens: string[];
   rpcUrl: string;
+  rpcUrls: string[];
   sentryDsn?: string;
   stakingStart: bigint;
   testnetUrl: string;

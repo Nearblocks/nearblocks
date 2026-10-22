@@ -1,4 +1,4 @@
-import { providers } from 'near-api-js';
+import type { providers } from 'near-api-js';
 import {
   BlockId,
   BlockReference,
@@ -6,9 +6,29 @@ import {
 } from 'near-api-js/lib/providers/provider.js';
 
 import config from '#config';
+import { FailoverJsonRpcProvider } from '#libs/failoverProvider';
+import logger from '#libs/logger';
+
+let sharedProvider: FailoverJsonRpcProvider | undefined;
 
 export const getProvider = (url?: string) => {
-  return new providers.JsonRpcProvider({ url: url ?? config.rpcUrl });
+  if (url) return new FailoverJsonRpcProvider([{ authToken: '', url }]);
+
+  // One shared instance so circuit-breaker state is common to all callers.
+  sharedProvider ??= new FailoverJsonRpcProvider(
+    config.rpcUrls.map((rpcUrl, index) => ({
+      authToken: config.rpcAuthTokens[index],
+      url: rpcUrl,
+    })),
+    {
+      onFallback: (error, endpoint) =>
+        logger.warn(
+          { endpoint, error: error ? String(error) : undefined },
+          'using configured RPC fallback',
+        ),
+    },
+  );
+  return sharedProvider;
 };
 
 export const bytesParse = (input: Uint8Array) =>

@@ -14,7 +14,7 @@
     "build": "pnpm clean && tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "dev": "tsx watch --env-file=.env src/index.ts",
-    "test": "vitest run",
+    "test": "pnpm build && vitest run",
     "lint": "tsc --noEmit && oxlint -c ../../.oxlintrc.json --fix .",
     "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
@@ -22,6 +22,7 @@
     "@aws-sdk/client-s3": "catalog:",
     "envalid": "catalog:",
     "express": "catalog:",
+    "nb-logger": "workspace:*",
     "prom-client": "catalog:",
     "uuid": "11.0.3"
   },
@@ -29,7 +30,6 @@
     "@types/express": "catalog:",
     "@types/node": "catalog:",
     "@types/uuid": "~10.0",
-    "nb-logger": "workspace:*",
     "nb-tsconfig": "workspace:*",
     "rimraf": "~5.0",
     "tsx": "catalog:",
