@@ -87,5 +87,5 @@ export const readSource = async (candidates: Map<string, string>) => {
     );
   }
 
-  return found;
+  return { blocks: entries.length, items: found };
 };

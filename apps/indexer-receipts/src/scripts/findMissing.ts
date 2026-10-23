@@ -2,11 +2,15 @@ import { Knex } from 'nb-knex';
 
 export type CheckName = 'A' | 'A2' | 'C';
 
-export type Row = { empty?: boolean; receipt_id: string; ts: string };
+export type Row = {
+  empties?: null | string;
+  empty?: boolean;
+  receipt_id: string;
+  ts: string;
+};
 
 type Check = { column: string; sql: string; table: null | string };
 
-const cap = 5000;
 const hour = 3_600_000_000_000n;
 const lookbackNs = 900_000_000_000n;
 const confirmMarginNs = 7n * 86_400_000_000_000n;
@@ -24,23 +28,28 @@ const checks: Record<CheckName, Check> = {
         and r.included_in_block_timestamp < :t1
       where eo.executed_in_block_timestamp >= :t0
         and eo.executed_in_block_timestamp < :t1
-        and r.receipt_id is null
-      limit :cap`,
+        and r.receipt_id is null`,
     table: 'receipts',
   },
   A2: {
     column: 'receipt_included_in_block_timestamp',
-    sql: `select eo.receipt_id, eo.executed_in_block_timestamp as ts,
-        eo.gas_burnt = ${emptyReceiptGas}
-          and eo.status in ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID') as empty
-      from execution_outcomes eo
-      left join action_receipt_actions x on x.receipt_id = eo.receipt_id
-        and x.receipt_included_in_block_timestamp >= :lb
-        and x.receipt_included_in_block_timestamp < :t1
-      where eo.executed_in_block_timestamp >= :t0
-        and eo.executed_in_block_timestamp < :t1
-        and x.receipt_id is null
-      limit :cap`,
+    sql: `with c as materialized (
+        select eo.receipt_id, eo.executed_in_block_timestamp as ts,
+          eo.gas_burnt = ${emptyReceiptGas}
+            and eo.status in ('SUCCESS_VALUE', 'SUCCESS_RECEIPT_ID') as empty
+        from execution_outcomes eo
+        left join action_receipt_actions x on x.receipt_id = eo.receipt_id
+          and x.receipt_included_in_block_timestamp >= :lb
+          and x.receipt_included_in_block_timestamp < :t1
+        where eo.executed_in_block_timestamp >= :t0
+          and eo.executed_in_block_timestamp < :t1
+          and x.receipt_id is null
+      )
+      select receipt_id, ts, empty, null::bigint as empties
+      from c where not empty
+      union all
+      select receipt_id, ts, empty, (select count(*) from c where empty) as empties
+      from (select receipt_id, ts, empty from c where empty order by ts limit 1) s`,
     table: 'action_receipt_actions',
   },
   C: {
@@ -51,8 +60,7 @@ const checks: Record<CheckName, Check> = {
         and receipt_included_in_block_timestamp < :t1
       group by receipt_id
       having count(*) <> max(index_in_action_receipt) + 1
-        or min(index_in_action_receipt) <> 0
-      limit :cap`,
+        or min(index_in_action_receipt) <> 0`,
     table: null,
   },
 };
@@ -100,7 +108,6 @@ const query = (client: Knex, name: CheckName, t0: bigint, t1: bigint) =>
       await trx.raw('set local enable_nestloop = off');
 
       const result = await trx.raw(checks[name].sql, {
-        cap,
         lb: String(t0 - lookbackNs),
         t0: String(t0),
         t1: String(t1),
@@ -110,14 +117,15 @@ const query = (client: Knex, name: CheckName, t0: bigint, t1: bigint) =>
     }),
   );
 
-const confirm = async (client: Knex, name: CheckName, rows: Row[]) => {
-  const { column, table } = checks[name];
-
-  const probe = rows.filter((row) => !row.empty);
-
-  if (!table || !probe.length) return rows;
-
-  const sorted = probe.sort((a, b) => (BigInt(a.ts) < BigInt(b.ts) ? -1 : 1));
+export const findPresent = async (
+  client: Knex,
+  table: string,
+  column: string,
+  rows: Row[],
+) => {
+  const sorted = [...rows].sort((a, b) =>
+    BigInt(a.ts) < BigInt(b.ts) ? -1 : 1,
+  );
   const found = new Set<string>();
 
   for (let i = 0; i < sorted.length; i += 500) {
@@ -142,6 +150,17 @@ const confirm = async (client: Knex, name: CheckName, rows: Row[]) => {
     present.forEach((row) => found.add(row.receipt_id));
   }
 
+  return found;
+};
+
+const confirm = async (client: Knex, name: CheckName, rows: Row[]) => {
+  const { column, table } = checks[name];
+  const probe = rows.filter((row) => !row.empty);
+
+  if (!table || !probe.length) return rows;
+
+  const found = await findPresent(client, table, column, probe);
+
   return rows.filter((row) => row.empty || !found.has(row.receipt_id));
 };
 
@@ -160,7 +179,7 @@ export const scanWindow = async (
     if (!isTimeout(error)) throw error;
   }
 
-  if (!rows || rows.length >= cap) {
+  if (!rows) {
     const width = t1 - t0;
 
     if (width <= minWindowNs) {
@@ -191,5 +210,7 @@ export const findMissing = async (client: Knex, from: bigint, to: bigint) => {
     }
   }
 
-  return new Map([...rows].map(([id, row]) => [id, row.ts]));
+  return new Map(
+    [...rows].filter(([, row]) => !row.empty).map(([id, row]) => [id, row.ts]),
+  );
 };

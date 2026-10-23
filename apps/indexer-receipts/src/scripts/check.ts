@@ -1,7 +1,7 @@
 import { logger } from 'nb-logger';
 
 import { db, dbRead } from '#scripts/db';
-import { CheckName, Row, scanWindow } from '#scripts/findMissing';
+import { CheckName, findPresent, Row, scanWindow } from '#scripts/findMissing';
 import { checkConcurrency } from '#scripts/range';
 import { readSource, Source } from '#scripts/source';
 
@@ -108,24 +108,36 @@ const blockRange = async (
     : null;
 };
 
+const presentItem: Source = { actions: 1, kind: 'Action' };
+const inferredItem: Source = { actions: 0, kind: 'Action' };
+
 const verify = async (found: Found) => {
-  const sampled = [...found.A2]
-    .filter(([, row]) => row.empty)
-    .slice(0, sampleSize)
-    .map(([id]) => id);
+  const withActions = await findPresent(
+    dbRead,
+    'action_receipt_actions',
+    'receipt_included_in_block_timestamp',
+    [...found.A.values()],
+  );
+  const empties = [...found.A2.values()].filter((row) => row.empty);
+  const sampled = empties.slice(0, sampleSize);
   const candidates = new Map<string, string>();
 
-  found.A.forEach((row, id) => candidates.set(id, row.ts));
-  found.A2.forEach((row, id) => {
-    if (!row.empty || sampled.includes(id)) candidates.set(id, row.ts);
+  found.A.forEach((row, id) => {
+    if (!withActions.has(id)) candidates.set(id, row.ts);
   });
+  found.A2.forEach((row, id) => {
+    if (!row.empty) candidates.set(id, row.ts);
+  });
+  sampled.forEach((row) => candidates.set(row.receipt_id, row.ts));
 
-  const source = await readSource(candidates);
-  const confirmed = sampled.every((id) => source.get(id)?.actions === 0);
-  const inferredItem: Source = { actions: 0, kind: 'Action' };
+  const { blocks, items } = await readSource(candidates);
+  const confirmed = sampled.every(
+    (row) => items.get(row.receipt_id)?.actions === 0,
+  );
   const verdict = {
     actions: 0,
     falsePositives: 0,
+    fetched: blocks,
     ids: [] as string[],
     inferred: 0,
     receipts: 0,
@@ -135,12 +147,12 @@ const verify = async (found: Found) => {
 
   const judge = (
     rows: Map<string, Row>,
+    lookup: (row: Row) => Source | undefined,
     isReal: (item: Source) => boolean,
     key: 'actions' | 'receipts',
   ) =>
     rows.forEach((row, id) => {
-      const inferred = Boolean(row.empty) && confirmed && !source.has(id);
-      const item = inferred ? inferredItem : source.get(id);
+      const item = lookup(row);
 
       if (!item) {
         verdict.unverified += 1;
@@ -151,16 +163,37 @@ const verify = async (found: Found) => {
         verdict.stamps.add(row.ts);
       } else {
         verdict.falsePositives += 1;
-        if (inferred) verdict.inferred += 1;
+        if (row.empty && !items.has(id)) verdict.inferred += 1;
       }
     });
 
-  judge(found.A, (item) => item.kind === 'Action', 'receipts');
+  judge(
+    found.A,
+    (row) =>
+      withActions.has(row.receipt_id) ? presentItem : items.get(row.receipt_id),
+    (item) => item.kind === 'Action',
+    'receipts',
+  );
   judge(
     found.A2,
+    (row) =>
+      items.get(row.receipt_id) ??
+      (row.empty && confirmed ? inferredItem : undefined),
     (item) => item.kind === 'Action' && item.actions > 0,
     'actions',
   );
+
+  empties.forEach((row) => {
+    const rest = Number(row.empties) - 1;
+
+    if (confirmed) {
+      verdict.falsePositives += rest;
+      verdict.inferred += rest;
+    } else {
+      verdict.unverified += rest;
+      verdict.stamps.add(row.ts);
+    }
+  });
 
   return verdict;
 };
@@ -249,6 +282,7 @@ export const runReceiptsCheck = async () => {
         {
           day: label,
           falsePositives: verdict.falsePositives,
+          fetched: verdict.fetched,
           inferred: verdict.inferred,
           remaining: days.length - cursorIndex,
           seconds: (Date.now() - started) / 1000,
