@@ -18,7 +18,7 @@ import config from '#config';
 import cursors from '#libs/cursors';
 import { dbBase, dbEvents, pgp } from '#libs/pgp';
 import {
-  cappedCount,
+  countFromEstimate,
   paginateData,
   rollingWindowCount,
   rollingWindowList,
@@ -198,24 +198,39 @@ const txnCount = responseHandler(
     const before = req.validator.before_ts;
 
     const beforeTs = before ? BigInt(before) - 1n : undefined;
-    const count = await rollingWindowCount(
-      (start, end, limit) =>
-        dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
-          before,
-          contract,
-          end,
-          limit,
-          start,
-          token,
-        }),
-      {
-        end: beforeTs,
-        limit: config.maxQueryCount,
-        start: config.eventsStart,
-      },
-    );
 
-    return { data: { count: cappedCount(count, config.maxQueryCount) } };
+    const count = await countFromEstimate({
+      db: dbEvents,
+      exactCount: () =>
+        rollingWindowCount(
+          (start, end, limit) =>
+            dbEvents.one<{ count: string }>(sql.tokens.tokenTxnCount, {
+              before,
+              contract,
+              end,
+              limit,
+              start,
+              token,
+            }),
+          {
+            end: beforeTs,
+            limit: config.maxQueryCount,
+            start: config.eventsStart,
+          },
+        ),
+      limit: config.maxQueryCount,
+      maxCost: config.maxQueryCost,
+      maxRows: config.maxQueryRows,
+      query: sql.tokens.tokenTxnCountEstimate,
+      values: {
+        before: before ?? null,
+        contract,
+        start: config.eventsStart.toString(),
+        token,
+      },
+    });
+
+    return { data: { count } };
   },
 );
 
