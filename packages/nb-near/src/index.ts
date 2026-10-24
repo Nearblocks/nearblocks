@@ -1,7 +1,10 @@
 import axios, { AxiosInstance } from 'axios';
 import { validators } from 'near-api-js';
 
-import { retry } from 'nb-utils';
+import {
+  retry,
+  RpcFailover,
+} from 'nb-utils';
 
 export * from './types.js';
 
@@ -126,7 +129,7 @@ export const checkArchival = async (
     }
   } catch (error) {
     throw new Error(
-      `RPC_URL must point at an archival node, reading block ${blockHeight} ` +
+      `An RPC_URL or RPC_URLS endpoint must provide archival data; reading block ${blockHeight} ` +
         `failed: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
@@ -191,5 +194,68 @@ export class RPC {
       prefix_base64: prefix,
       request_type: 'view_state',
     });
+  }
+}
+
+export type RpcEndpoint = {
+  authToken?: string;
+  name: string;
+  url: string;
+};
+
+export type FailoverRPCOptions = {
+  onFallback?: (error: unknown, endpoint: string) => void;
+  timeoutMs?: number;
+};
+
+const rpcResponseError = (body: Record<string, unknown>): Error => {
+  const message =
+    typeof body.message === 'string' ? body.message : 'JSON-RPC request failed';
+  const error = new Error(message);
+  return Object.assign(error, {
+    code: body.code,
+    data: body.data,
+    error: body,
+    type: body.name,
+  });
+};
+
+/** RPC client with the API's ordered endpoint failover and circuit breaker. */
+export class FailoverRPC extends RPC {
+  private readonly endpoints: RpcEndpoint[];
+  private readonly failover = new RpcFailover();
+  private readonly onFallback?: FailoverRPCOptions['onFallback'];
+  private readonly timeoutMs: number;
+
+  constructor(endpoints: RpcEndpoint[], options: FailoverRPCOptions = {}) {
+    if (!endpoints.length) throw new Error('At least one RPC endpoint is required.');
+    super(endpoints[0]!.url);
+    this.endpoints = endpoints;
+    this.onFallback = options.onFallback;
+    this.timeoutMs = options.timeoutMs ?? 15_000;
+  }
+
+  override async query(params: unknown, method = 'query') {
+    return this.failover.run(
+      this.endpoints.map((endpoint) => ({
+        name: endpoint.name,
+        request: async () => {
+          const response = await axios.post(
+            endpoint.url,
+            { id: 'near', jsonrpc: '2.0', method, params },
+            {
+              headers: endpoint.authToken
+                ? { Authorization: `Bearer ${endpoint.authToken}` }
+                : undefined,
+              timeout: this.timeoutMs,
+            },
+          );
+          const body = response.data as { error?: Record<string, unknown> };
+          if (body?.error) throw rpcResponseError(body.error);
+          return response;
+        },
+      })),
+      this.onFallback,
+    );
   }
 }

@@ -769,6 +769,46 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
+  apps/ft-finder:
+    dependencies:
+      '@sentry/node':
+        specifier: 'catalog:'
+        version: 7.120.0
+      envalid:
+        specifier: 'catalog:'
+        version: 8.1.0
+      nb-knex:
+        specifier: workspace:*
+        version: link:../../packages/nb-knex
+      nb-logger:
+        specifier: workspace:*
+        version: link:../../packages/nb-logger
+      nb-near:
+        specifier: workspace:*
+        version: link:../../packages/nb-near
+      nb-types:
+        specifier: workspace:*
+        version: link:../../packages/nb-types
+      nb-utils:
+        specifier: workspace:*
+        version: link:../../packages/nb-utils
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.0
+      knex:
+        specifier: 'catalog:'
+        version: 3.1.0(pg@8.14.1)(supports-color@8.1.1)
+      nb-tsconfig:
+        specifier: workspace:*
+        version: link:../../packages/nb-tsconfig
+      rimraf:
+        specifier: ~5.0
+        version: 5.0.5
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   apps/frontend:
     dependencies:
       '@aws-sdk/client-ses':
@@ -1686,6 +1726,9 @@ importers:
       axios:
         specifier: 'catalog:'
         version: 1.10.0(debug@4.4.3(supports-color@8.1.1))
+      nb-utils:
+        specifier: workspace:*
+        version: link:../nb-utils
       near-api-js:
         specifier: 4.0.1
         version: 4.0.1(encoding@0.1.13)
@@ -1696,9 +1739,6 @@ importers:
       nb-tsconfig:
         specifier: workspace:*
         version: link:../nb-tsconfig
-      nb-utils:
-        specifier: workspace:*
-        version: link:../nb-utils
       near-lake-framework:
         specifier: 2.0.0
         version: 2.0.0

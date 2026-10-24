@@ -13,12 +13,12 @@
   },
   "dependencies": {
     "axios": "catalog:",
-    "near-api-js": "4.0.1"
+    "near-api-js": "4.0.1",
+    "nb-utils": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "nb-tsconfig": "workspace:*",
-    "nb-utils": "workspace:*",
     "near-lake-framework": "2.0.0",
     "typescript": "catalog:"
   }
