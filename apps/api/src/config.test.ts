@@ -30,11 +30,11 @@ const loadConfig = async (env: Record<string, string>) => {
 describe('RPC endpoints', () => {
   afterEach(() => vi.unstubAllEnvs());
 
-  it('takes a comma-separated RPC_URL in priority order', async () => {
+  it('takes RPC_URLS in priority order', async () => {
     const config = await loadConfig({
       FASTNEAR_API_KEY: 'fast',
       RPC_AUTH_TOKENS: 'node-key,',
-      RPC_URL: 'https://node.example/rpc, https://rpc.example',
+      RPC_URLS: 'https://node.example/rpc, https://rpc.example',
     });
     expect(config.rpcUrls).toEqual([
       'https://node.example/rpc',
@@ -43,7 +43,7 @@ describe('RPC endpoints', () => {
     expect(config.rpcAuthTokens).toEqual(['node-key', '']);
   });
 
-  it('keeps the FastNear fallback for a single RPC_URL', async () => {
+  it('keeps the deprecated single RPC_URL working as before', async () => {
     expect(
       (await loadConfig({ FASTNEAR_API_KEY: 'fast', RPC_URL: 'https://a' }))
         .rpcUrls,
@@ -53,7 +53,7 @@ describe('RPC endpoints', () => {
     ]);
   });
 
-  it('keeps RPC_URLS working, and winning over RPC_URL as before', async () => {
+  it('uses RPC_URLS when the deprecated RPC_URL is also set', async () => {
     expect(
       (await loadConfig({ FASTNEAR_API_KEY: 'fast', RPC_URLS: 'https://a' }))
         .rpcUrls,
@@ -71,7 +71,7 @@ describe('RPC endpoints', () => {
 
   it('requires one auth token per endpoint', async () => {
     await expect(
-      loadConfig({ RPC_AUTH_TOKENS: 'one', RPC_URL: 'https://a,https://b' }),
-    ).rejects.toThrow('one entry per RPC_URL endpoint');
+      loadConfig({ RPC_AUTH_TOKENS: 'one', RPC_URLS: 'https://a,https://b' }),
+    ).rejects.toThrow('one entry per RPC_URLS endpoint');
   });
 });

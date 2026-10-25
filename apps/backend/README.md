@@ -13,7 +13,7 @@ DB_URL_EVENTS=
 NETWORK=
 COINGECKO_API_KEY=
 COINMARKETCAP_API_KEY=
-RPC_URL=
+RPC_URLS=
 ARCHIVAL_RPC_URL=
 
 # Optional
@@ -25,8 +25,8 @@ DATABASE_KEY=
 SENTRY_DSN=
 ```
 
-`RPC_URL` takes one endpoint or a comma-separated list in priority order, with
-matching `RPC_AUTH_TOKENS`. Later endpoints are used when an earlier one fails
-or cannot serve the request. `RPC_URL` need not be archival: NFT metadata that
+`RPC_URLS` lists endpoints in priority order, with matching `RPC_AUTH_TOKENS`
+(`RPC_URL` is deprecated). Later endpoints are used when an earlier one fails
+or cannot serve the request. `RPC_URLS` need not be archival: NFT metadata that
 needs old heights is retried through `ARCHIVAL_RPC_URL`. The hourly `rpc_calls`
 log shows calls per endpoint.
