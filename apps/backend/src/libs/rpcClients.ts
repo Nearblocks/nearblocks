@@ -26,8 +26,28 @@ export type RpcClientOptions = {
   failover?: RpcFailover;
   /** Short pause before the single quick retry on the primary. */
   primaryRetryDelayMs?: number;
-  recordCall?: (path: string, attempt: number, ok: boolean) => void;
+  recordCall?: (
+    path: string,
+    attempt: number,
+    ok: boolean,
+    endpoint: string,
+  ) => void;
   timeoutMs?: number;
+};
+
+/**
+ * A loggable name for an endpoint: host and path only. Query strings are
+ * dropped, as they can carry API keys.
+ */
+export const endpointLabel = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname === '/'
+      ? parsed.host
+      : `${parsed.host}${parsed.pathname}`;
+  } catch {
+    return 'unknown';
+  }
 };
 
 const authorizationHeaders = (authToken: string) =>
@@ -115,6 +135,7 @@ const callPath = (method: string, params: unknown) => {
 class CountedRpcClient extends NearRpcClient {
   private readonly clients: NearRpcClient[];
   private readonly failover: RpcFailover;
+  private readonly labels: string[];
   private readonly options: RpcClientOptions;
 
   constructor(endpoints: RpcEndpoint[], options: RpcClientOptions = {}) {
@@ -125,6 +146,7 @@ class CountedRpcClient extends NearRpcClient {
     });
     Object.assign(this, { retries: 0 });
     this.failover = options.failover ?? new RpcFailover();
+    this.labels = endpoints.map(({ url }) => endpointLabel(url));
     this.options = options;
     this.clients = endpoints.map(({ authToken, url }) => {
       const client = new NearRpcClient({
@@ -158,10 +180,10 @@ class CountedRpcClient extends NearRpcClient {
                 method,
                 params,
               );
-              recordCall(path, attempt, true);
+              recordCall(path, attempt, true, this.labels[index]);
               return result;
             } catch (error) {
-              recordCall(path, attempt, false);
+              recordCall(path, attempt, false, this.labels[index]);
               const delay = retryDelayMs(
                 index,
                 this.clients.length,
@@ -183,11 +205,13 @@ class CountedRpcClient extends NearRpcClient {
 class CountedAxiosRpc extends NearRPC {
   private readonly clients: NearRPC[];
   private readonly failover: RpcFailover;
+  private readonly labels: string[];
   private readonly options: RpcClientOptions;
 
   constructor(endpoints: RpcEndpoint[], options: RpcClientOptions = {}) {
     super(endpoints[0].url);
     this.failover = options.failover ?? new RpcFailover();
+    this.labels = endpoints.map(({ url }) => endpointLabel(url));
     this.options = options;
     this.clients = endpoints.map(({ authToken, url }) => {
       const client = new NearRPC(url);
@@ -217,7 +241,7 @@ class CountedAxiosRpc extends NearRPC {
               try {
                 const response = await client.query(params, method);
                 const body = response.data as { error?: unknown } | undefined;
-                recordCall(path, attempt, !body?.error);
+                recordCall(path, attempt, !body?.error, this.labels[index]);
                 // The node answers 200 with a JSON-RPC error when it lacks
                 // the block, times out or is not synced; let the next
                 // endpoint try, without penalty.
@@ -226,7 +250,7 @@ class CountedAxiosRpc extends NearRPC {
                 return response;
               } catch (error) {
                 if (error instanceof SoftAnswerResponse) throw error;
-                recordCall(path, attempt, false);
+                recordCall(path, attempt, false, this.labels[index]);
                 const delay = retryDelayMs(
                   index,
                   this.clients.length,

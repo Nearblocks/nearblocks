@@ -19,7 +19,6 @@ REDIS_SENTINEL_NAME=
 REDIS_SENTINEL_URLS=
 REDIS_PASSWORD=
 RPC_URL=
-RPC_URLS=
 RPC_AUTH_TOKENS=
 NETWORK=
 MAINNET_URL=
@@ -33,7 +32,6 @@ REDIS_URL=
 SENTRY_DSN=
 ```
 
-`RPC_URLS` lists RPC endpoints in priority order (for example the block proxy's
-`/rpc`, then FastNear); `RPC_AUTH_TOKENS` holds matching Bearer tokens, with an
-empty entry for none. Later endpoints are used only when an earlier one is
-unreachable or returns 408, 429 or 5xx. `RPC_URL` still works for one endpoint.
+`RPC_URL` takes one endpoint or a comma-separated list in priority order, with
+matching `RPC_AUTH_TOKENS`. Later endpoints are used when an earlier one fails
+or cannot serve the request. No endpoint needs to be archival.

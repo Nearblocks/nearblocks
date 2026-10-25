@@ -1,22 +1,18 @@
 import { logger } from 'nb-logger';
 
 import config from '#config';
+import { endpointLabel } from '#libs/rpcClients';
 
 type Tally = { errors: number; ok: number; retries: number };
 
 const MINUTE_MS = 60000;
 
 const tallies = new Map<string, Tally>();
+// Which endpoint answered: shows how much the primary serves and how much
+// falls through to later RPC_URLS entries.
+const endpointTallies = new Map<string, Omit<Tally, 'retries'>>();
 
-const endpoint = (() => {
-  try {
-    const url = new URL(config.rpcUrl);
-
-    return url.pathname === '/' ? url.host : `${url.host}${url.pathname}`;
-  } catch {
-    return 'unknown';
-  }
-})();
+const endpoint = endpointLabel(config.rpcUrl);
 
 let job = 'backend';
 let windowStart = Date.now();
@@ -25,8 +21,24 @@ export const setRpcJob = (name: string) => {
   job = name;
 };
 
-export const recordRpcCall = (path: string, attempt: number, ok: boolean) => {
+export const recordRpcCall = (
+  path: string,
+  attempt: number,
+  ok: boolean,
+  endpointName: string,
+) => {
   const tally = tallies.get(path) ?? { errors: 0, ok: 0, retries: 0 };
+  const endpointTally = endpointTallies.get(endpointName) ?? {
+    errors: 0,
+    ok: 0,
+  };
+
+  if (ok) {
+    endpointTally.ok += 1;
+  } else {
+    endpointTally.errors += 1;
+  }
+  endpointTallies.set(endpointName, endpointTally);
 
   if (ok) {
     tally.ok += 1;
@@ -60,6 +72,7 @@ const emit = (final: boolean) => {
       {
         asOf: new Date().toISOString(),
         endpoint,
+        endpoints: Object.fromEntries(endpointTallies),
         final,
         job,
         paths: Object.fromEntries(paths),
@@ -75,6 +88,7 @@ const emit = (final: boolean) => {
 
   if (final) {
     tallies.clear();
+    endpointTallies.clear();
     windowStart = Date.now();
   }
 };
