@@ -8,12 +8,15 @@ import {
   sleep,
 } from 'nb-utils';
 
+import { recordRpcAttempt } from '#libs/promMetrics';
+
 export const RPC_REQUEST_TIMEOUT_MS = 15_000;
 const RPC_RETRIES = 3;
 const PRIMARY_RETRY_DELAY_MS = 300;
 
 export type RpcEndpoint = {
   authToken: string;
+  name?: string;
   url: string;
 };
 
@@ -173,34 +176,53 @@ export class FailoverJsonRpcProvider extends providers.JsonRpcProvider {
 
   async sendJsonRpc<T>(method: string, params: object): Promise<T> {
     return this.failover.run(
-      this.endpoints.map((endpoint, index) => ({
-        name: `rpc-${index}`,
-        request: async () => {
-          const single = this.endpoints.length === 1;
-          const baseMs =
-            this.retryDelayMs ?? (single ? 1000 : PRIMARY_RETRY_DELAY_MS);
-          for (let attempt = 1; ; attempt++) {
-            try {
-              return (await postJsonRpc(
-                endpoint,
-                method,
-                params,
-                this.timeoutMs,
-              )) as T;
-            } catch (error) {
-              const delay = retryDelay(
-                index,
-                this.endpoints.length,
-                error,
-                attempt,
-                baseMs,
-              );
-              if (delay === undefined) throw error;
-              await sleep(delay);
+      this.endpoints.map((endpoint, index) => {
+        const endpointName =
+          endpoint.name ?? (index === 0 ? 'primary' : `fallback_${index}`);
+
+        return {
+          name: endpointName,
+          request: async () => {
+            const single = this.endpoints.length === 1;
+            const baseMs =
+              this.retryDelayMs ?? (single ? 1000 : PRIMARY_RETRY_DELAY_MS);
+            for (let attempt = 1; ; attempt++) {
+              const startedAt = process.hrtime.bigint();
+              try {
+                const result = await postJsonRpc(
+                  endpoint,
+                  method,
+                  params,
+                  this.timeoutMs,
+                );
+                recordRpcAttempt(
+                  endpointName,
+                  method,
+                  'success',
+                  Number(process.hrtime.bigint() - startedAt) / 1e9,
+                );
+                return result as T;
+              } catch (error) {
+                recordRpcAttempt(
+                  endpointName,
+                  method,
+                  'error',
+                  Number(process.hrtime.bigint() - startedAt) / 1e9,
+                );
+                const delay = retryDelay(
+                  index,
+                  this.endpoints.length,
+                  error,
+                  attempt,
+                  baseMs,
+                );
+                if (delay === undefined) throw error;
+                await sleep(delay);
+              }
             }
-          }
-        },
-      })),
+          },
+        };
+      }),
       this.onFallback,
     );
   }

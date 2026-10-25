@@ -10,7 +10,9 @@ import * as v from 'valibot';
 
 import apiDocumentation from '#libs/apiDocumentation';
 import logger from '#libs/logger';
+import { register as metricsRegister } from '#libs/promMetrics';
 import sentry from '#libs/sentry';
+import internalOnly from '#middlewares/internalOnly';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import { usageEvents } from '#middlewares/usageEvents';
 import routes from '#routes/index';
@@ -58,6 +60,14 @@ passport.use(anonymousStrategy);
 
 app.set('trust proxy', 2);
 app.get('/ip', (req, res) => res.send(req.ip));
+app.get('/metrics', internalOnly, async (_req, res, next) => {
+  try {
+    res.setHeader('Content-Type', metricsRegister.contentType);
+    res.end(await metricsRegister.metrics());
+  } catch (error) {
+    next(error);
+  }
+});
 
 app.use(usageEvents);
 

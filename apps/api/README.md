@@ -35,3 +35,7 @@ SENTRY_DSN=
 `RPC_URLS` lists endpoints in priority order, with matching `RPC_AUTH_TOKENS`
 (`RPC_URL` is deprecated). Later endpoints are used when an earlier one fails
 or cannot serve the request. No endpoint needs to be archival.
+
+The internal `GET /metrics` endpoint exports RPC request counters, latency
+histograms and fallbacks by reason. Endpoints are labelled `primary` and
+`fallback_N`; URLs and credentials are never exported.

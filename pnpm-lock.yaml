@@ -427,6 +427,9 @@ importers:
       pg-promise:
         specifier: 11.14.0
         version: 11.14.0(pg-query-stream@4.8.1(pg@8.13.1))
+      prom-client:
+        specifier: 'catalog:'
+        version: 15.1.3
       pino:
         specifier: 'catalog:'
         version: 9.6.0

@@ -10,6 +10,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { RpcFailover } from 'nb-utils';
 
+import { rpcRequests } from '#libs/promMetrics';
+
 import { FailoverJsonRpcProvider } from './failoverProvider.js';
 
 type Handler = (req: IncomingMessage, res: ServerResponse) => void;
@@ -92,6 +94,7 @@ describe('FailoverJsonRpcProvider with real servers', () => {
   });
 
   it('falls over when the primary returns 503', async () => {
+    rpcRequests.reset();
     const primary = await start(jsonRpc({ error: 'unavailable' }, 503));
     const fallback = await start(ok({ from: 'fallback' }));
     const started = Date.now();
@@ -101,6 +104,25 @@ describe('FailoverJsonRpcProvider with real servers', () => {
     );
     expect(result).toEqual({ from: 'fallback' });
     expect(Date.now() - started).toBeLessThan(TIMEOUT_MS + 1000);
+
+    const metric = await rpcRequests.get();
+    expect(metric.values).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          // The primary gets one quick retry before falling over.
+          labels: { endpoint: 'primary', method: 'status', result: 'error' },
+          value: 2,
+        }),
+        expect.objectContaining({
+          labels: {
+            endpoint: 'fallback_1',
+            method: 'status',
+            result: 'success',
+          },
+          value: 1,
+        }),
+      ]),
+    );
   });
 
   it('falls over when the primary returns a non-JSON 502', async () => {
