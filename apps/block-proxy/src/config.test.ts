@@ -109,3 +109,39 @@ describe('defaults and retired settings', () => {
     ).rejects.toThrow('nothing would be compared');
   });
 });
+
+describe('client keys', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('parses named keys and keeps PROXY_API_KEY as the default client', async () => {
+    const config = await loadConfig({
+      PROXY_API_KEY: 'legacy',
+      PROXY_API_KEYS: 'backend:b-key, api:a-key',
+    });
+    expect(config.proxyClients).toEqual([
+      { key: 'b-key', name: 'backend' },
+      { key: 'a-key', name: 'api' },
+      { key: 'legacy', name: 'default' },
+    ]);
+  });
+
+  it('does not add PROXY_API_KEY twice when it is also named', async () => {
+    const config = await loadConfig({
+      PROXY_API_KEY: 'a-key',
+      PROXY_API_KEYS: 'api:a-key',
+    });
+    expect(config.proxyClients).toEqual([{ key: 'a-key', name: 'api' }]);
+  });
+
+  it.each([
+    ['missing key', 'backend:'],
+    ['missing name', ':key'],
+    ['bad name', 'Back End:key'],
+    ['duplicate name', 'api:one,api:two'],
+    ['duplicate key', 'api:same,backend:same'],
+  ])('refuses %s', async (_case, value) => {
+    await expect(loadConfig({ PROXY_API_KEYS: value })).rejects.toThrow(
+      'PROXY_API_KEYS',
+    );
+  });
+});

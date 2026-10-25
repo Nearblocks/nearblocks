@@ -118,6 +118,8 @@ const env = cleanEnv(process.env, {
   NODE_RPC_URL: str({ default: 'http://127.0.0.1:3030' }),
   PORT: port({ default: 3000 }),
   PROXY_API_KEY: str({ default: '' }),
+  // Named client keys, `name:key,...`; the name labels usage metrics.
+  PROXY_API_KEYS: str({ default: '' }),
   RPC_ALLOWED_METHODS: str({ default: DEFAULT_RPC_ALLOWED_METHODS }),
   // Compare served blocks with this source in the background (see README).
   SHADOW_SAMPLE_RATE: num({ default: 1 }),
@@ -218,6 +220,34 @@ if (blockSources.includes('node') && !env.CACHE_ENABLED) {
   throw new Error('local indexer requires persistent disk caching');
 }
 
+// One key per client, so each can be rotated alone and its usage seen in
+// metrics. PROXY_API_KEY stays a single key named "default".
+const CLIENT_NAME = /^[a-z0-9][a-z0-9_-]{0,31}$/;
+const proxyClients = env.PROXY_API_KEYS.split(',')
+  .map((entry) => entry.trim())
+  .filter(Boolean)
+  .map((entry) => {
+    const separator = entry.indexOf(':');
+    const name = entry.slice(0, separator).trim();
+    const key = entry.slice(separator + 1).trim();
+    if (separator < 1 || !CLIENT_NAME.test(name) || !key)
+      throw new Error(
+        'PROXY_API_KEYS entries must be name:key, with a lowercase name.',
+      );
+    return { key, name };
+  });
+if (
+  env.PROXY_API_KEY &&
+  !proxyClients.some((client) => client.key === env.PROXY_API_KEY)
+)
+  proxyClients.push({ key: env.PROXY_API_KEY, name: 'default' });
+if (
+  new Set(proxyClients.map((client) => client.name)).size !==
+    proxyClients.length ||
+  new Set(proxyClients.map((client) => client.key)).size !== proxyClients.length
+)
+  throw new Error('PROXY_API_KEYS names and keys must be unique.');
+
 const rpcAllowedMethods = env.RPC_ALLOWED_METHODS.split(',')
   .map((method) => method.trim())
   .filter(Boolean);
@@ -256,6 +286,7 @@ const config = {
   nodeRpcUrl: env.NODE_RPC_URL,
   port: env.PORT,
   proxyApiKey: env.PROXY_API_KEY,
+  proxyClients,
   proxyUpstreamApiKey: env.BLOCK_PROXY_UPSTREAM_API_KEY,
   proxyUpstreamBaseUrl: env.BLOCK_PROXY_UPSTREAM_URL,
   rpcAllowedMethods,
@@ -296,6 +327,7 @@ export function logConfigSummary(): void {
       nodeIndexerEnabled: config.nodeIndexerEnabled,
       nodeMaxLagSecs: config.nodeMaxLagSecs,
       port: config.port,
+      proxyClients: config.proxyClients.map((client) => client.name),
       proxyUpstreamApiKey: mask(config.proxyUpstreamApiKey),
       proxyUpstreamUrl: config.proxyUpstreamBaseUrl || '<unset>',
       shadowSampleRate: config.shadowSampleRate,
