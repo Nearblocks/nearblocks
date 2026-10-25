@@ -18,7 +18,7 @@ DB_WRITE_URL_BASE=
 REDIS_SENTINEL_NAME=
 REDIS_SENTINEL_URLS=
 REDIS_PASSWORD=
-RPC_URL=
+RPC_URLS=
 RPC_AUTH_TOKENS=
 NETWORK=
 MAINNET_URL=
@@ -32,6 +32,6 @@ REDIS_URL=
 SENTRY_DSN=
 ```
 
-`RPC_URL` takes one endpoint or a comma-separated list in priority order, with
-matching `RPC_AUTH_TOKENS`. Later endpoints are used when an earlier one fails
+`RPC_URLS` lists endpoints in priority order, with matching `RPC_AUTH_TOKENS`
+(`RPC_URL` is deprecated). Later endpoints are used when an earlier one fails
 or cannot serve the request. No endpoint needs to be archival.
