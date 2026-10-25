@@ -19,7 +19,6 @@
     "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json ."
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "catalog:",
     "envalid": "catalog:",
     "express": "catalog:",
     "nb-logger": "workspace:*",

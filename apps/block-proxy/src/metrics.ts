@@ -77,3 +77,74 @@ export const tipHeight = new client.Gauge({
   name: 'block_proxy_tip_height',
   registers: [register],
 });
+
+export const indexerHead = new client.Gauge({
+  help: 'Local node finalized head height',
+  name: 'block_proxy_indexer_head_height',
+  registers: [register],
+});
+export const indexerPublished = new client.Gauge({
+  help: 'Last durably published local enriched block height',
+  name: 'block_proxy_indexer_published_height',
+  registers: [register],
+});
+export const indexerHeadAge = new client.Gauge({
+  help: 'Local finalized head age at last poll in seconds',
+  name: 'block_proxy_indexer_head_age_seconds',
+  registers: [register],
+});
+export const indexerPending = new client.Gauge({
+  help: 'In-memory receipt origin entries including short executed retention',
+  name: 'block_proxy_indexer_receipt_entries',
+  registers: [register],
+});
+export const indexerHealthy = new client.Gauge({
+  help: 'Whether local ingestion last completed without error',
+  name: 'block_proxy_indexer_healthy',
+  registers: [register],
+});
+export const indexerErrors = new client.Counter({
+  help: 'Local ingestion errors; HTTP fallback remains independent',
+  name: 'block_proxy_indexer_errors_total',
+  registers: [register],
+});
+export const indexerHeadTimestamp = new client.Gauge({
+  help: 'Local finalized head timestamp; use time() minus this for age',
+  name: 'block_proxy_indexer_head_timestamp_seconds',
+  registers: [register],
+});
+export const indexerPublishedTimestamp = new client.Gauge({
+  help: 'Local published block timestamp; use time() minus this for age',
+  name: 'block_proxy_indexer_published_timestamp_seconds',
+  registers: [register],
+});
+export const nodeInSync = new client.Gauge({
+  help: 'Whether the local node is healthy and its finalized head is within the allowed lag (1) or not (0)',
+  name: 'block_proxy_node_in_sync',
+  registers: [register],
+});
+
+export const indexerReanchors = new client.Counter({
+  help: 'Times the local indexer restarted at the node head, leaving earlier heights to remote sources',
+  name: 'block_proxy_indexer_reanchors_total',
+  registers: [register],
+});
+
+export const shadowComparisons = new client.Counter({
+  help: 'Shadow block comparisons by result (match, mismatch, unavailable, error, skipped)',
+  labelNames: ['result', 'source'] as const,
+  name: 'block_proxy_shadow_comparisons_total',
+  registers: [register],
+});
+
+export const shadowLastMismatchHeight = new client.Gauge({
+  help: 'Highest block height whose shadow comparison found a difference',
+  name: 'block_proxy_shadow_last_mismatch_height',
+  registers: [register],
+});
+
+export const proxyNullOverridden = new client.Counter({
+  help: 'Heights the upstream proxy reported as skipped (null) but a later source served as a block',
+  name: 'block_proxy_proxy_null_overridden_total',
+  registers: [register],
+});
