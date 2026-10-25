@@ -36,9 +36,8 @@ const options: SWRConfiguration = {
 };
 
 export const useView = <T = unknown>(params: null | ViewParams) => {
-  const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const provider = useConfig((s) => s.config.provider);
 
   const shouldFetch = hydrated && params;
   const key = shouldFetch
@@ -58,7 +57,7 @@ export const useView = <T = unknown>(params: null | ViewParams) => {
       if (!params) throw new Error('Missing required params');
 
       return viewFunction<T>(
-        provider || defaultProvider,
+        provider,
         params.contract,
         params.method,
         params.args ?? {},
@@ -71,9 +70,8 @@ export const useView = <T = unknown>(params: null | ViewParams) => {
 };
 
 export const useBatchView = <T = unknown>(params: BatchViewParams | null) => {
-  const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const provider = useConfig((s) => s.config.provider);
 
   const shouldFetch = hydrated && params;
   const key = shouldFetch
@@ -97,7 +95,7 @@ export const useBatchView = <T = unknown>(params: BatchViewParams | null) => {
       return Promise.all(
         params.map((call) =>
           viewFunction<T>(
-            provider || defaultProvider,
+            provider,
             call.contract,
             call.method,
             call.args ?? {},
@@ -112,14 +110,13 @@ export const useBatchView = <T = unknown>(params: BatchViewParams | null) => {
 };
 
 export const useViewMutation = <T = unknown>() => {
-  const provider = useSettings((s) => s.provider);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const provider = useConfig((s) => s.config.provider);
 
   return useSWRMutation<T, Error, string, ViewParams>(
     'rpc-mutation',
     async (_key, { arg }) => {
       const text = await viewFunctionText(
-        provider || defaultProvider,
+        provider,
         arg.contract,
         arg.method,
         arg.args ?? {},
@@ -138,9 +135,8 @@ type TxnStatusParams = {
 } | null;
 
 export const useTxnStatus = (params: TxnStatusParams) => {
-  const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const provider = useConfig((s) => s.config.provider);
 
   const shouldFetch = hydrated && params;
   const key = shouldFetch
@@ -152,11 +148,7 @@ export const useTxnStatus = (params: TxnStatusParams) => {
     async () => {
       if (!params) throw new Error('Missing required params');
 
-      return txnStatus(
-        provider || defaultProvider,
-        params.txHash,
-        params.senderAccountId,
-      );
+      return txnStatus(provider, params.txHash, params.senderAccountId);
     },
     options,
   );
