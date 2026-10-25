@@ -10,7 +10,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { RpcFailover } from 'nb-utils';
 
-import { CountedAxiosRpc, CountedRpcClient } from './rpcClients.js';
+import {
+  CountedAxiosRpc,
+  CountedRpcClient,
+  endpointLabel,
+} from './rpcClients.js';
 
 type Handler = (req: IncomingMessage, res: ServerResponse) => void;
 
@@ -343,5 +347,48 @@ describe('CountedAxiosRpc with real servers', () => {
     );
     expect(response.data.error.cause.name).toBe('UNKNOWN_ACCOUNT');
     expect(fallbackCalls).toBe(0);
+  });
+});
+
+describe('endpoint accounting', () => {
+  it('labels endpoints by host and path, never the query string', () => {
+    expect(endpointLabel('https://rpc.example/mainnet/rpc?apiKey=secret')).toBe(
+      'rpc.example/mainnet/rpc',
+    );
+    expect(endpointLabel('https://rpc.example/?apiKey=secret')).toBe(
+      'rpc.example',
+    );
+    expect(endpointLabel('not a url')).toBe('unknown');
+  });
+
+  it('credits the endpoint that answered after a missing-history fallback', async () => {
+    const primary = await start(unknownBlock);
+    const fallback = await start(ok({ from: 'fallback' }));
+    const calls: Array<[boolean, string]> = [];
+    const recordCall = (
+      _path: string,
+      _attempt: number,
+      success: boolean,
+      endpoint: string,
+    ) => calls.push([success, endpoint]);
+    const axiosClient = new CountedAxiosRpc(endpoints(primary, fallback), {
+      ...options(),
+      recordCall,
+    });
+    await axiosClient.query({ finality: 'final' }, 'block');
+    const rpcClient = new CountedRpcClient(endpoints(primary, fallback), {
+      ...options(),
+      recordCall,
+    });
+    await rpcClient.makeRequest('block', { finality: 'final' });
+    const [primaryLabel, fallbackLabel] = [primary, fallback].map(
+      endpointLabel,
+    );
+    expect(calls).toEqual([
+      [false, primaryLabel],
+      [true, fallbackLabel],
+      [false, primaryLabel],
+      [true, fallbackLabel],
+    ]);
   });
 });

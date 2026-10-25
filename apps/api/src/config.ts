@@ -1,5 +1,6 @@
 import { cleanEnv, num, str, url } from 'envalid';
 
+import { logger } from 'nb-logger';
 import { Network } from 'nb-types';
 
 import { Config } from '#types/types';
@@ -73,21 +74,37 @@ const fastNearRpcFallback = () => {
 
   return `https://archival-rpc.${env.NETWORK}.fastnear.com`;
 };
-const rpcUrls = env.RPC_URLS
-  ? env.RPC_URLS.split(',')
-      .map((value) => value.trim())
-      .filter(Boolean)
-  : [env.RPC_URL, fastNearRpcFallback()].filter(
-      (value): value is string => !!value,
-    );
-if (!rpcUrls.length) throw new Error('Set RPC_URL or RPC_URLS.');
+const splitList = (value: string) =>
+  value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+// RPC_URL takes one endpoint or a comma-separated list in priority order.
+// RPC_URLS is its older alias and, as before, wins when both are set.
+if (
+  env.RPC_URL &&
+  env.RPC_URLS &&
+  splitList(env.RPC_URL).join() !== splitList(env.RPC_URLS).join()
+) {
+  logger.warn('RPC_URL and RPC_URLS disagree; using RPC_URLS.');
+}
+const configuredRpcUrls = splitList(env.RPC_URLS || env.RPC_URL);
+// A single RPC_URL keeps the FastNear archival fallback FASTNEAR_API_KEY
+// adds, as before; a list (or the RPC_URLS alias) is used exactly as given.
+const rpcUrls =
+  !env.RPC_URLS && configuredRpcUrls.length === 1
+    ? [configuredRpcUrls[0], fastNearRpcFallback()].filter(
+        (value): value is string => !!value,
+      )
+    : configuredRpcUrls;
+if (!rpcUrls.length) throw new Error('Set RPC_URL.');
 if (new Set(rpcUrls).size !== rpcUrls.length) {
-  throw new Error('RPC_URLS must not contain duplicate endpoints.');
+  throw new Error('RPC_URL must not contain duplicate endpoints.');
 }
 for (const endpoint of rpcUrls) {
   const url = new URL(endpoint);
   if (!['http:', 'https:'].includes(url.protocol)) {
-    throw new Error('RPC_URLS endpoints must use HTTP or HTTPS.');
+    throw new Error('RPC_URL endpoints must use HTTP or HTTPS.');
   }
 }
 const rpcAuthTokens = env.RPC_AUTH_TOKENS
@@ -99,7 +116,7 @@ const rpcAuthTokens = env.RPC_AUTH_TOKENS
         : '',
     );
 if (rpcAuthTokens.length !== rpcUrls.length) {
-  throw new Error('RPC_AUTH_TOKENS must have one entry per RPC_URLS endpoint.');
+  throw new Error('RPC_AUTH_TOKENS must have one entry per RPC_URL endpoint.');
 }
 
 const config: Config = {
