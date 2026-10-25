@@ -673,9 +673,6 @@ importers:
 
   apps/block-proxy:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: 'catalog:'
-        version: 3.750.0
       envalid:
         specifier: 'catalog:'
         version: 8.1.0

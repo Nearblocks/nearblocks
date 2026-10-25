@@ -1,18 +1,19 @@
 import { CacheStore } from '#cache/index';
 import type { Config } from '#config';
+import type { LocalIndexer } from '#indexer/index';
+import { ShadowComparator } from '#shadow';
 import { StatsCollector } from '#stats';
-import { FastnearUpstream } from '#upstream/fastnear';
-import { S3Upstream } from '#upstream/s3';
+import { BlockProxyUpstream, NeardataUpstream } from '#upstream/neardata';
 
 export interface AppState {
+  blockProxy: BlockProxyUpstream;
   cache: CacheStore;
   config: Config;
   dedup: Map<string, Promise<{ bytes: Buffer; source: string }>>;
-  fastnear: FastnearUpstream;
-  fastnearEnabled: boolean;
+  localIndexer: LocalIndexer | null;
+  neardata: NeardataUpstream;
   ready: boolean;
-  s3: null | S3Upstream;
-  s3Enabled: boolean;
+  shadow: null | ShadowComparator;
   startTime: number;
   stats: StatsCollector;
   tipHeight: number;
@@ -21,18 +22,18 @@ export interface AppState {
 
 export function createAppState(config: Config): AppState {
   const cache = new CacheStore(config);
-  const fastnear = new FastnearUpstream(config);
-  const s3 = S3Upstream.create(config);
+  const blockProxy = new BlockProxyUpstream(config);
+  const neardata = new NeardataUpstream(config);
 
   return {
+    blockProxy,
     cache,
     config,
     dedup: new Map(),
-    fastnear,
-    fastnearEnabled: config.fastnearEnabled,
+    localIndexer: null,
+    neardata,
     ready: false,
-    s3,
-    s3Enabled: config.s3Enabled && s3 !== null,
+    shadow: ShadowComparator.create(config, { neardata, proxy: blockProxy }),
     startTime: Date.now(),
     stats: new StatsCollector(),
     tipHeight: 0,

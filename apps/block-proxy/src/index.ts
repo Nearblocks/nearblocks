@@ -4,6 +4,7 @@ import { logger } from 'nb-logger';
 
 import { createAdminServer } from '#admin';
 import config, { logConfigSummary } from '#config';
+import { LocalIndexer } from '#indexer/index';
 import { createDataServer } from '#server';
 import { createAppState } from '#state';
 
@@ -36,6 +37,10 @@ if (config.cacheEnabled) {
   state.cache.ensureDir();
 }
 
+if (config.nodeIndexerEnabled) {
+  state.localIndexer = new LocalIndexer(config);
+}
+
 const dataApp = createDataServer(state);
 const adminApp = createAdminServer(state);
 
@@ -44,16 +49,19 @@ const adminServer = http.createServer(adminApp);
 
 // Wait for both servers to bind before marking ready
 const dataReady = new Promise<void>((resolve) =>
-  dataServer.listen(config.port, '0.0.0.0', () => {
-    logger.info({ addr: `0.0.0.0:${config.port}` }, 'data server listening');
+  dataServer.listen(config.port, config.listenHost, () => {
+    logger.info(
+      { addr: `${config.listenHost}:${config.port}` },
+      'data server listening',
+    );
     resolve();
   }),
 );
 
 const adminReady = new Promise<void>((resolve) =>
-  adminServer.listen(config.adminPort, '0.0.0.0', () => {
+  adminServer.listen(config.adminPort, config.adminListenHost, () => {
     logger.info(
-      { addr: `0.0.0.0:${config.adminPort}` },
+      { addr: `${config.adminListenHost}:${config.adminPort}` },
       'admin server listening',
     );
     resolve();
@@ -89,6 +97,7 @@ const onSignal = (signal: string) => {
   forceTimer.unref();
 
   const closePromises = [
+    state.localIndexer?.stop() ?? Promise.resolve(),
     new Promise<void>((resolve) => dataServer.close(() => resolve())),
     new Promise<void>((resolve) => adminServer.close(() => resolve())),
   ];
