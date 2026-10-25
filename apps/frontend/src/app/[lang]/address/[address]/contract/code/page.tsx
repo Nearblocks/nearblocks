@@ -1,11 +1,11 @@
 /* eslint-disable nb/require-hold-nav -- data is fully awaited before render (no streaming boundary), so the segment holds implicitly */
-import { NearRpcClient, viewFunctionAsJson } from '@near-js/jsonrpc-client';
 import { redirect } from 'next/navigation';
 
 import { ContractCode } from '@/components/address/contract/code';
 import { fetchContract } from '@/data/address/contract';
-import { getRuntimeConfig, getServerConfig } from '@/lib/config';
+import { getRuntimeConfig } from '@/lib/config';
 import { encodeArgs } from '@/lib/rpc';
+import { relayRpc } from '@/lib/rpc-upstream';
 import {
   ContractSourceMetadata,
   ContractVerifierResponse,
@@ -22,24 +22,28 @@ const view = async <T,>(
   method: string,
   args: unknown,
 ): Promise<null | T> => {
-  const config = getServerConfig();
-  // This page fully awaits, so a hanging upstream would block TTFB — cap the
-  // lookup instead of riding the client's 30s default with retries.
-  const client = new NearRpcClient({
-    endpoint: config.RPC_UPSTREAM_URL,
-    retries: 1,
-    timeout: 5_000,
-    ...(config.RPC_UPSTREAM_KEY
-      ? { headers: { Authorization: `Bearer ${config.RPC_UPSTREAM_KEY}` } }
-      : {}),
-  });
-
   try {
-    return await viewFunctionAsJson<T>(client, {
-      accountId: contract,
-      argsBase64: encodeArgs(args),
-      methodName: method,
-    });
+    // This page fully awaits, so cap each upstream attempt to bound TTFB.
+    const { body } = await relayRpc(
+      JSON.stringify({
+        id: 'nearblocks',
+        jsonrpc: '2.0',
+        method: 'query',
+        params: {
+          account_id: contract,
+          args_base64: encodeArgs(args),
+          finality: 'final',
+          method_name: method,
+          request_type: 'call_function',
+        },
+      }),
+      false,
+      5_000,
+    );
+    const bytes = (JSON.parse(body) as { result?: { result?: number[] } })
+      .result?.result;
+
+    return bytes ? (JSON.parse(Buffer.from(bytes).toString()) as T) : null;
   } catch {
     // Non-NEP-330 contracts don't expose these methods; treat as unverified.
     return null;

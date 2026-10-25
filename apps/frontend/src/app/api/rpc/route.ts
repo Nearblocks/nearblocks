@@ -7,6 +7,7 @@ import {
   verifySessionToken,
 } from '@/lib/rpc-auth';
 import { RPC_SESSION_ERROR_CODE } from '@/lib/rpc-session';
+import { relayRpc } from '@/lib/rpc-upstream';
 
 const ALLOWED_METHODS = new Set([
   'EXPERIMENTAL_protocol_config',
@@ -96,31 +97,14 @@ export const POST = async (request: NextRequest) => {
       body.params !== null &&
       'block_id' in body.params);
 
-  const upstreamUrl =
-    needsArchival && config.RPC_UPSTREAM_ARCHIVAL_URL
-      ? config.RPC_UPSTREAM_ARCHIVAL_URL
-      : config.RPC_UPSTREAM_URL;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (config.RPC_UPSTREAM_KEY) {
-    headers.Authorization = `Bearer ${config.RPC_UPSTREAM_KEY}`;
-  }
-
-  let upstream: Response;
   try {
-    upstream = await fetch(upstreamUrl, {
-      body: raw,
-      headers,
-      method: 'POST',
+    const result = await relayRpc(raw, needsArchival);
+
+    return new NextResponse(result.body, {
+      headers: { 'Content-Type': 'application/json' },
+      status: result.status,
     });
   } catch {
     return rpcError(body?.id, 502, -32603, 'Upstream RPC unavailable');
   }
-
-  return new NextResponse(upstream.body, {
-    headers: { 'Content-Type': 'application/json' },
-    status: upstream.status,
-  });
 };
