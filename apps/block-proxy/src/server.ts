@@ -72,6 +72,16 @@ function keyMatches(actual: string | undefined, expected: string): boolean {
   );
 }
 
+/** Client keys; PROXY_API_KEY alone is a single client named "default". */
+function proxyClients(
+  config: AppState['config'],
+): Array<{ key: string; name: string }> {
+  return (
+    config.proxyClients ??
+    (config.proxyApiKey ? [{ key: config.proxyApiKey, name: 'default' }] : [])
+  );
+}
+
 function upstreamRedirectLocation(
   req: express.Request,
   location: string,
@@ -128,7 +138,7 @@ function typedHeightError(
 
 type RpcRequestCheck =
   | { batch: boolean; ids: unknown[]; ok: false; reason: 'not-allowed' }
-  | { body: Buffer; ok: true }
+  | { body: Buffer; method: string; ok: true }
   | { ok: false; reason: 'invalid' };
 
 /** Validate the JSON-RPC body against the method allowlist. */
@@ -159,7 +169,12 @@ function checkRpcRequest(body: Buffer, allowed: Set<string>): RpcRequestCheck {
   // Forward what was checked, not the raw bytes: with duplicate keys the
   // allowlist (last key wins) and the node's parser could disagree.
   if (requests.every((request) => allowed.has(request.method)))
-    return { body: Buffer.from(JSON.stringify(payload)), ok: true };
+    return {
+      body: Buffer.from(JSON.stringify(payload)),
+      // Allowlisted, so a bounded metric label.
+      method: batch ? 'batch' : requests[0].method,
+      ok: true,
+    };
   return {
     batch,
     ids: requests.map((request) => request.id ?? null),
@@ -217,17 +232,18 @@ export function createDataServer(state: AppState): express.Express {
   });
 
   app.use((req, res, next) => {
-    const expected = state.config.proxyApiKey;
-    if (
-      expected &&
-      req.path !== '/healthz' &&
-      req.path !== '/readyz' &&
-      !keyMatches(suppliedApiKey(req), expected)
-    ) {
-      jsonStringError(res, 403, 'Forbidden');
-      return;
+    const clients = proxyClients(state.config);
+    res.locals.client = 'anonymous';
+    if (clients.length && req.path !== '/healthz' && req.path !== '/readyz') {
+      const supplied = suppliedApiKey(req);
+      const client = clients.find(({ key }) => keyMatches(supplied, key));
+      if (!client) {
+        jsonStringError(res, 403, 'Forbidden');
+        return;
+      }
+      res.locals.client = client.name;
     }
-    if (expected) res.locals.cacheScope = 'private';
+    if (clients.length) res.locals.cacheScope = 'private';
     res.setHeader('x-content-type-options', 'nosniff');
     next();
   });
@@ -307,7 +323,20 @@ export function createDataServer(state: AppState): express.Express {
         body,
         new Set(state.config.rpcAllowedMethods),
       );
+      // Only allowlisted method names become label values.
+      const method = check.ok
+        ? check.method
+        : check.reason === 'invalid'
+          ? 'invalid'
+          : 'other';
+      const record = (result: string) =>
+        metrics.rpcRequests.inc({
+          client: String(res.locals.client),
+          method,
+          result,
+        });
       if (!check.ok) {
+        record(check.reason === 'invalid' ? 'invalid' : 'not_allowed');
         if (check.reason === 'invalid') {
           res
             .status(400)
@@ -332,6 +361,7 @@ export function createDataServer(state: AppState): express.Express {
       // The guard needs the node source: without a local indexer there is no
       // view of the node's lag and requests are forwarded as-is.
       if (state.localIndexer && !state.localIndexer.isNodeCurrent()) {
+        record('out_of_sync');
         res
           .status(503)
           .set('cache-control', 'no-store')
@@ -351,6 +381,7 @@ export function createDataServer(state: AppState): express.Express {
         if (!res.writableEnded) abortForClient();
       });
 
+      const startedAt = Date.now();
       try {
         const upstream = await fetch(state.config.nodeRpcUrl, {
           body: check.body,
@@ -367,6 +398,11 @@ export function createDataServer(state: AppState): express.Express {
         // The timeout covers waiting for the node to answer, not a client
         // slowly downloading a large response.
         clearTimeout(timeout);
+        metrics.rpcDuration.observe(
+          { method },
+          (Date.now() - startedAt) / 1000,
+        );
+        record(upstream.ok ? 'ok' : 'upstream_error');
         res.status(upstream.status).set('cache-control', 'no-store');
         const contentType = upstream.headers.get('content-type');
         if (contentType) res.set('content-type', contentType);
@@ -385,6 +421,7 @@ export function createDataServer(state: AppState): express.Express {
           return;
         }
         const status = timedOut ? 504 : 502;
+        record(timedOut ? 'timeout' : 'upstream_error');
         logger.warn(
           { error: String(error), status },
           'node rpc proxy request failed',
@@ -471,6 +508,10 @@ export function createDataServer(state: AppState): express.Express {
             .set('cache-control', cacheFor(res, BLOCK_MAX_AGE_SECS))
             .set('x-upstream-source', source)
             .send(bytes);
+          metrics.blocksServed.inc({
+            client: String(res.locals.client),
+            source,
+          });
           return;
         } catch (error: unknown) {
           if (error instanceof UpstreamRedirectError) {
