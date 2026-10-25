@@ -8,9 +8,13 @@ export const serverEnvSchema = z.object({
   AWS_REGION: z.string(),
   AWS_SES_FROM_EMAIL: z.email(),
   AWS_SES_TO_EMAIL: z.email(),
+  RPC_UPSTREAM_ARCHIVAL_KEY: z.optional(z.string()),
   RPC_UPSTREAM_ARCHIVAL_URL: z.optional(z.url()),
+  // Deprecated single-endpoint form of RPC_UPSTREAM_URLS / _TOKENS.
   RPC_UPSTREAM_KEY: z.optional(z.string()),
-  RPC_UPSTREAM_URL: z.url(),
+  RPC_UPSTREAM_TOKENS: z.optional(z.string()),
+  RPC_UPSTREAM_URL: z.optional(z.url()),
+  RPC_UPSTREAM_URLS: z.optional(z.string()),
   TURNSTILE_SECRET_KEY: z.string(),
 });
 
