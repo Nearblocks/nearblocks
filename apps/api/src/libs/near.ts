@@ -8,6 +8,7 @@ import {
 import config from '#config';
 import { FailoverJsonRpcProvider } from '#libs/failoverProvider';
 import logger from '#libs/logger';
+import { getRpcFallbackReason, rpcFallbacks } from '#libs/promMetrics';
 
 let sharedProvider: FailoverJsonRpcProvider | undefined;
 
@@ -18,14 +19,20 @@ export const getProvider = (url?: string) => {
   sharedProvider ??= new FailoverJsonRpcProvider(
     config.rpcUrls.map((rpcUrl, index) => ({
       authToken: config.rpcAuthTokens[index],
+      name: index === 0 ? 'primary' : `fallback_${index}`,
       url: rpcUrl,
     })),
     {
-      onFallback: (error, endpoint) =>
+      onFallback: (error, endpoint) => {
+        rpcFallbacks.inc({
+          endpoint,
+          reason: getRpcFallbackReason(error),
+        });
         logger.warn(
           { endpoint, error: error ? String(error) : undefined },
           'using configured RPC fallback',
-        ),
+        );
+      },
     },
   );
   return sharedProvider;

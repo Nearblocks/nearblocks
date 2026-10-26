@@ -47,6 +47,7 @@
     "passport-http-bearer": "1.0.1",
     "pg": "catalog:",
     "pg-promise": "11.14.0",
+    "prom-client": "catalog:",
     "pino": "catalog:",
     "postgres": "3.4.5",
     "query-string": "9.1.0",
