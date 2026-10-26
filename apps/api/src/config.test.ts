@@ -17,6 +17,7 @@ const loadConfig = async (env: Record<string, string>) => {
   vi.resetModules();
   for (const name of [
     'FASTNEAR_API_KEY',
+    'FASTNEAR_URL',
     'RPC_AUTH_TOKENS',
     'RPC_URL',
     'RPC_URLS',
@@ -73,5 +74,30 @@ describe('RPC endpoints', () => {
     await expect(
       loadConfig({ RPC_AUTH_TOKENS: 'one', RPC_URLS: 'https://a,https://b' }),
     ).rejects.toThrow('one entry per RPC_URLS endpoint');
+  });
+});
+
+const RPC = { RPC_URLS: 'https://rpc.example' };
+
+describe('FastNear API URL', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('defaults to the mainnet API on mainnet', async () => {
+    expect((await loadConfig(RPC)).fastnearUrl).toBe(
+      'https://api.fastnear.com',
+    );
+  });
+
+  it('defaults to the testnet API on testnet', async () => {
+    expect((await loadConfig({ ...RPC, NETWORK: 'testnet' })).fastnearUrl).toBe(
+      'https://test.api.fastnear.com',
+    );
+  });
+
+  it('uses FASTNEAR_URL when set', async () => {
+    expect(
+      (await loadConfig({ ...RPC, FASTNEAR_URL: 'https://fastnear.example' }))
+        .fastnearUrl,
+    ).toBe('https://fastnear.example');
   });
 });
