@@ -8,6 +8,7 @@ import {
 
 import config from '#config';
 import catchAsync from '#libs/async';
+import { anonymousClientKey } from '#libs/clientKey';
 import dayjs from '#libs/dayjs';
 import logger from '#libs/logger';
 import { userSql } from '#libs/postgres';
@@ -64,7 +65,7 @@ const rateLimiter = catchAsync(
     }
 
     if (!id) {
-      return await useFreePlan(req, res, next, req.ip!);
+      return await useFreePlan(req, res, next, anonymousClientKey(ipAddress));
     }
 
     let plans: Plan[] = [];
@@ -113,7 +114,7 @@ const rateLimiter = catchAsync(
           `rate limit: plan lookup failed for user ${id}, applying free plan`,
         );
 
-        return await useFreePlan(req, res, next, req.ip!);
+        return await useFreePlan(req, res, next, anonymousClientKey(ipAddress));
       }
     }
 
