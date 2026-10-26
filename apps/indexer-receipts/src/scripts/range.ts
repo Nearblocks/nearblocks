@@ -1,4 +1,4 @@
-export const blockRange = { from: 129_253_056, to: 129_256_992 };
+export const refillDays = { from: '2021-01-01', to: '2026-12-31' };
 
 export const lookbackBlocks = 500;
 

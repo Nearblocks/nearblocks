@@ -19,7 +19,7 @@ type Finding = {
 
 type Cursor = { findings: Finding[]; sync: string };
 
-const cursorKey = 'receipts-check';
+export const cursorKey = 'receipts-check';
 const maxFindings = 3000;
 const sampleSize = 3;
 const minute = 60_000_000_000n;

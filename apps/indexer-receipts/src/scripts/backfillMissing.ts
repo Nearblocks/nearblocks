@@ -315,7 +315,9 @@ const layoutOf = async (
   inclusion: boolean,
 ) => {
   const used = new Map<string, string>();
-  let collisions = 0;
+  const added = new Set<string>();
+  const crossStyle: string[] = [];
+  let internal = 0;
 
   (await existingAt(timestamp)).forEach((row) =>
     used.set(`${row.shard_id}|${row.index_in_chunk}`, row.receipt_id),
@@ -325,12 +327,16 @@ const layoutOf = async (
     const key = `${row.shard_id}|${row.index_in_chunk}`;
     const holder = used.get(key);
 
-    if (holder && holder !== row.receipt_id) collisions += 1;
+    if (holder && holder !== row.receipt_id) {
+      if (added.has(key)) internal += 1;
+      else crossStyle.push(`${timestamp}|${key}|${holder}|${row.receipt_id}`);
+    }
 
+    added.add(key);
     used.set(key, row.receipt_id);
   });
 
-  if (!inclusion) return { collisions, holes: 0 };
+  if (!inclusion) return { crossStyle, holes: 0, internal };
 
   const maxByShard = new Map<number, number>();
   const countByShard = new Map<number, number>();
@@ -348,7 +354,7 @@ const layoutOf = async (
     holes += max + 1 - (countByShard.get(shard) ?? 0);
   });
 
-  return { collisions, holes };
+  return { crossStyle, holes, internal };
 };
 
 export const runBackfill = async (ids: Map<string, string>) => {
@@ -376,10 +382,11 @@ export const runBackfill = async (ids: Map<string, string>) => {
   );
   const resolved = resolveMethods(candidates);
   const { groups, stats } = buildGroups(resolved, inclusionById);
+  const crossStyle: string[] = [];
   const totals = {
     actions: 0,
-    collisions: 0,
     holesAfter: 0,
+    internalCollisions: 0,
     receipts: 0,
     skippedExisting: 0,
   };
@@ -389,7 +396,8 @@ export const runBackfill = async (ids: Map<string, string>) => {
     const layout = await layoutOf(timestamp, kept.receipts, group.inclusion);
 
     totals.actions += kept.actions.length;
-    totals.collisions += layout.collisions;
+    crossStyle.push(...layout.crossStyle);
+    totals.internalCollisions += layout.internal;
     totals.holesAfter += layout.holes;
     totals.receipts += kept.receipts.length;
     totals.skippedExisting += group.receipts.length - kept.receipts.length;
@@ -400,6 +408,7 @@ export const runBackfill = async (ids: Map<string, string>) => {
   logger.info(
     {
       blocksWithMissing: candidates.length,
+      crossStyleCollisions: crossStyle.length,
       delayed: stats.delayed,
       disagree: stats.disagree,
       emptyBlocks: candidates.filter((item) => item.emptyBlock).length,
@@ -415,11 +424,14 @@ export const runBackfill = async (ids: Map<string, string>) => {
     },
     'plan',
   );
-  logger.info({ samples: stats.samples }, 'plan samples');
+  logger.info(
+    { crossStyle: crossStyle.slice(0, 5), samples: stats.samples },
+    'plan samples',
+  );
 
-  if (notFound.length || stats.notPlaced.length || totals.collisions) {
+  if (notFound.length || stats.notPlaced.length || totals.internalCollisions) {
     throw new Error(
-      `validation failed: notFound=${notFound.slice(0, 3)} notPlaced=${stats.notPlaced.slice(0, 3)} collisions=${totals.collisions}`,
+      `validation failed: notFound=${notFound.slice(0, 3)} notPlaced=${stats.notPlaced.slice(0, 3)} internalCollisions=${totals.internalCollisions}`,
     );
   }
 

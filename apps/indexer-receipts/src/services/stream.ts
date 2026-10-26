@@ -1,5 +1,5 @@
-import { runReceiptsCheck } from '#scripts/check';
+import { runReceiptsBackfill } from '#scripts/backfill';
 
 export const syncData = async () => {
-  await runReceiptsCheck();
+  await runReceiptsBackfill();
 };

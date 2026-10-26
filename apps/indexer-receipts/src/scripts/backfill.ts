@@ -1,10 +1,17 @@
 import { logger } from 'nb-logger';
 
 import { runBackfill } from '#scripts/backfillMissing';
+import { cursorKey } from '#scripts/check';
 import { db } from '#scripts/db';
 import { findMissing } from '#scripts/findMissing';
-import { blockRange } from '#scripts/range';
+import { refillDays } from '#scripts/range';
 import { checkLanding, findDuplicates } from '#scripts/verify';
+
+type Finding = {
+  blocks: [number, number] | null;
+  day: string;
+  receipts: number;
+};
 
 const blockTimestamp = async (height: number) => {
   const row = await db('blocks')
@@ -17,14 +24,33 @@ const blockTimestamp = async (height: number) => {
   return BigInt(row.block_timestamp);
 };
 
-export const runReceiptsBackfill = async () => {
-  logger.info({ blockRange }, 'receipts backfill starting');
+const loadFindings = async () => {
+  const row = await db('settings').where({ key: cursorKey }).first();
+  const findings: Finding[] = row?.value?.findings ?? [];
 
-  const from = await blockTimestamp(blockRange.from);
-  const to = await blockTimestamp(blockRange.to + 1);
+  return findings
+    .filter(
+      (finding) =>
+        finding.receipts > 0 &&
+        finding.blocks &&
+        finding.day >= refillDays.from &&
+        finding.day <= refillDays.to,
+    )
+    .sort((a, b) => a.day.localeCompare(b.day));
+};
+
+const refill = async (finding: Finding) => {
+  const [first, last] = finding.blocks as [number, number];
+  const from = await blockTimestamp(first);
+  const to = await blockTimestamp(last + 1);
   const ids = await findMissing(db, from, to);
 
-  logger.info({ missing: ids.size }, 'missing receipts found');
+  logger.info(
+    { blocks: finding.blocks, day: finding.day, missing: ids.size },
+    'missing receipts found',
+  );
+
+  if (!ids.size) return 0;
 
   const result = await runBackfill(ids);
   const stillMissing = await findMissing(db, from, to);
@@ -33,6 +59,7 @@ export const runReceiptsBackfill = async () => {
 
   logger.info(
     {
+      day: finding.day,
       duplicates: duplicates.length,
       landing,
       stillMissing: stillMissing.size,
@@ -42,9 +69,40 @@ export const runReceiptsBackfill = async () => {
 
   if (stillMissing.size || duplicates.length) {
     throw new Error(
-      `backfill verification failed: stillMissing=${stillMissing.size} duplicates=${duplicates.length}`,
+      `backfill verification failed on ${finding.day}: stillMissing=${stillMissing.size} duplicates=${duplicates.length}`,
     );
   }
 
-  logger.info('receipts backfill completed');
+  return ids.size;
+};
+
+export const runReceiptsBackfill = async () => {
+  const findings = await loadFindings();
+  let refilled = 0;
+
+  logger.info(
+    { days: findings.length, refillDays },
+    'receipts backfill starting',
+  );
+
+  for (const finding of findings) {
+    const started = Date.now();
+    const count = await refill(finding);
+
+    refilled += count;
+
+    logger.info(
+      {
+        day: finding.day,
+        refilled: count,
+        seconds: (Date.now() - started) / 1000,
+      },
+      'range done',
+    );
+  }
+
+  logger.info(
+    { days: findings.length, refilled },
+    'receipts backfill completed',
+  );
 };
