@@ -1,5 +1,6 @@
 import config from '#config';
 import logger from '#libs/logger';
+import { fastnearFtLookups, fastnearRequests } from '#libs/promMetrics';
 import redis from '#libs/redis';
 
 type FastNearFtToken = {
@@ -77,6 +78,8 @@ const fetchBalances = async (account: string): Promise<FtBalance[] | null> => {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
+    fastnearRequests.inc({ status: String(res.status) });
+
     if (!res.ok) {
       if (res.status === 429) await startCooldown();
 
@@ -96,7 +99,11 @@ const fetchBalances = async (account: string): Promise<FtBalance[] | null> => {
         contract: t.contract_id,
       }));
   } catch (error) {
-    logger.warn(`fastnear: ${account}: ${(error as Error).name}`);
+    const name = (error as Error).name;
+    fastnearRequests.inc({
+      status: name === 'TimeoutError' ? 'timeout' : 'error',
+    });
+    logger.warn(`fastnear: ${account}: ${name}`);
 
     return null;
   }
@@ -122,9 +129,15 @@ export const getAccountFtBalances = async (
 
   const cached = await readCache(cacheKey);
 
-  if (cached) return cached.tokens;
+  if (cached) {
+    fastnearFtLookups.inc({ result: 'cache_hit' });
+    return cached.tokens;
+  }
 
-  if (await isCoolingDown()) return null;
+  if (await isCoolingDown()) {
+    fastnearFtLookups.inc({ result: 'cooldown' });
+    return null;
+  }
 
   let locked: null | string = 'OK';
 
@@ -136,11 +149,13 @@ export const getAccountFtBalances = async (
 
   if (locked !== 'OK') {
     const shared = await waitForCache(cacheKey);
+    fastnearFtLookups.inc({ result: shared ? 'wait_hit' : 'wait_miss' });
 
     return shared ? shared.tokens : null;
   }
 
   try {
+    fastnearFtLookups.inc({ result: 'fetched' });
     const tokens = await fetchBalances(account);
 
     await writeCache(cacheKey, tokens);

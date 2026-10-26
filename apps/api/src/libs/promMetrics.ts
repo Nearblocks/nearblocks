@@ -36,6 +36,20 @@ export const rpcFallbacks = new client.Counter({
   registers: [register],
 });
 
+export const fastnearFtLookups = new client.Counter({
+  help: 'Account FT balance lookups by outcome (cache hit, shared wait, cooldown, fetched)',
+  labelNames: ['result'] as const,
+  name: 'nearblocks_api_fastnear_ft_lookups_total',
+  registers: [register],
+});
+
+export const fastnearRequests = new client.Counter({
+  help: 'HTTP requests the API sent to the FastNear API, by status',
+  labelNames: ['status'] as const,
+  name: 'nearblocks_api_fastnear_requests_total',
+  registers: [register],
+});
+
 export const recordRpcAttempt = (
   endpoint: string,
   method: string,
