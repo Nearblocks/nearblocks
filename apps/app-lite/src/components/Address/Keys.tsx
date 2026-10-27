@@ -25,6 +25,49 @@ type AccessKey = {
 };
 
 const LIMIT = 25;
+// nearcore 2.14+ rejects unpaginated key lists over 100 keys; page with
+// limit/after_key, falling back to one request for older nodes.
+const RPC_PAGE = 100;
+const MAX_RPC_PAGES = 100;
+
+type AccessKeyPage = RpcResultAccessKey & { last_key?: null | string };
+
+const fetchAccessKeys = async (
+  rpcUrl: string,
+  account: string,
+  signal: AbortSignal,
+) => {
+  const query = (extra: object) =>
+    rpcFetch<AccessKeyPage>(
+      rpcUrl,
+      'query',
+      {
+        account_id: account,
+        finality: 'final',
+        request_type: 'view_access_key_list',
+        ...extra,
+      },
+      { signal },
+    );
+
+  let first: AccessKeyPage;
+  try {
+    first = await query({ limit: RPC_PAGE });
+  } catch (error) {
+    if (signal.aborted) throw error;
+    return (await query({})).keys;
+  }
+
+  const keys = [...first.keys];
+  let after = first.last_key;
+  for (let page = 1; after && page < MAX_RPC_PAGES; page++) {
+    const next = await query({ after_key: after, limit: RPC_PAGE });
+    keys.push(...next.keys);
+    after = next.last_key !== after ? next.last_key : null;
+  }
+
+  return keys;
+};
 
 const Keys = ({ id, rpcUrl }: KeysProps) => {
   const [error, setError] = useState<unknown>(null);
@@ -44,19 +87,10 @@ const Keys = ({ id, rpcUrl }: KeysProps) => {
 
     setLoading(true);
     setPage(1);
-    rpcFetch<RpcResultAccessKey>(
-      rpcUrl,
-      'query',
-      {
-        account_id: id,
-        finality: 'final',
-        request_type: 'view_access_key_list',
-      },
-      { signal },
-    )
-      .then((response) => {
+    fetchAccessKeys(rpcUrl, id, signal)
+      .then((accessKeys) => {
         setKeys(
-          response.keys.map((key) => {
+          accessKeys.map((key) => {
             if (key.access_key.permission === 'FullAccess') {
               return {
                 access: 'FULL',
