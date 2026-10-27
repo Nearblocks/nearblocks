@@ -26,9 +26,11 @@ type Group = {
   actions: ActionReceiptAction[];
   inclusion: boolean;
   receipts: Receipt[];
+  styles: Map<string, Method>;
 };
 
 const guardMarginNs = 7n * 86_400_000_000_000n;
+const delayedMarginNs = 3_600_000_000_000n;
 const runGap = 50;
 
 const batches = <T>(items: T[], size: number) =>
@@ -71,6 +73,37 @@ const existingAt = (timestamp: string): Promise<ExistingRow[]> =>
   db('receipts')
     .where('included_in_block_timestamp', timestamp)
     .select('receipt_id', 'shard_id', 'index_in_chunk');
+
+const delayedStyleAt = async (
+  timestamp: string,
+  executed: Receipt[],
+  inclusion: Map<string, Position>,
+  ids: Map<string, string>,
+): Promise<Method | null> => {
+  const delayed = executed
+    .filter((row) => !inclusion.has(row.receipt_id) && !ids.has(row.receipt_id))
+    .map((row) => row.receipt_id);
+
+  if (!delayed.length) return null;
+
+  const rows = await db('receipts')
+    .whereIn('receipt_id', delayed)
+    .where(
+      'included_in_block_timestamp',
+      '>=',
+      String(BigInt(timestamp) - delayedMarginNs),
+    )
+    .where('included_in_block_timestamp', '<=', timestamp)
+    .select('included_in_block_timestamp');
+  const atBlock = rows.filter(
+    (row) => String(row.included_in_block_timestamp) === timestamp,
+  ).length;
+  const earlier = rows.length - atBlock;
+
+  if (atBlock === earlier) return null;
+
+  return atBlock > earlier ? 'outcome' : 'inclusion';
+};
 
 const existingIds = async (
   table: string,
@@ -165,11 +198,19 @@ const collect = async (ids: Map<string, string>, runs: [number, number][]) => {
       const outcomeById = new Map(
         executed.map((row): [string, Receipt] => [row.receipt_id, row]),
       );
+      const hasDelayed = receipts.some((row) => {
+        const position = inclusionById.get(row.receipt_id);
+
+        return position && position.blockTimestamp !== timestamp;
+      });
 
       candidates.push({
         actions: built
           .flatMap((item) => item.actions)
           .filter((row) => ids.has(row.receipt_id)),
+        delayedStyle: hasDelayed
+          ? await delayedStyleAt(timestamp, executed, inclusion, ids)
+          : null,
         detection: detectMethod(existing, inclusion, outcomeById),
         emptyBlock: existing.length === 0,
         height,
@@ -201,6 +242,7 @@ const buildGroups = (
   );
   const stats = {
     delayed: 0,
+    delayedOutcome: 0,
     disagree: 0,
     inclusion: 0,
     maxDelay: 0,
@@ -214,6 +256,7 @@ const buildGroups = (
       actions: [],
       inclusion: false,
       receipts: [],
+      styles: new Map<string, Method>(),
     };
 
     groups.set(timestamp, group);
@@ -222,17 +265,29 @@ const buildGroups = (
   };
 
   resolved.forEach(({ candidate, method }) => {
+    const asOutcome = new Set<string>();
+
     candidate.receipts.forEach((row) => {
-      if (method === 'outcome') {
-        groupOf(candidate.timestamp).receipts.push(row);
+      const position = inclusionById.get(row.receipt_id);
+      const keepAtBlock =
+        method === 'outcome' ||
+        (candidate.delayedStyle === 'outcome' &&
+          position &&
+          position.blockTimestamp !== candidate.timestamp);
+
+      if (keepAtBlock) {
+        const group = groupOf(candidate.timestamp);
+
+        asOutcome.add(row.receipt_id);
+        group.receipts.push(row);
+        group.styles.set(row.receipt_id, 'outcome');
         stats.outcome += 1;
 
+        if (method !== 'outcome') stats.delayedOutcome += 1;
         if (stats.samples.outcome.length < 3) stats.samples.outcome.push(row);
 
         return;
       }
-
-      const position = inclusionById.get(row.receipt_id);
 
       if (!position) {
         stats.notPlaced.push(row.receipt_id);
@@ -245,6 +300,7 @@ const buildGroups = (
 
       group.inclusion = true;
       group.receipts.push(placed);
+      group.styles.set(row.receipt_id, 'inclusion');
       stats.inclusion += 1;
 
       if (stats.samples.inclusion.length < 3) {
@@ -265,7 +321,7 @@ const buildGroups = (
     });
 
     candidate.actions.forEach((row) => {
-      if (method === 'outcome') {
+      if (method === 'outcome' || asOutcome.has(row.receipt_id)) {
         groupOf(candidate.timestamp).actions.push(row);
 
         return;
@@ -313,9 +369,10 @@ const layoutOf = async (
   timestamp: string,
   receipts: Receipt[],
   inclusion: boolean,
+  styles: Map<string, Method>,
 ) => {
   const used = new Map<string, string>();
-  const added = new Set<string>();
+  const added = new Map<string, string>();
   const crossStyle: string[] = [];
   let internal = 0;
 
@@ -328,11 +385,14 @@ const layoutOf = async (
     const holder = used.get(key);
 
     if (holder && holder !== row.receipt_id) {
-      if (added.has(key)) internal += 1;
+      const sameStyle =
+        added.has(key) && styles.get(holder) === styles.get(row.receipt_id);
+
+      if (sameStyle) internal += 1;
       else crossStyle.push(`${timestamp}|${key}|${holder}|${row.receipt_id}`);
     }
 
-    added.add(key);
+    added.set(key, row.receipt_id);
     used.set(key, row.receipt_id);
   });
 
@@ -393,7 +453,12 @@ export const runBackfill = async (ids: Map<string, string>) => {
 
   for (const [timestamp, group] of groups) {
     const kept = await guard(timestamp, group);
-    const layout = await layoutOf(timestamp, kept.receipts, group.inclusion);
+    const layout = await layoutOf(
+      timestamp,
+      kept.receipts,
+      group.inclusion,
+      group.styles,
+    );
 
     totals.actions += kept.actions.length;
     crossStyle.push(...layout.crossStyle);
@@ -410,6 +475,7 @@ export const runBackfill = async (ids: Map<string, string>) => {
       blocksWithMissing: candidates.length,
       crossStyleCollisions: crossStyle.length,
       delayed: stats.delayed,
+      delayedOutcome: stats.delayedOutcome,
       disagree: stats.disagree,
       emptyBlocks: candidates.filter((item) => item.emptyBlock).length,
       expected: ids.size,

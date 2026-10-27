@@ -28,6 +28,7 @@ export type Detection = {
 
 export type Candidate = {
   actions: ActionReceiptAction[];
+  delayedStyle: Method | null;
   detection: Detection;
   emptyBlock: boolean;
   height: number;
