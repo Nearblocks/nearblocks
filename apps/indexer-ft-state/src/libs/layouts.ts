@@ -81,7 +81,38 @@ export const PREFIXES: Buffer[] =
         Buffer.from('7e2431343101', 'hex'),
         Buffer.from('7374757364', 'hex'),
       ]
-    : [];
+    : [
+        Buffer.from('00', 'hex'),
+        Buffer.from('61', 'hex'),
+        Buffer.from('74', 'hex'),
+        Buffer.from('01', 'hex'),
+        Buffer.from('7573646f', 'hex'),
+        Buffer.from('7374757364', 'hex'),
+        Buffer.from('04', 'hex'),
+        Buffer.from('07', 'hex'),
+        Buffer.from('7e2431343101', 'hex'),
+        Buffer.from('62616c616e636573', 'hex'),
+        Buffer.from('06030000003a3a30', 'hex'),
+        Buffer.from('6c', 'hex'),
+        Buffer.from('544f4b41', 'hex'),
+        Buffer.from('6674', 'hex'),
+        Buffer.from('03', 'hex'),
+        Buffer.from('23', 'hex'),
+        Buffer.from('05', 'hex'),
+        Buffer.from('020000000000', 'hex'),
+        Buffer.from('0c', 'hex'),
+        Buffer.from('636674', 'hex'),
+        Buffer.from('777574', 'hex'),
+        Buffer.from('10', 'hex'),
+        Buffer.from('0f', 'hex'),
+        Buffer.from('637478', 'hex'),
+        Buffer.from('0207000000494e4445583438', 'hex'),
+        Buffer.from('14', 'hex'),
+      ];
+
+if (!PREFIXES.length) {
+  throw new Error(`ft-state PREFIXES is empty for ${config.network}`);
+}
 
 for (const a of PREFIXES) {
   for (const b of PREFIXES) {

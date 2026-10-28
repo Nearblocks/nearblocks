@@ -2,8 +2,21 @@ interface CamelCaseObject {
   [key: string]: unknown;
 }
 
+const CACHE_LIMIT = 10_000;
+const cache = new Map<string, string>();
+
 const camelCase = (str: string): string => {
-  return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+  if (!str.includes('_')) return str;
+
+  const cached = cache.get(str);
+
+  if (cached !== undefined) return cached;
+
+  const converted = str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+
+  if (cache.size < CACHE_LIMIT) cache.set(str, converted);
+
+  return converted;
 };
 
 export const camelCaseKeys = <T>(obj: T): T => {
