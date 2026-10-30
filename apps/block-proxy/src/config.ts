@@ -120,11 +120,11 @@ const env = cleanEnv(process.env, {
   PROXY_API_KEY: str({ default: '' }),
   RPC_ALLOWED_METHODS: str({ default: DEFAULT_RPC_ALLOWED_METHODS }),
   // Compare served blocks with this source in the background (see README).
-  SHADOW_SAMPLE_RATE: num({ default: 1 }),
+  SHADOW_SAMPLE_RATE: num({ default: 0.1 }),
   SHADOW_SOURCE: str({ choices: ['', 'neardata', 'proxy'], default: '' }),
   // One timeout for every upstream, kept below the client abort. When equal,
   // indexers gave up before the proxy could answer.
-  UPSTREAM_TIMEOUT_SECS: num({ default: 10 }),
+  UPSTREAM_TIMEOUT_SECS: num({ default: 13 }),
 });
 
 function deriveNeardataUrl(network: string, override_: string): string {

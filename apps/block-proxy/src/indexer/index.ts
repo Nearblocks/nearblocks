@@ -5,10 +5,7 @@ import { logger } from 'nb-logger';
 import type { Config } from '#config';
 import * as metrics from '#metrics';
 
-/**
- * Heights past the last published block that are worth waiting for, matching
- * neardata's MAX_WAIT_BLOCKS so both sources answer the tip the same way.
- */
+/** Heights past the last published block worth waiting for, as in neardata. */
 export const MAX_WAIT_AHEAD_BLOCKS = 10;
 
 export interface LocalBlockResult {

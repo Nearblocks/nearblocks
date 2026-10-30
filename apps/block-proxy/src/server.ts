@@ -26,10 +26,7 @@ const MISS_HEAD_MAX_AGE_MS = 1000;
 const RPC_METHOD_NOT_ALLOWED = -32601;
 const MAX_RPC_BATCH = 100;
 
-/**
- * Like neardata, hold a future block for 1s per block ahead plus 1s. A
- * downstream proxy's UPSTREAM_TIMEOUT_SECS must exceed the ~11s maximum.
- */
+// neardata's wait for a future block: 1s per block ahead plus 1s.
 function nodeTipWaitMs(state: AppState, height: number): number {
   const published = state.localIndexer?.status?.published ?? height;
   return (Math.max(height - published, 0) + 1) * 1000;

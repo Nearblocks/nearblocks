@@ -107,8 +107,6 @@ function serializeBlock(block: IndexerBlock): Buffer {
     tracked_shards?: number[];
   };
   delete output.tracked_shards;
-  // `proposed_split: null` is kept: mainnet neardata emits it since block
-  // ~222.0M, as testnet always has.
 
   // `timestamp` is lossy in JSON.parse; restore it from the exact RPC string.
   const timestamp = output.block.header.timestamp_nanosec;
