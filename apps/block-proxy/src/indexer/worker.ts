@@ -107,24 +107,8 @@ function serializeBlock(block: IndexerBlock): Buffer {
     tracked_shards?: number[];
   };
   delete output.tracked_shards;
-
-  const omitNullProposedSplit = (value: unknown): void => {
-    if (Array.isArray(value)) {
-      for (const entry of value) omitNullProposedSplit(entry);
-    } else if (value && typeof value === 'object') {
-      const record = value as Record<string, unknown>;
-      for (const [key, entry] of Object.entries(record)) {
-        if (
-          options.network === 'mainnet' &&
-          key === 'proposed_split' &&
-          entry === null
-        )
-          delete record[key];
-        else omitNullProposedSplit(entry);
-      }
-    }
-  };
-  omitNullProposedSplit(output);
+  // `proposed_split: null` is kept: mainnet neardata emits it since block
+  // ~222.0M, as testnet always has.
 
   // `timestamp` is lossy in JSON.parse; restore it from the exact RPC string.
   const timestamp = output.block.header.timestamp_nanosec;
