@@ -5,8 +5,8 @@ import { logger } from 'nb-logger';
 import type { Config } from '#config';
 import * as metrics from '#metrics';
 
-/** Heights past the last published block that are worth waiting for. */
-export const MAX_WAIT_AHEAD_BLOCKS = 3;
+/** Heights past the last published block worth waiting for, as in neardata. */
+export const MAX_WAIT_AHEAD_BLOCKS = 10;
 
 export interface LocalBlockResult {
   bytes: Buffer;

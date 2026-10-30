@@ -50,8 +50,8 @@ token, or `X-API-Key`.
 | `CACHE_DIR`                         | `/app/cache`            | Block cache directory.                                     |
 | `CACHE_TTL_SECS`                    | `3600`                  | Cache lifetime and local history window.                   |
 | `SHADOW_SOURCE`                     | _(unset)_               | Optional source for background block comparisons.          |
-| `SHADOW_SAMPLE_RATE`                | `1`                     | Fraction of eligible comparisons, `(0, 1]`.                |
-| `UPSTREAM_TIMEOUT_SECS`             | `10`                    | Timeout for upstream requests.                             |
+| `SHADOW_SAMPLE_RATE`                | `0.1`                   | Fraction of eligible comparisons, `(0, 1]`.                |
+| `UPSTREAM_TIMEOUT_SECS`             | `13`                    | Timeout for upstream requests.                             |
 
 ## Build
 

@@ -1,10 +1,9 @@
 import { logger } from 'nb-logger';
 
+import { MAX_WAIT_AHEAD_BLOCKS } from '#indexer/index';
 import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import { type UpstreamError, UpstreamRedirectError } from '#types';
-
-const MAX_NODE_TIP_WAIT_AHEAD = 3;
 
 function recordUpstreamOk(
   state: AppState,
@@ -206,7 +205,7 @@ export async function fetchBlock(
         height > published &&
         // Only the next few heights: during catch-up, waiting on the node for
         // each block it has not reached would stall indexers per block.
-        height <= Math.min(finalized, published) + MAX_NODE_TIP_WAIT_AHEAD
+        height <= Math.min(finalized, published) + MAX_WAIT_AHEAD_BLOCKS
       ) {
         errors.push({
           error: `block ${height} is not published by node yet`,

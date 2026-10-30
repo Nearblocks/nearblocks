@@ -108,24 +108,6 @@ function serializeBlock(block: IndexerBlock): Buffer {
   };
   delete output.tracked_shards;
 
-  const omitNullProposedSplit = (value: unknown): void => {
-    if (Array.isArray(value)) {
-      for (const entry of value) omitNullProposedSplit(entry);
-    } else if (value && typeof value === 'object') {
-      const record = value as Record<string, unknown>;
-      for (const [key, entry] of Object.entries(record)) {
-        if (
-          options.network === 'mainnet' &&
-          key === 'proposed_split' &&
-          entry === null
-        )
-          delete record[key];
-        else omitNullProposedSplit(entry);
-      }
-    }
-  };
-  omitNullProposedSplit(output);
-
   // `timestamp` is lossy in JSON.parse; restore it from the exact RPC string.
   const timestamp = output.block.header.timestamp_nanosec;
   output.block.header.timestamp = rawJsonNumber(timestamp);
