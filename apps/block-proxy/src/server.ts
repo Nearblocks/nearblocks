@@ -20,14 +20,20 @@ const DAY_SECONDS = 24 * 60 * 60;
 // in front must not pin a bad block for long.
 const BLOCK_MAX_AGE_SECS = 60;
 const MAX_BEHIND_HEAD_RETRIES = 3;
-// Wait on the node for a near-tip block well below a downstream proxy's
-// timeout, so this proxy answers (and the caller falls back) first.
-const NODE_TIP_WAIT_MS = 3000;
 const LAST_BLOCK_CACHE_MS = 100;
 // A head seen this recently already proves a higher height is in the future.
 const MISS_HEAD_MAX_AGE_MS = 1000;
 const RPC_METHOD_NOT_ALLOWED = -32601;
 const MAX_RPC_BATCH = 100;
+
+/**
+ * Like neardata, hold a future block for 1s per block ahead plus 1s. A
+ * downstream proxy's UPSTREAM_TIMEOUT_SECS must exceed the ~11s maximum.
+ */
+function nodeTipWaitMs(state: AppState, height: number): number {
+  const published = state.localIndexer?.status?.published ?? height;
+  return (Math.max(height - published, 0) + 1) * 1000;
+}
 
 function parseU64(value: string): bigint | null {
   if (!/^\d+$/.test(value)) return null;
@@ -447,7 +453,7 @@ export function createDataServer(state: AppState): express.Express {
       state.stats.requestsBlock++;
       let clientDisconnected = false;
       let behindHeadRetries = 0;
-      let nodeWaitStartedAt: null | number = null;
+      let nodeWaitDeadline: null | number = null;
       let finalNodeRecheck = false;
       let skipNodeAfterWait = false;
       res.once('close', () => {
@@ -488,11 +494,8 @@ export function createDataServer(state: AppState): express.Express {
               skipNodeAfterWait = true;
               continue;
             }
-            nodeWaitStartedAt ??= Date.now();
-            if (
-              Date.now() - nodeWaitStartedAt >=
-              Math.min(state.config.upstreamTimeoutMs, NODE_TIP_WAIT_MS)
-            ) {
+            nodeWaitDeadline ??= Date.now() + nodeTipWaitMs(state, height);
+            if (Date.now() >= nodeWaitDeadline) {
               finalNodeRecheck = true;
               continue;
             }
