@@ -42,7 +42,7 @@ token, or `X-API-Key`.
 | `RPC_ALLOWED_METHODS`               | read-only set           | RPC methods forwarded by `/rpc`.                           |
 | `INDEXER_STATE_DIR`                 | `/app/state`            | Local indexer checkpoint directory.                        |
 | `INDEXER_INTERVAL_MS`               | `250`                   | Finalized-head poll interval.                              |
-| `NODE_MAX_LAG_SECS`                 | `10`                    | Maximum age of the node's finalized head.                  |
+| `NODE_MAX_LAG_SECS`                 | `10`                    | Maximum age of the node's finalized head for `/rpc`.       |
 | `BLOCK_PROXY_UPSTREAM_URL`          | _(unset)_               | Required when `proxy` is in `BLOCK_SOURCES`.               |
 | `BLOCK_PROXY_UPSTREAM_API_KEY`      | _(unset)_               | Bearer token for the proxy source.                         |
 | `NEARDATA_URL`                      | _(from `NETWORK`)_      | Data endpoint origin or `/v0` URL.                         |

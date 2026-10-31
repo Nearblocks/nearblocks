@@ -7,6 +7,9 @@ import * as metrics from '#metrics';
 
 /** Heights past the last published block worth waiting for, as in neardata. */
 export const MAX_WAIT_AHEAD_BLOCKS = 10;
+// Finality can pause for seconds while the node is current; only a much longer
+// stall means it has fallen behind.
+const MAX_HEAD_STALL_MS = 60_000;
 
 export interface LocalBlockResult {
   bytes: Buffer;
@@ -181,8 +184,7 @@ export class LocalIndexer {
     // stale head: report none so a multi-source proxy uses the next source.
     if (
       !this.lastBlock ||
-      Date.now() - this.lastBlock.timestampMs >
-        this.config.nodeMaxLagSecs * 1000
+      Date.now() - this.lastBlock.timestampMs > MAX_HEAD_STALL_MS
     )
       return null;
     return this.status.published;
@@ -201,9 +203,7 @@ export class LocalIndexer {
 
   /**
    * Whether the node can be trusted for fresh data: the follower is healthy, a
-   * head poll arrived recently, and that head block is no older than
-   * `nodeMaxLagSecs`. A node that answers polls but trails the chain is not in
-   * sync.
+   * head poll arrived recently, and that head is not stalled.
    */
   isInSync(): boolean {
     if (
@@ -212,7 +212,7 @@ export class LocalIndexer {
     )
       return false;
     const lag = this.lagSecs();
-    return lag !== null && lag <= this.config.nodeMaxLagSecs;
+    return lag !== null && lag * 1000 <= MAX_HEAD_STALL_MS;
   }
 
   /**

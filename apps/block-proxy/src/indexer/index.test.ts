@@ -163,13 +163,13 @@ describe('producer join', () => {
       worker.emit('message', { pending: 0, type: 'healthy' });
       worker.emit('message', published(100));
       // A stuck node: every poll succeeds and returns the same old block.
-      const stuck = Date.now() - 31_000;
+      const stuck = Date.now() - 61_000;
       for (let i = 0; i < 5; i++) {
         vi.advanceTimersByTime(250);
         worker.emit('message', headAt(stuck));
       }
       expect(indexer.isInSync()).toBe(false);
-      expect(indexer.lagSecs()).toBeGreaterThan(30);
+      expect(indexer.lagSecs()).toBeGreaterThan(60);
       expect(indexer.currentFinalizedHeight()).toBeNull();
       expect(indexer.status.published).toBe(100);
     });
@@ -179,7 +179,7 @@ describe('producer join', () => {
       const worker = mocks.workers[0];
       worker.emit('message', { pending: 0, type: 'healthy' });
       worker.emit('message', published(100));
-      worker.emit('message', headAt(Date.now() - 60_000, 101));
+      worker.emit('message', headAt(Date.now() - 61_000, 101));
       // Resolves without advancing timers, so no wait timer was involved.
       expect(await indexer.waitForBlock(101)).toBeNull();
       expect(vi.getTimerCount()).toBe(0);
@@ -190,7 +190,7 @@ describe('producer join', () => {
       const worker = mocks.workers[0];
       worker.emit('message', { pending: 0, type: 'healthy' });
       worker.emit('message', published(100));
-      worker.emit('message', headAt(Date.now() - 60_000));
+      worker.emit('message', headAt(Date.now() - 61_000));
       expect(indexer.isInSync()).toBe(false);
       worker.emit('message', headAt(Date.now() - 1000, 101));
       expect(indexer.isInSync()).toBe(true);

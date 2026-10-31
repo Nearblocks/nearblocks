@@ -32,6 +32,15 @@ function nodeTipWaitMs(state: AppState, height: number): number {
   return (Math.max(height - published, 0) + 1) * 1000;
 }
 
+function isNotYet(error: UpstreamError): boolean {
+  return !!error.notFound && !!error.body?.includes('BLOCK_DOES_NOT_EXIST');
+}
+
+// Timeouts, connection failures and 5xx: a source that could not answer.
+function isUnavailable(error: UpstreamError): boolean {
+  return error.status === undefined || error.status >= 500;
+}
+
 function parseU64(value: string): bigint | null {
   if (!/^\d+$/.test(value)) return null;
   try {
@@ -512,6 +521,19 @@ export function createDataServer(state: AppState): express.Express {
           }
           const allNotFound =
             errors.length > 0 && errors.every((item) => item.notFound);
+          // A source at the tip saying "not yet" outweighs one that timed out.
+          if (
+            !allNotFound &&
+            errors.some(isNotYet) &&
+            errors.every((item) => item.notFound || isUnavailable(item))
+          ) {
+            typedHeightError(
+              res,
+              'The block is too far in the future',
+              'BLOCK_DOES_NOT_EXIST',
+            );
+            return;
+          }
           if (!allNotFound) {
             logger.error(
               { errors, height },
@@ -552,6 +574,16 @@ export function createDataServer(state: AppState): express.Express {
             const headErrors =
               (headError as Error & { errors?: UpstreamError[] }).errors ?? [];
             if (sendRateLimit(res, headErrors)) return;
+            // A height above the node's published one is still in the future.
+            const published = state.localIndexer?.status?.published;
+            if (published && height > published) {
+              typedHeightError(
+                res,
+                'The block is too far in the future',
+                'BLOCK_DOES_NOT_EXIST',
+              );
+              return;
+            }
             jsonStringError(res, 503, 'Internal data error');
             return;
           }
