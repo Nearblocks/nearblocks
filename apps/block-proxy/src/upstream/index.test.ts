@@ -329,6 +329,71 @@ describe('fetchBlockDeduped', () => {
     });
   });
 
+  describe('with a polled upstream proxy', () => {
+    const withProxy = (head: number, sync: string) => {
+      const proxy = vi.fn().mockResolvedValue(BYTES);
+      const missing = Object.assign(new Error('not yet'), { notFound: true });
+      const state = makeState(vi.fn().mockRejectedValue(missing), 5000);
+      state.config.blockSources = ['proxy', 'neardata'];
+      state.blockProxy = {
+        fetch: proxy,
+        syncState: () => ({ head, state: sync }),
+      } as never;
+      return { proxy, state };
+    };
+
+    it('sends the next few heights to an in-sync proxy and skips beyond', async () => {
+      const { proxy, state } = withProxy(HEIGHT - 10, 'in_sync');
+      expect((await fetchBlockDeduped(state, HEIGHT)).source).toBe('proxy');
+      const error = await fetchBlockDeduped(state, HEIGHT + 1).catch(
+        (value) => value,
+      );
+      expect(proxy).toHaveBeenCalledOnce();
+      expect(error.errors[0]).toMatchObject({ notYet: true, source: 'proxy' });
+    });
+
+    it('serves only published heights from an out-of-sync proxy', async () => {
+      const { proxy, state } = withProxy(HEIGHT, 'out_of_sync');
+      expect((await fetchBlockDeduped(state, HEIGHT)).source).toBe('proxy');
+      await expect(fetchBlockDeduped(state, HEIGHT + 1)).rejects.toThrow();
+      expect(proxy).toHaveBeenCalledOnce();
+    });
+
+    it('hands a waited "not yet" from an in-sync proxy back without neardata', async () => {
+      const { proxy, state } = withProxy(HEIGHT - 1, 'in_sync');
+      const notYet = Object.assign(new Error('not yet'), {
+        body: '{"type":"BLOCK_DOES_NOT_EXIST"}',
+        notFound: true,
+      });
+      proxy.mockImplementation(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        throw notYet;
+      });
+      const error = await fetchBlockDeduped(state, HEIGHT).catch(
+        (value) => value,
+      );
+      expect(error.errors).toEqual([
+        expect.objectContaining({ source: 'proxy', tipWait: true }),
+      ]);
+      expect(state.neardata.fetch).not.toHaveBeenCalled();
+
+      // A quick "not yet" means the proxy just fell behind: ask neardata.
+      proxy.mockRejectedValue(notYet);
+      await expect(fetchBlockDeduped(state, HEIGHT)).rejects.toThrow();
+      expect(state.neardata.fetch).toHaveBeenCalledOnce();
+    });
+
+    it('skips a proxy that is down, at any height', async () => {
+      const { proxy, state } = withProxy(HEIGHT, 'down');
+      const error = await fetchBlockDeduped(state, HEIGHT - 5).catch(
+        (value) => value,
+      );
+      expect(proxy).not.toHaveBeenCalled();
+      expect(error.errors[0]).toMatchObject({ source: 'proxy' });
+      expect(error.errors[0].notFound).toBeUndefined();
+    });
+  });
+
   it('collapses concurrent requests for the same height into one fetch', async () => {
     const fetch = vi.fn().mockResolvedValue(BYTES);
     const state = makeState(fetch);

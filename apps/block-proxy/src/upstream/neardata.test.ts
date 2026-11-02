@@ -224,4 +224,37 @@ describe('upstream cooldown', () => {
     await expect(neardata.fetch(2)).rejects.toThrow('down');
     expect(fetch).toHaveBeenCalledTimes(4);
   });
+
+  it('polls the proxy head outside the cooldown and tells out of sync from down', async () => {
+    const fetch = vi.fn().mockResolvedValue(
+      new Response(null, {
+        headers: { location: '/v0/block/100' },
+        status: 302,
+      }),
+    );
+    vi.stubGlobal('fetch', fetch);
+    const proxy = new BlockProxyUpstream({
+      proxyUpstreamApiKey: '',
+      proxyUpstreamBaseUrl: 'https://node.example',
+      upstreamTimeoutMs: 1000,
+    } as never);
+    expect(proxy.syncState()).toEqual({ head: 0, state: 'unknown' });
+
+    await proxy.pollSync();
+    expect(proxy.syncState()).toEqual({ head: 100, state: 'in_sync' });
+
+    // Out of sync: the last in-sync head stays, and blocks are not cooled down.
+    fetch.mockResolvedValue(
+      new Response('"Internal data error"', { status: 503 }),
+    );
+    await proxy.pollSync();
+    expect(proxy.syncState()).toEqual({ head: 100, state: 'out_of_sync' });
+    fetch.mockResolvedValue(new Response('{"ok":true}'));
+    await proxy.fetch(100);
+
+    fetch.mockRejectedValue(new Error('connect timeout'));
+    await proxy.pollSync();
+    expect(proxy.syncState()).toEqual({ head: 100, state: 'down' });
+    expect(fetch).toHaveBeenCalledTimes(4);
+  });
 });

@@ -41,6 +41,8 @@ if (config.nodeIndexerEnabled) {
   state.localIndexer = new LocalIndexer(config);
 }
 
+if (config.blockSources.includes('proxy')) state.blockProxy.startSyncPoll();
+
 const dataApp = createDataServer(state);
 const adminApp = createAdminServer(state);
 
@@ -87,6 +89,7 @@ const onSignal = (signal: string) => {
   );
 
   if (evictionInterval) clearInterval(evictionInterval);
+  state.blockProxy.stopSyncPoll();
   state.ready = false;
 
   // Force exit if graceful shutdown takes too long

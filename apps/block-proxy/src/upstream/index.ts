@@ -5,6 +5,10 @@ import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import { type UpstreamError, UpstreamRedirectError } from '#types';
 
+// An in-sync proxy waits at least this long before saying "not yet"; a quicker
+// answer means its state changed since the last poll.
+const PROXY_TIP_WAIT_MS = 1000;
+
 function recordUpstreamOk(
   state: AppState,
   source: string,
@@ -123,6 +127,21 @@ function validateBlockBytes(
   }
 }
 
+/**
+ * Whether to bypass the upstream proxy, from its polled sync state. Its
+ * published blocks stay servable while it lags; past its head it serves only
+ * the next few heights, and only while in sync (it waits for them, as neardata
+ * does). Unpolled, it is tried as before; the cooldown remains the backstop.
+ */
+function proxySkip(state: AppState, height: number): 'ahead' | 'down' | null {
+  const sync = state.blockProxy.syncState?.();
+  if (!sync || sync.state === 'unknown') return null;
+  if (sync.state === 'down') return 'down';
+  const limit =
+    sync.state === 'in_sync' ? sync.head + MAX_WAIT_AHEAD_BLOCKS : sync.head;
+  return height > limit ? 'ahead' : null;
+}
+
 export async function fetchBlock(
   state: AppState,
   height: number,
@@ -225,6 +244,21 @@ export async function fetchBlock(
     }
 
     if (source === 'proxy') {
+      const skip = proxySkip(state, height);
+      if (skip) {
+        metrics.proxySkips.inc({ reason: skip });
+        errors.push(
+          skip === 'down'
+            ? { error: 'proxy skipped: unreachable', source: 'proxy' }
+            : {
+                error: `block ${height} is past the proxy head`,
+                notFound: true,
+                notYet: true,
+                source: 'proxy',
+              },
+        );
+        continue;
+      }
       const upstreamStart = Date.now();
       try {
         const bytes = await state.blockProxy.fetch(height, finality);
@@ -263,12 +297,19 @@ export async function fetchBlock(
           continue;
         }
         const error = toUpstreamError(err, 'proxy');
-        recordUpstreamFailure(
-          state,
-          'proxy',
-          Date.now() - upstreamStart,
-          !!error.notFound,
-        );
+        const elapsedMs = Date.now() - upstreamStart;
+        recordUpstreamFailure(state, 'proxy', elapsedMs, !!error.notFound);
+        // An in-sync proxy that waited and still says "not yet" speaks for the
+        // chain: neardata would only wait for it too. The caller asks again.
+        if (
+          error.notFound &&
+          error.body?.includes('BLOCK_DOES_NOT_EXIST') &&
+          elapsedMs >= PROXY_TIP_WAIT_MS &&
+          state.blockProxy.syncState?.().state === 'in_sync'
+        ) {
+          errors.push({ ...error, tipWait: true });
+          break;
+        }
         errors.push(error);
       }
       continue;

@@ -5,10 +5,14 @@ export interface UpstreamError {
   notFound?: boolean;
   /** Older than this proxy holds: another source may still have it. */
   notHeld?: boolean;
+  /** Past the source's head: the block may not exist yet. */
+  notYet?: boolean;
   pending?: boolean;
   retryAfter?: string;
   source: string;
   status?: number;
+  /** An in-sync source waited at the tip: ask it again, as neardata loops. */
+  tipWait?: boolean;
 }
 
 export class UpstreamRedirectError extends Error {

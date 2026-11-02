@@ -974,6 +974,80 @@ describe('block API behavior', () => {
     });
   });
 
+  describe('with a polled upstream proxy', () => {
+    const withProxySync =
+      (head: number, sync: string) => async (state: AppState) => {
+        Object.assign(state.blockProxy, {
+          syncState: () => ({ head, state: sync }),
+        });
+      };
+
+    it('takes the head from the poll, never a live lookup', async () => {
+      await withServer(
+        async (baseUrl, state) => {
+          await withProxySync(HEIGHT + 5, 'in_sync')(state);
+          const response = await fetch(`${baseUrl}/v0/last_block/final`, {
+            redirect: 'manual',
+          });
+          expect(response.headers.get('location')).toBe(
+            `/v0/block/${HEIGHT + 5}`,
+          );
+          expect(state.blockProxy.fetchLastBlockHeight).not.toHaveBeenCalled();
+          expect(state.neardata.fetchLastBlockHeight).not.toHaveBeenCalled();
+        },
+        { localHeight: null, sources: ['proxy', 'neardata'] },
+      );
+    });
+
+    it('holds a tip request on the in-sync proxy until the block appears', async () => {
+      await withServer(
+        async (baseUrl, state) => {
+          await withProxySync(HEIGHT - 1, 'in_sync')(state);
+          (state.config as { dedupTtlMs: number }).dedupTtlMs = 5000;
+          const notYet = Object.assign(new Error('not yet'), {
+            body: '{"type":"BLOCK_DOES_NOT_EXIST"}',
+            notFound: true,
+          });
+          vi.mocked(state.blockProxy.fetch)
+            .mockImplementationOnce(async () => {
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              throw notYet;
+            })
+            .mockResolvedValueOnce(blockBytes);
+          const response = await fetch(`${baseUrl}/v0/block/${HEIGHT}`);
+          expect(response.status).toBe(200);
+          expect(response.headers.get('x-upstream-source')).toBe('proxy');
+          expect(state.blockProxy.fetch).toHaveBeenCalledTimes(2);
+          expect(state.neardata.fetch).not.toHaveBeenCalled();
+        },
+        { localHeight: null, sources: ['proxy', 'neardata'] },
+      );
+    });
+
+    it('answers not yet when the proxy is behind and neardata times out', async () => {
+      await withServer(
+        async (baseUrl, state) => {
+          await withProxySync(HEIGHT, 'out_of_sync')(state);
+          vi.mocked(state.neardata.fetch).mockRejectedValue(
+            new Error('neardata timeout'),
+          );
+          const response = await fetch(`${baseUrl}/v0/block/${HEIGHT + 1}`);
+          expect(response.status).toBe(404);
+          expect(await response.json()).toMatchObject({
+            type: 'BLOCK_DOES_NOT_EXIST',
+          });
+          expect(state.blockProxy.fetch).not.toHaveBeenCalled();
+
+          // A height a head lookup has proven to exist stays a 502.
+          await fetch(`${baseUrl}/v0/last_block/final`, { redirect: 'manual' });
+          const known = await fetch(`${baseUrl}/v0/block/${HEIGHT + 1}`);
+          expect(known.status).toBe(502);
+        },
+        { localHeight: null, sources: ['proxy', 'neardata'] },
+      );
+    });
+  });
+
   it('answers tip misses from a fresh head without another lookup', async () => {
     await withServer(
       async (baseUrl, state) => {

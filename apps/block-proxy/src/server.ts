@@ -23,6 +23,9 @@ const MAX_BEHIND_HEAD_RETRIES = 3;
 const LAST_BLOCK_CACHE_MS = 100;
 // A head seen this recently already proves a higher height is in the future.
 const MISS_HEAD_MAX_AGE_MS = 1000;
+// neardata holds a near-tip request until the block appears; indexers abort at
+// 30s. Hold as long, short of that, and answer "not yet" after.
+const TIP_HOLD_MS = 25_000;
 const RPC_METHOD_NOT_ALLOWED = -32601;
 const MAX_RPC_BATCH = 100;
 
@@ -30,6 +33,16 @@ const MAX_RPC_BATCH = 100;
 function nodeTipWaitMs(state: AppState, height: number): number {
   const published = state.localIndexer?.status?.published ?? height;
   return (Math.max(height - published, 0) + 1) * 1000;
+}
+
+function isNotYet(error: UpstreamError): boolean {
+  if (error.notYet) return true;
+  return !!error.notFound && !!error.body?.includes('BLOCK_DOES_NOT_EXIST');
+}
+
+// Timeouts, connection failures and 5xx: a source that could not answer.
+function isUnavailable(error: UpstreamError): boolean {
+  return error.status === undefined || error.status >= 500;
 }
 
 function parseU64(value: string): bigint | null {
@@ -258,7 +271,12 @@ export function createDataServer(state: AppState): express.Express {
           if (source === 'node') {
             height = state.localIndexer?.currentFinalizedHeight() ?? null;
           } else if (source === 'proxy') {
-            height = await state.blockProxy.fetchLastBlockHeight('final');
+            // Use the poller's view: a live lookup waits out a hung proxy, and
+            // an out-of-sync one answers 503, which would start its cooldown.
+            const sync = state.blockProxy.syncState?.();
+            if (sync && sync.state !== 'unknown')
+              height = sync.state === 'in_sync' ? sync.head : null;
+            else height = await state.blockProxy.fetchLastBlockHeight('final');
           } else if (source === 'neardata') {
             height = await state.neardata.fetchLastBlockHeight('final');
           }
@@ -453,6 +471,7 @@ export function createDataServer(state: AppState): express.Express {
       let nodeWaitDeadline: null | number = null;
       let finalNodeRecheck = false;
       let skipNodeAfterWait = false;
+      let tipHoldDeadline: null | number = null;
       res.once('close', () => {
         clientDisconnected = true;
       });
@@ -499,6 +518,11 @@ export function createDataServer(state: AppState): express.Express {
             await sleep(state.config.indexerIntervalMs);
             continue;
           }
+          // The in-sync proxy already waited about (ahead + 1)s; ask it again.
+          if (errors.some((item) => item.tipWait)) {
+            tipHoldDeadline ??= Date.now() + TIP_HOLD_MS;
+            if (Date.now() < tipHoldDeadline) continue;
+          }
           if (sendRateLimit(res, errors)) return;
           // The node only holds recent blocks. Answer an older miss at once,
           // and as a miss: a downstream proxy then tries its next source
@@ -512,6 +536,22 @@ export function createDataServer(state: AppState): express.Express {
           }
           const allNotFound =
             errors.length > 0 && errors.every((item) => item.notFound);
+          // A source at the tip saying "not yet" outweighs one that timed out,
+          // e.g. neardata holding requests through a chain-wide finality pause.
+          // Not for heights known to exist: those stay a 502.
+          if (
+            !allNotFound &&
+            height > highestFinalizedHeight &&
+            errors.some(isNotYet) &&
+            errors.every((item) => item.notFound || isUnavailable(item))
+          ) {
+            typedHeightError(
+              res,
+              'The block is too far in the future',
+              'BLOCK_DOES_NOT_EXIST',
+            );
+            return;
+          }
           if (!allNotFound) {
             logger.error(
               { errors, height },
@@ -552,6 +592,16 @@ export function createDataServer(state: AppState): express.Express {
             const headErrors =
               (headError as Error & { errors?: UpstreamError[] }).errors ?? [];
             if (sendRateLimit(res, headErrors)) return;
+            // A height above the node's published one is still in the future.
+            const published = state.localIndexer?.status?.published;
+            if (published && height > published) {
+              typedHeightError(
+                res,
+                'The block is too far in the future',
+                'BLOCK_DOES_NOT_EXIST',
+              );
+              return;
+            }
             jsonStringError(res, 503, 'Internal data error');
             return;
           }

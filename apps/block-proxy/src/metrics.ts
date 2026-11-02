@@ -124,6 +124,24 @@ export const nodeInSync = new client.Gauge({
   registers: [register],
 });
 
+export const proxySyncState = new client.Gauge({
+  help: 'Upstream proxy sync state from its head endpoint, polled every second (1 for the current state)',
+  labelNames: ['state'] as const,
+  name: 'block_proxy_proxy_sync_state',
+  registers: [register],
+});
+export const proxyHead = new client.Gauge({
+  help: 'Last finalized height the upstream proxy reported while in sync',
+  name: 'block_proxy_proxy_head_height',
+  registers: [register],
+});
+export const proxySkips = new client.Counter({
+  help: 'Block requests not sent to the upstream proxy because of its sync state',
+  labelNames: ['reason'] as const,
+  name: 'block_proxy_proxy_skips_total',
+  registers: [register],
+});
+
 export const indexerReanchors = new client.Counter({
   help: 'Times the local indexer restarted at the node head, leaving earlier heights to remote sources',
   name: 'block_proxy_indexer_reanchors_total',

@@ -10,6 +10,22 @@ const MAX_REDIRECTS = 3;
 // The upstream proxy is first in line; neardata is the last resort and keeps
 // being tried.
 const PROXY_SOURCE_COOLDOWN_MS = 10_000;
+// The upstream proxy's sync state is polled, not inferred from block traffic:
+// once routing stops sending tip requests to it, only a poll sees it recover.
+const PROXY_SYNC_POLL_MS = 1000;
+// Short, so a hung proxy is skipped within about 2s; a slow poll only sends
+// a second of traffic to neardata.
+const PROXY_SYNC_TIMEOUT_MS = 1000;
+// A poll result older than this means the poller itself stalled.
+const PROXY_SYNC_STALE_MS = 5000;
+
+/**
+ * The upstream proxy as its own head endpoint reports it: `in_sync` with a
+ * height, `out_of_sync` (it answered 503) or `down` (no answer, or another
+ * error). `head` is the last height seen in sync; published blocks are
+ * immutable, so it stays servable while the proxy lags.
+ */
+export type ProxySyncState = 'down' | 'in_sync' | 'out_of_sync' | 'unknown';
 
 /** Release response bodies that are not consumed. */
 const discardBody = async (response: Response): Promise<void> => {
@@ -117,6 +133,11 @@ export class RemoteBlockUpstream {
     finality: 'final' | 'optimistic' = 'final',
   ): Promise<{ bytes: Buffer; source: null | string }> {
     return this.guard(() => this.fetchBlock(height, finality));
+  }
+
+  /** The head, with its own timeout and outside the cooldown. */
+  protected headHeightUnguarded(timeoutMs: number): Promise<number> {
+    return this.fetchHeadHeight('final', timeoutMs);
   }
 
   private buildUrl(path: string): string {
@@ -227,12 +248,13 @@ export class RemoteBlockUpstream {
 
   private async fetchHeadHeight(
     finality: 'final' | 'optimistic',
+    timeoutMs = this.timeoutMs,
   ): Promise<number> {
     const url = this.buildUrl(`/v0/last_block/${finality}`);
     const response = await globalThis.fetch(url, {
       headers: this.headers(),
       redirect: 'manual',
-      signal: AbortSignal.timeout(this.timeoutMs),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location');
@@ -340,6 +362,9 @@ export class NeardataUpstream extends RemoteBlockUpstream {
 }
 
 export class BlockProxyUpstream extends RemoteBlockUpstream {
+  private pollTimer: null | ReturnType<typeof setTimeout> = null;
+  private sync = { head: 0, state: 'unknown' as ProxySyncState, updatedAt: 0 };
+
   constructor(config: Config) {
     super(
       'proxy',
@@ -349,5 +374,51 @@ export class BlockProxyUpstream extends RemoteBlockUpstream {
       'bearer',
       PROXY_SOURCE_COOLDOWN_MS,
     );
+  }
+
+  /** Poll the head endpoint, outside the cooldown: a 503 here is not an outage. */
+  async pollSync(): Promise<void> {
+    let state: ProxySyncState;
+    try {
+      const height = await this.headHeightUnguarded(PROXY_SYNC_TIMEOUT_MS);
+      this.sync.head = Math.max(this.sync.head, height);
+      state = 'in_sync';
+    } catch (error) {
+      state =
+        (error as { status?: unknown }).status === 503 ? 'out_of_sync' : 'down';
+    }
+    if (state !== this.sync.state)
+      logger[state === 'in_sync' ? 'info' : 'warn'](
+        { head: this.sync.head, state },
+        'upstream proxy sync state changed',
+      );
+    this.sync.state = state;
+    this.sync.updatedAt = Date.now();
+    metrics.proxyHead.set(this.sync.head);
+    for (const name of ['down', 'in_sync', 'out_of_sync'] as const)
+      metrics.proxySyncState.set({ state: name }, name === state ? 1 : 0);
+  }
+
+  startSyncPoll(): void {
+    if (this.pollTimer) return;
+    const loop = () => {
+      void this.pollSync().finally(() => {
+        this.pollTimer = setTimeout(loop, PROXY_SYNC_POLL_MS);
+        this.pollTimer.unref();
+      });
+    };
+    loop();
+  }
+
+  stopSyncPoll(): void {
+    if (this.pollTimer) clearTimeout(this.pollTimer);
+    this.pollTimer = null;
+  }
+
+  syncState(): { head: number; state: ProxySyncState } {
+    const stale =
+      this.sync.state !== 'unknown' &&
+      Date.now() - this.sync.updatedAt > PROXY_SYNC_STALE_MS;
+    return { head: this.sync.head, state: stale ? 'down' : this.sync.state };
   }
 }
