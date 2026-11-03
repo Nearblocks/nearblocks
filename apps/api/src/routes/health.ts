@@ -11,6 +11,7 @@ const routes = (app: Router) => {
 
   route.get('/indexer-base', health.base);
   route.get('/indexer-receipts', health.receipts);
+  route.get('/rpc-node', health.rpcNode);
 };
 
 export default routes;

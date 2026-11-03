@@ -336,16 +336,16 @@ v2 exposed only `GET /v2/mts/contract/{contract}/{token_id}` (metadata). v3 adds
 
 ### Sync status
 
-| v1                                    | v3                                                                                                                                              |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET /v1/sync/status`                 | Removed — use per-indexer endpoints below                                                                                                       |
-| `GET /v1/sync/status/ft-holders`      | `GET /v3/sync/status/ft-holders`                                                                                                                |
-| `GET /v1/sync/status/nft-holders`     | `GET /v3/sync/status/nft-holders`                                                                                                               |
-| `GET /v1/sync/status/indexer-balance` | `GET /v3/sync/status/indexer-balance`                                                                                                           |
-| `GET /v1/sync/status/indexer-base`    | `GET /v3/sync/status/indexer-base`                                                                                                              |
-| `GET /v1/sync/status/indexer-events`  | `GET /v3/sync/status/indexer-events`                                                                                                            |
-| `GET /v1/sync/status/daily-stats`     | `GET /v3/sync/status/daily-stats`                                                                                                               |
-| —                                     | `GET /v3/sync/status/mt-holders`, `/indexer-receipts`, `/indexer-accounts`, `/indexer-contract`, `/indexer-signature`, `/indexer-staking` (new) |
+| v1                                    | v3                                                                                                                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /v1/sync/status`                 | Removed — use per-indexer endpoints below                                                                                                                    |
+| `GET /v1/sync/status/ft-holders`      | `GET /v3/sync/status/ft-holders`                                                                                                                             |
+| `GET /v1/sync/status/nft-holders`     | `GET /v3/sync/status/nft-holders`                                                                                                                            |
+| `GET /v1/sync/status/indexer-balance` | `GET /v3/sync/status/indexer-balance`                                                                                                                        |
+| `GET /v1/sync/status/indexer-base`    | `GET /v3/sync/status/indexer-base`                                                                                                                           |
+| `GET /v1/sync/status/indexer-events`  | `GET /v3/sync/status/indexer-events`                                                                                                                         |
+| `GET /v1/sync/status/daily-stats`     | `GET /v3/sync/status/daily-stats`                                                                                                                            |
+| —                                     | `GET /v3/sync/status/mt-holders`, `/indexer-receipts`, `/indexer-accounts`, `/indexer-contract`, `/indexer-signature`, `/indexer-staking`, `/rpc-node` (new) |
 
 ---
 
