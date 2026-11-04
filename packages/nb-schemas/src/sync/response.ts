@@ -13,8 +13,8 @@ const dateStatus = v.object({
   sync: v.boolean(),
 });
 
-// The primary RPC node behind block-proxy. While it lags, RPC falls back to
-// FastNear; sync is false so monitors alert.
+// An RPC node behind block-proxy. While it lags, RPC falls back to the next
+// endpoint; sync is false so monitors alert.
 const rpcNodeStatus = v.object({
   flat_storage_deltas: v.nullable(v.number()),
   has_state_snapshot: v.nullable(v.boolean()),
@@ -23,6 +23,8 @@ const rpcNodeStatus = v.object({
   peers: v.nullable(v.number()),
   sync: v.boolean(),
 });
+
+const rpcNodesStatus = v.record(v.string(), rpcNodeStatus);
 
 const multichainStatus = v.record(v.string(), blockStatus);
 
@@ -57,20 +59,21 @@ const syncStatus = v.object({
   jobs: v.object({
     daily_stats: dateStatus,
   }),
-  rpc: v.optional(v.object({ node: rpcNodeStatus })),
+  rpc: v.optional(v.object({ nodes: rpcNodesStatus })),
 });
 
 const syncStatusResponse = responseSchema(syncStatus);
 const blockStatusResponse = responseSchema(blockStatus);
 const dateStatusResponse = responseSchema(dateStatus);
 const multichainStatusResponse = responseSchema(multichainStatus);
-const rpcNodeStatusResponse = responseSchema(rpcNodeStatus);
+const rpcNodesStatusResponse = responseSchema(rpcNodesStatus);
 const tvlStatusResponse = responseSchema(tvlStatus);
 
 export type BlockStatus = v.InferOutput<typeof blockStatus>;
 export type DateStatus = v.InferOutput<typeof dateStatus>;
 export type MultichainStatus = v.InferOutput<typeof multichainStatus>;
 export type RpcNodeStatus = v.InferOutput<typeof rpcNodeStatus>;
+export type RpcNodesStatus = v.InferOutput<typeof rpcNodesStatus>;
 export type SyncStatus = v.InferOutput<typeof syncStatus>;
 export type TvlStatus = v.InferOutput<typeof tvlStatus>;
 export type SyncStatusRes = v.InferOutput<typeof syncStatusResponse>;
@@ -95,7 +98,7 @@ export default {
   nftAccountHolders: blockStatusResponse,
   nftHolders: blockStatusResponse,
   receipts: blockStatusResponse,
-  rpcNode: rpcNodeStatusResponse,
+  rpcNodes: rpcNodesStatusResponse,
   signature: blockStatusResponse,
   staking: blockStatusResponse,
   status: syncStatusResponse,

@@ -6,7 +6,7 @@ import service from '#services/v3/sync/index';
 
 const routes = (app: Router) => {
   app.get('/sync/status', bearerAuth, rateLimiter, service.status);
-  app.get('/sync/status/rpc-node', bearerAuth, rateLimiter, service.rpcNode);
+  app.get('/sync/status/rpc-nodes', bearerAuth, rateLimiter, service.rpcNodes);
   app.get(
     '/sync/status/ft-holders',
     bearerAuth,

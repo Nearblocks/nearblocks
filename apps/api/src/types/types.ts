@@ -51,7 +51,7 @@ export type Config = {
   redisSentinelUrls: string;
   redisUrl: string;
   rpcAuthTokens: string[];
-  rpcNodeStatus: { token: string; url: string } | null;
+  rpcNodes: { name: string; token: string; url: string }[];
   rpcUrl: string;
   rpcUrls: string[];
   sentryDsn?: string;

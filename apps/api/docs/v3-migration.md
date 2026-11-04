@@ -16,7 +16,7 @@ Everything else is additive: the new multi-token (NEP-245), intents, analytics, 
 
 These changes are mechanical, so an AI coding assistant can handle most of them. Paste this guide and your integration code into Claude Code, Cursor, or your agent of choice with a prompt like:
 
-> Migrate this codebase from NearBlocks API v1/v2 to v3. Apply: (1) endpoint paths `/v1/`,`/v2/` → `/v3/` (and `/account/` → `/accounts/`, `stake-txns` → `staking-txns`, `chain-abstraction` → `multichain`); (2) pagination `page`/`per_page` → opaque `next`/`prev` cursors + `limit`; (3) read results from `data` and pagination from `meta` instead of keys like `txns`; (4) rename filters `from`/`to` → `signer`/`receiver`; (5) date filters → nanosecond `before_ts`; (6) block metadata from the nested `block` object; (7) capped counts as strings like `"10000+"`. Flag any use of deprecated endpoints (activities, ETH-implicit accounts, kitwallet, legacy, health) that have no v3 equivalent. Do not change authentication; API keys stay the same.
+> Migrate this codebase from NearBlocks API v1/v2 to v3. Apply: (1) endpoint paths `/v1/`,`/v2/` → `/v3/` (and `/account/` → `/accounts/`, `stake-txns` → `staking-txns`, `chain-abstraction` → `multichain`); (2) pagination `page`/`per_page` → opaque `next`/`prev` cursors + `limit`; (3) read results from `data` and pagination from `meta` instead of keys like `txns`; (4) rename filters `from`/`to` → `signer`/`receiver`; (5) date filters → nanosecond `before_ts`; (6) block metadata from the nested `block` object; (7) capped counts as strings like `"10000+"`. Flag any use of deprecated endpoints (activities, ETH-implicit accounts, kitwallet, legacy) that have no v3 equivalent. Do not change authentication; API keys stay the same.
 
 Then review its changes against the reference tables below.
 
@@ -334,19 +334,6 @@ v2 exposed only `GET /v2/mts/contract/{contract}/{token_id}` (metadata). v3 adds
 - `GET /v3/intents/txns` — intents transfer events (public)
 - `GET /v3/intents/txns/count` — public count
 
-### Sync status
-
-| v1                                    | v3                                                                                                                                                           |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `GET /v1/sync/status`                 | Removed — use per-indexer endpoints below                                                                                                                    |
-| `GET /v1/sync/status/ft-holders`      | `GET /v3/sync/status/ft-holders`                                                                                                                             |
-| `GET /v1/sync/status/nft-holders`     | `GET /v3/sync/status/nft-holders`                                                                                                                            |
-| `GET /v1/sync/status/indexer-balance` | `GET /v3/sync/status/indexer-balance`                                                                                                                        |
-| `GET /v1/sync/status/indexer-base`    | `GET /v3/sync/status/indexer-base`                                                                                                                           |
-| `GET /v1/sync/status/indexer-events`  | `GET /v3/sync/status/indexer-events`                                                                                                                         |
-| `GET /v1/sync/status/daily-stats`     | `GET /v3/sync/status/daily-stats`                                                                                                                            |
-| —                                     | `GET /v3/sync/status/mt-holders`, `/indexer-receipts`, `/indexer-accounts`, `/indexer-contract`, `/indexer-signature`, `/indexer-staking`, `/rpc-node` (new) |
-
 ---
 
 ## 6. Deprecated endpoints (no v3 equivalent)
@@ -359,7 +346,6 @@ These are being retired along with v1/v2 and will not be carried into v3. They h
 - `GET /v1/kitwallet/*` — kitwallet compatibility endpoints
 - `GET /v1/legacy/*` — legacy supply/fees endpoints
 - `GET /v1/campaigns/*` — ads/campaigns
-- `GET /v1/health/*` — use `/v3/sync/status/*`
 
 ---
 

@@ -18,7 +18,7 @@ then the full migration guide.
    - Error: `{ "data": null, "errors": [{ "message", "path" }] }`
    - There are no domain-keyed wrappers (`{ "txns": [...] }`) anymore — always read `data`.
 2. **Pagination** — `limit` (1–100, default 25) plus opaque `next` / `prev` cursors taken from `meta.next_page` / `meta.prev_page`. Cursors are opaque tokens — never parse or construct them. No `page`/`per_page`/offset. Use `before_ts` (19-digit nanosecond timestamp) to start from a point in time. Lists are newest-first.
-3. **Endpoints** — `/v3/txns`, `/v3/blocks`, `/v3/accounts/{account}/*`, `/v3/fts`, `/v3/nfts`, `/v3/mts`, `/v3/keys`, `/v3/search`, `/v3/multichain`, `/v3/intents`, `/v3/validators`, `/v3/stats`, `/v3/sync/status/*`. Most `*/count` endpoints are internal-only for public keys.
+3. **Endpoints** — `/v3/txns`, `/v3/blocks`, `/v3/accounts/{account}/*`, `/v3/fts`, `/v3/nfts`, `/v3/mts`, `/v3/keys`, `/v3/search`, `/v3/multichain`, `/v3/intents`, `/v3/validators`, `/v3/stats`. Most `*/count` endpoints are internal-only for public keys.
 4. **Common renames** — `/account/` → `/accounts/`, `from`/`to` → `signer`/`receiver`, `stake-txns` → `staking-txns`, `chain-abstraction` → `multichain`.
 
 ## Do not

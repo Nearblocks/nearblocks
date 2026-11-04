@@ -2,6 +2,7 @@ import type {
   BlockStatus,
   DateStatus,
   MultichainStatus,
+  RpcNodesStatus,
   RpcNodeStatus,
   SyncStatus,
   TvlStatus,
@@ -273,14 +274,14 @@ const UNKNOWN_RPC_NODE: RpcNodeStatus = {
 const numberOrNull = (value: unknown) =>
   typeof value === 'number' && Number.isFinite(value) ? value : null;
 
-// Health of the block-proxy primary RPC node. Unreachable counts as not in
-// sync: the RPC traffic is then on the fallback provider either way.
-const getRpcNodeStatus = async (): Promise<RpcNodeStatus | undefined> => {
-  const target = config.rpcNodeStatus;
-  if (!target) return undefined;
+// Health of one block-proxy RPC node. Unreachable counts as not in sync: its
+// RPC traffic is then on the next endpoint either way.
+const getRpcNodeStatus = async (
+  node: (typeof config.rpcNodes)[number],
+): Promise<RpcNodeStatus> => {
   try {
-    const res = await fetch(target.url, {
-      headers: target.token ? { Authorization: `Bearer ${target.token}` } : {},
+    const res = await fetch(node.url, {
+      headers: node.token ? { Authorization: `Bearer ${node.token}` } : {},
       signal: AbortSignal.timeout(RPC_NODE_TIMEOUT_MS),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -298,9 +299,20 @@ const getRpcNodeStatus = async (): Promise<RpcNodeStatus | undefined> => {
       sync: body.healthy === true,
     };
   } catch (error) {
-    logger.warn({ error: String(error) }, 'rpc node status unavailable');
+    logger.warn(
+      { error: String(error), node: node.name },
+      'rpc node status unavailable',
+    );
     return UNKNOWN_RPC_NODE;
   }
+};
+
+const getRpcNodesStatus = async (): Promise<RpcNodesStatus | undefined> => {
+  if (!config.rpcNodes.length) return undefined;
+  const statuses = await Promise.all(config.rpcNodes.map(getRpcNodeStatus));
+  return Object.fromEntries(
+    config.rpcNodes.map((node, index) => [node.name, statuses[index]]),
+  );
 };
 
 const accounts = responseHandler(response.accounts, async () => ({
@@ -377,8 +389,8 @@ const mtHolders = responseHandler(response.mtHolders, async () => ({
   data: await getMTHoldersStatus(),
 }));
 
-const rpcNode = responseHandler(response.rpcNode, async () => ({
-  data: (await getRpcNodeStatus()) ?? UNKNOWN_RPC_NODE,
+const rpcNodes = responseHandler(response.rpcNodes, async () => ({
+  data: (await getRpcNodesStatus()) ?? {},
 }));
 
 const receipts = responseHandler(response.receipts, async () => ({
@@ -420,7 +432,7 @@ const status = responseHandler(response.status, async () => {
     intentsStatsData,
     intentsAccountStatsData,
     tvlStatsData,
-    rpcNodeData,
+    rpcNodesData,
   ] = await Promise.all([
     getBaseStatus(),
     getBalanceStatus(),
@@ -443,7 +455,7 @@ const status = responseHandler(response.status, async () => {
     getIntentsStatsStatus(),
     getIntentsAccountStatsStatus(),
     getTvlStatsStatus(),
-    getRpcNodeStatus(),
+    getRpcNodesStatus(),
   ]);
 
   const data: SyncStatus = {
@@ -475,7 +487,7 @@ const status = responseHandler(response.status, async () => {
     jobs: {
       daily_stats: statsData,
     },
-    ...(rpcNodeData ? { rpc: { node: rpcNodeData } } : {}),
+    ...(rpcNodesData ? { rpc: { nodes: rpcNodesData } } : {}),
   };
 
   return { data };
@@ -489,7 +501,7 @@ export {
   getFTHoldersStatus,
   getNFTHoldersStatus,
   getReceiptsStatus,
-  getRpcNodeStatus,
+  getRpcNodesStatus,
   getStatStatus,
 };
 
@@ -511,7 +523,7 @@ export default {
   nftAccountHolders,
   nftHolders,
   receipts,
-  rpcNode,
+  rpcNodes,
   signature,
   staking,
   status,
