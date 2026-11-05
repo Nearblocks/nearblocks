@@ -13,6 +13,7 @@ import logger from '#libs/logger';
 import { register as metricsRegister } from '#libs/promMetrics';
 import sentry from '#libs/sentry';
 import internalOnly from '#middlewares/internalOnly';
+import legacyApi from '#middlewares/legacyApi';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import { usageEvents } from '#middlewares/usageEvents';
 import routes from '#routes/index';
@@ -70,6 +71,7 @@ app.get('/metrics', internalOnly, async (_req, res, next) => {
 });
 
 app.use(usageEvents);
+app.use(legacyApi);
 
 app.use('/v1', routes());
 app.use('/v2', routesV2());
