@@ -123,7 +123,7 @@ if (rpcAuthTokens.length !== rpcUrls.length) {
 const legacyApiSunset = new Date(
   env.LEGACY_API_SUNSET ||
     (env.NETWORK === Network.MAINNET
-      ? '2026-12-05T00:00:00Z'
+      ? '2026-12-01T00:00:00Z'
       : '2026-11-05T00:00:00Z'),
 );
 if (Number.isNaN(legacyApiSunset.getTime())) {

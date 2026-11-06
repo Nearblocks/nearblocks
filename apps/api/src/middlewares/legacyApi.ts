@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import config from '#config';
 
-const DEPRECATED_AT = Date.parse('2026-11-05T00:00:00Z');
+const DEPRECATED_AT = Date.parse('2026-11-06T00:00:00Z');
 const LEGACY = /^\/v[12](\/|$)/;
 // Internal probes, not part of the public API.
 const KEEP = /^\/v1\/(health|sync)(\/|$)/;

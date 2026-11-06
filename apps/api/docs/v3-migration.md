@@ -1,6 +1,6 @@
 # Migrating to NearBlocks API v3
 
-> **v1 and v2 are deprecated.** Testnet retired them on **5 November 2026**. Mainnet retires them on **5 December 2026**. After that date they return `410 Gone`. Until then, every v1/v2 response carries `Deprecation` and `Sunset` headers.
+> **v1 and v2 are deprecated.** Testnet has retired them; mainnet retires them at the end of November 2026.
 
 v3 reworks the whole API. If you only remember one thing: paths move to `/v3/*`, every response is `{ "data": ..., "meta": ... }`, and pagination is cursor-based. Your API key doesn't change; it's the same bearer token (`Authorization: Bearer <key>`).
 
