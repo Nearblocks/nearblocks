@@ -37,7 +37,6 @@ const supervise = async (
         { chain, delayMs: delay, error },
         'chain sync failed, restarting',
       );
-      Sentry.captureException(error, { tags: { chain } });
       await sleep(delay);
       delay = Math.min(delay * 2, MAX_RESTART_DELAY_MS);
     }
