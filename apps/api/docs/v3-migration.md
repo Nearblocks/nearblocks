@@ -1,5 +1,7 @@
 # Migrating to NearBlocks API v3
 
+> **v1 and v2 are deprecated.** Testnet has retired them; mainnet retires them at the end of November 2026.
+
 v3 reworks the whole API. If you only remember one thing: paths move to `/v3/*`, every response is `{ "data": ..., "meta": ... }`, and pagination is cursor-based. Your API key doesn't change; it's the same bearer token (`Authorization: Bearer <key>`).
 
 Most integrations only touch `txns` and `accounts`, so start there. The rest of this guide is reference you can pull from as needed.

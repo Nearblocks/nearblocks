@@ -31,6 +31,7 @@ export type Config = {
   eventsStart: bigint;
   fastnearApiKey: string;
   fastnearUrl: string;
+  legacyApiSunset: Date;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryCount: number;

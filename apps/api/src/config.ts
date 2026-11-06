@@ -30,6 +30,8 @@ const env = cleanEnv(process.env, {
   DB_WRITE_URL_BASE: str(dbFallback),
   FASTNEAR_API_KEY: str({ default: '' }),
   FASTNEAR_URL: str({ default: '' }),
+  // ISO date when /v1 and /v2 start returning 410; defaults per network below.
+  LEGACY_API_SUNSET: str({ default: '' }),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -118,6 +120,16 @@ if (rpcAuthTokens.length !== rpcUrls.length) {
   throw new Error('RPC_AUTH_TOKENS must have one entry per RPC_URLS endpoint.');
 }
 
+const legacyApiSunset = new Date(
+  env.LEGACY_API_SUNSET ||
+    (env.NETWORK === Network.MAINNET
+      ? '2026-12-01T00:00:00Z'
+      : '2026-11-05T00:00:00Z'),
+);
+if (Number.isNaN(legacyApiSunset.getTime())) {
+  throw new Error('LEGACY_API_SUNSET must be an ISO date.');
+}
+
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
   apiUrl: env.API_URL,
@@ -141,6 +153,7 @@ const config: Config = {
     (env.NETWORK === Network.MAINNET
       ? 'https://api.fastnear.com'
       : 'https://test.api.fastnear.com'),
+  legacyApiSunset,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryCount: 10000,

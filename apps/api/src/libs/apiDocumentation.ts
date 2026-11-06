@@ -42,7 +42,7 @@ const servers = [
 ];
 
 const apiDocumentation = async (app: Application, dir: string) => {
-  const legacyDescription = `<p><strong>These are deprecated endpoints. They will be removed in a future release.</strong></p>
+  const legacyDescription = `<p><strong>Deprecated. Testnet has retired these endpoints; mainnet retires them at the end of November 2026.</strong></p>
         <p>For new integrations, use the <a href="/api-docs">current API</a>. See the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> to move existing integrations.</p>
         `;
 
