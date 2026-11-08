@@ -70,6 +70,11 @@ app.get('/metrics', internalOnly, async (_req, res, next) => {
   }
 });
 
+// Request start time, for the duration in error logs.
+app.use((_req, res, next) => {
+  res.locals.startedAt = Date.now();
+  next();
+});
 app.use(usageEvents);
 app.use(legacyApi);
 
@@ -88,7 +93,20 @@ app.use((_req: Request, res: Response) => {
 
 app.use(sentry.Handlers.errorHandler());
 
-app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+// Which request failed and how: path without the query (it can carry API keys), the
+// router-relative route pattern, duration and the error code (Postgres 57014 = statement timeout).
+const errorContext = (err: Error, req: Request, res: Response) => ({
+  code: (err as { code?: unknown }).code,
+  durationMs:
+    typeof res.locals.startedAt === 'number'
+      ? Date.now() - res.locals.startedAt
+      : undefined,
+  method: req.method,
+  path: req.originalUrl.split('?')[0],
+  route: req.route?.path,
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (res.headersSent) {
     return next(err);
   }
@@ -97,13 +115,16 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
     const errors = err.issues.map(
       (issue) => `${v.getDotPath(issue)}: ${issue.message}`,
     );
-    logger.error(errors);
+    logger.error(
+      { ...errorContext(err, req, res), errors },
+      'invalid response',
+    );
     return res
       .status(500)
       .json({ data: null, errors: [{ message: 'Server Error' }] });
   }
 
-  logger.error(err.stack);
+  logger.error({ ...errorContext(err, req, res), err }, err.message);
   return res
     .status(500)
     .json({ data: null, errors: [{ message: 'Server Error' }] });
