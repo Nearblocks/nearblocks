@@ -10,6 +10,9 @@ import type { Nodes } from '#libs/schema/legacy';
 const HASH = `api:${config.network}:telemetry:nodes`;
 const SEEN = `${HASH}:seen`;
 const MAX_NODES = 20_000;
+const MAX_LIST = 5_000;
+const CACHE_MS = 30_000;
+const FULL_PRUNE_MS = 3_600_000;
 const ONLINE_MS = 10 * 60_000;
 const STALE_MS = 24 * 3_600_000;
 
@@ -43,14 +46,17 @@ type Geo = {
 export const geoFromHeaders = (
   get: (name: string) => string | undefined,
 ): Geo => {
-  const country = get('cf-ipcountry');
+  // Only trust Cloudflare headers on requests that came through Cloudflare.
+  if (!get('cf-ray'))
+    return { city: null, country: null, lat: null, lon: null };
+  const country = get('cf-ipcountry') ?? '';
   const lat = Number.parseFloat(get('cf-iplatitude') ?? '');
   const lon = Number.parseFloat(get('cf-iplongitude') ?? '');
   return {
-    city: get('cf-ipcity') || null,
-    country: country && !['T1', 'XX'].includes(country) ? country : null,
-    lat: Number.isFinite(lat) ? round1(lat) : null,
-    lon: Number.isFinite(lon) ? round1(lon) : null,
+    city: get('cf-ipcity')?.slice(0, 64) || null,
+    country: /^[A-Z]{2}$/.test(country) && country !== 'XX' ? country : null,
+    lat: Number.isFinite(lat) && Math.abs(lat) <= 90 ? round1(lat) : null,
+    lon: Number.isFinite(lon) && Math.abs(lon) <= 180 ? round1(lon) : null,
   };
 };
 
@@ -67,23 +73,58 @@ export const toReport = (data: Nodes, geo: Geo): NodeReport => ({
   version: data.agent.version,
 });
 
+// Atomic capped upsert. When full, first drop entries silent for an hour, so junk
+// ids can't lock real nodes out for a day.
+const UPSERT = `
+local hash, seen = KEYS[1], KEYS[2]
+local id, json, now = ARGV[1], ARGV[2], tonumber(ARGV[3])
+local cap, prune = tonumber(ARGV[4]), tonumber(ARGV[5])
+if redis.call('HEXISTS', hash, id) == 0 and redis.call('ZCARD', seen) >= cap then
+  local old = redis.call('ZRANGEBYSCORE', seen, 0, now - prune, 'LIMIT', 0, 500)
+  for _, o in ipairs(old) do
+    redis.call('HDEL', hash, o)
+    redis.call('ZREM', seen, o)
+  end
+  if redis.call('ZCARD', seen) >= cap then return 0 end
+end
+redis.call('HSET', hash, id, json)
+redis.call('ZADD', seen, now, id)
+return 1`;
+
+let lastWarnAt = 0;
+
 export const storeReport = async (report: NodeReport) => {
   try {
-    const known = await redisClient.hexists(HASH, report.node_id);
-    if (!known && (await redisClient.zcard(SEEN)) >= MAX_NODES) return;
-    await redisClient
-      .multi()
-      .hset(HASH, report.node_id, JSON.stringify(report))
-      .zadd(SEEN, report.last_seen, report.node_id)
-      .exec();
+    await redisClient.eval(
+      UPSERT,
+      2,
+      HASH,
+      SEEN,
+      report.node_id,
+      JSON.stringify(report),
+      report.last_seen,
+      MAX_NODES,
+      FULL_PRUNE_MS,
+    );
   } catch (error) {
-    logger.warn({ error: String(error) }, 'node telemetry store failed');
+    // At most one line a minute: this path is unauthenticated and high-volume.
+    if (Date.now() - lastWarnAt > 60_000) {
+      lastWarnAt = Date.now();
+      logger.warn({ error: String(error) }, 'node telemetry store failed');
+    }
   }
 };
 
-export const onlineReports = async (): Promise<NodeReport[]> => {
+const readOnline = async (): Promise<NodeReport[]> => {
   const now = Date.now();
-  const stale = await redisClient.zrangebyscore(SEEN, 0, now - STALE_MS);
+  const stale = await redisClient.zrangebyscore(
+    SEEN,
+    0,
+    now - STALE_MS,
+    'LIMIT',
+    0,
+    1000,
+  );
   if (stale.length) {
     await redisClient
       .multi()
@@ -91,8 +132,29 @@ export const onlineReports = async (): Promise<NodeReport[]> => {
       .zrem(SEEN, ...stale)
       .exec();
   }
-  const ids = await redisClient.zrangebyscore(SEEN, now - ONLINE_MS, '+inf');
+  const ids = await redisClient.zrevrangebyscore(
+    SEEN,
+    '+inf',
+    now - ONLINE_MS,
+    'LIMIT',
+    0,
+    MAX_LIST,
+  );
   if (!ids.length) return [];
   const rows = await redisClient.hmget(HASH, ...ids);
   return rows.flatMap((row) => (row ? [JSON.parse(row) as NodeReport] : []));
+};
+
+// Shared per pod for CACHE_MS, so callers can't make every request re-read Redis.
+let cached: { at: number; reports: Promise<NodeReport[]> } | null = null;
+
+export const onlineReports = (): Promise<NodeReport[]> => {
+  if (!cached || Date.now() - cached.at > CACHE_MS) {
+    const reports = readOnline();
+    cached = { at: Date.now(), reports };
+    reports.catch(() => {
+      cached = null;
+    });
+  }
+  return cached.reports;
 };

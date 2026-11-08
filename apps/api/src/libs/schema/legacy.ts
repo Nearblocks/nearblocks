@@ -10,10 +10,11 @@ const fees = z.object({
 });
 
 const nodes = z.object({
+  // Every string is length-bounded: reports are stored in Redis unauthenticated.
   agent: z.object({
-    build: z.string(),
-    name: z.string(),
-    version: z.string(),
+    build: z.string().max(64),
+    name: z.string().max(64),
+    version: z.string().max(32),
   }),
   chain: z.object({
     account_id: z
@@ -25,16 +26,16 @@ const nodes = z.object({
       .nullish(),
     block_production_tracking_delay: z.number().optional(),
     is_validator: z.boolean(),
-    latest_block_hash: z.string().min(43).max(44),
+    latest_block_hash: z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{43,44}$/),
     latest_block_height: z.number(),
     max_block_production_delay: z.number().optional(),
     max_block_wait_delay: z.number().optional(),
     min_block_production_delay: z.number().optional(),
-    node_id: z.string(),
+    node_id: z.string().regex(/^ed25519:[1-9A-HJ-NP-Za-km-z]{43,44}$/),
     num_peers: z.number(),
-    status: z.string(),
+    status: z.string().max(32),
   }),
-  signature: z.string().optional(),
+  signature: z.string().max(128).optional(),
   system: z.object({
     bandwidth_download: z.number(),
     bandwidth_upload: z.number(),
