@@ -8,7 +8,6 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import { Network } from 'nb-types';
 
 import config from '#config';
-import { migrationPage } from '#libs/migrationPage';
 
 const scalarCss = `
   .light-mode .introduction-section {
@@ -245,20 +244,47 @@ const apiDocumentation = async (app: Application, dir: string) => {
     }
   }
 
-  const migrationHtml = migrationPage(migrationGuide);
+  // Rendered by Scalar like the rest of the docs: the guide is the description of an
+  // endpoint-less spec, so its headings become the sidebar.
+  const migrationSpec = {
+    info: {
+      description: migrationGuide.replace(/^# .*\n/, ''),
+      title: 'Migrating to NearBlocks API v3',
+      version: '3',
+    },
+    openapi: '3.1.0',
+    paths: {},
+  };
+  app.get('/openapi-migration.json', (_, res) => {
+    res.json(migrationSpec);
+  });
+  const migrationReference = apiReference({
+    customCss: scalarCss,
+    documentDownloadType: 'none',
+    favicon: 'https://nearblocks.io/favicon_32x32.png',
+    hideModels: true,
+    layout: 'modern',
+    metaData: {
+      ...scalarMeta,
+      description: 'How to move a NearBlocks API v1 or v2 integration to v3.',
+      ogTitle: 'Migrating to API v3 | NearBlocks',
+      title: 'Migrating to API v3 | NearBlocks',
+    },
+    theme: 'none',
+    url: '/openapi-migration.json',
+  });
   const sendMigrationMarkdown = (res: Response) =>
     res.type('text/markdown; charset=utf-8').send(migrationGuide);
 
-  // Browsers get the rendered page; curl and agents (Accept: */*) get markdown.
-  app.get('/api-docs/migration', (req, res) => {
-    res.vary('Accept');
-    if (req.accepts(['text/markdown', 'text/html']) === 'text/html') {
-      res.type('html').send(migrationHtml);
-    } else {
-      sendMigrationMarkdown(res);
-    }
-  });
+  // Browsers get the rendered guide; curl and agents (Accept: */*) get markdown.
   app.get('/api-docs/migration.md', (_, res) => sendMigrationMarkdown(res));
+  app.get('/api-docs/migration', (req, res, next) => {
+    res.vary('Accept');
+    if (req.accepts(['text/markdown', 'text/html']) === 'text/html')
+      return next();
+    sendMigrationMarkdown(res);
+  });
+  app.use('/api-docs/migration', migrationReference);
 
   app.use(
     '/api-docs/legacy',
