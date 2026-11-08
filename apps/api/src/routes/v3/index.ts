@@ -10,6 +10,7 @@ import mtsContract from '#routes/v3/mts/contract';
 import mts from '#routes/v3/mts/index';
 import multichain from '#routes/v3/multichain/index';
 import nfts from '#routes/v3/nfts/index';
+import nodes from '#routes/v3/nodes';
 import receipts from '#routes/v3/receipts';
 import search from '#routes/v3/search';
 import staking from '#routes/v3/staking';
@@ -31,6 +32,7 @@ const routes = () => {
   mtsContract(app);
   multichain(app);
   nfts(app);
+  nodes(app);
   receipts(app);
   search(app);
   staking(app);
