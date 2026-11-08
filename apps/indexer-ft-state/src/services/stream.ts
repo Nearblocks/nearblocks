@@ -27,7 +27,9 @@ export const syncData = async () => {
 
     const windowEnd = Math.min(end, block + config.rawBatchSize);
 
-    logger.info(`backfilling from block: ${block} to block: ${windowEnd}`);
+    logger.info(
+      `backfilling from block: ${block} to block: ${windowEnd} (raw archives)`,
+    );
 
     const raw = streamRawBlock({
       apiKey: config.fastnearApiKey,
@@ -45,14 +47,16 @@ export const syncData = async () => {
 
       if (height < block) continue;
 
-      await onMessage(message);
+      await onMessage(message, 'raw');
       block = height + 1;
 
       if (height >= windowEnd) break;
     }
   }
 
-  logger.info(`syncing from block: ${block}`);
+  logger.info(
+    `syncing from block: ${block} (${config.neardataUrl ?? 'neardata'})`,
+  );
 
   const stream = streamBlock({
     concurrency: config.neardataConcurrency,
@@ -62,16 +66,16 @@ export const syncData = async () => {
   });
 
   for await (const message of stream) {
-    await onMessage(extractMessage(message));
+    await onMessage(extractMessage(message), 'live');
   }
 };
 
-export const onMessage = async (message: FTMessage) => {
+export const onMessage = async (message: FTMessage, source: 'live' | 'raw') => {
   try {
     const start = performance.now();
     const blockHeight = message.block.header.height;
 
-    logger.info(`syncing block: ${blockHeight}`);
+    logger.info(`syncing block: ${blockHeight} (${source})`);
 
     await storeFTState(db, message);
 
