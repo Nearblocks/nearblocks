@@ -49,5 +49,8 @@ USER node
 WORKDIR /app
 COPY --chown=node:node --from=installer /app .
 COPY --from=neon /out/ ./packages/nb-json/
+# Last, so a new commit only rebuilds this layer; reported as the release in error tracking.
+ARG GITHUB_SHA=""
+ENV GIT_SHA=${GITHUB_SHA}
 
 CMD ["sh", "-c", "exec node ${NODE_ARGS} apps/${APP}/dist/index.js"]
