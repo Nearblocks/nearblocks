@@ -14,7 +14,20 @@ Three things will break existing code:
 
 Some filters and fields are renamed as well. For example, `from` and `to` are now `signer` and `receiver`.
 
-Most integrations only use the transaction and account endpoints, so start there and use the rest of this page as a reference. v3 also adds endpoints that v1 and v2 never had (multi-tokens, intents, stats and multichain); you don't need them to migrate.
+Most integrations only use the transaction and account endpoints, so start there and use the rest of this page as a reference.
+
+## What's new in v3
+
+v3 is our biggest API upgrade: more of NEAR's on-chain data, in one consistent API.
+
+- Multi-token (NEP-245) transfers and balances
+- Richer staking and validator data
+- Account balances and holdings, broken out by token
+- Account and token analytics: activity, holders and transfers over time
+- Intents activity
+- Multichain and chain-signature data
+
+Every endpoint returns the same response format, and cursor-based pagination stays fast on large result sets. You don't need any of the new endpoints to migrate.
 
 ### Using an AI coding assistant
 
