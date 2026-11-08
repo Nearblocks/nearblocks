@@ -403,9 +403,6 @@ importers:
       lodash-es:
         specifier: 'catalog:'
         version: 4.17.21
-      marked:
-        specifier: ^16.4.2
-        version: 16.4.2
       near-api-js:
         specifier: 1.1.0
         version: 1.1.0(encoding@0.1.13)
@@ -9594,11 +9591,6 @@ packages:
 
   markdown-table@3.0.3:
     resolution: {integrity: sha512-Z1NL3Tb1M9wH4XESsCDEksWoKTdlUafKc4pt0GRwjUyXaCFZ+dc3g2erqB6zm3szA2IUSi7VnPI+o/9jnxh9hw==}
-
-  marked@16.4.2:
-    resolution: {integrity: sha512-TI3V8YYWvkVf3KJe1dRkpnjs68JUPyEa5vjKrp1XEEJUAOaQc+Qj+L1qWbPd0SJuAdQkFU0h73sXXqwDYxsiDA==}
-    engines: {node: '>= 20'}
-    hasBin: true
 
   math-intrinsics@1.0.0:
     resolution: {integrity: sha512-4MqMiKP90ybymYvsut0CH2g4XWbfLtmlCkXmtmdcDCxNB+mQcu1w/1+L/VD7vi/PSv7X2JYV7SCcR+jiPXnQtA==}
@@ -22266,8 +22258,6 @@ snapshots:
       object-visit: 1.0.1
 
   markdown-table@3.0.3: {}
-
-  marked@16.4.2: {}
 
   math-intrinsics@1.0.0: {}
 
