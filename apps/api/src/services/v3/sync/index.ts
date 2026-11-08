@@ -262,23 +262,24 @@ const getStatStatus = async (): Promise<DateStatus> => {
 };
 
 const RPC_NODE_TIMEOUT_MS = 5_000;
-const UNKNOWN_RPC_NODE: RpcNodeStatus = {
-  flat_storage_deltas: null,
-  has_state_snapshot: null,
-  height: null,
-  lag_secs: null,
-  peers: null,
-  sync: false,
+// A node only reports sync: false after being unhealthy this long, so a restart or
+// a short lag doesn't alert; RPC fails over on its own in the meantime.
+const RPC_NODE_GRACE_MS = 180_000;
+const startedAt = Date.now();
+const lastHealthyAt = new Map<string, number>();
+
+type RpcNodeProbe = {
+  healthy: boolean;
+  height: null | string;
+  lag: null | number;
 };
 
 const numberOrNull = (value: unknown) =>
   typeof value === 'number' && Number.isFinite(value) ? value : null;
 
-// Health of one block-proxy RPC node. Unreachable counts as not in sync: its
-// RPC traffic is then on the next endpoint either way.
-const getRpcNodeStatus = async (
+const probeRpcNode = async (
   node: (typeof config.rpcNodes)[number],
-): Promise<RpcNodeStatus> => {
+): Promise<RpcNodeProbe> => {
   try {
     const res = await fetch(node.url, {
       headers: node.token ? { Authorization: `Bearer ${node.token}` } : {},
@@ -288,23 +289,48 @@ const getRpcNodeStatus = async (
     const body = (await res.json()) as Record<string, unknown>;
     const height = numberOrNull(body.height);
     return {
-      flat_storage_deltas: numberOrNull(body.flat_storage_deltas),
-      has_state_snapshot:
-        typeof body.has_state_snapshot === 'boolean'
-          ? body.has_state_snapshot
-          : null,
+      healthy: body.healthy === true,
       height: height === null ? null : String(height),
-      lag_secs: numberOrNull(body.lag_secs),
-      peers: numberOrNull(body.peers),
-      sync: body.healthy === true,
+      lag: numberOrNull(body.lag_secs),
     };
   } catch (error) {
     logger.warn(
       { error: String(error), node: node.name },
       'rpc node status unavailable',
     );
-    return UNKNOWN_RPC_NODE;
+    return { healthy: false, height: null, lag: null };
   }
+};
+
+const RPC_NODE_POLL_MS = 30_000;
+
+const recordProbe = (name: string, probe: RpcNodeProbe) => {
+  if (probe.healthy) lastHealthyAt.set(name, Date.now());
+  return probe;
+};
+
+// Keep lastHealthyAt fresh between requests so the grace window is measured from
+// when the node actually went bad, not from the last time someone asked.
+if (config.rpcNodes.length) {
+  setInterval(() => {
+    for (const node of config.rpcNodes) {
+      void probeRpcNode(node).then((probe) => recordProbe(node.name, probe));
+    }
+  }, RPC_NODE_POLL_MS).unref();
+}
+
+// Health of one block-proxy RPC node: height, lag and sync only.
+const getRpcNodeStatus = async (
+  node: (typeof config.rpcNodes)[number],
+): Promise<RpcNodeStatus> => {
+  const probe = recordProbe(node.name, await probeRpcNode(node));
+  const now = Date.now();
+  const since = lastHealthyAt.get(node.name) ?? startedAt;
+  return {
+    height: probe.height,
+    lag_secs: probe.lag,
+    sync: probe.healthy || now - since < RPC_NODE_GRACE_MS,
+  };
 };
 
 const getRpcNodesStatus = async (): Promise<RpcNodesStatus | undefined> => {
