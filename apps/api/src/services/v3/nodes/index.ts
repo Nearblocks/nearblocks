@@ -1,7 +1,12 @@
 import type { Request, Response } from 'express';
 
 import catchAsync from '#libs/async';
-import { onlineReports, storeReport, toReport } from '#libs/nodeTelemetry';
+import {
+  geoFromHeaders,
+  onlineReports,
+  storeReport,
+  toReport,
+} from '#libs/nodeTelemetry';
 import schema from '#libs/schema/legacy';
 
 const countBy = <T>(items: T[], key: (item: T) => null | string) =>
@@ -14,7 +19,14 @@ const countBy = <T>(items: T[], key: (item: T) => null | string) =>
 export const ingest = (req: Request, res: Response) => {
   res.status(200).end();
   const parsed = schema.nodes.safeParse(req.body);
-  if (parsed.success) void storeReport(toReport(parsed.data, req.ip));
+  if (parsed.success) {
+    void storeReport(
+      toReport(
+        parsed.data,
+        geoFromHeaders((name) => req.get(name)),
+      ),
+    );
+  }
 };
 
 // Nodes that reported in the last 10 minutes, plus version and country counts.
