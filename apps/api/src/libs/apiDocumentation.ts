@@ -2,12 +2,13 @@ import { readFileSync } from 'fs';
 import path from 'path';
 
 import { apiReference } from '@scalar/express-api-reference';
-import { Application } from 'express';
+import { Application, Response } from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
 import { Network } from 'nb-types';
 
 import config from '#config';
+import { migrationPage } from '#libs/migrationPage';
 
 const scalarCss = `
   .light-mode .introduction-section {
@@ -42,7 +43,7 @@ const servers = [
 ];
 
 const apiDocumentation = async (app: Application, dir: string) => {
-  const legacyDescription = `<p><strong>Deprecated. Testnet has retired these endpoints; mainnet retires them at the end of November 2026.</strong></p>
+  const legacyDescription = `<p><strong>Deprecated. v1 and v2 will be switched off on 22 November 2026; testnet already runs v3 only.</strong></p>
         <p>For new integrations, use the <a href="/api-docs">current API</a>. See the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> to move existing integrations.</p>
         `;
 
@@ -59,7 +60,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
       },
       info: {
-        description: `<blockquote><p><strong>Migrating from v1 or v2?</strong> v3 changes pagination, response envelopes, and several endpoints — it is not a drop-in base-path swap. Read the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> (also available as raw markdown at <a href="/api-docs/migration"><code>/api-docs/migration</code></a> for tooling and AI agents).</p></blockquote>
+        description: `<blockquote><p><strong>Migrating from v1 or v2?</strong> v3 changes pagination, response envelopes, and several endpoints — it is not a drop-in base-path swap. Read the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> (also as <a href="/api-docs/migration.md">Markdown</a> for tools and AI assistants).</p></blockquote>
         <p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
         <p><h2>Attribution Requirements:</h2></p>
         <p>The APIs are offered as a community service and are provided without any warranty. Please use them responsibly and only for what you need.</p>
@@ -89,7 +90,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
             : config.testnetUrl
         }/v3/accounts/wrap.near"</pre></code></p>
         <h2>Legacy API</h2>
-        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. These endpoints will be removed in a future release. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
+        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. They will be switched off on 22 November 2026. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
         `,
         title: ' ',
         version: '1.0.0',
@@ -228,8 +229,8 @@ const apiDocumentation = async (app: Application, dir: string) => {
     res.json(legacySpec);
   });
 
-  // Raw v1/v2 -> v3 migration guide, served as markdown for both humans and
-  // agents to fetch directly. Read once at startup from the shipped asset
+  // v1/v2 -> v3 migration guide, as HTML for browsers and markdown for tools.
+  // Read once at startup from the shipped asset
   // (dist/docs) or the source docs/ dir in dev; falls back if absent.
   let migrationGuide = '# Migration guide unavailable\n';
   for (const candidate of [
@@ -244,9 +245,19 @@ const apiDocumentation = async (app: Application, dir: string) => {
     }
   }
 
-  app.get('/api-docs/migration', (_, res) => {
+  const migrationHtml = migrationPage(migrationGuide);
+  const sendMigrationMarkdown = (res: Response) =>
     res.type('text/markdown; charset=utf-8').send(migrationGuide);
+
+  // Browsers get the rendered page; curl and agents (Accept: */*) get markdown.
+  app.get('/api-docs/migration', (req, res) => {
+    if (req.accepts(['text/markdown', 'text/html']) === 'text/html') {
+      res.type('html').send(migrationHtml);
+    } else {
+      sendMigrationMarkdown(res);
+    }
   });
+  app.get('/api-docs/migration.md', (_, res) => sendMigrationMarkdown(res));
 
   app.use(
     '/api-docs/legacy',
