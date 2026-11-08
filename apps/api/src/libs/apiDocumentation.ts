@@ -42,7 +42,7 @@ const servers = [
 ];
 
 const apiDocumentation = async (app: Application, dir: string) => {
-  const legacyDescription = `<p><strong>Deprecated. Testnet has retired these endpoints; mainnet retires them at the end of November 2026.</strong></p>
+  const legacyDescription = `<p><strong>Deprecated. v1 and v2 will be switched off on 20 November 2026; testnet already runs v3 only.</strong></p>
         <p>For new integrations, use the <a href="/api-docs">current API</a>. See the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> to move existing integrations.</p>
         `;
 
@@ -89,7 +89,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
             : config.testnetUrl
         }/v3/accounts/wrap.near"</pre></code></p>
         <h2>Legacy API</h2>
-        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. These endpoints will be removed in a future release. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
+        <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. They will be switched off on 20 November 2026. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
         `,
         title: ' ',
         version: '1.0.0',
