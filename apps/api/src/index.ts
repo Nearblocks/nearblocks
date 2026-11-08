@@ -39,6 +39,9 @@ const options = {
   beforeShutdown: () => new Promise((resolve) => setTimeout(resolve, 10000)),
   healthChecks: {
     '/healthz': healthCheck,
+    // Process-only readiness for the k8s probe: no DB/Redis, so a dependency blip
+    // can't pull every pod at once. Terminus returns 503 while shutting down.
+    '/readyz': () => Promise.resolve(),
   },
   onSignal,
   signals: ['SIGTERM', 'SIGINT'],
