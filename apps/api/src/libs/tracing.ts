@@ -29,4 +29,5 @@ export const sdk = new BaselimeSDK({
   service: config.otelServiceName,
 });
 
-sdk.start();
+// Only when an exporter key is set; otherwise the instrumentation is pure overhead.
+if (config.otelExporterApiKey) sdk.start();
