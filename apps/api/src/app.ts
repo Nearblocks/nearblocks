@@ -20,6 +20,7 @@ import { usageEvents } from '#middlewares/usageEvents';
 import routes from '#routes/index';
 import routesV2 from '#routes/v2/index';
 import routesV3 from '#routes/v3/index';
+import { ingest as ingestNodeTelemetry } from '#services/v3/nodes/index';
 
 const file = fileURLToPath(import.meta.url);
 const dir = path.dirname(file);
@@ -76,6 +77,13 @@ app.use((_req, res, next) => {
   res.locals.startedAt = Date.now();
   next();
 });
+// NEAR node telemetry (explorer.*.near.org/api/nodes): before rate limiting, usage
+// tracking and the legacy sunset, so nodes always get an instant 200.
+app.post(
+  '/v1/legacy/nodes',
+  express.json({ limit: '32kb' }),
+  ingestNodeTelemetry,
+);
 app.use(kitwalletClientMetrics);
 app.use(usageEvents);
 app.use(legacyApi);
