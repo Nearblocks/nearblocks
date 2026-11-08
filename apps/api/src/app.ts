@@ -93,8 +93,7 @@ app.use((_req: Request, res: Response) => {
 
 app.use(sentry.Handlers.errorHandler());
 
-// Which request failed and how: path without the query (it can carry API keys), the
-// router-relative route pattern, duration and the error code (Postgres 57014 = statement timeout).
+// Request context for error logs; 57014 is a Postgres statement timeout.
 const errorContext = (err: Error, req: Request, res: Response) => ({
   code: (err as { code?: unknown }).code,
   durationMs:
