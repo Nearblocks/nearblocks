@@ -77,3 +77,10 @@ export const getRpcFallbackReason = (error: unknown): string => {
   if (isRetryableRpcFailure(error)) return 'transport_error';
   return 'other';
 };
+
+export const kitwalletClients = new client.Counter({
+  help: 'Kitwallet API requests by host called, caller origin and user-agent family',
+  labelNames: ['host', 'origin', 'agent'] as const,
+  name: 'nearblocks_api_kitwallet_requests_total',
+  registers: [register],
+});
