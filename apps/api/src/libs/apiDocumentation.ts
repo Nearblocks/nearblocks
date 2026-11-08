@@ -251,6 +251,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
 
   // Browsers get the rendered page; curl and agents (Accept: */*) get markdown.
   app.get('/api-docs/migration', (req, res) => {
+    res.vary('Accept');
     if (req.accepts(['text/markdown', 'text/html']) === 'text/html') {
       res.type('html').send(migrationHtml);
     } else {
