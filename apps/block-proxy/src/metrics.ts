@@ -148,3 +148,25 @@ export const proxyNullOverridden = new client.Counter({
   name: 'block_proxy_proxy_null_overridden_total',
   registers: [register],
 });
+
+export const rpcRequests = new client.Counter({
+  help: 'JSON-RPC requests by client, method and result (ok, upstream_error, timeout, out_of_sync, not_allowed, invalid)',
+  labelNames: ['client', 'method', 'result'] as const,
+  name: 'block_proxy_rpc_requests_total',
+  registers: [register],
+});
+
+export const rpcDuration = new client.Histogram({
+  buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+  help: 'Time for the node to answer a forwarded JSON-RPC request',
+  labelNames: ['method'] as const,
+  name: 'block_proxy_rpc_duration_seconds',
+  registers: [register],
+});
+
+export const blocksServed = new client.Counter({
+  help: 'Blocks served by client and source (node, proxy, neardata, cache)',
+  labelNames: ['client', 'source'] as const,
+  name: 'block_proxy_blocks_served_total',
+  registers: [register],
+});

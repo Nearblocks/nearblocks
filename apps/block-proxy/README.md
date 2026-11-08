@@ -25,8 +25,11 @@ held locally, include a remote source after `node`.
 | GET    | `/healthz`, `/readyz`  | Liveness and readiness.                                    |
 | GET    | `/metrics`, `/stats`   | Prometheus metrics and JSON stats.                         |
 
-When `PROXY_API_KEY` is set, data routes require it as `?api_key=`, a Bearer
-token, or `X-API-Key`.
+When client keys are set, data routes require one as `?api_key=`, a Bearer
+token, or `X-API-Key`. `PROXY_API_KEYS` names each client (`backend:<key>,...`)
+so keys rotate separately and usage is labelled per client in
+`block_proxy_rpc_requests_total{client,method,result}` and
+`block_proxy_blocks_served_total{client,source}`.
 
 ## Configuration
 
@@ -36,7 +39,8 @@ token, or `X-API-Key`.
 | `NETWORK`                           | `mainnet`               | `mainnet` or `testnet`.                                    |
 | `PORT` / `ADMIN_PORT`               | `3000` / `3001`         | Data and admin ports.                                      |
 | `LISTEN_HOST` / `ADMIN_LISTEN_HOST` | `0.0.0.0`               | Bind addresses; restrict access in the deployment network. |
-| `PROXY_API_KEY`                     | _(unset)_               | Optional client key.                                       |
+| `PROXY_API_KEYS`                    | _(unset)_               | Named client keys, `name:key,...`.                         |
+| `PROXY_API_KEY`                     | _(unset)_               | Single key, client `default`.                              |
 | `NODE_RPC_URL`                      | `http://127.0.0.1:3030` | Node source and `/rpc` endpoint.                           |
 | `NODE_RPC_API_KEY`                  | _(unset)_               | Bearer token for `NODE_RPC_URL`.                           |
 | `RPC_ALLOWED_METHODS`               | read-only set           | RPC methods forwarded by `/rpc`.                           |
