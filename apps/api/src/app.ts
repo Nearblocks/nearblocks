@@ -13,6 +13,7 @@ import logger from '#libs/logger';
 import { register as metricsRegister } from '#libs/promMetrics';
 import sentry from '#libs/sentry';
 import internalOnly from '#middlewares/internalOnly';
+import { kitwalletClientMetrics } from '#middlewares/kitwalletClients';
 import legacyApi from '#middlewares/legacyApi';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import { usageEvents } from '#middlewares/usageEvents';
@@ -75,6 +76,7 @@ app.use((_req, res, next) => {
   res.locals.startedAt = Date.now();
   next();
 });
+app.use(kitwalletClientMetrics);
 app.use(usageEvents);
 app.use(legacyApi);
 
