@@ -1,6 +1,6 @@
 # Migrating to NearBlocks API v3
 
-> API v1 and v2 will be switched off on **20 November 2026**. Testnet already runs v3 only.
+> API v1 and v2 will be switched off on **22 November 2026**. Testnet already runs v3 only.
 
 This guide covers what you need to change to move an integration from v1 or v2 to v3. Your API key and authentication stay the same (`Authorization: Bearer <key>`).
 
@@ -347,7 +347,7 @@ v2 exposed only `GET /v2/mts/contract/{contract}/{token_id}` (metadata). v3 adds
 
 ## 6. Endpoints without a v3 version
 
-These v1 endpoints are not carried over and stop working on 20 November 2026:
+These v1 endpoints are not carried over and stop working on 22 November 2026:
 
 - `GET /v1/account/{account}/activities`: use `/v3/accounts/{account}/stats/*` for activity over time
 - `GET /v1/account/{account}/txns-only`: use `/v3/accounts/{account}/txns`
