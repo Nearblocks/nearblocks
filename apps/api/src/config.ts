@@ -50,6 +50,8 @@ const env = cleanEnv(process.env, {
   REDIS_SENTINEL_URLS: str({ default: '' }),
   REDIS_URL: url({ default: '' }),
   RPC_AUTH_TOKENS: str({ default: '' }),
+  // Overrides the block-proxy node status URLs derived from RPC_URLS.
+  RPC_NODE_STATUS_URLS: str({ default: '' }),
   RPC_URL: str({ default: '' }),
   RPC_URLS: str({ default: '' }),
   SENTRY_DSN: str({ default: '' }),
@@ -130,6 +132,30 @@ if (Number.isNaN(legacyApiSunset.getTime())) {
   throw new Error('LEGACY_API_SUNSET must be an ISO date.');
 }
 
+// Each block-proxy in RPC_URLS serves /node/status beside /rpc. Reuse the
+// token of the RPC endpoint on the same origin, so no extra secret is needed.
+const nodeStatusFromRpc = (endpoint: string): string => {
+  const url = new URL(endpoint);
+  if (!url.pathname.endsWith('/rpc')) return '';
+  url.pathname = url.pathname.replace(/\/rpc$/, '/node/status');
+  return url.toString();
+};
+const rpcNodeStatusUrls = env.RPC_NODE_STATUS_URLS
+  ? splitList(env.RPC_NODE_STATUS_URLS)
+  : rpcUrls.map(nodeStatusFromRpc).filter(Boolean);
+const rpcNodes = rpcNodeStatusUrls.map((statusUrl) => {
+  const url = new URL(statusUrl);
+  const index = rpcUrls.findIndex(
+    (endpoint) => new URL(endpoint).origin === url.origin,
+  );
+  return {
+    // e.g. proxy.nearblocks.io/mainnet
+    name: `${url.host}${url.pathname.replace(/\/node\/status$/, '')}`,
+    token: index === -1 ? '' : rpcAuthTokens[index],
+    url: statusUrl,
+  };
+});
+
 const config: Config = {
   apiAccessKey: env.API_ACCESS_KEY,
   apiUrl: env.API_URL,
@@ -174,6 +200,7 @@ const config: Config = {
   redisSentinelUrls: env.REDIS_SENTINEL_URLS,
   redisUrl: env.REDIS_URL,
   rpcAuthTokens,
+  rpcNodes,
   rpcUrl: rpcUrls[0],
   rpcUrls,
   sentryDsn: env.SENTRY_DSN,

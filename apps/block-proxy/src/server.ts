@@ -9,6 +9,7 @@ import { logger } from 'nb-logger';
 
 import { parseJsonPreservingUnsafeIntegers } from '#indexer/rpc';
 import * as metrics from '#metrics';
+import { nodeStatus } from '#nodeStatus';
 import type { AppState } from '#state';
 import { type UpstreamError, UpstreamRedirectError } from '#types';
 import { fetchBlockDeduped } from '#upstream/index';
@@ -579,6 +580,20 @@ export function createDataServer(state: AppState): express.Express {
           return;
         }
       }
+    }),
+  );
+
+  // Authenticated: node lag and flat-storage health for the API's sync status.
+  app.get(
+    '/node/status',
+    route(async (_req, res) => {
+      const status = await nodeStatus(state);
+      res.set('cache-control', 'no-store');
+      if (!status) {
+        jsonStringError(res, 404, 'No local node configured');
+        return;
+      }
+      res.json(status);
     }),
   );
 
