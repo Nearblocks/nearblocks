@@ -20,9 +20,7 @@ import { useState } from 'react';
 
 export const ConfigProvider = ({ children, config }: Props) => {
   const [configStore] = useState(() => createConfigStore(config));
-  const [settingsStore] = useState(() =>
-    createSettingsStore(config.network, config.provider),
-  );
+  const [settingsStore] = useState(() => createSettingsStore(config.network));
   const [walletStore] = useState(() =>
     createWalletStore({
       mainnetUrl: config.mainnetUrl,

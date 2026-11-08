@@ -11,7 +11,6 @@ import { Copy } from '@/components/copy';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { ActiveLink } from '@/components/link';
 import { PageHeading } from '@/components/page-heading';
-import { RpcSelector } from '@/components/rpc';
 import { TabBadge, TabLink } from '@/components/tab-links';
 import { TabLinks } from '@/components/tab-links';
 import {
@@ -76,10 +75,7 @@ const AddressLayout = async ({ children, params }: Props) => {
               </span>
             }
           >
-            <div className="flex items-center gap-2">
-              <RpcSelector />
-              <Validate address={address} />
-            </div>
+            <Validate address={address} />
           </PageHeading>
           <ErrorSuspense fallback={null}>
             <AccountAlerts

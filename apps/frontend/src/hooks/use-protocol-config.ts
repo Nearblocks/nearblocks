@@ -9,11 +9,10 @@ import { useConfig } from './use-config';
 import { useSettings } from './use-settings';
 
 export const useProtocolConfig = () => {
-  const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
+  const provider = useConfig((s) => s.config.provider);
 
-  const rpcUrl = (provider || defaultProvider).url;
+  const rpcUrl = provider.url;
   const shouldFetch = hydrated && rpcUrl;
 
   return useSWR(

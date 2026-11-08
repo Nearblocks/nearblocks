@@ -17,10 +17,9 @@ export type ValidatorStatus =
   | null;
 
 export const useValidator = (node: string) => {
-  const provider = useSettings((s) => s.provider);
   const hydrated = useSettings((s) => s.hydrated);
-  const defaultProvider = useConfig((s) => s.config.provider);
-  const rpcUrl = (provider || defaultProvider).url;
+  const provider = useConfig((s) => s.config.provider);
+  const rpcUrl = provider.url;
 
   const { data, isLoading } = useSWR(
     hydrated && rpcUrl ? ['node-validator-details', node, rpcUrl] : null,

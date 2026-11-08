@@ -4,7 +4,6 @@ import { Copy } from '@/components/copy';
 import { ErrorSuspense } from '@/components/error-suspense';
 import { ActiveLink } from '@/components/link';
 import { PageHeading } from '@/components/page-heading';
-import { RpcSelector } from '@/components/rpc';
 import { TabLink, TabLinks } from '@/components/tab-links';
 import { Overview } from '@/components/validators/node/overview';
 import { Uptime } from '@/components/validators/node/uptime';
@@ -47,9 +46,7 @@ const NodeLayout = async ({ children, params }: Props) => {
             <Copy text={node} />
           </span>
         }
-      >
-        <RpcSelector />
-      </PageHeading>
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <ErrorSuspense fallback={<Overview loading />}>

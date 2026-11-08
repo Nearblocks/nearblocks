@@ -1,61 +1,34 @@
 import { createStore } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import type { Config } from '@/lib/config';
 import type { Network } from '@/types/enums';
-
-type RpcProvider = Config['provider'];
 
 export type TimestampMode = 'age' | 'time';
 export type UTCMode = 'local' | 'utc';
 
 interface SettingsActions {
-  addProvider: (provider: RpcProvider) => void;
-  deleteProvider: (url: string) => void;
   setHydrated: (value: boolean) => void;
-  setProvider: (provider: RpcProvider) => void;
   toggleTimestampMode: () => void;
   toggleUTCMode: () => void;
-  updateProvider: (url: string, provider: RpcProvider) => void;
 }
 
 export interface SettingsState extends SettingsActions {
   hydrated: boolean;
-  provider: null | RpcProvider;
-  providers: RpcProvider[];
   timestampMode: TimestampMode;
   utcMode: UTCMode;
 }
 
 export type SettingsStore = ReturnType<typeof createSettingsStore>;
 
-export const createSettingsStore = (
-  network: Network,
-  provider: RpcProvider,
-) => {
+export const createSettingsStore = (network: Network) => {
   return createStore<SettingsState>()(
     persist(
       /* eslint-disable perfectionist/sort-objects */
       (set, get) => ({
         hydrated: false,
-        provider,
-        providers: [],
         timestampMode: 'age',
         utcMode: 'utc',
-        addProvider: (provider) =>
-          set((s) => ({ providers: [...s.providers, provider] })),
-        deleteProvider: (url) =>
-          set((s) => ({
-            provider: s.provider?.url === url ? null : s.provider,
-            providers: s.providers.filter((p) => p.url !== url),
-          })),
         setHydrated: (hydrated) => set({ hydrated }),
-        setProvider: (provider) => set({ provider }),
-        updateProvider: (url, provider) =>
-          set((s) => ({
-            provider: s.provider?.url === url ? provider : s.provider,
-            providers: s.providers.map((p) => (p.url === url ? provider : p)),
-          })),
         toggleTimestampMode: () => {
           const mode = get().timestampMode;
           set({ timestampMode: mode === 'age' ? 'time' : 'age' });
@@ -67,20 +40,13 @@ export const createSettingsStore = (
       }),
       /* eslint-enable perfectionist/sort-objects */
       {
-        // v1: reset the active provider so existing users pick up the proxied default
-        // v2: reset providers pinned to the deprecated near.org RPC aliases
-        migrate: (persisted, version) => {
-          const state = persisted as Partial<SettingsState>;
+        // v3: the RPC provider is no longer user-selectable; drop any saved
+        // provider so every browser goes through the proxied default.
+        migrate: (persisted) => {
+          const { timestampMode, utcMode } = (persisted ??
+            {}) as Partial<SettingsState>;
 
-          if (version < 1) {
-            return { ...state, provider: null };
-          }
-
-          if (version < 2 && state.provider?.url.includes('.near.org')) {
-            return { ...state, provider: null };
-          }
-
-          return state;
+          return { timestampMode, utcMode } as Partial<SettingsState>;
         },
         name: `nearblocks:${network}`,
         onRehydrateStorage: () => (state, error) => {
@@ -90,8 +56,6 @@ export const createSettingsStore = (
           state?.setHydrated(true);
         },
         partialize: (state) => ({
-          provider: state.provider,
-          providers: state.providers,
           timestampMode: state.timestampMode,
           utcMode: state.utcMode,
         }),
@@ -104,7 +68,7 @@ export const createSettingsStore = (
                 setItem: () => void 0,
               },
         ),
-        version: 2,
+        version: 3,
       },
     ),
   );
