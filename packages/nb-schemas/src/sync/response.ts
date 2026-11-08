@@ -16,11 +16,8 @@ const dateStatus = v.object({
 // An RPC node behind block-proxy. While it lags, RPC falls back to the next
 // endpoint; sync is false so monitors alert.
 const rpcNodeStatus = v.object({
-  flat_storage_deltas: v.nullable(v.number()),
-  has_state_snapshot: v.nullable(v.boolean()),
   height: v.nullable(v.string()),
   lag_secs: v.nullable(v.number()),
-  peers: v.nullable(v.number()),
   sync: v.boolean(),
 });
 
