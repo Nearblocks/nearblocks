@@ -2,6 +2,8 @@ import type {
   BlockStatus,
   DateStatus,
   MultichainStatus,
+  RpcNodesStatus,
+  RpcNodeStatus,
   SyncStatus,
   TvlStatus,
 } from 'nb-schemas';
@@ -10,6 +12,7 @@ import { Network } from 'nb-types';
 
 import config from '#config';
 import dayjs from '#libs/dayjs';
+import logger from '#libs/logger';
 import {
   dbBalance,
   dbBase,
@@ -258,6 +261,60 @@ const getStatStatus = async (): Promise<DateStatus> => {
   return { date, sync: isDateInSync(date) };
 };
 
+const RPC_NODE_TIMEOUT_MS = 5_000;
+const UNKNOWN_RPC_NODE: RpcNodeStatus = {
+  flat_storage_deltas: null,
+  has_state_snapshot: null,
+  height: null,
+  lag_secs: null,
+  peers: null,
+  sync: false,
+};
+
+const numberOrNull = (value: unknown) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : null;
+
+// Health of one block-proxy RPC node. Unreachable counts as not in sync: its
+// RPC traffic is then on the next endpoint either way.
+const getRpcNodeStatus = async (
+  node: (typeof config.rpcNodes)[number],
+): Promise<RpcNodeStatus> => {
+  try {
+    const res = await fetch(node.url, {
+      headers: node.token ? { Authorization: `Bearer ${node.token}` } : {},
+      signal: AbortSignal.timeout(RPC_NODE_TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const body = (await res.json()) as Record<string, unknown>;
+    const height = numberOrNull(body.height);
+    return {
+      flat_storage_deltas: numberOrNull(body.flat_storage_deltas),
+      has_state_snapshot:
+        typeof body.has_state_snapshot === 'boolean'
+          ? body.has_state_snapshot
+          : null,
+      height: height === null ? null : String(height),
+      lag_secs: numberOrNull(body.lag_secs),
+      peers: numberOrNull(body.peers),
+      sync: body.healthy === true,
+    };
+  } catch (error) {
+    logger.warn(
+      { error: String(error), node: node.name },
+      'rpc node status unavailable',
+    );
+    return UNKNOWN_RPC_NODE;
+  }
+};
+
+const getRpcNodesStatus = async (): Promise<RpcNodesStatus | undefined> => {
+  if (!config.rpcNodes.length) return undefined;
+  const statuses = await Promise.all(config.rpcNodes.map(getRpcNodeStatus));
+  return Object.fromEntries(
+    config.rpcNodes.map((node, index) => [node.name, statuses[index]]),
+  );
+};
+
 const accounts = responseHandler(response.accounts, async () => ({
   data: await getAccountsStatus(),
 }));
@@ -332,6 +389,10 @@ const mtHolders = responseHandler(response.mtHolders, async () => ({
   data: await getMTHoldersStatus(),
 }));
 
+const rpcNodes = responseHandler(response.rpcNodes, async () => ({
+  data: (await getRpcNodesStatus()) ?? {},
+}));
+
 const receipts = responseHandler(response.receipts, async () => ({
   data: await getReceiptsStatus(),
 }));
@@ -371,6 +432,7 @@ const status = responseHandler(response.status, async () => {
     intentsStatsData,
     intentsAccountStatsData,
     tvlStatsData,
+    rpcNodesData,
   ] = await Promise.all([
     getBaseStatus(),
     getBalanceStatus(),
@@ -393,6 +455,7 @@ const status = responseHandler(response.status, async () => {
     getIntentsStatsStatus(),
     getIntentsAccountStatsStatus(),
     getTvlStatsStatus(),
+    getRpcNodesStatus(),
   ]);
 
   const data: SyncStatus = {
@@ -424,6 +487,7 @@ const status = responseHandler(response.status, async () => {
     jobs: {
       daily_stats: statsData,
     },
+    ...(rpcNodesData ? { rpc: { nodes: rpcNodesData } } : {}),
   };
 
   return { data };
@@ -437,6 +501,7 @@ export {
   getFTHoldersStatus,
   getNFTHoldersStatus,
   getReceiptsStatus,
+  getRpcNodesStatus,
   getStatStatus,
 };
 
@@ -458,6 +523,7 @@ export default {
   nftAccountHolders,
   nftHolders,
   receipts,
+  rpcNodes,
   signature,
   staking,
   status,
