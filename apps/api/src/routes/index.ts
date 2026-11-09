@@ -12,7 +12,6 @@ import exports from '#routes/exports';
 import fts from '#routes/fts';
 import health from '#routes/health';
 import keys from '#routes/keys';
-import kitwallet from '#routes/kitwallet';
 import legacy from '#routes/legacy';
 import nfts from '#routes/nfts';
 import search from '#routes/search';
@@ -34,7 +33,6 @@ const routes = () => {
   fts(app);
   health(app);
   keys(app);
-  kitwallet(app);
   legacy(app);
   nfts(app);
   search(app);
