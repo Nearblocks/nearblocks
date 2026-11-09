@@ -51,6 +51,8 @@ export const kitwalletClientMetrics = (
     kitwalletClients.inc({
       agent: capped('agent', agentOf(req.get('user-agent'))),
       host: capped('host', req.hostname || 'none'),
+      // Presence only (auth runs later); enough to tell keyed callers apart.
+      key: req.get('authorization') || req.query.apikey ? 'yes' : 'no',
       origin: capped('origin', originOf(req)),
     });
   }

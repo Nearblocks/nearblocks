@@ -79,8 +79,8 @@ export const getRpcFallbackReason = (error: unknown): string => {
 };
 
 export const kitwalletClients = new client.Counter({
-  help: 'Kitwallet API requests by host called, caller origin and user-agent family',
-  labelNames: ['host', 'origin', 'agent'] as const,
+  help: 'Kitwallet API requests by host called, caller origin, user-agent family and whether an API key was sent',
+  labelNames: ['host', 'origin', 'agent', 'key'] as const,
   name: 'nearblocks_api_kitwallet_requests_total',
   registers: [register],
 });

@@ -38,7 +38,6 @@ const FREE_PLAN: Plan = {
   price_monthly: 0,
   title: 'Free Plan',
 };
-const KITWALLET_PATH = '/v1/kitwallet';
 const SEARCH_PATH = '/v1/search';
 const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
@@ -240,7 +239,7 @@ const useFreePlan = async (
 };
 
 const getPlan = async (baseUrl: string, token: string) => {
-  if (baseUrl === KITWALLET_PATH || baseUrl === SEARCH_PATH) {
+  if (baseUrl === SEARCH_PATH) {
     return DEFAULT_PLAN;
   }
 
