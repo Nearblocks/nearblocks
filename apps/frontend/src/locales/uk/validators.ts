@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: 'Провідні країни',
+    noData: 'Телеметрія вузлів зараз недоступна.',
+    note: 'За телеметрією, яку вузли NEAR надіслали до оглядача за останні 10 хвилин. Версії та акаунти вказує сам вузол.',
+    online: '{{nodes}} вузлів онлайн · {{validators}} валідаторів',
+    title: 'Вузли мережі',
+    versions: 'Версії вузлів',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

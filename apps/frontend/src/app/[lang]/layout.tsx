@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { Geist_Mono, Roboto } from 'next/font/google';
 import { cookies } from 'next/headers';
 
 import { Layout } from '@/components/layout';
+import { geist, roboto } from '@/fonts';
 import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import type { Locale } from '@/locales/config';
 import { getDictionary, hasLocale, translator } from '@/locales/dictionaries';
@@ -12,17 +12,6 @@ import { RpcSessionProvider } from '@/providers/rpc-session';
 import { Toaster } from '@/ui/sonner';
 
 import '../globals.css';
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['300', '400', '500', '700'],
-});
-
-const geist = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-geist',
-});
 
 export const generateMetadata = async ({
   params,

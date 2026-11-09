@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: 'Negara teratas',
+    noData: 'Telemetri node sedang tidak tersedia.',
+    note: 'Dari telemetri yang dikirim node NEAR ke explorer dalam 10 menit terakhir. Versi dan akun dilaporkan oleh masing-masing node.',
+    online: '{{nodes}} node online · {{validators}} validator',
+    title: 'Node Jaringan',
+    versions: 'Versi node',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

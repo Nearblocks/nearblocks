@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: '主要國家',
+    noData: '節點遙測暫時不可用。',
+    note: '根據過去 10 分鐘內 NEAR 節點發送到瀏覽器的遙測數據。版本和帳戶由各節點自行上報。',
+    online: '{{nodes}} 個節點在線 · {{validators}} 個驗證者',
+    title: '網絡節點',
+    versions: '節點版本',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

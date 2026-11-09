@@ -1,11 +1,11 @@
 'use client';
 
-import { Roboto } from 'next/font/google';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Footer } from '@/components/layout/footer';
 import { Header } from '@/components/layout/header';
+import { roboto } from '@/fonts';
 import { defaultTheme, getRuntimeConfig } from '@/lib/config';
 import { defaultLocale, type Locale, supportedLocales } from '@/locales/config';
 import { clientTranslator, getDictionary } from '@/locales/dictionaries';
@@ -13,12 +13,6 @@ import { ConfigProvider } from '@/providers/config';
 import { LocaleProvider } from '@/providers/locale';
 import { Theme } from '@/types/enums';
 import type { BaseDictionary, DeepPartial, Translator } from '@/types/types';
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['300', '400', '500', '700'],
-});
 
 type Props = {
   children: (props: {
