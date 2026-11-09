@@ -38,6 +38,19 @@ const FREE_PLAN: Plan = {
   price_monthly: 0,
   title: 'Free Plan',
 };
+// Keyless kitwallet callers (wallets on users' devices) get a little more than the
+// free plan, in their own counters (id -2) so wallet use doesn't eat the IP's free quota.
+const KITWALLET_PLAN: Plan = {
+  id: -2,
+  limit_per_day: 1000,
+  limit_per_minute: 12,
+  limit_per_month: 10000,
+  limit_per_second: 1,
+  price_annually: 0,
+  price_monthly: 0,
+  title: 'Kitwallet',
+};
+const KITWALLET_PATH = '/v3/kitwallet';
 const SEARCH_PATH = '/v1/search';
 const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
@@ -241,6 +254,10 @@ const useFreePlan = async (
 const getPlan = async (baseUrl: string, token: string) => {
   if (baseUrl === SEARCH_PATH) {
     return DEFAULT_PLAN;
+  }
+
+  if (baseUrl === KITWALLET_PATH) {
+    return KITWALLET_PLAN;
   }
 
   const plan = await getFreePlan();
