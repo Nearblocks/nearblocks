@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: 'Quốc gia hàng đầu',
+    noData: 'Hiện không có dữ liệu telemetry của node.',
+    note: 'Theo dữ liệu telemetry các node NEAR gửi tới explorer trong 10 phút qua. Phiên bản và tài khoản do từng node tự báo cáo.',
+    online: '{{nodes}} node trực tuyến · {{validators}} validator',
+    title: 'Node mạng lưới',
+    versions: 'Phiên bản node',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

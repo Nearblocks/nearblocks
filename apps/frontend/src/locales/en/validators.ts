@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: 'Top countries',
+    noData: 'Node telemetry is not available right now.',
+    note: 'From telemetry NEAR nodes sent to the explorer in the last 10 minutes. Versions and accounts are reported by each node.',
+    online: '{{nodes}} nodes online · {{validators}} validators',
+    title: 'Network Nodes',
+    versions: 'Node versions',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

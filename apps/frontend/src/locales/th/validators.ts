@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: 'ประเทศยอดนิยม',
+    noData: 'ขณะนี้ไม่มีข้อมูลเทเลเมทรีของโหนด',
+    note: 'จากเทเลเมทรีที่โหนด NEAR ส่งถึง explorer ใน 10 นาทีที่ผ่านมา เวอร์ชันและบัญชีเป็นข้อมูลที่แต่ละโหนดรายงานเอง',
+    online: 'ออนไลน์ {{nodes}} โหนด · ผู้ตรวจสอบ {{validators}}',
+    title: 'โหนดของเครือข่าย',
+    versions: 'เวอร์ชันของโหนด',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

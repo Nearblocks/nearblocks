@@ -42,6 +42,14 @@ export const validators = {
     description: 'NEAR Protocol validator {{node}} delegators list',
     title: 'NEAR Validator {{node}}',
   },
+  nodesMap: {
+    countries: '上位の国',
+    noData: '現在ノードのテレメトリを利用できません。',
+    note: '過去10分間にNEARノードがエクスプローラーへ送信したテレメトリに基づきます。バージョンとアカウントは各ノードの自己申告です。',
+    online: 'オンライン {{nodes}} ノード · バリデーター {{validators}}',
+    title: 'ネットワークノード',
+    versions: 'ノードのバージョン',
+  },
   nodeTitle: 'NEAR Validator',
   staking: {
     currentValidators: 'Current Validators',

@@ -10,3 +10,4 @@ __ENV.js
 next-env.d.ts
 pnpm-lock.yaml
 /AGENTS.md
+apps/frontend/public/maps
