@@ -38,7 +38,19 @@ const FREE_PLAN: Plan = {
   price_monthly: 0,
   title: 'Free Plan',
 };
-const KITWALLET_PATH = '/v1/kitwallet';
+// Keyless kitwallet callers: room for a wallet's burst on open/refresh (~5 calls), but a
+// low daily cap so polling scripts run out fast. Own counters (id -2).
+const KITWALLET_PLAN: Plan = {
+  id: -2,
+  limit_per_day: 150,
+  limit_per_minute: 10,
+  limit_per_month: 10000,
+  limit_per_second: 1,
+  price_annually: 0,
+  price_monthly: 0,
+  title: 'Kitwallet',
+};
+const KITWALLET_PATH = '/v3/kitwallet';
 const SEARCH_PATH = '/v1/search';
 const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
@@ -240,8 +252,12 @@ const useFreePlan = async (
 };
 
 const getPlan = async (baseUrl: string, token: string) => {
-  if (baseUrl === KITWALLET_PATH || baseUrl === SEARCH_PATH) {
+  if (baseUrl === SEARCH_PATH) {
     return DEFAULT_PLAN;
+  }
+
+  if (baseUrl === KITWALLET_PATH) {
+    return KITWALLET_PLAN;
   }
 
   const plan = await getFreePlan();

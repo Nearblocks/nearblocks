@@ -96,11 +96,6 @@ app.use('/v1', routes());
 app.use('/v2', routesV2());
 app.use('/v3', routesV3());
 
-app.get('/v1/kitwallet', (_req, res) => {
-  const htmlFilePath = path.join(dir, '..', 'src', 'kitwallet', 'index.html');
-  res.sendFile(htmlFilePath);
-});
-
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ data: null, errors: [{ message: 'Not Found' }] });
 });

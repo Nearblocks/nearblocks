@@ -204,7 +204,6 @@ const apiDocumentation = async (app: Application, dir: string) => {
         { description: 'Deprecated.', name: 'Legacy / Charts' },
         { description: 'Deprecated.', name: 'Legacy / DEX' },
         { description: 'Deprecated.', name: 'Legacy / FTs' },
-        { description: 'Deprecated.', name: 'Legacy / Kitwallet' },
         { description: 'Deprecated.', name: 'Legacy / Supply' },
         { description: 'Deprecated.', name: 'Legacy / NFTs' },
         { description: 'Deprecated.', name: 'Legacy / Search' },
