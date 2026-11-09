@@ -9,11 +9,13 @@ import { echarts } from './core';
 
 type Props = {
   className?: string;
+  /** Accessible name for the chart. */
+  label: string;
   option: EChartsCoreOption;
 };
 
 // Thin React wrapper: one ECharts instance per element, resized with its container.
-export const EChart = ({ className, option }: Props) => {
+export const EChart = ({ className, label, option }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const chart = useRef<echarts.ECharts | null>(null);
 
@@ -34,5 +36,12 @@ export const EChart = ({ className, option }: Props) => {
     chart.current?.setOption(option, { notMerge: true });
   }, [option]);
 
-  return <div className={cn('w-full', className)} ref={ref} />;
+  return (
+    <div
+      aria-label={label}
+      className={cn('w-full', className)}
+      ref={ref}
+      role="img"
+    />
+  );
 };

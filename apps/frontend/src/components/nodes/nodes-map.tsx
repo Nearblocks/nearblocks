@@ -40,30 +40,47 @@ const top = (counts: Record<string, number>, n: number) =>
     .sort((a, b) => b[1] - a[1])
     .slice(0, n);
 
-// Natural Earth 110m outlines keyed by ISO alpha-2 (scripts/build-world-map.mjs).
-const useWorldMap = () => {
-  const [codes, setCodes] = useState<null | string[]>(null);
+// Natural Earth outlines keyed by ISO alpha-2 (scripts/build-world-map.mjs). Fetched
+// and registered once per page load, shared by every render.
+let worldMap: null | Promise<null | string[]> = null;
+
+const loadWorldMap = () => {
+  worldMap ??= fetch('/maps/world-110m.geo.json')
+    .then((res) => {
+      if (!res.ok) throw new Error(`map ${res.status}`);
+      return res.json() as Promise<GeoJson>;
+    })
+    .then((geo) => {
+      echarts.registerMap('world', geo as never);
+      return geo.features.map((f) => f.properties.name);
+    })
+    .catch(() => {
+      worldMap = null;
+      return null;
+    });
+  return worldMap;
+};
+
+// undefined while loading, null if the map could not be loaded.
+const useWorldMap = (enabled: boolean) => {
+  const [codes, setCodes] = useState<null | string[] | undefined>(undefined);
   useEffect(() => {
+    if (!enabled) return;
     let active = true;
-    fetch('/maps/world-110m.geo.json')
-      .then((res) => (res.ok ? (res.json() as Promise<GeoJson>) : null))
-      .then((geo) => {
-        if (!active || !geo) return;
-        echarts.registerMap('world', geo as never);
-        setCodes(geo.features.map((f) => f.properties.name));
-      })
-      .catch(() => undefined);
+    void loadWorldMap().then((result) => {
+      if (active) setCodes(result);
+    });
     return () => {
       active = false;
     };
-  }, []);
+  }, [enabled]);
   return codes;
 };
 
 export const NodesMap = ({ loading, statsPromise }: Props) => {
   const { locale, t } = useLocale('validators');
   const stats = !loading && statsPromise ? use(statsPromise) : null;
-  const codes = useWorldMap();
+  const codes = useWorldMap(!loading);
   const theme = useChartTheme();
 
   const regionName = useMemo(() => {
@@ -135,12 +152,16 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          {loading || !option ? (
+          {loading || codes === undefined || (codes && !option) ? (
             <Skeleton className="h-90 w-full" />
-          ) : (
-            <EChart className="h-90" option={option} />
-          )}
-          {!loading && !stats ? (
+          ) : option ? (
+            <EChart
+              className="h-90"
+              label={t('nodesMap.title')}
+              option={option}
+            />
+          ) : null}
+          {!loading && (!stats || codes === null) ? (
             <p className="mt-2 text-body-sm text-muted-foreground">
               {t('nodesMap.noData')}
             </p>
@@ -148,8 +169,10 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
             <div className="mt-2 flex items-center justify-end gap-1 text-body-xs text-muted-foreground">
               {PIECES.map((piece, index) => (
                 <span
+                  aria-label={pieceLabel(piece)}
                   className="block h-3 w-3 rounded-xs"
                   key={piece.min}
+                  role="img"
                   style={{ background: theme?.scale[index] }}
                   title={pieceLabel(piece)}
                 />
