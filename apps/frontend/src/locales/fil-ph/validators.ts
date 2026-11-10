@@ -47,6 +47,12 @@ export const validators = {
     description:
       'Ipinapakita ng mapa ng Network Nodes ang mga NEAR node na nagpadala ng telemetry sa nakaraang 10 minuto, ayon sa bansa.',
     legend: 'Mga node bawat bansa',
+    mapError: 'Hindi ma-load ang mapa.',
+    meta: {
+      description:
+        'Mapa ng mga node ng NEAR Protocol ayon sa bansa, kasama ang mga bersyon, mula sa telemetry sa nakaraang 10 minuto.',
+      title: 'Mapa ng mga Node ng NEAR Network',
+    },
     noData: 'Hindi available ang node telemetry sa ngayon.',
     online: '{{nodes}} node online · {{validators}} validator',
     series: 'Mga node',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Mga node',
+    validators: 'Mga validator',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

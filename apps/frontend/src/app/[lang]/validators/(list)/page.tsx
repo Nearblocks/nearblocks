@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 
 import { ErrorSuspense } from '@/components/error-suspense';
-import { PageHeading } from '@/components/page-heading';
-import { RpcSelector } from '@/components/rpc';
 import { Validators } from '@/components/validators';
 import { fetchStats } from '@/data/layout';
 import { fetchValidatorInfo, fetchValidatorList } from '@/data/validators';
@@ -25,10 +23,7 @@ export const generateMetadata = async ({
   };
 };
 
-const ValidatorsPage = async ({ params, searchParams }: Props) => {
-  const { lang } = await params;
-  const locale = hasLocale(lang) ? lang : 'en';
-  const t = await translator(locale, 'validators');
+const ValidatorsPage = async ({ searchParams }: Props) => {
   const filters = await searchParams;
   const validatorListPromise = fetchValidatorList(filters);
   const validatorInfoPromise = fetchValidatorInfo();
@@ -36,18 +31,13 @@ const ValidatorsPage = async ({ params, searchParams }: Props) => {
   await holdNav();
 
   return (
-    <>
-      <PageHeading apiTag="staking" title={t('title')}>
-        <RpcSelector />
-      </PageHeading>
-      <ErrorSuspense fallback={<Validators loading />}>
-        <Validators
-          statsPromise={statsPromise}
-          validatorInfoPromise={validatorInfoPromise}
-          validatorListPromise={validatorListPromise}
-        />
-      </ErrorSuspense>
-    </>
+    <ErrorSuspense fallback={<Validators loading />}>
+      <Validators
+        statsPromise={statsPromise}
+        validatorInfoPromise={validatorInfoPromise}
+        validatorListPromise={validatorListPromise}
+      />
+    </ErrorSuspense>
   );
 };
 

@@ -47,6 +47,12 @@ export const validators = {
     description:
       'Карта узлов сети показывает по странам узлы NEAR, отправлявшие телеметрию за последние 10 минут.',
     legend: 'Узлы по странам',
+    mapError: 'Не удалось загрузить карту.',
+    meta: {
+      description:
+        'Карта узлов NEAR Protocol по странам с их версиями по телеметрии за последние 10 минут.',
+      title: 'Карта узлов сети NEAR',
+    },
     noData: 'Телеметрия узлов сейчас недоступна.',
     online: '{{nodes}} узлов онлайн · {{validators}} валидаторов',
     series: 'Узлы',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Узлы',
+    validators: 'Валидаторы',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

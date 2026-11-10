@@ -47,6 +47,12 @@ export const validators = {
     description:
       'Bản đồ Node mạng lưới hiển thị các node NEAR đã gửi telemetry trong 10 phút qua, theo quốc gia.',
     legend: 'Số node theo quốc gia',
+    mapError: 'Không thể tải bản đồ.',
+    meta: {
+      description:
+        'Bản đồ các node NEAR Protocol theo quốc gia, kèm phiên bản, từ telemetry trong 10 phút qua.',
+      title: 'Bản đồ Node mạng lưới NEAR',
+    },
     noData: 'Hiện không có dữ liệu telemetry của node.',
     online: '{{nodes}} node trực tuyến · {{validators}} validator',
     series: 'Node',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Node',
+    validators: 'Validator',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

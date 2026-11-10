@@ -47,6 +47,12 @@ export const validators = {
     description:
       'Peta Node Jaringan menampilkan node NEAR yang mengirim telemetri dalam 10 menit terakhir, per negara.',
     legend: 'Node per negara',
+    mapError: 'Peta tidak dapat dimuat.',
+    meta: {
+      description:
+        'Peta node NEAR Protocol per negara, beserta versinya, dari telemetri 10 menit terakhir.',
+      title: 'Peta Node Jaringan NEAR',
+    },
     noData: 'Telemetri node sedang tidak tersedia.',
     online: '{{nodes}} node online · {{validators}} validator',
     series: 'Node',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Node',
+    validators: 'Validator',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

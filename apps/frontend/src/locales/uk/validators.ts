@@ -47,6 +47,12 @@ export const validators = {
     description:
       'Карта вузлів мережі показує за країнами вузли NEAR, що надсилали телеметрію за останні 10 хвилин.',
     legend: 'Вузли за країнами',
+    mapError: 'Не вдалося завантажити карту.',
+    meta: {
+      description:
+        'Карта вузлів NEAR Protocol за країнами з їхніми версіями за телеметрією останніх 10 хвилин.',
+      title: 'Карта вузлів мережі NEAR',
+    },
     noData: 'Телеметрія вузлів зараз недоступна.',
     online: '{{nodes}} вузлів онлайн · {{validators}} валідаторів',
     series: 'Вузли',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Вузли',
+    validators: 'Валідатори',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

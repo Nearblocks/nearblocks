@@ -47,6 +47,12 @@ export const validators = {
     description:
       'ネットワークノードマップは、過去10分間にテレメトリを送信したNEARノードを国別に表示します。',
     legend: '国別ノード数',
+    mapError: 'マップを読み込めませんでした。',
+    meta: {
+      description:
+        '過去10分間のテレメトリに基づく、国別のNEAR Protocolノードとそのバージョンのマップ。',
+      title: 'NEARネットワークノードマップ',
+    },
     noData: '現在ノードのテレメトリを利用できません。',
     online: 'オンライン {{nodes}} ノード · バリデーター {{validators}}',
     series: 'ノード',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'ノード',
+    validators: 'バリデーター',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

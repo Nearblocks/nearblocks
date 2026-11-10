@@ -47,6 +47,12 @@ export const validators = {
     description:
       '网络节点地图按国家/地区显示过去 10 分钟内上报遥测的 NEAR 节点。',
     legend: '各国家/地区节点数',
+    mapError: '无法加载地图。',
+    meta: {
+      description:
+        '基于过去 10 分钟遥测数据的 NEAR Protocol 节点及版本国家/地区分布图。',
+      title: 'NEAR 网络节点地图',
+    },
     noData: '节点遥测暂不可用。',
     online: '{{nodes}} 个节点在线 · {{validators}} 个验证者',
     series: '节点',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: '节点',
+    validators: '验证者',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {
