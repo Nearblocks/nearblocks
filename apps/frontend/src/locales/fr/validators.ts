@@ -47,6 +47,12 @@ export const validators = {
     description:
       'La carte des nœuds du réseau montre, par pays, les nœuds NEAR ayant envoyé leur télémétrie au cours des 10 dernières minutes.',
     legend: 'Nœuds par pays',
+    mapError: 'La carte n’a pas pu être chargée.',
+    meta: {
+      description:
+        'Carte des nœuds NEAR Protocol par pays, avec leurs versions, d’après la télémétrie des 10 dernières minutes.',
+      title: 'Carte des nœuds du réseau NEAR',
+    },
     noData: 'La télémétrie des nœuds est indisponible pour le moment.',
     online: '{{nodes}} nœuds en ligne · {{validators}} validateurs',
     series: 'Nœuds',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Nœuds',
+    validators: 'Validateurs',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

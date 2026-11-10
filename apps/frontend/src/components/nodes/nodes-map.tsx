@@ -1,20 +1,27 @@
 'use client';
 
+import { Map as MapIcon } from 'lucide-react';
 import { use, useEffect, useMemo, useState } from 'react';
 
 import { EChart } from '@/components/echarts/chart';
 import { echarts } from '@/components/echarts/core';
 import { useChartTheme } from '@/components/echarts/use-chart-theme';
+import { EmptyBox } from '@/components/empty';
 import {
   nodesMapOption,
   stepColors,
   STEPS,
 } from '@/components/nodes/map-option';
+import {
+  COUNTRY_ROWS,
+  MapSkeleton,
+  NodesMapSkeleton,
+  VERSION_ROWS,
+} from '@/components/nodes/nodes-skeleton';
 import type { NodeStats } from '@/data/nodes';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { Card, CardContent, CardHeader } from '@/ui/card';
-import { Skeleton } from '@/ui/skeleton';
 
 type GeoJson = { features: { properties: { name: string } }[] };
 
@@ -35,6 +42,28 @@ const top = (counts: Record<string, number>, n: number) =>
     .filter(([key]) => key !== 'unknown' && key !== '')
     .sort((a, b) => b[1] - a[1])
     .slice(0, n);
+
+const NodeList = ({
+  rows,
+  title,
+}: {
+  rows: [string, number][];
+  title: string;
+}) => (
+  <section>
+    <h3 className="mb-2 text-body-xs text-muted-foreground">{title}</h3>
+    <ul className="space-y-1 text-body-sm">
+      {rows.map(([label, count]) => (
+        <li className="flex justify-between gap-2" key={label}>
+          <span className="truncate">{label}</span>
+          <span className="text-muted-foreground tabular-nums">
+            {numberFormat(count)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+);
 
 // Natural Earth outlines keyed by ISO alpha-2 (scripts/build-world-map.mjs). Fetched
 // and registered once per page load, shared by every render.
@@ -104,9 +133,9 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
     });
   }, [codes, regionName, stats, t, theme]);
 
+  if (loading) return <NodesMapSkeleton />;
+
   const colors = theme && stepColors(theme);
-  const countries = top(stats?.by_country ?? {}, 8);
-  const versions = top(stats?.by_version ?? {}, 6);
 
   return (
     <Card>
@@ -123,72 +152,60 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
           </span>
         )}
       </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 lg:self-center">
-          {loading || codes === undefined || (codes && !option) ? (
-            <Skeleton className="aspect-9/4 w-full" />
-          ) : option ? (
-            <EChart
-              className="aspect-9/4"
-              label={t('nodesMap.title')}
-              option={option}
-            />
-          ) : null}
-          {!loading && (!stats || codes === null) ? (
-            <p className="mt-2 text-body-sm text-muted-foreground">
-              {t('nodesMap.noData')}
-            </p>
-          ) : (
-            colors && (
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-body-xs text-muted-foreground">
-                <span>{t('nodesMap.legend')}</span>
-                {STEPS.map((step, index) => (
-                  <span className="flex items-center gap-1" key={step.min}>
-                    <span
-                      className="block size-2.5 rounded-xs"
-                      style={{ background: colors[index] }}
-                    />
-                    <span className="tabular-nums">{stepLabel(step)}</span>
-                  </span>
-                ))}
+      {stats ? (
+        <CardContent className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-3">
+          <div className="lg:col-span-2 lg:self-center">
+            {codes === null ? (
+              <div className="flex aspect-9/4 w-full">
+                <EmptyBox
+                  description={t('nodesMap.mapError')}
+                  icon={<MapIcon />}
+                />
               </div>
-            )
-          )}
-        </div>
-        <div className="space-y-6">
-          <section>
-            <h3 className="mb-2 text-body-xs text-muted-foreground">
-              {t('nodesMap.countries')}
-            </h3>
-            <ul className="space-y-1 text-body-sm">
-              {countries.map(([code, count]) => (
-                <li className="flex justify-between gap-2" key={code}>
-                  <span className="truncate">{regionName(code)}</span>
-                  <span className="text-muted-foreground tabular-nums">
-                    {numberFormat(count)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <section>
-            <h3 className="mb-2 text-body-xs text-muted-foreground">
-              {t('nodesMap.versions')}
-            </h3>
-            <ul className="space-y-1 text-body-sm">
-              {versions.map(([version, count]) => (
-                <li className="flex justify-between gap-2" key={version}>
-                  {/* Self-reported by nodes: rendered as React text only. */}
-                  <span className="truncate">{version}</span>
-                  <span className="text-muted-foreground tabular-nums">
-                    {numberFormat(count)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
-      </CardContent>
+            ) : !option || !colors ? (
+              <MapSkeleton />
+            ) : (
+              <>
+                <EChart
+                  className="aspect-9/4"
+                  label={t('nodesMap.title')}
+                  option={option}
+                />
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-body-xs text-muted-foreground">
+                  <span>{t('nodesMap.legend')}</span>
+                  {STEPS.map((step, index) => (
+                    <span className="flex items-center gap-1" key={step.min}>
+                      <span
+                        className="block size-2.5 rounded-xs"
+                        style={{ background: colors[index] }}
+                      />
+                      <span className="tabular-nums">{stepLabel(step)}</span>
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+          <div className="space-y-6">
+            <NodeList
+              rows={top(stats.by_country, COUNTRY_ROWS).map(([code, count]) => [
+                regionName(code),
+                count,
+              ])}
+              title={t('nodesMap.countries')}
+            />
+            {/* Versions are self-reported by nodes: rendered as React text only. */}
+            <NodeList
+              rows={top(stats.by_version, VERSION_ROWS)}
+              title={t('nodesMap.versions')}
+            />
+          </div>
+        </CardContent>
+      ) : (
+        <CardContent className="flex min-h-64 p-4">
+          <EmptyBox description={t('nodesMap.noData')} icon={<MapIcon />} />
+        </CardContent>
+      )}
     </Card>
   );
 };

@@ -47,6 +47,12 @@ export const validators = {
     description:
       'Network Nodes map shows NEAR nodes that reported telemetry in the last 10 minutes, by country.',
     legend: 'Nodes per country',
+    mapError: 'The map could not be loaded.',
+    meta: {
+      description:
+        'Map of NEAR Protocol nodes by country, with node versions, from telemetry reported in the last 10 minutes.',
+      title: 'NEAR Network Nodes Map',
+    },
     noData: 'Node telemetry is not available right now.',
     online: '{{nodes}} nodes online · {{validators}} validators',
     series: 'Nodes',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'Nodes',
+    validators: 'Validators',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

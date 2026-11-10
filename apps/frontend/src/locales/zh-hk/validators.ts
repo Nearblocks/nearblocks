@@ -47,6 +47,12 @@ export const validators = {
     description:
       '網絡節點地圖按國家/地區顯示過去 10 分鐘內上報遙測的 NEAR 節點。',
     legend: '各國家/地區節點數',
+    mapError: '無法載入地圖。',
+    meta: {
+      description:
+        '基於過去 10 分鐘遙測數據的 NEAR Protocol 節點及版本國家/地區分佈圖。',
+      title: 'NEAR 網絡節點地圖',
+    },
     noData: '節點遙測暫時不可用。',
     online: '{{nodes}} 個節點在線 · {{validators}} 個驗證者',
     series: '節點',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: '節點',
+    validators: '驗證者',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {

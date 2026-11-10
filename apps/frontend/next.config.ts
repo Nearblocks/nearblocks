@@ -82,6 +82,11 @@ const nextConfig: NextConfig = {
         source: '/node-explorer',
       },
       {
+        destination: '/validators/nodes',
+        permanent: true,
+        source: '/nodes',
+      },
+      {
         destination: '/terms',
         permanent: true,
         source: '/terms-and-conditions',

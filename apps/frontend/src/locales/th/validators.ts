@@ -47,6 +47,12 @@ export const validators = {
     description:
       'แผนที่โหนดเครือข่ายแสดงโหนด NEAR ที่ส่งเทเลเมทรีใน 10 นาทีที่ผ่านมา แยกตามประเทศ',
     legend: 'โหนดตามประเทศ',
+    mapError: 'ไม่สามารถโหลดแผนที่ได้',
+    meta: {
+      description:
+        'แผนที่โหนด NEAR Protocol แยกตามประเทศ พร้อมเวอร์ชัน จากเทเลเมทรีใน 10 นาทีที่ผ่านมา',
+      title: 'แผนที่โหนดเครือข่าย NEAR',
+    },
     noData: 'ขณะนี้ไม่มีข้อมูลเทเลเมทรีของโหนด',
     online: 'ออนไลน์ {{nodes}} โหนด · ผู้ตรวจสอบ {{validators}}',
     series: 'โหนด',
@@ -107,6 +113,10 @@ export const validators = {
     total: '{{count}} Validators found',
     warning:
       'Validators 1-{{index}} hold a cumulative stake above 33%. Delegating to the validators below improves the decentralization of the network.',
+  },
+  tabs: {
+    nodes: 'โหนด',
+    validators: 'ผู้ตรวจสอบ',
   },
   title: 'NEAR Protocol Validator Explorer',
   validatorInfo: {
