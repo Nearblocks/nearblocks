@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Nangungunang mga bansa',
+    description:
+      'Ipinapakita ng mapa ng Network Nodes ang mga NEAR node na nagpadala ng telemetry sa nakaraang 10 minuto, ayon sa bansa.',
     legend: 'Mga node bawat bansa',
     noData: 'Hindi available ang node telemetry sa ngayon.',
-    note: 'Mga node na nagpadala ng telemetry sa nakaraang 10 minuto.',
     online: '{{nodes}} node online · {{validators}} validator',
+    series: 'Mga node',
     title: 'Mga Node ng Network',
     versions: 'Mga bersyon ng node',
   },

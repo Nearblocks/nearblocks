@@ -12,8 +12,8 @@ export type ChartTheme = {
   card: string;
   foreground: string;
   muted: string;
-  /** Heatmap/choropleth steps, lightest first. */
-  scale: string[];
+  /** Primary series colour of the Highcharts charts (brand teal). */
+  series: string;
 };
 
 const VARS = {
@@ -21,11 +21,8 @@ const VARS = {
   card: '--card',
   foreground: '--foreground',
   muted: '--muted-foreground',
+  series: '--highcharts-color-0',
 } as const;
-
-const SCALE_VARS = [0, 1, 2, 3, 4].map(
-  (i) => `--highcharts-heatmap-color-${i}`,
-);
 
 let canvas: CanvasRenderingContext2D | null = null;
 
@@ -53,7 +50,7 @@ const readTheme = (): ChartTheme => {
     card: read(VARS.card),
     foreground: read(VARS.foreground),
     muted: read(VARS.muted),
-    scale: SCALE_VARS.map(read),
+    series: read(VARS.series),
   };
 };
 

@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Top countries',
+    description:
+      'Network Nodes map shows NEAR nodes that reported telemetry in the last 10 minutes, by country.',
     legend: 'Nodes per country',
     noData: 'Node telemetry is not available right now.',
-    note: 'Nodes reporting telemetry in the last 10 minutes.',
     online: '{{nodes}} nodes online · {{validators}} validators',
+    series: 'Nodes',
     title: 'Network Nodes',
     versions: 'Node versions',
   },

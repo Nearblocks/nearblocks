@@ -10,7 +10,7 @@ type Options = {
   tooltip: (code: string, value: number) => string;
 };
 
-// Nodes per country, one step per colour of the theme's heatmap scale.
+// Nodes per country, one colour step each.
 export const STEPS = [
   { max: 0, min: 0 },
   { max: 4, min: 1 },
@@ -29,22 +29,12 @@ const mix = (base: string, tint: string, amount: number) => {
   return `rgb(${rgb.join(', ')})`;
 };
 
-const luma = (color: string) => {
-  const [r = 0, g = 0, b = 0] = channels(color);
-  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-};
-
-// Countries without nodes get a light tint of the text colour, visible on the card in
-// both themes. The dark heatmap scale starts almost black and would vanish next to
-// that grey, so in dark mode its steps are lifted towards the brightest one.
-export const stepColors = ({ card, foreground, scale }: ChartTheme) => {
-  const lift = luma(card) < 0.5 ? 0.3 : 0;
-  const strongest = scale[scale.length - 1];
-  return [
-    mix(card, foreground, 0.08),
-    ...scale.slice(1).map((color) => mix(color, strongest, lift)),
-  ];
-};
+// Countries without nodes get a light tint of the text colour; the rest a ramp of the
+// charts' series teal over the card, like the soft area fill on the chart pages.
+export const stepColors = ({ card, foreground, series }: ChartTheme) => [
+  mix(card, foreground, 0.08),
+  ...[0.3, 0.55, 0.8, 1].map((amount) => mix(card, series, amount)),
+];
 
 const stepIndex = (value: number) =>
   STEPS.filter((step) => value >= step.min).length - 1;
@@ -122,14 +112,14 @@ export const nodesMapOption = ({ codes, counts, theme, tooltip }: Options) => {
     ],
     tooltip: {
       backgroundColor: theme.card,
-      borderColor: theme.border,
-      borderWidth: 1,
+      // Same look as the Highcharts tooltips: card fill, no border, soft shadow.
+      borderWidth: 0,
       confine: true,
       extraCssText:
-        'border-radius: 6px; box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);',
+        'border-radius: 4px; box-shadow: 1px 1px 3px rgb(0 0 0 / 0.15);',
       formatter: (p: { name: string; value?: number }) =>
         tooltip(p.name, p.value ?? 0),
-      padding: [6, 10],
+      padding: 8,
       textStyle: {
         color: theme.foreground,
         fontFamily: 'inherit',

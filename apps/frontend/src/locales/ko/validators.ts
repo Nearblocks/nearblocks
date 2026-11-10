@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: '상위 국가',
+    description:
+      '네트워크 노드 지도는 최근 10분 동안 텔레메트리를 보고한 NEAR 노드를 국가별로 보여줍니다.',
     legend: '국가별 노드',
     noData: '현재 노드 텔레메트리를 사용할 수 없습니다.',
-    note: '최근 10분 동안 텔레메트리를 보고한 노드입니다.',
     online: '온라인 노드 {{nodes}}개 · 검증인 {{validators}}개',
+    series: '노드',
     title: '네트워크 노드',
     versions: '노드 버전',
   },

@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: '上位の国',
+    description:
+      'ネットワークノードマップは、過去10分間にテレメトリを送信したNEARノードを国別に表示します。',
     legend: '国別ノード数',
     noData: '現在ノードのテレメトリを利用できません。',
-    note: '過去10分間にテレメトリを送信したノード。',
     online: 'オンライン {{nodes}} ノード · バリデーター {{validators}}',
+    series: 'ノード',
     title: 'ネットワークノード',
     versions: 'ノードのバージョン',
   },

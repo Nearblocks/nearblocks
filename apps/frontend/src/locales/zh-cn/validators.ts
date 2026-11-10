@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: '主要国家',
+    description:
+      '网络节点地图按国家/地区显示过去 10 分钟内上报遥测的 NEAR 节点。',
     legend: '各国家/地区节点数',
     noData: '节点遥测暂不可用。',
-    note: '过去 10 分钟内上报遥测的节点。',
     online: '{{nodes}} 个节点在线 · {{validators}} 个验证者',
+    series: '节点',
     title: '网络节点',
     versions: '节点版本',
   },
