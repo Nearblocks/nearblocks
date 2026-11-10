@@ -1,13 +1,14 @@
 import { Knex } from 'nb-knex';
 import { BlockHeader, Message, Receipt } from 'nb-neardata';
 import { Account } from 'nb-types';
-import { retry } from 'nb-utils';
+import { isUniversalAccount, retry } from 'nb-utils';
 
 import {
   isCreateAccountAction,
   isDeleteAccountAction,
   isDeterministicStateInitAction,
   isTransferAction,
+  isUniversalStateInitAction,
 } from '#libs/guards';
 import { isEthImplicit, isExecutionSuccess, isNearImplicit } from '#libs/utils';
 
@@ -115,7 +116,10 @@ const getChunkAccounts = (
         continue;
       }
 
-      if (isDeterministicStateInitAction(action)) {
+      if (
+        isDeterministicStateInitAction(action) ||
+        isUniversalStateInitAction(action)
+      ) {
         accountsToUpdate.delete(accountId);
         accounts.set(
           accountId,
@@ -127,7 +131,9 @@ const getChunkAccounts = (
 
       if (
         isTransferAction(action) &&
-        (isNearImplicit(accountId) || isEthImplicit(accountId)) &&
+        (isNearImplicit(accountId) ||
+          isEthImplicit(accountId) ||
+          isUniversalAccount(accountId)) &&
         (!accounts.has(accountId) || accountsToUpdate.has(accountId))
       ) {
         accountsToUpdate.delete(accountId);

@@ -1,5 +1,6 @@
 import {
   Coins,
+  Fuel,
   Globe,
   Info,
   Key,
@@ -35,11 +36,14 @@ const variants = (action: ActionKind) => {
     case ActionKind.ADD_KEY:
     case ActionKind.CREATE_ACCOUNT:
     case ActionKind.DETERMINISTIC_STATE_INIT:
+    case ActionKind.UNIVERSAL_STATE_INIT:
       return { bg: 'bg-lime-background', color: 'text-lime-foreground' };
     case ActionKind.FUNCTION_CALL:
       return { bg: 'bg-blue-background', color: 'text-blue-foreground' };
     case ActionKind.STAKE:
     case ActionKind.TRANSFER:
+    case ActionKind.TRANSFER_TO_GAS_KEY:
+    case ActionKind.WITHDRAW_FROM_GAS_KEY:
       return { bg: 'bg-amber-background', color: 'text-amber-foreground' };
     case ActionKind.DELEGATE_ACTION:
     case ActionKind.DEPLOY_CONTRACT:
@@ -123,7 +127,11 @@ export const ActionIcon = ({ action, className }: IconProps) => {
     case ActionKind.DEPLOY_GLOBAL_CONTRACT_BY_ACCOUNT_ID:
       return <Globe className={className} />;
     case ActionKind.CREATE_ACCOUNT:
+    case ActionKind.UNIVERSAL_STATE_INIT:
       return <UserRoundPlus className={className} />;
+    case ActionKind.TRANSFER_TO_GAS_KEY:
+    case ActionKind.WITHDRAW_FROM_GAS_KEY:
+      return <Fuel className={className} />;
     case ActionKind.DELETE_ACCOUNT:
       return <UserX className={className} />;
     case ActionKind.DELEGATE_ACTION:

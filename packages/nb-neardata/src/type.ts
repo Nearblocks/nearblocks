@@ -156,8 +156,11 @@ export type Action =
   | FunctionCallAction
   | StakeAction
   | TransferAction
+  | TransferToGasKeyAction
+  | UniversalStateInitAction
   | UseGlobalContractAction
-  | UseGlobalContractByAccountIdAction;
+  | UseGlobalContractByAccountIdAction
+  | WithdrawFromGasKeyAction;
 
 export type NonDelegateAction =
   | 'CreateAccount'
@@ -171,8 +174,11 @@ export type NonDelegateAction =
   | FunctionCallAction
   | StakeAction
   | TransferAction
+  | TransferToGasKeyAction
+  | UniversalStateInitAction
   | UseGlobalContractAction
-  | UseGlobalContractByAccountIdAction;
+  | UseGlobalContractByAccountIdAction
+  | WithdrawFromGasKeyAction;
 
 export type AddKeyAction = {
   AddKey: {
@@ -267,9 +273,51 @@ export type UseGlobalContractByAccountIdAction = {
   };
 };
 
+export type UniversalStateInitAction = {
+  UniversalStateInit: {
+    deposit: string;
+    stateInit: string;
+  };
+};
+
+export type TransferToGasKeyAction = {
+  TransferToGasKey: {
+    deposit: string;
+    publicKey: string;
+  };
+};
+
+export type WithdrawFromGasKeyAction = {
+  WithdrawFromGasKey: {
+    amount: string;
+    publicKey: string;
+  };
+};
+
 export type AccessKey = {
   nonce: number;
-  permission: AccessKeyFunctionCallPermission | string;
+  permission:
+    | AccessKeyFunctionCallPermission
+    | GasKeyFullAccessPermission
+    | GasKeyFunctionCallPermission
+    | string;
+};
+
+export type GasKeyFullAccessPermission = {
+  GasKeyFullAccess: {
+    balance: string;
+    numNonces: number;
+  };
+};
+
+export type GasKeyFunctionCallPermission = {
+  GasKeyFunctionCall: {
+    allowance: null | string;
+    balance: string;
+    methodNames: string[];
+    numNonces: number;
+    receiverId: string;
+  };
 };
 
 export type AccessKeyFunctionCallPermission = {

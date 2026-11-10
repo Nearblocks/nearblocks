@@ -12,7 +12,9 @@
     "lint:check": "tsc --noEmit && oxlint -c ../../.oxlintrc.json .",
     "test": "pnpm build && node --test test/*.test.mjs"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@scure/base": "catalog:"
+  },
   "devDependencies": {
     "@types/node": "catalog:",
     "nb-tsconfig": "workspace:*",

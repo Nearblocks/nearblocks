@@ -239,6 +239,88 @@ export const Action = ({
     );
   }
 
+  if (action.action === ActionKind.UNIVERSAL_STATE_INIT) {
+    const code = argsRecord(args.code ?? null);
+    const codeHash = typeof code.hash === 'string' ? code.hash : undefined;
+    const codeAccount =
+      typeof code.account_id === 'string' ? code.account_id : undefined;
+    const deposit = String(args.deposit ?? 0);
+
+    return (
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
+        {t('actions.createUniversalAccount')}
+        {full && (
+          <>
+            {' '}
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
+          </>
+        )}
+        {codeHash && (
+          <>
+            <Badge variant="gray">
+              <code className="max-w-32 truncate sm:max-w-40">{codeHash}</code>
+            </Badge>
+            <Copy className="text-muted-foreground" text={codeHash} />
+          </>
+        )}
+        {codeAccount && (
+          <AccountLink
+            account={codeAccount}
+            hideCopy={hideCopy}
+            textClassName="max-w-32 sm:max-w-40"
+          />
+        )}
+        {Number(deposit) > 0 && (
+          <>
+            <NearCircle className="size-4" />
+            {nearFormat(deposit)}
+          </>
+        )}
+      </span>
+    );
+  }
+
+  if (
+    action.action === ActionKind.TRANSFER_TO_GAS_KEY ||
+    action.action === ActionKind.WITHDRAW_FROM_GAS_KEY
+  ) {
+    const withdraw = action.action === ActionKind.WITHDRAW_FROM_GAS_KEY;
+    const publicKey = String(args.public_key ?? '');
+    const amount = String(withdraw ? (args.amount ?? 0) : (args.deposit ?? 0));
+
+    return (
+      <span className="flex flex-wrap items-center gap-1 text-body-sm">
+        {withdraw ? t('actions.withdrawFromGasKey') : t('actions.fundGasKey')}{' '}
+        <QuantumSafeBadge publicKey={publicKey} />
+        <Link
+          className="max-w-32 truncate text-link sm:max-w-40"
+          href={`/address/${receiver}/keys`}
+        >
+          {publicKey}
+        </Link>
+        <Copy className="text-muted-foreground" text={publicKey} />
+        <NearCircle className="size-4" />
+        {nearFormat(amount)}
+        {Number(amount) > 0 && <NearFiat amount={amount} price={nearPrice} />}
+        {full && (
+          <>
+            {' '}
+            {t('actions.for')}{' '}
+            <AccountLink
+              account={receiver}
+              hideCopy={hideCopy}
+              textClassName="max-w-32 sm:max-w-40"
+            />
+          </>
+        )}
+      </span>
+    );
+  }
+
   if (action.action === ActionKind.DELETE_ACCOUNT) {
     return (
       <span className="flex flex-wrap items-center gap-1 text-body-sm">
@@ -277,9 +359,17 @@ export const Action = ({
   }
 
   if (action.action === ActionKind.ADD_KEY) {
+    const permission = argsRecord(
+      argsRecord(args.access_key ?? null).permission ?? null,
+    );
+    const isGasKey = String(permission.permission_kind ?? '').startsWith(
+      'GAS_KEY_',
+    );
+
     return (
       <span className="flex flex-wrap items-center gap-1 text-body-sm">
         {t('actions.addKey')}{' '}
+        {isGasKey && <Badge variant="gray">{t('actions.gasKey')}</Badge>}
         <QuantumSafeBadge publicKey={String(args.public_key ?? '')} />
         <Link
           className="max-w-32 truncate text-link sm:max-w-40"

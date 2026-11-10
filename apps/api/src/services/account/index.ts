@@ -115,7 +115,9 @@ const contract = catchAsync(
       sql`
         SELECT
           COALESCE(
-            NOT BOOL_OR(permission_kind = 'FULL_ACCESS'),
+            NOT BOOL_OR(
+              permission_kind IN ('FULL_ACCESS', 'GAS_KEY_FULL_ACCESS')
+            ),
             TRUE
           ) AS locked
         FROM

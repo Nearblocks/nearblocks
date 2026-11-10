@@ -1,4 +1,5 @@
 import {
+  AccessKey,
   AccessKeyFunctionCallPermission,
   Action,
   AddKeyAction,
@@ -10,10 +11,15 @@ import {
   DeployGlobalContractByAccountIdAction,
   DeterministicStateInitAction,
   FunctionCallAction,
+  GasKeyFullAccessPermission,
+  GasKeyFunctionCallPermission,
   StakeAction,
   TransferAction,
+  TransferToGasKeyAction,
+  UniversalStateInitAction,
   UseGlobalContractAction,
   UseGlobalContractByAccountIdAction,
+  WithdrawFromGasKeyAction,
 } from 'nb-neardata';
 
 export const isFunctionCallAction = (
@@ -58,9 +64,21 @@ export const isAddKeyAction = (action: Action): action is AddKeyAction =>
   (action as AddKeyAction).AddKey !== undefined;
 
 export const isAccessKeyFunctionCallPermission = (
-  accessKeyPermission: AccessKeyFunctionCallPermission | string,
+  accessKeyPermission: AccessKey['permission'],
 ): accessKeyPermission is AccessKeyFunctionCallPermission =>
   (accessKeyPermission as AccessKeyFunctionCallPermission).FunctionCall !==
+  undefined;
+
+export const isGasKeyFullAccessPermission = (
+  accessKeyPermission: AccessKey['permission'],
+): accessKeyPermission is GasKeyFullAccessPermission =>
+  (accessKeyPermission as GasKeyFullAccessPermission).GasKeyFullAccess !==
+  undefined;
+
+export const isGasKeyFunctionCallPermission = (
+  accessKeyPermission: AccessKey['permission'],
+): accessKeyPermission is GasKeyFunctionCallPermission =>
+  (accessKeyPermission as GasKeyFunctionCallPermission).GasKeyFunctionCall !==
   undefined;
 
 export const isDeleteKeyAction = (action: Action): action is DeleteKeyAction =>
@@ -78,3 +96,18 @@ export const isDeterministicStateInitAction = (
   action: Action,
 ): action is DeterministicStateInitAction =>
   (action as DeterministicStateInitAction).DeterministicStateInit !== undefined;
+
+export const isUniversalStateInitAction = (
+  action: Action,
+): action is UniversalStateInitAction =>
+  (action as UniversalStateInitAction).UniversalStateInit !== undefined;
+
+export const isTransferToGasKeyAction = (
+  action: Action,
+): action is TransferToGasKeyAction =>
+  (action as TransferToGasKeyAction).TransferToGasKey !== undefined;
+
+export const isWithdrawFromGasKeyAction = (
+  action: Action,
+): action is WithdrawFromGasKeyAction =>
+  (action as WithdrawFromGasKeyAction).WithdrawFromGasKey !== undefined;

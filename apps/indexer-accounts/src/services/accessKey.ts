@@ -1,18 +1,21 @@
 import { Knex } from 'nb-knex';
 import {
-  AccessKeyFunctionCallPermission,
   BlockHeader,
   Message,
+  AccessKey as NeardataAccessKey,
   Receipt,
 } from 'nb-neardata';
 import { AccessKey, AccessKeyPermissionKind, JsonValue } from 'nb-types';
-import { retry } from 'nb-utils';
+import { decodeUniversalStateInit, retry } from 'nb-utils';
 
 import {
   isAddKeyAction,
   isDeleteAccountAction,
   isDeleteKeyAction,
+  isGasKeyFullAccessPermission,
+  isGasKeyFunctionCallPermission,
   isTransferAction,
+  isUniversalStateInitAction,
 } from '#libs/guards';
 import {
   isExecutionSuccess,
@@ -188,6 +191,46 @@ const addRecreatedKey = (
   recreatedKeys.set(accountId, keys);
 };
 
+const addImplicitKey = (
+  block: BlockHeader,
+  receiptId: string,
+  accountId: string,
+  publicKey: string,
+  accessKeys: AccessKeyMap,
+  implicitKeys: AccessKeyMap,
+  accessKeysToUpdate: AccessKeyMap,
+  deletedAccounts: DeletedAccountMap,
+  recreatedKeys: RecreatedKeysMap,
+): boolean => {
+  const mapKey = `${accountId}:${publicKey}`;
+  const pending = accessKeys.get(mapKey) ?? implicitKeys.get(mapKey);
+  const accountRecreated = deletedAccounts.has(accountId);
+  const needsFreshEntry =
+    !pending || pending.deleted_by_block_timestamp !== null || accountRecreated;
+
+  if (!needsFreshEntry) return false;
+
+  accessKeys.delete(mapKey);
+
+  if (accountRecreated) {
+    accessKeysToUpdate.delete(mapKey);
+    addRecreatedKey(recreatedKeys, accountId, publicKey);
+  }
+
+  implicitKeys.set(
+    mapKey,
+    getAccessKeyData(
+      accountId,
+      publicKey,
+      AccessKeyPermissionKind.FULL_ACCESS,
+      block.timestampNanosec,
+      receiptId,
+    ),
+  );
+
+  return true;
+};
+
 const getChunkAccessKeys = (
   block: BlockHeader,
   receipt: Receipt,
@@ -276,34 +319,48 @@ const getChunkAccessKeys = (
 
       if (isTransferAction(action) && isNearImplicit(accountId)) {
         const publicKey = publicKeyFromImplicitAccount(accountId);
-        const mapKey = `${accountId}:${publicKey}`;
-        const pending = accessKeys.get(mapKey) ?? implicitKeys.get(mapKey);
-        const accountRecreated = deletedAccounts.has(accountId);
-        const needsFreshEntry =
-          !pending ||
-          pending.deleted_by_block_timestamp !== null ||
-          accountRecreated;
 
-        if (publicKey && needsFreshEntry) {
-          accessKeys.delete(mapKey);
-
-          if (accountRecreated) {
-            accessKeysToUpdate.delete(mapKey);
-            addRecreatedKey(recreatedKeys, accountId, publicKey);
-          }
-
-          implicitKeys.set(
-            mapKey,
-            getAccessKeyData(
-              accountId,
-              publicKey,
-              AccessKeyPermissionKind.FULL_ACCESS,
-              block.timestampNanosec,
-              receiptId,
-            ),
-          );
-
+        if (
+          publicKey &&
+          addImplicitKey(
+            block,
+            receiptId,
+            accountId,
+            publicKey,
+            accessKeys,
+            implicitKeys,
+            accessKeysToUpdate,
+            deletedAccounts,
+            recreatedKeys,
+          )
+        ) {
           continue;
+        }
+      }
+
+      if (isUniversalStateInitAction(action)) {
+        const stateInit = decodeUniversalStateInit(
+          action.UniversalStateInit.stateInit,
+        );
+
+        if (!stateInit) {
+          throw new Error(
+            `Malformed UniversalStateInit in successful receipt ${receiptId}`,
+          );
+        }
+
+        for (const publicKey of stateInit.access_keys) {
+          addImplicitKey(
+            block,
+            receiptId,
+            accountId,
+            publicKey,
+            accessKeys,
+            implicitKeys,
+            accessKeysToUpdate,
+            deletedAccounts,
+            recreatedKeys,
+          );
         }
       }
     }
@@ -313,7 +370,7 @@ const getChunkAccessKeys = (
 export const getAccessKeyData = (
   account: string,
   publicKey: string,
-  permission: AccessKeyFunctionCallPermission | null | string,
+  permission: NeardataAccessKey['permission'] | null,
   blockTimestamp: string,
   receiptId: null | string = null,
   deletedBlockTimestamp: null | string = null,
@@ -323,8 +380,20 @@ export const getAccessKeyData = (
   let permissionKind = AccessKeyPermissionKind.FULL_ACCESS;
 
   if (permission && typeof permission !== 'string') {
-    permissions = jsonStringify(permission.FunctionCall);
-    permissionKind = AccessKeyPermissionKind.FUNCTION_CALL;
+    if (isGasKeyFullAccessPermission(permission)) {
+      permissions = jsonStringify({
+        numNonces: permission.GasKeyFullAccess.numNonces,
+      });
+      permissionKind = AccessKeyPermissionKind.GAS_KEY_FULL_ACCESS;
+    } else if (isGasKeyFunctionCallPermission(permission)) {
+      const { balance, ...details } = permission.GasKeyFunctionCall;
+
+      permissions = jsonStringify(details);
+      permissionKind = AccessKeyPermissionKind.GAS_KEY_FUNCTION_CALL;
+    } else {
+      permissions = jsonStringify(permission.FunctionCall);
+      permissionKind = AccessKeyPermissionKind.FUNCTION_CALL;
+    }
   }
 
   return {

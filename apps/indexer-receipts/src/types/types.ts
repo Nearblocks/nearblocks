@@ -48,9 +48,10 @@ export type ReceiptAction = {
 
 export type AccessKeyPermission = {
   permission_details?: {
-    allowance: string;
-    method_names: string[];
-    receiver_id: string;
+    allowance?: null | string;
+    method_names?: string[];
+    num_nonces?: number;
+    receiver_id?: string;
   };
   permission_kind: AccessKeyPermissionKind;
 };

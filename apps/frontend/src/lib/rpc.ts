@@ -1,10 +1,10 @@
 import {
-  experimentalTxStatus,
   JsonRpcClientError,
   NearRpcClient,
   viewFunctionAsJson,
   viewFunction as viewFunctionBytes,
 } from '@near-js/jsonrpc-client';
+import { experimentalTxStatus } from '@near-js/jsonrpc-client/no-validation';
 import {
   BlockId,
   Finality,

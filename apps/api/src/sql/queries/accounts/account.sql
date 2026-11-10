@@ -25,7 +25,7 @@ SELECT
         access_keys
       WHERE
         account_id = ${account}
-        AND permission_kind = 'FULL_ACCESS'
+        AND permission_kind IN ('FULL_ACCESS', 'GAS_KEY_FULL_ACCESS')
         AND deleted_by_block_timestamp IS NULL
     ) THEN TRUE
     ELSE FALSE
