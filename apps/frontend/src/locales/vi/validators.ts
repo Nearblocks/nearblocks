@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Quốc gia hàng đầu',
+    description:
+      'Bản đồ Node mạng lưới hiển thị các node NEAR đã gửi telemetry trong 10 phút qua, theo quốc gia.',
     legend: 'Số node theo quốc gia',
     noData: 'Hiện không có dữ liệu telemetry của node.',
-    note: 'Các node gửi telemetry trong 10 phút qua.',
     online: '{{nodes}} node trực tuyến · {{validators}} validator',
+    series: 'Node',
     title: 'Node mạng lưới',
     versions: 'Phiên bản node',
   },

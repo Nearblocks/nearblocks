@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Paesi principali',
+    description:
+      'La mappa dei nodi di rete mostra, per paese, i nodi NEAR che hanno inviato telemetria negli ultimi 10 minuti.',
     legend: 'Nodi per paese',
     noData: 'La telemetria dei nodi non è disponibile al momento.',
-    note: 'Nodi che hanno inviato telemetria negli ultimi 10 minuti.',
     online: '{{nodes}} nodi online · {{validators}} validatori',
+    series: 'Nodi',
     title: 'Nodi della rete',
     versions: 'Versioni dei nodi',
   },

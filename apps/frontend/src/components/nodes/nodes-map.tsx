@@ -13,7 +13,7 @@ import {
 import type { NodeStats } from '@/data/nodes';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
+import { Card, CardContent, CardHeader } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 
 type GeoJson = { features: { properties: { name: string } }[] };
@@ -96,15 +96,13 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
       codes,
       counts: stats?.by_country ?? {},
       theme,
-      // Country name from Intl and a number: nothing node-supplied is rendered.
+      // Country name from Intl, a locale string and a number: nothing node-supplied.
       tooltip: (code, value) =>
-        `<div style="display:flex;gap:16px;justify-content:space-between"><span>${regionName(
-          code,
-        )}</span><span style="font-variant-numeric:tabular-nums;font-weight:500">${numberFormat(
-          value,
-        )}</span></div>`,
+        `<span>${regionName(code)}</span><br/><span style="color:${theme.series}">●</span> ${t(
+          'nodesMap.series',
+        )}: <b>${numberFormat(value)}</b>`,
     });
-  }, [codes, regionName, stats, theme]);
+  }, [codes, regionName, stats, t, theme]);
 
   const colors = theme && stepColors(theme);
   const countries = top(stats?.by_country ?? {}, 8);
@@ -112,12 +110,12 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
 
   return (
     <Card>
-      <CardHeader className="border-b py-3">
-        <CardTitle className="text-headline-sm">
-          {t('nodesMap.title')}
-        </CardTitle>
+      <CardHeader className="flex-wrap gap-2 border-b">
+        <p className="text-body-sm text-muted-foreground">
+          {t('nodesMap.description')}
+        </p>
         {stats && (
-          <span className="text-body-sm text-muted-foreground">
+          <span className="text-body-xs whitespace-nowrap text-muted-foreground tabular-nums">
             {t('nodesMap.online', {
               nodes: numberFormat(stats.total),
               validators: numberFormat(stats.validators),
@@ -159,10 +157,10 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
         </div>
         <div className="space-y-6">
           <section>
-            <h3 className="mb-2 text-body-sm text-muted-foreground">
+            <h3 className="mb-2 text-body-xs text-muted-foreground">
               {t('nodesMap.countries')}
             </h3>
-            <ul className="space-y-1">
+            <ul className="space-y-1 text-body-sm">
               {countries.map(([code, count]) => (
                 <li className="flex justify-between gap-2" key={code}>
                   <span className="truncate">{regionName(code)}</span>
@@ -174,10 +172,10 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
             </ul>
           </section>
           <section>
-            <h3 className="mb-2 text-body-sm text-muted-foreground">
+            <h3 className="mb-2 text-body-xs text-muted-foreground">
               {t('nodesMap.versions')}
             </h3>
-            <ul className="space-y-1">
+            <ul className="space-y-1 text-body-sm">
               {versions.map(([version, count]) => (
                 <li className="flex justify-between gap-2" key={version}>
                   {/* Self-reported by nodes: rendered as React text only. */}
@@ -189,9 +187,6 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
               ))}
             </ul>
           </section>
-          <p className="text-body-xs text-muted-foreground">
-            {t('nodesMap.note')}
-          </p>
         </div>
       </CardContent>
     </Card>

@@ -44,10 +44,12 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Negara teratas',
+    description:
+      'Peta Node Jaringan menampilkan node NEAR yang mengirim telemetri dalam 10 menit terakhir, per negara.',
     legend: 'Node per negara',
     noData: 'Telemetri node sedang tidak tersedia.',
-    note: 'Node yang mengirim telemetri dalam 10 menit terakhir.',
     online: '{{nodes}} node online · {{validators}} validator',
+    series: 'Node',
     title: 'Node Jaringan',
     versions: 'Versi node',
   },
