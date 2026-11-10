@@ -4,6 +4,8 @@
 // world-atlas, public domain) as GeoJSON, feature name = ISO 3166-1 alpha-2. 110m
 // outlines, plus a small dot for each country 110m leaves out (Singapore, Hong Kong,
 // Malta, ...), placed at its 50m centroid, so every country can be coloured.
+// Antarctica is dropped and rings crossing ±180° (Russia, Fiji) are cut there, as
+// ECharts would otherwise draw them as lines across the whole map.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
@@ -25,20 +27,55 @@ const code = (f) => {
   const a2 = f.id && countries.numericToAlpha2(f.id);
   return a2 && a2 !== 'AQ' ? a2 : null;
 };
+// Unwrap a ring's longitudes so it is continuous, then clip it to one side of ±180.
+const unwrap = (ring) =>
+  ring.reduce((out, [lon, lat]) => {
+    const prev = out.at(-1)?.[0] ?? lon;
+    return [...out, [lon + 360 * Math.round((prev - lon) / 360), lat]];
+  }, []);
+const clip = (ring, inside, edge) =>
+  ring.flatMap((b, i) => {
+    const a = ring.at(i - 1);
+    const cut = [edge, a[1] + ((b[1] - a[1]) * (edge - a[0])) / (b[0] - a[0])];
+    if (inside(b)) return inside(a) ? [b] : [cut, b];
+    return inside(a) ? [cut] : [];
+  });
+const splitPolygon = (rings) => {
+  const open = rings.map((r) => unwrap(r).slice(0, -1));
+  const lons = open.flat().map((c) => c[0]);
+  if (Math.min(...lons) >= -180 && Math.max(...lons) <= 180) return [rings];
+  const edge = Math.max(...lons) > 180 ? 180 : -180;
+  const sides = [
+    [(c) => c[0] * Math.sign(edge) <= 180, 0],
+    [(c) => c[0] * Math.sign(edge) >= 180, -edge * 2],
+  ];
+  return sides.flatMap(([inside, by]) => {
+    const parts = open.map((r) =>
+      clip(r, inside, edge).map(([lon, lat]) => [lon + by, lat]),
+    );
+    if (parts[0].length < 3) return [];
+    return [parts.filter((r) => r.length >= 3).map((r) => [...r, r[0]])];
+  });
+};
+const split = (geometry) => {
+  const { coordinates, type } = geometry;
+  const polys = type === 'Polygon' ? [coordinates] : coordinates;
+  const parts = polys.flatMap(splitPolygon);
+  return parts.length === polys.length
+    ? geometry
+    : { coordinates: parts, type: 'MultiPolygon' };
+};
 const features = load('countries-110m').flatMap((f) => {
   const a2 = code(f);
-  return a2
-    ? [
-        {
-          geometry: {
-            ...f.geometry,
-            coordinates: round(f.geometry.coordinates),
-          },
-          properties: { name: a2 },
-          type: 'Feature',
-        },
-      ]
-    : [];
+  if (!a2) return [];
+  const geometry = split(f.geometry);
+  return [
+    {
+      geometry: { ...geometry, coordinates: round(geometry.coordinates) },
+      properties: { name: a2 },
+      type: 'Feature',
+    },
+  ];
 });
 const have = new Set(features.map((f) => f.properties.name));
 const R = 0.9; // degrees

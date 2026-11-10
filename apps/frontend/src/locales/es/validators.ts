@@ -44,8 +44,9 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Principales países',
+    legend: 'Nodos por país',
     noData: 'La telemetría de nodos no está disponible en este momento.',
-    note: 'Según la telemetría que los nodos de NEAR enviaron al explorador en los últimos 10 minutos. Las versiones y cuentas las informa cada nodo.',
+    note: 'Nodos que enviaron telemetría en los últimos 10 minutos.',
     online: '{{nodes}} nodos en línea · {{validators}} validadores',
     title: 'Nodos de la red',
     versions: 'Versiones de nodos',

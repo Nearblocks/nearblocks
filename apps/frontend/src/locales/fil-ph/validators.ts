@@ -44,8 +44,9 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Nangungunang mga bansa',
+    legend: 'Mga node bawat bansa',
     noData: 'Hindi available ang node telemetry sa ngayon.',
-    note: 'Mula sa telemetry na ipinadala ng mga NEAR node sa explorer sa nakaraang 10 minuto. Ang mga bersyon at account ay iniulat ng bawat node.',
+    note: 'Mga node na nagpadala ng telemetry sa nakaraang 10 minuto.',
     online: '{{nodes}} node online · {{validators}} validator',
     title: 'Mga Node ng Network',
     versions: 'Mga bersyon ng node',
