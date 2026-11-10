@@ -44,8 +44,9 @@ export const validators = {
   },
   nodesMap: {
     countries: '主要国家',
+    legend: '各国家/地区节点数',
     noData: '节点遥测暂不可用。',
-    note: '基于过去 10 分钟内 NEAR 节点发送到浏览器的遥测数据。版本和账户由各节点自行上报。',
+    note: '过去 10 分钟内上报遥测的节点。',
     online: '{{nodes}} 个节点在线 · {{validators}} 个验证者',
     title: '网络节点',
     versions: '节点版本',

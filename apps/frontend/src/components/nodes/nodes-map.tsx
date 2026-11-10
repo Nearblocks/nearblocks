@@ -5,6 +5,11 @@ import { use, useEffect, useMemo, useState } from 'react';
 import { EChart } from '@/components/echarts/chart';
 import { echarts } from '@/components/echarts/core';
 import { useChartTheme } from '@/components/echarts/use-chart-theme';
+import {
+  nodesMapOption,
+  stepColors,
+  STEPS,
+} from '@/components/nodes/map-option';
 import type { NodeStats } from '@/data/nodes';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
@@ -18,21 +23,12 @@ type Props = {
   statsPromise?: Promise<NodeStats | null>;
 };
 
-// Same steps and palette as the account activity heatmap.
-const PIECES = [
-  { max: 0, min: 0 },
-  { max: 4, min: 1 },
-  { max: 19, min: 5 },
-  { max: 99, min: 20 },
-  { min: 100 },
-];
-
-const pieceLabel = (piece: { max?: number; min: number }) =>
-  piece.max === undefined
-    ? `${numberFormat(piece.min)}+`
-    : piece.min === piece.max
-      ? numberFormat(piece.min)
-      : `${numberFormat(piece.min)} - ${numberFormat(piece.max)}`;
+const stepLabel = (step: { max?: number; min: number }) =>
+  step.max === undefined
+    ? `${numberFormat(step.min)}+`
+    : step.min === step.max
+      ? numberFormat(step.min)
+      : `${numberFormat(step.min)}–${numberFormat(step.max)}`;
 
 const top = (counts: Record<string, number>, n: number) =>
   Object.entries(counts)
@@ -96,42 +92,21 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
 
   const option = useMemo(() => {
     if (!codes || !theme) return null;
-    const byCountry = stats?.by_country ?? {};
-    return {
-      series: [
-        {
-          data: codes.map((code) => ({
-            name: code,
-            value: byCountry[code] ?? 0,
-          })),
-          emphasis: {
-            itemStyle: { borderColor: theme.foreground },
-            label: { show: false },
-          },
-          itemStyle: { borderColor: theme.card, borderWidth: 0.5 },
-          map: 'world',
-          roam: false,
-          select: { disabled: true },
-          type: 'map',
-        },
-      ],
-      tooltip: {
-        backgroundColor: theme.card,
-        borderColor: theme.border,
-        // Country name from Intl and a number: nothing node-supplied is rendered.
-        formatter: (p: { name: string; value?: number }) =>
-          `${regionName(p.name)}: ${numberFormat(p.value ?? 0)}`,
-        textStyle: { color: theme.foreground, fontSize: 12 },
-      },
-      visualMap: {
-        inRange: { color: theme.scale },
-        pieces: PIECES,
-        show: false,
-        type: 'piecewise',
-      },
-    };
+    return nodesMapOption({
+      codes,
+      counts: stats?.by_country ?? {},
+      theme,
+      // Country name from Intl and a number: nothing node-supplied is rendered.
+      tooltip: (code, value) =>
+        `<div style="display:flex;gap:16px;justify-content:space-between"><span>${regionName(
+          code,
+        )}</span><span style="font-variant-numeric:tabular-nums;font-weight:500">${numberFormat(
+          value,
+        )}</span></div>`,
+    });
   }, [codes, regionName, stats, theme]);
 
+  const colors = theme && stepColors(theme);
   const countries = top(stats?.by_country ?? {}, 8);
   const versions = top(stats?.by_version ?? {}, 6);
 
@@ -151,12 +126,12 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
         )}
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 lg:self-center">
           {loading || codes === undefined || (codes && !option) ? (
-            <Skeleton className="h-90 w-full" />
+            <Skeleton className="aspect-9/4 w-full" />
           ) : option ? (
             <EChart
-              className="h-90"
+              className="aspect-9/4"
               label={t('nodesMap.title')}
               option={option}
             />
@@ -166,18 +141,20 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
               {t('nodesMap.noData')}
             </p>
           ) : (
-            <div className="mt-2 flex items-center justify-end gap-1 text-body-xs text-muted-foreground">
-              {PIECES.map((piece, index) => (
-                <span
-                  aria-label={pieceLabel(piece)}
-                  className="block h-3 w-3 rounded-xs"
-                  key={piece.min}
-                  role="img"
-                  style={{ background: theme?.scale[index] }}
-                  title={pieceLabel(piece)}
-                />
-              ))}
-            </div>
+            colors && (
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-body-xs text-muted-foreground">
+                <span>{t('nodesMap.legend')}</span>
+                {STEPS.map((step, index) => (
+                  <span className="flex items-center gap-1" key={step.min}>
+                    <span
+                      className="block size-2.5 rounded-xs"
+                      style={{ background: colors[index] }}
+                    />
+                    <span className="tabular-nums">{stepLabel(step)}</span>
+                  </span>
+                ))}
+              </div>
+            )
           )}
         </div>
         <div className="space-y-6">
@@ -189,7 +166,7 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
               {countries.map(([code, count]) => (
                 <li className="flex justify-between gap-2" key={code}>
                   <span className="truncate">{regionName(code)}</span>
-                  <span className="text-muted-foreground">
+                  <span className="text-muted-foreground tabular-nums">
                     {numberFormat(count)}
                   </span>
                 </li>
@@ -204,8 +181,8 @@ export const NodesMap = ({ loading, statsPromise }: Props) => {
               {versions.map(([version, count]) => (
                 <li className="flex justify-between gap-2" key={version}>
                   {/* Self-reported by nodes: rendered as React text only. */}
-                  <span className="truncate font-mono">{version}</span>
-                  <span className="text-muted-foreground">
+                  <span className="truncate">{version}</span>
+                  <span className="text-muted-foreground tabular-nums">
                     {numberFormat(count)}
                   </span>
                 </li>

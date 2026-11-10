@@ -44,8 +44,9 @@ export const validators = {
   },
   nodesMap: {
     countries: '上位の国',
+    legend: '国別ノード数',
     noData: '現在ノードのテレメトリを利用できません。',
-    note: '過去10分間にNEARノードがエクスプローラーへ送信したテレメトリに基づきます。バージョンとアカウントは各ノードの自己申告です。',
+    note: '過去10分間にテレメトリを送信したノード。',
     online: 'オンライン {{nodes}} ノード · バリデーター {{validators}}',
     title: 'ネットワークノード',
     versions: 'ノードのバージョン',

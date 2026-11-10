@@ -44,8 +44,9 @@ export const validators = {
   },
   nodesMap: {
     countries: 'Principaux pays',
+    legend: 'Nœuds par pays',
     noData: 'La télémétrie des nœuds est indisponible pour le moment.',
-    note: 'D’après la télémétrie envoyée à l’explorateur par les nœuds NEAR au cours des 10 dernières minutes. Les versions et les comptes sont déclarés par chaque nœud.',
+    note: 'Nœuds ayant envoyé leur télémétrie au cours des 10 dernières minutes.',
     online: '{{nodes}} nœuds en ligne · {{validators}} validateurs',
     title: 'Nœuds du réseau',
     versions: 'Versions des nœuds',

@@ -44,8 +44,9 @@ export const validators = {
   },
   nodesMap: {
     countries: '상위 국가',
+    legend: '국가별 노드',
     noData: '현재 노드 텔레메트리를 사용할 수 없습니다.',
-    note: '최근 10분 동안 NEAR 노드가 익스플로러에 보낸 텔레메트리 기준입니다. 버전과 계정은 각 노드가 보고한 값입니다.',
+    note: '최근 10분 동안 텔레메트리를 보고한 노드입니다.',
     online: '온라인 노드 {{nodes}}개 · 검증인 {{validators}}개',
     title: '네트워크 노드',
     versions: '노드 버전',
