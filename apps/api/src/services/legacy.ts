@@ -2,45 +2,44 @@ import { Response } from 'express';
 
 import catchAsync from '#libs/async';
 import dayjs from '#libs/dayjs';
-import db from '#libs/db';
+import { dbBase } from '#libs/pgp';
 import sql from '#libs/postgres';
+import redis from '#libs/redis';
 import { Fees, Supply } from '#libs/schema/legacy';
 import { msToNsTime, yoctoToNear } from '#libs/utils';
+import blocksSql from '#sql/blocks';
+import statsSql from '#sql/stats';
 import { RequestValidator } from '#types/types';
+
+type BlockSupply = { block_timestamp: string; total_supply: string };
+
+// v1 response shapes, served from v3 data.
+const sendSupply = (
+  req: RequestValidator<Supply>,
+  res: Response,
+  yocto: string,
+  body: Record<string, string>,
+) => {
+  const { format, unit } = req.validator.data;
+  const value = unit === 'near' ? (+yoctoToNear(yocto)).toFixed() : yocto;
+
+  if (format === 'coingecko') {
+    return res.status(200).json({ result: value });
+  }
+
+  if (unit === 'near') return res.send(value);
+
+  return res.status(200).json(body);
+};
 
 const supply = catchAsync(
   async (req: RequestValidator<Supply>, res: Response) => {
-    const unit = req.validator.data.unit;
-    const format = req.validator.data.format;
-
-    const { rows } = await db.query(
-      `
-        SELECT
-          *
-        FROM
-          stats
-        LIMIT
-          1
-      `,
+    const { total_supply } = await dbBase.one<{ total_supply: string }>(
+      statsSql.stats,
     );
 
-    let circulatingSupply = rows?.[0]?.total_supply;
-    if (unit === 'near') {
-      circulatingSupply = (+yoctoToNear(circulatingSupply)).toFixed();
-
-      if (format === 'coingecko') {
-        return res.status(200).json({ result: circulatingSupply });
-      }
-
-      return res.send(circulatingSupply);
-    }
-
-    if (format === 'coingecko') {
-      return res.status(200).json({ result: circulatingSupply });
-    }
-
-    return res.status(200).json({
-      circulating_supply_in_yoctonear: rows?.[0]?.total_supply,
+    return sendSupply(req, res, total_supply, {
+      circulating_supply_in_yoctonear: total_supply,
       timestamp: msToNsTime(dayjs.utc().startOf('day').valueOf()),
     });
   },
@@ -48,41 +47,15 @@ const supply = catchAsync(
 
 const total = catchAsync(
   async (req: RequestValidator<Supply>, res: Response) => {
-    const unit = req.validator.data.unit;
-    const format = req.validator.data.format;
-
-    const { rows } = await db.query(
-      `
-        SELECT
-          *
-        FROM
-          blocks
-        ORDER BY
-          block_timestamp DESC
-        LIMIT
-          1
-      `,
+    const block = await redis.cache<BlockSupply>(
+      'v1:legacy:total-supply',
+      () => dbBase.one<BlockSupply>(blocksSql.supply),
+      5, // cache results for 5s
     );
 
-    let totalSupply = rows?.[0]?.total_supply;
-
-    if (unit === 'near') {
-      totalSupply = (+yoctoToNear(totalSupply)).toFixed();
-
-      if (format === 'coingecko') {
-        return res.status(200).json({ result: totalSupply });
-      }
-
-      return res.send(totalSupply);
-    }
-
-    if (format === 'coingecko') {
-      return res.status(200).json({ result: totalSupply });
-    }
-
-    return res.status(200).json({
-      timestamp: rows?.[0]?.block_timestamp,
-      total_supply_in_yoctonear: rows?.[0]?.total_supply,
+    return sendSupply(req, res, block.total_supply, {
+      timestamp: block.block_timestamp,
+      total_supply_in_yoctonear: block.total_supply,
     });
   },
 );

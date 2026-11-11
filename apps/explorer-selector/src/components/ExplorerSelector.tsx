@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import styles from '../styles/ExplorerSelector.module.css';
-import { getNetworkId } from '@/utils/config';
+import type { NetworkProps } from '@/utils/config';
 import Image from 'next/image';
 
 const imageStyle = {
@@ -15,12 +15,11 @@ const footerImageStyle = {
   width: 'auto',
 };
 
-export default function ExplorerSelector() {
+export default function ExplorerSelector({ network }: NetworkProps) {
   const router = useRouter();
   const slug = router.query.slug;
   const path = slug ? slug[0] : '';
   const value = slug ? slug[1] : '';
-  const network = getNetworkId();
 
   const config = {
     nearblocks:

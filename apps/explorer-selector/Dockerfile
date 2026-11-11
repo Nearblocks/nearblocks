@@ -32,8 +32,5 @@ COPY --from=installer /app/apps/explorer-selector/package.json .
 COPY --from=installer --chown=nextjs:nodejs /app/apps/explorer-selector/public ./apps/explorer-selector/public
 COPY --from=installer --chown=nextjs:nodejs /app/apps/explorer-selector/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/explorer-selector/.next/static ./apps/explorer-selector/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/explorer-selector/generate-env.js ./apps/explorer-selector/generate-env.js
-COPY --from=builder --chown=nextjs:nodejs /app/apps/explorer-selector/entrypoint.sh ./apps/explorer-selector/entrypoint.sh
 
-RUN chmod +x /app/apps/explorer-selector/entrypoint.sh
-CMD ["apps/explorer-selector/entrypoint.sh"]
+CMD ["node", "apps/explorer-selector/server.js"]

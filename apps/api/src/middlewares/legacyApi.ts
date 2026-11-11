@@ -4,8 +4,9 @@ import config from '#config';
 
 const DEPRECATED_AT = Date.parse('2026-11-06T00:00:00Z');
 const LEGACY = /^\/v[12](\/|$)/;
-// Internal probes, not part of the public API.
-const KEEP = /^\/v1\/(health|sync)(\/|$)/;
+// Internal probes and supply endpoints.
+const KEEP =
+  /^\/v1\/(health|sync|legacy\/(circulating-supply|total-supply))(\/|$)/;
 
 /**
  * v1 and v2 are deprecated in favour of v3. Responses carry Deprecation and

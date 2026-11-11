@@ -1,14 +1,10 @@
-import { Spinner } from '@/components/lib/Spinner';
-import dynamic from 'next/dynamic';
-const ExplorerSelector = dynamic(
-  () => import('../components/ExplorerSelector'),
-  {
-    loading: () => <Spinner />,
-    ssr: false,
-  },
-);
-const ExplorerPage = () => {
-  return <ExplorerSelector />;
+import ExplorerSelector from '@/components/ExplorerSelector';
+import { networkProps, NetworkProps } from '@/utils/config';
+
+export const getServerSideProps = networkProps;
+
+const ExplorerPage = ({ network }: NetworkProps) => {
+  return <ExplorerSelector network={network} />;
 };
 
 export default ExplorerPage;
