@@ -4,7 +4,14 @@ import { decodeBase64, encodeBase58, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
 
 import { logger } from 'nb-logger';
-import { AccessKey, Action, ExecutionStatus, ReceiptEnum } from 'nb-neardata';
+import {
+  AccessKey,
+  Action,
+  DelegateNonce,
+  ExecutionStatus,
+  NonDelegateAction,
+  ReceiptEnum,
+} from 'nb-neardata';
 import {
   AccessKeyPermissionKind,
   ActionKind,
@@ -17,6 +24,7 @@ import {
   isAccessKeyFunctionCallPermission,
   isAddKeyAction,
   isDelegateAction,
+  isDelegateV2Action,
   isDeleteAccountAction,
   isDeleteKeyAction,
   isDeployContractAction,
@@ -131,6 +139,24 @@ const mapAccessKeyPermission = (
   }
 
   return { permission_kind: AccessKeyPermissionKind.FULL_ACCESS };
+};
+
+const mapDelegateNonce = (nonce: DelegateNonce) => {
+  const variant = Object.values(nonce)[0];
+
+  return variant.nonceIndex === undefined
+    ? { nonce: variant.nonce }
+    : { nonce: variant.nonce, nonce_index: variant.nonceIndex };
+};
+
+export const unwrapDelegate = (action: Action): NonDelegateAction[] | null => {
+  if (isDelegateAction(action)) return action.Delegate.delegateAction.actions;
+
+  if (isDelegateV2Action(action)) {
+    return action.DelegateV2.delegateAction.V2.actions;
+  }
+
+  return null;
 };
 
 export const mapActionKind = (action: Action): ReceiptAction => {
@@ -326,7 +352,24 @@ export const mapActionKind = (action: Action): ReceiptAction => {
         public_key: delegateAction.publicKey,
         receiver_id: delegateAction.receiverId,
         sender_id: delegateAction.senderId,
-        signature: action.signature,
+        signature: action.Delegate.signature,
+      }),
+      kind: ActionKind.DELEGATE_ACTION,
+      rlpHash,
+    };
+  }
+
+  if (isDelegateV2Action(action)) {
+    const delegateAction = action.DelegateV2.delegateAction.V2;
+
+    return {
+      args: jsonStringify({
+        max_block_height: delegateAction.maxBlockHeight,
+        ...mapDelegateNonce(delegateAction.nonce),
+        public_key: delegateAction.publicKey,
+        receiver_id: delegateAction.receiverId,
+        sender_id: delegateAction.senderId,
+        signature: action.DelegateV2.signature,
       }),
       kind: ActionKind.DELEGATE_ACTION,
       rlpHash,

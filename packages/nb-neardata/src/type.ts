@@ -147,6 +147,7 @@ export type Action =
   | 'CreateAccount'
   | AddKeyAction
   | DelegateAction
+  | DelegateV2Action
   | DeleteAccountAction
   | DeleteKeyAction
   | DeployContractAction
@@ -197,8 +198,29 @@ export type DelegateAction = {
       receiverId: string;
       senderId: string;
     };
+    signature: string;
   };
-  signature: string;
+};
+
+export type DelegateNonce = Record<
+  string,
+  { nonce: number; nonceIndex?: number }
+>;
+
+export type DelegateV2Action = {
+  DelegateV2: {
+    delegateAction: {
+      V2: {
+        actions: NonDelegateAction[];
+        maxBlockHeight: number;
+        nonce: DelegateNonce;
+        publicKey: string;
+        receiverId: string;
+        senderId: string;
+      };
+    };
+    signature: string;
+  };
 };
 
 export type DeleteAccountAction = {
