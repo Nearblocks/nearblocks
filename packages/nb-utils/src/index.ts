@@ -21,6 +21,11 @@ export {
   withRpcFallback,
 } from './rpc-failover.js';
 export type { RpcEndpoint, RpcFailoverOptions } from './rpc-failover.js';
+export { decodeUniversalStateInit, isUniversalAccount } from './universal.js';
+export type {
+  GlobalContractReference,
+  UniversalStateInit,
+} from './universal.js';
 
 const NS_IN_A_MS = 10n ** 6n;
 const YOCTO_IN_A_NEAR = 10n ** 24n;

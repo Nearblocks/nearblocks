@@ -16,12 +16,13 @@ import {
   ContractEventType,
   StateChangeCauseView,
 } from 'nb-types';
-import { retry } from 'nb-utils';
+import { decodeUniversalStateInit, retry } from 'nb-utils';
 
 import {
   isContractDeletion,
   isContractUpdate,
   isDeterministicStateInitAction,
+  isUniversalStateInitAction,
   isUseGlobalContractAction,
   isUseGlobalContractByAccountIdAction,
 } from '#libs/guards';
@@ -205,6 +206,34 @@ const getReceiptChanges = (
             index_in_chunk: 0, // placeholder; actual value will be set later
             receipt_id: receiptId,
             shard_id: 0, // placeholder; actual value will be set later
+          });
+        } else if (isUniversalStateInitAction(action)) {
+          const stateInit = decodeUniversalStateInit(
+            action.UniversalStateInit.stateInit,
+          );
+
+          if (!stateInit) {
+            throw new Error(
+              `Malformed UniversalStateInit in successful receipt ${receiptId}`,
+            );
+          }
+
+          if (!stateInit.code) continue;
+
+          result.code.push({
+            block_height: block.height,
+            block_timestamp: block.timestampNanosec,
+            code_base64: null,
+            code_hash: null,
+            contract_account_id: outcome.receipt.receiverId,
+            event_type: ContractEventType.UPDATE,
+            global_account_id:
+              'account_id' in stateInit.code ? stateInit.code.account_id : null,
+            global_code_hash:
+              'hash' in stateInit.code ? stateInit.code.hash : null,
+            index_in_chunk: 0,
+            receipt_id: receiptId,
+            shard_id: 0,
           });
         }
       }

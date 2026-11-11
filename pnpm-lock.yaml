@@ -1826,6 +1826,10 @@ importers:
         version: 6.0.3
 
   packages/nb-utils:
+    dependencies:
+      '@scure/base':
+        specifier: 'catalog:'
+        version: 1.2.5
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

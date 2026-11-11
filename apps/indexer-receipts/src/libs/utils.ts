@@ -4,13 +4,14 @@ import { decodeBase64, encodeBase58, hexlify, Transaction } from 'ethers';
 import { snakeCase, toUpper } from 'lodash-es';
 
 import { logger } from 'nb-logger';
-import { Action, ExecutionStatus, ReceiptEnum } from 'nb-neardata';
+import { AccessKey, Action, ExecutionStatus, ReceiptEnum } from 'nb-neardata';
 import {
   AccessKeyPermissionKind,
   ActionKind,
   ExecutionOutcomeStatus,
   ReceiptKind,
 } from 'nb-types';
+import { decodeUniversalStateInit } from 'nb-utils';
 
 import {
   isAccessKeyFunctionCallPermission,
@@ -23,10 +24,15 @@ import {
   isDeployGlobalContractByAccountIdAction,
   isDeterministicStateInitAction,
   isFunctionCallAction,
+  isGasKeyFullAccessPermission,
+  isGasKeyFunctionCallPermission,
   isStakeAction,
   isTransferAction,
+  isTransferToGasKeyAction,
+  isUniversalStateInitAction,
   isUseGlobalContractAction,
   isUseGlobalContractByAccountIdAction,
+  isWithdrawFromGasKeyAction,
 } from '#libs/guards';
 import sentry from '#libs/sentry';
 import { AccessKeyPermission, ReceiptAction, RlpJson } from '#types/types';
@@ -64,6 +70,67 @@ const getCodeHash = (codeBase64: string) => {
   }
 
   return code === null ? { code } : { code_hash: code };
+};
+
+const reportedUnknown = new Set<string>();
+
+const reportUnknown = (name: string, payload: unknown) => {
+  if (reportedUnknown.has(name)) return;
+
+  reportedUnknown.add(name);
+  logger.warn(`unknown ${name}`);
+  sentry.captureMessage(`Unknown ${name}`, {
+    extra: { payload: JSON.stringify(payload)?.slice(0, 1000) },
+    fingerprint: ['unknown', name],
+    level: 'error',
+  });
+};
+
+const reportUnknownAction = (action: Action) => {
+  const name =
+    typeof action === 'string' ? action : (Object.keys(action ?? {})[0] ?? '');
+
+  reportUnknown(`action kind: ${name}`, action);
+};
+
+const mapAccessKeyPermission = (
+  permission: AccessKey['permission'],
+): AccessKeyPermission => {
+  if (isAccessKeyFunctionCallPermission(permission)) {
+    return {
+      permission_details: {
+        allowance: permission.FunctionCall.allowance,
+        method_names: permission.FunctionCall.methodNames,
+        receiver_id: permission.FunctionCall.receiverId,
+      },
+      permission_kind: AccessKeyPermissionKind.FUNCTION_CALL,
+    };
+  }
+
+  if (isGasKeyFunctionCallPermission(permission)) {
+    return {
+      permission_details: {
+        allowance: permission.GasKeyFunctionCall.allowance,
+        method_names: permission.GasKeyFunctionCall.methodNames,
+        num_nonces: permission.GasKeyFunctionCall.numNonces,
+        receiver_id: permission.GasKeyFunctionCall.receiverId,
+      },
+      permission_kind: AccessKeyPermissionKind.GAS_KEY_FUNCTION_CALL,
+    };
+  }
+
+  if (isGasKeyFullAccessPermission(permission)) {
+    return {
+      permission_details: { num_nonces: permission.GasKeyFullAccess.numNonces },
+      permission_kind: AccessKeyPermissionKind.GAS_KEY_FULL_ACCESS,
+    };
+  }
+
+  if (permission !== 'FullAccess') {
+    reportUnknown('access key permission', permission);
+  }
+
+  return { permission_kind: AccessKeyPermissionKind.FULL_ACCESS };
 };
 
 export const mapActionKind = (action: Action): ReceiptAction => {
@@ -169,19 +236,9 @@ export const mapActionKind = (action: Action): ReceiptAction => {
   }
 
   if (isAddKeyAction(action)) {
-    const permission: AccessKeyPermission = {
-      permission_kind: AccessKeyPermissionKind.FULL_ACCESS,
-    };
-
-    if (isAccessKeyFunctionCallPermission(action.AddKey.accessKey.permission)) {
-      permission.permission_kind = AccessKeyPermissionKind.FUNCTION_CALL;
-      permission.permission_details = {
-        allowance: action.AddKey.accessKey.permission.FunctionCall.allowance,
-        method_names:
-          action.AddKey.accessKey.permission.FunctionCall.methodNames,
-        receiver_id: action.AddKey.accessKey.permission.FunctionCall.receiverId,
-      };
-    }
+    const permission = mapAccessKeyPermission(
+      action.AddKey.accessKey.permission,
+    );
 
     return {
       args: jsonStringify({
@@ -224,6 +281,41 @@ export const mapActionKind = (action: Action): ReceiptAction => {
     };
   }
 
+  if (isUniversalStateInitAction(action)) {
+    const { deposit, stateInit } = action.UniversalStateInit;
+    const decoded = decodeUniversalStateInit(stateInit);
+
+    return {
+      args: jsonStringify(
+        decoded ? { deposit, ...decoded } : { deposit, state_init: stateInit },
+      ),
+      kind: ActionKind.UNIVERSAL_STATE_INIT,
+      rlpHash,
+    };
+  }
+
+  if (isTransferToGasKeyAction(action)) {
+    return {
+      args: jsonStringify({
+        deposit: action.TransferToGasKey.deposit,
+        public_key: action.TransferToGasKey.publicKey,
+      }),
+      kind: ActionKind.TRANSFER_TO_GAS_KEY,
+      rlpHash,
+    };
+  }
+
+  if (isWithdrawFromGasKeyAction(action)) {
+    return {
+      args: jsonStringify({
+        amount: action.WithdrawFromGasKey.amount,
+        public_key: action.WithdrawFromGasKey.publicKey,
+      }),
+      kind: ActionKind.WITHDRAW_FROM_GAS_KEY,
+      rlpHash,
+    };
+  }
+
   if (isDelegateAction(action)) {
     const delegateAction = action.Delegate.delegateAction;
 
@@ -240,6 +332,8 @@ export const mapActionKind = (action: Action): ReceiptAction => {
       rlpHash,
     };
   }
+
+  reportUnknownAction(action);
 
   return {
     args: jsonStringify(args),
