@@ -4,6 +4,7 @@ import {
   Action,
   AddKeyAction,
   DelegateAction,
+  DelegateV2Action,
   DeleteAccountAction,
   DeleteKeyAction,
   DeployContractAction,
@@ -91,6 +92,11 @@ export const isDeleteAccountAction = (
 
 export const isDelegateAction = (action: Action): action is DelegateAction =>
   (action as DelegateAction).Delegate !== undefined;
+
+export const isDelegateV2Action = (
+  action: Action,
+): action is DelegateV2Action =>
+  (action as DelegateV2Action).DelegateV2 !== undefined;
 
 export const isDeterministicStateInitAction = (
   action: Action,

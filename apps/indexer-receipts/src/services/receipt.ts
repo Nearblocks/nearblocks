@@ -15,10 +15,14 @@ import {
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { isDelegateAction } from '#libs/guards';
 import { lru } from '#libs/lru';
 import { receiptHistogram } from '#libs/prom';
-import { difference, mapActionKind, mapReceiptKind } from '#libs/utils';
+import {
+  difference,
+  mapActionKind,
+  mapReceiptKind,
+  unwrapDelegate,
+} from '#libs/utils';
 
 const batchSize = config.insertLimit;
 const receiptKinds = ['Action', 'Data']; // Skip GlobalContractDistribution (missing parent txn)
@@ -192,7 +196,9 @@ const storeChunkReceipts = async (
 
       let actionIndex = 0;
       receipt.receipt.Action.actions.forEach((action) => {
-        if (isDelegateAction(action)) {
+        const innerActions = unwrapDelegate(action);
+
+        if (innerActions) {
           receiptActionsData.push(
             getActionReceiptActionData(
               shardId,
@@ -207,7 +213,7 @@ const storeChunkReceipts = async (
           );
           actionIndex += 1;
 
-          action.Delegate.delegateAction.actions.forEach((action) => {
+          innerActions.forEach((action) => {
             receiptActionsData.push(
               getActionReceiptActionData(
                 shardId,

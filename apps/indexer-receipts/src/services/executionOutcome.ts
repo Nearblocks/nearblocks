@@ -14,7 +14,6 @@ import {
 import { retry } from 'nb-utils';
 
 import config from '#config';
-import { isDelegateAction } from '#libs/guards';
 import { outcomeHistogram } from '#libs/prom';
 import {
   getExecutionResult,
@@ -22,6 +21,7 @@ import {
   mapActionKind,
   mapExecutionStatus,
   mapReceiptKind,
+  unwrapDelegate,
 } from '#libs/utils';
 
 const batchSize = config.insertLimit;
@@ -189,7 +189,9 @@ export const storeChunkExecutionOutcomes = (
 
       let actionIndex = 0;
       executionOutcome.receipt.receipt.Action.actions.forEach((action) => {
-        if (isDelegateAction(action)) {
+        const innerActions = unwrapDelegate(action);
+
+        if (innerActions) {
           actions.push(
             getActionReceiptActionData(
               shardId,
@@ -204,7 +206,7 @@ export const storeChunkExecutionOutcomes = (
           );
           actionIndex += 1;
 
-          action.Delegate.delegateAction.actions.forEach((action) => {
+          innerActions.forEach((action) => {
             actions.push(
               getActionReceiptActionData(
                 shardId,
