@@ -11,7 +11,6 @@ export default function Document() {
         />
         <link href="/favicon.ico" rel="icon" />
         <link href="/site.webmanifest" rel="manifest" />
-        <script src="/__ENV.js" />
       </Head>
       <body>
         <Main />

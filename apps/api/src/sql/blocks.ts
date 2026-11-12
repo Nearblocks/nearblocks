@@ -5,4 +5,5 @@ export default {
   blocks: sql('queries/blocks/blocks.sql'),
   countCagg: sql('queries/blocks/countCagg.sql'),
   stats: sql('queries/blocks/stats.sql'),
+  supply: sql('queries/blocks/supply.sql'),
 };

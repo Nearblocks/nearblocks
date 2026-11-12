@@ -365,7 +365,7 @@ These v1 endpoints are not carried over and stop working on 22 November 2026:
 - `GET /v1/account/{account}/activities`: use `/v3/accounts/{account}/stats/*` for activity over time
 - `GET /v1/account/{account}/txns-only`: use `/v3/accounts/{account}/txns`
 - `GET /v1/accounts/eth`: ETH-implicit account listing
-- `GET /v1/legacy/*`: legacy supply and fee endpoints
+- `GET /v1/legacy/fees`: legacy fee endpoint
 - `GET /v1/campaigns/*`: ads and campaigns
 
 ### Kitwallet
