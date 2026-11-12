@@ -159,7 +159,8 @@ export const getTransaction = async (
       signature,
       {
         encoding: 'json',
-        maxSupportedTransactionVersion: 0,
+        // v1 transactions keep accountKeys and meta; with 0 the RPC rejects them.
+        maxSupportedTransactionVersion: 1,
       },
     ],
     { allowNull: true },
