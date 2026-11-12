@@ -26,10 +26,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
       network === 'testnet'
         ? 'https://testnet.nearblocks.io'
         : 'https://nearblocks.io',
-    nearblocksLite:
-      network === 'testnet'
-        ? 'https://nearvalidate.org'
-        : 'https://nearvalidate.org',
     nearrocks:
       network === 'testnet'
         ? 'https://testnet.near.rocks'
@@ -106,33 +102,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
     }
   }
 
-  function getNearblocksLiteHref(link: string) {
-    if (link)
-      switch (path) {
-        case 'accounts':
-          return network === 'testnet'
-            ? config.nearblocksLite + '/address/' + value + `?network=testnet`
-            : config.nearblocksLite + '/address/' + value;
-        case 'transactions':
-          return network === 'testnet'
-            ? config.nearblocksLite + '/txns/' + value + `?network=testnet`
-            : config.nearblocksLite + '/txns/' + value;
-        case 'receipts':
-          return network === 'testnet'
-            ? config.nearblocksLite + '/hash/' + value + `?network=testnet`
-            : config.nearblocksLite + '/hash/' + value;
-        case 'blocks':
-          return network === 'testnet'
-            ? config.nearblocksLite + '/blocks/' + value + `?network=testnet`
-            : config.nearblocksLite + '/blocks/' + value;
-        default:
-          return config.nearblocksLite;
-      }
-    else {
-      return config.nearblocksLite;
-    }
-  }
-
   function linkPikespeakai(link: string) {
     if (link)
       switch (path) {
@@ -169,6 +138,8 @@ export default function ExplorerSelector({ network }: NetworkProps) {
           return true;
         case 'stats':
           return true;
+        case 'nodes':
+          return true;
         default:
           return false;
       }
@@ -196,29 +167,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
     return false;
   }
 
-  function linkNearblocksLite(link: string) {
-    if (link)
-      switch (path) {
-        case '':
-          return true;
-        case 'accounts':
-          return true;
-        case 'transactions':
-          return true;
-        case 'receipts':
-          return true;
-        case 'blocks':
-          return true;
-        case 'stats':
-          return true;
-        case 'nodes':
-          return true;
-        default:
-          return false;
-      }
-    return false;
-  }
-
   function shortenHex(address: string) {
     return address?.length > 9
       ? `${address && address.substr(0, 6)}...${address.substr(-4)}`
@@ -232,7 +180,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
   const hasValidLink =
     linkNearRocks(path) ||
     linkNearblocks(path) ||
-    linkNearblocksLite(path) ||
     linkPikespeakai(path);
 
   const isInvalidReceiptsPath = path === 'receipts' && isNumericId(value);
@@ -240,7 +187,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
   const nearRocksHref = getNearRocksHref(path);
   const href = getHref(path);
   const pikespeakHref = getPikespeakHref(path);
-  const nearblocksLiteHref = getNearblocksLiteHref(path);
 
   const isNearRocksInactive =
     (path && !linkNearRocks(path)) ||
@@ -251,13 +197,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
     (path && !linkNearblocks(path)) ||
     isInvalidReceiptsPath ||
     (path && value === '');
-
-  const isNearblocksLiteInactive =
-    (path && !linkNearblocksLite(path)) ||
-    isInvalidReceiptsPath ||
-    config.nearblocksLite === null ||
-    (path && value === '') ||
-    path === 'stats';
 
   const isPikespeakInactive =
     (path && !linkPikespeakai(path)) ||
@@ -304,8 +243,8 @@ export default function ExplorerSelector({ network }: NetworkProps) {
               <div
                 className={`${styles.linkContainer} ${
                   config.pikespeakai !== null
-                    ? styles.fourColumns
-                    : styles.threeColumns
+                    ? styles.threeColumns
+                    : styles.twoColumns
                 }`}
               >
                 <a
@@ -326,27 +265,6 @@ export default function ExplorerSelector({ network }: NetworkProps) {
                     width={45}
                   />
                   <h3 className={styles.explorerHead}>Near Rocks</h3>
-                </a>
-
-                <a
-                  className={`${styles.nearExplorerButton} ${
-                    isNearblocksLiteInactive ? styles.inactive : ''
-                  }`}
-                  href={
-                    !isNearblocksLiteInactive
-                      ? (nearblocksLiteHref && nearblocksLiteHref) ||
-                        (config.nearblocksLite ?? '') + path
-                      : config.nearblocksLite ?? ''
-                  }
-                >
-                  <Image
-                    alt="Near Validate"
-                    height={45}
-                    src="https://nearvalidate.org/images/near-validate.svg"
-                    style={imageStyle}
-                    width={216}
-                  />
-                  <h3 className={styles.explorerHead}>Near Validate</h3>
                 </a>
 
                 <a
