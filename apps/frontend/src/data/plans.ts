@@ -19,7 +19,7 @@ export type { ApiPlan };
 
 export const fetchPlans = cache(async (): Promise<ApiPlan[]> => {
   try {
-    const res = await fetch('https://api.exploreblocks.io/api/plans');
+    const res = await fetch('https://api.exploreblocks.io/v2/api/plans');
     if (!res.ok) return [];
     const resp = (await res.json()) as PlansRes;
     return resp.data;
