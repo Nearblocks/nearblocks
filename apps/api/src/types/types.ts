@@ -32,6 +32,7 @@ export type Config = {
   fastnearApiKey: string;
   fastnearUrl: string;
   legacyApiSunset: Date;
+  legacyCompatRemoval: Date;
   mainnetUrl: string;
   maxQueryCost: number;
   maxQueryCount: number;
