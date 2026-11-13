@@ -220,13 +220,15 @@ const getReceiptChanges = (
 
           if (!stateInit.code) continue;
 
+          // A repeat init is a no-op but looks identical in the block, so every
+          // init is stored as INIT and readers resolve whether it took effect.
           result.code.push({
             block_height: block.height,
             block_timestamp: block.timestampNanosec,
             code_base64: null,
             code_hash: null,
             contract_account_id: outcome.receipt.receiverId,
-            event_type: ContractEventType.UPDATE,
+            event_type: ContractEventType.INIT,
             global_account_id:
               'account_id' in stateInit.code ? stateInit.code.account_id : null,
             global_code_hash:

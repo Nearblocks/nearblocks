@@ -135,6 +135,8 @@ export enum StakingEventType {
 export enum ContractEventType {
   UPDATE = 'UPDATE',
   DELETE = 'DELETE',
+  // UniversalStateInit; readers decide whether it took effect (see contract.sql)
+  INIT = 'INIT',
 }
 
 // Used for creating DB event index
