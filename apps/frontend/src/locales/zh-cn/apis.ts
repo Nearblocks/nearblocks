@@ -66,6 +66,7 @@ export const apis = {
     heading: 'Ready to get started?',
     mo: '/mo',
     monthly: 'Monthly',
+    monthlyOnly: 'Monthly billing only',
     mostUsed: 'Most used!',
     off: '({{percent}}% off)',
     or: 'Or',

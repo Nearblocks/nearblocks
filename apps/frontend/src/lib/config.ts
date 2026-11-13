@@ -92,6 +92,13 @@ const contractVerifier = {
   },
 } as const;
 
+/** Empty optional URLs (as in .env.example) count as unset, so their defaults apply instead of failing z.url(). */
+export const emptyUrlsAsUnset = (env: NodeJS.ProcessEnv) => ({
+  ...env,
+  NEXT_PUBLIC_DASHBOARD_URL: env.NEXT_PUBLIC_DASHBOARD_URL || undefined,
+  NEXT_PUBLIC_LEGACY_UI_URL: env.NEXT_PUBLIC_LEGACY_UI_URL || undefined,
+});
+
 export const envSchema = z.object({
   ...serverEnvSchema.shape,
   ...publicEnvSchema.shape,
@@ -146,8 +153,11 @@ let cachedPublicConfig: null | PublicEnv = null;
 export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
-      NEXT_PUBLIC_DASHBOARD_URL: process.env.NEXT_PUBLIC_DASHBOARD_URL,
-      NEXT_PUBLIC_LEGACY_UI_URL: process.env.NEXT_PUBLIC_LEGACY_UI_URL,
+      // Empty means unset, as in emptyUrlsAsUnset.
+      NEXT_PUBLIC_DASHBOARD_URL:
+        process.env.NEXT_PUBLIC_DASHBOARD_URL || undefined,
+      NEXT_PUBLIC_LEGACY_UI_URL:
+        process.env.NEXT_PUBLIC_LEGACY_UI_URL || undefined,
       NEXT_PUBLIC_MAINNET_URL: process.env.NEXT_PUBLIC_MAINNET_URL,
       NEXT_PUBLIC_NETWORK_ID: process.env.NEXT_PUBLIC_NETWORK_ID,
       NEXT_PUBLIC_REOWN_PROJECT_ID: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,

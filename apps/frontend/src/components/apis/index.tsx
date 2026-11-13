@@ -178,7 +178,9 @@ export const Apis = ({ plansPromise }: Props) => {
                       </span>
                     </p>
                   ) : !yearly ? (
-                    <p className="mb-4 h-5" />
+                    <p className="mb-4 h-5 text-body-xs text-muted-foreground">
+                      {billingInterval === 'year' && t('pricing.monthlyOnly')}
+                    </p>
                   ) : (
                     <p className="mb-4 h-5 text-body-xs text-muted-foreground">
                       {t('pricing.or')}{' '}
