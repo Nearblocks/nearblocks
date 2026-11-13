@@ -32,70 +32,69 @@ import { blockRange as blockRangeSql } from '#sql/accounts';
 import sql from '#sql/accounts';
 import { ActionKind } from '#types/enums';
 
-const txns = responseHandler(
-  response.txns,
-  async (req: RequestValidator<AccountTxnsReq>) => {
-    const account = req.validator.account;
-    const signer = req.validator.signer;
-    const receiver = req.validator.receiver;
-    const limit = req.validator.limit;
-    const before = req.validator.before_ts;
-    const next = req.validator.next
-      ? cursors.decode(request.cursor, req.validator.next)
-      : null;
-    const prev = req.validator.prev
-      ? cursors.decode(request.cursor, req.validator.prev)
-      : null;
-    const direction = prev ? 'asc' : 'desc';
-    const cursor = prev || next;
+export const txnsData = async (req: RequestValidator<AccountTxnsReq>) => {
+  const account = req.validator.account;
+  const signer = req.validator.signer;
+  const receiver = req.validator.receiver;
+  const limit = req.validator.limit;
+  const before = req.validator.before_ts;
+  const next = req.validator.next
+    ? cursors.decode(request.cursor, req.validator.next)
+    : null;
+  const prev = req.validator.prev
+    ? cursors.decode(request.cursor, req.validator.prev)
+    : null;
+  const direction = prev ? 'asc' : 'desc';
+  const cursor = prev || next;
 
-    if (signer && receiver && signer !== account && receiver !== account) {
-      return { data: [] };
-    }
+  if (signer && receiver && signer !== account && receiver !== account) {
+    return { data: [] };
+  }
 
-    const txnsQuery: WindowListQuery<AccountTxn> = (start, end, limit) => {
-      const cte = pgp.as.format(
-        signer || receiver ? sql.txns.cte : sql.txns.cteUnion,
-        {
-          before,
-          cursor: {
-            index: cursor?.index,
-            shard: cursor?.shard,
-            timestamp: cursor?.timestamp,
-          },
-          direction,
-          end,
-          limit,
-          receiver: receiver || account,
-          signer: signer || account,
-          start,
+  const txnsQuery: WindowListQuery<AccountTxn> = (start, end, limit) => {
+    const cte = pgp.as.format(
+      signer || receiver ? sql.txns.cte : sql.txns.cteUnion,
+      {
+        before,
+        cursor: {
+          index: cursor?.index,
+          shard: cursor?.shard,
+          timestamp: cursor?.timestamp,
         },
-      );
-
-      return dbBase.manyOrNone<AccountTxn>(sql.txns.txns, { cte, direction });
-    };
-
-    const txns = await rollingWindowList(txnsQuery, {
-      direction,
-      end: windowEnd(cursor?.timestamp, before, direction),
-      // Fetch one extra to check if there is a next page
-      limit: limit + 1,
-      start: windowStart(config.baseStart, cursor?.timestamp, direction),
-    });
-
-    return paginateData(
-      txns,
-      limit,
-      direction,
-      (txn) => ({
-        index: txn.index_in_chunk,
-        shard: txn.shard_id,
-        timestamp: txn.block_timestamp,
-      }),
-      !!cursor,
+        direction,
+        end,
+        limit,
+        receiver: receiver || account,
+        signer: signer || account,
+        start,
+      },
     );
-  },
-);
+
+    return dbBase.manyOrNone<AccountTxn>(sql.txns.txns, { cte, direction });
+  };
+
+  const txns = await rollingWindowList(txnsQuery, {
+    direction,
+    end: windowEnd(cursor?.timestamp, before, direction),
+    // Fetch one extra to check if there is a next page
+    limit: limit + 1,
+    start: windowStart(config.baseStart, cursor?.timestamp, direction),
+  });
+
+  return paginateData(
+    txns,
+    limit,
+    direction,
+    (txn) => ({
+      index: txn.index_in_chunk,
+      shard: txn.shard_id,
+      timestamp: txn.block_timestamp,
+    }),
+    !!cursor,
+  );
+};
+
+const txns = responseHandler(response.txns, txnsData);
 
 const count = responseHandler(
   response.count,

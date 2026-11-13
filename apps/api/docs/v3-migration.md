@@ -444,3 +444,15 @@ After: `/v3/accounts/alice.near/ft-txns?limit=25` → metadata under `meta`; ite
 6. Update field access: nested `block{}` object, `meta` for token metadata, `status_key` for outcome detail.
 7. Remove dependence on public `/count` endpoints; where still available, parse counts as strings with a possible `+` suffix.
 8. Check section 6 for endpoints without a v3 version, and move kitwallet calls to `/v3/kitwallet/`.
+
+---
+
+## Limited compatibility (until 2027-02-28)
+
+These v1/v2 endpoints keep answering in their old format, served from v3 data, until **28 February 2027**. Formats are not guaranteed: some fields are `null` and only the first page or a returned `cursor` is supported. Move to the v3 equivalents.
+
+- `/v1/account/{account}`, and its `/txns`, `/txns-only`, `/receipts`, `/ft-txns`, `/inventory`
+- `/v1/txns/{hash}`, `/v2/txns/{hash}`
+- `/v1/blocks/latest`, `/v1/stats`
+
+Every other v1/v2 endpoint returns `410 Gone`.

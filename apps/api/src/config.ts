@@ -32,6 +32,8 @@ const env = cleanEnv(process.env, {
   FASTNEAR_URL: str({ default: '' }),
   // ISO date when /v1 and /v2 start returning 410; defaults per network below.
   LEGACY_API_SUNSET: str({ default: '' }),
+  // ISO date when the limited v1/v2 compatibility routes also return 410.
+  LEGACY_COMPAT_REMOVAL: str({ default: '2027-02-28T00:00:00Z' }),
   MAINNET_URL: str({ default: 'https://api.nearblocks.io' }),
   NETWORK: str({
     choices: [Network.MAINNET, Network.TESTNET],
@@ -125,11 +127,15 @@ if (rpcAuthTokens.length !== rpcUrls.length) {
 const legacyApiSunset = new Date(
   env.LEGACY_API_SUNSET ||
     (env.NETWORK === Network.MAINNET
-      ? '2026-12-01T00:00:00Z'
+      ? '2026-11-22T00:00:00Z'
       : '2026-11-05T00:00:00Z'),
 );
 if (Number.isNaN(legacyApiSunset.getTime())) {
   throw new Error('LEGACY_API_SUNSET must be an ISO date.');
+}
+const legacyCompatRemoval = new Date(env.LEGACY_COMPAT_REMOVAL);
+if (Number.isNaN(legacyCompatRemoval.getTime())) {
+  throw new Error('LEGACY_COMPAT_REMOVAL must be an ISO date.');
 }
 
 // Each block-proxy in RPC_URLS serves /node/status beside /rpc. Reuse the
@@ -180,6 +186,7 @@ const config: Config = {
       ? 'https://api.fastnear.com'
       : 'https://test.api.fastnear.com'),
   legacyApiSunset,
+  legacyCompatRemoval,
   mainnetUrl: env.MAINNET_URL,
   maxQueryCost: 400000,
   maxQueryCount: 10000,

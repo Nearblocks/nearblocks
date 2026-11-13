@@ -25,33 +25,32 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/blocks';
 
-const latest = responseHandler(
-  response.blocks,
-  async (req: RequestValidator<BlocksLatestReq>) => {
-    const limit = req.validator.limit;
+export const latestData = async (req: RequestValidator<BlocksLatestReq>) => {
+  const limit = req.validator.limit;
 
-    const rollingQuery = rollingWindowList<Block>(
-      (start, end) => {
-        return dbBase.manyOrNone<Block>(sql.blocks, {
-          cursor: { timestamp: null },
-          direction: 'desc',
-          end,
-          limit,
-          start,
-        });
-      },
-      { limit, start: config.baseStart },
-    );
+  const rollingQuery = rollingWindowList<Block>(
+    (start, end) => {
+      return dbBase.manyOrNone<Block>(sql.blocks, {
+        cursor: { timestamp: null },
+        direction: 'desc',
+        end,
+        limit,
+        start,
+      });
+    },
+    { limit, start: config.baseStart },
+  );
 
-    const blocks = await redis.cache<Block[]>(
-      `v3:blocks:latest:${limit}`,
-      () => rollingQuery,
-      5, // cache results for 5s
-    );
+  const blocks = await redis.cache<Block[]>(
+    `v3:blocks:latest:${limit}`,
+    () => rollingQuery,
+    5, // cache results for 5s
+  );
 
-    return { data: blocks };
-  },
-);
+  return { data: blocks };
+};
+
+const latest = responseHandler(response.blocks, latestData);
 
 const blocks = responseHandler(
   response.blocks,

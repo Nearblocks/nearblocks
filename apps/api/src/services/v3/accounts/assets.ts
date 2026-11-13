@@ -29,67 +29,66 @@ import { responseHandler } from '#middlewares/response';
 import type { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/accounts';
 
-const fts = responseHandler(
-  response.fts,
-  async (req: RequestValidator<AccountAssetFTsReq>) => {
-    const account = req.validator.account;
-    const limit = req.validator.limit;
-    const next = req.validator.next
-      ? cursors.decode(request.ftsCursor, req.validator.next)
-      : null;
-    const prev = req.validator.prev
-      ? cursors.decode(request.ftsCursor, req.validator.prev)
-      : null;
-    const direction = prev ? 'asc' : 'desc';
-    const contractDirection = prev ? 'desc' : 'asc';
-    const cursor = prev || next;
+export const ftsData = async (req: RequestValidator<AccountAssetFTsReq>) => {
+  const account = req.validator.account;
+  const limit = req.validator.limit;
+  const next = req.validator.next
+    ? cursors.decode(request.ftsCursor, req.validator.next)
+    : null;
+  const prev = req.validator.prev
+    ? cursors.decode(request.ftsCursor, req.validator.prev)
+    : null;
+  const direction = prev ? 'asc' : 'desc';
+  const contractDirection = prev ? 'desc' : 'asc';
+  const cursor = prev || next;
 
-    const balances = await getAccountFtBalances(account);
+  const balances = await getAccountFtBalances(account);
 
-    let fts: (AccountAssetFT & { value: string })[];
+  let fts: (AccountAssetFT & { value: string })[];
 
-    if (balances !== null) {
-      fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
-        sql.assets.ftsBalances,
-        {
-          balances: JSON.stringify(balances),
-          contractDirection,
-          cursor: {
-            contract: cursor?.contract,
-            value: cursor?.value,
-          },
-          direction,
-          limit: limit + 1,
+  if (balances !== null) {
+    fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
+      sql.assets.ftsBalances,
+      {
+        balances: JSON.stringify(balances),
+        contractDirection,
+        cursor: {
+          contract: cursor?.contract,
+          value: cursor?.value,
         },
-      );
-    } else {
-      fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
-        sql.assets.fts,
-        {
-          account,
-          contractDirection,
-          cursor: {
-            contract: cursor?.contract,
-            value: cursor?.value,
-          },
-          direction,
-          limit: limit + 1,
-        },
-      );
-    }
-
-    return paginateData(
-      fts,
-      limit,
-      direction,
-      (ft) => ({
-        contract: ft.contract,
-        value: ft.value,
-      }),
-      !!cursor,
+        direction,
+        limit: limit + 1,
+      },
     );
-  },
-);
+  } else {
+    fts = await dbEvents.manyOrNone<AccountAssetFT & { value: string }>(
+      sql.assets.fts,
+      {
+        account,
+        contractDirection,
+        cursor: {
+          contract: cursor?.contract,
+          value: cursor?.value,
+        },
+        direction,
+        limit: limit + 1,
+      },
+    );
+  }
+
+  return paginateData(
+    fts,
+    limit,
+    direction,
+    (ft) => ({
+      contract: ft.contract,
+      value: ft.value,
+    }),
+    !!cursor,
+  );
+};
+
+const fts = responseHandler(response.fts, ftsData);
 
 const ftCount = responseHandler(
   response.ftCount,
@@ -141,43 +140,42 @@ const ftBalance = responseHandler(
   },
 );
 
-const nfts = responseHandler(
-  response.nfts,
-  async (req: RequestValidator<AccountAssetNFTsReq>) => {
-    const account = req.validator.account;
-    const limit = req.validator.limit;
-    const next = req.validator.next
-      ? cursors.decode(request.nftsCursor, req.validator.next)
-      : null;
-    const prev = req.validator.prev
-      ? cursors.decode(request.nftsCursor, req.validator.prev)
-      : null;
-    const direction = prev ? 'asc' : 'desc';
-    const cursor = prev || next;
+export const nftsData = async (req: RequestValidator<AccountAssetNFTsReq>) => {
+  const account = req.validator.account;
+  const limit = req.validator.limit;
+  const next = req.validator.next
+    ? cursors.decode(request.nftsCursor, req.validator.next)
+    : null;
+  const prev = req.validator.prev
+    ? cursors.decode(request.nftsCursor, req.validator.prev)
+    : null;
+  const direction = prev ? 'asc' : 'desc';
+  const cursor = prev || next;
 
-    const nfts = await dbEvents.manyOrNone<AccountAssetNFT>(sql.assets.nfts, {
-      account,
-      cursor: {
-        contract: cursor?.contract,
-        token: cursor?.token,
-      },
-      direction,
-      // Fetch one extra to check if there is a next page
-      limit: limit + 1,
-    });
+  const nfts = await dbEvents.manyOrNone<AccountAssetNFT>(sql.assets.nfts, {
+    account,
+    cursor: {
+      contract: cursor?.contract,
+      token: cursor?.token,
+    },
+    direction,
+    // Fetch one extra to check if there is a next page
+    limit: limit + 1,
+  });
 
-    return paginateData(
-      nfts,
-      limit,
-      direction,
-      (nft) => ({
-        contract: nft.contract,
-        token: nft.token,
-      }),
-      !!cursor,
-    );
-  },
-);
+  return paginateData(
+    nfts,
+    limit,
+    direction,
+    (nft) => ({
+      contract: nft.contract,
+      token: nft.token,
+    }),
+    !!cursor,
+  );
+};
+
+const nfts = responseHandler(response.nfts, nftsData);
 
 const nftCount = responseHandler(
   response.nftCount,

@@ -25,11 +25,13 @@ import { responseHandler } from '#middlewares/response';
 import { RequestValidator } from '#middlewares/validate';
 import sql from '#sql/stats';
 
-const stats = responseHandler(response.stats, async () => {
+export const statsData = async () => {
   const data = await dbBase.one<Stats>(sql.stats);
 
   return { data };
-});
+};
+
+const stats = responseHandler(response.stats, statsData);
 
 const block = responseHandler(
   response.block,

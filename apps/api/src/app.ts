@@ -17,6 +17,7 @@ import { kitwalletClientMetrics } from '#middlewares/kitwalletClients';
 import legacyApi from '#middlewares/legacyApi';
 import { anonymousStrategy, bearerStrategy } from '#middlewares/passport';
 import { usageEvents } from '#middlewares/usageEvents';
+import routesCompat from '#routes/compat/index';
 import routes from '#routes/index';
 import routesV2 from '#routes/v2/index';
 import routesV3 from '#routes/v3/index';
@@ -90,6 +91,7 @@ app.post(
 );
 app.use(kitwalletClientMetrics);
 app.use(usageEvents);
+app.use(routesCompat()); // limited v1/v2 compat, see docs/v3-migration.md
 app.use(legacyApi);
 
 app.use('/v1', routes());
