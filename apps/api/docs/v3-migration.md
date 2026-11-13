@@ -449,31 +449,10 @@ After: `/v3/accounts/alice.near/ft-txns?limit=25` → metadata under `meta`; ite
 
 ## Limited compatibility (until 2027-02-28)
 
-After the sunset, a few of the most used v1/v2 endpoints keep answering in their old format, served from v3 data. This is a stopgap to give you time to migrate. **Formats are not guaranteed and may change or be removed.** On **28 February 2027** these endpoints also return `410 Gone`. Every other v1/v2 path returns `410` from the sunset date, including all `/count` endpoints.
+These v1/v2 endpoints keep answering in their old format, served from v3 data, until **28 February 2027**. Formats are not guaranteed: some fields are `null` and only the first page or a returned `cursor` is supported. Move to the v3 equivalents.
 
-| Endpoint                                     | Notes                                                                                                                                                                        |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET /v1/account/{account}`                  | `amount` and `locked` (staked) come from the v3 balance; `block_height`/`block_hash` are the latest block. An unknown account returns `{ "account": [] }`.                   |
-| `GET /v1/account/{account}/txns`             | Receipt rows from `/v3/accounts/{account}/receipts`. `block_timestamp` and `block.block_height` are the receipt's, not the transaction's. `receipt_kind` is always `ACTION`. |
-| `GET /v1/account/{account}/receipts`         | As `/txns`, without `receipt_kind`.                                                                                                                                          |
-| `GET /v1/account/{account}/txns-only`        | From `/v3/accounts/{account}/txns`.                                                                                                                                          |
-| `GET /v1/account/{account}/ft-txns`          | From `/v3/accounts/{account}/ft-txns`. `event` maps to `cause`. Only the side of the transfer that v3 records is returned.                                                   |
-| `GET /v1/account/{account}/inventory`        | First page only: up to 250 FTs (largest value first) and NFTs grouped from the first 24 tokens, so `quantity` is a lower bound.                                              |
-| `GET /v1/txns/{hash}`, `GET /v2/txns/{hash}` | From `/v3/txns/{hash}` with its `/receipts`, `/fts` and `/nfts`. Only action receipts are listed, ordered by block time. v2 `logs`/`result` are JSON-encoded strings.        |
-| `GET /v1/blocks/latest`                      | From `/v3/blocks/latest` (`limit` up to 10).                                                                                                                                 |
-| `GET /v1/stats`                              | From `/v3/stats`.                                                                                                                                                            |
+- `/v1/account/{account}`, and its `/txns`, `/txns-only`, `/receipts`, `/ft-txns`, `/inventory`
+- `/v1/txns/{hash}`, `/v2/txns/{hash}`
+- `/v1/blocks/latest`, `/v1/stats`
 
-**Fields that are always `null`:** `id` on every row; on `/txns` and `/receipts`, `included_in_block_hash`, `receipt_conversion_tokens_burnt`, `outcomes.status`, `outcomes_agg.transaction_fee`, and `receipt_outcome.gas_burnt`/`tokens_burnt`; on `/txns`, `/receipts` and `/txns-only`, per-action `deposit`, `fee` and `args`; on `/txns-only`, `receipt_conversion_tokens_burnt`; on `/ft-txns`, `outcomes.status` and `outcomes_agg.transaction_fee`; on `/v1/stats`, `high_24h`, `high_all`, `low_24h` and `low_all`.
-
-**Changed values:** `event_index` is a synthetic 35-digit string. It is unique and ordered, but it is not the old value. `cursor` is an opaque v3 cursor: pass it back unchanged.
-
-**Requests that return `422`:**
-
-- `page` other than 1, and `order=asc`. Use `cursor` to page through results.
-- Any `after_*` or `before_*` parameter, such as `after_date`, `before_block` or `before_timestamp`.
-- A numeric v1 `cursor`. Start again from the first page and use the returned cursor.
-- `action` on `/txns` and `/receipts`. `method` still works.
-
-`per_page` is capped at 100, and you are charged for the capped page size.
-
-**Headers:** responses keep `Deprecation`, `Sunset` and `Link`, and add `NearBlocks-Compat: limited` and `NearBlocks-Compat-Removal: 2027-02-28`.
+Every other v1/v2 endpoint returns `410 Gone`.
