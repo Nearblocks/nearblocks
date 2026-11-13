@@ -62,7 +62,10 @@ export const usageEvents = (
         status: res.statusCode,
         t: Date.now(),
         user_id: user?.id ?? null,
-        version: versionOf(req.originalUrl),
+        // A route may override it, e.g. 'compat' for v1/v2 served from v3.
+        version:
+          (res.locals?.usageVersion as string | undefined) ??
+          versionOf(req.originalUrl),
       };
 
       void usageStreamRedisClient
