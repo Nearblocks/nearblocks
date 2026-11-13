@@ -40,10 +40,8 @@ export const bestYearlySaving = (plans: ApiPlan[]) => {
   return { best, uniform: savings.every((saving) => saving === best) };
 };
 
+export const DASHBOARD_URL = 'https://dash.nearblocks.io';
+
 /** The dashboard's public checkout page for a plan; sign-in happens there. */
-export const checkoutUrl = (
-  dashboardUrl: string,
-  planId: number,
-  interval: BillingInterval,
-) =>
-  `${dashboardUrl.replace(/\/+$/, '')}/plans/checkout?id=${planId}&interval=${interval}`;
+export const checkoutUrl = (planId: number, interval: BillingInterval) =>
+  `${DASHBOARD_URL}/plans/checkout?id=${planId}&interval=${interval}`;

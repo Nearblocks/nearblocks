@@ -6,7 +6,6 @@ import { use, useState } from 'react';
 
 import { Link } from '@/components/link';
 import type { ApiPlan } from '@/data/plans';
-import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
@@ -18,6 +17,7 @@ import {
   bestYearlySaving,
   type BillingInterval,
   checkoutUrl,
+  DASHBOARD_URL,
   formatCents,
   hasYearly,
   intervalFor,
@@ -43,7 +43,6 @@ export const Apis = ({ plansPromise }: Props) => {
   const [billingInterval, setBillingInterval] =
     useState<BillingInterval>('month');
   const plans = use(plansPromise);
-  const dashboardUrl = useConfig((s) => s.config.dashboardUrl);
   const saving = bestYearlySaving(plans);
   const anyYearly = plans.some(hasYearly);
 
@@ -64,7 +63,7 @@ export const Apis = ({ plansPromise }: Props) => {
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg" variant="secondary">
                 <a
-                  href={dashboardUrl}
+                  href={DASHBOARD_URL}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
@@ -216,7 +215,7 @@ export const Apis = ({ plansPromise }: Props) => {
                     </li>
                   </ul>
                   <Button asChild className="w-full" variant="secondary">
-                    <a href={checkoutUrl(dashboardUrl, plan.id, planInterval)}>
+                    <a href={checkoutUrl(plan.id, planInterval)}>
                       {isFree ? t('pricing.ctaFree') : t('pricing.cta')}
                     </a>
                   </Button>

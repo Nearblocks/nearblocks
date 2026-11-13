@@ -19,7 +19,6 @@ export const serverEnvSchema = z.object({
 });
 
 export const publicEnvSchema = z.object({
-  NEXT_PUBLIC_DASHBOARD_URL: z._default(z.url(), 'https://dash.nearblocks.io'),
   NEXT_PUBLIC_LEGACY_UI_URL: z.optional(z.url()),
   NEXT_PUBLIC_MAINNET_URL: z._default(z.url(), 'https://nearblocks.io'),
   NEXT_PUBLIC_NETWORK_ID: z.enum(ONetwork),
@@ -92,13 +91,6 @@ const contractVerifier = {
   },
 } as const;
 
-/** Empty optional URLs (as in .env.example) count as unset, so their defaults apply instead of failing z.url(). */
-export const emptyUrlsAsUnset = (env: NodeJS.ProcessEnv) => ({
-  ...env,
-  NEXT_PUBLIC_DASHBOARD_URL: env.NEXT_PUBLIC_DASHBOARD_URL || undefined,
-  NEXT_PUBLIC_LEGACY_UI_URL: env.NEXT_PUBLIC_LEGACY_UI_URL || undefined,
-});
-
 export const envSchema = z.object({
   ...serverEnvSchema.shape,
   ...publicEnvSchema.shape,
@@ -119,7 +111,6 @@ const verifierSchema = z.object({
 });
 
 const configSchema = z.object({
-  dashboardUrl: publicEnvSchema.shape.NEXT_PUBLIC_DASHBOARD_URL,
   legacyUiUrl: publicEnvSchema.shape.NEXT_PUBLIC_LEGACY_UI_URL,
   mainnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_MAINNET_URL,
   metaTemplate: z.string(),
@@ -153,11 +144,7 @@ let cachedPublicConfig: null | PublicEnv = null;
 export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
-      // Empty means unset, as in emptyUrlsAsUnset.
-      NEXT_PUBLIC_DASHBOARD_URL:
-        process.env.NEXT_PUBLIC_DASHBOARD_URL || undefined,
-      NEXT_PUBLIC_LEGACY_UI_URL:
-        process.env.NEXT_PUBLIC_LEGACY_UI_URL || undefined,
+      NEXT_PUBLIC_LEGACY_UI_URL: process.env.NEXT_PUBLIC_LEGACY_UI_URL,
       NEXT_PUBLIC_MAINNET_URL: process.env.NEXT_PUBLIC_MAINNET_URL,
       NEXT_PUBLIC_NETWORK_ID: process.env.NEXT_PUBLIC_NETWORK_ID,
       NEXT_PUBLIC_REOWN_PROJECT_ID: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID,
@@ -179,7 +166,6 @@ export const getRuntimeConfig = (): Config => {
     network === 'mainnet' ? '%s | NearBlocks' : 'TESTNET | %s | NearBlocks';
 
   return {
-    dashboardUrl: cachedPublicConfig.NEXT_PUBLIC_DASHBOARD_URL,
     legacyUiUrl: cachedPublicConfig.NEXT_PUBLIC_LEGACY_UI_URL,
     mainnetUrl,
     metaTemplate,
