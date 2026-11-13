@@ -11,7 +11,19 @@ import { numberFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
-import { Switch } from '@/ui/switch';
+
+import { BillingToggle } from './billing-toggle';
+import {
+  bestYearlySaving,
+  type BillingInterval,
+  checkoutUrl,
+  DASHBOARD_URL,
+  formatCents,
+  hasYearly,
+  intervalFor,
+  isFreePlan,
+  yearlySaving,
+} from './pricing';
 
 const faqKeys = [
   'subscribe',
@@ -22,21 +34,17 @@ const faqKeys = [
   'activation',
 ] as const;
 
-const formatCents = (cents: number, decimals = 2) => {
-  const value = cents / 100;
-  return value % 1 === 0
-    ? `$${numberFormat(value)}`
-    : `$${numberFormat(value, { maximumFractionDigits: decimals })}`;
-};
-
 type Props = {
   plansPromise: Promise<ApiPlan[]>;
 };
 
 export const Apis = ({ plansPromise }: Props) => {
   const { t } = useLocale('apis');
-  const [isAnnual, setIsAnnual] = useState(true);
+  const [billingInterval, setBillingInterval] =
+    useState<BillingInterval>('month');
   const plans = use(plansPromise);
+  const saving = bestYearlySaving(plans);
+  const anyYearly = plans.some(hasYearly);
 
   return (
     <>
@@ -55,7 +63,7 @@ export const Apis = ({ plansPromise }: Props) => {
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg" variant="secondary">
                 <a
-                  href="https://dash.nearblocks.io"
+                  href={DASHBOARD_URL}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
@@ -95,40 +103,34 @@ export const Apis = ({ plansPromise }: Props) => {
           <p className="mx-auto mb-8 text-balance text-muted-foreground">
             {t('pricing.subheading')}
           </p>
-          <div className="mb-8 flex items-center justify-center gap-3">
-            <span
-              className={isAnnual ? 'text-muted-foreground' : 'font-medium'}
-            >
-              {t('pricing.monthly')}
-            </span>
-            <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
-            <span
-              className={isAnnual ? 'font-medium' : 'text-muted-foreground'}
-            >
-              {t('pricing.annually')}{' '}
-              <span className="text-body-sm text-lime-foreground">
-                {t('pricing.save')}
-              </span>
-            </span>
-          </div>
+          {anyYearly && (
+            <div className="mb-10 flex justify-center">
+              <BillingToggle
+                onChange={setBillingInterval}
+                saving={saving}
+                value={billingInterval}
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {plans.map((plan) => {
               const isFeatured = plan.id === 4;
-              const isFree =
-                plan.price_monthly === 0 && plan.price_annually === 0;
-              const monthlyDisplay = isFree
-                ? '$0'
-                : formatCents(plan.price_monthly, 0);
+              const isFree = isFreePlan(plan);
+              const yearly = hasYearly(plan);
+              const planInterval = intervalFor(plan, billingInterval);
+              const isAnnual = planInterval === 'year';
+              const planSaving = yearlySaving(plan);
+              const monthly = plan.price_monthly ?? 0;
+              const annual = plan.price_annually ?? 0;
+              const monthlyDisplay = isFree ? '$0' : formatCents(monthly, 0);
               const annualMonthlyDisplay = isFree
                 ? '$0'
-                : formatCents(plan.price_annually / 12);
+                : formatCents(annual / 12);
               const annualTotalDisplay = isFree
                 ? ''
-                : `${formatCents(plan.price_annually)}/yr`;
-              const strikethrough = isFree
-                ? ''
-                : formatCents(plan.price_monthly * 12, 0);
+                : `${formatCents(annual)}/yr`;
+              const strikethrough = isFree ? '' : formatCents(monthly * 12, 0);
               const currentPrice = isAnnual
                 ? annualMonthlyDisplay
                 : monthlyDisplay;
@@ -174,11 +176,17 @@ export const Apis = ({ plansPromise }: Props) => {
                         {annualTotalDisplay}
                       </span>
                     </p>
+                  ) : !yearly ? (
+                    <p className="mb-4 h-5 text-body-xs text-muted-foreground">
+                      {billingInterval === 'year' && t('pricing.monthlyOnly')}
+                    </p>
                   ) : (
                     <p className="mb-4 h-5 text-body-xs text-muted-foreground">
                       {t('pricing.or')}{' '}
                       <span className="text-lime-foreground">
-                        {annualMonthlyDisplay} {t('pricing.off')}
+                        {annualMonthlyDisplay}
+                        {planSaving > 0 &&
+                          ` ${t('pricing.off', { percent: planSaving })}`}
                       </span>{' '}
                       {t('pricing.billed')}
                     </p>
@@ -207,12 +215,8 @@ export const Apis = ({ plansPromise }: Props) => {
                     </li>
                   </ul>
                   <Button asChild className="w-full" variant="secondary">
-                    <a
-                      href={`https://dash.nearblocks.io/login?id=${plan?.id}&interval=${
-                        isAnnual ? 'year' : 'month'
-                      }`}
-                    >
-                      {t('pricing.cta')}
+                    <a href={checkoutUrl(plan.id, planInterval)}>
+                      {isFree ? t('pricing.ctaFree') : t('pricing.cta')}
                     </a>
                   </Button>
                 </Card>

@@ -6,8 +6,8 @@ type ApiPlan = {
   limit_per_minute: null | number;
   limit_per_month: null | number;
   limit_per_second: null | number;
-  price_annually: number;
-  price_monthly: number;
+  price_annually: null | number;
+  price_monthly: null | number;
   title: string;
 };
 
