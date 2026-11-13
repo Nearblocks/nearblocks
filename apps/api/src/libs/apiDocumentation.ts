@@ -87,7 +87,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
           config.network === Network.MAINNET
             ? config.mainnetUrl
             : config.testnetUrl
-        }/v3/accounts/wrap.near"</pre></code></p>
+        }/v3/accounts/wrap.near"</code></pre>
         <h2>Legacy API</h2>
         <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. They will be switched off on 22 November 2026. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
         `,

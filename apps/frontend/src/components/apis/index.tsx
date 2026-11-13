@@ -134,9 +134,9 @@ export const Apis = ({ plansPromise }: Props) => {
               const currentPrice = isAnnual
                 ? annualMonthlyDisplay
                 : monthlyDisplay;
-              const limitMinute = isFree ? 6 : plan.limit_per_minute;
-              const limitDay = isFree ? 333 : plan.limit_per_day;
-              const limitMonth = isFree ? 10000 : plan.limit_per_month;
+              const limitMinute = plan.limit_per_minute;
+              const limitDay = plan.limit_per_day;
+              const limitMonth = plan.limit_per_month;
 
               return (
                 <Card
