@@ -53,6 +53,15 @@ export const charts = {
     series: 'Active Contracts',
     yAxis: 'Active Contracts',
   },
+  export: {
+    exitFullscreen: 'Salir de pantalla completa',
+    fullscreen: 'Ver en pantalla completa',
+    jpeg: 'Descargar imagen JPEG',
+    menu: 'Menú del gráfico',
+    png: 'Descargar imagen PNG',
+    print: 'Imprimir gráfico',
+    svg: 'Descargar imagen vectorial SVG',
+  },
   gas: {
     description:
       'NEAR Gas chart shows the total gas used and average gas price per day on the NEAR protocol.',
