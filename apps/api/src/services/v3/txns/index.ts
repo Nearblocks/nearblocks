@@ -382,43 +382,42 @@ const fetchTxnDetail = async (anchor: TxnAnchor): Promise<null | TxnDetail> => {
   };
 };
 
-const detail = responseHandler(
-  response.detail,
-  async (req: RequestValidator<TxnDetailReq>) => {
-    const hash = req.validator.hash;
-    const key = detailCacheKey(hash);
+export const detailData = async (req: RequestValidator<TxnDetailReq>) => {
+  const hash = req.validator.hash;
+  const key = detailCacheKey(hash);
 
+  try {
+    const cached = await redis.parse(key);
+
+    if (cached) return { data: cached as TxnDetail };
+  } catch {
+    // cache read unavailable, fall through to the source
+  }
+
+  const anchor = await resolveTxnAnchor(hash);
+
+  if (!anchor) return { data: null };
+
+  const data = await fetchTxnDetail(anchor);
+
+  if (data) {
     try {
-      const cached = await redis.parse(key);
-
-      if (cached) return { data: cached as TxnDetail };
+      await redis.stringify(
+        key,
+        data,
+        isChainFinalized(anchor.block_timestamp)
+          ? FINALIZED_TTL_S
+          : RECENT_TTL_S,
+      );
     } catch {
-      // cache read unavailable, fall through to the source
+      // cache write unavailable (full/down), serve the uncached result
     }
+  }
 
-    const anchor = await resolveTxnAnchor(hash);
+  return { data };
+};
 
-    if (!anchor) return { data: null };
-
-    const data = await fetchTxnDetail(anchor);
-
-    if (data) {
-      try {
-        await redis.stringify(
-          key,
-          data,
-          isChainFinalized(anchor.block_timestamp)
-            ? FINALIZED_TTL_S
-            : RECENT_TTL_S,
-        );
-      } catch {
-        // cache write unavailable (full/down), serve the uncached result
-      }
-    }
-
-    return { data };
-  },
-);
+const detail = responseHandler(response.detail, detailData);
 
 export default {
   count,

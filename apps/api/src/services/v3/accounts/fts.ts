@@ -32,92 +32,76 @@ import type { RequestValidator } from '#middlewares/validate';
 import { blockRange as blockRangeSql } from '#sql/accounts';
 import sql from '#sql/accounts';
 
-const txns = responseHandler(
-  response.txns,
-  async (req: RequestValidator<AccountFTTxnsReq>) => {
-    const account = req.validator.account;
-    const contract = req.validator.contract;
-    const involved = req.validator.involved;
-    const cause = req.validator.cause;
-    const limit = req.validator.limit;
-    const before = req.validator.before_ts;
-    const next = req.validator.next
-      ? cursors.decode(request.cursor, req.validator.next)
-      : null;
-    const prev = req.validator.prev
-      ? cursors.decode(request.cursor, req.validator.prev)
-      : null;
-    const direction = prev ? 'asc' : 'desc';
-    const cursor = prev || next;
+export const txnsData = async (req: RequestValidator<AccountFTTxnsReq>) => {
+  const account = req.validator.account;
+  const contract = req.validator.contract;
+  const involved = req.validator.involved;
+  const cause = req.validator.cause;
+  const limit = req.validator.limit;
+  const before = req.validator.before_ts;
+  const next = req.validator.next
+    ? cursors.decode(request.cursor, req.validator.next)
+    : null;
+  const prev = req.validator.prev
+    ? cursors.decode(request.cursor, req.validator.prev)
+    : null;
+  const direction = prev ? 'asc' : 'desc';
+  const cursor = prev || next;
 
-    const eventsQuery: WindowListQuery<
+  const eventsQuery: WindowListQuery<
+    Omit<AccountFTTxn, 'block' | 'transaction_hash'>
+  > = (start, end, limit) => {
+    return dbEvents.manyOrNone<
       Omit<AccountFTTxn, 'block' | 'transaction_hash'>
-    > = (start, end, limit) => {
-      return dbEvents.manyOrNone<
-        Omit<AccountFTTxn, 'block' | 'transaction_hash'>
-      >(sql.fts.txns, {
-        account,
-        before,
-        cause,
-        contract,
-        cursor: {
-          index: cursor?.index,
-          shard: cursor?.shard,
-          timestamp: cursor?.timestamp,
-          type: cursor?.type,
-        },
-        direction,
-        end,
-        involved,
-        limit,
-        start,
-      });
-    };
-
-    const events = await rollingWindowList(eventsQuery, {
+    >(sql.fts.txns, {
+      account,
+      before,
+      cause,
+      contract,
+      cursor: {
+        index: cursor?.index,
+        shard: cursor?.shard,
+        timestamp: cursor?.timestamp,
+        type: cursor?.type,
+      },
       direction,
-      end: windowEnd(cursor?.timestamp, before, direction),
-      // Fetch one extra to check if there is a next page
-      limit: limit + 1,
-      start: windowStart(config.eventsStart, cursor?.timestamp, direction),
+      end,
+      involved,
+      limit,
+      start,
     });
+  };
 
-    if (!events.length) {
-      return { data: [] };
-    }
+  const events = await rollingWindowList(eventsQuery, {
+    direction,
+    end: windowEnd(cursor?.timestamp, before, direction),
+    // Fetch one extra to check if there is a next page
+    limit: limit + 1,
+    start: windowStart(config.eventsStart, cursor?.timestamp, direction),
+  });
 
-    const queries = events.map((event) => {
-      return pgp.as.format(sql.fts.txn, event);
-    });
-    const unionQuery = queries.join('\nUNION ALL\n');
-    const txns = await dbBase.manyOrNone<AccountFTTxn>(unionQuery);
+  if (!events.length) {
+    return { data: [] };
+  }
 
-    // If lengths don't match, receipts are missing (maybe delayed).
-    if (txns.length !== events.length) {
-      const merged = unionWith(
-        txns,
-        events,
-        (a, b) =>
-          `${a.block_timestamp}${a.shard_id}${a.event_type}${a.event_index}` ===
-          `${b.block_timestamp}${b.shard_id}${b.event_type}${b.event_index}`,
-      );
+  const queries = events.map((event) => {
+    return pgp.as.format(sql.fts.txn, event);
+  });
+  const unionQuery = queries.join('\nUNION ALL\n');
+  const txns = await dbBase.manyOrNone<AccountFTTxn>(unionQuery);
 
-      return paginateData(
-        merged,
-        limit,
-        direction,
-        (txn) => ({
-          index: txn.event_index,
-          shard: txn.shard_id,
-          timestamp: txn.block_timestamp,
-          type: txn.event_type,
-        }),
-        !!cursor,
-      );
-    }
+  // If lengths don't match, receipts are missing (maybe delayed).
+  if (txns.length !== events.length) {
+    const merged = unionWith(
+      txns,
+      events,
+      (a, b) =>
+        `${a.block_timestamp}${a.shard_id}${a.event_type}${a.event_index}` ===
+        `${b.block_timestamp}${b.shard_id}${b.event_type}${b.event_index}`,
+    );
 
     return paginateData(
-      txns,
+      merged,
       limit,
       direction,
       (txn) => ({
@@ -128,8 +112,23 @@ const txns = responseHandler(
       }),
       !!cursor,
     );
-  },
-);
+  }
+
+  return paginateData(
+    txns,
+    limit,
+    direction,
+    (txn) => ({
+      index: txn.event_index,
+      shard: txn.shard_id,
+      timestamp: txn.block_timestamp,
+      type: txn.event_type,
+    }),
+    !!cursor,
+  );
+};
+
+const txns = responseHandler(response.txns, txnsData);
 
 const count = responseHandler(
   response.count,

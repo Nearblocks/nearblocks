@@ -34,90 +34,91 @@ import { ActionKind } from '#types/enums';
 
 const filterIndexed = (method?: string) => !!method;
 
-const receipts = responseHandler(
-  response.receipts,
-  async (req: RequestValidator<AccountReceiptsReq>) => {
-    const account = req.validator.account;
-    const predecessor = req.validator.predecessor;
-    const receiver = req.validator.receiver;
-    const limit = req.validator.limit;
-    const before = req.validator.before_ts;
-    const method = req.validator.method;
-    const next = req.validator.next
-      ? cursors.decode(request.cursor, req.validator.next)
-      : null;
-    const prev = req.validator.prev
-      ? cursors.decode(request.cursor, req.validator.prev)
-      : null;
-    const direction = prev ? 'asc' : 'desc';
-    const cursor = prev || next;
+export const receiptsData = async (
+  req: RequestValidator<AccountReceiptsReq>,
+) => {
+  const account = req.validator.account;
+  const predecessor = req.validator.predecessor;
+  const receiver = req.validator.receiver;
+  const limit = req.validator.limit;
+  const before = req.validator.before_ts;
+  const method = req.validator.method;
+  const next = req.validator.next
+    ? cursors.decode(request.cursor, req.validator.next)
+    : null;
+  const prev = req.validator.prev
+    ? cursors.decode(request.cursor, req.validator.prev)
+    : null;
+  const direction = prev ? 'asc' : 'desc';
+  const cursor = prev || next;
 
-    if (
-      predecessor &&
-      receiver &&
-      predecessor !== account &&
-      receiver !== account
-    ) {
-      return { data: [] };
-    }
+  if (
+    predecessor &&
+    receiver &&
+    predecessor !== account &&
+    receiver !== account
+  ) {
+    return { data: [] };
+  }
 
-    const receiptsQuery: WindowListQuery<AccountReceipt> = (
-      start,
+  const receiptsQuery: WindowListQuery<AccountReceipt> = (
+    start,
+    end,
+    limit,
+  ) => {
+    const indexed = filterIndexed(method);
+    const cteSql =
+      predecessor || receiver
+        ? indexed
+          ? sql.receipts.filterCte
+          : sql.receipts.cte
+        : indexed
+          ? sql.receipts.filterCteUnion
+          : sql.receipts.cteUnion;
+    const cte = pgp.as.format(cteSql, {
+      before,
+      cursor: {
+        index: cursor?.index,
+        shard: cursor?.shard,
+        timestamp: cursor?.timestamp,
+      },
+      direction,
       end,
       limit,
-    ) => {
-      const indexed = filterIndexed(method);
-      const cteSql =
-        predecessor || receiver
-          ? indexed
-            ? sql.receipts.filterCte
-            : sql.receipts.cte
-          : indexed
-            ? sql.receipts.filterCteUnion
-            : sql.receipts.cteUnion;
-      const cte = pgp.as.format(cteSql, {
-        before,
-        cursor: {
-          index: cursor?.index,
-          shard: cursor?.shard,
-          timestamp: cursor?.timestamp,
-        },
-        direction,
-        end,
-        limit,
-        method,
-        predecessor: predecessor || account,
-        receiver: receiver || account,
-        start,
-      });
-
-      return dbBase.manyOrNone<AccountReceipt>(sql.receipts.receipts, {
-        cte,
-        direction,
-      });
-    };
-
-    const receipts = await rollingWindowList(receiptsQuery, {
-      direction,
-      end: windowEnd(cursor?.timestamp, before, direction),
-      // Fetch one extra to check if there is a next page
-      limit: limit + 1,
-      start: windowStart(config.baseStart, cursor?.timestamp, direction),
+      method,
+      predecessor: predecessor || account,
+      receiver: receiver || account,
+      start,
     });
 
-    return paginateData(
-      receipts,
-      limit,
+    return dbBase.manyOrNone<AccountReceipt>(sql.receipts.receipts, {
+      cte,
       direction,
-      (receipt) => ({
-        index: receipt.index_in_chunk,
-        shard: receipt.shard_id,
-        timestamp: receipt.included_in_block_timestamp,
-      }),
-      !!cursor,
-    );
-  },
-);
+    });
+  };
+
+  const receipts = await rollingWindowList(receiptsQuery, {
+    direction,
+    end: windowEnd(cursor?.timestamp, before, direction),
+    // Fetch one extra to check if there is a next page
+    limit: limit + 1,
+    start: windowStart(config.baseStart, cursor?.timestamp, direction),
+  });
+
+  return paginateData(
+    receipts,
+    limit,
+    direction,
+    (receipt) => ({
+      index: receipt.index_in_chunk,
+      shard: receipt.shard_id,
+      timestamp: receipt.included_in_block_timestamp,
+    }),
+    !!cursor,
+  );
+};
+
+const receipts = responseHandler(response.receipts, receiptsData);
 
 const count = responseHandler(
   response.count,
