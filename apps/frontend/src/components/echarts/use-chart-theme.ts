@@ -10,8 +10,12 @@ import { useTheme } from '@/hooks/use-theme';
 export type ChartTheme = {
   border: string;
   card: string;
+  /** Body font, so chart text matches the page. */
+  font: string;
   foreground: string;
   muted: string;
+  /** Series colours `--highcharts-color-0..15`, in order. */
+  palette: string[];
   /** Primary series colour of the Highcharts charts (brand teal). */
   series: string;
 };
@@ -23,6 +27,8 @@ const VARS = {
   muted: '--muted-foreground',
   series: '--highcharts-color-0',
 } as const;
+
+const PALETTE_SIZE = 16;
 
 let canvas: CanvasRenderingContext2D | null = null;
 
@@ -48,10 +54,21 @@ const readTheme = (): ChartTheme => {
   return {
     border: read(VARS.border),
     card: read(VARS.card),
+    // ECharts writes this into SVG style attributes unescaped.
+    font: `${getComputedStyle(document.body).fontFamily.replaceAll('"', "'")}, sans-serif`,
     foreground: read(VARS.foreground),
     muted: read(VARS.muted),
+    palette: Array.from({ length: PALETTE_SIZE }, (_, i) =>
+      read(`--highcharts-color-${i}`),
+    ),
     series: read(VARS.series),
   };
+};
+
+/** `color` (an rgb()/rgba() string from the theme) at the given opacity. */
+export const alpha = (color: string, opacity: number): string => {
+  const [r, g, b] = color.match(/[\d.]+/g) ?? [];
+  return r === undefined ? color : `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
 export const useChartTheme = (): ChartTheme | null => {

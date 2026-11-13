@@ -67,7 +67,7 @@ export const TxnsChart = dynamic(
 );
 
 export const TxnsChartMini = dynamic(
-  () => import('./txns').then((m) => m.TxnsChartMini),
+  () => import('./txns-mini').then((m) => m.TxnsChartMini),
   { loading: () => <Skeleton className="my-3 h-49 w-full" />, ssr: false },
 );
 

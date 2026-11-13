@@ -1,51 +1,21 @@
 'use client';
 
-import { Tooltip, XAxis, YAxis } from '@highcharts/react';
-import { Area } from '@highcharts/react/series';
-import 'highcharts/esm/modules/exporting.src.js';
-import 'highcharts/esm/modules/stock.src.js';
 import { use, useMemo, useState } from 'react';
 
 import { DailyTxnStats } from 'nb-schemas';
 
-import { AnalyticsChart } from '@/components/address/analytics/chart';
+import { TimeSeriesChart } from '@/components/echarts/time-series';
 import { SkeletonSlot } from '@/components/skeleton';
 import { useLocale } from '@/hooks/use-locale';
-import { dateFormat, numberFormat } from '@/lib/format';
 import { Card, CardContent } from '@/ui/card';
-import { Skeleton } from '@/ui/skeleton';
 
-import { ChartEmpty, ChartHeader } from '.';
+import { ChartEmpty, ChartHeader } from './chart-header';
 import { ChartSkeleton } from './chart-skeleton';
-import { MiniChart } from './mini-chart';
+import { getTxnsData } from './txns-data';
 
 type Props = {
   loading?: boolean;
   statsPromise?: Promise<DailyTxnStats[] | null>;
-};
-
-const getData = (stats: DailyTxnStats[] | null) =>
-  (stats ?? [])
-    .toReversed()
-    .filter((item) => item.txns !== null)
-    .map(
-      (item) =>
-        [new Date(item.date).getTime(), +item.txns!] as [number, number],
-    );
-
-const yAxisLabel = {
-  formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
-    return numberFormat(+this.value, { notation: 'compact' });
-  },
-};
-
-const tooltipFormatter = function (this: Highcharts.Point) {
-  const header = `<span>${dateFormat(this.x, 'MMM D, YYYY')}</span><br/>`;
-  const rows = (this.points as Array<Highcharts.Point>)?.map((point, index) => {
-    const val = numberFormat(point.y, { notation: 'compact' });
-    return `<span class="flex items-center gap-x-1"><span style="color:var(--highcharts-color-${index})">\u25CF</span> ${point.series.name}: <span class="font-bold">${val}</span></span>`;
-  });
-  return header + (rows?.join('') ?? '');
 };
 
 export const TxnsChart = ({ loading, statsPromise }: Props) => {
@@ -53,7 +23,11 @@ export const TxnsChart = ({ loading, statsPromise }: Props) => {
   const [logView, setLogView] = useState(false);
   const stats = !loading && statsPromise ? use(statsPromise) : null;
 
-  const data = useMemo(() => getData(stats), [stats]);
+  const data = useMemo(() => getTxnsData(stats), [stats]);
+  const series = useMemo(
+    () => [{ data, name: t('txns.series'), type: 'area' as const }],
+    [data, t],
+  );
   const isEmpty = !data.length;
 
   return (
@@ -70,54 +44,18 @@ export const TxnsChart = ({ loading, statsPromise }: Props) => {
               isEmpty ? (
                 <ChartEmpty />
               ) : (
-                <AnalyticsChart height={560}>
-                  <XAxis className="stroke-0" type="datetime" />
-                  <YAxis
-                    className="stroke-0"
-                    labels={yAxisLabel}
-                    opposite={false}
-                    title={{ text: t('txns.yAxis') }}
-                    type={logView ? 'logarithmic' : 'linear'}
-                  />
-                  <Area.Series
-                    data={data}
-                    options={{ name: t('txns.series') }}
-                  />
-                  <Tooltip formatter={tooltipFormatter} shared />
-                </AnalyticsChart>
+                <TimeSeriesChart
+                  filename="near-daily-transactions"
+                  label={t('txns.heading')}
+                  logScale={logView}
+                  series={series}
+                  yAxisName={t('txns.yAxis')}
+                />
               )
             }
           </SkeletonSlot>
         </div>
       </CardContent>
     </Card>
-  );
-};
-
-export const TxnsChartMini = ({ loading, statsPromise }: Props) => {
-  const { t } = useLocale('charts');
-  const stats = !loading && statsPromise ? use(statsPromise) : null;
-
-  const data = useMemo(() => getData(stats), [stats]);
-  const isEmpty = !data.length;
-
-  return (
-    <div className="h-55">
-      <SkeletonSlot
-        fallback={<Skeleton className="my-3 h-49 w-full" />}
-        loading={!!loading}
-      >
-        {() =>
-          isEmpty ? (
-            <ChartEmpty />
-          ) : (
-            <MiniChart height={220}>
-              <Area.Series data={data} options={{ name: t('txns.series') }} />
-              <Tooltip formatter={tooltipFormatter} shared />
-            </MiniChart>
-          )
-        }
-      </SkeletonSlot>
-    </div>
   );
 };

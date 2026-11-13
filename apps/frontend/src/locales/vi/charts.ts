@@ -53,6 +53,15 @@ export const charts = {
     series: 'Active Contracts',
     yAxis: 'Active Contracts',
   },
+  export: {
+    exitFullscreen: 'Thoát toàn màn hình',
+    fullscreen: 'Xem toàn màn hình',
+    jpeg: 'Tải ảnh JPEG',
+    menu: 'Menu biểu đồ',
+    png: 'Tải ảnh PNG',
+    print: 'In biểu đồ',
+    svg: 'Tải ảnh vector SVG',
+  },
   gas: {
     description:
       'NEAR Gas chart shows the total gas used and average gas price per day on the NEAR protocol.',
