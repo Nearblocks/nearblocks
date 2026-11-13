@@ -104,20 +104,11 @@ const rateLimiter = catchAsync(
           WHERE
             s.user_id = ${id}
             AND p.type = 0
-            AND (
-              (
-                s.status IN (
-                  ${SubscriptionStatus.ACTIVE},
-                  ${SubscriptionStatus.TRIALING}
-                )
-                AND ${date} BETWEEN s.start_date AND s.end_date
-              )
-              -- failed renewal: keep the plan for 7 days while Stripe retries
-              OR (
-                s.status = ${SubscriptionStatus.PAST_DUE}
-                AND ${date} < s.start_date + 7
-              )
+            AND s.status IN (
+              ${SubscriptionStatus.ACTIVE},
+              ${SubscriptionStatus.TRIALING}
             )
+            AND ${date} BETWEEN s.start_date AND s.end_date
           ORDER BY
             s.end_date DESC
           LIMIT
