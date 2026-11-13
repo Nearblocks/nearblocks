@@ -17,6 +17,8 @@ export const resetMeta = async () => {
   }
 };
 
+// Latest effective event per account deployed in the last 2 days. A repeat
+// UniversalStateInit (INIT whose previous event isn't absent/DELETE) is a no-op.
 export const fetchDeployments = async () => {
   return dbContracts.raw<Raw<MetaContract>>(
     `
@@ -25,26 +27,52 @@ export const fetchDeployments = async () => {
       FROM
         (
           SELECT DISTINCT
-            ON (contract_account_id) contract_account_id,
-            event_type
+            ON (c.contract_account_id) c.contract_account_id,
+            c.event_type
           FROM
-            contract_code_events
+            contract_code_events c
           WHERE
-            block_timestamp > (
+            c.block_timestamp > (
               EXTRACT(
                 EPOCH
                 FROM
                   NOW() - INTERVAL '2 days'
               ) * 1e9
             )::BIGINT
+            AND (
+              c.event_type <> 'INIT'
+              OR COALESCE(
+                (
+                  SELECT
+                    p.event_type
+                  FROM
+                    contract_code_events p
+                  WHERE
+                    p.contract_account_id = c.contract_account_id
+                    AND p.block_timestamp <= c.block_timestamp
+                    AND (p.block_timestamp, p.shard_id, p.index_in_chunk) < (
+                      c.block_timestamp,
+                      c.shard_id,
+                      c.index_in_chunk
+                    )
+                  ORDER BY
+                    p.block_timestamp DESC,
+                    p.shard_id DESC,
+                    p.index_in_chunk DESC
+                  LIMIT
+                    1
+                ),
+                'DELETE'
+              ) = 'DELETE'
+            )
           ORDER BY
-            contract_account_id,
-            block_timestamp DESC,
-            shard_id DESC,
-            index_in_chunk DESC
+            c.contract_account_id,
+            c.block_timestamp DESC,
+            c.shard_id DESC,
+            c.index_in_chunk DESC
         ) latest
       WHERE
-        latest.event_type = 'UPDATE'
+        latest.event_type IN ('UPDATE', 'INIT')
     `,
   );
 };
