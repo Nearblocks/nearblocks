@@ -6,6 +6,7 @@ import { use, useState } from 'react';
 
 import { Link } from '@/components/link';
 import type { ApiPlan } from '@/data/plans';
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { numberFormat } from '@/lib/format';
 import { Button } from '@/ui/button';
@@ -18,6 +19,8 @@ import {
   type BillingInterval,
   checkoutUrl,
   formatCents,
+  hasYearly,
+  intervalFor,
   isFreePlan,
   yearlySaving,
 } from './pricing';
@@ -40,8 +43,9 @@ export const Apis = ({ plansPromise }: Props) => {
   const [billingInterval, setBillingInterval] =
     useState<BillingInterval>('month');
   const plans = use(plansPromise);
-  const isAnnual = billingInterval === 'year';
+  const dashboardUrl = useConfig((s) => s.config.dashboardUrl);
   const saving = bestYearlySaving(plans);
+  const anyYearly = plans.some(hasYearly);
 
   return (
     <>
@@ -60,7 +64,7 @@ export const Apis = ({ plansPromise }: Props) => {
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg" variant="secondary">
                 <a
-                  href="https://dash.nearblocks.io"
+                  href={dashboardUrl}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
@@ -100,31 +104,34 @@ export const Apis = ({ plansPromise }: Props) => {
           <p className="mx-auto mb-8 text-balance text-muted-foreground">
             {t('pricing.subheading')}
           </p>
-          <div className="mb-10 flex justify-center">
-            <BillingToggle
-              onChange={setBillingInterval}
-              saving={saving}
-              value={billingInterval}
-            />
-          </div>
+          {anyYearly && (
+            <div className="mb-10 flex justify-center">
+              <BillingToggle
+                onChange={setBillingInterval}
+                saving={saving}
+                value={billingInterval}
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             {plans.map((plan) => {
               const isFeatured = plan.id === 4;
               const isFree = isFreePlan(plan);
+              const yearly = hasYearly(plan);
+              const planInterval = intervalFor(plan, billingInterval);
+              const isAnnual = planInterval === 'year';
               const planSaving = yearlySaving(plan);
-              const monthlyDisplay = isFree
-                ? '$0'
-                : formatCents(plan.price_monthly, 0);
+              const monthly = plan.price_monthly ?? 0;
+              const annual = plan.price_annually ?? 0;
+              const monthlyDisplay = isFree ? '$0' : formatCents(monthly, 0);
               const annualMonthlyDisplay = isFree
                 ? '$0'
-                : formatCents(plan.price_annually / 12);
+                : formatCents(annual / 12);
               const annualTotalDisplay = isFree
                 ? ''
-                : `${formatCents(plan.price_annually)}/yr`;
-              const strikethrough = isFree
-                ? ''
-                : formatCents(plan.price_monthly * 12, 0);
+                : `${formatCents(annual)}/yr`;
+              const strikethrough = isFree ? '' : formatCents(monthly * 12, 0);
               const currentPrice = isAnnual
                 ? annualMonthlyDisplay
                 : monthlyDisplay;
@@ -170,6 +177,8 @@ export const Apis = ({ plansPromise }: Props) => {
                         {annualTotalDisplay}
                       </span>
                     </p>
+                  ) : !yearly ? (
+                    <p className="mb-4 h-5" />
                   ) : (
                     <p className="mb-4 h-5 text-body-xs text-muted-foreground">
                       {t('pricing.or')}{' '}
@@ -205,7 +214,7 @@ export const Apis = ({ plansPromise }: Props) => {
                     </li>
                   </ul>
                   <Button asChild className="w-full" variant="secondary">
-                    <a href={checkoutUrl(plan.id, billingInterval)}>
+                    <a href={checkoutUrl(dashboardUrl, plan.id, planInterval)}>
                       {isFree ? t('pricing.ctaFree') : t('pricing.cta')}
                     </a>
                   </Button>

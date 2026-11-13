@@ -3,6 +3,7 @@
 import { CircleCheck } from 'lucide-react';
 import Image from 'next/image';
 
+import { useConfig } from '@/hooks/use-config';
 import { useLocale } from '@/hooks/use-locale';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/ui/button';
@@ -12,6 +13,7 @@ import { Separator } from '@/ui/separator';
 export const Advertise = () => {
   const theme = useTheme();
   const { t } = useLocale('advertise');
+  const dashboardUrl = useConfig((s) => s.config.dashboardUrl);
 
   return (
     <>
@@ -24,7 +26,7 @@ export const Advertise = () => {
           <p className="mb-4 text-muted-foreground">{t('description')}</p>
           <p className="mb-8 text-muted-foreground">{t('body')}</p>
           <Button asChild size="lg" variant="secondary">
-            <a href="https://dash.nearblocks.io/login">{t('cta')}</a>
+            <a href={`${dashboardUrl}/login`}>{t('cta')}</a>
           </Button>
         </div>
         <div className="flex-1">

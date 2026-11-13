@@ -19,6 +19,7 @@ export const serverEnvSchema = z.object({
 });
 
 export const publicEnvSchema = z.object({
+  NEXT_PUBLIC_DASHBOARD_URL: z._default(z.url(), 'https://dash.nearblocks.io'),
   NEXT_PUBLIC_LEGACY_UI_URL: z.optional(z.url()),
   NEXT_PUBLIC_MAINNET_URL: z._default(z.url(), 'https://nearblocks.io'),
   NEXT_PUBLIC_NETWORK_ID: z.enum(ONetwork),
@@ -111,6 +112,7 @@ const verifierSchema = z.object({
 });
 
 const configSchema = z.object({
+  dashboardUrl: publicEnvSchema.shape.NEXT_PUBLIC_DASHBOARD_URL,
   legacyUiUrl: publicEnvSchema.shape.NEXT_PUBLIC_LEGACY_UI_URL,
   mainnetUrl: publicEnvSchema.shape.NEXT_PUBLIC_MAINNET_URL,
   metaTemplate: z.string(),
@@ -144,6 +146,7 @@ let cachedPublicConfig: null | PublicEnv = null;
 export const getRuntimeConfig = (): Config => {
   if (!cachedPublicConfig) {
     cachedPublicConfig = publicEnvSchema.parse({
+      NEXT_PUBLIC_DASHBOARD_URL: process.env.NEXT_PUBLIC_DASHBOARD_URL,
       NEXT_PUBLIC_LEGACY_UI_URL: process.env.NEXT_PUBLIC_LEGACY_UI_URL,
       NEXT_PUBLIC_MAINNET_URL: process.env.NEXT_PUBLIC_MAINNET_URL,
       NEXT_PUBLIC_NETWORK_ID: process.env.NEXT_PUBLIC_NETWORK_ID,
@@ -166,6 +169,7 @@ export const getRuntimeConfig = (): Config => {
     network === 'mainnet' ? '%s | NearBlocks' : 'TESTNET | %s | NearBlocks';
 
   return {
+    dashboardUrl: cachedPublicConfig.NEXT_PUBLIC_DASHBOARD_URL,
     legacyUiUrl: cachedPublicConfig.NEXT_PUBLIC_LEGACY_UI_URL,
     mainnetUrl,
     metaTemplate,
