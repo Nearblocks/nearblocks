@@ -7,6 +7,7 @@ export default {
   contractTxnCountCagg: sql('queries/nfts/contractTxnCountCagg.sql'),
   contractTxns: sql('queries/nfts/contractTxns.sql'),
   count: sql('queries/nfts/count.sql'),
+  hasMeta: sql('queries/nfts/hasMeta.sql'),
   holderCount: sql('queries/nfts/holderCount.sql'),
   holders: sql('queries/nfts/holders.sql'),
   list: sql('queries/nfts/list.sql'),

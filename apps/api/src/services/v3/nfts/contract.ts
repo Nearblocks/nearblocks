@@ -81,6 +81,12 @@ const txns = responseHandler(
       });
     };
 
+    // Contracts without metadata have every row dropped by the meta join, so
+    // the window scan would read their whole history to return nothing.
+    if (!(await dbEvents.oneOrNone(sql.hasMeta, { contract }))) {
+      return { data: [] };
+    }
+
     const events = await rollingWindowList(eventsQuery, {
       direction,
       end: windowEnd(cursor?.timestamp, before, direction),
