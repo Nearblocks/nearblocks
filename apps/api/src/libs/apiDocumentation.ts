@@ -9,6 +9,7 @@ import { Network } from 'nb-types';
 
 import config from '#config';
 import { withResponses } from '#libs/apiDocs/responses';
+import logger from '#libs/logger';
 
 const scalarCss = `
   .light-mode .introduction-section {
@@ -261,9 +262,15 @@ const apiDocumentation = async (app: Application, dir: string) => {
     },
   };
 
-  const mainSpec = withResponses(
-    swaggerJsdoc(mainOptions) as Record<string, unknown>,
-  );
+  const baseSpec = swaggerJsdoc(mainOptions) as Record<string, unknown>;
+  let mainSpec = baseSpec;
+
+  // Docs must never take the API down: fall back to the spec without examples.
+  try {
+    mainSpec = withResponses(baseSpec);
+  } catch (error) {
+    logger.error(error, 'api docs: failed to build response schemas');
+  }
   const legacySpec = swaggerJsdoc(legacyOptions);
 
   // Specs are static per deploy: serialise once and let browsers/CDN cache.
