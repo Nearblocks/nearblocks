@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "@sentry/node": "catalog:",
-    "envalid": "catalog:"
+    "envalid": "catalog:",
+    "nb-prom": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

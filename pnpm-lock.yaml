@@ -1276,6 +1276,9 @@ importers:
       envalid:
         specifier: 'catalog:'
         version: 8.1.0
+      nb-prom:
+        specifier: workspace:*
+        version: link:../../packages/nb-prom
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
