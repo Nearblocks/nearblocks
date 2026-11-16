@@ -3,6 +3,7 @@ import { sleep } from 'nb-utils';
 
 import config from '#config';
 import knex, { baseKnex } from '#libs/knex';
+import metrics from '#libs/prom';
 import Sentry from '#libs/sentry';
 import { big } from '#libs/utils';
 import { IntentsSwap } from '#types/types';
@@ -115,7 +116,11 @@ const swaps = async () => {
         .onConflict('key')
         .merge();
     });
+
+    metrics.sync.lastBlockTimestamp.set(Number(end / 1_000_000_000n));
+    metrics.perf.blocksProcessedTotal.inc();
   } catch (error) {
+    metrics.errors.errorsTotal.inc({ type: 'processing' });
     logger.error(error, 'syncIntentsSwaps');
     Sentry.captureException(error);
     await sleep(5000);
