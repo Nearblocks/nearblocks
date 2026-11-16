@@ -94,21 +94,40 @@ const withoutStrayMeta = (example: unknown) => {
   return Array.isArray(rest.data) ? { ...rest, meta } : rest;
 };
 
+// Recursive (lazy) schemas come with root-relative `#/$defs/N` refs; move
+// those definitions to `components.schemas`, namespaced by response name.
+const hoistDefs = <T>(value: T, name: string): T =>
+  JSON.parse(
+    JSON.stringify(value).replaceAll(
+      '"#/$defs/',
+      `"#/components/schemas/${name}.`,
+    ),
+  );
+
 const buildResponse = (name: string, apiPath: string) => {
   const schema = toJsonSchema(resolveSchema(name), {
     errorMode: 'ignore',
   }) as Json;
-  const { $schema: _, ...jsonSchema } = schema;
+  const { $defs = {}, $schema: _, ...jsonSchema } = schema;
   const example = exampleFor(jsonSchema, '', contextFor(apiPath));
+  const schemas = Object.fromEntries(
+    Object.entries($defs as Json).map(([key, def]) => [
+      `${name}.${key}`,
+      hoistDefs(def, name),
+    ]),
+  );
 
   return {
-    content: {
-      'application/json': {
-        example: withoutStrayMeta(example),
-        schema: jsonSchema,
+    response: {
+      content: {
+        'application/json': {
+          example: withoutStrayMeta(example),
+          schema: hoistDefs(jsonSchema, name),
+        },
       },
+      description: 'Success response',
     },
-    description: 'Success response',
+    schemas,
   };
 };
 
@@ -139,6 +158,7 @@ const withParamExamples = (params: Json[], apiPath: string) =>
  */
 export const withResponses = (spec: Json) => {
   const paths = spec.paths as Record<string, Record<string, Json>>;
+  const schemas: Record<string, unknown> = {};
   const responses: Record<string, unknown> = {
     RateLimited: errorResponse('Rate limit exceeded for your plan', {
       message:
@@ -160,7 +180,12 @@ export const withResponses = (spec: Json) => {
 
           if (typeof ref === 'string' && ref.startsWith(REF_PREFIX)) {
             const name = ref.slice(REF_PREFIX.length);
-            responses[name] ??= buildResponse(name, apiPath);
+
+            if (!responses[name]) {
+              const built = buildResponse(name, apiPath);
+              responses[name] = built.response;
+              Object.assign(schemas, built.schemas);
+            }
           }
 
           return [
@@ -189,7 +214,7 @@ export const withResponses = (spec: Json) => {
 
   return {
     ...spec,
-    components: { ...components, responses },
+    components: { ...components, responses, schemas },
     paths: newPaths,
   };
 };
