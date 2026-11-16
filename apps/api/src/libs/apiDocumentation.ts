@@ -186,11 +186,6 @@ const apiDocumentation = async (app: Application, dir: string) => {
             'Current validators, their stake, uptime, and produced blocks and chunks.',
           name: 'Validators',
         },
-        {
-          description:
-            'Wallet helper endpoints: staking pools, deposits, accounts by public key, and token/NFT holdings.',
-          name: 'Kitwallet',
-        },
       ],
       'x-tagGroups': [
         {
@@ -214,7 +209,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
         {
           name: 'Other',
-          tags: ['Keys', 'Search', 'Multichain', 'Kitwallet'],
+          tags: ['Keys', 'Search', 'Multichain'],
         },
       ],
     },

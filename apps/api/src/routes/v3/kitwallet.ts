@@ -17,6 +17,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/stakingPools:
    *   get:
    *     summary: Get all staking pools
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns the account IDs of all known
    *       staking pools as a plain array.
@@ -33,6 +34,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/staking-deposits/{account}:
    *   get:
    *     summary: Get staking deposits for an account
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns the net amount an account has
    *       deposited (deposits minus withdrawals) into each staking pool it has
@@ -61,6 +63,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/publicKey/{key}/accounts:
    *   get:
    *     summary: Get accounts by public key
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns the IDs of existing accounts that
    *       currently have the given public key as an access key.
@@ -88,6 +91,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyTokens:
    *   get:
    *     summary: Get likely tokens for an account
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns NEP-141 token contracts the
    *       account has interacted with, as a plain array of contract IDs.
@@ -115,6 +119,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyTokensFromBlock:
    *   get:
    *     summary: Get likely tokens for an account from block
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns NEP-141 token contracts the
    *       account has interacted with after fromBlockTimestamp, plus
@@ -150,6 +155,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyNFTs:
    *   get:
    *     summary: Get likely NFTs for an account
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns NEP-171 NFT contracts the account
    *       has interacted with, as a plain array of contract IDs.
@@ -177,6 +183,7 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyNFTsFromBlock:
    *   get:
    *     summary: Get likely NFTs for an account from block
+   *     x-internal: true
    *     description: >-
    *       Kitwallet-compatible endpoint. Returns NEP-171 NFT contracts the account
    *       has interacted with after fromBlockTimestamp, plus lastBlockTimestamp to
