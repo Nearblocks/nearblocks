@@ -20,6 +20,10 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}:
    *   get:
    *     summary: Get FT contract details
+   *     description: >-
+   *       Returns NEP-141 token metadata (name, symbol, decimals, icon), supply,
+   *       price and market data, and social links for a fungible token contract.
+   *       Supply values are raw integer strings; apply decimals.
    *     tags:
    *       - FTs
    *     parameters:
@@ -31,7 +35,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.contract'
    */
   route.get('/:contract', validate(request.contract), service.contract);
 
@@ -40,6 +44,13 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/txns:
    *   get:
    *     summary: List FT contract transfers
+   *     description: >-
+   *       Returns transfers of a NEP-141 token, newest first. Without affected,
+   *       each transfer appears once (receiving side, plus burns); with affected,
+   *       both incoming and outgoing balance changes for that account are
+   *       returned. Amounts are raw integer strings; timestamps are nanoseconds.
+   *       Paginate with the next/prev cursors from meta.next_page and
+   *       meta.prev_page.
    *     tags:
    *       - FTs
    *     parameters:
@@ -51,7 +62,7 @@ const routes = (app: Router) => {
    *           type: string
    *       - in: query
    *         name: affected
-   *         description: Affected account to filter results by
+   *         description: Account ID; only return balance changes of this account (incoming and outgoing)
    *         schema:
    *           type: string
    *       - in: query
@@ -81,7 +92,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.contractTxns'
    */
   route.get('/:contract/txns', validate(request.contractTxns), service.txns);
 
@@ -90,6 +101,11 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/txns/count:
    *   get:
    *     summary: Get FT contract transfer count
+   *     x-internal: true
+   *     description: >-
+   *       Returns the total count for the matching /v3/fts/{contract}/txns list.
+   *       Counts are capped at 10,000; larger values are approximate and end with
+   *       a '+'.
    *     tags:
    *       - FTs
    *     parameters:
@@ -101,7 +117,7 @@ const routes = (app: Router) => {
    *           type: string
    *       - in: query
    *         name: affected
-   *         description: Affected account to filter results by
+   *         description: Account ID; only return balance changes of this account (incoming and outgoing)
    *         schema:
    *           type: string
    *       - in: query
@@ -113,7 +129,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.contractTxnCount'
    */
   route.get(
     '/:contract/txns/count',
@@ -127,6 +143,11 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/holders:
    *   get:
    *     summary: List FT contract holders
+   *     description: >-
+   *       Returns accounts holding a non-zero balance of a NEP-141 token, ordered
+   *       by balance descending, then account ID. Amounts are raw integer strings;
+   *       apply the token's decimals. Paginate with the next/prev cursors from
+   *       meta.next_page and meta.prev_page.
    *     tags:
    *       - FTs
    *     parameters:
@@ -156,7 +177,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.contractHolders'
    */
   route.get(
     '/:contract/holders',
@@ -169,6 +190,10 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/holders/count:
    *   get:
    *     summary: Get FT contract holder count
+   *     x-internal: true
+   *     description: >-
+   *       Returns the total count for the /v3/fts/{contract}/holders list, read
+   *       from the precomputed token list.
    *     tags:
    *       - FTs
    *     parameters:
@@ -180,7 +205,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.contractHolderCount'
    */
   route.get(
     '/:contract/holders/count',
@@ -194,6 +219,11 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/stats/overview:
    *   get:
    *     summary: Get FT contract stats overview
+   *     description: >-
+   *       Returns lifetime transfer activity for a token: first and last active
+   *       day, total transfers, active and unique days, and the longest streak of
+   *       consecutive active days. Returns null if the token has no recorded
+   *       transfers.
    *     tags:
    *       - FTs
    *     parameters:
@@ -205,7 +235,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.stats.overview'
    */
   route.get(
     '/:contract/stats/overview',
@@ -218,6 +248,10 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/stats/heatmap:
    *   get:
    *     summary: Get FT contract transfer heatmap (last 11 months, daily)
+   *     description: >-
+   *       Returns daily transfer counts and unique sender/receiver counts for a
+   *       token from the start of the month 11 months ago until today, newest day
+   *       first. Dates are UTC YYYY-MM-DD.
    *     tags:
    *       - FTs
    *     parameters:
@@ -229,7 +263,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.stats.heatmap'
    */
   route.get(
     '/:contract/stats/heatmap',
@@ -242,6 +276,10 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/stats/transfers:
    *   get:
    *     summary: Get FT contract daily transfer stats
+   *     description: >-
+   *       Returns daily transfer statistics for a token (transfer count, raw
+   *       transferred amount, unique senders, receivers and accounts), newest day
+   *       first. Dates are UTC YYYY-MM-DD.
    *     tags:
    *       - FTs
    *     parameters:
@@ -261,7 +299,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.stats.transfers'
    */
   route.get(
     '/:contract/stats/transfers',
@@ -274,6 +312,10 @@ const routes = (app: Router) => {
    * /v3/fts/{contract}/stats/{account}/transfers:
    *   get:
    *     summary: Get daily FT transfer stats for a specific account on a contract
+   *     description: >-
+   *       Returns daily transfer statistics for one account on a token (transfer
+   *       count, raw amounts in and out, unique counterparties in and out), newest
+   *       day first. Dates are UTC YYYY-MM-DD.
    *     tags:
    *       - FTs
    *     parameters:
@@ -299,7 +341,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.stats.accountTransfers'
    */
   route.get(
     '/:contract/stats/:account/transfers',

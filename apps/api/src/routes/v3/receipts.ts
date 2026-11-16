@@ -18,12 +18,16 @@ const routes = (app: Router) => {
    * /v3/receipts:
    *   get:
    *     summary: List receipts
+   *     description: >-
+   *       Returns receipts newest first, optionally limited to one block or to
+   *       those before a timestamp. Paginate by passing meta.next_page as next
+   *       (or meta.prev_page as prev). Timestamps are nanosecond strings.
    *     tags:
    *       - Receipts
    *     parameters:
    *       - in: query
    *         name: block
-   *         description: Block hash to filter results by
+   *         description: Only return receipts included in this block hash
    *         schema:
    *           type: string
    *       - in: query
@@ -53,7 +57,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/receipts.receipts'
    */
   route.get('/', validate(request.receipts), service.receipts);
 
@@ -80,7 +84,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/receipts.count'
    */
   route.get('/count', internalOnly, validate(request.count), service.count);
 };

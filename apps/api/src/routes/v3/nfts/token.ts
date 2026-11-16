@@ -18,6 +18,10 @@ const routes = (app: Router) => {
    * /v3/nfts/{contract}/tokens:
    *   get:
    *     summary: List NFT tokens in a contract
+   *     description: >-
+   *       Returns tokens of a NEP-171 contract with title, media, reference and
+   *       current owner, ordered by token ID ascending. Paginate forward with the
+   *       next cursor from meta.next_page.
    *     tags:
    *       - NFTs
    *     parameters:
@@ -39,15 +43,15 @@ const routes = (app: Router) => {
    *           type: string
    *       - in: query
    *         name: limit
-   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         description: The number of items to return (max 24)
    *         schema:
    *           type: integer
    *           minimum: 1
-   *           maximum: 100
-   *           default: 25
+   *           maximum: 24
+   *           default: 24
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.tokens.list'
    */
   route.get('/:contract/tokens', validate(request.list), service.list);
 
@@ -56,6 +60,9 @@ const routes = (app: Router) => {
    * /v3/nfts/{contract}/tokens/count:
    *   get:
    *     summary: Get NFT token count in a contract
+   *     x-internal: true
+   *     description: >-
+   *       Returns the total count for the /v3/nfts/{contract}/tokens list.
    *     tags:
    *       - NFTs
    *     parameters:
@@ -67,7 +74,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.tokens.count'
    */
   route.get(
     '/:contract/tokens/count',
@@ -81,6 +88,8 @@ const routes = (app: Router) => {
    * /v3/nfts/{contract}/tokens/{token}:
    *   get:
    *     summary: Get NFT token details
+   *     description: >-
+   *       Returns metadata and the current owner of a single NEP-171 token.
    *     tags:
    *       - NFTs
    *     parameters:
@@ -93,12 +102,12 @@ const routes = (app: Router) => {
    *       - in: path
    *         name: token
    *         required: true
-   *         description: Token ID
+   *         description: NFT token ID within the contract
    *         schema:
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.tokens.token'
    */
   route.get('/:contract/tokens/:token', validate(request.token), service.token);
 
@@ -107,6 +116,10 @@ const routes = (app: Router) => {
    * /v3/nfts/{contract}/tokens/{token}/txns:
    *   get:
    *     summary: List NFT token transfers
+   *     description: >-
+   *       Returns transfers, mints and burns of a single NEP-171 token, newest
+   *       first. Timestamps are nanoseconds. Paginate with the next/prev cursors
+   *       from meta.next_page and meta.prev_page.
    *     tags:
    *       - NFTs
    *     parameters:
@@ -119,7 +132,7 @@ const routes = (app: Router) => {
    *       - in: path
    *         name: token
    *         required: true
-   *         description: Token ID
+   *         description: NFT token ID within the contract
    *         schema:
    *           type: string
    *       - in: query
@@ -149,7 +162,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.tokens.txns'
    */
   route.get(
     '/:contract/tokens/:token/txns',
@@ -162,6 +175,11 @@ const routes = (app: Router) => {
    * /v3/nfts/{contract}/tokens/{token}/txns/count:
    *   get:
    *     summary: Get NFT token transfer count
+   *     x-internal: true
+   *     description: >-
+   *       Returns the total count for the matching
+   *       /v3/nfts/{contract}/tokens/{token}/txns list. Counts are capped at
+   *       10,000; larger values end with a '+'.
    *     tags:
    *       - NFTs
    *     parameters:
@@ -174,7 +192,7 @@ const routes = (app: Router) => {
    *       - in: path
    *         name: token
    *         required: true
-   *         description: Token ID
+   *         description: NFT token ID within the contract
    *         schema:
    *           type: string
    *       - in: query
@@ -186,7 +204,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.tokens.txnCount'
    */
   route.get(
     '/:contract/tokens/:token/txns/count',

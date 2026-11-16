@@ -17,6 +17,11 @@ const routes = (app: Router) => {
    * /v3/validators:
    *   get:
    *     summary: List validators
+   *     description: >-
+   *       Returns validators from the current epoch data with stake, block and
+   *       chunk production, fees and pool metadata, ordered by current epoch
+   *       stake (highest first, nulls last). Paginate by passing meta.next_page
+   *       as next (or meta.prev_page as prev). Stakes are yoctoNEAR strings.
    *     tags:
    *       - Validators
    *     parameters:
@@ -32,7 +37,7 @@ const routes = (app: Router) => {
    *           type: string
    *       - in: query
    *         name: limit
-   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         description: Number of validators to return. Validator endpoints always use 1 rate-limit credit
    *         schema:
    *           type: integer
    *           minimum: 1
@@ -40,7 +45,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/validators.list'
    */
   route.get('/', validate(request.list), service.list);
 
@@ -49,11 +54,15 @@ const routes = (app: Router) => {
    * /v3/validators/info:
    *   get:
    *     summary: Get validator network info
+   *     description: >-
+   *       Returns epoch-level network info. Current and next epoch seat price,
+   *       total stake (yoctoNEAR), epoch start height and timestamp, epoch
+   *       length, protocol version, last epoch APY and validator counts.
    *     tags:
    *       - Validators
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/validators.info'
    */
   route.get('/info', service.info);
 
@@ -62,18 +71,21 @@ const routes = (app: Router) => {
    * /v3/validators/{account}:
    *   get:
    *     summary: Get validator details
+   *     description: >-
+   *       Returns a single validator with the same fields as the list endpoint.
+   *       data is null if the account is not in the current validator data.
    *     tags:
    *       - Validators
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Validator account ID
+   *         description: Validator staking pool account ID
    *         schema:
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/validators.detail'
    */
   route.get('/:account', validate(request.detail), service.detail);
 
@@ -82,25 +94,28 @@ const routes = (app: Router) => {
    * /v3/validators/{account}/stats/blocks:
    *   get:
    *     summary: Get validator daily blocks produced
+   *     description: >-
+   *       Returns the number of blocks produced by the validator per UTC day,
+   *       newest first.
    *     tags:
    *       - Validators
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Validator account ID
+   *         description: Validator staking pool account ID
    *         schema:
    *           type: string
    *       - in: query
    *         name: limit
-   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         description: Number of days to return. Omit to return all available days
    *         schema:
    *           type: integer
    *           minimum: 1
    *           maximum: 365
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/validators.blocks'
    */
   route.get('/:account/stats/blocks', validate(request.blocks), service.blocks);
 
@@ -109,25 +124,28 @@ const routes = (app: Router) => {
    * /v3/validators/{account}/stats/chunks:
    *   get:
    *     summary: Get validator daily chunks produced
+   *     description: >-
+   *       Returns the number of chunks produced by the validator per UTC day,
+   *       newest first.
    *     tags:
    *       - Validators
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Validator account ID
+   *         description: Validator staking pool account ID
    *         schema:
    *           type: string
    *       - in: query
    *         name: limit
-   *         description: The number of items to return. Each increment of 25 will count towards rate limit. For example, limit 50 will use 2 credits
+   *         description: Number of days to return. Omit to return all available days
    *         schema:
    *           type: integer
    *           minimum: 1
    *           maximum: 365
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/validators.chunks'
    */
   route.get('/:account/stats/chunks', validate(request.chunks), service.chunks);
 };

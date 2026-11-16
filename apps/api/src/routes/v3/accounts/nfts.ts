@@ -12,45 +12,55 @@ const routes = (route: Router) => {
    * /v3/accounts/{account}/nft-txns:
    *   get:
    *     summary: List account NFT transfers
+   *     description: >-
+   *       Lists NFT events (mints, transfers and burns) involving the account,
+   *       newest first, with contract and token metadata. Timestamps are
+   *       nanoseconds. Paginate with `next`/`prev` using
+   *       `meta.next_page`/`meta.prev_page`.
    *     tags:
    *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *       - in: query
    *         name: contract
-   *         description: Contract ID to filter results by
+   *         description: NFT contract account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: token
-   *         description: Token ID to filter results by
+   *         description: NFT token ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: involved
-   *         description: Involved account to filter results by
+   *         description: Counterparty account ID to filter by
+   *         schema:
+   *           type: string
+   *       - in: query
+   *         name: cause
+   *         description: Event cause to filter by (`MINT`, `TRANSFER` or `BURN`)
    *         schema:
    *           type: string
    *       - in: query
    *         name: before_ts
-   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         description: Only return results before this 19-digit nanosecond Unix timestamp (exclusive)
    *         schema:
    *           type: string
    *           minLength: 19
    *           maxLength: 19
    *       - in: query
    *         name: next
-   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         description: Cursor for the next page, taken from `meta.next_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
    *         name: prev
-   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         description: Cursor for the previous page, taken from `meta.prev_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
@@ -63,7 +73,7 @@ const routes = (route: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.nfts.txns'
    */
   route.get('/:account/nft-txns', validate(request.txns), service.txns);
 
@@ -79,34 +89,34 @@ const routes = (route: Router) => {
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *       - in: query
    *         name: contract
-   *         description: Contract ID to filter results by
+   *         description: NFT contract account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: token
-   *         description: Token ID to filter results by
+   *         description: NFT token ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: involved
-   *         description: Involved account to filter results by
+   *         description: Counterparty account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: before_ts
-   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         description: Only return results before this 19-digit nanosecond Unix timestamp (exclusive)
    *         schema:
    *           type: string
    *           minLength: 19
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.nfts.count'
    */
   route.get(
     '/:account/nft-txns/count',

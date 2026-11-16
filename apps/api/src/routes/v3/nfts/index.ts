@@ -23,12 +23,17 @@ const routes = (app: Router) => {
    * /v3/nfts:
    *   get:
    *     summary: List top NFT collections
+   *     description: >-
+   *       Returns NEP-171 NFT collections with metadata, token count and 24h
+   *       transfer count. Sorted by 24h transfers descending by default; use sort
+   *       and order to change it. Paginate with the next/prev cursors from
+   *       meta.next_page and meta.prev_page.
    *     tags:
    *       - NFTs
    *     parameters:
    *       - in: query
    *         name: search
-   *         description: Search keyword
+   *         description: Case-insensitive partial match on contract ID, name or symbol
    *         schema:
    *           type: string
    *       - in: query
@@ -51,21 +56,21 @@ const routes = (app: Router) => {
    *           default: 25
    *       - in: query
    *         name: sort
-   *         description: Sort field
+   *         description: Field to sort by
    *         schema:
    *           type: string
    *           enum: [name, tokens, transfers_24h]
    *           default: transfers_24h
    *       - in: query
    *         name: order
-   *         description: Sort order
+   *         description: Sort direction
    *         schema:
    *           type: string
    *           enum: [desc, asc]
    *           default: desc
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.list'
    */
   route.get('/', validate(request.list), service.list);
 
@@ -85,7 +90,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.count'
    */
   route.get('/count', internalOnly, validate(request.count), service.count);
 
@@ -94,6 +99,10 @@ const routes = (app: Router) => {
    * /v3/nfts/txns:
    *   get:
    *     summary: List all NFT transfers
+   *     description: >-
+   *       Returns the latest NEP-171 NFT transfers, mints and burns across all
+   *       contracts, newest first. Timestamps are nanoseconds. Paginate with the
+   *       next/prev cursors from meta.next_page and meta.prev_page.
    *     tags:
    *       - NFTs
    *     parameters:
@@ -124,7 +133,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.txns'
    */
   route.get('/txns', validate(request.txns), service.txns);
 
@@ -146,7 +155,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/nfts.txnCount'
    */
   route.get(
     '/txns/count',

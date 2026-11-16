@@ -18,6 +18,13 @@ const routes = (app: Router) => {
    * /v3/mts/{contract}/txns:
    *   get:
    *     summary: List MT contract transfers
+   *     description: >-
+   *       Returns NEP-245 multi-token transfers for a contract, newest first,
+   *       optionally limited to one token ID. Without affected, each transfer
+   *       appears once (receiving side, plus burns); with affected, both incoming
+   *       and outgoing balance changes are returned. Amounts are raw integer
+   *       strings. Paginate with the next/prev cursors from meta.next_page and
+   *       meta.prev_page.
    *     tags:
    *       - MTs
    *     parameters:
@@ -29,12 +36,12 @@ const routes = (app: Router) => {
    *           type: string
    *       - in: query
    *         name: affected
-   *         description: Affected account to filter results by
+   *         description: Account ID; only return balance changes of this account (incoming and outgoing)
    *         schema:
    *           type: string
    *       - in: query
    *         name: token
-   *         description: Token ID to filter results by
+   *         description: Only return transfers of this token ID, e.g. nep141:wrap.near
    *         schema:
    *           type: string
    *       - in: query
@@ -64,7 +71,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/mts.contractTxns'
    */
   route.get('/:contract/txns', validate(request.contractTxns), service.txns);
 
@@ -73,6 +80,11 @@ const routes = (app: Router) => {
    * /v3/mts/{contract}/txns/count:
    *   get:
    *     summary: Get MT contract transfer count
+   *     x-internal: true
+   *     description: >-
+   *       Returns the total count for the matching /v3/mts/{contract}/txns list.
+   *       Counts are capped at 10,000; larger values are approximate and end with
+   *       a '+'.
    *     tags:
    *       - MTs
    *     parameters:
@@ -84,12 +96,12 @@ const routes = (app: Router) => {
    *           type: string
    *       - in: query
    *         name: affected
-   *         description: Affected account to filter results by
+   *         description: Account ID; only return balance changes of this account (incoming and outgoing)
    *         schema:
    *           type: string
    *       - in: query
    *         name: token
-   *         description: Token ID to filter results by
+   *         description: Only return transfers of this token ID, e.g. nep141:wrap.near
    *         schema:
    *           type: string
    *       - in: query
@@ -101,7 +113,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/mts.contractTxnCount'
    */
   route.get(
     '/:contract/txns/count',

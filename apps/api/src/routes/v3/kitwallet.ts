@@ -17,11 +17,14 @@ const routes = (app: Router) => {
    * /v3/kitwallet/stakingPools:
    *   get:
    *     summary: Get all staking pools
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns the account IDs of all known
+   *       staking pools as a plain array.
    *     tags:
    *       - Kitwallet
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.pools'
    */
   route.get('/stakingPools', service.pools);
 
@@ -30,6 +33,10 @@ const routes = (app: Router) => {
    * /v3/kitwallet/staking-deposits/{account}:
    *   get:
    *     summary: Get staking deposits for an account
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns the net amount an account has
+   *       deposited (deposits minus withdrawals) into each staking pool it has
+   *       ever deposited to. Amounts are yoctoNEAR strings.
    *     tags:
    *       - Kitwallet
    *     parameters:
@@ -39,12 +46,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: example-account-id
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.deposits'
    */
   route.get(
     '/staking-deposits/:account',
@@ -57,6 +61,9 @@ const routes = (app: Router) => {
    * /v3/kitwallet/publicKey/{key}/accounts:
    *   get:
    *     summary: Get accounts by public key
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns the IDs of existing accounts that
+   *       currently have the given public key as an access key.
    *     tags:
    *       - Kitwallet
    *     parameters:
@@ -66,12 +73,9 @@ const routes = (app: Router) => {
    *         description: Public key
    *         schema:
    *           type: string
-   *         examples:
-   *           key:
-   *             value: example-public-key
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.accounts'
    */
   route.get(
     '/publicKey/:key/accounts',
@@ -84,6 +88,9 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyTokens:
    *   get:
    *     summary: Get likely tokens for an account
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns NEP-141 token contracts the
+   *       account has interacted with, as a plain array of contract IDs.
    *     tags:
    *       - Kitwallet
    *     parameters:
@@ -93,12 +100,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: example-account-id
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.tokens'
    */
   route.get(
     '/account/:account/likelyTokens',
@@ -111,6 +115,11 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyTokensFromBlock:
    *   get:
    *     summary: Get likely tokens for an account from block
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns NEP-141 token contracts the
+   *       account has interacted with after fromBlockTimestamp, plus
+   *       lastBlockTimestamp to pass as fromBlockTimestamp on the next call for
+   *       incremental updates.
    *     tags:
    *       - Kitwallet
    *     parameters:
@@ -120,17 +129,15 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: example-account-id
    *       - in: query
    *         name: fromBlockTimestamp
-   *         description: Block timestamp in nanoseconds
+   *         description: Only include contracts with activity after this block timestamp (nanoseconds). 0 returns all
    *         schema:
    *           type: string
+   *           default: '0'
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.tokensFromBlock'
    */
   route.get(
     '/account/:account/likelyTokensFromBlock',
@@ -143,6 +150,9 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyNFTs:
    *   get:
    *     summary: Get likely NFTs for an account
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns NEP-171 NFT contracts the account
+   *       has interacted with, as a plain array of contract IDs.
    *     tags:
    *       - Kitwallet
    *     parameters:
@@ -152,12 +162,9 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: example-account-id
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.nfts'
    */
   route.get(
     '/account/:account/likelyNFTs',
@@ -170,6 +177,10 @@ const routes = (app: Router) => {
    * /v3/kitwallet/account/{account}/likelyNFTsFromBlock:
    *   get:
    *     summary: Get likely NFTs for an account from block
+   *     description: >-
+   *       Kitwallet-compatible endpoint. Returns NEP-171 NFT contracts the account
+   *       has interacted with after fromBlockTimestamp, plus lastBlockTimestamp to
+   *       pass as fromBlockTimestamp on the next call for incremental updates.
    *     tags:
    *       - Kitwallet
    *     parameters:
@@ -179,17 +190,15 @@ const routes = (app: Router) => {
    *         description: Account ID
    *         schema:
    *           type: string
-   *         examples:
-   *           account:
-   *             value: example-account-id
    *       - in: query
    *         name: fromBlockTimestamp
-   *         description: Block timestamp in nanoseconds
+   *         description: Only include contracts with activity after this block timestamp (nanoseconds). 0 returns all
    *         schema:
    *           type: string
+   *           default: '0'
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/kitwallet.nftsFromBlock'
    */
   route.get(
     '/account/:account/likelyNFTsFromBlock',

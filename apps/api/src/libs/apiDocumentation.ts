@@ -2,12 +2,13 @@ import { readFileSync } from 'fs';
 import path from 'path';
 
 import { apiReference } from '@scalar/express-api-reference';
-import { Application, Response } from 'express';
+import { Application, Request, Response } from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 
 import { Network } from 'nb-types';
 
 import config from '#config';
+import { withResponses } from '#libs/apiDocs/responses';
 
 const scalarCss = `
   .light-mode .introduction-section {
@@ -36,6 +37,12 @@ const scalarMeta = {
   twitterTitle: 'Near(Ⓝ) REST API | NearBlocks',
 };
 
+// Pinned: the unpinned default URL is poorly cached by the CDN (~5 MB).
+const SCALAR_CDN =
+  'https://cdn.jsdelivr.net/npm/@scalar/api-reference@1.76.4/dist/browser/standalone.js';
+
+const DOCS_CACHE_CONTROL = 'public, max-age=300, s-maxage=3600';
+
 const servers = [
   { description: 'Mainnet', url: config.mainnetUrl },
   { description: 'Testnet', url: config.testnetUrl },
@@ -61,7 +68,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
       info: {
         description: `<blockquote><p><strong>Migrating from v1 or v2?</strong> v3 changes pagination, response envelopes, and several endpoints — it is not a drop-in base-path swap. Read the <a href="/api-docs/migration">v1/v2 → v3 migration guide</a> (also as <a href="/api-docs/migration.md">Markdown</a> for tools and AI assistants).</p></blockquote>
         <p>NearBlocks provides REST APIs for accessing NEAR Protocol blockchain data. Our APIs enable developers to retrieve account information, analyze smart contracts, and track transactions. You can access the REST APIs using cURL or any HTTP client. We support GET requests only.</p>
-        <p><h2>Attribution Requirements:</h2></p>
+        <h2>Attribution Requirements</h2>
         <p>The APIs are offered as a community service and are provided without any warranty. Please use them responsibly and only for what you need.</p>
         <p>For any usage other than personal or private, attribution is required. This can be done by either:</p>
         <ul>
@@ -88,13 +95,15 @@ const apiDocumentation = async (app: Application, dir: string) => {
             ? config.mainnetUrl
             : config.testnetUrl
         }/v3/accounts/wrap.near"</code></pre>
+        <h2>Credits</h2>
+        <p>Each request uses 1 credit per 25 items requested with <code>limit</code>, rounded up, from 1 up to 10 credits. For example, <code>limit=50</code> uses 2 credits and <code>limit=100</code> uses 4. Validator endpoints always use 1 credit.</p>
         <h2>Legacy API</h2>
         <p>Documentation for deprecated v1/v2 endpoints is available at <a href="/api-docs/legacy">/api-docs/legacy</a>. They will be switched off on 22 November 2026. To port an existing v1/v2 integration, follow the <a href="/api-docs/migration">migration guide</a>.</p>
         `,
         title: ' ',
         version: '1.0.0',
       },
-      openapi: '3.0.0',
+      openapi: '3.1.0',
       servers,
       tags: [
         {
@@ -152,6 +161,35 @@ const apiDocumentation = async (app: Application, dir: string) => {
             'List and filter transactions, retrieve transaction details with receipts, and inspect associated token events.',
           name: 'Txns',
         },
+        {
+          description:
+            'Look up multi-token (NEP-245) contracts such as intents.near, list tokens, and paginate through transfer history and holder data.',
+          name: 'MTs',
+        },
+        {
+          description:
+            'NEAR Intents swap history, volume, and per-asset, per-blockchain, and per-account statistics.',
+          name: 'Intents',
+        },
+        {
+          description: 'List receipts and look up individual receipts.',
+          name: 'Receipts',
+        },
+        {
+          description:
+            'Network-wide staking deposits, withdrawals, and pool activity.',
+          name: 'Staking',
+        },
+        {
+          description:
+            'Current validators, their stake, uptime, and produced blocks and chunks.',
+          name: 'Validators',
+        },
+        {
+          description:
+            'Wallet helper endpoints: staking pools, deposits, accounts by public key, and token/NFT holdings.',
+          name: 'Kitwallet',
+        },
       ],
       'x-tagGroups': [
         {
@@ -160,15 +198,22 @@ const apiDocumentation = async (app: Application, dir: string) => {
         },
         {
           name: 'Blockchain',
-          tags: ['Blocks', 'Txns', 'Stats'],
+          tags: [
+            'Blocks',
+            'Txns',
+            'Receipts',
+            'Stats',
+            'Validators',
+            'Staking',
+          ],
         },
         {
           name: 'Tokens',
-          tags: ['FTs', 'NFTs', 'MTs'],
+          tags: ['FTs', 'NFTs', 'MTs', 'Intents'],
         },
         {
           name: 'Other',
-          tags: ['Keys', 'Search', 'Multichain'],
+          tags: ['Keys', 'Search', 'Multichain', 'Kitwallet'],
         },
       ],
     },
@@ -216,16 +261,21 @@ const apiDocumentation = async (app: Application, dir: string) => {
     },
   };
 
-  const mainSpec = swaggerJsdoc(mainOptions);
+  const mainSpec = withResponses(
+    swaggerJsdoc(mainOptions) as Record<string, unknown>,
+  );
   const legacySpec = swaggerJsdoc(legacyOptions);
 
-  app.get('/openapi.json', (_, res) => {
-    res.json(mainSpec);
-  });
+  // Specs are static per deploy: serialise once and let browsers/CDN cache.
+  const sendJson = (body: string) => (_: Request, res: Response) => {
+    res
+      .set('Cache-Control', DOCS_CACHE_CONTROL)
+      .type('application/json')
+      .send(body);
+  };
 
-  app.get('/openapi-legacy.json', (_, res) => {
-    res.json(legacySpec);
-  });
+  app.get('/openapi.json', sendJson(JSON.stringify(mainSpec)));
+  app.get('/openapi-legacy.json', sendJson(JSON.stringify(legacySpec)));
 
   // v1/v2 -> v3 migration guide, as HTML for browsers and markdown for tools.
   // Read once at startup from the shipped asset
@@ -288,6 +338,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
   app.use(
     '/api-docs/legacy',
     apiReference({
+      cdn: SCALAR_CDN,
       customCss: scalarCss,
       documentDownloadType: 'none',
       favicon: 'https://nearblocks.io/favicon_32x32.png',
@@ -301,6 +352,7 @@ const apiDocumentation = async (app: Application, dir: string) => {
   app.use(
     '/api-docs',
     apiReference({
+      cdn: SCALAR_CDN,
       customCss: scalarCss,
       documentDownloadType: 'none',
       favicon: 'https://nearblocks.io/favicon_32x32.png',
