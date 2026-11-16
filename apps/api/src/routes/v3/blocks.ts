@@ -18,6 +18,10 @@ const routes = (app: Router) => {
    * /v3/blocks:
    *   get:
    *     summary: List blocks
+   *     description: >-
+   *       Returns blocks newest first. Paginate by passing meta.next_page as
+   *       next (or meta.prev_page as prev). Timestamps are nanoseconds and gas
+   *       price is in yoctoNEAR per gas unit, both as strings.
    *     tags:
    *       - Blocks
    *     parameters:
@@ -41,7 +45,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/blocks.blocks'
    */
   route.get('/', validate(request.blocks), service.blocks);
 
@@ -55,7 +59,7 @@ const routes = (app: Router) => {
    *       - Blocks
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/blocks.count'
    */
   route.get('/count', internalOnly, service.count);
 
@@ -64,13 +68,15 @@ const routes = (app: Router) => {
    * /v3/blocks/latest:
    *   get:
    *     summary: List latest blocks
-   *     description: ⚠️ Response is cached for 5 seconds
+   *     description: >-
+   *       Returns the most recent blocks, newest first, without pagination.
+   *       ⚠️ Response is cached for 5 seconds.
    *     tags:
    *       - Blocks
    *     parameters:
    *       - in: query
    *         name: limit
-   *         description: The number of items to return
+   *         description: Number of blocks to return (1-10)
    *         schema:
    *           type: integer
    *           minimum: 1
@@ -78,7 +84,7 @@ const routes = (app: Router) => {
    *           default: 10
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/blocks.blocks'
    */
   route.get('/latest', validate(request.latest), service.latest);
 
@@ -87,11 +93,15 @@ const routes = (app: Router) => {
    * /v3/blocks/stats:
    *   get:
    *     summary: Get 24-hour block statistics
+   *     description: >-
+   *       Returns totals over the last 24 hours from hourly aggregates. Block
+   *       count, average gas price, gas used and gas limit (gas units), and
+   *       tokens burnt (yoctoNEAR string).
    *     tags:
    *       - Blocks
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/blocks.stats'
    */
   route.get('/stats', service.stats);
 
@@ -99,19 +109,22 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/blocks/{hash}:
    *   get:
-   *     summary: Get block by hash
+   *     summary: Get block by hash or height
+   *     description: >-
+   *       Returns a single block looked up by base58 block hash or numeric block
+   *       height. data is null if no matching block is found.
    *     tags:
    *       - Blocks
    *     parameters:
    *       - in: path
    *         name: hash
    *         required: true
-   *         description: Block hash or block height to retrieve
+   *         description: Base58 block hash or numeric block height
    *         schema:
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/blocks.block'
    */
   route.get('/:hash', validate(request.block), service.block);
 };

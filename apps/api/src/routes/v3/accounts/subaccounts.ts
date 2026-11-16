@@ -11,24 +11,29 @@ const routes = (route: Router) => {
    * @openapi
    * /v3/accounts/{account}/subaccounts:
    *   get:
-   *     summary: List account sub accounts
+   *     summary: List account subaccounts
+   *     description: >-
+   *       Lists direct subaccounts of the account (e.g. `bob.alice.near` for
+   *       `alice.near`), including deleted ones, ordered by the latest creation
+   *       or deletion first. Top-level accounts are not supported. Paginate
+   *       with `next`/`prev` using `meta.next_page`/`meta.prev_page`.
    *     tags:
    *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *       - in: query
    *         name: next
-   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         description: Cursor for the next page, taken from `meta.next_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
    *         name: prev
-   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         description: Cursor for the previous page, taken from `meta.prev_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
@@ -41,7 +46,7 @@ const routes = (route: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.subaccounts.subaccounts'
    */
   route.get(
     '/:account/subaccounts',
@@ -61,12 +66,12 @@ const routes = (route: Router) => {
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.subaccounts.count'
    */
   route.get(
     '/:account/subaccounts/count',

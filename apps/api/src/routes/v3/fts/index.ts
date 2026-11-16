@@ -21,12 +21,17 @@ const routes = (app: Router) => {
    * /v3/fts:
    *   get:
    *     summary: List top fungible tokens
+   *     description: >-
+   *       Returns NEP-141 fungible tokens with metadata, price, market cap, 24h
+   *       volume, holder and transfer counts. Sorted by 24h volume descending by
+   *       default; use sort and order to change it. Paginate with the next/prev
+   *       cursors from meta.next_page and meta.prev_page.
    *     tags:
    *       - FTs
    *     parameters:
    *       - in: query
    *         name: search
-   *         description: Search keyword
+   *         description: Case-insensitive partial match on contract ID, name or symbol
    *         schema:
    *           type: string
    *       - in: query
@@ -49,21 +54,21 @@ const routes = (app: Router) => {
    *           default: 25
    *       - in: query
    *         name: sort
-   *         description: Sort field
+   *         description: Field to sort by
    *         schema:
    *           type: string
-   *           enum: [market_cap, name, onchain_market_cap, price, volume_24h]
+   *           enum: [holders, market_cap, name, onchain_market_cap, price, transfers, volume_24h]
    *           default: volume_24h
    *       - in: query
    *         name: order
-   *         description: Sort order
+   *         description: Sort direction
    *         schema:
    *           type: string
    *           enum: [desc, asc]
    *           default: desc
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.list'
    */
   route.get('/', validate(request.list), service.list);
 
@@ -83,7 +88,7 @@ const routes = (app: Router) => {
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.count'
    */
   route.get('/count', internalOnly, validate(request.count), service.count);
 
@@ -92,6 +97,12 @@ const routes = (app: Router) => {
    * /v3/fts/txns:
    *   get:
    *     summary: List all FT transfers
+   *     description: >-
+   *       Returns the latest NEP-141 token transfers across all contracts, newest
+   *       first. Each item is one transfer (the receiving side, plus burns);
+   *       delta_amount is a raw integer string, apply the token's decimals.
+   *       Timestamps are nanoseconds. Paginate with the next/prev cursors from
+   *       meta.next_page and meta.prev_page.
    *     tags:
    *       - FTs
    *     parameters:
@@ -122,7 +133,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.txns'
    */
   route.get('/txns', validate(request.txns), service.txns);
 
@@ -144,7 +155,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/fts.txnCount'
    */
   route.get(
     '/txns/count',

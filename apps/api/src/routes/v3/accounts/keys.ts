@@ -12,23 +12,29 @@ const routes = (route: Router) => {
    * /v3/accounts/{account}/keys:
    *   get:
    *     summary: List account access keys
+   *     description: >-
+   *       Lists access keys of the account, including deleted ones, ordered by
+   *       the latest key action (creation or deletion) first. Each key includes
+   *       its permission, the creating and deleting transactions, and MPC
+   *       derivation info when the key is a derived key. Paginate with
+   *       `next`/`prev` using `meta.next_page`/`meta.prev_page`.
    *     tags:
    *       - Accounts
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *       - in: query
    *         name: next
-   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         description: Cursor for the next page, taken from `meta.next_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
    *         name: prev
-   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         description: Cursor for the previous page, taken from `meta.prev_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
@@ -41,7 +47,7 @@ const routes = (route: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.keys.keys'
    */
   route.get('/:account/keys', validate(request.keys), service.keys);
 
@@ -57,12 +63,12 @@ const routes = (route: Router) => {
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.keys.count'
    */
   route.get(
     '/:account/keys/count',

@@ -54,11 +54,15 @@ const KITWALLET_PATH = '/v3/kitwallet';
 const SEARCH_PATH = '/v1/search';
 const SUBNETS = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'];
 
-// 1 credit per 25 rows, clamped to 1-10; validators always cost 1.
-const credits = (baseUrl: string, perPage: unknown) =>
-  baseUrl.endsWith('/validators')
+// 1 credit per 25 rows (v1/v2 `per_page`, v3 `limit`), clamped to 1-10;
+// validators always cost 1.
+const credits = (req: Request) => {
+  const pageSize = req.query?.per_page ?? req.query?.limit;
+
+  return req.baseUrl.endsWith('/validators')
     ? 1
-    : Math.min(10, Math.max(1, Math.ceil((Number(perPage) || 25) / 25)));
+    : Math.min(10, Math.max(1, Math.ceil((Number(pageSize) || 25) / 25)));
+};
 
 const rateLimiter = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -148,7 +152,7 @@ const rateLimiter = catchAsync(
     const baseUrl = req.baseUrl;
     const { limiters, rateLimit } = rateLimiterUnion(selectedPlan, baseUrl);
 
-    const consumeCount = credits(baseUrl, req?.query?.per_page);
+    const consumeCount = credits(req);
     res.locals.usageCredits = consumeCount;
 
     try {
@@ -208,7 +212,7 @@ const useFreePlan = async (
   const baseUrl = req.baseUrl;
   const authHeader = req.headers.authorization || '';
   const token = authHeader.replace('Bearer ', '');
-  const consumeCount = credits(baseUrl, req?.query?.per_page);
+  const consumeCount = credits(req);
   res.locals.usageCredits = consumeCount;
 
   const plan = await getPlan(baseUrl, token);

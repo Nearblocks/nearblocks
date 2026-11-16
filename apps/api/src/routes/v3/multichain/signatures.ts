@@ -18,11 +18,16 @@ const routes = (app: Router) => {
    * /v3/multichain/mpcs:
    *   get:
    *     summary: List MPC operators
+   *     description: >-
+   *       Returns the Chain Signatures MPC signer contract, its signing threshold
+   *       and participants with their URL, TLS public key, whether they are a
+   *       validator and TEE attestation status. ⚠️ Response is cached for 5
+   *       minutes.
    *     tags:
    *       - Multichain
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/multichain.mpcState'
    */
   route.get('/mpcs', service.mpcs);
 
@@ -31,28 +36,32 @@ const routes = (app: Router) => {
    * /v3/multichain/signatures:
    *   get:
    *     summary: List multichain signature transactions
+   *     description: >-
+   *       Returns Chain Signatures sign requests with their NEAR transaction and
+   *       destination chain, address and transaction where known, newest first.
+   *       Paginate by passing meta.next_page as next (or meta.prev_page as prev).
    *     tags:
    *       - Multichain
    *     parameters:
    *       - in: query
    *         name: account
-   *         description: Account ID to filter results by
+   *         description: Only return requests whose transaction was signed by this NEAR account ID
    *         schema:
    *           type: string
    *       - in: query
    *         name: chain
-   *         description: Destination chain to filter results by
+   *         description: Only return requests for this destination chain
    *         schema:
    *           type: string
    *           enum: [ARBITRUM, BASE, BITCOIN, BSC, ETHEREUM, GNOSIS, OPTIMISM, POLYGON, SOLANA, ZCASH]
    *       - in: query
    *         name: address
-   *         description: Destination address to filter results by
+   *         description: Only return requests for this destination chain address
    *         schema:
    *           type: string
    *       - in: query
    *         name: txn
-   *         description: Destination transaction hash to filter results by
+   *         description: Only return requests linked to this destination chain transaction hash
    *         schema:
    *           type: string
    *       - in: query
@@ -82,7 +91,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/multichain.txns'
    */
   route.get('/signatures', validate(request.txns), service.txns);
 
@@ -125,7 +134,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/multichain.count'
    */
   route.get(
     '/signatures/count',
@@ -139,11 +148,14 @@ const routes = (app: Router) => {
    * /v3/multichain/signatures/stats:
    *   get:
    *     summary: Get 24-hour multichain signature statistics
+   *     description: >-
+   *       Returns counts over the last 24 hours. Signature requests, distinct
+   *       signer accounts, destination addresses and destination chains.
    *     tags:
    *       - Multichain
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/multichain.stats'
    */
   route.get('/signatures/stats', service.stats);
 };

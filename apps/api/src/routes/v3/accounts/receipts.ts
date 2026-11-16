@@ -12,45 +12,51 @@ const routes = (route: Router) => {
    * /v3/accounts/{account}/receipts:
    *   get:
    *     summary: List account receipts
+   *     description: >-
+   *       Lists receipts where the account is the predecessor or receiver,
+   *       newest first, with their actions and outcome. With only one of
+   *       `predecessor`/`receiver` set, the other side is the account itself;
+   *       if both are set, one must be the account or the result is empty.
+   *       Paginate with `next`/`prev` using `meta.next_page`/`meta.prev_page`.
    *     tags:
    *       - Account Transactions
    *     parameters:
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *       - in: query
    *         name: predecessor
-   *         description: Receipt predecessor account to filter results by
+   *         description: Predecessor (sender) account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: receiver
-   *         description: Receipt receiver account to filter results by
+   *         description: Receiver account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: method
-   *         description: Function call method to filter results by
+   *         description: Function call method name to filter by, e.g. `ft_transfer`
    *         schema:
    *           type: string
    *       - in: query
    *         name: before_ts
-   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         description: Only return results before this 19-digit nanosecond Unix timestamp (exclusive)
    *         schema:
    *           type: string
    *           minLength: 19
    *           maxLength: 19
    *       - in: query
    *         name: next
-   *         description: Next page cursor. Pass the next_page value returned from the previous response to retrieve the next page of results
+   *         description: Cursor for the next page, taken from `meta.next_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
    *         name: prev
-   *         description: Previous page cursor. Pass the prev_page value returned from the previous response to retrieve the previous page of results
+   *         description: Cursor for the previous page, taken from `meta.prev_page` of the previous response
    *         schema:
    *           type: string
    *       - in: query
@@ -63,7 +69,7 @@ const routes = (route: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.receipts.receipts'
    */
   route.get('/:account/receipts', validate(request.receipts), service.receipts);
 
@@ -79,34 +85,34 @@ const routes = (route: Router) => {
    *       - in: path
    *         name: account
    *         required: true
-   *         description: Account ID
+   *         description: NEAR account ID, e.g. `alice.near`
    *         schema:
    *           type: string
    *       - in: query
    *         name: predecessor
-   *         description: Receipt predecessor account to filter results by
+   *         description: Predecessor (sender) account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: receiver
-   *         description: Receipt receiver account to filter results by
+   *         description: Receiver account ID to filter by
    *         schema:
    *           type: string
    *       - in: query
    *         name: method
-   *         description: Function call method to filter results by
+   *         description: Function call method name to filter by, e.g. `ft_transfer`
    *         schema:
    *           type: string
    *       - in: query
    *         name: before_ts
-   *         description: Timestamp in nanoseconds. Return results before this timestamp (exclusive)
+   *         description: Only return results before this 19-digit nanosecond Unix timestamp (exclusive)
    *         schema:
    *           type: string
    *           minLength: 19
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/accounts.receipts.count'
    */
   route.get(
     '/:account/receipts/count',

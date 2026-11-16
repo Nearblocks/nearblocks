@@ -18,6 +18,11 @@ const routes = (app: Router) => {
    * /v3/staking-txns:
    *   get:
    *     summary: List staking transactions
+   *     description: >-
+   *       Returns staking pool events (deposit, stake, unstake, withdraw, reward,
+   *       contract) with their transactions, newest first. Paginate by passing
+   *       meta.next_page as next (or meta.prev_page as prev). Amounts are
+   *       yoctoNEAR strings.
    *     tags:
    *       - Staking
    *     parameters:
@@ -48,7 +53,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/staking.txns'
    */
   route.get('/', validate(request.txns), service.txns);
 
@@ -70,7 +75,7 @@ const routes = (app: Router) => {
    *           maxLength: 19
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/staking.count'
    */
   route.get('/count', internalOnly, validate(request.count), service.count);
 };

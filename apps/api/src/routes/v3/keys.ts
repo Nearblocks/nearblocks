@@ -16,14 +16,18 @@ const routes = (app: Router) => {
    * @openapi
    * /v3/keys/{key}:
    *   get:
-   *     summary: Get access key info
+   *     summary: List access keys by public key
+   *     description: >-
+   *       Returns the active (not deleted) access keys that use this public key,
+   *       one per account, most recently changed first, with permission and the
+   *       creating transaction. Paginate by passing meta.next_page as next.
    *     tags:
    *       - Keys
    *     parameters:
    *       - in: path
    *         name: key
    *         required: true
-   *         description: Public key
+   *         description: Public key including curve prefix (e.g. ed25519)
    *         schema:
    *           type: string
    *       - in: query
@@ -46,7 +50,7 @@ const routes = (app: Router) => {
    *           default: 25
    *     responses:
    *       200:
-   *         description: Success response
+   *         $ref: '#/components/responses/keys.keys'
    */
   route.get('/:key', validate(request.keys), service.keys);
 };
