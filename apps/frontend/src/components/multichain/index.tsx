@@ -95,10 +95,10 @@ const CHAIN_EXPLORERS: Record<string, ChainExplorer> = {
     txUrl: 'https://solscan.io/tx/',
   },
   ZCASH: {
-    addrUrl: 'https://cipherscan.app/address/',
+    addrUrl: 'https://zecblock.com/address/',
     icon: '/images/icons/zec.svg',
     name: 'Zcash',
-    txUrl: 'https://cipherscan.app/tx/',
+    txUrl: 'https://zecblock.com/tx/',
   },
 };
 
