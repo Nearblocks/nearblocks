@@ -18,6 +18,8 @@ import { Plan, User } from '#types/types';
 
 const CUSTOM_RATE_LIMIT_MESSAGE =
   'You have exceeded your API request limit. Please try again later or upgrade your plan for higher limits at https://nearblocks.io/apis.';
+const QUOTA_EXCEEDED_MESSAGE =
+  "You have reached your plan's daily or monthly API quota. Upgrade your plan at https://nearblocks.io/apis or wait until your quota resets.";
 const DEFAULT_PLAN: Plan = {
   id: -1,
   limit_per_day: 3666,
@@ -159,8 +161,10 @@ const rateLimiter = catchAsync(
       if (keyId) {
         const tokenKey = getTokenKey(id, keyId);
 
-        if (await isLimitReached(limiters, tokenKey, consumeCount)) {
-          return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+        const reached = await isLimitReached(limiters, tokenKey, consumeCount);
+
+        if (reached) {
+          return res.status(429).json({ message: limitMessage(reached) });
         }
 
         await rateLimit.consume(tokenKey, consumeCount);
@@ -170,8 +174,10 @@ const rateLimiter = catchAsync(
     }
 
     try {
-      if (await isLimitReached(limiters, id, consumeCount)) {
-        return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+      const reached = await isLimitReached(limiters, id, consumeCount);
+
+      if (reached) {
+        return res.status(429).json({ message: limitMessage(reached) });
       }
 
       await rateLimit.consume(id, consumeCount);
@@ -187,7 +193,11 @@ const rateLimiter = catchAsync(
         return next();
       }
 
-      return res.status(429).json({ message: CUSTOM_RATE_LIMIT_MESSAGE });
+      // RateLimiterUnion rejects with { [keyPrefix]: RateLimiterRes } for each
+      // window that ran out.
+      return res
+        .status(429)
+        .json({ message: limitMessage(Object.keys(error as object)) });
     }
   },
 );
@@ -337,15 +347,19 @@ const isLimitReached = async (
   const limits = await Promise.all(
     limiters.map((limiter) => limiter.get(key).catch(() => null)),
   );
+  const reached = limiters
+    .filter((_, i) => limits[i] && limits[i].remainingPoints < points)
+    .map((limiter) => limiter.keyPrefix);
 
-  for (const limit of limits) {
-    if (limit && limit.remainingPoints < points) {
-      return true;
-    }
-  }
-
-  return false;
+  return reached.length ? reached : null;
 };
+
+// keyPrefixes end in _minute, _day or _month. A spent day or month window is a
+// used-up quota, not a burst, so paid plans get a message that says so.
+const limitMessage = (keyPrefixes: string[]) =>
+  keyPrefixes.some((prefix) => !prefix.endsWith('_minute'))
+    ? QUOTA_EXCEEDED_MESSAGE
+    : CUSTOM_RATE_LIMIT_MESSAGE;
 
 // In-memory fallback limiters used when the rate-limiter store is unreachable
 // (RateLimiterRedis `insuranceLimiter`). Cached per plan+window as module-level

@@ -160,10 +160,29 @@ export const withResponses = (spec: Json) => {
   const paths = spec.paths as Record<string, Record<string, Json>>;
   const schemas: Record<string, unknown> = {};
   const responses: Record<string, unknown> = {
-    RateLimited: errorResponse('Rate limit exceeded for your plan', {
-      message:
-        'You have exceeded your API request limit. Please try again later or upgrade your plan for higher limits at https://nearblocks.io/apis.',
-    }),
+    RateLimited: {
+      content: {
+        'application/json': {
+          examples: {
+            quota_exceeded: {
+              summary: "Paid plan's daily or monthly quota used up",
+              value: {
+                message:
+                  "You have reached your plan's daily or monthly API quota. Upgrade your plan at https://nearblocks.io/apis or wait until your quota resets.",
+              },
+            },
+            rate_limited: {
+              summary: 'Too many requests',
+              value: {
+                message:
+                  'You have exceeded your API request limit. Please try again later or upgrade your plan for higher limits at https://nearblocks.io/apis.',
+              },
+            },
+          },
+        },
+      },
+      description: 'Rate limit exceeded for your plan',
+    },
     ValidationError: errorResponse('Invalid path or query parameter', {
       data: null,
       errors: [{ message: 'Invalid type: Expected number', path: 'limit' }],
