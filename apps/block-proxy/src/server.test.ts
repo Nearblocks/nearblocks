@@ -3,6 +3,7 @@ import type { AddressInfo } from 'node:net';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import * as metrics from '#metrics';
 import type { AppState } from '#state';
 import { StatsCollector } from '#stats';
 import { UpstreamRedirectError } from '#types';
@@ -1168,5 +1169,169 @@ describe('block API behavior', () => {
         404,
       );
     });
+  });
+});
+
+describe('per-client keys and usage metrics', () => {
+  const count = async (
+    metric: {
+      get: () => Promise<{ values: Array<{ labels: object; value: number }> }>;
+    },
+    labels: Record<string, string>,
+  ) =>
+    (await metric.get()).values
+      .filter((item) =>
+        Object.entries(labels).every(
+          ([name, value]) =>
+            (item.labels as Record<string, unknown>)[name] === value,
+        ),
+      )
+      .reduce((total, item) => total + item.value, 0);
+
+  it('accepts each named key and labels RPC usage by client, method and result', async () => {
+    const rpcUpstream = createServer((req, res) => {
+      req.resume();
+      req.on('end', () => {
+        res.setHeader('content-type', 'application/json');
+        res.end('{"jsonrpc":"2.0","id":1,"result":{}}');
+      });
+    });
+    rpcUpstream.listen(0, '127.0.0.1');
+    await new Promise<void>((resolve) =>
+      rpcUpstream.once('listening', resolve),
+    );
+    const { port } = rpcUpstream.address() as AddressInfo;
+    const post = (baseUrl: string, key: string, body: unknown) =>
+      fetch(`${baseUrl}/rpc`, {
+        body: typeof body === 'string' ? body : JSON.stringify(body),
+        headers: { authorization: `Bearer ${key}` },
+        method: 'POST',
+      });
+    try {
+      await withServer(
+        async (baseUrl, state) => {
+          state.config = {
+            ...state.config,
+            proxyClients: [
+              { key: 'backend-key', name: 'backend' },
+              { key: 'api-key', name: 'api' },
+            ],
+          } as never;
+          const status = {
+            id: 1,
+            jsonrpc: '2.0',
+            method: 'status',
+            params: [],
+          };
+          const before = {
+            api: await count(metrics.rpcRequests, {
+              client: 'api',
+              method: 'status',
+              result: 'ok',
+            }),
+            backend: await count(metrics.rpcRequests, {
+              client: 'backend',
+              method: 'status',
+              result: 'ok',
+            }),
+            invalid: await count(metrics.rpcRequests, {
+              client: 'api',
+              method: 'invalid',
+              result: 'invalid',
+            }),
+            notAllowed: await count(metrics.rpcRequests, {
+              client: 'api',
+              method: 'other',
+              result: 'not_allowed',
+            }),
+          };
+
+          expect((await post(baseUrl, 'backend-key', status)).status).toBe(200);
+          expect((await post(baseUrl, 'api-key', status)).status).toBe(200);
+          expect((await post(baseUrl, 'api-key', status)).status).toBe(200);
+          expect((await post(baseUrl, 'wrong', status)).status).toBe(403);
+          // A caller-chosen method name must never become a label value.
+          await post(baseUrl, 'api-key', { ...status, method: 'made_up' });
+          await post(baseUrl, 'api-key', 'not json');
+
+          expect(
+            (await count(metrics.rpcRequests, {
+              client: 'backend',
+              method: 'status',
+              result: 'ok',
+            })) - before.backend,
+          ).toBe(1);
+          expect(
+            (await count(metrics.rpcRequests, {
+              client: 'api',
+              method: 'status',
+              result: 'ok',
+            })) - before.api,
+          ).toBe(2);
+          expect(
+            (await count(metrics.rpcRequests, {
+              client: 'api',
+              method: 'other',
+              result: 'not_allowed',
+            })) - before.notAllowed,
+          ).toBe(1);
+          expect(
+            (await count(metrics.rpcRequests, {
+              client: 'api',
+              method: 'invalid',
+              result: 'invalid',
+            })) - before.invalid,
+          ).toBe(1);
+          expect(await count(metrics.rpcRequests, { method: 'made_up' })).toBe(
+            0,
+          );
+        },
+        { nodeRpcUrl: `http://127.0.0.1:${port}`, sources: ['neardata'] },
+      );
+    } finally {
+      rpcUpstream.closeAllConnections();
+      await new Promise<void>((resolve, reject) =>
+        rpcUpstream.close((error) => (error ? reject(error) : resolve())),
+      );
+    }
+  });
+
+  it('counts served blocks by client and source', async () => {
+    await withServer(
+      async (baseUrl, state) => {
+        state.config = {
+          ...state.config,
+          proxyClients: [{ key: 'k8s-key', name: 'k8s' }],
+        } as never;
+        const labels = { client: 'k8s', source: 'neardata' };
+        const before = await count(metrics.blocksServed, labels);
+        const response = await fetch(`${baseUrl}/v0/block/${HEIGHT}`, {
+          headers: { 'x-api-key': 'k8s-key' },
+        });
+        expect(response.status).toBe(200);
+        expect((await count(metrics.blocksServed, labels)) - before).toBe(1);
+      },
+      { block: blockBytes, localHeight: null, sources: ['neardata'] },
+    );
+  });
+
+  it('keeps a single PROXY_API_KEY working as the default client', async () => {
+    await withServer(
+      async (baseUrl) => {
+        const labels = { client: 'default', source: 'neardata' };
+        const before = await count(metrics.blocksServed, labels);
+        expect(
+          (await fetch(`${baseUrl}/v0/block/${HEIGHT}?api_key=only-key`))
+            .status,
+        ).toBe(200);
+        expect((await count(metrics.blocksServed, labels)) - before).toBe(1);
+      },
+      {
+        apiKey: 'only-key',
+        block: blockBytes,
+        localHeight: null,
+        sources: ['neardata'],
+      },
+    );
   });
 });
